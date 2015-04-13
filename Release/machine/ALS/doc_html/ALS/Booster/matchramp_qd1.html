@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of matchramp_qd1</title>
+  <meta name="keywords" content="matchramp_qd1">
+  <meta name="description" content="sysinv BW 100">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; matchramp_qd1.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>matchramp_qd1
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>sysinv BW 100</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> sysinv BW 100
+ Zero the error for a longer
+ Adjust the first point</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% sysinv BW 100</span>
+0002 <span class="comment">% Zero the error for a longer</span>
+0003 <span class="comment">% Adjust the first point</span>
+0004 
+0005 <span class="keyword">if</span> 1
+0006     clear
+0007     <span class="comment">%FileName = '/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_current/RampTableQD.txt';</span>
+0008     FileName = <span class="string">'/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_current/RampTableQD.txt'</span>;
+0009     <span class="comment">%FileName = 'BEND_QF_QD.txt';</span>
+0010     
+0011     <span class="comment">% Input</span>
+0012     fid = fopen(FileName, <span class="string">'r'</span>);
+0013     <span class="keyword">if</span> fid == -1
+0014         fprintf(<span class="string">'  File open error.\n'</span>);
+0015         <span class="keyword">return</span>;
+0016     <span class="keyword">end</span>
+0017     
+0018     T = fscanf(fid, <span class="string">'%f\n'</span>, 1);
+0019     N = fscanf(fid, <span class="string">'%f\n'</span>, 1);
+0020     Data = fscanf(fid, <span class="string">'%f %f %f'</span>, [3 inf]);
+0021     fclose(fid);
+0022 
+0023     Data = Data';
+0024 
+0025     QF   =  60 * Data(:,1);  <span class="comment">%  60-&gt;New Quad, 48-&gt;Old Quad</span>
+0026     QD   =  60 * Data(:,2);  <span class="comment">%  60-&gt;New Quad, 48-&gt;Old Quad</span>
+0027     BEND = 125 * Data(:,3);  <span class="comment">% 125-&gt;New BEND, 80-&gt;Old BEND</span>
+0028 
+0029 
+0030     <span class="comment">% Filter the BEND</span>
+0031     [b,a] = fir1(5,.1);
+0032     BEND = filtfilt(b, a, BEND);
+0033 
+0034 
+0035     fs = 1/T;
+0036     t = (0:(length(QF)-1))' / fs;
+0037 
+0038 
+0039     <span class="comment">% Goal</span>
+0040     QFratio = QF./BEND - .520;
+0041     QFratio0 = QFratio;
+0042     
+0043     <span class="comment">% Zero the error until the system can be controlled (old bend)</span>
+0044     i = find(t &lt; .04);
+0045     QFratio(i) = 0;
+0046 
+0047     <span class="comment">% Power supply TF</span>
+0048     w = 2 * pi * 7.8;
+0049     sys = tf(1,[1/w 1]);
+0050     <span class="comment">%bode(H)</span>
+0051 
+0052     <span class="comment">% The inverse system</span>
+0053     Fc = 2 * pi * 100;      <span class="comment">% High frequency poles for the compensation (avoid phase delay!!!)</span>
+0054     sysinv = tf([1/w 1], conv([1/Fc 1],[1/Fc 1]));
+0055 
+0056 
+0057     ComputeDelay = 1;
+0058     Fig1 = 1;
+0059 <span class="keyword">else</span>
+0060     Fig1 = 2;
+0061     ComputeDelay = 0;
+0062 <span class="keyword">end</span>
+0063 
+0064 
+0065 
+0066 
+0067 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0068 <span class="comment">% Compensation Transfer Function %</span>
+0069 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0070 <span class="keyword">if</span> 1 <span class="comment">%ComputeDelay</span>
+0071 
+0072     <span class="comment">% Wait a time constant or 2 before computing the RMS</span>
+0073     Nrms = min(find(t&gt;=3/w));
+0074 
+0075     <span class="comment">%dT = 0:.001:.1;</span>
+0076     dT = 0:.0002:1./w;
+0077     <span class="keyword">for</span> i = 1:length(dT)
+0078         
+0079         QFratioErr = -QFratio;
+0080         N = min(find(t&gt;=dT(i)));
+0081         QFratioErr = [QFratioErr(N:end); zeros(N-1,1)];
+0082 
+0083         <span class="comment">%QFratioErr = -QFratio;</span>
+0084         [QFratioErr, tinv, xinv] = lsim(sysinv, QFratioErr, t);
+0085         
+0086 
+0087         <span class="comment">% Power supply output</span>
+0088         [QFout,t1] = lsim(sys, QFratioErr, t);
+0089         <span class="comment">%[QFout2,t1] = lsim(sys, QFratioErr2, t);</span>
+0090 
+0091         <span class="comment">%[b,a] = fir1(20, .1);</span>
+0092         <span class="comment">%QFcommand = filtfilt(b, a, QFcommand);</span>
+0093 
+0094 
+0095         RMSError(i) = std(QFratio(Nrms:end)+QFout(Nrms:end));
+0096         MaxError(i) = max(abs(QFratio(Nrms:end)+QFout(Nrms:end)));
+0097     <span class="keyword">end</span>
+0098 
+0099     figure(10);
+0100     clf reset
+0101     subplot(2,1,1);
+0102     plot(dT, RMSError,<span class="string">'.-'</span>);
+0103     subplot(2,1,2);
+0104     plot(dT, MaxError,<span class="string">'.-'</span>);
+0105 
+0106 <span class="keyword">end</span>
+0107 
+0108 
+0109 <span class="comment">% Best case</span>
+0110 [RMSmin, dTi] = min(RMSError);
+0111 fprintf(<span class="string">'   Delay in the input by %f seconds (Tc=%f).\n'</span>, dT(dTi), 1/w);
+0112 
+0113 <span class="comment">%Gain = .5;</span>
+0114 
+0115 QFratioErr = -QFratio;
+0116 N = min(find(t&gt;=dT(dTi)));
+0117 N1 = min(find(t&gt;=.01));
+0118 <span class="keyword">if</span> N &gt; N1
+0119     N = N1
+0120 <span class="keyword">end</span>
+0121 QFratioErr = [QFratioErr(N:end); zeros(N-1,1)];
+0122 QFratioErr = -QFratio;
+0123 
+0124 [QFratioErr, tinv, xinv] = lsim(sysinv, QFratioErr, t);
+0125 QFratioErr_old = QFratioErr;
+0126 
+0127 <span class="comment">% Filter the command</span>
+0128 [b,a] = fir1(50,.005);
+0129 <span class="comment">%freqz(b,a,4096,4000)</span>
+0130 QFratioErr = filtfilt(b, a, QFratioErr);
+0131 
+0132 [QFout,t1] = lsim(sys, QFratioErr, t);
+0133 
+0134 
+0135 figure(Fig1);
+0136 clf reset
+0137 plot(t1, [QFratio(:) QFout(:) QFratioErr(:) QFratioErr_old(:) QFratio+QFout(:)]);
+0138 hold on
+0139 plot(t1, QFratio0,<span class="string">'b'</span>);
+0140 hold off
+0141 
+0142 QFratio = QFratio + QFout(:);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

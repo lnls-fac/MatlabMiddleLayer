@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of quadgetdata</title>
+  <meta name="keywords" content="quadgetdata">
+  <meta name="description" content="QUADGETDATA - Collect the date from a quadrupole center run.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; quadgetdata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>quadgetdata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>QUADGETDATA - Collect the date from a quadrupole center run.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadgetdata(DirName, PlotFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">QUADGETDATA - Collect the date from a quadrupole center run.
+              When all the quadrupole center data files are stored in a directory this function
+              will go through all the files and pull out some of the important information.
+
+  [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, XfileDate, YfilesDate] = quadgetdata(DirName)
+
+  INPUTS
+  1. DirName - Directory name to look for quadrupole center files  
+               [] to browse {Default}
+  2. PlotFlag - 0 to just get data without plotting results, else, plot results
+  
+  OUTPUTS
+  1. X - Horizontal output matrix (format below)
+  2. Y - Vertical output matrix (format below)
+
+             1&amp;2     3       4        5     6       7         8         9
+  Output = [BPMDev Center CenterSTD BPMpos DCCT BPMATIndex Quadpos QuadATIndex]
+
+  3-6. BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily - Family name for each center measurement
+  7-8. XfileDate, YfilesDate - Date string for the file name</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="bpm2quad.html" class="code" title="function [QUADFamilyOutput, QUADDevOutput, DeltaSpos, PhaseAdvanceX, PhaseAdvanceY] = bpm2quad(BPMFamily, BPMDev, LocationFlag)">bpm2quad</a>	BPM2QUAD - Returns the nearest quadrupole to the specified BPM</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="quadplotall.html" class="code" title="function [Xnew, Ynew, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadplotall(DirName, PlotFlag)">quadplotall</a>	QUADPLOTALL - Collect the date from a quadrupole center run.</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadgetdata(DirName, PlotFlag)</a>
+0002 <span class="comment">%QUADGETDATA - Collect the date from a quadrupole center run.</span>
+0003 <span class="comment">%              When all the quadrupole center data files are stored in a directory this function</span>
+0004 <span class="comment">%              will go through all the files and pull out some of the important information.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, XfileDate, YfilesDate] = quadgetdata(DirName)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  INPUTS</span>
+0009 <span class="comment">%  1. DirName - Directory name to look for quadrupole center files</span>
+0010 <span class="comment">%               [] to browse {Default}</span>
+0011 <span class="comment">%  2. PlotFlag - 0 to just get data without plotting results, else, plot results</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  OUTPUTS</span>
+0014 <span class="comment">%  1. X - Horizontal output matrix (format below)</span>
+0015 <span class="comment">%  2. Y - Vertical output matrix (format below)</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%             1&amp;2     3       4        5     6       7         8         9</span>
+0018 <span class="comment">%  Output = [BPMDev Center CenterSTD BPMpos DCCT BPMATIndex Quadpos QuadATIndex]</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  3-6. BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily - Family name for each center measurement</span>
+0021 <span class="comment">%  7-8. XfileDate, YfilesDate - Date string for the file name</span>
+0022 
+0023 <span class="comment">%  Written by Greg Portmann</span>
+0024 
+0025 
+0026 <span class="keyword">if</span> nargin == 0
+0027     DirName = <span class="string">''</span>;
+0028 <span class="keyword">end</span>
+0029 
+0030 <span class="keyword">if</span> nargin &lt; 2
+0031     PlotFlag = 1;
+0032 <span class="keyword">end</span>
+0033 
+0034 <span class="keyword">if</span> isempty(DirName)
+0035     DirName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'DataRoot'</span>),<span class="string">'QMS\'</span>];
+0036     DirName = uigetdir(DirName, <span class="string">'Select directory where the QMS data are located'</span>);
+0037 <span class="keyword">end</span>
+0038 
+0039 StartDir = pwd;
+0040 cd(DirName);
+0041 
+0042 Files = dir;
+0043 
+0044 X = [];
+0045 Y = [];
+0046 BPMxFamily = [];
+0047 QUADxFamily = [];
+0048 BPMyFamily = [];
+0049 QUADyFamily = [];
+0050 DateMatX = [];
+0051 DateMatY = [];
+0052 <span class="keyword">for</span> i = 1:length(Files)
+0053     <span class="keyword">if</span> exist(Files(i).name) == 2
+0054         clear QMS DelHCM DelVCM
+0055         <span class="keyword">try</span>
+0056             load(Files(i).name)
+0057 
+0058             <span class="comment">%Files(i).name</span>
+0059 
+0060             <span class="comment">% Old middle layer</span>
+0061             <span class="keyword">if</span> exist(<span class="string">'DelHCM'</span>)
+0062                 clear q
+0063                 [q.Center, q.CenterSTD, ErrorString] = quadhplt(Files(i).name);
+0064                 q.BPMFamily = <span class="string">'BPMx'</span>;
+0065                 q.BPMDev = BPMnum + [0 1];
+0066                 q.DCCT = NaN;
+0067                 [q.QuadFamily, q.QuadDev] = <a href="bpm2quad.html" class="code" title="function [QUADFamilyOutput, QUADDevOutput, DeltaSpos, PhaseAdvanceX, PhaseAdvanceY] = bpm2quad(BPMFamily, BPMDev, LocationFlag)">bpm2quad</a>(q.BPMFamily, q.BPMDev);
+0068 
+0069                 X = [X; q.BPMDev q.Center q.CenterSTD <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.BPMFamily, q.BPMDev) min(q.DCCT) family2atindex(q.BPMFamily, q.BPMDev) <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.QuadFamily, q.QuadDev) family2atindex(q.QuadFamily, q.QuadDev)];
+0070                 BPMxFamily = strvcat(BPMxFamily, q.BPMFamily);
+0071                 QUADxFamily = strvcat(QUADxFamily, q.QuadFamily);
+0072                 DateMatX = [DateMatX; Files(i).date];
+0073                 
+0074             <span class="keyword">elseif</span> exist(<span class="string">'DelVCM'</span>)
+0075                 clear q
+0076                 [q.Center, q.CenterSTD, ErrorString] = quadvplt(Files(i).name);
+0077                 q.BPMFamily = <span class="string">'BPMy'</span>;
+0078                 q.BPMDev = BPMnum + [0 1];
+0079                 q.DCCT = NaN;
+0080                 [q.QuadFamily, q.QuadDev] = <a href="bpm2quad.html" class="code" title="function [QUADFamilyOutput, QUADDevOutput, DeltaSpos, PhaseAdvanceX, PhaseAdvanceY] = bpm2quad(BPMFamily, BPMDev, LocationFlag)">bpm2quad</a>(q.BPMFamily, q.BPMDev);
+0081 
+0082                 Y = [Y; q.BPMDev q.Center q.CenterSTD <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.BPMFamily, q.BPMDev) min(q.DCCT) family2atindex(q.BPMFamily, q.BPMDev) <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.QuadFamily, q.QuadDev) family2atindex(q.QuadFamily, q.QuadDev)];
+0083                 BPMyFamily = strvcat(BPMyFamily, q.BPMFamily);
+0084                 QUADyFamily = strvcat(QUADyFamily, q.QuadFamily);
+0085                 DateMatY = [DateMatY; Files(i).date];
+0086 
+0087             <span class="keyword">else</span>
+0088 
+0089                 <span class="comment">% New middle layer</span>
+0090                 q = QMS;
+0091 
+0092                 <span class="comment">%fprintf('   %d.  %s(%d,%d)\n', i, q.QuadFamily, q.QuadDev);</span>
+0093 
+0094                 <span class="keyword">if</span> q.QuadPlane == 1
+0095                     X = [X; q.BPMDev q.Center q.CenterSTD <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.BPMFamily, q.BPMDev) min(q.DCCT) family2atindex(q.BPMFamily, q.BPMDev) <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.QuadFamily, q.QuadDev) family2atindex(q.QuadFamily, q.QuadDev)];
+0096                     BPMxFamily = strvcat(BPMxFamily, q.BPMFamily);
+0097                     QUADxFamily = strvcat(QUADxFamily, q.QuadFamily);
+0098                     DateMatX = [DateMatX; Files(i).date];
+0099                 <span class="keyword">else</span>
+0100                     Y = [Y; q.BPMDev q.Center q.CenterSTD <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.BPMFamily, q.BPMDev) min(q.DCCT) family2atindex(q.BPMFamily, q.BPMDev) <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(q.QuadFamily, q.QuadDev) family2atindex(q.QuadFamily, q.QuadDev)];
+0101                     BPMyFamily = strvcat(BPMyFamily, q.BPMFamily);
+0102                     QUADyFamily = strvcat(QUADyFamily, q.QuadFamily);
+0103                     DateMatY = [DateMatY; Files(i).date];
+0104                 <span class="keyword">end</span>
+0105                 <span class="keyword">if</span> any(q.DCCT&lt;5)
+0106                     fprintf(<span class="string">'   %s(%d,%d) (%s) shows a beam less than 5 mamps during the experiment!\n'</span>, q.BPMFamily, q.BPMDev, Files(i).name);
+0107                 <span class="keyword">end</span>
+0108             <span class="keyword">end</span>
+0109         <span class="keyword">catch</span>
+0110         <span class="keyword">end</span>
+0111     <span class="keyword">end</span>
+0112 <span class="keyword">end</span>
+0113 
+0114 [DateMatX, iX] = sortrows(DateMatX);
+0115 [DateMatY, iY] = sortrows(DateMatY);
+0116 X = X(iX,:);
+0117 Y = Y(iY,:);
+0118 BPMxFamily = BPMxFamily(iX,:);
+0119 BPMyFamily = BPMyFamily(iY,:);
+0120 QUADxFamily = QUADxFamily(iX,:);
+0121 QUADyFamily = QUADyFamily(iY,:);
+0122 
+0123 cd(StartDir);
+0124 
+0125 
+0126 <span class="keyword">if</span> PlotFlag
+0127 
+0128     <span class="comment">% Plot data</span>
+0129     L = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0130 
+0131     figure;
+0132     subplot(2,1,1);
+0133     errorbar(X(:,5), X(:,3), X(:,4), <span class="string">'.b'</span>);
+0134     ylabel(<span class="string">'Horizontal [mm]'</span>);
+0135     xaxis([0 L]);
+0136     title(<span class="string">'BPM Offset'</span>);
+0137 
+0138     subplot(2,1,2);
+0139     errorbar(Y(:,5), Y(:,3), Y(:,4), <span class="string">'.b'</span>);
+0140     xlabel(<span class="string">'BPM Position [meters]'</span>);
+0141     ylabel(<span class="string">'Vertical [mm]'</span>);
+0142     xaxis([0 L]);
+0143 
+0144 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

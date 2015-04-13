@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of common2handle</title>
+  <meta name="keywords" content="common2handle">
+  <meta name="description" content="COMMON2HANDLE - Converts a common name to a MCA handle (Obsolete function)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; common2handle.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>common2handle
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>COMMON2HANDLE - Converts a common name to a MCA handle (Obsolete function)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">COMMON2HANDLE - Converts a common name to a MCA handle (Obsolete function)
+  [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family)
+
+  INPUTS
+  1. CommonNames - List of common names (string, matrix, cell array)
+  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {'Monitor'}
+  3. Family - Family Name
+              Accelerator Object
+              Cell Array of Accelerator Objects or Family Names
+              [] search all families {Default}
+
+  OUTPUTS
+  1. Handles - Handle name corresponding to the common name
+               If the common name or handle cannot be found, NaN is returned
+  2. ErrorFlag - Number of errors found
+
+  NOTES
+  1. CommonNames can be a cell array even if Field and Family are not.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="common2handle.html" class="code" title="function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);">common2handle</a>	COMMON2HANDLE - Converts a common name to a MCA handle (Obsolete function)</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="common2handle.html" class="code" title="function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);">common2handle</a>	COMMON2HANDLE - Converts a common name to a MCA handle (Obsolete function)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);</a>
+0002 <span class="comment">%COMMON2HANDLE - Converts a common name to a MCA handle (Obsolete function)</span>
+0003 <span class="comment">%  [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. CommonNames - List of common names (string, matrix, cell array)</span>
+0007 <span class="comment">%  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {'Monitor'}</span>
+0008 <span class="comment">%  3. Family - Family Name</span>
+0009 <span class="comment">%              Accelerator Object</span>
+0010 <span class="comment">%              Cell Array of Accelerator Objects or Family Names</span>
+0011 <span class="comment">%              [] search all families {Default}</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  OUTPUTS</span>
+0014 <span class="comment">%  1. Handles - Handle name corresponding to the common name</span>
+0015 <span class="comment">%               If the common name or handle cannot be found, NaN is returned</span>
+0016 <span class="comment">%  2. ErrorFlag - Number of errors found</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  NOTES</span>
+0019 <span class="comment">%  1. CommonNames can be a cell array even if Field and Family are not.</span>
+0020 
+0021 <span class="comment">% Written by Greg Portmann</span>
+0022 
+0023 <span class="keyword">if</span> nargin &lt; 1
+0024     error(<span class="string">'Must have at least 1 input (''CommonNames'')'</span>);
+0025 <span class="keyword">end</span>
+0026 <span class="keyword">if</span> nargin &lt; 2
+0027     Field = <span class="string">'Monitor'</span>;
+0028 <span class="keyword">end</span>
+0029 <span class="keyword">if</span> nargin &lt; 3
+0030     Family = [];
+0031 <span class="keyword">end</span>
+0032 <span class="keyword">if</span> isempty(Field)
+0033     Field = <span class="string">'Monitor'</span>;
+0034 <span class="keyword">end</span>
+0035 
+0036 
+0037 <span class="comment">% Cell inputs</span>
+0038 <span class="keyword">if</span> iscell(CommonNames)
+0039     <span class="keyword">if</span> iscell(Family)
+0040         <span class="keyword">if</span> length(Family) ~= length(CommonNames)
+0041             error(<span class="string">'Family and CommonNames must be the same size cell arrays.'</span>);
+0042         <span class="keyword">end</span>
+0043     <span class="keyword">end</span>
+0044     <span class="keyword">if</span> iscell(Field)
+0045         <span class="keyword">if</span> length(Field) ~= length(CommonNames)
+0046             error(<span class="string">'Field and CommonNames must be the same size cell arrays.'</span>);
+0047         <span class="keyword">end</span>
+0048     <span class="keyword">end</span>
+0049     
+0050     <span class="keyword">for</span> i = 1:length(CommonNames)
+0051         <span class="keyword">if</span> iscell(Family)
+0052             <span class="keyword">if</span> iscell(Field)
+0053                 [Handles{i}, ErrorFlag{i}] = <a href="common2handle.html" class="code" title="function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);">common2handle</a>(CommonNames{i}, Field{i}, Family{i});
+0054             <span class="keyword">else</span>
+0055                 [Handles{i}, ErrorFlag{i}] = <a href="common2handle.html" class="code" title="function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);">common2handle</a>(CommonNames{i}, Field, Family{i});
+0056             <span class="keyword">end</span>
+0057         <span class="keyword">else</span>
+0058             <span class="keyword">if</span> iscell(Field)
+0059                 [Handles{i}, ErrorFlag{i}] = <a href="common2handle.html" class="code" title="function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);">common2handle</a>(CommonNames{i}, Field{i}, Family);
+0060             <span class="keyword">else</span>
+0061                 [Handles{i}, ErrorFlag{i}] = <a href="common2handle.html" class="code" title="function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);">common2handle</a>(CommonNames{i}, Field, Family);
+0062             <span class="keyword">end</span>
+0063         <span class="keyword">end</span>
+0064     <span class="keyword">end</span>
+0065     <span class="keyword">return</span>    
+0066 <span class="keyword">end</span>
+0067 <span class="comment">% End cell input</span>
+0068 
+0069 
+0070 
+0071 <span class="comment">% If Family=[], search all families</span>
+0072 <span class="keyword">if</span> isempty(Family)
+0073     ErrorFlag = 0;
+0074     Handles = [];
+0075     FamilyList = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0076     
+0077     <span class="keyword">for</span> i = 1:size(CommonNames,1)
+0078         Name = deblank(CommonNames(i,:));
+0079         Found = 0;
+0080         <span class="keyword">for</span> j = 1:size(FamilyList, 1)
+0081             [Handle, ErrorFlag1] = <a href="common2handle.html" class="code" title="function [Handles, ErrorFlag] = common2handle(CommonNames, Field, Family);">common2handle</a>(Name, Field, deblank(FamilyList(j,:)));
+0082             <span class="keyword">if</span> ~isnan(Handle)
+0083                 Found = 1;
+0084                 <span class="keyword">break</span>
+0085             <span class="keyword">end</span>
+0086         <span class="keyword">end</span>
+0087         Handles = [Handles; Handle];
+0088         ErrorFlag = ErrorFlag + ErrorFlag1;
+0089     <span class="keyword">end</span>
+0090     <span class="keyword">return</span>
+0091 <span class="keyword">end</span>
+0092 <span class="comment">% End all family search</span>
+0093 
+0094 
+0095 <span class="comment">% Common2handle for scalar inputs</span>
+0096 Handles = [];
+0097 ErrorFlag = 0;
+0098 <span class="keyword">for</span> i = 1:size(CommonNames,1)
+0099     Name = deblank(CommonNames(i,:));
+0100     CommonNamesTotal = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'CommonNames'</span>);
+0101     
+0102     [name,j,k] = intersect(Name, CommonNamesTotal, <span class="string">'rows'</span>);
+0103 
+0104     <span class="keyword">if</span> isempty(name) &amp; length(Name)~=size(CommonNamesTotal)
+0105         Name = [repmat(<span class="string">' '</span>,size(Name,1),size(CommonNamesTotal,2)-size(Name,2)) Name];
+0106         [name,j,k] = intersect(Name, CommonNamesTotal, <span class="string">'rows'</span>);
+0107     <span class="keyword">end</span>
+0108     
+0109     <span class="keyword">if</span> isempty(name)
+0110         Name = deblank(CommonNames(i,:));
+0111         <span class="keyword">if</span> length(Name)~=size(CommonNamesTotal)
+0112             Name = [Name repmat(<span class="string">' '</span>,size(Name,1),size(CommonNamesTotal,2)-size(Name,2))];
+0113             [name,j,k] = intersect(Name, CommonNamesTotal, <span class="string">'rows'</span>);
+0114         <span class="keyword">end</span>
+0115     <span class="keyword">end</span>
+0116     
+0117     <span class="keyword">if</span> ~isempty(k)
+0118         HandlesTotal = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'Handles'</span>);
+0119         
+0120         <span class="keyword">if</span> isempty(HandlesTotal)
+0121             Handle = NaN;
+0122             ErrorFlag = ErrorFlag + 1;
+0123         <span class="keyword">else</span>
+0124             <span class="keyword">if</span> size(HandlesTotal,1) == 1
+0125                 Handle = HandlesTotal;
+0126             <span class="keyword">else</span>
+0127                 Handle = HandlesTotal(k,:);
+0128             <span class="keyword">end</span>
+0129         <span class="keyword">end</span>
+0130     <span class="keyword">else</span>
+0131         Handle = NaN;
+0132         ErrorFlag = ErrorFlag + 1;
+0133     <span class="keyword">end</span>
+0134     Handles = [Handles; Handle];
+0135 <span class="keyword">end</span>
+0136</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

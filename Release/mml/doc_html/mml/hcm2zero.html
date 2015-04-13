@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of hcm2zero</title>
+  <meta name="keywords" content="hcm2zero">
+  <meta name="description" content="HCM2ZERO - Set horizontal corrector strengths to zero">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; hcm2zero.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>hcm2zero
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>HCM2ZERO - Set horizontal corrector strengths to zero</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function hcm2zero(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">HCM2ZERO - Set horizontal corrector strengths to zero
+  hcm2zero(fraction, nstep)
+
+  INPUTS
+  1. fract - fraction of corrector strength to put to zero
+            {1} means correctors set to zero
+             0.5 means half of the corrector strength set to zero
+  2. nstep - number of step for zeroing correctors {Default: 5}
+  3. Optional - 'Interactive' Wait for user for each step {Default}
+                'NoInteractive' pause 0.2 s for each step     
+
+  See also <a href="vcm2zero.html" class="code" title="function vcm2zero(varargin)">vcm2zero</a>, <a href="vcm2golden.html" class="code" title="function vcm2golden(nstep)">vcm2golden</a>, <a href="hcm2golden.html" class="code" title="function hcm2golden(nstep)">hcm2golden</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function hcm2zero(varargin)</a>
+0002 <span class="comment">%HCM2ZERO - Set horizontal corrector strengths to zero</span>
+0003 <span class="comment">%  hcm2zero(fraction, nstep)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. fract - fraction of corrector strength to put to zero</span>
+0007 <span class="comment">%            {1} means correctors set to zero</span>
+0008 <span class="comment">%             0.5 means half of the corrector strength set to zero</span>
+0009 <span class="comment">%  2. nstep - number of step for zeroing correctors {Default: 5}</span>
+0010 <span class="comment">%  3. Optional - 'Interactive' Wait for user for each step {Default}</span>
+0011 <span class="comment">%                'NoInteractive' pause 0.2 s for each step</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  See also vcm2zero, vcm2golden, hcm2golden</span>
+0014 
+0015 <span class="comment">%  Written by Greg Portmann</span>
+0016 <span class="comment">%  Adapted by Laurent S. Nadolski</span>
+0017 
+0018 InteractiveFlag = 1;
+0019 
+0020 <span class="comment">% Input Parser</span>
+0021 <span class="keyword">for</span> i = length(varargin):-1:1
+0022     <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'Interactive'</span>)
+0023         InteractiveFlag = 1;
+0024         varargin(i) = [];
+0025     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoInteractive'</span>)
+0026         InteractiveFlag = 0;
+0027         varargin(i) = [];
+0028     <span class="keyword">end</span>
+0029 <span class="keyword">end</span>
+0030         
+0031 HCORFamily = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0032 
+0033 <span class="keyword">if</span> length(varargin) &lt; 1
+0034     fract = 1;
+0035 <span class="keyword">else</span>
+0036     fract = varargin{1};
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="keyword">if</span> length(varargin) &lt; 2
+0040     nstep = 5;
+0041 <span class="keyword">else</span>
+0042     nstep = varargin{2};
+0043 <span class="keyword">end</span>
+0044 
+0045 
+0046 setpt = fract * <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCORFamily);
+0047 
+0048 <span class="keyword">for</span> k = 1:nstep,
+0049     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(HCORFamily, (1-k/nstep)*setpt, [], -1);    
+0050     <span class="keyword">if</span> InteractiveFlag
+0051         disp([<span class="string">'   Step '</span> num2str(k) <span class="string">' of '</span> num2str(nstep) <span class="string">' Hit Return key to continue (Ctrl-C to stop)'</span>]);
+0052         pause;
+0053     <span class="keyword">else</span>
+0054         pause(0.2)
+0055     <span class="keyword">end</span>
+0056 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

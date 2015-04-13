@@ -1,0 +1,1689 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getpv</title>
+  <meta name="keywords" content="getpv">
+  <meta name="description" content="GETPV - Returns a variable from the online system or the model">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; getpv.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getpv
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETPV - Returns a variable from the online system or the model</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [AM, tout, DataTime, ErrorFlag] = getpv(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETPV - Returns a variable from the online system or the model
+
+  FamilyName/DeviceList Method
+  [AM, tout, DataTime] = getpv(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)
+
+  Data Structure
+  [AM, tout, DataTime] = getpv(DataStructure, t, FreshDataFlag, TimeOutPeriod)
+
+  ChannelName Method
+  [AM, tout, DataTime] = getpv(ChannelName, t, FreshDataFlag, TimeOutPeriod)
+
+  CommonName Method (Family can be '' to search all families, Field is optional)
+  [AM, tout, DataTime] = getpv(CommonName, Field, t, FreshDataFlag, TimeOutPeriod)
+  [AM, tout, DataTime] = getpv(Family, Field, CommonName, t, FreshDataFlag, TimeOutPeriod)
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Channel Name or matrix of Channel Names
+              Accelerator Object (only the family name is used)
+              For CommonNames, Family=[] searches all families
+              (or Cell Array of inputs)
+
+  2. Field - Subfield name of an accelerator family ('Monitor', 'Setpoint', etc)  
+             {Default: 'Monitor' or '' or ChannelName method}
+             (For non-Family subfields, Field is added as .Field, see Note #8 below for more information.)
+
+  3. DeviceList - [Sector Device #] or [element #] list {Default or empty list: Entire family}
+                  Note: if input 1 is a cell array then DeviceList must be a cell array
+     CommonName - Common name can replace a DeviceList (scalar or vector outputs)
+
+  4. t - Time vector of when to start taking data (t can not be a cell) {Default: 0}
+
+  5. FreshDataFlag -  0   -&gt; Return after first measurement {Default}
+                     else -&gt; Return after FreshDataFlag number of new measurements have been read
+                     Ie, getpv('BPMx',[1 1],0,2) measures the orbit then continues to read the orbit
+                         until 2 new orbits have been measured and returns the last measurement.
+                     Note: 1. t can only be a scalar when using the FreshDataFlag.
+                           2. FreshDataFlag cannot be used with 'Matrix' data types. 
+
+  6. TimeOutPeriod - Time-out period when waiting for fresh data {Default: 10 seconds}
+
+  7. 'Struct'  - Return a data structure {Default for data structure inputs}
+     'Numeric' - Return numeric outputs  {Default for non-data structure inputs}
+     'Object'  - Return a accelerator object (AccObj)
+
+  8. Units flag overrides
+     'Physics'  - Use physics  units
+     'Hardware' - Use hardware units
+
+  9. Mode flag overrides
+     'Online' - Get data online 
+     'Model'  - get data on the model
+     'Manual' - Get data manually
+
+  10. 'Double' - The output will be a double {Default}
+      'String' - The output will be a string
+
+
+  OUTPUTS
+  1. AM   - Monitor values (Column vector or matrix where each column is a data point in time)
+
+  2. tout - Time when measurement was completed according to the computer time (Matlab time) (row vector)
+            tout-t is the time it took to make the measurement.  diff(t) can be arbitarily small, but tout will 
+            report the actual completion time.  
+
+  3. DataTime - Time when the data was measured (as report by the hardware)
+                Time since 00:00:00, Jan 1, 1970 in days (in the present time zone)
+                Units are in Matlab &quot;serial day number&quot; format (days) to be compatible with 
+                timing functions like datevec, datenum, datetick, etc.  
+                For exmple, [d, tout, datatime] = getpv('BPMx', 'Monitor', [], 0:.5:10);
+                            plot(datatime, d); datetick x
+                When using the model, the datatime is the same a the computer time (Matlab time).
+
+  NOTES
+  1. The output will be a data structure if the word 'struct' appears somewhere on the input line 
+     or if the input is a data structure and 'numeric' is not on the input line.
+
+  2. For data structure inputs:
+     Family     - DataStructure.FamilyName (This field must exist)
+     Field      - DataStructure.Field      (Field can be overridden on the input line)
+     DeviceList - DataStructure.DeviceList (DeviceList can be overridden on the input line)
+     Units      - DataStructure.Units      (Units can be overridden on the input line)
+     (The Mode field is ignored!)
+
+  3. For data structure outputs:
+     TimeStamp  - Time (Matlab clock) at the start of the function
+     tout       - Delta time vector at the end of each measurement (relative to TimeStamp)
+
+  4. diff(t) should not be too small.  If the desired time to collect the data is too 
+     short then the data collecting will not be able to keep up.  Always check tout. 
+     (t - tout) is the time it took to collect the data on each iteration.   
+ 
+  5. An easy way to averaged 10 monitors is:
+     PVmean = mean(getpv(Family,DeviceList,0:.5:4.5)')';   % .5 second between measurements
+
+  6. Channel name method is always Online!
+
+  7. It is often useful to measure the update rate of a set of channel by using a very
+     small time between measurements.
+     For exmple, [d, tout] = getpv('BPMx', 'Monitor', [], 0:eps:100*eps);
+                 plot(tout(1:end-1), 1./diff(tout),'.-'); % Point-wise data rate
+                 If the update rate of the hardware is slower then the control system, then
+                 hardware data rate can be visually inspected by plotting,
+                 plot(tout, d,'.-'); 
+
+  8. For cell array inputs:
+     a. Input 1 defines the size of all cells
+     b. All of the cell array inputs must be the same size
+     c. Field does not have to be a cell array but DeviceList does (if they exist)
+     d. t, FreshDataFlag, TimeOutPeriod can not be cell arrays
+     e. Waveforms do not work with cell arrays.
+
+  8. The Field input can be used for getting the &quot;dot&quot; EPICS field.  For instance, at the ALS
+     getpv('BPMx','SCAN',[1 2],'String') will return SR01S___IBPM2X_AM02.SCAN as a string.
+     (Note: at Spear ':' is used instead of '.')
+
+  10. Error flaga are not used at the moment since all errors cause a Matlab error.
+      Use try;catch statements to catch errors.
+
+  12. If say Golden is a software field in the MML structure in the BPMx family, then 
+      getpv('BPMx','Golden', DeviceList) will return the data in that field.
+
+  See also <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>, <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>, <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>, <a href="steppv.html" class="code" title="function ErrorFlag = steppv(varargin)">steppv</a>
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>	COMMON2DEV - Converts a common name to a device list</li><li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>	FAMILY2CHANNEL - Converts the family name to a channel name</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>	GETMODE - Returns the present family mode ('Online', 'Simulator', 'Manual', 'Special', etc)</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>	PHYSICS2HW - Converts from 'Physics' units to 'Hardware' units</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li><li><a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>	GETMACHINECONFIG - Returns or saves to file the present storage ring setpoints and monitors</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>	GETRAMPRATE - Returns the ramp rate for a family</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>	GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>	GETTUNE - Returns the betatron tunes</li><li><a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>	GETX - Returns the horizontal orbit</li><li><a href="gety.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = gety(varargin)">gety</a>	GETY - Returns the vertical orbit</li><li><a href="getz.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getz(varargin)">getz</a>	GETZ - Returns the vertical orbit</li><li><a href="measidfftable.html" class="code" title="function measidfftable(Sector, BPMFlag)">measidfftable</a>	MEASIDFFTABLE - Measures an insertion device feed forward table for the vertical gap</li><li><a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>	MEASRESPMAT - Measure a response matrix</li><li><a href="mmlviewer.html" class="code" title="function varargout = mmlviewer(varargin)">mmlviewer</a>	MMLVIEWER M-file for mmlviewer.fig</li><li><a href="monbpm.html" class="code" title="function varargout = monbpm(varargin)">monbpm</a>	MONBPM - Monitors the orbit</li><li><a href="plotfamily.html" class="code" title="function varargout = plotfamily(varargin)">plotfamily</a>	PLOTFAMILY - Plots by middle layer family name</li><li><a href="rmgolden.html" class="code" title="function Data = rmgolden(varargin)">rmgolden</a>	RMGOLDEN - Remove the golden values for data set</li><li><a href="rmoffset.html" class="code" title="function Data = rmoffset(varargin)">rmoffset</a>	RMOFFSET - Remove the offset values for data set</li><li><a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>	SETORBIT - Orbit correction function</li><li><a href="setorbitbumpgui.html" class="code" title="function varargout = setorbitbumpgui(varargin)">setorbitbumpgui</a>	SETORBITBUMPGUI M-file for setorbitbumpgui.fig</li><li><a href="setorbitgui.html" class="code" title="function varargout = setorbitgui(varargin)">setorbitgui</a>	SETORBITGUI - Orbit correction GUI</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [AM, tout, DataTime, DeviceList, ErrorFlag] = getbycommonname(CommonNames, Field, t, t0, FreshDataFlag, TimeOutPeriod, varargin)</a></li><li><a href="#_sub2" class="code">function [AM, tout, DataTime, ErrorFlag] = local_getbyname(ChannelName, OutputDataType, N, t, FreshDataFlag, TimeOutPeriod)</a></li><li><a href="#_sub3" class="code">function [AM, tout, DataTime, ErrorFlag, DeviceIndex] = local_getpv(AO, Field, DeviceList, OutputDataType, t, FreshDataFlag, TimeOutPeriod)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)</a>
+0002 <span class="comment">%GETPV - Returns a variable from the online system or the model</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  FamilyName/DeviceList Method</span>
+0005 <span class="comment">%  [AM, tout, DataTime] = getpv(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  Data Structure</span>
+0008 <span class="comment">%  [AM, tout, DataTime] = getpv(DataStructure, t, FreshDataFlag, TimeOutPeriod)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  ChannelName Method</span>
+0011 <span class="comment">%  [AM, tout, DataTime] = getpv(ChannelName, t, FreshDataFlag, TimeOutPeriod)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  CommonName Method (Family can be '' to search all families, Field is optional)</span>
+0014 <span class="comment">%  [AM, tout, DataTime] = getpv(CommonName, Field, t, FreshDataFlag, TimeOutPeriod)</span>
+0015 <span class="comment">%  [AM, tout, DataTime] = getpv(Family, Field, CommonName, t, FreshDataFlag, TimeOutPeriod)</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  INPUTS</span>
+0018 <span class="comment">%  1. Family - Family Name</span>
+0019 <span class="comment">%              Data Structure</span>
+0020 <span class="comment">%              Channel Name or matrix of Channel Names</span>
+0021 <span class="comment">%              Accelerator Object (only the family name is used)</span>
+0022 <span class="comment">%              For CommonNames, Family=[] searches all families</span>
+0023 <span class="comment">%              (or Cell Array of inputs)</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%  2. Field - Subfield name of an accelerator family ('Monitor', 'Setpoint', etc)</span>
+0026 <span class="comment">%             {Default: 'Monitor' or '' or ChannelName method}</span>
+0027 <span class="comment">%             (For non-Family subfields, Field is added as .Field, see Note #8 below for more information.)</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%  3. DeviceList - [Sector Device #] or [element #] list {Default or empty list: Entire family}</span>
+0030 <span class="comment">%                  Note: if input 1 is a cell array then DeviceList must be a cell array</span>
+0031 <span class="comment">%     CommonName - Common name can replace a DeviceList (scalar or vector outputs)</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%  4. t - Time vector of when to start taking data (t can not be a cell) {Default: 0}</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%  5. FreshDataFlag -  0   -&gt; Return after first measurement {Default}</span>
+0036 <span class="comment">%                     else -&gt; Return after FreshDataFlag number of new measurements have been read</span>
+0037 <span class="comment">%                     Ie, getpv('BPMx',[1 1],0,2) measures the orbit then continues to read the orbit</span>
+0038 <span class="comment">%                         until 2 new orbits have been measured and returns the last measurement.</span>
+0039 <span class="comment">%                     Note: 1. t can only be a scalar when using the FreshDataFlag.</span>
+0040 <span class="comment">%                           2. FreshDataFlag cannot be used with 'Matrix' data types.</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">%  6. TimeOutPeriod - Time-out period when waiting for fresh data {Default: 10 seconds}</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">%  7. 'Struct'  - Return a data structure {Default for data structure inputs}</span>
+0045 <span class="comment">%     'Numeric' - Return numeric outputs  {Default for non-data structure inputs}</span>
+0046 <span class="comment">%     'Object'  - Return a accelerator object (AccObj)</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">%  8. Units flag overrides</span>
+0049 <span class="comment">%     'Physics'  - Use physics  units</span>
+0050 <span class="comment">%     'Hardware' - Use hardware units</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">%  9. Mode flag overrides</span>
+0053 <span class="comment">%     'Online' - Get data online</span>
+0054 <span class="comment">%     'Model'  - get data on the model</span>
+0055 <span class="comment">%     'Manual' - Get data manually</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">%  10. 'Double' - The output will be a double {Default}</span>
+0058 <span class="comment">%      'String' - The output will be a string</span>
+0059 <span class="comment">%</span>
+0060 <span class="comment">%</span>
+0061 <span class="comment">%  OUTPUTS</span>
+0062 <span class="comment">%  1. AM   - Monitor values (Column vector or matrix where each column is a data point in time)</span>
+0063 <span class="comment">%</span>
+0064 <span class="comment">%  2. tout - Time when measurement was completed according to the computer time (Matlab time) (row vector)</span>
+0065 <span class="comment">%            tout-t is the time it took to make the measurement.  diff(t) can be arbitarily small, but tout will</span>
+0066 <span class="comment">%            report the actual completion time.</span>
+0067 <span class="comment">%</span>
+0068 <span class="comment">%  3. DataTime - Time when the data was measured (as report by the hardware)</span>
+0069 <span class="comment">%                Time since 00:00:00, Jan 1, 1970 in days (in the present time zone)</span>
+0070 <span class="comment">%                Units are in Matlab &quot;serial day number&quot; format (days) to be compatible with</span>
+0071 <span class="comment">%                timing functions like datevec, datenum, datetick, etc.</span>
+0072 <span class="comment">%                For exmple, [d, tout, datatime] = getpv('BPMx', 'Monitor', [], 0:.5:10);</span>
+0073 <span class="comment">%                            plot(datatime, d); datetick x</span>
+0074 <span class="comment">%                When using the model, the datatime is the same a the computer time (Matlab time).</span>
+0075 <span class="comment">%</span>
+0076 <span class="comment">%  NOTES</span>
+0077 <span class="comment">%  1. The output will be a data structure if the word 'struct' appears somewhere on the input line</span>
+0078 <span class="comment">%     or if the input is a data structure and 'numeric' is not on the input line.</span>
+0079 <span class="comment">%</span>
+0080 <span class="comment">%  2. For data structure inputs:</span>
+0081 <span class="comment">%     Family     - DataStructure.FamilyName (This field must exist)</span>
+0082 <span class="comment">%     Field      - DataStructure.Field      (Field can be overridden on the input line)</span>
+0083 <span class="comment">%     DeviceList - DataStructure.DeviceList (DeviceList can be overridden on the input line)</span>
+0084 <span class="comment">%     Units      - DataStructure.Units      (Units can be overridden on the input line)</span>
+0085 <span class="comment">%     (The Mode field is ignored!)</span>
+0086 <span class="comment">%</span>
+0087 <span class="comment">%  3. For data structure outputs:</span>
+0088 <span class="comment">%     TimeStamp  - Time (Matlab clock) at the start of the function</span>
+0089 <span class="comment">%     tout       - Delta time vector at the end of each measurement (relative to TimeStamp)</span>
+0090 <span class="comment">%</span>
+0091 <span class="comment">%  4. diff(t) should not be too small.  If the desired time to collect the data is too</span>
+0092 <span class="comment">%     short then the data collecting will not be able to keep up.  Always check tout.</span>
+0093 <span class="comment">%     (t - tout) is the time it took to collect the data on each iteration.</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">%  5. An easy way to averaged 10 monitors is:</span>
+0096 <span class="comment">%     PVmean = mean(getpv(Family,DeviceList,0:.5:4.5)')';   % .5 second between measurements</span>
+0097 <span class="comment">%</span>
+0098 <span class="comment">%  6. Channel name method is always Online!</span>
+0099 <span class="comment">%</span>
+0100 <span class="comment">%  7. It is often useful to measure the update rate of a set of channel by using a very</span>
+0101 <span class="comment">%     small time between measurements.</span>
+0102 <span class="comment">%     For exmple, [d, tout] = getpv('BPMx', 'Monitor', [], 0:eps:100*eps);</span>
+0103 <span class="comment">%                 plot(tout(1:end-1), 1./diff(tout),'.-'); % Point-wise data rate</span>
+0104 <span class="comment">%                 If the update rate of the hardware is slower then the control system, then</span>
+0105 <span class="comment">%                 hardware data rate can be visually inspected by plotting,</span>
+0106 <span class="comment">%                 plot(tout, d,'.-');</span>
+0107 <span class="comment">%</span>
+0108 <span class="comment">%  8. For cell array inputs:</span>
+0109 <span class="comment">%     a. Input 1 defines the size of all cells</span>
+0110 <span class="comment">%     b. All of the cell array inputs must be the same size</span>
+0111 <span class="comment">%     c. Field does not have to be a cell array but DeviceList does (if they exist)</span>
+0112 <span class="comment">%     d. t, FreshDataFlag, TimeOutPeriod can not be cell arrays</span>
+0113 <span class="comment">%     e. Waveforms do not work with cell arrays.</span>
+0114 <span class="comment">%</span>
+0115 <span class="comment">%  8. The Field input can be used for getting the &quot;dot&quot; EPICS field.  For instance, at the ALS</span>
+0116 <span class="comment">%     getpv('BPMx','SCAN',[1 2],'String') will return SR01S___IBPM2X_AM02.SCAN as a string.</span>
+0117 <span class="comment">%     (Note: at Spear ':' is used instead of '.')</span>
+0118 <span class="comment">%</span>
+0119 <span class="comment">%  10. Error flaga are not used at the moment since all errors cause a Matlab error.</span>
+0120 <span class="comment">%      Use try;catch statements to catch errors.</span>
+0121 <span class="comment">%</span>
+0122 <span class="comment">%  12. If say Golden is a software field in the MML structure in the BPMx family, then</span>
+0123 <span class="comment">%      getpv('BPMx','Golden', DeviceList) will return the data in that field.</span>
+0124 <span class="comment">%</span>
+0125 <span class="comment">%  See also getam, getsp, setpv, steppv</span>
+0126 <span class="comment">%</span>
+0127 <span class="comment">%  Written by Greg Portmann</span>
+0128 
+0129 
+0130 <span class="comment">% Starting time</span>
+0131 t0 = clock;
+0132 
+0133 
+0134 <span class="comment">% Defaults</span>
+0135 FieldDefault = <span class="string">'Monitor'</span>;
+0136 Field = FieldDefault;
+0137 DeviceList = [];
+0138 t = 0;
+0139 FreshDataFlag = 0;
+0140 TimeOutPeriod = 10;
+0141 ErrorFlag = 0;
+0142 
+0143 StructOutputFlag = 0;
+0144 NumericOutputFlag = 0;
+0145 ObjectOutputFlag = 0;
+0146 ModeFlag = <span class="string">''</span>;
+0147 UnitsFlag = <span class="string">''</span>;
+0148 OutputDataType = <span class="string">'Double'</span>;
+0149 
+0150 
+0151 <span class="comment">% Look if 'struct' or 'numeric' in on the input line</span>
+0152 InputFlags = {};
+0153 <span class="keyword">for</span> i = length(varargin):-1:1
+0154     <span class="keyword">if</span> isstruct(varargin{i})
+0155         <span class="comment">% Ignor structures</span>
+0156     <span class="keyword">elseif</span> iscell(varargin{i})
+0157         <span class="comment">% Ignor cells</span>
+0158     <span class="keyword">elseif</span> isnumeric(varargin{i})
+0159         <span class="comment">% Ignor numeric</span>
+0160     <span class="keyword">elseif</span> isa(varargin{i},<span class="string">'AccObj'</span>)
+0161         AccObj1 = struct(varargin{i});
+0162         Families = fieldnames(AccObj1);
+0163         j = 0;
+0164         <span class="keyword">for</span> k = 1:length(Families)
+0165             <span class="keyword">if</span> ~isempty(AccObj1.(Families{k}))
+0166                 j = j + 1;
+0167                 tmpcell{j} = AccObj1.(Families{k});
+0168             <span class="keyword">end</span>
+0169         <span class="keyword">end</span>
+0170         <span class="keyword">if</span> length(tmpcell) == 1
+0171             varargin{i} = tmpcell{1};
+0172         <span class="keyword">else</span>
+0173             varargin{i} = tmpcell;
+0174         <span class="keyword">end</span>
+0175         <span class="keyword">if</span> ~NumericOutputFlag
+0176             ObjectOutputFlag = 1;
+0177             StructOutputFlag = 1;
+0178         <span class="keyword">end</span>
+0179     <span class="keyword">elseif</span> ischar(varargin{i}) &amp;&amp; size(varargin{i},1)==1
+0180         <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0181             StructOutputFlag = 1;
+0182             ObjectOutputFlag = 0;
+0183             varargin(i) = [];
+0184         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0185             NumericOutputFlag = 1;
+0186             StructOutputFlag = 0;
+0187             ObjectOutputFlag = 0;
+0188             varargin(i) = [];
+0189         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0190             ModeFlag = <span class="string">'SIMULATOR'</span>;
+0191             InputFlags = [InputFlags varargin(i)];
+0192             varargin(i) = [];
+0193         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0194             ModeFlag = <span class="string">'Online'</span>;
+0195             InputFlags = [InputFlags varargin(i)];
+0196             varargin(i) = [];
+0197         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0198             ModeFlag = <span class="string">'Manual'</span>;
+0199             InputFlags = [InputFlags varargin(i)];
+0200             varargin(i) = [];
+0201         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Special'</span>)
+0202             ModeFlag = <span class="string">'Special'</span>;
+0203             InputFlags = [InputFlags varargin(i)];
+0204             varargin(i) = [];
+0205         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0206             UnitsFlag = <span class="string">'Physics'</span>;
+0207             InputFlags = [InputFlags varargin(i)];
+0208             varargin(i) = [];
+0209         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0210             UnitsFlag = <span class="string">'Hardware'</span>;
+0211             InputFlags = [InputFlags varargin(i)];
+0212             varargin(i) = [];
+0213         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'archive'</span>)
+0214             <span class="comment">% Just remove</span>
+0215             varargin(i) = [];
+0216         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'noarchive'</span>)
+0217             <span class="comment">% Just remove</span>
+0218             varargin(i) = [];
+0219         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'String'</span>) || strcmpi(varargin{i},<span class="string">'Char'</span>)
+0220             OutputDataType = <span class="string">'String'</span>;
+0221             InputFlags = [InputFlags varargin(i)];
+0222             varargin(i) = [];
+0223         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Double'</span>)
+0224             OutputDataType = <span class="string">'Double'</span>;
+0225             InputFlags = [InputFlags varargin(i)];
+0226             varargin(i) = [];
+0227         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'WaveForm'</span>) || strcmpi(varargin{i},<span class="string">'Matrix'</span>)
+0228             OutputDataType = <span class="string">'Matrix'</span>;
+0229             InputFlags = [InputFlags varargin(i)];
+0230             varargin(i) = [];
+0231         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Object'</span>)
+0232             ObjectOutputFlag = 1;
+0233             StructOutputFlag = 1;
+0234             varargin(i) = [];
+0235         <span class="keyword">end</span>
+0236     <span class="keyword">end</span>
+0237 <span class="keyword">end</span>
+0238 
+0239 <span class="keyword">if</span> isempty(varargin)
+0240     error(<span class="string">'Must have at least one input (Family, Data structure, or Channel Name).'</span>);
+0241 <span class="keyword">end</span>
+0242 
+0243 
+0244 
+0245 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0246 <span class="comment">% CELL OR CELL ARRAY INPUT %</span>
+0247 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0248 <span class="keyword">if</span> iscell(varargin{1})
+0249     <span class="comment">%if strcmpi(ModeFlag, 'Online') | (isempty(ModeFlag) &amp; strcmpi(getmode(varargin{1}{1}), 'Online'))</span>
+0250     <span class="comment">%     % Unfortunately the following code using channelnames is not much of a speed improvement over</span>
+0251     <span class="comment">%     % interating over cell arrays (which is needed for simulator mode)</span>
+0252     <span class="comment">%</span>
+0253     <span class="comment">%     % Online cell arrays</span>
+0254     <span class="comment">%     %</span>
+0255     <span class="comment">%     % Online cell arrays are treated differently because to the desired for speed.</span>
+0256     <span class="comment">%     % By loading all the channel names into one array then sending to the c-function</span>
+0257     <span class="comment">%     % with the t-vector, the total time is greatly sped up.  However, using channel names</span>
+0258     <span class="comment">%     % only works in online mode.  The one problem is all output have to scalars.</span>
+0259     <span class="comment">%</span>
+0260     <span class="comment">%</span>
+0261     <span class="comment">%     % Count the number of inputs which are cells (Family or DeviceList) or strings (possibly Field)</span>
+0262     <span class="comment">%     NCellOrString = 1;</span>
+0263     <span class="comment">%     for i = 2:length(varargin)</span>
+0264     <span class="comment">%         if ~iscell(varargin{i})</span>
+0265     <span class="comment">%             if ~ischar(varargin{i})</span>
+0266     <span class="comment">%                 break;</span>
+0267     <span class="comment">%             else</span>
+0268     <span class="comment">%                 NCellOrString = NCellOrString + 1;</span>
+0269     <span class="comment">%             end</span>
+0270     <span class="comment">%         else</span>
+0271     <span class="comment">%             NCellOrString = NCellOrString + 1;</span>
+0272     <span class="comment">%             %if length(varargin{1})~=length(varargin{NCellOrString}) | length(varargin{NCellOrString})==1</span>
+0273     <span class="comment">%             %    error('When using cell, all the cells must be the same size as input 1 or be length one.');</span>
+0274     <span class="comment">%             %end</span>
+0275     <span class="comment">%         end</span>
+0276     <span class="comment">%     end</span>
+0277     <span class="comment">%</span>
+0278     <span class="comment">%     % t (if it exists) should be the next input</span>
+0279     <span class="comment">%     if length(varargin) &gt;= NCellOrString+1</span>
+0280     <span class="comment">%         if iscell(varargin{NCellOrString+1})</span>
+0281     <span class="comment">%             error(sprintf('Expecting input #%d to be a time vector not a cell', NCellOrString+1));</span>
+0282     <span class="comment">%         end</span>
+0283     <span class="comment">%         if ischar(varargin{NCellOrString+1})</span>
+0284     <span class="comment">%             error(sprintf('Expecting input #%d to be a time vector not a string', NCellOrString+1));</span>
+0285     <span class="comment">%         end</span>
+0286     <span class="comment">%         t = varargin{NCellOrString+1};</span>
+0287     <span class="comment">%         varargin{NCellOrString+1} = [];</span>
+0288     <span class="comment">%         if isempty(t)</span>
+0289     <span class="comment">%             t = 0;</span>
+0290     <span class="comment">%         end</span>
+0291     <span class="comment">%     end</span>
+0292     <span class="comment">%</span>
+0293     <span class="comment">%     % FreshDataFlag (if it exists) should be the next input</span>
+0294     <span class="comment">%     if length(varargin) &gt;= NCellOrString+1</span>
+0295     <span class="comment">%         if iscell(varargin{NCellOrString+1})</span>
+0296     <span class="comment">%             error(sprintf('Expecting input #%d to be FreshDataFlag not a cell', NCellOrString+2));</span>
+0297     <span class="comment">%         end</span>
+0298     <span class="comment">%         if ischar(varargin{NCellOrString+1})</span>
+0299     <span class="comment">%             error(sprintf('Expecting input #%d to be FreshDataFlag not a string', NCellOrString+2));</span>
+0300     <span class="comment">%         end</span>
+0301     <span class="comment">%         FreshDataFlag = varargin{NCellOrString+1};</span>
+0302     <span class="comment">%         varargin{NCellOrString+1} = [];</span>
+0303     <span class="comment">%     end</span>
+0304     <span class="comment">%</span>
+0305     <span class="comment">%     % TimeOutPeriod (if it exists) should be the next input</span>
+0306     <span class="comment">%     if length(varargin) &gt;= NCellOrString+1</span>
+0307     <span class="comment">%         if iscell(varargin{NCellOrString+1})</span>
+0308     <span class="comment">%             error(sprintf('Expecting input #%d to be TimeOutPeriod not a cell', NCellOrString+2));</span>
+0309     <span class="comment">%         end</span>
+0310     <span class="comment">%         if ischar(varargin{NCellOrString+1})</span>
+0311     <span class="comment">%             error(sprintf('Expecting input #%d to be TimeOutPeriod not a string', NCellOrString+2));</span>
+0312     <span class="comment">%         end</span>
+0313     <span class="comment">%         TimeOutPeriod = varargin{NCellOrString+1};</span>
+0314     <span class="comment">%         varargin{NCellOrString+1} = [];</span>
+0315     <span class="comment">%     end</span>
+0316     <span class="comment">%</span>
+0317     <span class="comment">%     % Build the channel name matrix</span>
+0318     <span class="comment">%     ChannelNames = [];</span>
+0319     <span class="comment">%     for i = 1:size(varargin{1},1)</span>
+0320     <span class="comment">%         for j = 1:size(varargin{1},2)</span>
+0321     <span class="comment">%             if NCellOrString == 1</span>
+0322     <span class="comment">%                 NewNames = family2channel(varargin{1}{i,j});</span>
+0323     <span class="comment">%             elseif NCellOrString == 2</span>
+0324     <span class="comment">%                 if iscell(varargin{2})</span>
+0325     <span class="comment">%                     NewNames = family2channel(varargin{1}{i,j}, varargin{2}{i,j});</span>
+0326     <span class="comment">%                 else</span>
+0327     <span class="comment">%                     NewNames = family2channel(varargin{1}{i,j}, varargin{2});</span>
+0328     <span class="comment">%                 end</span>
+0329     <span class="comment">%             elseif NCellOrString == 3</span>
+0330     <span class="comment">%                 if iscell(varargin{2})</span>
+0331     <span class="comment">%                     NewNames = family2channel(varargin{1}{i,j}, varargin{2}{i,j}, varargin{3}{i,j});</span>
+0332     <span class="comment">%                 else</span>
+0333     <span class="comment">%                     NewNames = family2channel(varargin{1}{i,j}, varargin{2}, varargin{3}{i,j});</span>
+0334     <span class="comment">%                 end</span>
+0335     <span class="comment">%             end</span>
+0336     <span class="comment">%             ChannelNames = strvcat(ChannelNames, NewNames);</span>
+0337     <span class="comment">%             NameSize(i,j) = size(NewNames,1);</span>
+0338     <span class="comment">%         end</span>
+0339     <span class="comment">%     end</span>
+0340     <span class="comment">%</span>
+0341     <span class="comment">%     ExtraTimeDelay = etime(clock, t0);</span>
+0342     <span class="comment">%</span>
+0343     <span class="comment">%     %if nargout &gt;= 3</span>
+0344     <span class="comment">%     [AMtmp, tout, DataTimetmp, ErrorFlag] = local_getbyname(ChannelNames, 'Double', 1, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod);</span>
+0345     <span class="comment">%     %else</span>
+0346     <span class="comment">%     %    [AMtmp, tout] = local_getbyname(ChannelNames, 'Double', 1, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod)</span>
+0347     <span class="comment">%     %end</span>
+0348     <span class="comment">%</span>
+0349     <span class="comment">%     %if StructOutputFlag | nargout &gt;= 3</span>
+0350     <span class="comment">%     % .DataTime is the time on computer taking the data but</span>
+0351     <span class="comment">%     % reference it w.r.t. the time zone where Matlab is running</span>
+0352     <span class="comment">%     DateNumber1970 = 719529;  %datenum('1-Jan-1970');</span>
+0353     <span class="comment">%     days = datenum(t0(1:3)) - DateNumber1970;</span>
+0354     <span class="comment">%     t0_sec = 24*60*60*days + 60*60*t0(4) + 60*t0(5) + t0(6);</span>
+0355     <span class="comment">%     TimeZoneDiff = round((t0_sec - real(DataTimetmp(1,1)))/60/60);</span>
+0356     <span class="comment">%     DataTimetmp = (real(DataTimetmp)/60/60 + TimeZoneDiff)/24 + DateNumber1970 + imag(DataTimetmp)/(1e9 * 60 * 60 * 24);</span>
+0357     <span class="comment">%</span>
+0358     <span class="comment">%     % No time zone adjustment (UTC 00:00:00 Jan 1, 1970)</span>
+0359     <span class="comment">%     %DataTime = real(DataTime)/60/60/24 + imag(DataTime)/(1e9 * 60 * 60 * 24);</span>
+0360     <span class="comment">%     %end</span>
+0361     <span class="comment">%</span>
+0362     <span class="comment">%     for i = 1:size(varargin{1},1)</span>
+0363     <span class="comment">%         for j = 1:size(varargin{1},2)</span>
+0364     <span class="comment">%             AM{i,j} = AMtmp(1:NameSize(i,j),:);</span>
+0365     <span class="comment">%             AMtmp(1:NameSize(i,j),:) = [];</span>
+0366     <span class="comment">%             %if nargout &gt;= 3</span>
+0367     <span class="comment">%             DataTime{i,j} = DataTimetmp(1:NameSize(i,j),:);</span>
+0368     <span class="comment">%             DataTimetmp(1:NameSize(i,j),:) = [];</span>
+0369     <span class="comment">%             %end</span>
+0370     <span class="comment">%</span>
+0371     <span class="comment">%             % If input is a data structure, only change StructOutputFlag if 'numeric' is not on the input line</span>
+0372     <span class="comment">%             StructOutputFlagStart = StructOutputFlag;</span>
+0373     <span class="comment">%             if isstruct(varargin{1}{i,j})</span>
+0374     <span class="comment">%                 if isfield(varargin{1}{i,j},'Field')</span>
+0375     <span class="comment">%                     if ~NumericOutputFlag</span>
+0376     <span class="comment">%                         StructOutputFlag = 1;</span>
+0377     <span class="comment">%                     end</span>
+0378     <span class="comment">%                 end</span>
+0379     <span class="comment">%             end</span>
+0380     <span class="comment">%</span>
+0381     <span class="comment">%             if StructOutputFlag</span>
+0382     <span class="comment">%                 Datatmp = AM{i,j};</span>
+0383     <span class="comment">%                 DataTimetmp = DataTime{i,j};</span>
+0384     <span class="comment">%                 if NCellOrString == 1</span>
+0385     <span class="comment">%                     if isempty(UnitsFlag)</span>
+0386     <span class="comment">%                         AM{i,j} = family2datastruct(varargin{1}{i,j});</span>
+0387     <span class="comment">%                     else</span>
+0388     <span class="comment">%                         AM{i,j} = family2datastruct(varargin{1}{i,j}, UnitsFlag);</span>
+0389     <span class="comment">%                     end</span>
+0390     <span class="comment">%                 elseif NCellOrString == 2</span>
+0391     <span class="comment">%                     if iscell(varargin{2})</span>
+0392     <span class="comment">%                         if isempty(UnitsFlag)</span>
+0393     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2}{i,j});</span>
+0394     <span class="comment">%                         else</span>
+0395     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2}{i,j}, UnitsFlag);</span>
+0396     <span class="comment">%                         end</span>
+0397     <span class="comment">%                     else</span>
+0398     <span class="comment">%                         if isempty(UnitsFlag)</span>
+0399     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2});</span>
+0400     <span class="comment">%                         else</span>
+0401     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2}, UnitsFlag);</span>
+0402     <span class="comment">%                         end</span>
+0403     <span class="comment">%                     end</span>
+0404     <span class="comment">%                 elseif NCellOrString == 3</span>
+0405     <span class="comment">%                     if iscell(varargin{2})</span>
+0406     <span class="comment">%                         if isempty(UnitsFlag)</span>
+0407     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2}{i,j}, varargin{3}{i,j});</span>
+0408     <span class="comment">%                         else</span>
+0409     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2}{i,j}, varargin{3}{i,j}, UnitsFlag);</span>
+0410     <span class="comment">%                         end</span>
+0411     <span class="comment">%                     else</span>
+0412     <span class="comment">%                         if isempty(UnitsFlag)</span>
+0413     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2}, varargin{3}{i,j});</span>
+0414     <span class="comment">%                         else</span>
+0415     <span class="comment">%                             AM{i,j} = family2datastruct(varargin{1}{i,j}, varargin{2}, varargin{3}{i,j}, UnitsFlag);</span>
+0416     <span class="comment">%                         end</span>
+0417     <span class="comment">%                     end</span>
+0418     <span class="comment">%                 end</span>
+0419     <span class="comment">%                 AM{i,j}.Data = Datatmp;</span>
+0420     <span class="comment">%                 AM{i,j}.t = t;</span>
+0421     <span class="comment">%                 AM{i,j}.tout = tout;</span>
+0422     <span class="comment">%                 AM{i,j}.DataTime = DataTimetmp;</span>
+0423     <span class="comment">%                 AM{i,j}.Mode = 'Online';</span>
+0424     <span class="comment">%                 AM{i,j}.CreatedBy = 'getpv';</span>
+0425     <span class="comment">%             end</span>
+0426     <span class="comment">%             StructOutputFlag = StructOutputFlagStart;</span>
+0427     <span class="comment">%         end</span>
+0428     <span class="comment">%     end</span>
+0429     <span class="comment">%</span>
+0430     <span class="comment">%     return</span>
+0431     <span class="comment">%</span>
+0432     <span class="comment">%else</span>
+0433 
+0434     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0435     <span class="comment">% CELL OR CELL ARRAY INPUT %</span>
+0436     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0437     <span class="comment">% Iterate on each cell with special attention to the t vector input</span>
+0438 
+0439     <span class="comment">% For an empty input, return empty</span>
+0440     <span class="keyword">if</span> isempty(varargin{1})
+0441         AM =[]; tout = []; DataTime = []; ErrorFlag = 0;
+0442         <span class="keyword">return</span>
+0443     <span class="keyword">end</span>
+0444 
+0445     <span class="comment">% If input is a data structure, only change StructOutputFlag if 'numeric' is not on the input line</span>
+0446     <span class="keyword">if</span> isstruct(varargin{1}{1}) &amp;&amp; isfield(varargin{1}{1},<span class="string">'Field'</span>)
+0447         <span class="keyword">if</span> ~NumericOutputFlag
+0448             StructOutputFlag = 1;
+0449         <span class="keyword">end</span>
+0450     <span class="keyword">end</span>
+0451 
+0452     
+0453     <span class="comment">% Count the number of inputs which are cells (Family or DeviceList) or strings (possibly Field)</span>
+0454     NCellOrString = 1;
+0455     <span class="keyword">for</span> i = 2:length(varargin)
+0456         <span class="keyword">if</span> ~iscell(varargin{i})
+0457             <span class="keyword">if</span> ~ischar(varargin{i})
+0458                 <span class="keyword">break</span>;
+0459             <span class="keyword">else</span>
+0460                 NCellOrString = NCellOrString + 1;
+0461             <span class="keyword">end</span>
+0462         <span class="keyword">else</span>
+0463             NCellOrString = NCellOrString + 1;
+0464             <span class="comment">%if length(varargin{1})~=length(varargin{NCellOrString}) | length(varargin{NCellOrString})==1</span>
+0465             <span class="comment">%    error('When using cell, all the cells must be the same size as input 1 or be length one.');</span>
+0466             <span class="comment">%end</span>
+0467         <span class="keyword">end</span>
+0468     <span class="keyword">end</span>
+0469 
+0470     <span class="comment">% t (if it exists) should be the next input.  Save it then zero it in varargin</span>
+0471     <span class="keyword">if</span> length(varargin) &gt;= NCellOrString+1
+0472         <span class="keyword">if</span> iscell(varargin{NCellOrString+1})
+0473             error(sprintf(<span class="string">'Expecting input #%d to be a time vector not a cell'</span>, NCellOrString+1));
+0474         <span class="keyword">end</span>
+0475         <span class="keyword">if</span> ischar(varargin{NCellOrString+1})
+0476             error(sprintf(<span class="string">'Expecting input #%d to be a time vector not a string'</span>, NCellOrString+1));
+0477         <span class="keyword">end</span>
+0478         t = varargin{NCellOrString+1};
+0479         varargin{NCellOrString+1} = 0;
+0480     <span class="keyword">end</span>
+0481 
+0482 
+0483     ExtraTimeDelay = etime(clock, t0);
+0484     t = t - ExtraTimeDelay;
+0485 
+0486     <span class="comment">% Loop according to t</span>
+0487     <span class="keyword">for</span> itime = 1:length(t)
+0488         T = t(itime)-etime(clock, t0);
+0489         <span class="keyword">if</span> T &gt; 0
+0490             pause(T);
+0491         <span class="keyword">end</span>
+0492 
+0493         <span class="keyword">for</span> i = 1:size(varargin{1},1)
+0494             <span class="keyword">for</span> j = 1:size(varargin{1},2)
+0495 
+0496                 <span class="comment">% Build the input line</span>
+0497                 <span class="keyword">for</span> k = 1:length(varargin)
+0498                     <span class="keyword">if</span> ~iscell(varargin{k})
+0499                         Inputs1{1,k} = varargin{k};
+0500                     <span class="keyword">elseif</span> length(varargin{k}) == 1
+0501                         Inputs1{1,k} = varargin{k}{1};
+0502                     <span class="keyword">elseif</span> (size(varargin{k},1) == size(varargin{1},1)) &amp;&amp; (size(varargin{k},2) == size(varargin{1},2))
+0503                         Inputs1{1,k} = varargin{k}{i,j};
+0504                     <span class="keyword">else</span>
+0505                         error(<span class="string">'When using cells, all the cells must be the same size or length 1 (repeated).'</span>);
+0506                     <span class="keyword">end</span>
+0507                 <span class="keyword">end</span>
+0508 
+0509                 <span class="keyword">if</span> StructOutputFlag
+0510                     <span class="keyword">if</span> itime == 1
+0511                         <span class="comment">% Form the structure on the first time</span>
+0512                         [AM{i,j}, tout(1,itime), DataTime{i,j}, ErrorFlagNew] = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Inputs1{:}, <span class="string">'Struct'</span>, InputFlags{:});
+0513                     <span class="keyword">else</span>
+0514                         <span class="comment">% Add to the Data and time fields</span>
+0515                         [AM{i,j}.Data(:,itime), tmp, AM{i,j}.DataTime(:,itime), ErrorFlagNew] = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Inputs1{:}, <span class="string">'Numeric'</span>, InputFlags{:});
+0516                         AM{i,j}.t(1,itime) = t(itime);
+0517                         AM{i,j}.tout(1,itime) = etime(clock, t0);
+0518                         DataTime{i,j}(:,itime) = AM{i,j}.DataTime(:,itime);
+0519                     <span class="keyword">end</span>
+0520                 <span class="keyword">else</span>
+0521                     [AM{i,j}(:,itime), tmp, DataTime{i,j}(:,itime), ErrorFlagNew] = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Inputs1{:}, <span class="string">'Numeric'</span>, InputFlags{:});
+0522                 <span class="keyword">end</span>
+0523                 ErrorFlag = ErrorFlag | any(ErrorFlagNew);
+0524             <span class="keyword">end</span>
+0525             tout(itime) = etime(clock, t0);
+0526         <span class="keyword">end</span>
+0527     <span class="keyword">end</span>
+0528 
+0529     <span class="comment">% Make the output an AccObj object</span>
+0530     <span class="keyword">if</span> ObjectOutputFlag
+0531         AM = AccObj(AM);
+0532     <span class="keyword">end</span>
+0533 
+0534     <span class="keyword">return</span>
+0535 <span class="keyword">end</span>
+0536 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0537 <span class="comment">% End cell input %</span>
+0538 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0539 
+0540 
+0541 
+0542 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0543 <span class="comment">% COMMONNAME - Commonname input with no family input %</span>
+0544 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0545 <span class="keyword">if</span> isempty(varargin{1})
+0546     <span class="keyword">if</span> length(varargin) &gt;= 2
+0547         <span class="keyword">if</span> ischar(varargin{2})
+0548             Field = varargin{2};
+0549             varargin(2) = [];
+0550         <span class="keyword">end</span>
+0551     <span class="keyword">else</span>
+0552         <span class="comment">% For an empty input, return empty</span>
+0553         <span class="keyword">if</span> isempty(varargin{1})
+0554             AM =[]; tout = []; DataTime = []; ErrorFlag = 0;
+0555             <span class="keyword">return</span>
+0556         <span class="keyword">end</span>
+0557     <span class="keyword">end</span>
+0558     <span class="keyword">if</span> isempty(Field)
+0559         Field = FieldDefault;
+0560     <span class="keyword">end</span>
+0561     <span class="keyword">if</span> length(varargin) &gt;= 2
+0562         CommonNames = varargin{2};
+0563     <span class="keyword">else</span>
+0564         error(<span class="string">'Common names not found on the input line.'</span>);
+0565     <span class="keyword">end</span>
+0566     <span class="keyword">if</span> length(varargin) &gt;= 3
+0567         t = varargin{3};
+0568     <span class="keyword">end</span>
+0569     <span class="keyword">if</span> length(varargin) &gt;= 4
+0570         FreshDataFlag = varargin{4};
+0571     <span class="keyword">end</span>
+0572     <span class="keyword">if</span> length(varargin) &gt;= 5
+0573         TimeOutPeriod = varargin{5};
+0574     <span class="keyword">end</span>
+0575 
+0576 
+0577     <span class="comment">% Common names with no family name</span>
+0578     <span class="keyword">if</span> ~ischar(CommonNames)
+0579         error(<span class="string">'If Family=[], then DeviceList must be a string of common names.'</span>)
+0580     <span class="keyword">end</span>
+0581     [AM, tout, DataTime, DeviceList, ErrorFlag] = <a href="#_sub1" class="code" title="subfunction [AM, tout, DataTime, DeviceList, ErrorFlag] = getbycommonname(CommonNames, Field, t, t0, FreshDataFlag, TimeOutPeriod, varargin)">getbycommonname</a>(CommonNames, Field, t, t0, FreshDataFlag, TimeOutPeriod, InputFlags{:});
+0582     <span class="keyword">if</span> ErrorFlag
+0583         <span class="keyword">return</span>;
+0584     <span class="keyword">end</span>
+0585 
+0586     <span class="keyword">if</span> StructOutputFlag || nargout &gt;= 3
+0587         <span class="comment">% .DataTime is the time on computer taking the data but</span>
+0588         <span class="comment">% reference it w.r.t. the time zone where Matlab is running</span>
+0589         DateNumber1970 = 719529;  <span class="comment">%datenum('1-Jan-1970');</span>
+0590         days = datenum(t0(1:3)) - DateNumber1970;
+0591         t0_sec = 24*60*60*days + 60*60*t0(4) + 60*t0(5) + t0(6);
+0592         TimeZoneDiff = round((t0_sec - real(DataTime(1,1)))/60/60);
+0593         DataTime = (real(DataTime)/60/60 + TimeZoneDiff)/24 + DateNumber1970 + imag(DataTime)/(1e9 * 60 * 60 * 24);
+0594     <span class="keyword">end</span>
+0595 
+0596     <span class="comment">% Structure output</span>
+0597     <span class="keyword">if</span> StructOutputFlag
+0598         AM = struct(<span class="string">'Data'</span>, AM);
+0599         AM.FamilyName = CommonNames;
+0600         AM.Field = Field;
+0601         AM.DeviceList = DeviceList;
+0602         AM.Status = [];
+0603         AM.t = t;
+0604         AM.tout = tout;
+0605         AM.DataTime = DataTime;
+0606         AM.TimeStamp = t0;
+0607         [DeviceList1, Family1] = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(CommonNames(1,:));
+0608         AM.Mode = <a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>(Family1);                      <span class="comment">% Base on just the first common name</span>
+0609         [AM.Units, AM.UnitsString] = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(Family1);  <span class="comment">% Base on just the first common name</span>
+0610         AM.DataDescriptor = <span class="string">'Get by Common Name'</span>;
+0611         AM.CreatedBy = <span class="string">'getpv'</span>;
+0612 
+0613         <span class="comment">% Make the output an AccObj object</span>
+0614         <span class="keyword">if</span> ObjectOutputFlag
+0615             AM = AccObj(AM);
+0616         <span class="keyword">end</span>
+0617     <span class="keyword">end</span>
+0618 
+0619     <span class="keyword">return</span>
+0620 <span class="keyword">end</span>
+0621 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0622 <span class="comment">% End CommonName input with no family input %</span>
+0623 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0624 
+0625 
+0626 
+0627 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0628 <span class="comment">% Parce inputs depending on Data structure, AO structure, Family, ChannelName method %</span>
+0629 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0630 <span class="keyword">if</span> isstruct(varargin{1})
+0631     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0632     <span class="comment">% STRUCTURE INPUTS - Data structure or AO structure %</span>
+0633     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0634     <span class="keyword">if</span> isfield(varargin{1},<span class="string">'FamilyName'</span>) &amp;&amp; isfield(varargin{1},<span class="string">'Field'</span>)
+0635         <span class="comment">% Data structure - select FamilyName, DeviceList, Units  from the structure (.Mode flag???)</span>
+0636         <span class="comment">% [AM, tout, DataTime, ErrorFlag] = getpv(DataStruct, Field {opt}, t, FreshDataFlag, TimeOutPeriod)</span>
+0637 
+0638         <span class="comment">% Only change StructOutputFlag if 'numeric' is not on the input line</span>
+0639         <span class="keyword">if</span> ~NumericOutputFlag
+0640             StructOutputFlag = 1;
+0641         <span class="keyword">end</span>
+0642 
+0643         Family = varargin{1}.FamilyName;
+0644 
+0645         Field = varargin{1}.Field;
+0646         <span class="keyword">if</span> length(varargin) &gt;= 2
+0647             <span class="keyword">if</span> ischar(varargin{2})
+0648                 Field = varargin{2};
+0649                 varargin(2) = [];
+0650             <span class="keyword">end</span>
+0651         <span class="keyword">end</span>
+0652 
+0653         DeviceList = varargin{1}.DeviceList;
+0654 
+0655         <span class="keyword">if</span> length(varargin) &gt;= 2
+0656             <span class="comment">% If the input exists use it</span>
+0657             t = varargin{2};
+0658         <span class="keyword">else</span>
+0659             <span class="comment">% Else, get it from the structure if the field exists</span>
+0660             <span class="keyword">if</span> isfield(varargin{1},<span class="string">'t'</span>)
+0661                 t = varargin{1}.t;
+0662             <span class="keyword">end</span>
+0663         <span class="keyword">end</span>
+0664         <span class="keyword">if</span> length(varargin) &gt;= 3
+0665             FreshDataFlag = varargin{3};
+0666         <span class="keyword">end</span>
+0667         <span class="keyword">if</span> length(varargin) &gt;= 4
+0668             TimeOutPeriod = varargin{4};
+0669         <span class="keyword">end</span>
+0670 
+0671         [FamilyIndex, AO] = <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(Family);
+0672 
+0673         <span class="comment">% Change Units to the data structure units</span>
+0674         <span class="keyword">if</span> isfield(AO, Field)
+0675             AO.(Field).Units = varargin{1}.Units;
+0676         <span class="keyword">end</span>
+0677 
+0678     <span class="keyword">elseif</span> isfield(varargin{1},<span class="string">'FamilyName'</span>)
+0679         <span class="comment">% AO structure - use the AO structure directly</span>
+0680         <span class="comment">%  [AM, tout, DataTime, ErrorFlag] = getpv(AO, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)</span>
+0681         FamilyIndex = 1;
+0682         AO = varargin{1};
+0683         Family = varargin{1}.FamilyName;
+0684 
+0685         Field = <span class="string">''</span>;
+0686         <span class="keyword">if</span> length(varargin) &gt;= 2
+0687             <span class="keyword">if</span> ischar(varargin{2})
+0688                 Field = varargin{2};
+0689                 varargin(2) = [];
+0690             <span class="keyword">end</span>
+0691         <span class="keyword">end</span>
+0692         <span class="keyword">if</span> length(varargin) &gt;= 2
+0693             DeviceList = varargin{2};
+0694         <span class="keyword">else</span>
+0695             DeviceList = AO.DeviceList;
+0696             iStatus = find(varargin{1}.Status == 0);
+0697             DeviceList(iStatus,:) = [];
+0698         <span class="keyword">end</span>
+0699         <span class="keyword">if</span> length(varargin) &gt;= 3
+0700             t = varargin{3};
+0701         <span class="keyword">end</span>
+0702         <span class="keyword">if</span> length(varargin) &gt;= 4
+0703             FreshDataFlag = varargin{4};
+0704         <span class="keyword">end</span>
+0705         <span class="keyword">if</span> length(varargin) &gt;= 5
+0706             TimeOutPeriod = varargin{5};
+0707         <span class="keyword">end</span>
+0708     <span class="keyword">else</span>
+0709         error(<span class="string">'Input #1 of unknown type'</span>);
+0710     <span class="keyword">end</span>
+0711     
+0712 <span class="keyword">else</span>
+0713 
+0714     <span class="comment">% Family, ChannelName, or Common name are still left</span>
+0715     [FamilyIndex, AO] = <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(varargin{1});
+0716 
+0717     <span class="keyword">if</span> FamilyIndex
+0718 
+0719         <span class="comment">%%%%%%%%%%%%%%%%</span>
+0720         <span class="comment">% FAMILY INPUT %</span>
+0721         <span class="comment">%%%%%%%%%%%%%%%%</span>
+0722         <span class="comment">%  [AM, tout, DataTime, ErrorFlag] = getpv(Family, Field {opt}, DeviceList, t, FreshDataFlag, TimeOutPeriod)</span>
+0723         Family = varargin{1};
+0724         <span class="keyword">if</span> length(varargin) &gt;= 2
+0725             <span class="keyword">if</span> ischar(varargin{2})
+0726                 Field = varargin{2};
+0727                 varargin(2) = [];
+0728             <span class="keyword">end</span>
+0729         <span class="keyword">end</span>
+0730         <span class="keyword">if</span> isempty(Field)
+0731             Field = FieldDefault;
+0732         <span class="keyword">end</span>
+0733         <span class="keyword">if</span> length(varargin) &gt;= 2
+0734             DeviceList = varargin{2};
+0735         <span class="keyword">end</span>
+0736         <span class="keyword">if</span> length(varargin) &gt;= 3
+0737             t = varargin{3};
+0738         <span class="keyword">end</span>
+0739         <span class="keyword">if</span> length(varargin) &gt;= 4
+0740             FreshDataFlag = varargin{4};
+0741         <span class="keyword">end</span>
+0742         <span class="keyword">if</span> length(varargin) &gt;= 5
+0743             TimeOutPeriod = varargin{5};
+0744         <span class="keyword">end</span>
+0745         
+0746     <span class="keyword">else</span>
+0747         
+0748         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0749         <span class="comment">% CHANNEL NAME OR COMMON NAME INPUT %</span>
+0750         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0751         
+0752         <span class="comment">% Just do input parsing here</span>
+0753         Family = varargin{1};
+0754         
+0755         <span class="comment">% Default field is '' for channel names or it would be added as ChannelName.Field</span>
+0756         <span class="comment">% But for common names it needs to be 'Monitor'</span>
+0757         Field = <span class="string">''</span>;
+0758         <span class="keyword">if</span> length(varargin) &gt;= 2
+0759             <span class="keyword">if</span> ~isnumeric(varargin{2})
+0760                 Field = varargin{2};
+0761                 varargin(2) = [];
+0762             <span class="keyword">end</span>
+0763         <span class="keyword">end</span>
+0764         <span class="keyword">if</span> length(varargin) &gt;= 2
+0765             t = varargin{2};
+0766         <span class="keyword">end</span>
+0767         <span class="keyword">if</span> length(varargin) &gt;= 3
+0768             FreshDataFlag = varargin{3};
+0769         <span class="keyword">end</span>
+0770         <span class="keyword">if</span> length(varargin) &gt;= 4
+0771             TimeOutPeriod = varargin{4};
+0772         <span class="keyword">end</span> 
+0773     <span class="keyword">end</span>
+0774 <span class="keyword">end</span>
+0775 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0776 <span class="comment">% End selection of inputs depending on Family, Data Structure, AO structure, or ChannelName method %</span>
+0777 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0778 
+0779 
+0780 
+0781 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0782 <span class="comment">% AO, ChannelName, or CommonName %</span>
+0783 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0784 <span class="keyword">if</span> isempty(t)
+0785     t = 0;
+0786 <span class="keyword">end</span>
+0787 <span class="keyword">if</span> FamilyIndex 
+0788     <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0789     <span class="comment">% FAMILY INPUTS %</span>
+0790     <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0791 
+0792     <span class="comment">% All ready done</span>
+0793     <span class="comment">%if isempty(Field)</span>
+0794     <span class="comment">%    Field = 'Monitor';</span>
+0795     <span class="comment">%end</span>
+0796 
+0797     <span class="keyword">if</span> isempty(DeviceList)
+0798         DeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family);     <span class="comment">% Default behavior comes from family2dev</span>
+0799         <span class="comment">%DeviceList = family2dev(Family,1);  % Good status only</span>
+0800         <span class="comment">%DeviceList = AO.DeviceList;         % All devices</span>
+0801     <span class="keyword">end</span>
+0802     <span class="keyword">if</span> ischar(DeviceList)
+0803         <span class="comment">% Convert common name to a DeviceList</span>
+0804         DeviceList = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(DeviceList, AO);
+0805     <span class="keyword">end</span>
+0806     <span class="keyword">if</span> (size(DeviceList,2) == 1) 
+0807         DeviceList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(Family, DeviceList);
+0808     <span class="keyword">end</span>
+0809 
+0810 
+0811     <span class="comment">% Look for command-line over-rides</span>
+0812     <span class="keyword">if</span> isfield(AO, Field)
+0813         <span class="keyword">if</span> ~isempty(UnitsFlag)
+0814             AO.(Field).Units = UnitsFlag;
+0815         <span class="keyword">end</span>
+0816         <span class="keyword">if</span> ~isempty(ModeFlag)
+0817             <span class="keyword">if</span> strcmp(ModeFlag, <span class="string">'Online'</span>) &amp;&amp; strcmp(AO.(Field).Mode, <span class="string">'Special'</span>)
+0818                 <span class="comment">% For Online over-rides, look for Special mode first</span>
+0819                 AO.(Field).Mode = <span class="string">'Special'</span>;
+0820             <span class="keyword">else</span>
+0821                 AO.(Field).Mode = ModeFlag;
+0822             <span class="keyword">end</span>
+0823         <span class="keyword">end</span>
+0824     <span class="keyword">end</span>
+0825 
+0826     
+0827     <span class="comment">% Get data</span>
+0828     ExtraTimeDelay = etime(clock, t0);
+0829     <span class="keyword">if</span> StructOutputFlag || nargout &gt;= 3
+0830         [AM, tout, DataTime, ErrorFlag, DeviceIndex] = <a href="#_sub3" class="code" title="subfunction [AM, tout, DataTime, ErrorFlag, DeviceIndex] = local_getpv(AO, Field, DeviceList, OutputDataType, t, FreshDataFlag, TimeOutPeriod)">local_getpv</a>(AO, Field, DeviceList, OutputDataType, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod);
+0831     <span class="keyword">else</span>
+0832         [AM, tout] = <a href="#_sub3" class="code" title="subfunction [AM, tout, DataTime, ErrorFlag, DeviceIndex] = local_getpv(AO, Field, DeviceList, OutputDataType, t, FreshDataFlag, TimeOutPeriod)">local_getpv</a>(AO, Field, DeviceList, OutputDataType, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod);
+0833     <span class="keyword">end</span>
+0834     tout = tout + ExtraTimeDelay;
+0835 
+0836     
+0837     <span class="keyword">if</span> StructOutputFlag
+0838         <span class="comment">% Structure output</span>
+0839         AM = struct(<span class="string">'Data'</span>, AM);
+0840         <span class="comment">%AM.Data = AM;</span>
+0841         AM.FamilyName = Family;
+0842         AM.Field = Field;
+0843         AM.DeviceList = DeviceList;
+0844         <span class="keyword">if</span> length(AO.Status) == 1
+0845             AM.Status = AO.Status * ones(size(DeviceIndex));
+0846         <span class="keyword">else</span>
+0847             <span class="comment">%AM.Status = family2status(Family, AM.DeviceList);</span>
+0848             AM.Status = AO.Status(DeviceIndex);
+0849         <span class="keyword">end</span>
+0850         <span class="keyword">if</span> isfield(AO, Field)
+0851             AM.Mode = AO.(Field).Mode;
+0852             AM.Units = AO.(Field).Units;
+0853             <span class="keyword">if</span> strcmpi(AM.Units,<span class="string">'hardware'</span>)
+0854                 AM.UnitsString = AO.(Field).HWUnits;
+0855             <span class="keyword">else</span>
+0856                 AM.UnitsString = AO.(Field).PhysicsUnits;
+0857             <span class="keyword">end</span>
+0858             AM.DataDescriptor = <span class="string">'Get by FamilyName'</span>; 
+0859         <span class="keyword">else</span>
+0860             AM.Mode = <span class="string">'Online'</span>;
+0861             AM.Units = <span class="string">''</span>;
+0862             AM.UnitsString = <span class="string">''</span>;
+0863             AM.DataDescriptor = <span class="string">'Get by Channel Name'</span>;
+0864         <span class="keyword">end</span>
+0865         AM.CreatedBy = <span class="string">'getpv'</span>;
+0866     <span class="keyword">end</span>
+0867 
+0868 <span class="keyword">else</span>
+0869 
+0870     <span class="comment">% Look to see if it's a channel name or a common name</span>
+0871     <span class="comment">% Just check the first name so it's a faster test</span>
+0872     [DeviceListTest, FamilyTest] = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(deblank(Family(1,:)));
+0873     <span class="comment">%FamilyTest = '';</span>
+0874     <span class="keyword">if</span> ~isempty(FamilyTest)
+0875         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0876         <span class="comment">% Family input is a common name list %</span>
+0877         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0878         
+0879         <span class="comment">% Field default will come from getbycommonname via another getpv call</span>
+0880         <span class="comment">% The DeviceList should not exist (and should not be used)</span>
+0881 
+0882         CommonNames = Family;
+0883         [AM, tout, DataTime, DeviceList, ErrorFlag] = <a href="#_sub1" class="code" title="subfunction [AM, tout, DataTime, DeviceList, ErrorFlag] = getbycommonname(CommonNames, Field, t, t0, FreshDataFlag, TimeOutPeriod, varargin)">getbycommonname</a>(CommonNames, Field, t, t0, FreshDataFlag, TimeOutPeriod, InputFlags{:});
+0884         <span class="keyword">if</span> ErrorFlag
+0885             <span class="keyword">return</span>;
+0886         <span class="keyword">end</span>
+0887 
+0888         <span class="comment">% Structure output</span>
+0889         <span class="keyword">if</span> StructOutputFlag
+0890             AM = struct(<span class="string">'Data'</span>, AM);
+0891             AM.FamilyName = CommonNames;
+0892             AM.Field = Field;
+0893             AM.DeviceList = DeviceList;
+0894             AM.Status = [];
+0895             AM.Mode = <a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>(FamilyTest(1,:));                      <span class="comment">% Base on just the first common name</span>
+0896             [AM.Units, AM.UnitsString] = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(FamilyTest(1,:));  <span class="comment">% Base on just the first common name</span>
+0897             AM.DataDescriptor = <span class="string">'Get by Common Name'</span>;
+0898             AM.CreatedBy = <span class="string">'getpv'</span>;
+0899         <span class="keyword">end</span>
+0900 
+0901     <span class="keyword">else</span>
+0902 
+0903         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0904         <span class="comment">% CHANNEL NAME - Online Only %</span>
+0905         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0906 
+0907         <span class="comment">% Can't use overrides with channel name method</span>
+0908         <span class="keyword">if</span> ~isempty(UnitsFlag)
+0909             error(<span class="string">'You cannot change the units when using channel names.'</span>)
+0910         <span class="keyword">end</span>
+0911         <span class="keyword">if</span> ~(isempty(ModeFlag) || strcmpi(ModeFlag, <span class="string">'Online'</span>))
+0912             error(<span class="string">'Channel names only have an ''Online'' Mode.'</span>)
+0913         <span class="keyword">end</span>
+0914 
+0915         <span class="comment">% Add Field to Family.Field</span>
+0916         FamilyOld = Family;
+0917         <span class="keyword">if</span> ~isempty(Field)
+0918             Family = strcat(Family, [<span class="string">'.'</span>,Field]);
+0919         <span class="keyword">end</span>
+0920 
+0921         ExtraTimeDelay = etime(clock, t0);
+0922         <span class="keyword">if</span> strcmpi(OutputDataType,<span class="string">'String'</span>)
+0923             <span class="comment">% Get data with strings output</span>
+0924             <span class="keyword">if</span> StructOutputFlag || nargout &gt;= 3
+0925                 [AM, tout, DataTime, ErrorFlag] = getpvonline(Family, <span class="string">'String'</span>, 0, t-ExtraTimeDelay);
+0926             <span class="keyword">else</span>
+0927                 [AM, tout] = getpvonline(Family, <span class="string">'String'</span>, 0, t-ExtraTimeDelay);
+0928             <span class="keyword">end</span>
+0929         <span class="keyword">else</span>
+0930             <span class="comment">% Get data at every point in time vector, t</span>
+0931             <span class="keyword">if</span> StructOutputFlag || nargout &gt;= 3
+0932                 [AM, tout, DataTime, ErrorFlag] = <a href="#_sub2" class="code" title="subfunction [AM, tout, DataTime, ErrorFlag] = local_getbyname(ChannelName, OutputDataType, N, t, FreshDataFlag, TimeOutPeriod)">local_getbyname</a>(Family, OutputDataType, 0, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod);
+0933             <span class="keyword">else</span>
+0934                 [AM, tout] = <a href="#_sub2" class="code" title="subfunction [AM, tout, DataTime, ErrorFlag] = local_getbyname(ChannelName, OutputDataType, N, t, FreshDataFlag, TimeOutPeriod)">local_getbyname</a>(Family, OutputDataType, 0, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod);
+0935             <span class="keyword">end</span>
+0936         <span class="keyword">end</span>
+0937         tout = tout + ExtraTimeDelay;
+0938 
+0939 
+0940         <span class="comment">% Structure output for channel name method</span>
+0941         <span class="keyword">if</span> StructOutputFlag
+0942             AM = struct(<span class="string">'Data'</span>, AM);
+0943             <span class="comment">%AM.Data = AM;</span>
+0944             AM.FamilyName = FamilyOld;
+0945             AM.Field = Field;
+0946             AM.DeviceList = [];
+0947             AM.Status = [];
+0948             AM.Mode = <span class="string">'Online'</span>;
+0949             AM.Units = <span class="string">''</span>;
+0950             AM.UnitsString = <span class="string">''</span>;
+0951             AM.DataDescriptor = <span class="string">'Get by Channel Name'</span>;
+0952             AM.CreatedBy = <span class="string">'getpv'</span>;
+0953         <span class="keyword">end</span>
+0954     <span class="keyword">end</span>
+0955 <span class="keyword">end</span>
+0956 
+0957 
+0958 <span class="keyword">if</span> StructOutputFlag || nargout &gt;= 3
+0959     <span class="comment">% .DataTime is the time on computer taking the data but</span>
+0960     <span class="comment">% reference it w.r.t. the time zone where Matlab is running</span>
+0961     DateNumber1970 = 719529;  <span class="comment">%datenum('1-Jan-1970');</span>
+0962     days = datenum(t0(1:3)) - DateNumber1970;
+0963     t0_sec = 24*60*60*days + 60*60*t0(4) + 60*t0(5) + t0(6);
+0964     TimeZoneDiff = round((t0_sec - real(DataTime(1,1)))/60/60);
+0965     DataTime = (real(DataTime)/60/60 + TimeZoneDiff)/24 + DateNumber1970 + imag(DataTime)/(1e9 * 60 * 60 * 24);
+0966 
+0967     <span class="comment">% No time zone adjustment (UTC 00:00:00 Jan 1, 1970)</span>
+0968     <span class="comment">%DataTime = real(DataTime)/60/60/24 + imag(DataTime)/(1e9 * 60 * 60 * 24);</span>
+0969 <span class="keyword">end</span>
+0970 
+0971 
+0972 <span class="comment">% Structure output</span>
+0973 <span class="keyword">if</span> StructOutputFlag
+0974     <span class="comment">% Add time to structure</span>
+0975     AM.t = t;
+0976     AM.tout = tout;
+0977     AM.DataTime = DataTime;
+0978     AM.TimeStamp = t0;
+0979 
+0980     <span class="comment">% Make the output an AccObj object</span>
+0981     <span class="keyword">if</span> ObjectOutputFlag
+0982         AM = AccObj(AM);
+0983     <span class="keyword">end</span>
+0984 <span class="keyword">end</span>
+0985 
+0986 
+0987 
+0988 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0989 <span class="comment">%  Main Function for Getting Data Using Common Names  %</span>
+0990 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0991 <a name="_sub1" href="#_subfunctions" class="code">function [AM, tout, DataTime, DeviceList, ErrorFlag] = getbycommonname(CommonNames, Field, t, t0, FreshDataFlag, TimeOutPeriod, varargin)</a>
+0992 
+0993 <span class="comment">% Convert all the common names to Family and Device lists</span>
+0994 [DeviceList, Family, ErrorFlag] = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(CommonNames);
+0995 
+0996 <span class="keyword">if</span> ErrorFlag
+0997     AM=[]; tout=[]; DataTime=[];
+0998     <span class="keyword">return</span>;
+0999 <span class="keyword">else</span>
+1000 
+1001     <span class="keyword">if</span> size(Family, 1) == 1
+1002         <span class="comment">% 1 Family, Multiple devices are ok</span>
+1003         [AM, tout, DataTime, ErrorFlag] = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod, <span class="string">'Numeric'</span>, varargin{:});
+1004     <span class="keyword">else</span>
+1005         <span class="comment">% Multiple families (loop)</span>
+1006         <span class="comment">% It has to be in a loop for the simulator and to pickup special functions</span>
+1007 
+1008         <span class="keyword">if</span> FreshDataFlag &gt;= 1
+1009             error(<span class="string">'The FreshDataFlag is not programmed yet when when getting common names from multiple families (GJP).'</span>);
+1010         <span class="keyword">end</span>
+1011 
+1012         <span class="comment">% Loop on the time vector (t0 has already been started)</span>
+1013         <span class="keyword">for</span> itime = 1:length(t)
+1014             T = t(itime)-etime(clock, t0);
+1015             <span class="keyword">if</span> T &gt; 0
+1016                 pause(T);
+1017             <span class="keyword">end</span>
+1018             <span class="keyword">for</span> i = 1:size(Family,1)
+1019                 [AM(i,itime), tmp, DataTime(i,itime), ErrorFlag1] = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Family(i,:), Field, DeviceList(i,:), <span class="string">'Numeric'</span>, varargin{:});
+1020                 tout(1,itime) = etime(clock, t0);
+1021                 ErrorFlag = ErrorFlag | ErrorFlag1;
+1022             <span class="keyword">end</span>
+1023         <span class="keyword">end</span>
+1024     <span class="keyword">end</span>
+1025 <span class="keyword">end</span>
+1026 
+1027 
+1028 
+1029 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1030 <span class="comment">%  Main Function for Getting Data using the Channel Names  %</span>
+1031 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1032 <a name="_sub2" href="#_subfunctions" class="code">function [AM, tout, DataTime, ErrorFlag] = local_getbyname(ChannelName, OutputDataType, N, t, FreshDataFlag, TimeOutPeriod)</a>
+1033 
+1034 t0 = clock;
+1035 ErrorFlag = 0;
+1036 
+1037 
+1038 <span class="keyword">if</span> nargout &lt; 3
+1039     [AM, tout] = getpvonline(ChannelName, OutputDataType, N, t);
+1040 <span class="keyword">else</span>
+1041     [AM, tout, DataTime, ErrorFlag] = getpvonline(ChannelName, OutputDataType, N, t);
+1042 <span class="keyword">end</span>
+1043 
+1044 
+1045 <span class="comment">% FreshDataFlag</span>
+1046 <span class="keyword">if</span> FreshDataFlag &amp;&amp; length(t) == 1
+1047     <span class="comment">% Only use FreshDataFlag for scalar t</span>
+1048     FreshDataCounter = FreshDataFlag;
+1049     AM0 = AM;
+1050     <span class="keyword">while</span> FreshDataCounter
+1051         <span class="keyword">if</span> nargout &lt; 3
+1052             [AM, tout] = getpvonline(ChannelName, OutputDataType, N);
+1053         <span class="keyword">else</span>
+1054             [AM, tout, DataTime, ErrorFlag] = getpvonline(ChannelName, OutputDataType, N);
+1055         <span class="keyword">end</span>
+1056 
+1057         <span class="keyword">if</span> ~any((AM-AM0)==0)
+1058             FreshDataCounter = FreshDataCounter - 1;
+1059             AM0 = AM;
+1060         <span class="keyword">end</span>
+1061 
+1062         <span class="keyword">if</span> etime(clock, t0) &gt; TimeOutPeriod
+1063             k = find((AM-AM0)==0);
+1064             <span class="keyword">for</span> j = 1:length(k)
+1065                 fprintf(<span class="string">'%s not changing.\n'</span>, deblank(ChannelName(k(j),:)));
+1066             <span class="keyword">end</span>
+1067             error(<span class="string">'Timed out waiting for fresh data.'</span>);
+1068         <span class="keyword">end</span>
+1069     <span class="keyword">end</span>
+1070     tout = etime(clock, t0);
+1071 <span class="keyword">end</span>
+1072 
+1073 <span class="keyword">return</span>
+1074 
+1075 
+1076 
+1077 
+1078 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1079 <span class="comment">%  Main Function for Getting Data using the Accelerator Object  %</span>
+1080 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1081 <a name="_sub3" href="#_subfunctions" class="code">function [AM, tout, DataTime, ErrorFlag, DeviceIndex] = local_getpv(AO, Field, DeviceList, OutputDataType, t, FreshDataFlag, TimeOutPeriod)</a>
+1082 
+1083 t0 = clock;
+1084 ErrorFlag = 0;
+1085 N = 0;  <span class="comment">% Output size</span>
+1086 
+1087 
+1088 <span class="comment">% Find the index for where the desired data is in the total device list</span>
+1089 DeviceListTotal = AO.DeviceList;
+1090 [DeviceIndex, iNotFound] = findrowindex(DeviceList, DeviceListTotal);
+1091 <span class="keyword">if</span> ~isempty(iNotFound)
+1092     <span class="comment">% Device not found</span>
+1093     <span class="keyword">for</span> i = 1:length(iNotFound)
+1094         fprintf(<span class="string">'   No devices to get for Family %s(%d,%d)\n'</span>, AO.FamilyName, DeviceList(i,1), DeviceList(i,2));
+1095     <span class="keyword">end</span>
+1096     error(sprintf(<span class="string">'%d Devices not found'</span>, length(iNotFound)));
+1097 <span class="keyword">end</span>
+1098 
+1099 <span class="comment">% Check the DeviceIndex</span>
+1100 <span class="keyword">if</span> isempty(DeviceIndex)
+1101     DataTime = 0 + 0*sqrt(-1);
+1102     tout = etime(clock, t0);
+1103     AM = [];
+1104     <span class="comment">%fprintf('   WARNING:  No devices to get for Family %s (getpv)\n', AO.FamilyName);</span>
+1105     <span class="keyword">return</span>;
+1106 <span class="keyword">end</span>
+1107 
+1108 
+1109 <span class="comment">% If Field is not found in the AO, it is unclear what to do next.</span>
+1110 <span class="comment">% I could error here, but it's convenient to try to get</span>
+1111 <span class="comment">% EPICS subfields or other simulator fields at this point.</span>
+1112 <span class="keyword">if</span> ~isfield(AO, Field);
+1113     <span class="comment">% Try to check it online or simulator</span>
+1114     <span class="keyword">if</span> isfield(AO, <span class="string">'Setpoint'</span>)
+1115         Mode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(AO.FamilyName, <span class="string">'Setpoint'</span>, <span class="string">'Mode'</span>);
+1116     <span class="keyword">elseif</span> isfield(AO, <span class="string">'Monitor'</span>)
+1117         Mode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(AO.FamilyName, <span class="string">'Monitor'</span>, <span class="string">'Mode'</span>);
+1118     <span class="keyword">else</span>
+1119         Mode = <span class="string">''</span>;
+1120     <span class="keyword">end</span>
+1121     <span class="keyword">if</span> strcmpi(Mode,<span class="string">'Simulator'</span>) || strcmpi(Mode,<span class="string">'Model'</span>)
+1122         ExtraTimeDelay = etime(clock, t0);
+1123         [AM, tout, DataTime, ErrorFlag] = getpvmodel(AO.FamilyName, Field, DeviceList, t-ExtraTimeDelay, <span class="string">'Physics'</span>, <span class="string">'Numeric'</span>);
+1124         tout = tout + ExtraTimeDelay;
+1125         
+1126         <span class="comment">% Since physics2hw conversions are not known for fields that are not families, just return</span>
+1127         <span class="keyword">return</span>
+1128     <span class="keyword">end</span>
+1129     
+1130     <span class="comment">% Try changing the suffix of the Monitor or Setpoint field</span>
+1131     <span class="keyword">if</span> isfield(AO, <span class="string">'Setpoint'</span>)
+1132         Channel = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(AO, <span class="string">'Setpoint'</span>, DeviceList);
+1133     <span class="keyword">elseif</span> isfield(AO, <span class="string">'Monitor'</span>)
+1134         Channel = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(AO, <span class="string">'Monitor'</span>, DeviceList);
+1135     <span class="keyword">else</span>
+1136         error(sprintf(<span class="string">'Field %s not found for Family %s'</span>, Field, AO.FamilyName));
+1137     <span class="keyword">end</span>
+1138     <span class="keyword">if</span> any(strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Machine'</span>),{<span class="string">'spear3'</span>,<span class="string">'spear'</span>}))
+1139         <span class="comment">% Spear likes to change the channel name after the ':'</span>
+1140         
+1141         <span class="comment">%i = findstr(Channel(1,:),':');</span>
+1142         <span class="comment">%if ~isempty(i)</span>
+1143         <span class="comment">%    Channel(:,i:end) = [];</span>
+1144         <span class="comment">%end</span>
+1145         <span class="comment">%Channel = strcat(Channel, [':',Field]);</span>
+1146 
+1147         <span class="comment">% Since the location of &quot;:&quot; can be different in each row, loop</span>
+1148         ChannelMat = [];
+1149         <span class="keyword">for</span> j = 1:size(Channel,1)
+1150             i = findstr(Channel(j,:),<span class="string">':'</span>);
+1151             <span class="keyword">if</span> isempty(i)
+1152                 <span class="comment">% I'm not sure what to do if &quot;:&quot; is missing, I'm just add a &quot;:&quot;</span>
+1153                 ChannelMat = strvcat(ChannelMat, [Channel(j,1:i), <span class="string">':'</span>, Field]);
+1154             <span class="keyword">else</span>
+1155                 ChannelMat = strvcat(ChannelMat, [Channel(j,1:i), Field]);
+1156             <span class="keyword">end</span>
+1157         <span class="keyword">end</span>
+1158         Channel = ChannelMat;
+1159 
+1160     <span class="keyword">else</span>
+1161         <span class="comment">% Add a .Field (EPICS)</span>
+1162         Channel = strcat(Channel, [<span class="string">'.'</span>,Field]);
+1163     <span class="keyword">end</span>
+1164 
+1165     ExtraTimeDelay = etime(clock, t0);
+1166     <span class="keyword">if</span> nargout &lt; 3
+1167         [AM, tout] = getpvonline(Channel, OutputDataType, N, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod);
+1168     <span class="keyword">else</span>
+1169         [AM, tout, DataTime, ErrorFlag] = getpvonline(Channel, OutputDataType, N, t-ExtraTimeDelay, FreshDataFlag, TimeOutPeriod);
+1170     <span class="keyword">end</span>
+1171     tout = tout + ExtraTimeDelay;
+1172     <span class="keyword">return</span>
+1173 <span class="keyword">end</span>
+1174 
+1175 
+1176 AOField = AO.(Field);   <span class="comment">% Should I replace this????</span>
+1177 
+1178 <span class="keyword">if</span> isfield(AOField, <span class="string">'Mode'</span>)
+1179     Mode = AOField.Mode;
+1180 <span class="keyword">else</span>
+1181     Mode = <span class="string">'Online'</span>;
+1182 <span class="keyword">end</span>
+1183 
+1184 
+1185 <span class="comment">% Check if Online should really be special</span>
+1186 <span class="keyword">if</span> strcmpi(Mode, <span class="string">'Online'</span>)
+1187    <span class="keyword">if</span> isfield(AO.(Field), <span class="string">'SpecialFunctionGet'</span>)
+1188        Mode = <span class="string">'Special'</span>;
+1189    <span class="keyword">end</span>
+1190 <span class="keyword">end</span>
+1191 
+1192 
+1193 <span class="keyword">if</span> ~isstruct(AO.(Field))
+1194     <span class="comment">% If it's not a structure that just get the field</span>
+1195     <span class="comment">% Hardward and physics get ignored</span>
+1196     t1 = clock;
+1197     [AM, ErrorFlag] = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(AO.FamilyName, Field, DeviceList);
+1198     
+1199     tout = etime(t1, t0);
+1200     <span class="keyword">if</span> nargout &gt;= 3
+1201         days = datenum(t1(1:3)) - 719529;  <span class="comment">%datenum('1-Jan-1970');</span>
+1202         tt = 24*60*60*days + 60*60*t1(4) + 60*t1(5) + t1(6);
+1203         DataTime(1:size(AM,1),1:length(t)) = fix(tt) + rem(tt,1)*1e9*sqrt(-1);
+1204     <span class="keyword">end</span>
+1205     
+1206 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'online'</span>)
+1207     <span class="comment">% Online</span>
+1208     <span class="keyword">if</span> strcmpi(AOField.DataType,<span class="string">'Scalar'</span>)
+1209         N = 1;  <span class="comment">% Output size</span>
+1210 
+1211         ExtraTimeDelay = etime(clock, t0);
+1212         <span class="keyword">if</span> nargout &lt; 3
+1213             [AM, tout] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N, t-ExtraTimeDelay);
+1214         <span class="keyword">else</span>
+1215             [AM, tout, DataTime, ErrorFlag] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N, t-ExtraTimeDelay);
+1216         <span class="keyword">end</span>
+1217         tout = tout + ExtraTimeDelay;
+1218 
+1219         <span class="comment">% FreshDataFlag</span>
+1220         <span class="keyword">if</span> FreshDataFlag &amp;&amp; length(t) == 1
+1221             <span class="comment">% Only use FreshDataFlag for scalar t</span>
+1222             FreshDataCounter = FreshDataFlag;
+1223             AM0 = AM;
+1224             <span class="keyword">while</span> FreshDataCounter
+1225                 <span class="keyword">if</span> nargout &lt; 3
+1226                     [AM, tout] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N);
+1227                 <span class="keyword">else</span>
+1228                     [AM, tout, DataTime, ErrorFlag] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N);
+1229                 <span class="keyword">end</span>
+1230 
+1231                 <span class="keyword">if</span> ~any((AM-AM0)==0)
+1232                     FreshDataCounter = FreshDataCounter - 1;
+1233                     AM0 = AM;
+1234                 <span class="keyword">end</span>
+1235 
+1236                 <span class="keyword">if</span> etime(clock, t0) &gt; TimeOutPeriod
+1237                     k = find((AM-AM0)==0);
+1238                     <span class="keyword">for</span> j = 1:length(k)
+1239                         fprintf(<span class="string">'%s not changing.\n'</span>, deblank((AOField.ChannelNames(DeviceIndex(k(j)),:))));
+1240                     <span class="keyword">end</span>
+1241                     error(<span class="string">'Timed out waiting for fresh data.'</span>);
+1242                 <span class="keyword">end</span>
+1243             <span class="keyword">end</span>
+1244             tout = etime(clock, t0);
+1245         <span class="keyword">end</span>
+1246         
+1247     <span class="keyword">elseif</span> strcmpi(AOField.DataType, <span class="string">'Vector'</span>)
+1248 
+1249         <span class="comment">% Output(DataTypeIndex) must be equal to the number of elements in the family</span>
+1250         
+1251         <span class="comment">% There can only be one channel name for DataType='Vector'</span>
+1252         ChannelNames = deblank(AOField.ChannelNames(1,:));
+1253 
+1254 
+1255         <span class="comment">% Get data at every point in time vector, t</span>
+1256         AM = [];
+1257         ExtraTimeDelay = etime(clock, t0);
+1258         t = t - ExtraTimeDelay;
+1259         <span class="keyword">for</span> itime = 1:length(t)
+1260             T = t(itime)-etime(clock, t0);
+1261             <span class="keyword">if</span> T &gt; 0
+1262                 pause(T);
+1263             <span class="keyword">end</span>
+1264 
+1265             <span class="comment">% Get data</span>
+1266             <span class="keyword">if</span> nargout &gt;= 3
+1267                 [tmp, tout, DataTime(:,itime), ErrorFlag] = getpvonline(ChannelNames, <span class="string">'Vector'</span>, N);
+1268             <span class="keyword">else</span>
+1269                 tmp = getpvonline(ChannelNames, <span class="string">'Vector'</span>, N);
+1270             <span class="keyword">end</span>
+1271             <span class="keyword">if</span> isfield(AOField, <span class="string">'DataTypeIndex'</span>)
+1272                 tmp = tmp(AOField.DataTypeIndex);
+1273             <span class="keyword">end</span>
+1274             AM = [AM tmp(DeviceIndex,:)];
+1275 
+1276             tout(itime) = etime(clock, t0);
+1277         <span class="keyword">end</span>
+1278 
+1279         <span class="comment">% FreshDataFlag</span>
+1280         <span class="keyword">if</span> FreshDataFlag &amp;&amp; length(t) == 1
+1281             <span class="comment">% Only use FreshDataFlag for scalar t</span>
+1282             FreshDataCounter = FreshDataFlag;
+1283             AM0 = AM;
+1284             <span class="keyword">while</span> FreshDataCounter
+1285                 <span class="keyword">if</span> nargout &gt;= 3
+1286                     [AM, tout, DataTime, ErrorFlag] = getpvonline(ChannelNames, <span class="string">'Vector'</span>, N);
+1287                 <span class="keyword">else</span>
+1288                     AM = getpvonline(ChannelNames, <span class="string">'Vector'</span>, N);
+1289                 <span class="keyword">end</span>
+1290                 <span class="keyword">if</span> isfield(AOField, <span class="string">'DataTypeIndex'</span>)
+1291                     AM = AM(AOField.DataTypeIndex);
+1292                 <span class="keyword">end</span>
+1293                 AM = AM(DeviceIndex,:);
+1294 
+1295                 <span class="keyword">if</span> ~any((AM-AM0)==0)
+1296                     FreshDataCounter = FreshDataCounter - 1;
+1297                     AM0 = AM;
+1298                 <span class="keyword">end</span>
+1299 
+1300                 <span class="keyword">if</span> etime(clock, t0) &gt; TimeOutPeriod
+1301                     k = find((AM-AM0)==0);
+1302                     <span class="keyword">for</span> j = 1:length(k)
+1303                         fprintf(<span class="string">'%s[%d,%d] not changing.\n'</span>, AO.FamilyName, DeviceList(k(j),1), DeviceList(k(j),2));
+1304                     <span class="keyword">end</span>
+1305                     error(<span class="string">'Timed out waiting for fresh data.'</span>);
+1306                 <span class="keyword">end</span>
+1307             <span class="keyword">end</span>
+1308             tout = etime(clock, t0);
+1309         <span class="keyword">end</span>
+1310 
+1311     <span class="keyword">elseif</span> strcmpi(AOField.DataType,<span class="string">'Matrix'</span>)
+1312 
+1313         <span class="keyword">for</span> iDev = 1:length(DeviceIndex)
+1314             <span class="comment">%AM(iDev,:) = rand(1,10); DataTime(iDev,:) = now; ErrorFlag(iDev,:)=0;</span>
+1315             [AM(iDev,:), tout, DataTime(iDev,:), ErrorFlag(iDev,1)] = getpvonline(AOField.ChannelNames(DeviceIndex(iDev),:), <span class="string">'Matrix'</span>, N);
+1316         <span class="keyword">end</span>
+1317         ErrorFlag = any(ErrorFlag);
+1318         tout = etime(clock, t0);
+1319 
+1320     <span class="keyword">else</span>
+1321         error(sprintf(<span class="string">'Unknown DataType for family %s.'</span>, AO.FamilyName));
+1322     <span class="keyword">end</span>
+1323 
+1324     <span class="comment">% Change to physics units if Units = 'physics'</span>
+1325     <span class="keyword">if</span> strcmpi(AO.(Field).Units,<span class="string">'physics'</span>)
+1326         <span class="comment">% Change to physics units</span>
+1327         AM = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(AO.FamilyName, Field, AM, DeviceList);
+1328     <span class="keyword">end</span>
+1329 
+1330 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'Special'</span>)
+1331 
+1332     <span class="keyword">if</span> isfield(AOField, <span class="string">'SpecialFunctionGet'</span>)
+1333         SpecialFunction = AOField.SpecialFunctionGet;
+1334     <span class="keyword">elseif</span> isfield(AOField, <span class="string">'SpecialFunction'</span>)
+1335         SpecialFunction = AOField.SpecialFunction;
+1336     <span class="keyword">else</span>
+1337         error(sprintf(<span class="string">'No special function specified for Family %s (getpv).'</span>, AO.FamilyName));
+1338     <span class="keyword">end</span>
+1339 
+1340     <span class="comment">% Get data at every point in time vector, t</span>
+1341     ExtraTimeDelay = etime(clock, t0);
+1342     t = t - ExtraTimeDelay;
+1343     [AM, tout, DataTime, ErrorFlag] = feval(SpecialFunction, AO.FamilyName, Field, DeviceList, t);
+1344     t1 = clock;
+1345     <span class="keyword">if</span> isempty(tout)
+1346         tout = etime(t1, t0);
+1347     <span class="keyword">end</span>
+1348     <span class="keyword">if</span> nargout &gt;= 3 &amp;&amp; isempty(DataTime)
+1349         days = datenum(t1(1:3)) - 719529;  <span class="comment">%datenum('1-Jan-1970');</span>
+1350         tt = 24*60*60*days + 60*60*t1(4) + 60*t1(5) + t1(6);
+1351         DataTime(1:size(AM,1),1) = fix(tt) + rem(tt,1)*1e9*sqrt(-1);
+1352     <span class="keyword">end</span>
+1353     <span class="keyword">if</span> length(t) &gt; length(tout)
+1354         <span class="keyword">for</span> itime = 2:length(t)
+1355             T = t(itime)-etime(clock, t0);
+1356             <span class="keyword">if</span> T &gt; 0
+1357                 pause(T);
+1358             <span class="keyword">end</span>
+1359 
+1360             <span class="comment">% Get data</span>
+1361             [Tmp, toutTmp, DataTimeTmp, ErrorFlag] = feval(SpecialFunction, AO.FamilyName, Field, DeviceList, t);
+1362             
+1363             AM = [AM Tmp];
+1364             DataTime = [DataTime DataTimeTmp];
+1365 
+1366             t1 = clock;
+1367             tout(1,itime) = etime(t1, t0);
+1368             <span class="keyword">if</span> nargout &gt;= 3 &amp;&amp; isempty(DataTimeTmp)
+1369                 days = datenum(t1(1:3)) - 719529;  <span class="comment">%datenum('1-Jan-1970');</span>
+1370                 tt = 24*60*60*days + 60*60*t1(4) + 60*t1(5) + t1(6);
+1371                 DataTime(1:size(AM,1),itime) = fix(tt) + rem(tt,1)*1e9*sqrt(-1);
+1372             <span class="keyword">end</span>
+1373         <span class="keyword">end</span>
+1374     <span class="keyword">end</span>
+1375 
+1376     <span class="comment">% FreshDataFlag</span>
+1377     <span class="keyword">if</span> FreshDataFlag &amp;&amp; length(t) == 1
+1378         <span class="comment">% Only use FreshDataFlag for scalar t</span>
+1379         FreshDataCounter = FreshDataFlag;
+1380         AM0 = AM;
+1381         <span class="keyword">while</span> FreshDataCounter
+1382             <span class="comment">% Get data</span>
+1383             [AM, tout, DataTime, ErrorFlag] = feval(SpecialFunction, AO.FamilyName, Field, DeviceList, t);
+1384 
+1385             <span class="keyword">if</span> ~any((AM-AM0)==0)
+1386                 FreshDataCounter = FreshDataCounter - 1;
+1387                 AM0 = AM;
+1388             <span class="keyword">end</span>
+1389 
+1390             t1 = clock;
+1391             <span class="keyword">if</span> etime(t1, t0) &gt; TimeOutPeriod
+1392                 k = find((AM-AM0)==0);
+1393                 <span class="keyword">for</span> j = 1:length(k)
+1394                     fprintf(<span class="string">'%s[%d,%d] not changing.\n'</span>, AO.FamilyName, DeviceList(k(j),1), DeviceList(k(j),2));
+1395                 <span class="keyword">end</span>
+1396                 error(<span class="string">'Timed out waiting for fresh data.'</span>);
+1397             <span class="keyword">end</span>
+1398         <span class="keyword">end</span>
+1399         tout = etime(t1, t0);
+1400 
+1401         <span class="keyword">if</span> nargout &gt;= 3 &amp;&amp; isempty(DataTime)
+1402             days = datenum(t1(1:3)) - 719529;  <span class="comment">%datenum('1-Jan-1970');</span>
+1403             tt = 24*60*60*days + 60*60*t1(4) + 60*t1(5) + t1(6);
+1404             DataTime(1:size(AM,1),1) = fix(tt) + rem(tt,1)*1e9*sqrt(-1);
+1405         <span class="keyword">end</span>
+1406     <span class="keyword">end</span>
+1407 
+1408     <span class="comment">% Change to physics units if Units = 'physics'</span>
+1409     <span class="keyword">if</span> strcmpi(AO.(Field).Units,<span class="string">'physics'</span>)
+1410         <span class="comment">% Change to physics units</span>
+1411         AM = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(AO.FamilyName, Field, AM, DeviceList);
+1412     <span class="keyword">end</span>
+1413 
+1414 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'manual'</span>)
+1415     <span class="comment">% Always return in hardware units (like connected to the IOC)</span>
+1416     <span class="comment">% The conversion to physics in done at the end</span>
+1417     t = 0;
+1418     <span class="keyword">if</span> strcmp(AO.FamilyName, <span class="string">'TUNE'</span>)
+1419         HarmNumber = [];
+1420         RF = [];
+1421         <span class="keyword">if</span> find(DeviceIndex == 1)
+1422             AM(1,1) = input(sprintf(<span class="string">'   Input the horizontal tune (fraction or Hz) = '</span>));
+1423             <span class="keyword">if</span> AM(1,1) &gt; 1
+1424                 HarmNumber = getharmonicnumber;
+1425                 RF = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Struct'</span>);
+1426                 <span class="keyword">if</span> strcmpi(RF.UnitsString,<span class="string">'MHz'</span>)
+1427                     FundFreq = 1e6*RF.Data / HarmNumber;
+1428                 <span class="keyword">elseif</span> strcmpi(RF.UnitsString,<span class="string">'Hz'</span>)
+1429                     FundFreq = RF.Data / HarmNumber;
+1430                 <span class="keyword">else</span>
+1431                     error(<span class="string">'RF units in not known.'</span>);
+1432                 <span class="keyword">end</span>
+1433                 <span class="comment">%AM(1,1) = (AM(1,1)- RF) / FundFreq;</span>
+1434                 AM(1,1) = AM(1,1) / FundFreq;
+1435                 fprintf(<span class="string">'   Horizontal fraction tune computed to be %f\n\n'</span>, AM(1,1));
+1436             <span class="keyword">end</span>
+1437         <span class="keyword">end</span>
+1438         <span class="keyword">if</span> find(DeviceIndex == 2)
+1439             AM(2,1) = input(sprintf(<span class="string">'   Input the vertical   tune (fraction or Hz) = '</span>));
+1440             <span class="keyword">if</span> AM(2,1) &gt; 1
+1441                 <span class="keyword">if</span> isempty(HarmNumber)
+1442                     HarmNumber = getharmonicnumber;
+1443                 <span class="keyword">end</span>
+1444                 <span class="keyword">if</span> isempty(RF)
+1445                     RF = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Struct'</span>);
+1446                 <span class="keyword">end</span>
+1447                 <span class="keyword">if</span> strcmpi(RF.UnitsString,<span class="string">'MHz'</span>)
+1448                     FundFreq = 1e6*RF.Data / HarmNumber;
+1449                 <span class="keyword">elseif</span> strcmpi(RF.UnitsString,<span class="string">'Hz'</span>)
+1450                     FundFreq = RF.Data / HarmNumber;
+1451                 <span class="keyword">else</span>
+1452                     error(<span class="string">'RF units in not known.'</span>);
+1453                 <span class="keyword">end</span>
+1454                 AM(2,1) = AM(2,1)/FundFreq;
+1455                 <span class="comment">%AM(2,1) = (AM(2,1) - HarmNumber * FundFreq)/FundFreq;</span>
+1456                 fprintf(<span class="string">'   Vertical   fraction tune computed to be %f\n\n'</span>, AM(2,1));
+1457             <span class="keyword">end</span>
+1458         <span class="keyword">end</span>
+1459         <span class="keyword">if</span> find(DeviceIndex == 3)
+1460             AM(2,1) = input(<span class="string">'   Input the synchrotron tune = '</span>);
+1461         <span class="keyword">end</span>
+1462     <span class="keyword">elseif</span> strcmp(AO.FamilyName, <span class="string">'RF'</span>)
+1463         <span class="keyword">if</span> strcmpi(AO.(Field).Units, <span class="string">'Hardware'</span>)
+1464             AM(1) = input(sprintf(<span class="string">'   Input the RF frequency [%s] = '</span>, AO.(Field).HWUnits));
+1465         <span class="keyword">else</span>
+1466             AM(1) = input(sprintf(<span class="string">'   Input the RF frequency [%s] = '</span>, AO.(Field).PhysicsUnits));
+1467             AM = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(AO.FamilyName, Field, AM, [1 1]);
+1468         <span class="keyword">end</span>
+1469     <span class="keyword">else</span>
+1470         <span class="keyword">for</span> i = 1:length(DeviceIndex)
+1471             <span class="keyword">if</span> strcmpi(AO.(Field).Units, <span class="string">'Hardware'</span>)
+1472                 AM(i,:) = input(sprintf(<span class="string">'   Manual input:  %s(%d,%d) [%s] = '</span>, AO.FamilyName, AO.DeviceList(DeviceIndex(i),1), AO.DeviceList(DeviceIndex(i),2), AO.(Field).HWUnits));
+1473             <span class="keyword">else</span>
+1474                 AM(i,:) = input(sprintf(<span class="string">'   Manual input:  %s(%d,%d) [%s] = '</span>, AO.FamilyName, AO.DeviceList(DeviceIndex(i),1), AO.DeviceList(DeviceIndex(i),2), AO.(Field).PhysicsUnits));
+1475                 AM(i,:) = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(AO.FamilyName, Field, AM(i,:), AO.DeviceList(DeviceIndex(i),:));
+1476             <span class="keyword">end</span>
+1477         <span class="keyword">end</span>
+1478     <span class="keyword">end</span>
+1479     
+1480     t1 = clock;
+1481     tout = etime(t1, t0);
+1482     days = datenum(t1(1:3)) - 719529;  <span class="comment">%datenum('1-Jan-1970');</span>
+1483     tt = 24*60*60*days + 60*60*t1(4) + 60*t1(5) + t1(6);
+1484     DataTime(1:size(AM,1),1) = fix(tt) + rem(tt,1)*1e9*sqrt(-1);
+1485 
+1486     <span class="comment">% Change to physics units if Units = 'physics'</span>
+1487     <span class="keyword">if</span> strcmpi(AO.(Field).Units,<span class="string">'physics'</span>)
+1488         <span class="comment">% Change to physics units</span>
+1489         AM = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(AO.FamilyName, Field, AM, DeviceList);
+1490     <span class="keyword">end</span>
+1491 
+1492 
+1493 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'Simulator'</span>) || strcmpi(Mode,<span class="string">'Model'</span>)
+1494 
+1495     ExtraTimeDelay = etime(clock, t0);
+1496     <span class="comment">%[AM, tout, DataTime, ErrorFlag] = getpvmodel(AO, Field, DeviceList, t-ExtraTimeDelay, 'Physics', 'Numeric');</span>
+1497     [AM, tout, DataTime, ErrorFlag] = getpvmodel(AO, Field, DeviceList, t-ExtraTimeDelay, AO.(Field).Units, <span class="string">'Numeric'</span>);
+1498     tout = tout + ExtraTimeDelay;
+1499 
+1500 
+1501     <span class="keyword">if</span> strcmpi(OutputDataType, <span class="string">'String'</span>)
+1502         AM = num2str(AM);
+1503     <span class="keyword">end</span>
+1504         
+1505     <span class="comment">% Change to physics units if Units = 'physics'</span>
+1506     <span class="comment">%if strcmpi(AO.(Field).Units,'Hardware')</span>
+1507     <span class="comment">%    % Change to physics units</span>
+1508     <span class="comment">%    AM = physics2hw(AO.FamilyName, Field, AM, DeviceList, getenergymodel);</span>
+1509     <span class="comment">%end</span>
+1510 
+1511 <span class="keyword">else</span>
+1512     error(sprintf(<span class="string">'Unknown mode for family %s.'</span>, AO.FamilyName));
+1513 <span class="keyword">end</span>
+1514 
+1515 
+1516</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

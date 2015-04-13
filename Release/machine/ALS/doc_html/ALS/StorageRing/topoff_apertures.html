@@ -1,0 +1,1798 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of topoff_apertures</title>
+  <meta name="keywords" content="topoff_apertures">
+  <meta name="description" content="TOPOFF_APERTURES - Phase space information on the BL Dot-3 ports">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; topoff_apertures.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>topoff_apertures
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>TOPOFF_APERTURES - Phase space information on the BL Dot-3 ports</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function BL = topoff_apertures(BLNumber, ExtremeRay, LineColor, LineWidth, DimFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">TOPOFF_APERTURES - Phase space information on the BL Dot-3 ports
+  BL = topoff_apertures(BLNumber, ExtremeRay, LineColor)
+
+  INPUTS
+  1. BLNumber - Beamline number
+                For scalar BLNumber, only the middle port number is compared.
+                For 2 element vector, sector and middle port number are compared.
+                For 3 element vector, sector, middle port, sub-port numbers are compared.
+                Empty to plot all beamlines
+                Special case strings: 'BL0', 'BL1', 'BL2', 'BL3', 'SB_BL2', 'SB_BL3'
+
+                For instance,
+                1. BLNumber = [6 3 2] for sector 6, dot-3, dot 2
+                2. BLNumber = 2 is all dot-2 ports
+                3. BLNumber = [6 2] is all sector 6, dot-2 ports
+  2. ExtremeRay - error in mm for the beamline apertures
+                  0 for nominal (no errors)
+                  2 is the default
+  3. LineColor - Line color if plotting only 1 beamline
+
+  OUTPUTS
+  1. BL - Structure array for all the beamlines
+          (plots data if no output exists)
+
+  EXAMPLES
+  1.  Data = topoff_plottrackingfile;
+      hold on
+      topoff_apertures([],2,'k',1,3);
+      xaxis([.23 .415]);
+      yaxis([.16 .29]);
+
+  2. 3.3.2 area of concern
+     xaxis([.295 .32]);
+     yaxis([.175 .205]);
+
+  See also <a href="topoff_plottrackingfile.html" class="code" title="function [Data, FileNameBase] = topoff_plottrackingfile(varargin)">topoff_plottrackingfile</a>, <a href="topoff_apertures.html" class="code" title="function BL = topoff_apertures(BLNumber, ExtremeRay, LineColor, LineWidth, DimFlag)">topoff_apertures</a>, <a href="topoff_fieldprofiles.html" class="code" title="function [x, f, Families] = topoff_fieldprofiles(Family)">topoff_fieldprofiles</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="topoff_plottrackingfile.html" class="code" title="function [Data, FileNameBase] = topoff_plottrackingfile(varargin)">topoff_plottrackingfile</a>	TOPOFF_PLOTTRACKINGFILE - Plot Hiroshi's top-off tracking files</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function h = plotphase1(BL, LineColor, LineWidth, DimFlag)</a></li><li><a href="#_sub2" class="code">function BL = getblapertures(OriginalBLFlag, OnlyTopOffApertures)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function BL = topoff_apertures(BLNumber, ExtremeRay, LineColor, LineWidth, DimFlag)</a>
+0002 <span class="comment">%TOPOFF_APERTURES - Phase space information on the BL Dot-3 ports</span>
+0003 <span class="comment">%  BL = topoff_apertures(BLNumber, ExtremeRay, LineColor)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. BLNumber - Beamline number</span>
+0007 <span class="comment">%                For scalar BLNumber, only the middle port number is compared.</span>
+0008 <span class="comment">%                For 2 element vector, sector and middle port number are compared.</span>
+0009 <span class="comment">%                For 3 element vector, sector, middle port, sub-port numbers are compared.</span>
+0010 <span class="comment">%                Empty to plot all beamlines</span>
+0011 <span class="comment">%                Special case strings: 'BL0', 'BL1', 'BL2', 'BL3', 'SB_BL2', 'SB_BL3'</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%                For instance,</span>
+0014 <span class="comment">%                1. BLNumber = [6 3 2] for sector 6, dot-3, dot 2</span>
+0015 <span class="comment">%                2. BLNumber = 2 is all dot-2 ports</span>
+0016 <span class="comment">%                3. BLNumber = [6 2] is all sector 6, dot-2 ports</span>
+0017 <span class="comment">%  2. ExtremeRay - error in mm for the beamline apertures</span>
+0018 <span class="comment">%                  0 for nominal (no errors)</span>
+0019 <span class="comment">%                  2 is the default</span>
+0020 <span class="comment">%  3. LineColor - Line color if plotting only 1 beamline</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  OUTPUTS</span>
+0023 <span class="comment">%  1. BL - Structure array for all the beamlines</span>
+0024 <span class="comment">%          (plots data if no output exists)</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  EXAMPLES</span>
+0027 <span class="comment">%  1.  Data = topoff_plottrackingfile;</span>
+0028 <span class="comment">%      hold on</span>
+0029 <span class="comment">%      topoff_apertures([],2,'k',1,3);</span>
+0030 <span class="comment">%      xaxis([.23 .415]);</span>
+0031 <span class="comment">%      yaxis([.16 .29]);</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%  2. 3.3.2 area of concern</span>
+0034 <span class="comment">%     xaxis([.295 .32]);</span>
+0035 <span class="comment">%     yaxis([.175 .205]);</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">%  See also topoff_plottrackingfile, topoff_apertures, topoff_fieldprofiles</span>
+0038 
+0039 <span class="comment">% Use present BL phase space or the proposed modifications?</span>
+0040 <span class="comment">%  0   -&gt; modified/proposed BL (if it exists)</span>
+0041 <span class="comment">% else -&gt; present/original BL</span>
+0042 OriginalBLFlag = 0;
+0043 
+0044 <span class="comment">% Not all phase space apertures are needed for topoff</span>
+0045 <span class="comment">%OnlyTopOffApertures = 1;   % Only plot phase spaces for topoff</span>
+0046 OnlyTopOffApertures = 0;    <span class="comment">% Plot all phase spaces</span>
+0047 
+0048 
+0049 <span class="comment">% Get all BL apertures</span>
+0050 BL = <a href="#_sub2" class="code" title="subfunction BL = getblapertures(OriginalBLFlag, OnlyTopOffApertures)">getblapertures</a>(OriginalBLFlag, OnlyTopOffApertures);
+0051 
+0052 
+0053 <span class="keyword">if</span> nargin &lt; 2
+0054     ExtremeRay = 2;
+0055 <span class="keyword">end</span>
+0056 
+0057 
+0058 <span class="keyword">if</span> nargin &lt; 1
+0059     BLNumber = [];
+0060 <span class="keyword">end</span>
+0061 <span class="keyword">if</span> any(strcmpi(BLNumber, {<span class="string">'SB_BL2'</span>}))
+0062     <span class="keyword">for</span> i = length(BL):-1:1
+0063         <span class="keyword">if</span> BL(i).Number(2) ~= 2 || any(BL(i).Number(1)==[1 2 3 5 6 7 9 10 11])
+0064             BL(i) = [];
+0065         <span class="keyword">end</span>
+0066     <span class="keyword">end</span>
+0067 <span class="keyword">elseif</span> any(strcmpi(BLNumber, {<span class="string">'SB_BL3'</span>}))
+0068     <span class="keyword">for</span> i = length(BL):-1:1
+0069         <span class="keyword">if</span> BL(i).Number(2) ~= 3 || any(BL(i).Number(1)==[1 2 3 5 6 7 9 10 11])
+0070             BL(i) = [];
+0071         <span class="keyword">end</span>
+0072     <span class="keyword">end</span>
+0073 <span class="keyword">elseif</span> any(strcmpi(BLNumber, {<span class="string">'BL0'</span>}))
+0074     <span class="keyword">for</span> i = length(BL):-1:1
+0075         <span class="keyword">if</span> BL(i).Number(2) ~= 0
+0076             BL(i) = [];
+0077         <span class="keyword">end</span>
+0078     <span class="keyword">end</span>
+0079 <span class="keyword">elseif</span> any(strcmpi(BLNumber, {<span class="string">'BL1'</span>}))
+0080     <span class="keyword">for</span> i = length(BL):-1:1
+0081         <span class="keyword">if</span> BL(i).Number(2) ~= 1
+0082             BL(i) = [];
+0083         <span class="keyword">end</span>
+0084     <span class="keyword">end</span>
+0085 <span class="keyword">elseif</span> any(strcmpi(BLNumber, {<span class="string">'BL2'</span>}))
+0086     <span class="keyword">for</span> i = length(BL):-1:1
+0087         <span class="keyword">if</span> BL(i).Number(2) ~= 2 || any(BL(i).Number(1)==[4 8 12])
+0088             BL(i) = [];
+0089         <span class="keyword">end</span>
+0090     <span class="keyword">end</span>
+0091 <span class="keyword">elseif</span> any(strcmpi(BLNumber, {<span class="string">'BL3'</span>}))
+0092     <span class="keyword">for</span> i = length(BL):-1:1
+0093         <span class="keyword">if</span> BL(i).Number(2) ~= 3 || any(BL(i).Number(1)==[4 8 12])
+0094             BL(i) = [];
+0095         <span class="keyword">end</span>
+0096     <span class="keyword">end</span>
+0097 <span class="keyword">else</span>
+0098     <span class="comment">% Find the set of beamlines based on BLNumber input</span>
+0099     <span class="keyword">if</span> ~isempty(BLNumber)
+0100         j = 0;
+0101         <span class="keyword">for</span> i = 1:length(BL)
+0102             <span class="keyword">if</span> length(BLNumber) == 1
+0103                 <span class="keyword">if</span> BLNumber == BL(i).Number(2)
+0104                     j = j + 1;
+0105                     BLnew(1,j) = BL(i);
+0106                 <span class="keyword">end</span>
+0107             <span class="keyword">else</span>
+0108                 <span class="keyword">if</span> all(BLNumber == BL(i).Number(1:size(BLNumber,2)))
+0109                     j = j + 1;
+0110                     BLnew(1,j) = BL(i);
+0111                 <span class="keyword">end</span>
+0112             <span class="keyword">end</span>
+0113         <span class="keyword">end</span>
+0114         <span class="keyword">if</span> exist(<span class="string">'BLnew'</span>, <span class="string">'var'</span>)
+0115             BL = BLnew;
+0116         <span class="keyword">else</span>
+0117             BL = [];
+0118         <span class="keyword">end</span>
+0119     <span class="keyword">end</span>
+0120 <span class="keyword">end</span>
+0121 
+0122 
+0123 <span class="comment">% Interpolate to the requested error level</span>
+0124 <span class="keyword">for</span> i = 1:length(BL)
+0125     BL(i).Data(1,:) = interp1([0; BL(i).ExtremeRay1], [BL(i).Data0(1,:); BL(i).Data1(1,:)], ExtremeRay, <span class="string">'linear'</span>, <span class="string">'extrap'</span>);
+0126     BL(i).Data(2,:) = interp1([0; BL(i).ExtremeRay1], [BL(i).Data0(2,:); BL(i).Data1(2,:)], ExtremeRay, <span class="string">'linear'</span>, <span class="string">'extrap'</span>);
+0127     BL(i).ExtremeRay = ExtremeRay;
+0128 <span class="keyword">end</span>
+0129 
+0130 
+0131 <span class="keyword">if</span> nargout == 0
+0132     <span class="keyword">if</span> nargin &lt; 3
+0133         LineColor = [];
+0134     <span class="keyword">end</span>
+0135 
+0136     <span class="keyword">if</span> nargin &lt; 4
+0137         LineWidth = 3;
+0138     <span class="keyword">end</span>
+0139 
+0140     <span class="keyword">if</span> nargin &lt; 5
+0141         <span class="keyword">if</span> length(axis)==6
+0142             DimFlag = 3;
+0143         <span class="keyword">else</span>
+0144             DimFlag = 2;
+0145         <span class="keyword">end</span>
+0146     <span class="keyword">end</span>
+0147 
+0148     <span class="comment">%clf reset</span>
+0149     NextPlot = get(gca,<span class="string">'NextPlot'</span>);
+0150     <span class="keyword">for</span> i = 1:length(BL)
+0151         LegendCell{i} = BL(i).Title;
+0152         <span class="keyword">if</span> nargin &lt; 3
+0153             [LineColor, LineStyle] = nextline(i);
+0154         <span class="keyword">else</span>
+0155             <span class="comment">%LineColor = 'k'; %[0 0 .5];</span>
+0156             LineStyle = <span class="string">'-'</span>;
+0157         <span class="keyword">end</span>
+0158         h(i) = <a href="#_sub1" class="code" title="subfunction h = plotphase1(BL, LineColor, LineWidth, DimFlag)">plotphase1</a>(BL(i), LineColor, LineWidth, DimFlag);
+0159         set(h(i), <span class="string">'LineStyle'</span>, LineStyle);
+0160         hold on
+0161     <span class="keyword">end</span>
+0162     <span class="comment">%hold off;</span>
+0163     set(gca,<span class="string">'NextPlot'</span>, NextPlot);
+0164 
+0165     <span class="comment">%       xaxis([.23 .415]);</span>
+0166     <span class="comment">%       yaxis([.16 .29]);</span>
+0167 
+0168     <span class="comment">% h(1) = plotphase1(BL(1), [0 0 1]);</span>
+0169     <span class="comment">% hold on</span>
+0170     <span class="comment">% h(2) = plotphase1(BL(2), [0 .8 0]);</span>
+0171     <span class="comment">% h(3) = plotphase1(BL(3), [1 0 0]);</span>
+0172     <span class="comment">% h(4) = plotphase1(BL(4), [1 1 0]);</span>
+0173     <span class="comment">% h(5) = plotphase1(BL(5), [0 1 1]);</span>
+0174     <span class="comment">% h(6) = plotphase1(BL(6), [.2 .2 .2]);</span>
+0175     <span class="comment">% h(7)  = plotphase1(BL(7),  [1 0 1]);</span>
+0176     <span class="comment">% h(8)  = plotphase1(BL(8),  [.4 0 0]);</span>
+0177     <span class="comment">% h(9)  = plotphase1(BL(9),  [.4 .1 .5]);</span>
+0178     <span class="comment">% h(10) = plotphase1(BL(10), [0 .5 .5]);</span>
+0179     <span class="comment">% h(11) = plotphase1(BL(11), [0 .5 .5]);</span>
+0180     <span class="comment">% h(12) = plotphase1(BL(12), [0 .5 .5]);</span>
+0181     <span class="comment">% hold off;</span>
+0182 
+0183     <span class="keyword">if</span> nargin &lt; 3 &amp;&amp; ~isempty(BL)
+0184         <span class="comment">%title('Dot-3 Beamline Phase Space');</span>
+0185         xlabel(<span class="string">'Meters'</span>);
+0186         ylabel(<span class="string">'Radians'</span>);
+0187         legend(LegendCell);
+0188     <span class="keyword">end</span>
+0189 <span class="keyword">end</span>
+0190 
+0191 
+0192 <a name="_sub1" href="#_subfunctions" class="code">function h = plotphase1(BL, LineColor, LineWidth, DimFlag)</a>
+0193 
+0194 <span class="keyword">if</span> nargin &lt; 2
+0195     LineColor = [0 0 1];
+0196 <span class="keyword">end</span>
+0197 <span class="keyword">if</span> nargin &lt; 3
+0198     LineWidth = 3;
+0199 <span class="keyword">end</span>
+0200 <span class="keyword">if</span> nargin &lt; 4
+0201     <span class="keyword">if</span> length(axis)==6
+0202         DimFlag = 3;
+0203     <span class="keyword">else</span>
+0204         DimFlag = 2;
+0205     <span class="keyword">end</span>
+0206 <span class="keyword">end</span>
+0207 
+0208 <span class="keyword">if</span> DimFlag == 3
+0209     h = plot3([BL.Data(1,:) BL.Data(1,1)], [BL.Data(2,:) BL.Data(2,1)],25*ones(1,length(BL.Data(1,:))+1), <span class="string">'Color'</span>, LineColor, <span class="string">'LineWidth'</span>,LineWidth, <span class="string">'EraseMode'</span>, <span class="string">'Background'</span>);
+0210     <span class="comment">%h = plot3([BL.Data(1,:) BL.Data(1,1)], [BL.Data(2,:) BL.Data(2,1)],25*ones(1,5), 'Color', LineColor, 'LineWidth',LineWidth);</span>
+0211 <span class="keyword">else</span>
+0212     h = plot([BL.Data(1,:) BL.Data(1,1)], [BL.Data(2,:) BL.Data(2,1)],<span class="string">'Color'</span>, LineColor, <span class="string">'LineWidth'</span>,LineWidth);
+0213 
+0214     <span class="keyword">if</span> 0
+0215         <span class="comment">% Marker at corners (usually for debuging)</span>
+0216         hold on
+0217         plot(BL.Data(1,1), BL.Data(2,1),<span class="string">'Color'</span>, LineColor, <span class="string">'Marker'</span>,<span class="string">'o'</span>);
+0218         plot(BL.Data(1,2), BL.Data(2,2),<span class="string">'Color'</span>, LineColor, <span class="string">'Marker'</span>,<span class="string">'square'</span>);
+0219         plot(BL.Data(1,3), BL.Data(2,3),<span class="string">'Color'</span>, LineColor, <span class="string">'Marker'</span>,<span class="string">'&gt;'</span>);
+0220         <span class="comment">%plot(BL.Data(1,4), BL.Data(2,4),'Color', LineColor, 'Marker','x');</span>
+0221         hold off
+0222     <span class="keyword">end</span>
+0223     <span class="keyword">if</span> 0
+0224         <span class="comment">% Plot the nominal and extreme (usually for debuging)</span>
+0225         hold on
+0226         plot([BL.Data0(1,:) BL.Data0(1,1)], [BL.Data0(2,:) BL.Data0(2,1)],<span class="string">':'</span>, <span class="string">'Color'</span>, LineColor, <span class="string">'LineWidth'</span>,1);
+0227         plot([BL.Data1(1,:) BL.Data1(1,1)], [BL.Data1(2,:) BL.Data1(2,1)],<span class="string">':'</span>, <span class="string">'Color'</span>, LineColor, <span class="string">'LineWidth'</span>,1);
+0228         hold off
+0229     <span class="keyword">end</span>
+0230 <span class="keyword">end</span>
+0231 <span class="comment">%text(BL.Data(1,1), BL.Data(2,1), BL.Title);</span>
+0232 
+0233 
+0234 <span class="comment">% h = patch(BL.Data(1,:), BL.Data(2,:), LineColor);</span>
+0235 <span class="comment">% set(h, 'EraseMode', 'XOR');</span>
+0236 
+0237 
+0238 <a name="_sub2" href="#_subfunctions" class="code">function BL = getblapertures(OriginalBLFlag, OnlyTopOffApertures)</a>
+0239 
+0240 i = 0;
+0241 
+0242 <span class="comment">% old data - superseded by values below based on beamline survey,</span>
+0243 <span class="comment">% sent by M. Kritscher on 2008-04-04</span>
+0244 <span class="comment">% % BL 2.1 - Nominal Rays</span>
+0245 <span class="comment">% i = i + 1;</span>
+0246 <span class="comment">% BL(i).Title = 'BL 2.1';</span>
+0247 <span class="comment">% BL(i).Number = [2 1 1];</span>
+0248 <span class="comment">% BL(i).Data0 = [</span>
+0249 <span class="comment">%     0.27625, 0.23908</span>
+0250 <span class="comment">%     0.29051, 0.23647</span>
+0251 <span class="comment">%     0.31527, 0.21998</span>
+0252 <span class="comment">%     0.30109, 0.22259</span>
+0253 <span class="comment">%     ]';</span>
+0254 <span class="comment">%</span>
+0255 <span class="comment">% % Extreme Rays 5mm</span>
+0256 <span class="comment">% BL(i).Data1 = [</span>
+0257 <span class="comment">%     0.26716, 0.24168</span>
+0258 <span class="comment">%     0.29565, 0.23647</span>
+0259 <span class="comment">%     0.32427, 0.21739</span>
+0260 <span class="comment">%     0.29596, 0.22259</span>
+0261 <span class="comment">%     ]';</span>
+0262 <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0263 
+0264 
+0265 <span class="keyword">if</span> OriginalBLFlag
+0266     <span class="comment">% Present data</span>
+0267     <span class="comment">% BL 2.1 - Nominal Rays</span>
+0268     i = i + 1;
+0269     BL(i).Title = <span class="string">'BL 2.1'</span>;
+0270     BL(i).Number = [2 1 1];
+0271     BL(i).Data0 = [
+0272         0.27540, 0.23729
+0273         0.28955, 0.23469
+0274         0.31292, 0.21901
+0275         0.29884, 0.22161
+0276         ]';
+0277 
+0278     <span class="comment">% Extreme Rays 5mm</span>
+0279     BL(i).Data1 = [
+0280         0.26634, 0.23990
+0281         0.29481, 0.23467
+0282         0.32190, 0.21641
+0283         0.29372, 0.22161
+0284         ]';
+0285     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0286 
+0287 <span class="keyword">else</span>
+0288 
+0289     <span class="comment">% BL 2.1 - Nominal Rays</span>
+0290     <span class="comment">% New data based on beamline survey as of 2008-04-04 plus proposed aperture</span>
+0291     <span class="comment">% i = i + 1;</span>
+0292     <span class="comment">% BL(i).Title = 'BL 2.1';</span>
+0293     <span class="comment">% BL(i).Number = [2 1 1];</span>
+0294     <span class="comment">% BL(i).Data0 = [</span>
+0295     <span class="comment">%     0.27425, 0.23806</span>
+0296     <span class="comment">%     0.28855, 0.23536</span>
+0297     <span class="comment">%     0.30584, 0.22377</span>
+0298     <span class="comment">%     0.29159, 0.22647</span>
+0299     <span class="comment">%     ]';</span>
+0300     <span class="comment">%</span>
+0301     <span class="comment">% % Extreme Rays 5mm</span>
+0302     <span class="comment">% BL(i).Data1 = [</span>
+0303     <span class="comment">%     0.26503, 0.24077</span>
+0304     <span class="comment">%     0.29369, 0.23536</span>
+0305     <span class="comment">%     0.31499, 0.22106</span>
+0306     <span class="comment">%     0.28646, 0.22647</span>
+0307     <span class="comment">%     ]';</span>
+0308     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0309 
+0310     <span class="comment">% BL 2.1 - Nominal Rays</span>
+0311     <span class="comment">% New data based on beamline survey as of 2008-04-30 plus proposed aperture</span>
+0312     i = i + 1;
+0313     BL(i).Title = <span class="string">'BL 2.1'</span>;
+0314     BL(i).Number = [2 1 1];
+0315     BL(i).Data0 = [
+0316         0.27539, 0.23730
+0317         0.28969, 0.23459
+0318         0.30584, 0.22377
+0319         0.29159, 0.22647
+0320         ]';
+0321 
+0322     <span class="comment">% Extreme Rays 5mm</span>
+0323     BL(i).Data1 = [
+0324         0.26618, 0.24001
+0325         0.29483, 0.23459
+0326         0.31500, 0.22106
+0327         0.28646, 0.22647
+0328         ]';
+0329     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0330 <span class="keyword">end</span>
+0331 
+0332 
+0333 
+0334 <span class="comment">% BL 3.2.1 - Nominal Rays</span>
+0335 i = i + 1;
+0336 BL(i).Title = <span class="string">'BL 3.2.1'</span>;
+0337 BL(i).Number = [3 2 1];
+0338 BL(i).Data0 = [
+0339     0.61737,0.33184;
+0340     0.6536,0.32133;
+0341     0.65845,0.29775;
+0342     0.62252,0.30813;
+0343     ]';
+0344 
+0345 <span class="comment">% Extreme Rays 5mm</span>
+0346 BL(i).Data1 = [
+0347     0.61135,0.33511;
+0348     0.65887,0.32134;
+0349     0.66432,0.29454;
+0350     0.61727,0.30814;
+0351     ]';
+0352 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0353 
+0354 
+0355 <span class="comment">% BL 3.2.2 - Nominal Rays (Unsafe, Not in use)</span>
+0356 i = i + 1;
+0357 BL(i).Title = <span class="string">'BL 3.2.2'</span>;
+0358 BL(i).Number = [3 2 2];
+0359 BL(i).Data0 = [
+0360     0.52454,0.30824;
+0361     0.55619,0.2993;
+0362     0.56156,0.27636;
+0363     0.53018,0.28518;
+0364     ]';
+0365 
+0366 <span class="comment">% Extreme Rays 5mm</span>
+0367 BL(i).Data1 = [
+0368     0.5185,0.31143;
+0369     0.56142,0.29931;
+0370     0.56784,0.27324;
+0371     0.52497,0.28519;
+0372     ]';
+0373 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0374 
+0375 
+0376 
+0377 <span class="comment">% BL 3.3.1 - Nominal Rays</span>
+0378 i = i + 1;
+0379 BL(i).Title = <span class="string">'BL 3.3.1'</span>;
+0380 BL(i).Number = [3 3 1];
+0381 BL(i).Data0 = [
+0382     0.3414  0.24668;
+0383     0.37655 0.23674;
+0384     0.39185 0.21499;
+0385     0.357   0.22481;
+0386     ]';
+0387 
+0388 <span class="comment">% Extreme Rays 5mm</span>
+0389 BL(i).Data1 = [
+0390     0.33378 0.25031
+0391     0.38186,0.2367;
+0392     0.39963,0.21137;
+0393     0.35203,0.22477;
+0394     ]';
+0395 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0396 
+0397 
+0398 <span class="comment">% BL 3.3.2 - Nominal Rays (Unsafe, Not in use)</span>
+0399 i = i + 1;
+0400 BL(i).Title = <span class="string">'BL 3.3.2'</span>;
+0401 BL(i).Number = [3 3 2];
+0402 BL(i).Data0 = [
+0403     0.25642 0.22422
+0404     0.29051 0.21486;
+0405     0.3056  0.19388;
+0406     0.2718  0.20312;
+0407     ]';
+0408 
+0409 <span class="comment">% Extreme Rays 5mm</span>
+0410 BL(i).Data1 = [
+0411     0.24887 0.22772
+0412     0.29579 0.21482
+0413     0.31332 0.19039
+0414     0.26685 0.20308
+0415     ]';
+0416 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0417 
+0418 
+0419 <span class="comment">% Somebody should double check 4.0 (CAS, April-2008)</span>
+0420 <span class="comment">% BL 4.0.0 - Nominal Rays</span>
+0421 i = i + 1;
+0422 BL(i).Title = <span class="string">'BL 4.0'</span>;
+0423 BL(i).Number = [4 0 0];
+0424 BL(i).Data0 = [
+0425     0.38922, 0.20208
+0426     0.437392, 0.18299
+0427     0.471365, 0.15015
+0428     0.423587, 0.16923
+0429     ]';
+0430 
+0431 <span class="comment">% Extreme Rays 5mm</span>
+0432 BL(i).Data1 = [
+0433     0.363467, 0.21423
+0434     0.463782, 0.1745
+0435     0.504595, 0.13478
+0436     0.405268, 0.1745
+0437     ]';
+0438 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0439 
+0440 
+0441 <span class="comment">% 4.2.2</span>
+0442 <span class="comment">% Phase space not needed for topoff</span>
+0443 <span class="keyword">if</span> ~OnlyTopOffApertures
+0444     <span class="comment">% No data</span>
+0445 <span class="keyword">end</span>
+0446 
+0447 
+0448 <span class="comment">% BL 5.0.0 - Nominal Rays</span>
+0449 i = i + 1;
+0450 BL(i).Title = <span class="string">'BL 5.0'</span>;
+0451 BL(i).Number = [5 0 0];
+0452 BL(i).Data0 = [
+0453     0.39429, 0.19868
+0454     0.46338, 0.17916
+0455     0.47127, 0.15130
+0456     0.40584, 0.16988
+0457     ]';
+0458 
+0459 <span class="comment">% Extreme Rays 5mm</span>
+0460 BL(i).Data1 = [
+0461     0.38788, 0.20191
+0462     0.46846, 0.17916
+0463     0.47721, 0.14817
+0464     0.40077, 0.16988
+0465     ]';
+0466 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0467 
+0468 
+0469 <span class="comment">% BL 5.3.1 - Nominal Rays</span>
+0470 i = i + 1;
+0471 BL(i).Title = <span class="string">'BL 5.3.1'</span>;
+0472 BL(i).Number = [5 3 1];
+0473 BL(i).Data0 = [
+0474     0.34739, 0.24494
+0475     0.37665, 0.23666
+0476     0.39235, 0.21433
+0477     0.36335, 0.22250
+0478     ]';
+0479 
+0480 <span class="comment">% Extreme Rays 5mm</span>
+0481 BL(i).Data1 = [
+0482     0.33917, 0.24922
+0483     0.38136, 0.23727
+0484     0.39997, 0.21075
+0485     0.35822, 0.22251
+0486     ]';
+0487 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0488 
+0489 
+0490 <span class="comment">% BL 5.3.2 - Nominal Rays</span>
+0491 i = i + 1;
+0492 BL(i).Title = <span class="string">'BL 5.3.2'</span>;
+0493 BL(i).Number = [5 3 2];
+0494 BL(i).Data0 = [
+0495     0.25911, 0.22391
+0496     0.27530, 0.20166
+0497     0.29498, 0.19628
+0498     0.27897, 0.21845
+0499     ]';
+0500 
+0501 <span class="comment">% Extreme Rays 5mm</span>
+0502 BL(i).Data1 = [
+0503     0.25139, 0.22745
+0504     0.27019, 0.20166
+0505     0.30255, 0.19283
+0506     0.28408, 0.21846
+0507     ]';
+0508 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0509 
+0510 
+0511 <span class="comment">% Somebody should double check 6.0 (CAS, Feb-2008)</span>
+0512 <span class="comment">% BL 6.0.0 - Nominal Rays</span>
+0513 i = i + 1;
+0514 BL(i).Title = <span class="string">'BL 6.0'</span>;
+0515 BL(i).Number = [6 0 0];
+0516 BL(i).Data0 = [
+0517     0.389841, 0.20866
+0518     0.441301, 0.18537
+0519     0.490949, 0.13476
+0520     0.440151, 0.15805
+0521     ]';
+0522 
+0523 <span class="comment">% Extreme Rays 5mm</span>
+0524 BL(i).Data1 = [
+0525     0.37628, 0.21706
+0526     0.446388, 0.18537
+0527     0.504146, 0.12637
+0528     0.435088, 0.15805
+0529     ]';
+0530 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0531 
+0532 
+0533 <span class="comment">% BL 6.1.2 - Nominal Rays</span>
+0534 i = i + 1;
+0535 BL(i).Title = <span class="string">'BL 6.1.2'</span>;
+0536 BL(i).Number = [6 1 2];
+0537 BL(i).Data0 = [
+0538     0.27874, 0.23418
+0539     0.29224, 0.23205
+0540     0.30751, 0.22143
+0541     0.29407, 0.22355
+0542     ]';
+0543 
+0544 <span class="comment">% Extreme Rays 5mm</span>
+0545 BL(i).Data1 = [
+0546     0.27056, 0.23628
+0547     0.29737, 0.23206
+0548     0.31562, 0.21935
+0549     0.28894, 0.22355
+0550     ]';
+0551 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0552 
+0553 
+0554 <span class="comment">% BL 6.3.1 Nominal Rays</span>
+0555 i = i + 1;
+0556 BL(i).Title = <span class="string">'BL 6.3.1'</span>;
+0557 BL(i).Number = [6 3 1];
+0558 BL(i).Data0 = [
+0559     0.35126, 0.24270
+0560     0.36914, 0.23764
+0561     0.40876, 0.20857
+0562     0.39117, 0.21353
+0563     ]';
+0564 
+0565 <span class="comment">% Extreme Rays 5mm</span>
+0566 BL(i).Data1 = [
+0567     0.33950, 0.24749
+0568     0.37462, 0.23755
+0569     0.42015, 0.20393
+0570     0.38602, 0.21356
+0571     ]';
+0572 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0573 
+0574 
+0575 <span class="comment">% BL 6.3.2 Nominal Rays</span>
+0576 i = i + 1;
+0577 BL(i).Title = <span class="string">'BL 6.3.2'</span>;
+0578 BL(i).Number = [6 3 2];
+0579 BL(i).Data0 = [
+0580     0.25251, 0.22107
+0581     0.26965, 0.21637
+0582     0.29432, 0.19853
+0583     0.27734, 0.20317
+0584     ]';
+0585 
+0586 <span class="comment">% Extreme Rays 5mm</span>
+0587 BL(i).Data1 = [
+0588     0.24103, 0.22562
+0589     0.27476, 0.21638
+0590     0.30554, 0.19407
+0591     0.27223, 0.20317
+0592     ]';
+0593 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0594 
+0595 
+0596 <span class="comment">% New (corrected) data for 7.0 and 8.0 received my Mike Kritscher on 4/24/2008</span>
+0597 <span class="comment">% CAS, April 2008 - should still be doublechecked by somebody else</span>
+0598 <span class="comment">%</span>
+0599 <span class="comment">% BL 7.0 Nominal Rays</span>
+0600 i = i + 1;
+0601 BL(i).Title = <span class="string">'BL 7.0'</span>;
+0602 BL(i).Number = [7 0 0];
+0603 BL(i).Data0 = [
+0604     0.38972, 0.22001
+0605     0.48811, 0.18282
+0606     0.47850, 0.12911
+0607     0.38098, 0.16630
+0608     ]';
+0609 
+0610 <span class="comment">% Extreme Rays 5mm</span>
+0611 BL(i).Data1 = [
+0612     0.38519, 0.22363
+0613     0.49319, 0.18282
+0614     0.48290, 0.12549
+0615     0.37591, 0.16630
+0616     ]';
+0617 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0618 
+0619 
+0620 <span class="keyword">if</span> OriginalBLFlag
+0621     <span class="comment">% Original BL</span>
+0622     <span class="comment">%Intersection - This is not perfect but it's close</span>
+0623 
+0624     <span class="comment">% BL 7.3.1 Nominal Rays</span>
+0625     i = i + 1;
+0626     BL(i).Title = <span class="string">'BL 7.3.1'</span>;
+0627     BL(i).Number = [7 3 1];
+0628     BL(i).Data0 = [
+0629         .3318  .2469
+0630         .3469  .2427
+0631         .3968  .1918
+0632         0.39925, 0.18447
+0633         0.39112, 0.18674
+0634         ]';
+0635 
+0636     <span class="comment">% Extreme Rays 5mm</span>
+0637     BL(i).Data1 = [
+0638         0.3226   0.251
+0639         0.352    0.2427
+0640         0.4019   0.1918
+0641         0.40534, 0.18139
+0642         0.38599, 0.18678
+0643         ]';
+0644     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0645 
+0646 
+0647     <span class="comment">% BL 7.3.3 Nominal Rays</span>
+0648     i = i + 1;
+0649     BL(i).Title = <span class="string">'BL 7.3.3'</span>;
+0650     BL(i).Number = [7 3 3];
+0651     BL(i).Data0 = [
+0652         0.2705   0.2641
+0653         0.2927   0.2579
+0654         0.35306, 0.19732
+0655         0.33157, 0.20327
+0656         ]';
+0657 
+0658     <span class="comment">% Extreme Rays 5mm</span>
+0659     BL(i).Data1 = [
+0660         0.2612   0.2682
+0661         0.2979   0.2579
+0662         0.36195, 0.19346
+0663         0.32645, 0.20329
+0664         ]';
+0665     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0666 
+0667     <span class="comment">% % Original BL with multiple aperturs on 7.3.3</span>
+0668     <span class="comment">% % BL 7.3.1 Nominal Rays</span>
+0669     <span class="comment">% i = i + 1;</span>
+0670     <span class="comment">% BL(i).Title = 'BL 7.3.1';</span>
+0671     <span class="comment">% BL(i).Number = [7 3 1];</span>
+0672     <span class="comment">% BL(i).Data0 = [</span>
+0673     <span class="comment">%     0.24053, 0.27253</span>
+0674     <span class="comment">%     0.38339, 0.23243</span>
+0675     <span class="comment">%     0.39925, 0.18447</span>
+0676     <span class="comment">%     0.25851, 0.22340</span>
+0677     <span class="comment">%     ]';</span>
+0678     <span class="comment">%</span>
+0679     <span class="comment">% % Extreme Rays 5mm</span>
+0680     <span class="comment">% BL(i).Data1 = [</span>
+0681     <span class="comment">%     0.23413, 0.27580</span>
+0682     <span class="comment">%     0.38852, 0.23244</span>
+0683     <span class="comment">%     0.40534, 0.18139</span>
+0684     <span class="comment">%     0.25338, 0.22340</span>
+0685     <span class="comment">%     ]';</span>
+0686     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0687     <span class="comment">%</span>
+0688     <span class="comment">%</span>
+0689     <span class="comment">% % BL 7.3.2a Nominal Rays</span>
+0690     <span class="comment">% i = i + 1;</span>
+0691     <span class="comment">% BL(i).Title = 'BL 7.3.3a';</span>
+0692     <span class="comment">% BL(i).Number = [7 3 3.1];</span>
+0693     <span class="comment">% BL(i).Data0 = [</span>
+0694     <span class="comment">%     0.27043, 0.26421</span>
+0695     <span class="comment">%     0.33157, 0.20327</span>
+0696     <span class="comment">%     0.35306, 0.19732</span>
+0697     <span class="comment">%     0.29254, 0.25803</span>
+0698     <span class="comment">%     ]';</span>
+0699     <span class="comment">%</span>
+0700     <span class="comment">% % Extreme Rays 5mm</span>
+0701     <span class="comment">% BL(i).Data1 = [</span>
+0702     <span class="comment">%     0.26107, 0.26831</span>
+0703     <span class="comment">%     0.32645, 0.20329</span>
+0704     <span class="comment">%     0.36195, 0.19346</span>
+0705     <span class="comment">%     0.29765, 0.25808</span>
+0706     <span class="comment">%     ]';</span>
+0707     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0708     <span class="comment">%</span>
+0709     <span class="comment">% % BL 7.3.2b Nominal Rays</span>
+0710     <span class="comment">% i = i + 1;</span>
+0711     <span class="comment">% BL(i).Title = 'BL 7.3.3b';</span>
+0712     <span class="comment">% BL(i).Number = [7 3 3.2];</span>
+0713     <span class="comment">% BL(i).Data0 = [</span>
+0714     <span class="comment">%     0.33167, 0.24704</span>
+0715     <span class="comment">%     0.39112, 0.18674</span>
+0716     <span class="comment">%     0.40584, 0.18264</span>
+0717     <span class="comment">%     0.34680, 0.24278</span>
+0718     <span class="comment">%     ]';</span>
+0719     <span class="comment">%</span>
+0720     <span class="comment">% % Extreme Rays 5mm</span>
+0721     <span class="comment">% BL(i).Data1 = [</span>
+0722     <span class="comment">%     0.32243, 0.25112</span>
+0723     <span class="comment">%     0.38599, 0.18678</span>
+0724     <span class="comment">%     0.41463, 0.17880</span>
+0725     <span class="comment">%     0.35192, 0.24281</span>
+0726     <span class="comment">%     ]';</span>
+0727     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0728 <span class="keyword">else</span>
+0729     <span class="comment">% BL 7.3 Modifications</span>
+0730 
+0731     <span class="comment">% % BL 7.3 Large box</span>
+0732     <span class="comment">% i = i + 1;</span>
+0733     <span class="comment">% BL(i).Title = 'BL 7.3.0';</span>
+0734     <span class="comment">% BL(i).Number = [7 3 0];</span>
+0735     <span class="comment">% BL(i).Data0 = [</span>
+0736     <span class="comment">%     .240512 .27259</span>
+0737     <span class="comment">%     .395671 .23244</span>
+0738     <span class="comment">%     .383385 .19538</span>
+0739     <span class="comment">%     .254096 .23557</span>
+0740     <span class="comment">%     ]';</span>
+0741     <span class="comment">%</span>
+0742     <span class="comment">% % Extreme Rays 5mm</span>
+0743     <span class="comment">% BL(i).Data1 = [</span>
+0744     <span class="comment">%     .234131 .27580</span>
+0745     <span class="comment">%     .401822 .23244</span>
+0746     <span class="comment">%     .388523 .19216</span>
+0747     <span class="comment">%     .248955 .23557</span>
+0748     <span class="comment">%     ]';</span>
+0749     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0750 
+0751     <span class="comment">% BL 7.3.1 Nominal Rays</span>
+0752     <span class="comment">% i = i + 1;</span>
+0753     <span class="comment">% BL(i).Title = 'BL 7.3.1';</span>
+0754     <span class="comment">% BL(i).Number = [7 3 1];</span>
+0755     <span class="comment">% BL(i).Data0 = [</span>
+0756     <span class="comment">%     .331633 .24708</span>
+0757     <span class="comment">%     .346773 .24281</span>
+0758     <span class="comment">%     %.392751 .19622  % Point 3 is replaced by cut from large box</span>
+0759     <span class="comment">%     .38595   .2031</span>
+0760     <span class="comment">%     .38445   .1986</span>
+0761     <span class="comment">%     .377651 .20054</span>
+0762     <span class="comment">%     ]';</span>
+0763     <span class="comment">%</span>
+0764     <span class="comment">% % Extreme Rays 5mm</span>
+0765     <span class="comment">% BL(i).Data1 = [</span>
+0766     <span class="comment">%     .322426 .25112</span>
+0767     <span class="comment">%     .351923 .24281</span>
+0768     <span class="comment">%     %.401623 .19222  % Point 3 is replaced by cut from large box</span>
+0769     <span class="comment">%     .39185  .2022</span>
+0770     <span class="comment">%     .3897  .1956</span>
+0771     <span class="comment">%     .372550 .20054</span>
+0772     <span class="comment">%     ]';</span>
+0773     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0774     <span class="comment">%</span>
+0775     <span class="comment">%</span>
+0776     <span class="comment">% % BL 7.3.3 Nominal Rays</span>
+0777     <span class="comment">% i = i + 1;</span>
+0778     <span class="comment">% BL(i).Title = 'BL 7.3.3';</span>
+0779     <span class="comment">% BL(i).Number = [7 3 3];</span>
+0780     <span class="comment">% BL(i).Data0 = [</span>
+0781     <span class="comment">%     .270372 .26427</span>
+0782     <span class="comment">%     .292650 .25803</span>
+0783     <span class="comment">%     .339185 .21150</span>
+0784     <span class="comment">%     .317204 .21775</span>
+0785     <span class="comment">%     ]';</span>
+0786     <span class="comment">%</span>
+0787     <span class="comment">% % Extreme Rays 5mm</span>
+0788     <span class="comment">% BL(i).Data1 = [</span>
+0789     <span class="comment">%     .261073 .26831</span>
+0790     <span class="comment">%     .297653 .25808</span>
+0791     <span class="comment">%     .348134 .20750</span>
+0792     <span class="comment">%     .312083 .21775</span>
+0793     <span class="comment">%     ]';</span>
+0794     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0795 
+0796 
+0797     <span class="comment">% BL 7.3.1 Nominal Rays 05-05-08</span>
+0798     i = i + 1;
+0799     BL(i).Title = <span class="string">'BL 7.3.1'</span>;
+0800     BL(i).Number = [7 3 1];
+0801     BL(i).Data0 = [
+0802         0.33613, 0.24240
+0803         0.35129, 0.23809
+0804         0.39288, 0.19577
+0805         0.37791, 0.20008
+0806         ]';
+0807 
+0808     <span class="comment">% Extreme Rays 5mm</span>
+0809     BL(i).Data1 = [
+0810         0.32690, 0.24649
+0811         0.35644, 0.23809
+0812         0.40195, 0.19169
+0813         0.37281, 0.20008
+0814         ]';
+0815     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0816 
+0817 
+0818     <span class="comment">% BL 7.3.3 Nominal Rays 05-05-08</span>
+0819     i = i + 1;
+0820     BL(i).Title = <span class="string">'BL 7.3.3'</span>;
+0821     BL(i).Number = [7 3 3];
+0822     BL(i).Data0 = [
+0823         0.27477, 0.25976
+0824         0.29692, 0.25351
+0825         0.33919, 0.21120
+0826         0.31732, 0.21745
+0827         ]';
+0828 
+0829     <span class="comment">% Extreme Rays 5mm</span>
+0830     BL(i).Data1 = [
+0831         0.26545, 0.26385
+0832         0.30209, 0.25351
+0833         0.34834, 0.20711
+0834         0.31220, 0.21745
+0835         ]';
+0836     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0837 <span class="keyword">end</span>
+0838 
+0839 
+0840 <span class="comment">% New (corrected) data for 7.0 and 8.0 received my Mike Kritscher on 4/24/2008</span>
+0841 <span class="comment">% CAS, April 2008 - should still be doublechecked by somebody else</span>
+0842 <span class="comment">%</span>
+0843 <span class="comment">% BL 8.0 Nominal Rays</span>
+0844 i = i + 1;
+0845 BL(i).Title = <span class="string">'BL 8.0'</span>;
+0846 BL(i).Number = [8 0 0];
+0847 BL(i).Data0 = [
+0848     0.38972, 0.22001
+0849     0.48811, 0.18282
+0850     0.47850, 0.12911
+0851     0.38098, 0.16630
+0852     ]';
+0853 
+0854 <span class="comment">% Extreme Rays 5mm</span>
+0855 BL(i).Data1 = [
+0856     0.38519, 0.22363
+0857     0.49319, 0.18282
+0858     0.48290, 0.12549
+0859     0.37591, 0.16630
+0860     ]';
+0861 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0862 
+0863 
+0864 <span class="comment">% BL 8.2.1 Nominal Rays (02-07-08)</span>
+0865 <span class="comment">% Phase space not needed for topoff</span>
+0866 <span class="keyword">if</span> ~OnlyTopOffApertures
+0867     i = i + 1;
+0868     BL(i).Title = <span class="string">'BL 8.2.1'</span>;
+0869     BL(i).Number = [8 2 1];
+0870     BL(i).Data0 = [
+0871         0.63792, 0.32136
+0872         0.65133, 0.31546
+0873         0.65802, 0.30661
+0874         0.64465, 0.31251
+0875         ]';
+0876 
+0877     <span class="comment">% Extreme Rays 5mm</span>
+0878     BL(i).Data1 = [
+0879         0.62731, 0.32832
+0880         0.65659, 0.31546
+0881         0.66849, 0.29965
+0882         0.63940, 0.31251
+0883         ]';
+0884     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0885 <span class="keyword">end</span>
+0886 
+0887 <span class="comment">% BL 8.2.2 Nominal Rays</span>
+0888 <span class="comment">% Phase space not needed for topoff</span>
+0889 <span class="keyword">if</span> ~OnlyTopOffApertures
+0890     i = i + 1;
+0891     BL(i).Title = <span class="string">'BL 8.2.2'</span>;
+0892     BL(i).Number = [8 2 2];
+0893     BL(i).Data0 = [
+0894         0.54886, 0.29916
+0895         0.56219, 0.29340
+0896         0.56862, 0.28513
+0897         0.55534, 0.29089
+0898         ]';
+0899 
+0900     <span class="comment">% Extreme Rays 5mm</span>
+0901     BL(i).Data1 = [
+0902         0.53823, 0.30600
+0903         0.56741, 0.29340
+0904         0.57912, 0.27830
+0905         0.55012, 0.29089
+0906         ]';
+0907     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0908 <span class="keyword">end</span>
+0909 
+0910 <span class="comment">% BL 8.3.1 Nominal Rays</span>
+0911 <span class="comment">% Nominal case</span>
+0912 <span class="comment">% i = i + 1;</span>
+0913 <span class="comment">% BL(i).Title = 'BL 8.3.1';</span>
+0914 <span class="comment">% BL(i).Number = [8 3 1];</span>
+0915 <span class="comment">% BL(i).Data0 = [</span>
+0916 <span class="comment">%     0.36670, 0.24256</span>
+0917 <span class="comment">%     0.37587, 0.23995</span>
+0918 <span class="comment">%     0.38966, 0.22011</span>
+0919 <span class="comment">%     0.38056, 0.22269</span>
+0920 <span class="comment">%     ]';</span>
+0921 <span class="comment">%</span>
+0922 <span class="comment">% % Extreme Rays 5mm</span>
+0923 <span class="comment">% BL(i).Data1 = [</span>
+0924 <span class="comment">%     0.35897, 0.24624</span>
+0925 <span class="comment">%     0.38101, 0.23996</span>
+0926 <span class="comment">%     0.39726, 0.21651</span>
+0927 <span class="comment">%     0.37543, 0.22270</span>
+0928 <span class="comment">%     ]';</span>
+0929 <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0930 
+0931 <span class="comment">% BL 8.3.1 Nominal Rays</span>
+0932 <span class="comment">% Phase space may not be needed for topoff</span>
+0933 <span class="keyword">if</span> ~OnlyTopOffApertures
+0934     <span class="comment">% BL 8.3.1 Nominal Rays (06-18-2008 - no modification, includes different apertures)</span>
+0935     <span class="comment">% i = i + 1;</span>
+0936     <span class="comment">% BL(i).Title = 'BL 8.3.1';</span>
+0937     <span class="comment">% BL(i).Number = [8 3 1];</span>
+0938     <span class="comment">% BL(i).Data0 = [</span>
+0939     <span class="comment">%     0.36920, 0.24226</span>
+0940     <span class="comment">%     0.37826, 0.23959</span>
+0941     <span class="comment">%     0.39276, 0.21868</span>
+0942     <span class="comment">%     0.38375, 0.22135</span>
+0943     <span class="comment">%     ]';</span>
+0944     <span class="comment">%</span>
+0945     <span class="comment">% % Extreme Rays 5mm</span>
+0946     <span class="comment">% BL(i).Data1 = [</span>
+0947     <span class="comment">%     0.36136, 0.24609</span>
+0948     <span class="comment">%     0.38340, 0.23959</span>
+0949     <span class="comment">%     0.40052, 0.21484</span>
+0950     <span class="comment">%     0.37863, 0.22135</span>
+0951     <span class="comment">%     ]';</span>
+0952     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+0953 
+0954     <span class="comment">% BL 8.3.1 Nominal Rays (07-31-2008)</span>
+0955     i = i + 1;
+0956     BL(i).Title = <span class="string">'BL 8.3.1'</span>;
+0957     BL(i).Number = [8 3 1];
+0958     BL(i).Data0 = [
+0959         0.37356, 0.23602
+0960         0.38421, 0.23103
+0961         0.38893, 0.22422
+0962         0.37830, 0.22921
+0963         ]';
+0964 
+0965     <span class="comment">% Extreme Rays 5mm</span>
+0966     BL(i).Data1 = [
+0967         0.36341, 0.24317
+0968         0.38935, 0.23103
+0969         0.39899, 0.21707
+0970         0.37317, 0.22921
+0971         ]';
+0972     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0973 <span class="keyword">end</span>
+0974 
+0975 
+0976 <span class="keyword">if</span> OriginalBLFlag
+0977     <span class="comment">% Nominal case without additional aperture</span>
+0978 
+0979     <span class="comment">% BL 8.3.2 Nominal Rays</span>
+0980     i = i + 1;
+0981     BL(i).Title = <span class="string">'BL 8.3.2'</span>;
+0982     BL(i).Number = [8 3 2];
+0983     BL(i).Data0 = [
+0984         0.27547, 0.22156
+0985         0.28739, 0.21826
+0986         0.30236, 0.19721
+0987         0.29053, 0.20046
+0988         ]';
+0989 
+0990     <span class="comment">% Extreme Rays 5mm</span>
+0991     BL(i).Data1 = [
+0992         0.26779, 0.22510
+0993         0.29251, 0.21827
+0994         0.30990, 0.19375
+0995         0.28543, 0.20047
+0996         ]';
+0997     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+0998 
+0999 <span class="keyword">else</span>
+1000     <span class="comment">% Proposed added aperture by Rob, April 2008</span>
+1001     <span class="comment">% keep in mind that this is the bigger of 12.3.2 and 8.3.2 plus the</span>
+1002     <span class="comment">% added aperture, so in some directions this is actually bigger than</span>
+1003     <span class="comment">% the original unchanged phase space above ...</span>
+1004     <span class="comment">% BL 8.3.2 Nominal Rays</span>
+1005     <span class="comment">% i = i + 1;</span>
+1006     <span class="comment">% BL(i).Title = 'BL 8.3.2';</span>
+1007     <span class="comment">% BL(i).Number = [8 3 2];</span>
+1008     <span class="comment">% BL(i).Data0 = [</span>
+1009     <span class="comment">%     .275369 .22172</span>
+1010     <span class="comment">%     .290198 .21758</span>
+1011     <span class="comment">%     .300712 .20280</span>
+1012     <span class="comment">%     .285930 .20694</span>
+1013     <span class="comment">%     ]';</span>
+1014     <span class="comment">%</span>
+1015     <span class="comment">% % Extreme Rays 5mm</span>
+1016     <span class="comment">% BL(i).Data1 = [</span>
+1017     <span class="comment">%     .267677 .22529</span>
+1018     <span class="comment">%     .295317 .21758</span>
+1019     <span class="comment">%     .308343 .19923</span>
+1020     <span class="comment">%     .280832 .20693</span>
+1021     <span class="comment">%     ]';</span>
+1022     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1023 
+1024     <span class="comment">% 06-18-2008</span>
+1025     <span class="comment">%BL 8.3.2 Nominal Rays</span>
+1026     i = i + 1;
+1027     BL(i).Title = <span class="string">'BL 8.3.2'</span>;
+1028     BL(i).Number = [8 3 2];
+1029     BL(i).Data0 = [
+1030         0.27741, 0.22206
+1031         0.28945, 0.21852
+1032         0.29991, 0.20381
+1033         0.28791, 0.20736
+1034         ]';
+1035 
+1036     <span class="comment">% Extreme Rays 5mm</span>
+1037     BL(i).Data1 = [
+1038         0.26953, 0.22589
+1039         0.29457, 0.21852
+1040         0.30772, 0.19999
+1041         0.28281, 0.20736
+1042         ]';
+1043     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1044 <span class="keyword">end</span>
+1045 
+1046 
+1047 
+1048 <span class="comment">% BL 9.0 Nominal Rays (02-12-08)</span>
+1049 i = i + 1;
+1050 BL(i).Title = <span class="string">'BL 9.0'</span>;
+1051 BL(i).Number = [9 0 0];
+1052 BL(i).Data0 = [
+1053     0.36965, 0.21898
+1054     0.50588, 0.17122
+1055     0.49837, 0.12996
+1056     0.36306, 0.17764
+1057     ]';
+1058 
+1059 <span class="comment">% Extreme Rays 5mm</span>
+1060 BL(i).Data1 = [
+1061     0.36507, 0.22234
+1062     0.51096, 0.17122
+1063     0.50280, 0.12661
+1064     0.35798, 0.17764
+1065     ]';
+1066 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1067 
+1068 
+1069 <span class="comment">% The many iterations of 9.3</span>
+1070 <span class="comment">% if OriginalBLFlag</span>
+1071     <span class="comment">% Present BL 2007 - Intersection Data - This is not perfect but it's very close for now</span>
+1072 
+1073     <span class="comment">% 9.3 Nominal Rays</span>
+1074     i = i + 1;
+1075     BL(i).Title = <span class="string">'BL 9.3.x'</span>;
+1076     BL(i).Number = [9 3 1];
+1077     BL(i).Data0 = [
+1078         0.2624  0.2846
+1079         0.3546  0.2463
+1080         0.3606  0.2438
+1081         0.385   0.2254
+1082         0.38401, 0.16636
+1083         0.34578, 0.18293
+1084         0.262    0.2421
+1085         ]';
+1086 
+1087     <span class="comment">% Extreme Rays 5mm</span>
+1088     BL(i).Data1 = [
+1089         0.2572   0.2887
+1090         0.3604   0.246
+1091         0.3664   0.2435
+1092         0.3902   0.2256
+1093         0.38899, 0.16200
+1094         0.34069, 0.18293
+1095         0.2567   0.242
+1096         ]';
+1097     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1098 
+1099     <span class="comment">% % Original BL - multiple apertures</span>
+1100     <span class="comment">% % BL 9-3 AP1 Nominal Rays</span>
+1101     <span class="comment">% i = i + 1;</span>
+1102     <span class="comment">% BL(i).Title = 'BL 9.3 AP1';</span>
+1103     <span class="comment">% BL(i).Number = [9 3 1];</span>
+1104     <span class="comment">% BL(i).Data0 = [</span>
+1105     <span class="comment">%     0.11560, 0.34556</span>
+1106     <span class="comment">%     0.36043, 0.24391</span>
+1107     <span class="comment">%     0.57666, 0.08163</span>
+1108     <span class="comment">%     0.34578, 0.18293</span>
+1109     <span class="comment">%     ]';</span>
+1110     <span class="comment">%</span>
+1111     <span class="comment">% % Extreme Rays 5mm</span>
+1112     <span class="comment">% BL(i).Data1 = [</span>
+1113     <span class="comment">%     0.09464, 0.35606</span>
+1114     <span class="comment">%     0.36614, 0.24367</span>
+1115     <span class="comment">%     0.59522, 0.07118</span>
+1116     <span class="comment">%     0.34069, 0.18293</span>
+1117     <span class="comment">%     ]';</span>
+1118     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1119     <span class="comment">%</span>
+1120     <span class="comment">%</span>
+1121     <span class="comment">% % 9.3 AP2 Nominal Rays</span>
+1122     <span class="comment">% i = i + 1;</span>
+1123     <span class="comment">% BL(i).Title = 'BL 9.3 AP2';</span>
+1124     <span class="comment">% BL(i).Number = [9 3 2];</span>
+1125     <span class="comment">% BL(i).Data0 = [</span>
+1126     <span class="comment">%     0.26238, 0.28563</span>
+1127     <span class="comment">%     0.38520, 0.23329</span>
+1128     <span class="comment">%     0.38401, 0.16636</span>
+1129     <span class="comment">%     0.26174, 0.21871</span>
+1130     <span class="comment">%     ]';</span>
+1131     <span class="comment">%</span>
+1132     <span class="comment">% % Extreme Rays 5mm</span>
+1133     <span class="comment">% BL(i).Data1 = [</span>
+1134     <span class="comment">%     0.25726, 0.28999</span>
+1135     <span class="comment">%     0.39034, 0.23329</span>
+1136     <span class="comment">%     0.38899, 0.16200</span>
+1137     <span class="comment">%     0.25650, 0.21871</span>
+1138     <span class="comment">%     ]';</span>
+1139     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1140 
+1141 <span class="comment">% else</span>
+1142 <span class="comment">%     % Proposed modifications: with M1 mirror aperture</span>
+1143 <span class="comment">%     % 9.3 Nominal Rays</span>
+1144 <span class="comment">%     i = i + 1;</span>
+1145 <span class="comment">%     BL(i).Title = 'BL 9.3.x';</span>
+1146 <span class="comment">%     BL(i).Number = [9 3 1];</span>
+1147 <span class="comment">%</span>
+1148 <span class="comment">%     if 1</span>
+1149 <span class="comment">%         % 2008-01-11 data</span>
+1150 <span class="comment">%         BL(i).Data0 = [</span>
+1151 <span class="comment">%             0.11560, 0.34556</span>
+1152 <span class="comment">%             0.36043, 0.24391</span>
+1153 <span class="comment">%             0.46405, 0.16724</span>
+1154 <span class="comment">%             0.30253, 0.21453</span>
+1155 <span class="comment">%             ]';</span>
+1156 <span class="comment">%</span>
+1157 <span class="comment">%         % BL 9-3 Extreme Rays 5mm.</span>
+1158 <span class="comment">%         BL(i).Data1 = [</span>
+1159 <span class="comment">%             0.09464, 0.35606</span>
+1160 <span class="comment">%             0.36614, 0.24367</span>
+1161 <span class="comment">%             0.47567, 0.16230</span>
+1162 <span class="comment">%             0.29741, 0.21453</span>
+1163 <span class="comment">%             ]';</span>
+1164 <span class="comment">%         BL(i).ExtremeRay1 = 5;  % mm</span>
+1165 <span class="comment">%     else</span>
+1166 <span class="comment">%         % 2008-01-10 data</span>
+1167 <span class="comment">%         BL(i).Data0 = [</span>
+1168 <span class="comment">%             0.11560, 0.34556</span>
+1169 <span class="comment">%             0.36043, 0.24391</span>
+1170 <span class="comment">%             0.47061, 0.16230</span>
+1171 <span class="comment">%             0.30933, 0.20958</span>
+1172 <span class="comment">%             ]';</span>
+1173 <span class="comment">%</span>
+1174 <span class="comment">%         % BL 9-3 Extreme Rays 5mm.</span>
+1175 <span class="comment">%         BL(i).Data1 = [</span>
+1176 <span class="comment">%             0.09464, 0.35606</span>
+1177 <span class="comment">%             0.36614, 0.24367</span>
+1178 <span class="comment">%             0.48222, 0.15737</span>
+1179 <span class="comment">%             0.30422, 0.20958</span>
+1180 <span class="comment">%             ]';</span>
+1181 <span class="comment">%         BL(i).ExtremeRay1 = 5;  % mm</span>
+1182 <span class="comment">%     end</span>
+1183 <span class="comment">% end</span>
+1184 
+1185 
+1186 <span class="comment">% BL 10.0.0 - Nominal Rays (02-21-08)</span>
+1187 i = i + 1;
+1188 BL(i).Title = <span class="string">'BL 10.0'</span>;
+1189 BL(i).Number = [10 0 0];
+1190 BL(i).Data0 = [
+1191     0.38305, 0.20481
+1192     0.48941, 0.16629
+1193     0.48547, 0.14428
+1194     0.37949, 0.18277
+1195     ]';
+1196 
+1197 <span class="comment">% Extreme Rays 5mm</span>
+1198 BL(i).Data1 = [
+1199     0.37850, 0.20828
+1200     0.49447, 0.16629
+1201     0.48990, 0.14082
+1202     0.37441, 0.18277
+1203     ]';
+1204 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1205 
+1206 <span class="comment">% BL 10.0.0 - using AP2 - which is an existing aperture</span>
+1207 <span class="comment">% i = i + 1;</span>
+1208 <span class="comment">% BL(i).Title = 'BL 10.0';</span>
+1209 <span class="comment">% BL(i).Number = [10 0 0];</span>
+1210 <span class="comment">% BL(i).Data0 = [</span>
+1211 <span class="comment">%     0.42307, 0.18978</span>
+1212 <span class="comment">%     0.46113, 0.15303</span>
+1213 <span class="comment">%     0.44593, 0.15929</span>
+1214 <span class="comment">%     0.40773, 0.19604</span>
+1215 <span class="comment">%     ]';</span>
+1216 <span class="comment">%</span>
+1217 <span class="comment">% % Extreme Rays 5mm</span>
+1218 <span class="comment">% BL(i).Data1 = [</span>
+1219 <span class="comment">%     0.42816, 0.18987</span>
+1220 <span class="comment">%     0.47361, 0.14580</span>
+1221 <span class="comment">%     0.44086, 0.15929</span>
+1222 <span class="comment">%     0.39505, 0.20327</span>
+1223 <span class="comment">%     ]';</span>
+1224 <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1225 
+1226 
+1227 <span class="comment">% BL 10.3</span>
+1228 <span class="comment">% Original Data BL</span>
+1229 <span class="comment">% i = i + 1;</span>
+1230 <span class="comment">% BL(i).Title = 'BL 10.3.1';</span>
+1231 <span class="comment">% BL(i).Number = [10 3 1];</span>
+1232 <span class="comment">% BL(i).Data0 = [</span>
+1233 <span class="comment">%     0.34113, 0.24714</span>
+1234 <span class="comment">%     0.37629, 0.23719</span>
+1235 <span class="comment">%     0.39242, 0.21426</span>
+1236 <span class="comment">%     0.35758, 0.22407</span>
+1237 <span class="comment">%     ]';</span>
+1238 <span class="comment">%</span>
+1239 <span class="comment">% % Extreme Rays 5mm</span>
+1240 <span class="comment">% BL(i).Data1 = [</span>
+1241 <span class="comment">%     0.33334, 0.25081</span>
+1242 <span class="comment">%     0.38143, 0.23720</span>
+1243 <span class="comment">%     0.40004, 0.21068</span>
+1244 <span class="comment">%     0.35245, 0.22407</span>
+1245 <span class="comment">%     ]';</span>
+1246 <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1247 <span class="comment">%</span>
+1248 <span class="comment">%</span>
+1249 <span class="comment">% % BL 10.3.2 Nominal Rays</span>
+1250 <span class="comment">% i = i + 1;</span>
+1251 <span class="comment">% BL(i).Title = 'BL 10.3.2';</span>
+1252 <span class="comment">% BL(i).Number = [10 3 2];</span>
+1253 <span class="comment">% BL(i).Data0 = [</span>
+1254 <span class="comment">%     0.25616, 0.22466</span>
+1255 <span class="comment">%     0.29025, 0.21529</span>
+1256 <span class="comment">%     0.30617, 0.19317</span>
+1257 <span class="comment">%     0.27237, 0.20240</span>
+1258 <span class="comment">%     ]';</span>
+1259 <span class="comment">%</span>
+1260 <span class="comment">% % Extreme Rays 5mm</span>
+1261 <span class="comment">% BL(i).Data1 = [</span>
+1262 <span class="comment">%     0.24844, 0.22821</span>
+1263 <span class="comment">%     0.29537, 0.21530</span>
+1264 <span class="comment">%     0.31372, 0.18972</span>
+1265 <span class="comment">%     0.26727, 0.20241</span>
+1266 <span class="comment">%     ]';</span>
+1267 <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1268 
+1269 <span class="comment">% New data: 01-25-2008</span>
+1270 i = i + 1;
+1271 BL(i).Title = <span class="string">'BL 10.3.1'</span>;
+1272 BL(i).Number = [10 3 1];
+1273 BL(i).Data0 = [
+1274     0.34941, 0.24404
+1275     0.36734, 0.23896
+1276     0.39204, 0.22088
+1277     0.37429, 0.22591
+1278     ]';
+1279 
+1280 <span class="comment">% Extreme Rays 5mm</span>
+1281 BL(i).Data1 = [
+1282     0.33761, 0.24886
+1283     0.37247, 0.23897
+1284     0.40357, 0.21616
+1285     0.36915, 0.22592
+1286     ]';
+1287 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1288 
+1289 
+1290 <span class="comment">% BL 10.3.2 Nominal Rays</span>
+1291 i = i + 1;
+1292 BL(i).Title = <span class="string">'BL 10.3.2'</span>;
+1293 BL(i).Number = [10 3 2];
+1294 BL(i).Data0 = [
+1295     0.25509, 0.21912
+1296     0.27225, 0.21440
+1297     0.29594, 0.19724
+1298     0.27895, 0.20190
+1299     ]';
+1300 
+1301 <span class="comment">% Extreme Rays 5mm</span>
+1302 BL(i).Data1 = [
+1303     0.24360, 0.22369
+1304     0.27735, 0.21441
+1305     0.30718, 0.19276
+1306     0.27383, 0.20191
+1307     ]';
+1308 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1309 
+1310 <span class="comment">% Somebody should double check 11.0 (CAS, Feb-2008)</span>
+1311 
+1312 <span class="comment">% BL 11.0.0 - Nominal Rays</span>
+1313 i = i + 1;
+1314 BL(i).Title = <span class="string">'BL 11.0'</span>;
+1315 BL(i).Number = [11 0 0];
+1316 BL(i).Data0 = [
+1317     0.383346, 0.2058
+1318     0.432325, 0.18708
+1319     0.474283, 0.14738
+1320     0.425767, 0.16611
+1321     ]';
+1322 
+1323 <span class="comment">% Extreme Rays 5mm</span>
+1324 BL(i).Data1 = [
+1325     0.371113, 0.2124
+1326     0.437413, 0.18708
+1327     0.486243, 0.14079
+1328     0.420701, 0.16611
+1329     ]';
+1330 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1331 
+1332 
+1333 <span class="keyword">if</span> OriginalBLFlag
+1334     <span class="comment">% Nominal case without additional aperture</span>
+1335 
+1336     <span class="comment">% BL 11.3.1 Nominal Rays</span>
+1337     i = i + 1;
+1338     BL(i).Title = <span class="string">'BL 11.3.1'</span>;
+1339     BL(i).Number = [11 3 1];
+1340     BL(i).Data0 = [
+1341         0.34391, 0.25126
+1342         0.36444, 0.24545
+1343         0.38878, 0.21094
+1344         0.36853, 0.21663
+1345         ]';
+1346 
+1347     <span class="comment">% Extreme Rays 5mm</span>
+1348     BL(i).Data1 = [
+1349         0.33610, 0.25494
+1350         0.36958, 0.24546
+1351         0.39638, 0.20738
+1352         0.36340, 0.21665
+1353         ]';
+1354     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1355 
+1356 
+1357     <span class="comment">% BL 11.3.2 Nominal Rays</span>
+1358     i = i + 1;
+1359     BL(i).Title = <span class="string">'BL 11.3.2'</span>;
+1360     BL(i).Number = [11 3 2];
+1361     BL(i).Data0 = [
+1362         0.25633, 0.22474
+1363         0.29042, 0.21537
+1364         0.30633, 0.19324
+1365         0.27254, 0.20247
+1366         ]';
+1367 
+1368     <span class="comment">% Extreme Rays 5mm</span>
+1369     BL(i).Data1 = [
+1370         0.24860, 0.22828
+1371         0.29553, 0.21537
+1372         0.31389, 0.18979
+1373         0.26743, 0.20248
+1374         ]';
+1375     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1376 
+1377 <span class="keyword">else</span>
+1378     <span class="comment">% BL 11.3.1 modifications 2008-04-22</span>
+1379     <span class="comment">% BL 11.3.1 Nominal Rays</span>
+1380     <span class="comment">% i = i + 1;</span>
+1381     <span class="comment">% BL(i).Title = 'BL 11.3.1';</span>
+1382     <span class="comment">% BL(i).Number = [11 3 1];</span>
+1383     <span class="comment">% BL(i).Data0 = [</span>
+1384     <span class="comment">%     0.34391, 0.25074</span>
+1385     <span class="comment">%     0.36444, 0.24488</span>
+1386     <span class="comment">%     0.38767, 0.21168</span>
+1387     <span class="comment">%     0.36743, 0.21737</span>
+1388     <span class="comment">%     ]';</span>
+1389     <span class="comment">%</span>
+1390     <span class="comment">% % Extreme Rays 5mm</span>
+1391     <span class="comment">% BL(i).Data1 = [</span>
+1392     <span class="comment">%     0.33595, 0.25442</span>
+1393     <span class="comment">%     0.36940, 0.24494</span>
+1394     <span class="comment">%     0.39527, 0.20812</span>
+1395     <span class="comment">%     0.36231, 0.21738</span>
+1396     <span class="comment">%     ]';</span>
+1397     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1398 
+1399 
+1400     <span class="comment">% BL 11.3.1 modifications 2008-04-30</span>
+1401     <span class="comment">% BL 11.3.1 Nominal Rays</span>
+1402     <span class="comment">% i = i + 1;</span>
+1403     <span class="comment">% BL(i).Title = 'BL 11.3.1';</span>
+1404     <span class="comment">% BL(i).Number = [11 3 1];</span>
+1405     <span class="comment">% BL(i).Data0 = [</span>
+1406     <span class="comment">%     0.34404, 0.25033</span>
+1407     <span class="comment">%     0.36456, 0.24450</span>
+1408     <span class="comment">%     0.38730, 0.21221</span>
+1409     <span class="comment">%     0.36703, 0.21794</span>
+1410     <span class="comment">%     ]';</span>
+1411     <span class="comment">%</span>
+1412     <span class="comment">% % Extreme Rays 5mm</span>
+1413     <span class="comment">% BL(i).Data1 = [</span>
+1414     <span class="comment">%     0.33623, 0.25403</span>
+1415     <span class="comment">%     0.36970, 0.24451</span>
+1416     <span class="comment">%     0.39491, 0.20863</span>
+1417     <span class="comment">%     0.36190, 0.21795</span>
+1418     <span class="comment">%     ]';</span>
+1419     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1420 
+1421 
+1422     <span class="comment">% BL 11.3.1 modifications 05-16-2008</span>
+1423     <span class="comment">% BL 11.3.1 Nominal Rays</span>
+1424     i = i + 1;
+1425     BL(i).Title = <span class="string">'BL 11.3.1'</span>;
+1426     BL(i).Number = [11 3 1];
+1427     BL(i).Data0 = [
+1428         0.34467, 0.25015
+1429         0.36519, 0.24432
+1430         0.38792, 0.21204
+1431         0.36766, 0.21776
+1432         ]';
+1433 
+1434     <span class="comment">% Extreme Rays 5mm</span>
+1435     BL(i).Data1 = [
+1436         0.33686, 0.25385
+1437         0.37032, 0.24433
+1438         0.39554, 0.20846
+1439         0.36253, 0.21777
+1440         ]';
+1441     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1442 
+1443 
+1444     <span class="comment">% % BL 11.3.2 modifications 2008-1-15</span>
+1445     <span class="comment">% % BL 11.3.2 Nominal Rays</span>
+1446     <span class="comment">% i = i + 1;</span>
+1447     <span class="comment">% BL(i).Title = 'BL 11.3.2';</span>
+1448     <span class="comment">% BL(i).Number = [11 3 2];</span>
+1449     <span class="comment">% BL(i).Data0 = [</span>
+1450     <span class="comment">%     0.256327, 0.22485</span>
+1451     <span class="comment">%     0.290417, 0.21540</span>
+1452     <span class="comment">%     0.304546, 0.19573</span>
+1453     <span class="comment">%     0.270587, 0.20517</span>
+1454     <span class="comment">%     ]';</span>
+1455     <span class="comment">%</span>
+1456     <span class="comment">% % Extreme Rays 5mm</span>
+1457     <span class="comment">% BL(i).Data1 = [</span>
+1458     <span class="comment">%     0.248519, 0.22839</span>
+1459     <span class="comment">%     0.295503, 0.21541</span>
+1460     <span class="comment">%     0.312176, 0.19219</span>
+1461     <span class="comment">%     0.26548, 0.20517</span>
+1462     <span class="comment">%     ]';</span>
+1463     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1464 
+1465     <span class="comment">% BL 11.3.2 modifications 2008-04-22</span>
+1466     <span class="comment">% BL 11.3.2 Nominal Rays</span>
+1467     <span class="comment">% i = i + 1;</span>
+1468     <span class="comment">% BL(i).Title = 'BL 11.3.2';</span>
+1469     <span class="comment">% BL(i).Number = [11 3 2];</span>
+1470     <span class="comment">% BL(i).Data0 = [</span>
+1471     <span class="comment">%     0.25519, 0.22551</span>
+1472     <span class="comment">%     0.28960, 0.21569</span>
+1473     <span class="comment">%     0.30427, 0.19527</span>
+1474     <span class="comment">%     0.27005, 0.20508</span>
+1475     <span class="comment">%     ]';</span>
+1476     <span class="comment">%</span>
+1477     <span class="comment">% % Extreme Rays 5mm</span>
+1478     <span class="comment">% BL(i).Data1 = [</span>
+1479     <span class="comment">%     0.24766, 0.22879</span>
+1480     <span class="comment">%     0.29501, 0.21528</span>
+1481     <span class="comment">%     0.31199, 0.19158</span>
+1482     <span class="comment">%     0.26494, 0.20508</span>
+1483     <span class="comment">%     ]';</span>
+1484     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1485 
+1486     <span class="comment">% BL 11.3.2 modifications 2008-04-30</span>
+1487     <span class="comment">% BL 11.3.2 Nominal Rays</span>
+1488     <span class="comment">% i = i + 1;</span>
+1489     <span class="comment">% BL(i).Title = 'BL 11.3.2';</span>
+1490     <span class="comment">% BL(i).Number = [11 3 2];</span>
+1491     <span class="comment">% BL(i).Data0 = [</span>
+1492     <span class="comment">%     0.25544, 0.22518</span>
+1493     <span class="comment">%     0.28984, 0.21536</span>
+1494     <span class="comment">%     0.30421, 0.19535</span>
+1495     <span class="comment">%     0.26999, 0.20516</span>
+1496     <span class="comment">%     ]';</span>
+1497     <span class="comment">%</span>
+1498     <span class="comment">% % Extreme Rays 5mm</span>
+1499     <span class="comment">% BL(i).Data1 = [</span>
+1500     <span class="comment">%     0.24761, 0.22886</span>
+1501     <span class="comment">%     0.29496, 0.21536</span>
+1502     <span class="comment">%     0.31194, 0.19166</span>
+1503     <span class="comment">%     0.26488, 0.20516</span>
+1504     <span class="comment">%     ]';</span>
+1505     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1506 
+1507     <span class="comment">% BL 11-3 Option 1.5mm Data 05-05-08</span>
+1508     <span class="comment">% BL 11.3.2 Nominal Rays</span>
+1509     <span class="comment">% i = i + 1;</span>
+1510     <span class="comment">% BL(i).Title = 'BL 11.3.2';</span>
+1511     <span class="comment">% BL(i).Number = [11 3 2];</span>
+1512     <span class="comment">% BL(i).Data0 = [</span>
+1513     <span class="comment">%     0.25544, 0.22518</span>
+1514     <span class="comment">%     0.28984, 0.21536</span>
+1515     <span class="comment">%     0.30408, 0.19553</span>
+1516     <span class="comment">%     0.26986, 0.20535</span>
+1517     <span class="comment">%     ]';</span>
+1518     <span class="comment">%</span>
+1519     <span class="comment">% % Extreme Rays 5mm</span>
+1520     <span class="comment">% BL(i).Data1 = [</span>
+1521     <span class="comment">%     0.24761, 0.22886</span>
+1522     <span class="comment">%     0.29496, 0.21536</span>
+1523     <span class="comment">%     0.31181, 0.19184</span>
+1524     <span class="comment">%     0.26475, 0.20535</span>
+1525     <span class="comment">%     ]';</span>
+1526     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1527 
+1528     <span class="keyword">if</span> 1
+1529         <span class="comment">% BL 11.3.2 modifications 05-16-2008</span>
+1530         <span class="comment">% 1.5 mm clearance to the photon beam</span>
+1531         <span class="comment">% BL 11.3.2 Nominal Rays</span>
+1532         i = i + 1;
+1533         BL(i).Title = <span class="string">'BL 11.3.2  1.5 mm'</span>;
+1534         BL(i).Number = [11 3 2];
+1535         BL(i).Data0 = [
+1536             0.25595, 0.22517
+1537             0.29034, 0.21533
+1538             0.30449, 0.19564
+1539             0.27027, 0.20545
+1540             ]';
+1541 
+1542         <span class="comment">% Extreme Rays 5mm</span>
+1543         BL(i).Data1 = [
+1544             0.24813, 0.22886
+1545             0.29546, 0.21536
+1546             0.31221, 0.19195
+1547             0.26516, 0.20545
+1548             ]';
+1549         BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1550     <span class="keyword">else</span>
+1551         <span class="comment">% BL 11.3.2 modifications 05-16-2008</span>
+1552         <span class="comment">% 2.0 mm clearance to the photon beam</span>
+1553         <span class="comment">% BL 11.3.2 Nominal Rays</span>
+1554         i = i + 1;
+1555         BL(i).Title = <span class="string">'BL 11.3.2'</span>;
+1556         <span class="comment">%BL(i).Title = 'BL 11.3.2  2 mm';</span>
+1557         BL(i).Number = [11 3 2];
+1558         BL(i).Data0 = [
+1559             0.25609, 0.22499
+1560             0.29048, 0.21517
+1561             0.30462, 0.19546
+1562             0.27040, 0.20527
+1563             ]';
+1564 
+1565         <span class="comment">% Extreme Rays 5mm</span>
+1566         BL(i).Data1 = [
+1567             0.24827, 0.22867
+1568             0.29559, 0.21517
+1569             0.31234, 0.19177
+1570             0.26530, 0.20527
+1571             ]';
+1572         BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1573     <span class="keyword">end</span>
+1574 <span class="keyword">end</span>
+1575 
+1576 
+1577 <span class="comment">% Somebody should doublecheck numbers CAS, April 2008</span>
+1578 <span class="comment">% BL 12.0 Nominal Rays</span>
+1579 i = i + 1;
+1580 BL(i).Title = <span class="string">'BL 12.0'</span>;
+1581 BL(i).Number = [12 0 0];
+1582 BL(i).Data0 = [
+1583     0.38668, 0.20132
+1584     0.48551, 0.16819
+1585     0.48185, 0.14771
+1586     0.38336, 0.18084
+1587     ]';
+1588 
+1589 <span class="comment">% Extreme Rays 5mm</span>
+1590 BL(i).Data1 = [
+1591     0.38210, 0.20455
+1592     0.49058, 0.16819
+1593     0.48633, 0.14449
+1594     0.37828, 0.18084
+1595     ]';
+1596 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1597 
+1598 
+1599 <span class="comment">% 12.2.2 Nominal Rays (07-22-2008)</span>
+1600 i = i + 1;
+1601 BL(i).Title = <span class="string">'BL 12.2.2'</span>;
+1602 BL(i).Number = [12 2 2];
+1603 BL(i).Data0 = [
+1604     0.54816, 0.30003
+1605     0.56271, 0.29374
+1606     0.56915, 0.28547
+1607     0.55465, 0.29176
+1608     ]';
+1609 
+1610 <span class="comment">% Extreme Rays 5mm</span>
+1611 BL(i).Data1 = [
+1612     0.53753, 0.30686
+1613     0.56794, 0.29374
+1614     0.57965, 0.27863
+1615     0.54943, 0.29176
+1616     ]';
+1617 BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1618 
+1619 
+1620 <span class="comment">% BL 12.3.1 Nominal Rays</span>
+1621 <span class="comment">% Phase space not needed for topoff</span>
+1622 <span class="keyword">if</span> ~OnlyTopOffApertures
+1623     i = i + 1;
+1624     BL(i).Title = <span class="string">'BL 12.3.1'</span>;
+1625     BL(i).Number = [12 3 1];
+1626     BL(i).Data0 = [
+1627         0.36553, 0.24243
+1628         0.38035, 0.23841
+1629         0.39343, 0.21954
+1630         0.37872, 0.22352
+1631         ]';
+1632 
+1633     <span class="comment">% Extreme Rays 5mm</span>
+1634     BL(i).Data1 = [
+1635         0.35794, 0.24590
+1636         0.38548, 0.23842
+1637         0.40089, 0.21614
+1638         0.37359, 0.22352
+1639         ]';
+1640     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1641 <span class="keyword">end</span>
+1642 
+1643 
+1644 <span class="keyword">if</span> OriginalBLFlag
+1645     <span class="comment">% BL 12.3.2 Nominal Rays</span>
+1646     i = i + 1;
+1647     BL(i).Title = <span class="string">'BL 12.3.2'</span>;
+1648     BL(i).Number = [12 3 2];
+1649     BL(i).Data0 = [
+1650         0.27657, 0.22002
+1651         0.29120, 0.21615
+1652         0.30413, 0.19795
+1653         0.28960, 0.20176
+1654         ]';
+1655 
+1656     <span class="comment">% Extreme Rays 5mm</span>
+1657     BL(i).Data1 = [
+1658         0.26904, 0.22336
+1659         0.29631, 0.21616
+1660         0.31154, 0.19468
+1661         0.28449, 0.20177
+1662         ]';
+1663     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1664 
+1665 <span class="keyword">else</span>
+1666     <span class="comment">% BL 12.3.2</span>
+1667 
+1668     <span class="comment">% Proposed added aperture by Rob, April 2008</span>
+1669     <span class="comment">% keep in mind that this is the bigger of 12.3.2 and 8.3.2 plus the</span>
+1670     <span class="comment">% added aperture, so in some directions this is actually bigger than</span>
+1671     <span class="comment">% the original unchanged phase space above ...</span>
+1672     <span class="comment">% BL 12.3.2 Nominal Rays</span>
+1673     <span class="comment">% i = i + 1;</span>
+1674     <span class="comment">% BL(i).Title = 'BL 12.3.2';</span>
+1675     <span class="comment">% BL(i).Number = [12 3 2];</span>
+1676     <span class="comment">% BL(i).Data0 = [</span>
+1677     <span class="comment">%     .275369 .22172</span>
+1678     <span class="comment">%     .290198 .21758</span>
+1679     <span class="comment">%     .300712 .20280</span>
+1680     <span class="comment">%     .285930 .20694</span>
+1681     <span class="comment">%     ]';</span>
+1682     <span class="comment">%</span>
+1683     <span class="comment">% % Extreme Rays 5mm</span>
+1684     <span class="comment">% BL(i).Data1 = [</span>
+1685     <span class="comment">%     .267677 .22529</span>
+1686     <span class="comment">%     .295317 .21758</span>
+1687     <span class="comment">%     .308343 .19923</span>
+1688     <span class="comment">%     .280832 .20693</span>
+1689     <span class="comment">%     ]';</span>
+1690     <span class="comment">% BL(i).ExtremeRay1 = 5;  % mm</span>
+1691 
+1692     <span class="comment">% 06-26-2008</span>
+1693     <span class="comment">% New PS fiducial survey data and the McKean aperture</span>
+1694     <span class="comment">% BL 12.3.2 Nominal Rays</span>
+1695     i = i + 1;
+1696     BL(i).Title = <span class="string">'BL 12.3.2'</span>;
+1697     BL(i).Number = [12 3 2];
+1698     BL(i).Data0 = [
+1699         0.27465, 0.22184
+1700         0.28964, 0.21747
+1701         0.30033, 0.20239
+1702         0.28540, 0.20675
+1703         ]';
+1704 
+1705     <span class="comment">% Extreme Rays 5mm</span>
+1706     BL(i).Data1 = [
+1707         0.26683, 0.22561
+1708         0.29476, 0.21747
+1709         0.30809, 0.19862
+1710         0.28030, 0.20675
+1711         ]';
+1712     BL(i).ExtremeRay1 = 5;  <span class="comment">% mm</span>
+1713 <span class="keyword">end</span>
+1714 
+1715</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

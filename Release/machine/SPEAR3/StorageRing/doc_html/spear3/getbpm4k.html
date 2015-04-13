@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getbpm4k</title>
+  <meta name="keywords" content="getbpm4k">
+  <meta name="description" content="BPM = getbpm4k(DeviceList)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; getbpm4k.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getbpm4k
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>BPM = getbpm4k(DeviceList)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [BPM, t116, t132, Error] = getbpm4k(DeviceList, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  BPM = getbpm4k(DeviceList)
+  BPM = getbpm4k(DeviceList, 'read')
+  BPM = getbpm4k(DeviceList, 'arm')
+  BPM = getbpm4k(DeviceList, 'trigger')
+
+  Spear BPM channels
+  |  West pit 132 |    East pit 116 |    West pit 132  |
+  |   1  to  26   |   27  to    82  |    83  to   112  |
+  |[1 1] to [5 1] | [5 2] to [14 1] | [14 2] to [18 7] |</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="LookForBPM14_1Problem.html" class="code" title="">LookForBPM14_1Problem</a>	</li><li><a href="LookForBPM14_4Problem.html" class="code" title="">LookForBPM14_4Problem</a>	</li><li><a href="getbpmpsd.html" class="code" title="function [Pxx, fx, Xrms, Pxx_Int, Pyy, fy, Yrms, Pyy_Int, TimeStart] = getbpmpsd(DeviceList, Navg, FileName, LineColor)">getbpmpsd</a>	GETBPMPSD - Program to analyze BPM power spectrum</li><li><a href="getcmpsd.html" class="code" title="function [PxxAvg, fx, XAvgRMS, PxxAvg_Int, PyyAvg, fy, YAvgRMS, PyyAvg_Int] = getbpmpsd(Family, DeviceList, Navg, LineColor)">getcmpsd</a>	GETCMPSD - Program to analyze CM power spectrum</li><li><a href="mcagetbpmpsd.html" class="code" title="function [PxxAvg, fx, XAvgrms, PxxAvg_int, PyyAvg, fy, YAvgrms, PyyAvg_int] = getbpmpsd(DeviceList, Navg, LineColor)">mcagetbpmpsd</a>	[PxxAvg, fx, XAvgrms, PxxAvg_int, PyyAvg, fy, YAvgrms, PyyAvg_int] = getbpmpsd(DeviceList, Navg, LineColor)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [BPM, t116, t132, Error] = getbpm4k(DeviceList, varargin)</a>
+0002 <span class="comment">%  BPM = getbpm4k(DeviceList)</span>
+0003 <span class="comment">%  BPM = getbpm4k(DeviceList, 'read')</span>
+0004 <span class="comment">%  BPM = getbpm4k(DeviceList, 'arm')</span>
+0005 <span class="comment">%  BPM = getbpm4k(DeviceList, 'trigger')</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  Spear BPM channels</span>
+0008 <span class="comment">%  |  West pit 132 |    East pit 116 |    West pit 132  |</span>
+0009 <span class="comment">%  |   1  to  26   |   27  to    82  |    83  to   112  |</span>
+0010 <span class="comment">%  |[1 1] to [5 1] | [5 2] to [14 1] | [14 2] to [18 7] |</span>
+0011 
+0012 
+0013 Error = 0;
+0014 <span class="keyword">if</span> nargin == 0
+0015     DeviceList = family2dev(<span class="string">'BPMx'</span>);
+0016 <span class="keyword">end</span>
+0017 
+0018 <span class="keyword">if</span> isempty(DeviceList)
+0019     DeviceList = family2dev(<span class="string">'BPMx'</span>);
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="keyword">if</span> nargin&gt;1
+0023     <span class="keyword">if</span> strcmpi(varargin{1},<span class="string">'read'</span>)
+0024     <span class="keyword">end</span>
+0025 <span class="keyword">else</span>
+0026     <span class="comment">% Trigger on event timer 2</span>
+0027     mcaput(mcacheckopen({<span class="string">'116-BPM:history.RARM'</span>,<span class="string">'132-BPM:history.RARM'</span>}),[1 1]);
+0028     pause(.1);
+0029 
+0030     <span class="comment">% Set Event (Software Trigger</span>
+0031     mcaput(mcacheckopen(<span class="string">'Spear:Event1'</span>),1);
+0032     pause(5);
+0033 
+0034 <span class="keyword">end</span>
+0035 
+0036 tic;
+0037 Event  = mcaget(mcacheckopen(<span class="string">'Spear:Event1'</span>));
+0038 NELM116 = mcaget(mcacheckopen(<span class="string">'116-BPM:history.NELM'</span>));
+0039 NELM132 = mcaget(mcacheckopen(<span class="string">'132-BPM:history.NELM'</span>));
+0040 
+0041 N116 = mcaget(mcacheckopen(<span class="string">'116-BPM:history.NORD'</span>));
+0042 N132 = mcaget(mcacheckopen(<span class="string">'132-BPM:history.NORD'</span>));
+0043 
+0044 
+0045 
+0046 <span class="comment">% Diagnostic loop</span>
+0047 <span class="keyword">while</span> N132 ~= NELM132 | N116 ~= NELM116
+0048     fprintf(<span class="string">'   %f seconds after setting 116-BPM:history.RARM=2, 132-BPM:history.RARM=2, and Spear:Event1=Active\n'</span>, toc);
+0049     fprintf(<span class="string">'   Spear:Event1 = %s\n'</span>, int2str(Event));
+0050     fprintf(<span class="string">'   116-BPM:history.NORD = %d\n'</span>, N116);
+0051     fprintf(<span class="string">'   132-BPM:history.NORD = %d\n\n'</span>, N132);
+0052     <span class="keyword">if</span> toc &gt; 10
+0053         fprintf(<span class="string">'   BPM Timeout\n'</span>);
+0054         error(<span class="string">'NORD problem'</span>);
+0055     <span class="keyword">end</span>
+0056     pause(.25);
+0057     Event  = mcaget(mcacheckopen(<span class="string">'Spear:Event1'</span>));
+0058     N116 = mcaget(mcacheckopen(<span class="string">'116-BPM:history.NORD'</span>));
+0059     N132 = mcaget(mcacheckopen(<span class="string">'132-BPM:history.NORD'</span>));
+0060     NELM116 = mcaget(mcacheckopen(<span class="string">'116-BPM:history.NELM'</span>));
+0061     NELM132 = mcaget(mcacheckopen(<span class="string">'132-BPM:history.NELM'</span>));
+0062 <span class="keyword">end</span>
+0063 
+0064 
+0065 
+0066 
+0067 BPM1=mcaget(mcacheckopen(<span class="string">'116-BPM:history'</span>));
+0068 BPM1 = reshape(BPM1, [4 56 4000]);
+0069 
+0070 <span class="comment">% 132 West Pit</span>
+0071 BPM2=mcaget(mcacheckopen(<span class="string">'132-BPM:history'</span>));
+0072 BPM2 = reshape(BPM2, [4 56 4000]);
+0073  
+0074 
+0075 BPM = [BPM2(:,31:56,:)  BPM1(:,1:<span class="keyword">end</span>,:) BPM2(:,1:30,:)];
+0076 
+0077 
+0078 i = findrowindex(DeviceList, family2dev(<span class="string">'BPMx'</span>,0));
+0079 BPM = BPM(:,i,:);
+0080 
+0081 
+0082</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

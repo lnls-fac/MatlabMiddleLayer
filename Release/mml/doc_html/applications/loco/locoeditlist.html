@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of locoeditlist</title>
+  <meta name="keywords" content="locoeditlist">
+  <meta name="description" content="LOCOEDITLIST - Device list editor">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; locoeditlist.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>locoeditlist
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LOCOEDITLIST - Device list editor</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function newList = locoeditlist(List, ListName, CheckList) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOCOEDITLIST - Device list editor
+ newList = locoeditlist(List)
+ newList = locoeditlist(List, InfoString)
+ newList = locoeditlist(List, InfoString, CheckList)
+
+ Allows one to easily edit a element or device list 
+ Inputs:  List       = list to edit
+          InfoString = informational string {optional}
+          CheckList  = 0 - don't check, else check
+
+ Note:  Closing the window will result in no change to the list
+
+ Writen by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="locogui.html" class="code" title="function varargout = locogui(varargin)">locogui</a>	LOCOGUI - Graphical interface for running the LOCO algorithm</li><li><a href="locoplot.html" class="code" title="function ElementsInput = locoplot(FileName, IterationNumber, PlotString, PlaneString, ElementsInput)">locoplot</a>	LOCOPLOT - Subroutines for plotting LOCO output</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function newList = locoeditlist(List, ListName, CheckList)</a>
+0002 <span class="comment">%LOCOEDITLIST - Device list editor</span>
+0003 <span class="comment">% newList = locoeditlist(List)</span>
+0004 <span class="comment">% newList = locoeditlist(List, InfoString)</span>
+0005 <span class="comment">% newList = locoeditlist(List, InfoString, CheckList)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Allows one to easily edit a element or device list</span>
+0008 <span class="comment">% Inputs:  List       = list to edit</span>
+0009 <span class="comment">%          InfoString = informational string {optional}</span>
+0010 <span class="comment">%          CheckList  = 0 - don't check, else check</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Note:  Closing the window will result in no change to the list</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Writen by Greg Portmann</span>
+0015 
+0016 <span class="keyword">if</span> nargin &lt; 1 
+0017    error(<span class="string">'At least 1 input is required.'</span>)
+0018 <span class="keyword">end</span>
+0019 
+0020 <span class="keyword">if</span> nargin &lt; 2
+0021    ListName = <span class="string">''</span>;
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="keyword">if</span> isstr(List)
+0025    error(<span class="string">'First input cannot be a string'</span>);
+0026    <span class="keyword">return</span>
+0027 <span class="keyword">end</span>
+0028 
+0029 <span class="keyword">if</span> nargin &lt; 3
+0030    CheckList = ones(max(size(List)),1);
+0031 <span class="keyword">end</span>
+0032 <span class="keyword">if</span> ~isstr(ListName)
+0033    CheckList = ListName;   
+0034    ListName = <span class="string">''</span>;
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="keyword">if</span> length(CheckList) ~= max(size(List))
+0038    error(<span class="string">'List and CheckList must have the same max(size).'</span>);
+0039 <span class="keyword">end</span>
+0040 
+0041 
+0042 <span class="keyword">if</span> isunix
+0043    ScaleFactor = 8;
+0044    ButtonHeight  = 20;
+0045    Offset = 6;
+0046 <span class="keyword">else</span>
+0047    ScaleFactor = 6.5;
+0048    ButtonHeight  = 16;
+0049    Offset = 6;
+0050 <span class="keyword">end</span>
+0051 
+0052 
+0053 <span class="keyword">if</span> size(List,2) == 2
+0054    <span class="comment">% Column vector</span>
+0055    RowVectorFlag = 0;
+0056    ButtonWidth = round(ScaleFactor*length(sprintf(<span class="string">'%s(%d), RingData(%d)'</span>, ListName, max(List(:,1)), max(List(:,1))))+Offset);
+0057 <span class="keyword">elseif</span> size(List,1) == 1
+0058    <span class="comment">% Row vector</span>
+0059    List = List';
+0060    RowVectorFlag = 1;
+0061    ButtonWidth = round(ScaleFactor*length(sprintf(<span class="string">'%s(%d)'</span>, ListName, max(List)))+Offset);
+0062 <span class="keyword">elseif</span> size(List,2) == 1
+0063    <span class="comment">% Column vector</span>
+0064    RowVectorFlag = 0;
+0065    ButtonWidth = round(ScaleFactor*length(sprintf(<span class="string">'%s(%d)'</span>, ListName, max(List)))+Offset);
+0066 <span class="keyword">elseif</span> size(List,2) &gt; 2
+0067    <span class="comment">% More than 2 columns is a problem</span>
+0068    error(<span class="string">'Input list must be 1 or 2 columns.'</span>)
+0069 <span class="keyword">end</span>
+0070 <span class="keyword">if</span> ButtonWidth &lt; 75
+0071    ButtonWidth = 75;
+0072 <span class="keyword">end</span>
+0073 
+0074 <span class="comment">% Add a buffer to ButtonWidth</span>
+0075 ButtonWidth = 1.15*ButtonWidth;
+0076 
+0077 n = size(List,1);
+0078 col = ceil(n/40);
+0079 row = ceil(n/col);
+0080 
+0081 
+0082 FigWidth = col*ButtonWidth + (col-1)*3 + 6;
+0083 FigHeight  = 3+(row+1)*ButtonHeight;
+0084 
+0085 
+0086 <span class="comment">% Change figure position</span>
+0087 set(0,<span class="string">'Units'</span>,<span class="string">'pixels'</span>);
+0088 p=get(0,<span class="string">'screensize'</span>);
+0089 
+0090 h0 = figure( <span class="keyword">...</span>
+0091    <span class="string">'Color'</span>,[0.8 0.8 0.8], <span class="keyword">...</span>
+0092    <span class="string">'HandleVisibility'</span>,<span class="string">'On'</span>, <span class="keyword">...</span>
+0093    <span class="string">'Interruptible'</span>, <span class="string">'on'</span>, <span class="keyword">...</span>
+0094    <span class="string">'MenuBar'</span>,<span class="string">'none'</span>, <span class="keyword">...</span>
+0095    <span class="string">'Name'</span>,[<span class="string">'Edit '</span>, ListName, <span class="string">' List'</span>], <span class="keyword">...</span>
+0096    <span class="string">'NumberTitle'</span>,<span class="string">'Off'</span>, <span class="keyword">...</span>
+0097    <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span><span class="comment">   </span>
+0098    <span class="string">'Position'</span>,[30 p(4)-FigHeight-40 FigWidth FigHeight], <span class="keyword">...</span>
+0099    <span class="string">'Resize'</span>,<span class="string">'on'</span>, <span class="keyword">...</span>
+0100    <span class="string">'Userdata'</span>, [], <span class="keyword">...</span>
+0101    <span class="string">'Tag'</span>,<span class="string">'EditListFigure'</span>);
+0102 
+0103 k = 1;
+0104 <span class="keyword">for</span> j = 1:col
+0105    <span class="keyword">for</span> i = 1:row
+0106       
+0107       <span class="keyword">if</span> size(List,2) == 2
+0108          liststring = sprintf(<span class="string">'%s(%d), RingData(%d)'</span>, ListName, List(k,1), List(k,2));
+0109          <span class="comment">%liststring = sprintf('%s(%d,%d)', ListName, List(k,1), List(k,2));</span>
+0110       <span class="keyword">else</span>
+0111          liststring = sprintf(<span class="string">'%s(%d)'</span>, ListName, List(k,1));
+0112       <span class="keyword">end</span>
+0113       
+0114       <span class="keyword">if</span> CheckList(k)
+0115          EnableFlag = 1;
+0116       <span class="keyword">else</span>
+0117          EnableFlag = 0;
+0118       <span class="keyword">end</span>
+0119       
+0120       h(k) = uicontrol(<span class="string">'Parent'</span>,h0, <span class="keyword">...</span>
+0121          <span class="string">'Callback'</span>,<span class="string">''</span>, <span class="keyword">...</span>
+0122          <span class="string">'Enable'</span>,<span class="string">'On'</span>, <span class="keyword">...</span>
+0123          <span class="string">'FontName'</span>, <span class="string">'MS Sans Serif'</span>, <span class="keyword">...</span>
+0124          <span class="string">'FontSize'</span>, [8], <span class="keyword">...</span>
+0125          <span class="string">'FontUnits'</span>, <span class="string">'points'</span>, <span class="keyword">...</span>
+0126          <span class="string">'Interruptible'</span>,<span class="string">'Off'</span>, <span class="keyword">...</span>
+0127          <span class="string">'Position'</span>,[6+(j-1)*(ButtonWidth+3) 3+(row-i+1)*ButtonHeight ButtonWidth-0*6 ButtonHeight], <span class="keyword">...</span>
+0128          <span class="string">'Style'</span>,<span class="string">'radio'</span>, <span class="keyword">...</span>
+0129          <span class="string">'String'</span>,liststring, <span class="keyword">...</span>
+0130          <span class="string">'Value'</span>,EnableFlag, <span class="keyword">...</span>
+0131          <span class="string">'Userdata'</span>,List(k,:), <span class="keyword">...</span>
+0132          <span class="string">'Tag'</span>,<span class="string">'Radio1'</span>);
+0133       k = k + 1;
+0134       <span class="keyword">if</span> k &gt; n
+0135          <span class="keyword">break</span>
+0136       <span class="keyword">end</span>    
+0137    <span class="keyword">end</span>
+0138 <span class="keyword">end</span>
+0139 
+0140 h1 = uicontrol(<span class="keyword">...</span>
+0141    <span class="string">'Parent'</span>,h0, <span class="keyword">...</span>
+0142    <span class="string">'Callback'</span>,[<span class="keyword">...</span>
+0143       <span class="string">'h = get(gco,''userdata'');'</span>, <span class="keyword">...</span>
+0144       <span class="string">'l=[];m=1;'</span>, <span class="keyword">...</span>
+0145       <span class="string">'for i = 1:length(h);'</span>, <span class="keyword">...</span>
+0146       <span class="string">'   if get(h(i),''Value'') == 1'</span>, <span class="keyword">...</span>
+0147       <span class="string">'      l(m,:) = get(h(i),''userdata'');'</span>, <span class="keyword">...</span>
+0148       <span class="string">'      m=m+1;'</span>, <span class="keyword">...</span>
+0149       <span class="string">'   end;'</span>, <span class="keyword">...</span>
+0150       <span class="string">'end;'</span>, <span class="keyword">...</span>
+0151       <span class="string">'set(gco,''userdata'',l);'</span>, <span class="keyword">...</span>
+0152       <span class="string">'set(gcf,''userdata'',1);'</span> , <span class="keyword">...</span>
+0153       <span class="string">'drawnow;'</span>;], <span class="keyword">...</span>
+0154    <span class="string">'Enable'</span>,<span class="string">'On'</span>, <span class="keyword">...</span>
+0155    <span class="string">'Interruptible'</span>,<span class="string">'Off'</span>, <span class="keyword">...</span>
+0156    <span class="string">'Position'</span>,[3 3+0*ButtonHeight FigWidth-6 ButtonHeight], <span class="keyword">...</span>
+0157    <span class="string">'String'</span>,<span class="string">'Change List'</span>, <span class="keyword">...</span>
+0158    <span class="string">'userdata'</span>, h, <span class="keyword">...</span>
+0159    <span class="string">'Tag'</span>,<span class="string">'EditListClose'</span>);
+0160 
+0161 
+0162 waitfor(gcf,<span class="string">'userdata'</span>);
+0163 newList=get(gco,<span class="string">'userdata'</span>);
+0164 
+0165 <span class="keyword">if</span> gcf == h0
+0166    close(h0);
+0167 <span class="keyword">else</span>
+0168    <span class="comment">% If the figure is closed (not changed) return the old list</span>
+0169    i = find(CheckList);
+0170    newList = List(i,:);
+0171 <span class="keyword">end</span>
+0172 
+0173 <span class="keyword">if</span> RowVectorFlag
+0174    newList = newList';
+0175 <span class="keyword">end</span>
+0176 
+0177 
+0178 
+0179 
+0180 
+0181 
+0182 
+0183 
+0184 
+0185</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

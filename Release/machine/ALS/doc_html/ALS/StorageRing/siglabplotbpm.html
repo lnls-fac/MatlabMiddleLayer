@@ -1,0 +1,681 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of siglabplotbpm</title>
+  <meta name="keywords" content="siglabplotbpm">
+  <meta name="description" content="[rms1,  rms2, rms3, rms4] = siglabplot(Filename, JPegFlag, JPegDirectory, LineColor, HoldFlag)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; siglabplotbpm.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>siglabplotbpm
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[rms1,  rms2, rms3, rms4] = siglabplot(Filename, JPegFlag, JPegDirectory, LineColor, HoldFlag)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [rms1,  rms2, rms3, rms4] = siglabplot(Filename, JPegFlag, JPegDirectory, LineColor, HoldFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [rms1,  rms2, rms3, rms4] = siglabplot(Filename, JPegFlag, JPegDirectory, LineColor, HoldFlag)
+
+  Filename = data file name {default or []: ask user for file}
+
+  JPegFlag = 0    - do not output a JPeg file {default: 0}
+             else - output a JPeg formated file
+
+  JPegDirectory = directory name to save JPeg file {default: current directory}
+
+  LineColor = line color and style  (ex., '--r' is a red dotted line)
+
+  HoldFlag = 0    - new plot
+             else - hold last plot</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [rms1,  rms2, rms3, rms4] = siglabplot(Filename, JPegFlag, JPegDirectory, LineColor, HoldFlag)</a>
+0002 <span class="comment">% [rms1,  rms2, rms3, rms4] = siglabplot(Filename, JPegFlag, JPegDirectory, LineColor, HoldFlag)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  Filename = data file name {default or []: ask user for file}</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  JPegFlag = 0    - do not output a JPeg file {default: 0}</span>
+0007 <span class="comment">%             else - output a JPeg formated file</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%  JPegDirectory = directory name to save JPeg file {default: current directory}</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  LineColor = line color and style  (ex., '--r' is a red dotted line)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  HoldFlag = 0    - new plot</span>
+0014 <span class="comment">%             else - hold last plot</span>
+0015 <span class="comment">%</span>
+0016 
+0017 <span class="keyword">if</span> 0
+0018     <span class="comment">% For adding multiple plots</span>
+0019     h1=1;
+0020     h2=2;
+0021     h3=3;
+0022     h4=4;
+0023 <span class="keyword">else</span>
+0024     h1 = figure;
+0025     h2 = h1 + 1;
+0026     h3 = h1 + 2;
+0027     h4 = h1 + 3;
+0028 <span class="keyword">end</span>
+0029 
+0030 NoiseFloorFlag = 0;
+0031 SquareRootFlag = 0;
+0032 PaperPosition = [.25 .25 4 4.5];
+0033 Fstart = 10;
+0034 fprintf(<span class="string">'  \n'</span>);
+0035 
+0036 
+0037 <span class="keyword">if</span> nargin &lt; 1
+0038     [Filename, Pathname] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Choose the desired PSD file.'</span>);
+0039     <span class="keyword">if</span> Filename==0
+0040         disp(<span class="string">'  Function canceled.'</span>);
+0041         <span class="keyword">return</span>
+0042     <span class="keyword">end</span>
+0043     load([Pathname, Filename]);
+0044 <span class="keyword">else</span>
+0045     <span class="keyword">if</span> isempty(Filename)
+0046         [Filename, Pathname] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Choose the desired PSD file.'</span>);
+0047         <span class="keyword">if</span> Filename==0
+0048             disp(<span class="string">'  Function canceled.'</span>);
+0049             <span class="keyword">return</span>
+0050         <span class="keyword">end</span>
+0051         load([Pathname, Filename]);
+0052     <span class="keyword">else</span>
+0053         load(Filename);
+0054         <span class="keyword">if</span> isunix
+0055             Pathname = [pwd,<span class="string">'/'</span>];
+0056         <span class="keyword">else</span>
+0057             Pathname = [pwd,<span class="string">'\'</span>];
+0058         <span class="keyword">end</span>
+0059     <span class="keyword">end</span>
+0060 <span class="keyword">end</span>
+0061 
+0062 <span class="keyword">if</span> nargin &lt; 2
+0063     JPegFlag = 0;
+0064 <span class="keyword">end</span>
+0065 <span class="keyword">if</span> JPegFlag
+0066     FontSize = 7;
+0067 <span class="keyword">else</span>
+0068     FontSize = 10;
+0069 <span class="keyword">end</span>
+0070 
+0071 
+0072 <span class="keyword">if</span> nargin &lt; 3
+0073     <span class="comment">% Put in the same directory as Filename</span>
+0074     JPegDirectory = Pathname;
+0075 <span class="keyword">end</span>
+0076 
+0077 <span class="keyword">if</span> nargin &lt; 4
+0078     LineColor = <span class="string">'-b'</span>;
+0079 <span class="keyword">end</span>
+0080 
+0081 <span class="keyword">if</span> nargin &lt; 5
+0082     HoldFlag = 0;
+0083 <span class="keyword">end</span>
+0084 
+0085 
+0086 f=f1*(0:length(Fd1)-1)';
+0087 ff = f(Fstart:end);
+0088 
+0089 <span class="comment">% Check for vibration data</span>
+0090 <span class="keyword">if</span> strcmp(lower(Pathname),<span class="string">'e:\idbpm\1998-12-01'</span>) | strcmp(lower(Pathname),<span class="string">'e:\idbpm\1998-11-19'</span>)
+0091     fprintf(<span class="string">'  Channel 2 is QFA vibration data\n'</span>);
+0092     P1 = Fd1(Fstart:end);
+0093     P2 = Fd2(Fstart:end);
+0094 
+0095     Gain = (1000 * 9.8/1000)^2;             <span class="comment">% Vibration gain [(mm/s/s)^2 / Hz]</span>
+0096     P3 = Gain * Fd3;
+0097     P4 = Gain * Fd4;
+0098     P3(2:end) = Gain * Fd3(2:end) .* ((ones(size(f(2:end)))./(2*pi*f(2:end))).^4);
+0099     P4(2:end) = Gain * Fd4(2:end) .* ((ones(size(f(2:end)))./(2*pi*f(2:end))).^4);
+0100     P3 = P3(Fstart:end);
+0101     P4 = P4(Fstart:end);
+0102 
+0103     Chan1Flag  = <span class="string">'IDBPM'</span>;
+0104     Chan1Label = <span class="string">'IDBPMx(9,2)'</span>;
+0105     Chan2Flag  = <span class="string">'IDBPM'</span>;
+0106     Chan2Label = <span class="string">'IDBPMy(9,2)'</span>;
+0107     Chan3Flag  = <span class="string">'Vibration'</span>;
+0108     Chan3Label = <span class="string">'QFA(9,2)'</span>;
+0109     Chan4Flag  = <span class="string">'Vibration'</span>;
+0110     Chan4Label = <span class="string">'QFA(9,2)'</span>;
+0111 <span class="keyword">else</span>
+0112     P1 = Fd1(Fstart:end);
+0113     P2 = Fd2(Fstart:end);
+0114     P3 = Fd3(Fstart:end);
+0115     P4 = Fd4(Fstart:end);
+0116 
+0117     Chan1Flag  = <span class="string">'BPM'</span>;
+0118     Chan1Label = <span class="string">'BPMx(7,5)'</span>;
+0119     Chan2Flag  = <span class="string">'BPM'</span>;
+0120     Chan2Label = <span class="string">'BPMy(7,5)'</span>;
+0121     Chan3Flag  = <span class="string">'BPM'</span>;
+0122     Chan3Label = <span class="string">'BPMx(7,6)'</span>;
+0123     Chan4Flag  = <span class="string">'BPM'</span>;
+0124     Chan4Label = <span class="string">'BPMy(7,6)'</span>;
+0125 
+0126     <span class="comment">%Chan1Flag  = 'IDBPM';</span>
+0127     <span class="comment">%Chan1Label = 'IDBPMx(10,2)';</span>
+0128     <span class="comment">%Chan2Flag  = 'IDBPM';</span>
+0129     <span class="comment">%Chan2Label = 'IDBPMy(10,2)';</span>
+0130     <span class="comment">%Chan3Flag  = 'IDBPM';</span>
+0131     <span class="comment">%Chan3Label = 'IDBPMx(10,1)';</span>
+0132     <span class="comment">%Chan4Flag  = 'IDBPM';</span>
+0133     <span class="comment">%Chan4Label = 'IDBPMy(10,1)';</span>
+0134 <span class="keyword">end</span>
+0135 
+0136 T = 1/f1;          <span class="comment">% Time buffer length</span>
+0137 
+0138 <span class="keyword">if</span> WindowType == 0
+0139     Uwindow = 1;
+0140     fprintf(<span class="string">'  No window function\n'</span>);
+0141 <span class="keyword">elseif</span> WindowType == 1
+0142     Uwindow = .66666666666666667;
+0143     fprintf(<span class="string">'  Hanning window function\n'</span>);
+0144 <span class="keyword">else</span>
+0145     error(<span class="string">'WindowType unknown'</span>);
+0146 <span class="keyword">end</span>
+0147 
+0148 year = TimeClock(1);
+0149 month = TimeClock(2);
+0150 day = TimeClock(3);
+0151 hour = TimeClock(4);
+0152 min = TimeClock(5);
+0153 sec  = TimeClock(6);
+0154 
+0155 
+0156 DateStr1 = sprintf(<span class="string">'DCCT = %.1f mAmps  (%d-%d-%d  %d:%d:%.0f)'</span>, DCCT,month,day,year,hour,min,sec);
+0157 DirStr1  = sprintf(<span class="string">'Data file: %s%s'</span>, lower(Pathname), lower(Filename));
+0158 <span class="comment">%i=findstr(DirStr1,'\');</span>
+0159 <span class="comment">%DirStr1(i)='/';</span>
+0160 
+0161 fprintf(<span class="string">'  Data file: %s%s \n'</span>, Pathname, Filename);
+0162 fprintf(<span class="string">'  Created on %d-%d-%d at time %d:%d:%.0d \n'</span>, month,day,year,hour,min,sec);
+0163 fprintf(<span class="string">'  DCCT = %.1f mAmps \n'</span>, DCCT);
+0164 
+0165 <span class="keyword">if</span> exist(<span class="string">'FFEnable1'</span>) == 1
+0166     fprintf(<span class="string">'  FF  Enable 1 = '</span>);
+0167     fprintf(<span class="string">' %d '</span>, FFEnable1);
+0168     fprintf(<span class="string">'\n'</span>);
+0169 
+0170     fprintf(<span class="string">'  FF  Enable 2 = '</span>);
+0171     fprintf(<span class="string">' %d '</span>, FFEnable2);
+0172     fprintf(<span class="string">'\n'</span>);
+0173 
+0174     fprintf(<span class="string">'  Gap Enable 1 = '</span>);
+0175     fprintf(<span class="string">' %d '</span>, GapEnable1);
+0176     fprintf(<span class="string">'\n'</span>);
+0177 
+0178     fprintf(<span class="string">'  Gap Enable 2 = '</span>);
+0179     fprintf(<span class="string">' %d '</span>, GapEnable2);
+0180     fprintf(<span class="string">'\n'</span>);
+0181 
+0182     fprintf(<span class="string">'  Gaps 1 = '</span>);
+0183     fprintf(<span class="string">' %.3f '</span>, Gap1);
+0184     fprintf(<span class="string">'\n'</span>);
+0185 
+0186     fprintf(<span class="string">'  Gaps 2 = '</span>);
+0187     fprintf(<span class="string">' %.3f '</span>, Gap2);
+0188     fprintf(<span class="string">'\n\n'</span>);
+0189 <span class="keyword">end</span>
+0190 
+0191 
+0192 P1_int = sqrt(cumsum(P1(end:-1:1))*Uwindow);
+0193 P2_int = sqrt(cumsum(P2(end:-1:1))*Uwindow);
+0194 P3_int = sqrt(cumsum(P3(end:-1:1))*Uwindow);
+0195 P4_int = sqrt(cumsum(P4(end:-1:1))*Uwindow);
+0196 
+0197 rms1 = 1000*P1_int(end);
+0198 rms2 = 1000*P2_int(end);
+0199 rms3 = 1000*P3_int(end);
+0200 rms4 = 1000*P4_int(end);
+0201 
+0202 
+0203 Buffer = .01;
+0204 HeightBuffer = .05;
+0205 
+0206 
+0207 figure(h1);
+0208 <span class="keyword">if</span> JPegFlag
+0209     subplot(2,1,1);
+0210 <span class="keyword">else</span>
+0211     subplot(2,2,1);
+0212 <span class="keyword">end</span>
+0213 <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0214 loglog(ff, 1000*1000*T*P1*Uwindow,LineColor);
+0215 <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0216 <span class="keyword">if</span> NoiseFloorFlag
+0217     hold on;
+0218     floor92(50,1,0,SquareRootFlag);
+0219     hold off
+0220 <span class="keyword">end</span>
+0221 set(gca,<span class="string">'FontSize'</span>,FontSize);
+0222 xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0223 ylabel([Chan1Label, <span class="string">' [\mum{^2}/Hz]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0224 axis tight
+0225 grid on
+0226 
+0227 <span class="keyword">if</span> JPegFlag
+0228     title(sprintf(<span class="string">'Horizontal Power Spectral Density (RMS=%.1f \\mum)'</span>,1000*P1_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0229     subplot(2,1,2);
+0230 <span class="keyword">else</span>
+0231     title(<span class="string">'Horizontal Power Spectral Density'</span>,<span class="string">'FontSize'</span>,FontSize);
+0232     subplot(2,2,2);
+0233 <span class="keyword">end</span>
+0234 <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0235 loglog(ff, 1000*1000*T*P2*Uwindow,LineColor);
+0236 <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0237 <span class="keyword">if</span> NoiseFloorFlag
+0238     hold on;
+0239     floor92(50,2,0,SquareRootFlag);
+0240     hold off
+0241 <span class="keyword">end</span>
+0242 set(gca,<span class="string">'FontSize'</span>,FontSize);
+0243 xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0244 ylabel([Chan2Label, <span class="string">' [\mum{^2}/Hz]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0245 <span class="keyword">if</span> JPegFlag
+0246     title(sprintf(<span class="string">'Vertical Power Spectral Density (RMS=%.1f \\mum)'</span>,1000*P2_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0247 <span class="keyword">else</span>
+0248     title(<span class="string">'Vertical Power Spectral Density'</span>,<span class="string">'FontSize'</span>,FontSize);
+0249 <span class="keyword">end</span>
+0250 axis tight
+0251 grid on
+0252 
+0253 
+0254 <span class="keyword">if</span> ~JPegFlag
+0255     <span class="keyword">if</span> SquareRootFlag
+0256         subplot(2,2,3);
+0257         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0258         loglog(ff(end:-1:1), 1000*P1_int,LineColor);
+0259         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0260         <span class="keyword">if</span> NoiseFloorFlag
+0261             hold on;
+0262             floor92(50,1,1,SquareRootFlag);
+0263             hold off
+0264         <span class="keyword">end</span>
+0265         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0266         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0267         ylabel([Chan1Label, <span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0268         <span class="keyword">if</span> HoldFlag
+0269             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD)'</span>),<span class="string">'FontSize'</span>,FontSize);
+0270         <span class="keyword">else</span>
+0271             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD) (RMS=%.1f \\mum)'</span>,1000*P1_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0272         <span class="keyword">end</span>
+0273         grid on;
+0274         axis tight
+0275 
+0276         subplot(2,2,4);
+0277         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0278         loglog(ff(end:-1:1), 1000*P2_int,LineColor);
+0279         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0280         <span class="keyword">if</span> NoiseFloorFlag
+0281             hold on;
+0282             floor92(50,2,1,SquareRootFlag);
+0283             hold off
+0284         <span class="keyword">end</span>
+0285         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0286         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0287         ylabel([Chan2Label, <span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0288         <span class="keyword">if</span> HoldFlag
+0289             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD)'</span>),<span class="string">'FontSize'</span>,FontSize);
+0290         <span class="keyword">else</span>
+0291             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD) (RMS=%.1f \\mum)'</span>,1000*P2_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0292         <span class="keyword">end</span>
+0293         grid on;
+0294         axis tight
+0295     <span class="keyword">else</span>
+0296         subplot(2,2,3);
+0297         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0298         <span class="comment">%loglog(ff(end:-1:1), 1000*1000*(P1_int).^2,LineColor);</span>
+0299         semilogx(ff(end:-1:1), 1000*1000*(P1_int).^2,LineColor);
+0300         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0301         <span class="keyword">if</span> NoiseFloorFlag
+0302             hold on;
+0303             floor92(50,1,1,SquareRootFlag);
+0304             hold off
+0305         <span class="keyword">end</span>
+0306         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0307         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0308         ylabel([Chan1Label, <span class="string">' [\mum^2]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0309         <span class="keyword">if</span> HoldFlag
+0310             title(sprintf(<span class="string">'Cumulative \\intPSD'</span>),<span class="string">'FontSize'</span>,FontSize);
+0311         <span class="keyword">else</span>
+0312             title(sprintf(<span class="string">'Cumulative \\intPSD (RMS=%.1f \\mum)'</span>,1000*P1_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0313         <span class="keyword">end</span>
+0314         grid on;
+0315         a = axis;
+0316         axis tight
+0317         <span class="comment">%yaxis([a(3) a(4)]);</span>
+0318 
+0319         subplot(2,2,4);
+0320         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0321         <span class="comment">%loglog(ff(end:-1:1), 1000*1000*P2_int.^2,LineColor);</span>
+0322         semilogx(ff(end:-1:1), 1000*1000*P2_int.^2,LineColor);
+0323         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0324         <span class="keyword">if</span> NoiseFloorFlag
+0325             hold on;
+0326             floor92(50,2,1,SquareRootFlag);
+0327             hold off
+0328         <span class="keyword">end</span>
+0329         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0330         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0331         ylabel([Chan2Label, <span class="string">' [\mum^2]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0332         <span class="keyword">if</span> HoldFlag
+0333             title(sprintf(<span class="string">'Cumulative \\intPSD'</span>),<span class="string">'FontSize'</span>,FontSize);
+0334         <span class="keyword">else</span>
+0335             title(sprintf(<span class="string">'Cumulative \\intPSD (RMS=%.1f \\mum)'</span>,1000*P2_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0336         <span class="keyword">end</span>
+0337         grid on;
+0338         a = axis;
+0339         axis tight
+0340         <span class="comment">%yaxis([a(3) a(4)]);</span>
+0341     <span class="keyword">end</span>
+0342 <span class="keyword">end</span>
+0343 
+0344 
+0345 <span class="comment">%orient landscape</span>
+0346 <span class="keyword">if</span> ~HoldFlag
+0347     h = addlabel(1,0,DateStr1);
+0348 <span class="keyword">end</span>
+0349 
+0350 <span class="keyword">if</span> JPegFlag
+0351     <span class="comment">% For jpeg</span>
+0352     set(h,<span class="string">'FontSize'</span>,FontSize-2);
+0353     set(gcf,<span class="string">'PaperPosition'</span>,PaperPosition);
+0354     eval([<span class="string">'print '</span>,JPegDirectory,<span class="string">'psd1 -djpeg'</span>]);
+0355 <span class="keyword">else</span>
+0356     <span class="keyword">if</span> ~HoldFlag
+0357         addlabel(0,0,DirStr1);
+0358     <span class="keyword">end</span>
+0359 <span class="keyword">end</span>
+0360 set(h1,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[.5+Buffer .5+Buffer .5-2*Buffer .5-2*Buffer-HeightBuffer]);
+0361 
+0362 
+0363 <span class="keyword">if</span> exist(<span class="string">'d1'</span>) == 1
+0364     t = (0:length(d1)-1)*T/length(d1);
+0365     figure(h3);
+0366     subplot(2,1,1);
+0367     <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0368     plot(t, 1000*d1, LineColor);
+0369     <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0370     set(gca,<span class="string">'FontSize'</span>,FontSize);
+0371     xlabel(<span class="string">'Time [Seconds]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0372     ylabel([Chan1Label, <span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0373     <span class="keyword">if</span> HoldFlag
+0374         title(sprintf(<span class="string">'Time Domain Data for %s'</span>, Chan1Label),<span class="string">'FontSize'</span>,FontSize);
+0375     <span class="keyword">else</span>
+0376         title(sprintf(<span class="string">'Time Domain Data for %s (RMS=%.1f \\mum)'</span>, Chan1Label, 1000*P1_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0377     <span class="keyword">end</span>
+0378     axis tight
+0379     grid on
+0380 
+0381     subplot(2,1,2);
+0382     <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0383     plot(t, 1000*d2, LineColor);
+0384     <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0385     set(gca,<span class="string">'FontSize'</span>,FontSize);
+0386     xlabel(<span class="string">'Time [Seconds]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0387     ylabel([Chan2Label, <span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0388     <span class="keyword">if</span> HoldFlag
+0389         title(sprintf(<span class="string">'Time Domain Data for %s'</span>, Chan1Label),<span class="string">'FontSize'</span>,FontSize);
+0390     <span class="keyword">else</span>
+0391         title(sprintf(<span class="string">'Time Domain Data for %s (RMS=%.1f \\mum)'</span>, Chan2Label, 1000*P2_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0392     <span class="keyword">end</span>
+0393     axis tight
+0394     grid on
+0395 
+0396     <span class="comment">%    orient landscape</span>
+0397     <span class="keyword">if</span> ~HoldFlag
+0398         h = addlabel(1,0,DateStr1);
+0399     <span class="keyword">end</span>
+0400 
+0401     <span class="keyword">if</span> JPegFlag
+0402         <span class="comment">% For jpeg</span>
+0403         set(h,<span class="string">'FontSize'</span>,FontSize-2);
+0404         set(gcf,<span class="string">'PaperPosition'</span>,PaperPosition);
+0405         eval([<span class="string">'print '</span>,JPegDirectory,<span class="string">'time1 -djpeg'</span>]);
+0406     <span class="keyword">else</span>
+0407         <span class="keyword">if</span> ~HoldFlag
+0408             addlabel(0,0,DirStr1);
+0409         <span class="keyword">end</span>
+0410     <span class="keyword">end</span>
+0411     set(h3,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[.5+Buffer .05+Buffer .5-2*Buffer .5-2*Buffer-HeightBuffer]);
+0412 
+0413 
+0414     figure(h4);
+0415     subplot(2,1,1);
+0416     <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0417     plot(t, 1000*d3, LineColor);
+0418     <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0419     set(gca,<span class="string">'FontSize'</span>,FontSize);
+0420     xlabel(<span class="string">'Time [Seconds]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0421     ylabel([Chan3Label, <span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0422     <span class="keyword">if</span> HoldFlag
+0423         title(sprintf(<span class="string">'Time Domain Data for %s'</span>, Chan1Label),<span class="string">'FontSize'</span>,FontSize);
+0424     <span class="keyword">else</span>
+0425         title(sprintf(<span class="string">'Time Domain Data for %s (RMS=%.1f \\mum)'</span>, Chan3Label, 1000*P3_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0426     <span class="keyword">end</span>
+0427     axis tight
+0428     grid on
+0429 
+0430     subplot(2,1,2);
+0431     <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0432     plot(t, 1000*d4, LineColor);
+0433     <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0434     set(gca,<span class="string">'FontSize'</span>,FontSize);
+0435     xlabel(<span class="string">'Time [Seconds]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0436     ylabel([Chan4Label, <span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0437     <span class="keyword">if</span> HoldFlag
+0438         title(sprintf(<span class="string">'Time Domain Data for %s'</span>, Chan1Label),<span class="string">'FontSize'</span>,FontSize);
+0439     <span class="keyword">else</span>
+0440         title(sprintf(<span class="string">'Time Domain Data for %s (RMS=%.1f \\mum)'</span>, Chan4Label, 1000*P4_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0441     <span class="keyword">end</span>
+0442     axis tight
+0443     grid on
+0444 
+0445     <span class="comment">% orient landscape</span>
+0446     <span class="keyword">if</span> ~HoldFlag
+0447         h = addlabel(1,0,DateStr1);
+0448     <span class="keyword">end</span>
+0449 
+0450     <span class="keyword">if</span> JPegFlag
+0451         <span class="comment">% For jpeg</span>
+0452         set(h,<span class="string">'FontSize'</span>,FontSize-2);
+0453         set(gcf,<span class="string">'PaperPosition'</span>,PaperPosition);
+0454         eval([<span class="string">'print '</span>,JPegDirectory,<span class="string">'time2 -djpeg'</span>]);
+0455     <span class="keyword">else</span>
+0456         <span class="keyword">if</span> ~HoldFlag
+0457             addlabel(0,0,DirStr1);
+0458         <span class="keyword">end</span>
+0459     <span class="keyword">end</span>
+0460     set(h4,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[.0+Buffer .05+Buffer .5-2*Buffer .5-2*Buffer-HeightBuffer]);
+0461 
+0462     std(d1)
+0463     std(d2)
+0464     std(d3)
+0465     std(d4)
+0466 <span class="keyword">end</span>
+0467 
+0468 
+0469 
+0470 figure(h2);
+0471 <span class="keyword">if</span> JPegFlag
+0472     subplot(2,1,1);
+0473 <span class="keyword">else</span>
+0474     subplot(2,2,1);
+0475 <span class="keyword">end</span>
+0476 <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0477 loglog(ff, 1000*1000*T*P3*Uwindow,LineColor);
+0478 <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0479 <span class="keyword">if</span> NoiseFloorFlag
+0480     hold on;
+0481     floor95(50,1,0,SquareRootFlag);
+0482     hold off
+0483 <span class="keyword">end</span>
+0484 set(gca,<span class="string">'FontSize'</span>,FontSize);
+0485 xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0486 ylabel([Chan3Label, <span class="string">' [\mum{^2}/Hz]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0487 axis tight
+0488 grid on
+0489 
+0490 <span class="keyword">if</span> JPegFlag
+0491     title(sprintf(<span class="string">'Horizontal Power Spectral Density (RMS=%.1f \\mum)'</span>,1000*P3_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0492     subplot(2,1,2);
+0493 <span class="keyword">else</span>
+0494     title(<span class="string">'Horizontal Power Spectral Density'</span>,<span class="string">'FontSize'</span>,FontSize);
+0495     subplot(2,2,2);
+0496 <span class="keyword">end</span>
+0497 <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0498 loglog(ff, 1000*1000*T*P4*Uwindow,LineColor);
+0499 <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0500 <span class="keyword">if</span> NoiseFloorFlag
+0501     hold on;
+0502     floor95(50,2,0,SquareRootFlag);
+0503     hold off
+0504 <span class="keyword">end</span>
+0505 set(gca,<span class="string">'FontSize'</span>,FontSize);
+0506 xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0507 ylabel([Chan4Label, <span class="string">' [\mum{^2}/Hz]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0508 <span class="keyword">if</span> JPegFlag
+0509     title(sprintf(<span class="string">'Vertical Power Spectral Density (RMS=%.1f \\mum)'</span>,1000*P4_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0510 <span class="keyword">else</span>
+0511     title(<span class="string">'Vertical Power Spectral Density'</span>,<span class="string">'FontSize'</span>,FontSize);
+0512 <span class="keyword">end</span>
+0513 axis tight
+0514 grid on
+0515 
+0516 <span class="keyword">if</span> ~JPegFlag
+0517     <span class="keyword">if</span> SquareRootFlag
+0518         subplot(2,2,3);
+0519         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0520         loglog(ff(end:-1:1), 1000*P3_int,LineColor);
+0521         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0522         <span class="keyword">if</span> NoiseFloorFlag
+0523             hold on;
+0524             floor95(50,1,1,SquareRootFlag);
+0525             hold off
+0526         <span class="keyword">end</span>
+0527         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0528         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0529         ylabel([Chan3Label,<span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0530         <span class="keyword">if</span> HoldFlag
+0531             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD)'</span>),<span class="string">'FontSize'</span>,FontSize);
+0532         <span class="keyword">else</span>
+0533             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD) (RMS=%.1f \\mum)'</span>,1000*P3_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0534         <span class="keyword">end</span>
+0535         grid on;
+0536         axis tight
+0537 
+0538         subplot(2,2,4);
+0539         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0540         loglog(ff(end:-1:1), 1000*P4_int,LineColor);
+0541         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0542         <span class="keyword">if</span> NoiseFloorFlag
+0543             hold on;
+0544             floor95(50,2,1,SquareRootFlag);
+0545             hold off
+0546         <span class="keyword">end</span>
+0547         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0548         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0549         ylabel([Chan4Label, <span class="string">' [\mum]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0550         <span class="keyword">if</span> HoldFlag
+0551             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD)'</span>),<span class="string">'FontSize'</span>,FontSize);
+0552         <span class="keyword">else</span>
+0553             title(sprintf(<span class="string">'\\surd( Cumulative \\intPSD) (RMS=%.1f \\mum)'</span>,1000*P4_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0554         <span class="keyword">end</span>
+0555         grid on;
+0556         axis tight
+0557     <span class="keyword">else</span>
+0558         subplot(2,2,3);
+0559         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0560         <span class="comment">% loglog(ff(end:-1:1), 1000*1000*P3_int.^2,LineColor);</span>
+0561         semilogx(ff(end:-1:1), 1000*1000*P3_int.^2,LineColor);
+0562         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0563         <span class="keyword">if</span> NoiseFloorFlag
+0564             hold on;
+0565             floor95(50,1,1,SquareRootFlag);
+0566             hold off
+0567         <span class="keyword">end</span>
+0568         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0569         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0570         ylabel([Chan3Label, <span class="string">' [\mum^2]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0571         <span class="keyword">if</span> HoldFlag
+0572             title(sprintf(<span class="string">'Cumulative \\intPSD'</span>),<span class="string">'FontSize'</span>,FontSize);
+0573         <span class="keyword">else</span>
+0574             title(sprintf(<span class="string">'Cumulative \\intPSD (RMS=%.1f \\mum)'</span>,1000*P3_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0575         <span class="keyword">end</span>
+0576         grid on;
+0577         a = axis;
+0578         axis tight
+0579         yaxis([a(3) a(4)]);
+0580 
+0581         subplot(2,2,4);
+0582         <span class="keyword">if</span> HoldFlag; hold on; <span class="keyword">end</span>
+0583         <span class="comment">%%loglog(ff(end:-1:1), 1000*1000*P4_int.^2,LineColor);</span>
+0584         semilogx(ff(end:-1:1), 1000*1000*P4_int.^2,LineColor);
+0585         <span class="keyword">if</span> HoldFlag; hold off; <span class="keyword">end</span>
+0586         <span class="keyword">if</span> NoiseFloorFlag
+0587             hold on;
+0588             floor95(50,2,1,SquareRootFlag);
+0589             hold off
+0590         <span class="keyword">end</span>
+0591         set(gca,<span class="string">'FontSize'</span>,FontSize);
+0592         xlabel(<span class="string">'Frequency [Hz]'</span>,<span class="string">'FontSize'</span>,FontSize);
+0593         ylabel([Chan4Label, <span class="string">' [\mum^2]'</span>],<span class="string">'FontSize'</span>,FontSize);
+0594         <span class="keyword">if</span> HoldFlag
+0595             title(sprintf(<span class="string">'Cumulative \\intPSD'</span>),<span class="string">'FontSize'</span>,FontSize);
+0596         <span class="keyword">else</span>
+0597             title(sprintf(<span class="string">'Cumulative \\intPSD (RMS=%.1f \\mum)'</span>,1000*P4_int(end)),<span class="string">'FontSize'</span>,FontSize);
+0598         <span class="keyword">end</span>
+0599         grid on;
+0600         a = axis;
+0601         axis tight
+0602         yaxis([a(3) a(4)]);
+0603     <span class="keyword">end</span>
+0604 <span class="keyword">end</span>
+0605 
+0606 <span class="comment">%orient landscape</span>
+0607 <span class="keyword">if</span> ~HoldFlag
+0608     h = addlabel(1,0,DateStr1);
+0609 <span class="keyword">end</span>
+0610 
+0611 <span class="keyword">if</span> JPegFlag
+0612     <span class="comment">% For jpeg</span>
+0613     set(h,<span class="string">'FontSize'</span>,FontSize-2);
+0614     set(gcf,<span class="string">'PaperPosition'</span>,PaperPosition);
+0615     eval([<span class="string">'print '</span>,JPegDirectory,<span class="string">'psd2 -djpeg'</span>]);
+0616 <span class="keyword">else</span>
+0617     <span class="keyword">if</span> ~HoldFlag
+0618         addlabel(0,0,DirStr1);
+0619     <span class="keyword">end</span>
+0620 <span class="keyword">end</span>
+0621 set(h2,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[.0+Buffer .5+Buffer .5-2*Buffer .5-2*Buffer-HeightBuffer]);
+0622 
+0623</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

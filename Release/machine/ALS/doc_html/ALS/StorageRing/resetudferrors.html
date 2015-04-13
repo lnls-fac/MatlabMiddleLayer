@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of resetudferrors</title>
+  <meta name="keywords" content="resetudferrors">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; resetudferrors.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>resetudferrors
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function resetudferrors </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function resetudferrors</a>
+0002 
+0003 
+0004 <span class="keyword">if</span> 1
+0005 
+0006     <span class="comment">% Set all the UDF fields for all the families in the AO</span>
+0007     <span class="comment">% Doing this has problems because not all channel seem to have .UDF fields</span>
+0008     [FamilyCell, AO] = getfamilylist(<span class="string">'Cell'</span>);
+0009     <span class="keyword">for</span> i = 1:length(FamilyCell)
+0010         FieldCell = fieldnames(AO.(FamilyCell{i}));
+0011         <span class="keyword">for</span> j = 1:length(FieldCell)
+0012             Names = family2channel(FamilyCell{i}, FieldCell{j});
+0013             <span class="keyword">if</span> ~isempty(deblank(Names)) &amp;&amp; ~any(strfind(Names(:)',<span class="string">'.'</span>))
+0014                 <span class="keyword">try</span>
+0015                     setpv(Names, <span class="string">'UDF'</span>, 0);
+0016                 <span class="keyword">catch</span>
+0017                     <span class="keyword">for</span> k = 1:size(Names, 1)
+0018                         <span class="keyword">try</span>
+0019                             Name = deblank(Names(k,:));
+0020                             <span class="keyword">if</span> ~isempty(Name)
+0021                                 setpv(Name, <span class="string">'UDF'</span>, 0);
+0022                             <span class="keyword">end</span>
+0023                         <span class="keyword">catch</span>
+0024                             fprintf(<span class="string">'   Could not set %s.UDF\n'</span>, Name);
+0025                         <span class="keyword">end</span>
+0026                     <span class="keyword">end</span>
+0027                 <span class="keyword">end</span>
+0028             <span class="keyword">end</span>
+0029         <span class="keyword">end</span>
+0030     <span class="keyword">end</span>
+0031 
+0032 <span class="keyword">else</span>
+0033 
+0034     Families = {<span class="string">'HCM'</span>,<span class="string">'VCM'</span>,<span class="string">'SQSF'</span>,<span class="string">'SQSD'</span>,<span class="string">'QF'</span>,<span class="string">'QD'</span>,<span class="string">'QFA'</span>,<span class="string">'QDA'</span>,<span class="string">'SF'</span>,<span class="string">'SD'</span>,<span class="string">'BEND'</span>};
+0035     <span class="keyword">for</span> i = 1:length(Families)
+0036         setpv(family2channel(Families{i}, <span class="string">'Setpoint'</span>),     <span class="string">'UDF'</span>, 0);
+0037         setpv(family2channel(Families{i}, <span class="string">'Monitor'</span>),      <span class="string">'UDF'</span>, 0);
+0038         setpv(family2channel(Families{i}, <span class="string">'RampRate'</span>),     <span class="string">'UDF'</span>, 0);
+0039         setpv(family2channel(Families{i}, <span class="string">'TimeConstant'</span>), <span class="string">'UDF'</span>, 0);
+0040         setpv(family2channel(Families{i}, <span class="string">'OnControl'</span>),    <span class="string">'UDF'</span>, 0);
+0041         setpv(family2channel(Families{i}, <span class="string">'Ready'</span>),        <span class="string">'UDF'</span>, 0);
+0042     <span class="keyword">end</span>
+0043 
+0044 
+0045     <span class="comment">% Feed forward channels</span>
+0046     setpv(family2channel(<span class="string">'HCM'</span>, <span class="string">'FF1'</span>), <span class="string">'UDF'</span>, 0);
+0047     setpv(family2channel(<span class="string">'HCM'</span>, <span class="string">'FF2'</span>), <span class="string">'UDF'</span>, 0);
+0048     setpv(family2channel(<span class="string">'VCM'</span>, <span class="string">'FF1'</span>), <span class="string">'UDF'</span>, 0);
+0049     setpv(family2channel(<span class="string">'VCM'</span>, <span class="string">'FF2'</span>), <span class="string">'UDF'</span>, 0);
+0050 
+0051     setpv(family2channel(<span class="string">'QF'</span>, <span class="string">'FF'</span>), <span class="string">'UDF'</span>, 0);
+0052     setpv(family2channel(<span class="string">'QD'</span>, <span class="string">'FF'</span>), <span class="string">'UDF'</span>, 0);
+0053 
+0054 
+0055     <span class="comment">% RF</span>
+0056     setpv(<span class="string">'EG______HQMOFM_AC01.UDF'</span>, 0);
+0057     setpv(<span class="string">'SR01C___FREQB__AM00.UDF'</span>, 0);
+0058     
+0059     <span class="comment">% Tune</span>
+0060     setpv(<span class="string">'SR01C___TUNE_X_AC00.UDF'</span>, 0);
+0061     setpv(<span class="string">'SR01C___TUNE_Y_AC00.UDF'</span>, 0);
+0062     setpv(<span class="string">'SR01C___TUNE_H_AC00.UDF'</span>, 0);
+0063 <span class="keyword">end</span>
+0064 
+0065 
+0066 <span class="comment">% SRCONTROL</span>
+0067 setpv(<span class="string">'SR_STATE.UDF'</span>, 0);
+0068 <span class="comment">%setpv('SR_LATTICE_FILE.UDF', 0);</span>
+0069 
+0070 
+0071 <span class="comment">% Physics channels</span>
+0072 setpv(<span class="string">'Physics1.UDF'</span>,  0);
+0073 setpv(<span class="string">'Physics2.UDF'</span>,  0);
+0074 setpv(<span class="string">'Physics3.UDF'</span>,  0);
+0075 setpv(<span class="string">'Physics4.UDF'</span>,  0);
+0076 setpv(<span class="string">'Physics5.UDF'</span>,  0);
+0077 setpv(<span class="string">'Physics6.UDF'</span>,  0);
+0078 setpv(<span class="string">'Physics7.UDF'</span>,  0);
+0079 setpv(<span class="string">'Physics8.UDF'</span>,  0);
+0080 setpv(<span class="string">'Physics9.UDF'</span>,  0);
+0081 setpv(<span class="string">'Physics10.UDF'</span>, 0);
+0082 
+0083</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

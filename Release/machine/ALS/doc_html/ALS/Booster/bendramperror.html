@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bendramperror</title>
+  <meta name="keywords" content="bendramperror">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; bendramperror.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>bendramperror
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 clear
+0002 
+0003 <span class="comment">% High frequency poles for the compensation</span>
+0004 Fc = 1000;
+0005 
+0006 
+0007 <span class="comment">%\\Als-filer\physdata\matlab\srdata\powersupplies\BQFQD_ramping_20070109</span>
+0008 <span class="comment">%FileName = '/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_20070109/coordinated_ramp_B_QF_QD_20070109_4kHz_55.txt';</span>
+0009 <span class="comment">%FileName = '/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_20070109/coordinated_ramp_B_QF_QD_20070109_4kHz_69.txt'</span>
+0010 <span class="comment">%FileName = uigetfile('*.mat', 'Pick a ramp file', '/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_20070109/');</span>
+0011 
+0012 
+0013 <span class="keyword">for</span> i = 1:69
+0014     <span class="keyword">if</span> i == 51
+0015     <span class="keyword">else</span>
+0016         <span class="keyword">if</span> ispc
+0017             FileName = sprintf(<span class="string">'C:\\greg\\Matlab\\machine\\ALS\\BoosterData\\123INJ\\PowerSupplies\\BQFQD_ramping_20070109\\coordinated_ramp_B_QF_QD_20070109_4kHz_%d.txt'</span>, i);
+0018         <span class="keyword">else</span>
+0019             FileName = sprintf(<span class="string">'/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_20070109/coordinated_ramp_B_QF_QD_20070109_4kHz_%d.txt'</span>, i);
+0020         <span class="keyword">end</span>
+0021         
+0022         fid = fopen(FileName,<span class="string">'r'</span>);
+0023         f = fscanf(fid, <span class="string">'%f\n'</span>, 1);
+0024         N = fscanf(fid, <span class="string">'%f\n'</span>, 1);
+0025         D = fscanf(fid, <span class="string">'%f %f %f'</span>, [3 inf]);
+0026         D = D';
+0027         fclose(fid);
+0028 
+0029     <span class="keyword">end</span>
+0030 
+0031     QF(:,i)   =  60 * D(:,3);  <span class="comment">%  60-&gt;New Quad, 48-&gt;Old Quad</span>
+0032     QD(:,i)   =  60 * D(:,1);  <span class="comment">%  60-&gt;New Quad, 48-&gt;Old Quad</span>
+0033     BEND(:,i) =  80 * D(:,3);  <span class="comment">% 125-&gt;New BEND, 80-&gt;Old BEND</span>
+0034 
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="comment">% Cut the Data</span>
+0038 <span class="comment">%Data = Data(2000:end,:);</span>
+0039 
+0040 fs = 4000;
+0041 t = (0:(size(BEND,1)-1)) / fs;
+0042 
+0043 
+0044 <span class="comment">% Goal</span>
+0045 <span class="comment">%QFratio = QF ./ BEND;</span>
+0046 <span class="comment">%QDratio = QD ./ BEND;</span>
+0047 
+0048 figure(1);
+0049 clf reset
+0050 plot(t,BEND);
+0051 xlabel(<span class="string">'Time [Seconds]'</span>);
+0052 ylabel(<span class="string">'Booster BEND Current [Amps]'</span>);
+0053 axis([0 1.05 -10 650]);
+0054 
+0055 
+0056 <span class="comment">%% Remove timing jitter</span>
+0057 
+0058 BEND1 =  10;
+0059 BEND2 = 100;
+0060 BEND3 = 200;
+0061 BEND4 = 300;
+0062 BEND5 = 400;
+0063 BEND6 = 500;
+0064 BEND7 = 600;
+0065 j1 = min(find(BEND(2500:<span class="keyword">end</span>,69)&gt;BEND1)) + 2500 - 1;
+0066 j2 = min(find(BEND(2500:<span class="keyword">end</span>,69)&gt;BEND2)) + 2500 - 1;
+0067 j3 = min(find(BEND(2500:<span class="keyword">end</span>,69)&gt;BEND3)) + 2500 - 1;
+0068 j4 = min(find(BEND(2500:<span class="keyword">end</span>,69)&gt;BEND4)) + 2500 - 1;
+0069 j5 = min(find(BEND(2500:<span class="keyword">end</span>,69)&gt;BEND5)) + 2500 - 1;
+0070 j6 = min(find(BEND(2500:<span class="keyword">end</span>,69)&gt;BEND6)) + 2500 - 1;
+0071 j7 = min(find(BEND(2500:<span class="keyword">end</span>,69)&gt;BEND7)) + 2500 - 1;
+0072 
+0073 <span class="comment">%figure(3);</span>
+0074 <span class="comment">%clf reset</span>
+0075 <span class="keyword">for</span> i = 1:69
+0076     j = min(find(BEND(2500:<span class="keyword">end</span>,i)&gt;BEND1)) + 2500 - 1;
+0077     dBEND = BEND(j,i) - BEND(j1,69);
+0078     r = (BEND(j+10,i) - BEND(j-10,i)) / .25e-3 / 20;
+0079     Jitter1 = t(j) - t(j1) - dBEND/r;
+0080 
+0081     j = min(find(BEND(2500:<span class="keyword">end</span>,i)&gt;BEND2)) + 2500 - 1;
+0082     dBEND = BEND(j,i) - BEND(j2,69);
+0083     r = (BEND(j+10,i) - BEND(j-10,i)) / .25e-3 / 20;
+0084     Jitter2 = t(j) - t(j2) - dBEND/r;
+0085 
+0086     j = min(find(BEND(2500:<span class="keyword">end</span>,i)&gt;BEND3)) + 2500 - 1;
+0087     dBEND = BEND(j,i) - BEND(j3,69);
+0088     r = (BEND(j+10,i) - BEND(j-10,i)) / .25e-3 / 20;
+0089     Jitter3 = t(j) - t(j3) - dBEND/r;    
+0090 
+0091     j = min(find(BEND(2500:<span class="keyword">end</span>,i)&gt;BEND4)) + 2500 - 1;
+0092     dBEND = BEND(j,i) - BEND(j4,69);
+0093     r = (BEND(j+10,i) - BEND(j-10,i)) / .25e-3 / 20;
+0094     Jitter4 = t(j) - t(j4) - dBEND/r;
+0095 
+0096     j = min(find(BEND(2500:<span class="keyword">end</span>,i)&gt;BEND5)) + 2500 - 1;
+0097     dBEND = BEND(j,i) - BEND(j5,69);
+0098     r = (BEND(j+10,i) - BEND(j-10,i)) / .25e-3 / 20;
+0099     Jitter5 = t(j) - t(j5) - dBEND/r;
+0100 
+0101     j = min(find(BEND(2500:<span class="keyword">end</span>,i)&gt;BEND6)) + 2500 - 1;
+0102     dBEND = BEND(j,i) - BEND(j6,69);
+0103     r = (BEND(j+10,i) - BEND(j-10,i)) / .25e-3 / 20;
+0104     Jitter6 = t(j) - t(j6) - dBEND/r;
+0105 
+0106     j = min(find(BEND(2500:<span class="keyword">end</span>,i)&gt;BEND7)) + 2500 - 1;
+0107     dBEND = BEND(j,i) - BEND(j7,69);
+0108     r = (BEND(j+5,i) - BEND(j-5,i)) / .25e-3 / 10;
+0109     Jitter7 = t(j) - t(j7) - dBEND/r;
+0110 
+0111     fprintf(<span class="string">' dBEND = %f\n'</span>, r*.25-3*10);
+0112     
+0113     Jitter(:,i) = [Jitter1;Jitter2;Jitter3;Jitter4;Jitter5;Jitter6;Jitter7];
+0114     
+0115     <span class="comment">%plot(t-mean(Jitter(:,i)), BEND(:,i));</span>
+0116     <span class="comment">%plot(t-Jitter(1,i), BEND(:,i),'-');</span>
+0117     <span class="comment">%plot(t, BEND(:,i),'-');</span>
+0118     <span class="comment">%hold on;</span>
+0119 <span class="keyword">end</span>
+0120 
+0121 <span class="comment">%hold off</span>
+0122 <span class="comment">%xlabel('Time [Seconds]');</span>
+0123 <span class="comment">%ylabel('Booster BEND Current [Amps]');</span>
+0124 <span class="comment">%axis([0 1.05 -10 650]);</span>
+0125 
+0126 
+0127 figure(2);
+0128 clf reset
+0129 plot(Jitter'*1000);
+0130 xlabel(<span class="string">'Ramp Number'</span>);
+0131 ylabel(<span class="string">'Booster BEND Timing Offset [msec]'</span>);
+0132 legend(<span class="string">'@10 Amps'</span>, <span class="string">'@100 Amps'</span>, <span class="string">'@200 Amps'</span>, <span class="string">'@300 Amps'</span>, <span class="string">'@400 Amps'</span>, <span class="string">'@500 Amps'</span>, <span class="string">'@600 Amps'</span>);
+0133 
+0134 
+0135</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

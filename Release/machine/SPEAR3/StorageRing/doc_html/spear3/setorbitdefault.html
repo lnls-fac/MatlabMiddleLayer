@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setorbitdefault</title>
+  <meta name="keywords" content="setorbitdefault">
+  <meta name="description" content="setorbitdefault(Evectors {1e-4}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; setorbitdefault.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setorbitdefault
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>setorbitdefault(Evectors {1e-4}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function setorbitdefault(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> setorbitdefault(Evectors {1e-4}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getmaxskewdata.html" class="code" title="function getmaxskewdata">getmaxskewdata</a>	</li><li><a href="scanqms.html" class="code" title="">scanqms</a>	shunt quads around ring and record rms values</li><li><a href="septumramp2des.html" class="code" title="function septumramp2des">septumramp2des</a>	SEPTUMRAMP2DES ramp septum to DES value from current value;</li><li><a href="septumramp2zero.html" class="code" title="function septumramp2des">septumramp2zero</a>	SEPTUMRAMP2ZERO ramp septum to ZERO value from current value;</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setorbitdefault(varargin)</a>
+0002 <span class="comment">% setorbitdefault(Evectors {1e-4}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</span>
+0003 
+0004 
+0005 <span class="comment">% Defaults</span>
+0006 PlaneFlag = 0;      <span class="comment">% Both planes</span>
+0007 ItersDefault = 1;
+0008 EvectorsDefault = 1e-4;
+0009 RemoveBPMDeviceList = [];   
+0010 <span class="comment">%RemoveBPMDeviceList = [14 4];</span>
+0011 RemoveHCMDeviceList = [];   
+0012 RemoveVCMDeviceList = [];   
+0013 DisplayFlag = <span class="string">'NoDisplay'</span>;
+0014 
+0015 <span class="comment">% Input parsing</span>
+0016 Evectors = [];
+0017 Iters = [];
+0018 <span class="keyword">for</span> i = length(varargin):-1:1
+0019     <span class="keyword">if</span> isstruct(varargin{i})
+0020         <span class="comment">% Just remove</span>
+0021         varargin(i) = [];
+0022     <span class="keyword">elseif</span> iscell(varargin{i})
+0023         <span class="comment">% Just remove</span>
+0024         varargin(i) = [];
+0025     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0026         <span class="comment">% Just remove</span>
+0027         varargin(i) = [];
+0028     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0029         <span class="comment">% Just remove</span>
+0030         varargin(i) = [];
+0031     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0032         DisplayFlag = <span class="string">'Display'</span>;
+0033         varargin(i) = [];
+0034     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0035         DisplayFlag = <span class="string">'NoDisplay'</span>;
+0036         varargin(i) = [];
+0037     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'x'</span>,<span class="string">'Horizontal'</span>}))
+0038         PlaneFlag = 1;
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'y'</span>,<span class="string">'Vertical'</span>}))
+0041         PlaneFlag = 2;
+0042         varargin(i) = [];
+0043     <span class="keyword">end</span>
+0044 <span class="keyword">end</span>
+0045 
+0046 
+0047 <span class="keyword">if</span> length(varargin) &gt;= 1
+0048     <span class="keyword">if</span> isnumeric(varargin{1})
+0049         Evectors = varargin{1};
+0050         varargin(i) = [];
+0051     <span class="keyword">end</span>
+0052 <span class="keyword">end</span>
+0053 <span class="keyword">if</span> isempty(Evectors)
+0054     <span class="keyword">if</span> PlaneFlag == 0
+0055         Evectors = EvectorsDefault;
+0056     <span class="keyword">elseif</span> PlaneFlag == 1
+0057         Evectors = EvectorsDefault;
+0058     <span class="keyword">elseif</span> PlaneFlag == 2
+0059         Evectors = EvectorsDefault;
+0060     <span class="keyword">end</span>
+0061 <span class="keyword">end</span>
+0062 
+0063 <span class="keyword">if</span> length(varargin) &gt;= 1
+0064     <span class="keyword">if</span> isnumeric(varargin{1})
+0065         Iters = varargin{1};
+0066         varargin(i) = [];
+0067     <span class="keyword">end</span>
+0068 <span class="keyword">end</span>
+0069 <span class="keyword">if</span> isempty(Iters)
+0070     Iters = ItersDefault;
+0071 <span class="keyword">end</span>
+0072 
+0073 <span class="keyword">if</span> length(varargin) &gt;= 1
+0074     <span class="keyword">if</span> isnumeric(varargin{1})
+0075         RemoveBPMDeviceList = varargin{1};
+0076         varargin(i) = [];
+0077     <span class="keyword">end</span>
+0078 <span class="keyword">end</span>
+0079 
+0080 
+0081 
+0082 <span class="keyword">if</span> PlaneFlag == 0
+0083     <span class="comment">% Get BPM and CM structures</span>
+0084     CM  = {getsp(<span class="string">'HCM'</span>,<span class="string">'struct'</span>),getsp(<span class="string">'VCM'</span>,<span class="string">'struct'</span>)};
+0085     BPM = {getx(<span class="string">'struct'</span>), gety(<span class="string">'struct'</span>)};
+0086     
+0087     
+0088     <span class="comment">% Remove devices</span>
+0089     
+0090     <span class="comment">% HCM</span>
+0091     i = findrowindex(RemoveHCMDeviceList, CM{1}.DeviceList); 
+0092     CM{1}.DeviceList(i,:) = [];
+0093     CM{1}.Data(i,:) = [];
+0094     CM{1}.Status(i,:) = [];
+0095 
+0096     <span class="comment">% VCM</span>
+0097     i = findrowindex(RemoveVCMDeviceList, CM{2}.DeviceList); 
+0098     CM{2}.DeviceList(i,:) = [];
+0099     CM{2}.Data(i,:) = [];
+0100     CM{2}.Status(i,:) = [];
+0101 
+0102     <span class="comment">% BPMx and BPMy</span>
+0103     i = findrowindex(RemoveBPMDeviceList, BPM{1}.DeviceList); 
+0104     BPM{1}.DeviceList(i,:) = [];
+0105     BPM{1}.Data(i,:) = [];
+0106     BPM{1}.Status(i,:) = [];
+0107     
+0108     i = findrowindex(RemoveBPMDeviceList, BPM{2}.DeviceList); 
+0109     BPM{2}.DeviceList(i,:) = [];
+0110     BPM{2}.Data(i,:) = [];
+0111     BPM{2}.Status(i,:) = [];
+0112     
+0113     
+0114     <span class="comment">% Corrector orbit</span>
+0115     setorbit(<span class="string">'Golden'</span>, BPM, CM, Iters, Evectors, DisplayFlag, varargin{:});
+0116 
+0117 <span class="keyword">elseif</span> PlaneFlag == 1
+0118 
+0119     <span class="comment">% Get BPM and CM structures</span>
+0120     CM  = getsp(<span class="string">'HCM'</span>,<span class="string">'struct'</span>);
+0121     BPM = getx(<span class="string">'struct'</span>);
+0122     
+0123     
+0124     <span class="comment">% Remove devices</span>
+0125     
+0126     <span class="comment">% HCM</span>
+0127     i = findrowindex(RemoveHCMDeviceList, CM.DeviceList); 
+0128     CM.DeviceList(i,:) = [];
+0129     CM.Data(i,:) = [];
+0130     CM.Status(i,:) = [];
+0131 
+0132     <span class="comment">% BPMx</span>
+0133     i = findrowindex(RemoveBPMDeviceList, BPM.DeviceList); 
+0134     BPM.DeviceList(i,:) = [];
+0135     BPM.Data(i,:) = [];
+0136     BPM.Status(i,:) = [];    
+0137     
+0138     
+0139     <span class="comment">% Corrector orbit</span>
+0140     setorbit(<span class="string">'Golden'</span>, BPM, CM, Iters, Evectors, DisplayFlag, varargin{:});
+0141     
+0142 <span class="keyword">elseif</span> PlaneFlag == 2
+0143     
+0144     <span class="comment">% Get BPM and CM structures</span>
+0145     CM  = getsp(<span class="string">'VCM'</span>,<span class="string">'struct'</span>);
+0146     BPM = gety(<span class="string">'struct'</span>);
+0147     
+0148     
+0149     <span class="comment">% Remove devices</span>
+0150     
+0151     <span class="comment">% VCM</span>
+0152     i = findrowindex(RemoveVCMDeviceList, CM.DeviceList); 
+0153     CM.DeviceList(i,:) = [];
+0154     CM.Data(i,:) = [];
+0155     CM.Status(i,:) = [];
+0156     
+0157     <span class="comment">% BPMy</span>
+0158     i = findrowindex(RemoveBPMDeviceList, BPM.DeviceList); 
+0159     BPM.DeviceList(i,:) = [];
+0160     BPM.Data(i,:) = [];
+0161     BPM.Status(i,:) = [];    
+0162     
+0163     
+0164     <span class="comment">% Corrector orbit</span>
+0165     setorbit(<span class="string">'Golden'</span>, BPM, CM, Iters, Evectors, DisplayFlag, varargin{:});
+0166 <span class="keyword">end</span>
+0167</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

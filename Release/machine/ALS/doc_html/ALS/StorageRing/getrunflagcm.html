@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getrunflagcm</title>
+  <meta name="keywords" content="getrunflagcm">
+  <meta name="description" content="GETRUNFLAGCM - Returns the run flag for the HCM & VCM families">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getrunflagcm.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getrunflagcm
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GETRUNFLAGCM - Returns the run flag for the HCM & VCM families</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [RunFlag, Delta, Tol] = getrunflagcm(Family, Field, DeviceList) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETRUNFLAGCM - Returns the run flag for the HCM &amp; VCM families
+ [RunFlag, Delta, Tol] = getrunflagcm(Family, Field, DeviceList)
+
+ Tolerance check for including the summing junctions for correctors.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="alsinit.html" class="code" title="function alsinit(OperationalMode)">alsinit</a>	ALSINIT</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [RunFlag, Delta, Tol] = getrunflagcm(Family, Field, DeviceList)</a>
+0002 <span class="comment">%GETRUNFLAGCM - Returns the run flag for the HCM &amp; VCM families</span>
+0003 <span class="comment">% [RunFlag, Delta, Tol] = getrunflagcm(Family, Field, DeviceList)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Tolerance check for including the summing junctions for correctors.</span>
+0006 
+0007 
+0008 <span class="keyword">if</span> nargin &lt; 1
+0009     error(<span class="string">'Must have at least 1 input (Family, Data Structure, or Channel Name).'</span>);
+0010 <span class="keyword">end</span>
+0011 
+0012 <span class="keyword">if</span> nargin &lt; 3
+0013     DeviceList = [];
+0014 <span class="keyword">end</span>
+0015 
+0016 SP  = getpv(Family, <span class="string">'Setpoint'</span>, DeviceList);
+0017 SP1 = getpv(Family, <span class="string">'Trim'</span>, DeviceList);
+0018 SP2 = getpv(Family, <span class="string">'FF1'</span>, DeviceList);
+0019 SP3 = getpv(Family, <span class="string">'FF2'</span>, DeviceList);
+0020 
+0021 FFMultiplier = getpv(Family, <span class="string">'FFMultiplier'</span>, DeviceList);
+0022 FFMultiplier(isnan(FFMultiplier)) = 1;
+0023 
+0024 
+0025 SP(isnan(SP)) = 0;
+0026 SP1(isnan(SP1)) = 0;
+0027 SP2(isnan(SP2)) = 0;
+0028 SP3(isnan(SP3)) = 0;
+0029 <span class="comment">%SP = SP + SP1 + SP2 + SP3;</span>
+0030 SP = SP + SP1 + FFMultiplier.*(SP2 + SP3); <span class="comment">% Note: fast feedback is not included here.</span>
+0031 
+0032 <span class="keyword">if</span> isempty(SP)
+0033     RunFlag = [];
+0034     Delta = [];
+0035     Tol = [];
+0036     <span class="keyword">return</span>;
+0037 <span class="keyword">end</span>
+0038 
+0039 
+0040 <span class="comment">% Base runflag on sum(SP)-AM</span>
+0041 <span class="comment">% The tolerances are stored in the 'Setpoint' field</span>
+0042 Tol = family2tol(Family, <span class="string">'Setpoint'</span>, DeviceList);
+0043 <span class="keyword">if</span> isempty(Tol)
+0044     RunFlag = [];
+0045     Delta = [];
+0046     <span class="keyword">return</span>;
+0047 <span class="keyword">end</span>
+0048 
+0049 AM  = getpv(Family, <span class="string">'Monitor'</span> , DeviceList);
+0050 <span class="keyword">if</span> isempty(AM)
+0051     RunFlag = [];
+0052     Delta = [];
+0053     <span class="keyword">return</span>;
+0054 <span class="keyword">end</span>
+0055 
+0056 
+0057 <span class="comment">% Use the &quot;real&quot; Setpoint &amp; Monitor values</span>
+0058 SP = raw2real(Family, <span class="string">'Setpoint'</span>, SP, DeviceList);
+0059 AM = raw2real(Family, <span class="string">'Monitor'</span>,  AM, DeviceList);
+0060 
+0061 
+0062 RunFlag = abs(SP-AM) &gt; Tol;
+0063 Delta = SP-AM;</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

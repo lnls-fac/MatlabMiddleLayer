@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of yaxesposition</title>
+  <meta name="keywords" content="yaxesposition">
+  <meta name="description" content="YAXESPOSITION - Vertical axes scaling for all the axes in a figure">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; yaxesposition.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>yaxesposition
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>YAXESPOSITION - Vertical axes scaling for all the axes in a figure</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function yaxesposition(PercentChange) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">YAXESPOSITION - Vertical axes scaling for all the axes in a figure
+ 
+  INPUTS
+  1. PercentChange - Percentage for scaling (1 means no change) 
+
+  See also <a href="yaxesposition.html" class="code" title="function yaxesposition(PercentChange)">yaxesposition</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function yaxesposition(PercentChange)</a>
+0002 <span class="comment">%YAXESPOSITION - Vertical axes scaling for all the axes in a figure</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  INPUTS</span>
+0005 <span class="comment">%  1. PercentChange - Percentage for scaling (1 means no change)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  See also yaxesposition</span>
+0008 
+0009 <span class="comment">%  Written by Greg Portmann</span>
+0010 
+0011 
+0012 h = get(gcf,<span class="string">'children'</span>);
+0013 
+0014 
+0015 <span class="comment">% set(gcf, 'Units', get(0, 'Units'));</span>
+0016 <span class="comment">% Pfig = get(gcf, 'Position');</span>
+0017 <span class="comment">% set(gcf, 'Position', get(0, 'ScreenSize'));</span>
+0018     
+0019 
+0020 <span class="comment">% Due to axis being linked, check if someone else changes it first</span>
+0021 <span class="keyword">for</span> i = 1:length(h)
+0022     hget = get(h(i));
+0023     <span class="keyword">if</span> isfield(hget, <span class="string">'Position'</span>) &amp;&amp; ~strcmpi(hget.Tag, <span class="string">'Legend'</span>)
+0024         pstart(i,:) = get(h(i), <span class="string">'Position'</span>);
+0025     <span class="keyword">else</span>
+0026         pstart(i,:) = [NaN NaN NaN NaN];
+0027     <span class="keyword">end</span>
+0028 <span class="keyword">end</span>
+0029 
+0030 
+0031 <span class="keyword">for</span> i = 1:length(h)
+0032     hget = get(h(i));
+0033     <span class="keyword">if</span> isfield(hget, <span class="string">'Position'</span>) &amp;&amp; ~strcmpi(hget.Tag, <span class="string">'Legend'</span>)
+0034         p = get(h(i), <span class="string">'Position'</span>);
+0035         <span class="keyword">if</span> all(p==pstart(i,:))
+0036             <span class="keyword">if</span> PercentChange &gt; 1
+0037                 Percent = PercentChange - 1;
+0038                 set(h(i), <span class="string">'Position'</span>, [p(1) p(2)-p(4)*Percent/2 p(3) p(4)+p(4)*Percent]);
+0039                 <span class="comment">%set(h(i), 'Position', [p(1) p(2)-p(4)*Percent/2 p(3) p(4)+p(4)*Percent*1.05]);  % 1.05 is a cluge</span>
+0040             <span class="keyword">else</span>
+0041                 Percent = 1 - PercentChange;
+0042                 set(h(i), <span class="string">'Position'</span>, [p(1) p(2)+p(4)*Percent/2 p(3) p(4)-p(4)*Percent]);
+0043                 <span class="comment">%set(h(i), 'Position', [p(1) p(2)+p(4)*Percent/2 p(3) p(4)-p(4)*Percent*0.95]);  % 0.95 is a cluge</span>
+0044             <span class="keyword">end</span>
+0045         <span class="keyword">end</span>
+0046     <span class="keyword">end</span>
+0047 <span class="keyword">end</span>
+0048 
+0049 <span class="comment">%set(gcf,'Position', Pfig);</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

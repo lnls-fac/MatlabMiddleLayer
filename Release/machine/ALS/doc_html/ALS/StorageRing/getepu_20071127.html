@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getepu_20071127</title>
+  <meta name="keywords" content="getepu_20071127">
+  <meta name="description" content="[Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector {4}, ChanType)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getepu_20071127.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getepu_20071127
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector {4}, ChanType)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector {4}, ChanType)
+   Offset  = hoizontal offset between upper and lower magnets [mm]
+   OffsetA = hoizontal offset A from &quot;zero&quot; [mm]
+   OffsetB = hoizontal offset B from &quot;zero&quot; [mm]
+   Velocity = Insertion device velocity [mm/sec]
+   RunFlag  = Run count number -&gt; .5 if running
+                               -&gt; negative if error occurred
+   UserGap  = Insertion device user requested offset [mm]  
+   Sector   = Sector Number
+               can either be vector or devicelist (to address
+               upstream/downstream EPUs)
+   ChanType = 0 -&gt; monitor  for position and velocity {default}
+                -&gt; setpoint for position and velocity</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)</a>
+0002 <span class="comment">% [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector {4}, ChanType)</span>
+0003 <span class="comment">%   Offset  = hoizontal offset between upper and lower magnets [mm]</span>
+0004 <span class="comment">%   OffsetA = hoizontal offset A from &quot;zero&quot; [mm]</span>
+0005 <span class="comment">%   OffsetB = hoizontal offset B from &quot;zero&quot; [mm]</span>
+0006 <span class="comment">%   Velocity = Insertion device velocity [mm/sec]</span>
+0007 <span class="comment">%   RunFlag  = Run count number -&gt; .5 if running</span>
+0008 <span class="comment">%                               -&gt; negative if error occurred</span>
+0009 <span class="comment">%   UserGap  = Insertion device user requested offset [mm]</span>
+0010 <span class="comment">%   Sector   = Sector Number</span>
+0011 <span class="comment">%               can either be vector or devicelist (to address</span>
+0012 <span class="comment">%               upstream/downstream EPUs)</span>
+0013 <span class="comment">%   ChanType = 0 -&gt; monitor  for position and velocity {default}</span>
+0014 <span class="comment">%                -&gt; setpoint for position and velocity</span>
+0015 
+0016 <span class="comment">% 2005-02-18 T.Scarvie, added Device to handle 2 EPUs per sector</span>
+0017 <span class="comment">% 2005-02-23, C. Steier, modified to allow Sector to be devicelist</span>
+0018 
+0019 <span class="keyword">if</span> nargin &lt; 1
+0020     Sector = 4;
+0021     Device = 1;
+0022 <span class="keyword">else</span> 
+0023     <span class="keyword">if</span> size(Sector,2)==2
+0024         Device = Sector(:,2);
+0025         Sector = Sector(:,1);
+0026     <span class="keyword">else</span>
+0027         Device = zeros(size(Sector));
+0028         <span class="keyword">for</span> loop = 1:length(Sector)
+0029             <span class="keyword">if</span> Sector(loop) == 11
+0030                 Device(loop,1) = 2;
+0031             <span class="keyword">else</span>
+0032                 Device(loop,1) = 1;
+0033             <span class="keyword">end</span>
+0034         <span class="keyword">end</span>
+0035     <span class="keyword">end</span>
+0036 <span class="keyword">end</span>
+0037 
+0038 <span class="keyword">if</span> isempty(Sector)
+0039    Sector = 4;
+0040    Device = 1;
+0041 <span class="keyword">end</span>
+0042 
+0043 <span class="keyword">if</span> nargin &lt; 2
+0044    ChanType = 0;
+0045 <span class="keyword">end</span>
+0046 <span class="keyword">if</span> isempty(ChanType)
+0047    ChanType= 0;
+0048 <span class="keyword">end</span>
+0049 
+0050 <span class="keyword">if</span> any(Device&lt;1) | any(Device&gt;2)
+0051    error(<span class="string">'  Device must be 1(upstream EPU) or 2(downstream EPU)!'</span>);
+0052 <span class="keyword">end</span>
+0053 
+0054 <span class="keyword">for</span> i = 1:length(Sector)
+0055    <span class="keyword">if</span> (Sector(i) == 4) | (Sector(i) == 11)
+0056       <span class="keyword">if</span> ChanType
+0057          Offset(i,1)   = scaget(sprintf(<span class="string">'SR%02dU___ODS%1iPS_AC00'</span>, Sector(i), Device(i)));
+0058          OffsetA(i,1)  = scaget(sprintf(<span class="string">'SR%02dU___ODA%1iPS_AC02'</span>, Sector(i), Device(i)));
+0059          OffsetB(i,1)  = scaget(sprintf(<span class="string">'SR%02dU___ODB%1iPS_AC03'</span>, Sector(i), Device(i)));
+0060          Velocity(i,1) = scaget(sprintf(<span class="string">'SR%02dU___ODS%1iV__AC01'</span>, Sector(i), Device(i)));
+0061       <span class="keyword">else</span>
+0062          Offset(i,1)   = scaget(sprintf(<span class="string">'SR%02dU___ODS%1iPS_AM00'</span>, Sector(i), Device(i)));
+0063          OffsetA(i,1)  = scaget(sprintf(<span class="string">'SR%02dU___ODA%1iPS_AM00'</span>, Sector(i), Device(i)));
+0064          OffsetB(i,1)  = scaget(sprintf(<span class="string">'SR%02dU___ODB%1iPS_AM01'</span>, Sector(i), Device(i)));
+0065          Velocity(i,1) = scaget(sprintf(<span class="string">'SR%02dU___ODS%1iV__AM01'</span>, Sector(i), Device(i)));
+0066       <span class="keyword">end</span>
+0067       
+0068       RunFlag(i,1) = scaget(sprintf(<span class="string">'SR%02dU___ODS%1iE__AM02'</span>, Sector(i), Device(i)));
+0069       
+0070       UserGap(i,1) = NaN; <span class="comment">%scaget(sprintf('cmm:ID%d_opr_grant', Sector(i)));</span>
+0071       
+0072       <span class="keyword">if</span> (RunFlag(i) &lt; 0)
+0073          <span class="keyword">if</span> (Sector(i) == 4) | (Sector(i) == 11)
+0074             <span class="keyword">switch</span> RunFlag(i,1)
+0075             <span class="keyword">case</span> -1
+0076                disp(<span class="string">'WARNING: EPU timeout error.'</span>);
+0077             <span class="keyword">case</span> -2    
+0078                disp(<span class="string">'WARNING: EPU PMAC software error.'</span>);
+0079             <span class="keyword">case</span> -3    
+0080                disp(<span class="string">'WARNING: EPU PMAC program stopped.'</span>);
+0081             <span class="keyword">case</span> -4    
+0082                disp(<span class="string">'WARNING: EPU PMAC not initiallized.'</span>);
+0083             <span class="keyword">case</span> -5    
+0084                disp(<span class="string">'WARNING: EPU Amp disabled.'</span>);
+0085             <span class="keyword">case</span> -6
+0086                disp(<span class="string">'WARNING: EPU PMAC status bad.'</span>);
+0087             <span class="keyword">otherwise</span>
+0088                disp(<span class="string">'WARNING: Insertion device error.'</span>);
+0089             <span class="keyword">end</span>
+0090          <span class="keyword">end</span>
+0091       <span class="keyword">end</span>
+0092    <span class="keyword">else</span>
+0093       Offset(i,1)   = 0;
+0094       OffsetA(i,1)  = 0;
+0095       OffsetB(i,1)  = 0;
+0096       Velocity(i,1) = 0;
+0097       RunFlag(i,1)  = 0;
+0098       UserGap(i,1)  = NaN;
+0099    <span class="keyword">end</span>
+0100 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

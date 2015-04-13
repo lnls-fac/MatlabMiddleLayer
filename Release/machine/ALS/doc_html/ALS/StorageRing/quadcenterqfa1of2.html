@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of quadcenterqfa1of2</title>
+  <meta name="keywords" content="quadcenterqfa1of2">
+  <meta name="description" content="Quadrupole Center Measurement">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; quadcenterqfa1of2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>quadcenterqfa1of2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Quadrupole Center Measurement</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  Quadrupole Center Measurement</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="quadcenterinit.html" class="code" title="function QMS = quadcenterinit(QuadFamily, QuadDev, QuadPlane)">quadcenterinit</a>	QMS = quadcenterinit(Family, Device, QuadPlane)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%  Quadrupole Center Measurement</span>
+0002 
+0003 
+0004 
+0005 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0006 <span class="comment">% Make the BPM list %</span>
+0007 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0008 BPMFamily = <span class="string">'BPMx'</span>;
+0009 
+0010 RemoveDeviceList = []; 
+0011 
+0012 <span class="comment">% BPMDevList = getlist(BPMFamily);</span>
+0013 BPMDevList = [
+0014     1     4
+0015     1     7
+0016     2     4
+0017     2     7
+0018     3     4
+0019     3     7
+0020     4     4
+0021     4     7
+0022     5     4
+0023     5     7
+0024     6     4
+0025     6     7
+0026     ];
+0027 
+0028 i = findrowindex(RemoveDeviceList, BPMDevList);
+0029 BPMDevList(i,:) = [];
+0030 
+0031 
+0032 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0033 <span class="comment">% Clean out the data directory %</span>
+0034 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0035 [QUADFamily, QUADDev] = bpm2quad(BPMFamily, BPMDevList(1,:));
+0036 q = <a href="quadcenterinit.html" class="code" title="function QMS = quadcenterinit(QuadFamily, QuadDev, QuadPlane)">quadcenterinit</a>(QUADFamily, QUADDev, 1);
+0037 DirStart = pwd;
+0038 NewDir = <span class="string">'old'</span>;
+0039 cd(q.DataDirectory);
+0040 <span class="keyword">if</span> ~exist(NewDir,<span class="string">'dir'</span>)
+0041     mkdir(NewDir);
+0042 <span class="keyword">end</span>
+0043 <span class="keyword">try</span>
+0044     movefile(<span class="string">'*.mat'</span>, NewDir);
+0045     movefile(<span class="string">'quadcenter.log'</span>, NewDir);
+0046 <span class="keyword">catch</span>
+0047 <span class="keyword">end</span>
+0048 cd(DirStart);
+0049 
+0050 
+0051 
+0052 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0053 <span class="comment">% Loop on all the BPMs %</span>
+0054 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0055 t0 = gettime;
+0056 <span class="keyword">for</span> i = 1:size(BPMDevList,1)
+0057     
+0058     [QUADFamily, QUADDev, DelSpos] = bpm2quad(BPMFamily, BPMDevList(i,:));
+0059     
+0060     <span class="comment">% Check how close the BPM is to the quad (should base on phase but I didn't want to assume the AT desk was available)</span>
+0061     <span class="keyword">if</span> abs(DelSpos) &lt; 1
+0062         fprintf(<span class="string">'   %d. BPM(%2d,%d)  %s(%2d,%d)  BPM-to-Quad Distance=%f meters\n'</span>, i, BPMDevList(i,:), QUADFamily, QUADDev, DelSpos);
+0063         
+0064         <span class="keyword">try</span>
+0065             q = quadcenter(QUADFamily, QUADDev, 0);
+0066         <span class="keyword">catch</span>
+0067             fprintf(<span class="string">'       Error occurred in BPM(%2d,%d).  Moving to the next magnet.\n'</span>, BPMDevList);
+0068         <span class="keyword">end</span>
+0069 
+0070         DCCT = getdcct;    
+0071         <span class="keyword">if</span> DCCT &lt; 2
+0072             <span class="comment">% Redo magnet if the beam dumped</span>
+0073             sound(cos(1:10000));
+0074             fprintf(<span class="string">'   Current too low.  Refill and hit return.\n'</span>);
+0075             pause;
+0076             fprintf(<span class="string">' \n'</span>);
+0077             q = quadcenter(QUADFamily, QUADDev, 0);
+0078             
+0079         <span class="keyword">elseif</span> DCCT &lt; 35 &amp;&amp; i&lt;size(BPMDevList,1)-1
+0080             sound(cos(1:10000));
+0081             fprintf(<span class="string">'   Current too low.  Refill and hit return.\n'</span>);
+0082             pause;
+0083             fprintf(<span class="string">' \n'</span>);
+0084         <span class="keyword">end</span>
+0085     <span class="keyword">end</span>
+0086 <span class="keyword">end</span>
+0087 
+0088 
+0089 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0090 <span class="comment">% Move data to new directory by date %</span>
+0091 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0092 DirStart = pwd;
+0093 NewDir = sprintf(<span class="string">'%4d-%02d-%02d_%02d-%02d-%02.0f'</span>, clock);
+0094 cd(q.DataDirectory);
+0095 <span class="keyword">if</span> ~exist(NewDir,<span class="string">'dir'</span>)
+0096     <span class="keyword">try</span>
+0097         mkdir(NewDir);
+0098     <span class="keyword">catch</span>
+0099     <span class="keyword">end</span>
+0100 <span class="keyword">end</span>
+0101 <span class="keyword">try</span>
+0102     movefile(<span class="string">'*.mat'</span>, NewDir);
+0103     fprintf(<span class="string">'   Data moved to %s\n'</span>, [q.DataDirectory NewDir]);
+0104     <span class="keyword">try</span>
+0105         movefile(<span class="string">'quadcenter.log'</span>, NewDir);
+0106     <span class="keyword">catch</span>
+0107         fprintf(<span class="string">'   Error occurred when moving log files to %s\n'</span>, [q.DataDirectory NewDir]);
+0108     <span class="keyword">end</span>
+0109 <span class="keyword">catch</span>
+0110     fprintf(<span class="string">'   Error occurred when moving data files to %s\n'</span>, [q.DataDirectory NewDir]);
+0111 <span class="keyword">end</span>
+0112 cd(DirStart);
+0113 
+0114 
+0115 
+0116 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0117 <span class="comment">% Print time and wake-up call %</span>
+0118 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0119 fprintf(<span class="string">'   Data collection time %f minutes\n'</span>, (gettime-t0)/60);
+0120 sound(cos(1:10000));
+0121 sound(cos(1:10000));</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getramprate</title>
+  <meta name="keywords" content="getramprate">
+  <meta name="description" content="GETRAMPRATE - Returns the ramp rate for a family">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; getramprate.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getramprate
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETRAMPRATE - Returns the ramp rate for a family</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function RampRate = getramprate(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETRAMPRATE - Returns the ramp rate for a family
+  RampRate = getramprate(Family, Field, DeviceList)
+  RampRate = getramprate(Family, Field)
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Accelerator Object
+  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Setpoint'}
+  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}
+  4. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+
+  OUTPUTS
+  1. RampRate - Ramp rate for the family
+ 
+  NOTES
+  1. If the ramprate is not known, then pick a value should be used that makes the delay when  
+     waiting one tolerance step resonable.   That is, Tol = family2tol is used by setpv and steppv
+     when the WaitFlag = -2.  After the setpoint is within tolerance, an extra delay of 
+     Tol / RampRate is done.  
+  2. If Family is a cell array, then DeviceList and Field can also be a cell arrays</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getphysdata.html" class="code" title="function [Data, iNotFound] = getphysdata(Family, Field, DeviceList)">getphysdata</a>	GETPHYSDATA - Gets physics data</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>	GETRAMPRATE - Returns the ramp rate for a family</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>	INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>	GETRAMPRATE - Returns the ramp rate for a family</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function RampRate = getramprate(varargin)</a>
+0002 <span class="comment">%GETRAMPRATE - Returns the ramp rate for a family</span>
+0003 <span class="comment">%  RampRate = getramprate(Family, Field, DeviceList)</span>
+0004 <span class="comment">%  RampRate = getramprate(Family, Field)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. Family - Family Name</span>
+0008 <span class="comment">%              Data Structure</span>
+0009 <span class="comment">%              Accelerator Object</span>
+0010 <span class="comment">%  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Setpoint'}</span>
+0011 <span class="comment">%  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}</span>
+0012 <span class="comment">%  4. 'Physics'  - Use physics  units (optional override of units)</span>
+0013 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  OUTPUTS</span>
+0016 <span class="comment">%  1. RampRate - Ramp rate for the family</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  NOTES</span>
+0019 <span class="comment">%  1. If the ramprate is not known, then pick a value should be used that makes the delay when</span>
+0020 <span class="comment">%     waiting one tolerance step resonable.   That is, Tol = family2tol is used by setpv and steppv</span>
+0021 <span class="comment">%     when the WaitFlag = -2.  After the setpoint is within tolerance, an extra delay of</span>
+0022 <span class="comment">%     Tol / RampRate is done.</span>
+0023 <span class="comment">%  2. If Family is a cell array, then DeviceList and Field can also be a cell arrays</span>
+0024 
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0029 <span class="comment">% Input Parsing %</span>
+0030 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0031 UnitsFlagCell = {};
+0032 <span class="keyword">for</span> i = length(varargin):-1:1
+0033     <span class="keyword">if</span> isstruct(varargin{i})
+0034         <span class="comment">% Ignor structures</span>
+0035     <span class="keyword">elseif</span> iscell(varargin{i})
+0036         <span class="comment">% Ignor cells</span>
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0038         <span class="comment">% Remove and ignor</span>
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0041         <span class="comment">% Remove and ignor</span>
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>) || strcmpi(varargin{i},<span class="string">'Online'</span>) || strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0044         <span class="comment">% Remove and ignor</span>
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0047         UnitsFlagCell = {<span class="string">'Physics'</span>};
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0050         UnitsFlagCell = {<span class="string">'Hardware'</span>};
+0051         varargin(i) = [];
+0052     <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 
+0055 <span class="keyword">if</span> isempty(varargin)
+0056     error(<span class="string">'Must have at least a family name input'</span>);
+0057 <span class="keyword">end</span>
+0058 
+0059 
+0060 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0061 <span class="comment">% Cell Array Inputs %</span>
+0062 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0063 <span class="keyword">if</span> iscell(varargin{1})
+0064     <span class="keyword">for</span> i = 1:length(varargin{1})
+0065         <span class="keyword">if</span> length(varargin) &lt; 2
+0066             RampRate{i} = <a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>(varargin{1}{i}, UnitsFlagCell{:});
+0067         <span class="keyword">elseif</span> length(varargin) &lt; 3
+0068             <span class="keyword">if</span> iscell(varargin{2})
+0069                 RampRate{i} = <a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>(varargin{1}{i}, varargin{2}{i}, UnitsFlagCell{:});
+0070             <span class="keyword">else</span>
+0071                 RampRate{i} = <a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>(varargin{1}{i}, varargin{2}, UnitsFlagCell{:});
+0072             <span class="keyword">end</span>
+0073         <span class="keyword">else</span>
+0074             <span class="keyword">if</span> iscell(varargin{3})
+0075                 RampRate{i} = <a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i}, UnitsFlagCell{:});
+0076             <span class="keyword">else</span>
+0077                 RampRate{i} = <a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}, UnitsFlagCell{:});
+0078             <span class="keyword">end</span>
+0079         <span class="keyword">end</span>
+0080     <span class="keyword">end</span>
+0081     <span class="keyword">return</span>
+0082 <span class="keyword">end</span>
+0083 
+0084 
+0085 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0086 <span class="comment">% Parse Family, Field, DeviceList %</span>
+0087 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0088 [Family, Field, DeviceList, UnitsFlag] = <a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>(varargin{:});
+0089 
+0090 <span class="comment">% Units flag</span>
+0091 <span class="keyword">if</span> isempty(UnitsFlagCell)
+0092     <span class="comment">% For structure inputs, use the units in the structure (from inputparsingffd)</span>
+0093     <span class="comment">% Else, get the default family value</span>
+0094     <span class="keyword">if</span> isempty(UnitsFlag)
+0095         UnitsFlag = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(Family);
+0096     <span class="keyword">end</span>
+0097 <span class="keyword">else</span>
+0098     <span class="comment">% Input override has priority</span>
+0099     UnitsFlag = UnitsFlagCell{1};
+0100 <span class="keyword">end</span>
+0101 
+0102 
+0103 <span class="comment">% Default field is Setpoint</span>
+0104 <span class="keyword">if</span> isempty(Field)
+0105     Field = <span class="string">'Setpoint'</span>;
+0106 <span class="keyword">end</span>
+0107 
+0108 
+0109 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0110 <span class="comment">% Look for the data in the following order %</span>
+0111 <span class="comment">% 1. RampRateFcn                           %</span>
+0112 <span class="comment">% 2. Channelname (if Field = 'Setpoint')   %</span>
+0113 <span class="comment">% 3. Constant in the AO                    %</span>
+0114 <span class="comment">% 4. Physdata file                         %</span>
+0115 <span class="comment">%                                          %</span>
+0116 <span class="comment">% Note: Data is stored in hardware units   %</span>
+0117 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0118 
+0119 <span class="comment">% 1. Look for a .RampRateFcn function</span>
+0120 RampRateFcn = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'RampRateFcn'</span>);
+0121 <span class="keyword">if</span> ~isempty(RampRateFcn)
+0122     RampRate = feval(RampRateFcn, Family, Field, DeviceList);
+0123     
+0124     <span class="comment">% Change to physics units if requested</span>
+0125     <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0126         RampRate = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(Family, Field, RampRate, DeviceList);
+0127     <span class="keyword">end</span>
+0128     <span class="keyword">return</span>
+0129 <span class="keyword">end</span>
+0130 
+0131 <span class="comment">% 2. Channelname</span>
+0132 <span class="keyword">if</span> strcmp(Field, <span class="string">'Setpoint'</span>)
+0133     AORampRate = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'RampRate'</span>);
+0134     <span class="keyword">if</span> ~isempty(AORampRate)
+0135         <span class="keyword">if</span> isfield(AORampRate, <span class="string">'ChannelNames'</span>) || isfield(AORampRate, <span class="string">'SpecialFunction'</span>) || isfield(AORampRate, <span class="string">'SpecialFunctionGet'</span>)  
+0136             RampRate = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Family, <span class="string">'RampRate'</span>, DeviceList);
+0137     
+0138             <span class="comment">% Change to physics units if requested</span>
+0139             <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0140                 RampRate = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(Family, Field, RampRate, DeviceList);
+0141             <span class="keyword">end</span>
+0142             <span class="keyword">return</span>
+0143         <span class="keyword">end</span>
+0144     <span class="keyword">end</span>
+0145 <span class="keyword">end</span>
+0146 
+0147 
+0148 <span class="comment">% 3. Constant in the AO</span>
+0149 RampRate = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'RampRate'</span>, DeviceList);
+0150 <span class="keyword">if</span> isempty(RampRate) &amp;&amp; (strcmp(Field, <span class="string">'Monitor'</span>) || strcmp(Field, <span class="string">'Setpoint'</span>))
+0151     RampRate = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'RampRate'</span>, DeviceList);
+0152 <span class="keyword">end</span>
+0153 
+0154 <span class="comment">% Change to physics units if requested</span>
+0155 <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0156     RampRate = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(Family, Field, RampRate, DeviceList);
+0157 <span class="keyword">end</span>
+0158 <span class="keyword">if</span> ~isempty(RampRate) &amp;&amp; isnumeric(RampRate)
+0159     <span class="keyword">return</span>
+0160 <span class="keyword">end</span>
+0161 
+0162 
+0163 <span class="comment">% 4. Physdata file</span>
+0164 <span class="keyword">try</span>
+0165     RampRate = <a href="getphysdata.html" class="code" title="function [Data, iNotFound] = getphysdata(Family, Field, DeviceList)">getphysdata</a>(Family, Field, <span class="string">'RampRate'</span>, DeviceList);
+0166     <span class="keyword">if</span> isempty(RampRate) &amp;&amp; (strcmp(Field, <span class="string">'Monitor'</span>) || strcmp(Field, <span class="string">'Setpoint'</span>))
+0167         RampRate = <a href="getphysdata.html" class="code" title="function [Data, iNotFound] = getphysdata(Family, Field, DeviceList)">getphysdata</a>(Family, <span class="string">'RampRate'</span>, DeviceList);
+0168     <span class="keyword">end</span>
+0169 
+0170     <span class="comment">% Change to physics units if requested</span>
+0171     <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0172         RampRate = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(Family, Field, RampRate, DeviceList);
+0173     <span class="keyword">end</span>
+0174 <span class="keyword">catch</span>
+0175     RampRate = [];
+0176 <span class="keyword">end</span>
+0177 
+0178</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

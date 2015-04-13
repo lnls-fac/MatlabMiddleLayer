@@ -1,0 +1,632 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measdisp</title>
+  <meta name="keywords" content="measdisp">
+  <meta name="description" content="MEASDISP - Measures the dispersion function">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measdisp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measdisp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASDISP - Measures the dispersion function</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Dx, Dy, FileName] = measdisp(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MEASDISP - Measures the dispersion function
+  [Dx, Dy, FileName] = measdisp(DeltaRF, BPMxFamily, BPMxList, BPMyFamily, BPMyList, WaitFlag, ModulationMethod)
+
+  Examples:
+  [Dx, Dy] = measdisp(DeltaRF, BPMxList, BPMyList)
+  [Dx, Dy] = measdisp('BPMx', [], 'BPMy')
+  [Dx, Dy] = measdisp(DeltaRF, 'Physics', mcf)
+  [Dx, Dy] = measdisp(DeltaRF, 'Physics')
+  [Dx, Dy] = measdisp
+  [Dx, Dy] = measdisp('Archive')
+  [Dx, Dy] = measdisp('Struct')
+
+  INPUTS
+  1. DeltaRF is the change in RF frequency {Default: .2% energy change}
+     Units match the units the RF family is in (or the override units)
+  2. BPMxFamily and BPMyFamily are the family names of the BPM's, {Default: gethbpmfamily, getvbpmfamily}
+  3. BPMxList and BPMyList are the device list of BPM's, {Default or []: the entire list}
+  4. WaitFlag &gt;= 0, wait WaitFlag seconds before measuring the tune (sec)
+               = -1, wait until the magnets are done ramping
+               = -2, wait until the magnets are done ramping + BPM processing delay {Default} 
+               = -4, wait until keyboard input
+  5. Modulation method for changing the RF frequency
+     'bipolar'  changes the RF by +/- DeltaRF/2 {Default}
+     'unipolar' changes the RF from 0 to DeltaRF
+  6. 'Physics' - For actual dispersion units (m/(dp/p)) add 'Physics' with an optional input 
+     of the momentum compaction factor.  If empty, the mcf will be found from the getmcf 
+     function.  That mean the model must be correct for the dispersion to be scaled properly.  For
+     instance, when measuring the disperison of the injection lattice the model lattice
+     would have to reflect the injection lattice too.  If not, override mcf on the input line.
+     'Hardware' in the input line forces hardware units, usually mm/MHz.  The actual units will
+     depend on the units for the BPM and RF families.
+  7. 'Struct'  will return data structures instead of vectors {Default for data structure inputs}
+     'Numeric' will return vector outputs {Default for non-data structure inputs}
+  8. Optional override of the mode
+     'Online'    - Set/Get data online  
+     'Simulator' - Set/Get data on the simulated accelerator using AT (ie, same commands as 'Online')
+     'Model'     - (same as Simulator, use modeldisp to get the model dispersion with no BPM errors)
+     'Manual'    - Set/Get data manually
+  9. Optional display
+     'Display'   - Plot the dispersion {Default if no outputs exist}
+     'NoDisplay' - Dispersion will not be plotted {Default if outputs exist}
+  10.'NoArchive' - No file archive {Default}
+     'Archive'   - Save a dispersion data structure to \&lt;Directory.DispData&gt;\&lt;DispArchiveFile&gt;&lt;Date&gt;&lt;Time&gt;.mat
+                   To change the filename, included the filename after the 'Archive', '' to browse
+
+  OUTPUTS
+  For hardware units:
+  Dx = Delta BPMx / Delta RF and Dy = Delta BPMy / Delta RF
+       hence Dx and Dy are not quite the definition of dispersion
+
+               x2(RF0+DeltaRF/2) - x1(RF0-DeltaRF/2) 
+           D = -------------------------------------
+                              DeltaRF
+           
+           where RF0 = is the present RF frequency
+
+  For physics units:
+  DeltaRF is converted to change in energy, dp/p 
+
+  The units for orbit change depend on what the hardware or physics units are.  
+  Typical units are mm for hardware and meters for physics.
+
+  Structure outputs have the following fields:
+                  Data: [double] - orbit shift with RF or energy shift
+            FamilyName: 'DispersionX' or 'DispersionY'
+              Actuator: [1x1 struct] - RF structure with starting frequency
+         ActuatorDelta: Change in RF in hardware units
+               Monitor: [1x1 struct] - BPM structure with starting orbit
+                   GeV: Storage ring energy
+             TimeStamp: Clock (for example, [2003 7 9 0 21 36.2620])
+                  DCCT: Beam current
+      ModulationMethod: 'bipolar' or 'unipolar'
+              WaitFlag: BPM wait flag (usually -2)
+            ExtraDelay: 0
+        DataDescriptor: 'Dispersion'
+             CreatedBy: 'measdisp'
+                   MCF: momentum compaction factor
+                 Units: 'Hardware' or 'Physics'
+           UnitsString: typically 'mm/MHz' or meters/(dp/p)
+                    dp: change in moment
+                 Orbit: [2 column vectors]  (orbit at RF0+DeltaRF/2 and RF0-DeltaRF/2)
+                    RF: [RF0+DeltaRF/2 RF0-DeltaRF/2] 
+
+  If no output exists, the dispersion function will be plotted to the screen.
+
+  NOTES
+  1. 'Hardware', 'Physics', 'Eta', 'Archive', 'Numeric', and 'Struct' are not case sensitive
+  2. 'Eta' can be used instead of 'Physics'
+  3.  Get and set the RF frequency are done with getrf and setrf
+  4.  RF frequency is changed by +/-(DeltaRF/2)
+  5.  All inputs are optional
+  6.  Units for DeltaRF depend on the 'Physics' or 'Hardware' flags
+
+  See also <a href="plotdisp.html" class="code" title="function [DxOut, DyOut, FileName] = plotdisp(varargin)">plotdisp</a>, modeldisp, <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getenergy.html" class="code" title="function [Energy, HCMEnergy] = getenergy(varargin)">getenergy</a>	GETENERGY - Returns the beam energy base on the bend magnet</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>	GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>	MEASDISP - Measures the dispersion function</li><li><a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>	MEASRESPMAT - Measure a response matrix</li><li><a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>	PHYSICS2HW - Converts from 'Physics' units to 'Hardware' units</li><li><a href="plotdisp.html" class="code" title="function [DxOut, DyOut, FileName] = plotdisp(varargin)">plotdisp</a>	PLOTDISP - Plots the dispersion function</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="buildopsdatafiles.html" class="code" title="function buildopsdatafiles">buildopsdatafiles</a>	BUILDOPSDATAFILES - Builds the files for the OpsData directory from the model</li><li><a href="findrf1.html" class="code" title="function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName)">findrf1</a>	FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion</li><li><a href="getdisp.html" class="code" title="function [Data, FileName] = getdisp(varargin)">getdisp</a>	GETDISP - Returns the dispersion for a BPM family (from file)</li><li><a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>	MEASDISP - Measures the dispersion function</li><li><a href="measlocodata.html" class="code" title="function measlocodata(varargin)">measlocodata</a>	MEASLOCODATA - Measures a set of LOCO data</li><li><a href="orbitcorrectionmethods.html" class="code" title="function [OCS, SmatNoWeights, S, U, V] = orbitcorrectionmethods(OCS, Smat, S, U, V)">orbitcorrectionmethods</a>	ORBITCORRECTIONMETHODS - Some the orbit correction methods used on light sources</li><li><a href="rmdisp.html" class="code" title="function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)">rmdisp</a>	RMDISP - Removes the portion of the orbit that correlates with the dispersion</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Dx, Dy, FileName] = measdisp(varargin)</a>
+0002 <span class="comment">%MEASDISP - Measures the dispersion function</span>
+0003 <span class="comment">%  [Dx, Dy, FileName] = measdisp(DeltaRF, BPMxFamily, BPMxList, BPMyFamily, BPMyList, WaitFlag, ModulationMethod)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Examples:</span>
+0006 <span class="comment">%  [Dx, Dy] = measdisp(DeltaRF, BPMxList, BPMyList)</span>
+0007 <span class="comment">%  [Dx, Dy] = measdisp('BPMx', [], 'BPMy')</span>
+0008 <span class="comment">%  [Dx, Dy] = measdisp(DeltaRF, 'Physics', mcf)</span>
+0009 <span class="comment">%  [Dx, Dy] = measdisp(DeltaRF, 'Physics')</span>
+0010 <span class="comment">%  [Dx, Dy] = measdisp</span>
+0011 <span class="comment">%  [Dx, Dy] = measdisp('Archive')</span>
+0012 <span class="comment">%  [Dx, Dy] = measdisp('Struct')</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  INPUTS</span>
+0015 <span class="comment">%  1. DeltaRF is the change in RF frequency {Default: .2% energy change}</span>
+0016 <span class="comment">%     Units match the units the RF family is in (or the override units)</span>
+0017 <span class="comment">%  2. BPMxFamily and BPMyFamily are the family names of the BPM's, {Default: gethbpmfamily, getvbpmfamily}</span>
+0018 <span class="comment">%  3. BPMxList and BPMyList are the device list of BPM's, {Default or []: the entire list}</span>
+0019 <span class="comment">%  4. WaitFlag &gt;= 0, wait WaitFlag seconds before measuring the tune (sec)</span>
+0020 <span class="comment">%               = -1, wait until the magnets are done ramping</span>
+0021 <span class="comment">%               = -2, wait until the magnets are done ramping + BPM processing delay {Default}</span>
+0022 <span class="comment">%               = -4, wait until keyboard input</span>
+0023 <span class="comment">%  5. Modulation method for changing the RF frequency</span>
+0024 <span class="comment">%     'bipolar'  changes the RF by +/- DeltaRF/2 {Default}</span>
+0025 <span class="comment">%     'unipolar' changes the RF from 0 to DeltaRF</span>
+0026 <span class="comment">%  6. 'Physics' - For actual dispersion units (m/(dp/p)) add 'Physics' with an optional input</span>
+0027 <span class="comment">%     of the momentum compaction factor.  If empty, the mcf will be found from the getmcf</span>
+0028 <span class="comment">%     function.  That mean the model must be correct for the dispersion to be scaled properly.  For</span>
+0029 <span class="comment">%     instance, when measuring the disperison of the injection lattice the model lattice</span>
+0030 <span class="comment">%     would have to reflect the injection lattice too.  If not, override mcf on the input line.</span>
+0031 <span class="comment">%     'Hardware' in the input line forces hardware units, usually mm/MHz.  The actual units will</span>
+0032 <span class="comment">%     depend on the units for the BPM and RF families.</span>
+0033 <span class="comment">%  7. 'Struct'  will return data structures instead of vectors {Default for data structure inputs}</span>
+0034 <span class="comment">%     'Numeric' will return vector outputs {Default for non-data structure inputs}</span>
+0035 <span class="comment">%  8. Optional override of the mode</span>
+0036 <span class="comment">%     'Online'    - Set/Get data online</span>
+0037 <span class="comment">%     'Simulator' - Set/Get data on the simulated accelerator using AT (ie, same commands as 'Online')</span>
+0038 <span class="comment">%     'Model'     - (same as Simulator, use modeldisp to get the model dispersion with no BPM errors)</span>
+0039 <span class="comment">%     'Manual'    - Set/Get data manually</span>
+0040 <span class="comment">%  9. Optional display</span>
+0041 <span class="comment">%     'Display'   - Plot the dispersion {Default if no outputs exist}</span>
+0042 <span class="comment">%     'NoDisplay' - Dispersion will not be plotted {Default if outputs exist}</span>
+0043 <span class="comment">%  10.'NoArchive' - No file archive {Default}</span>
+0044 <span class="comment">%     'Archive'   - Save a dispersion data structure to \&lt;Directory.DispData&gt;\&lt;DispArchiveFile&gt;&lt;Date&gt;&lt;Time&gt;.mat</span>
+0045 <span class="comment">%                   To change the filename, included the filename after the 'Archive', '' to browse</span>
+0046 <span class="comment">%</span>
+0047 <span class="comment">%  OUTPUTS</span>
+0048 <span class="comment">%  For hardware units:</span>
+0049 <span class="comment">%  Dx = Delta BPMx / Delta RF and Dy = Delta BPMy / Delta RF</span>
+0050 <span class="comment">%       hence Dx and Dy are not quite the definition of dispersion</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">%               x2(RF0+DeltaRF/2) - x1(RF0-DeltaRF/2)</span>
+0053 <span class="comment">%           D = -------------------------------------</span>
+0054 <span class="comment">%                              DeltaRF</span>
+0055 <span class="comment">%</span>
+0056 <span class="comment">%           where RF0 = is the present RF frequency</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">%  For physics units:</span>
+0059 <span class="comment">%  DeltaRF is converted to change in energy, dp/p</span>
+0060 <span class="comment">%</span>
+0061 <span class="comment">%  The units for orbit change depend on what the hardware or physics units are.</span>
+0062 <span class="comment">%  Typical units are mm for hardware and meters for physics.</span>
+0063 <span class="comment">%</span>
+0064 <span class="comment">%  Structure outputs have the following fields:</span>
+0065 <span class="comment">%                  Data: [double] - orbit shift with RF or energy shift</span>
+0066 <span class="comment">%            FamilyName: 'DispersionX' or 'DispersionY'</span>
+0067 <span class="comment">%              Actuator: [1x1 struct] - RF structure with starting frequency</span>
+0068 <span class="comment">%         ActuatorDelta: Change in RF in hardware units</span>
+0069 <span class="comment">%               Monitor: [1x1 struct] - BPM structure with starting orbit</span>
+0070 <span class="comment">%                   GeV: Storage ring energy</span>
+0071 <span class="comment">%             TimeStamp: Clock (for example, [2003 7 9 0 21 36.2620])</span>
+0072 <span class="comment">%                  DCCT: Beam current</span>
+0073 <span class="comment">%      ModulationMethod: 'bipolar' or 'unipolar'</span>
+0074 <span class="comment">%              WaitFlag: BPM wait flag (usually -2)</span>
+0075 <span class="comment">%            ExtraDelay: 0</span>
+0076 <span class="comment">%        DataDescriptor: 'Dispersion'</span>
+0077 <span class="comment">%             CreatedBy: 'measdisp'</span>
+0078 <span class="comment">%                   MCF: momentum compaction factor</span>
+0079 <span class="comment">%                 Units: 'Hardware' or 'Physics'</span>
+0080 <span class="comment">%           UnitsString: typically 'mm/MHz' or meters/(dp/p)</span>
+0081 <span class="comment">%                    dp: change in moment</span>
+0082 <span class="comment">%                 Orbit: [2 column vectors]  (orbit at RF0+DeltaRF/2 and RF0-DeltaRF/2)</span>
+0083 <span class="comment">%                    RF: [RF0+DeltaRF/2 RF0-DeltaRF/2]</span>
+0084 <span class="comment">%</span>
+0085 <span class="comment">%  If no output exists, the dispersion function will be plotted to the screen.</span>
+0086 <span class="comment">%</span>
+0087 <span class="comment">%  NOTES</span>
+0088 <span class="comment">%  1. 'Hardware', 'Physics', 'Eta', 'Archive', 'Numeric', and 'Struct' are not case sensitive</span>
+0089 <span class="comment">%  2. 'Eta' can be used instead of 'Physics'</span>
+0090 <span class="comment">%  3.  Get and set the RF frequency are done with getrf and setrf</span>
+0091 <span class="comment">%  4.  RF frequency is changed by +/-(DeltaRF/2)</span>
+0092 <span class="comment">%  5.  All inputs are optional</span>
+0093 <span class="comment">%  6.  Units for DeltaRF depend on the 'Physics' or 'Hardware' flags</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">%  See also plotdisp, modeldisp, measchro</span>
+0096 
+0097 <span class="comment">%  Written by Greg Portmann and Jeff Corbett</span>
+0098 
+0099 
+0100 BPMxFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>;
+0101 BPMyFamily = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;
+0102 BPMxList = [];
+0103 BPMyList = [];
+0104 WaitFlag = -2;
+0105 ExtraDelay = 1;
+0106 ModulationMethod = <span class="string">'bipolar'</span>;
+0107 StructOutputFlag = 0;
+0108 NumericOutputFlag = 0; 
+0109 ArchiveFlag = 0;
+0110 FileName = -1;
+0111 <span class="keyword">if</span> nargout == 0
+0112     DisplayFlag = 1;
+0113 <span class="keyword">else</span>
+0114     DisplayFlag = 0;
+0115 <span class="keyword">end</span>
+0116 ModeFlag = {};  <span class="comment">% model, online, manual, or '' for default mode</span>
+0117 UnitsFlag = <span class="string">'Physics'</span>; <span class="comment">% hardware, physics, or '' for default units</span>
+0118 MCF = [];
+0119 
+0120 
+0121 InputFlags = {};
+0122 <span class="keyword">for</span> i = length(varargin):-1:1
+0123     <span class="keyword">if</span> isstruct(varargin{i})
+0124         <span class="comment">% Ignor structures</span>
+0125     <span class="keyword">elseif</span> iscell(varargin{i})
+0126         <span class="comment">% Ignor cells</span>
+0127     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0128         StructOutputFlag = 1;
+0129         varargin(i) = [];
+0130     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0131         NumericOutputFlag = 1;
+0132         StructOutputFlag = 0;
+0133         varargin(i) = [];
+0134     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'archive'</span>)
+0135         ArchiveFlag = 1;
+0136         <span class="keyword">if</span> length(varargin) &gt; i
+0137             <span class="comment">% Look for a filename as the next input</span>
+0138             <span class="keyword">if</span> ischar(varargin{i+1})
+0139                 FileName = varargin{i+1};
+0140                 varargin(i+1) = [];
+0141             <span class="keyword">end</span>
+0142         <span class="keyword">end</span>
+0143         varargin(i) = [];
+0144     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'noarchive'</span>)
+0145         ArchiveFlag = 0;
+0146         varargin(i) = [];
+0147     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0148         DisplayFlag = 1;
+0149         varargin(i) = [];
+0150     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0151         DisplayFlag = 0;
+0152         varargin(i) = [];
+0153     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'bipolar'</span>)
+0154         ModulationMethod = <span class="string">'bipolar'</span>;
+0155         varargin(i) = [];
+0156     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'unipolar'</span>)
+0157         ModulationMethod = <span class="string">'unipolar'</span>;
+0158         varargin(i) = [];
+0159     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'eta'</span>) || strcmpi(varargin{i},<span class="string">'physics'</span>)
+0160         UnitsFlag = <span class="string">'Physics'</span>;
+0161         varargin(i) = [];
+0162         <span class="keyword">if</span> length(varargin) &gt;= i
+0163             <span class="keyword">if</span> isnumeric(varargin{i})
+0164                 MCF = varargin{i};
+0165                 varargin(i) = [];
+0166             <span class="keyword">end</span>
+0167         <span class="keyword">end</span>
+0168     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0169         UnitsFlag = varargin{i};
+0170         varargin(i) = [];
+0171         <span class="keyword">if</span> length(varargin) &gt;= i
+0172             <span class="keyword">if</span> isnumeric(varargin{i})
+0173                 MCF = varargin{i};
+0174                 varargin(i) = [];
+0175             <span class="keyword">end</span>
+0176         <span class="keyword">end</span>
+0177     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0178         ModeFlag = varargin(i);
+0179         varargin(i) = [];
+0180     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0181         ModeFlag = varargin(i);
+0182         varargin(i) = [];
+0183     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0184         ModeFlag = varargin(i);
+0185         varargin(i) = [];
+0186     <span class="keyword">end</span>        
+0187 <span class="keyword">end</span>
+0188 
+0189 
+0190 <span class="comment">% Look for DeltaRF input</span>
+0191 <span class="keyword">if</span> length(varargin) &gt;= 1
+0192     <span class="keyword">if</span> isnumeric(varargin{1})
+0193         DeltaRF = varargin{1}; 
+0194         varargin(1) = [];
+0195     <span class="keyword">else</span>
+0196         DeltaRF = [];
+0197     <span class="keyword">end</span>
+0198 <span class="keyword">else</span>
+0199     DeltaRF = [];
+0200 <span class="keyword">end</span>
+0201 
+0202 <span class="comment">% Look for BPMx family info</span>
+0203 <span class="keyword">if</span> length(varargin) &gt;= 1
+0204     <span class="keyword">if</span> ischar(varargin{1})
+0205         BPMxFamily = varargin{1};
+0206         varargin(1) = [];
+0207         <span class="keyword">if</span> length(varargin) &gt;= 1
+0208             <span class="keyword">if</span> isnumeric(varargin{1})
+0209                 BPMxList = varargin{1};
+0210                 varargin(1) = [];
+0211             <span class="keyword">end</span>
+0212         <span class="keyword">end</span>
+0213     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0214         BPMxList = varargin{1};
+0215         varargin(1) = [];
+0216     <span class="keyword">elseif</span> isstruct(varargin{1})
+0217         BPMxFamily = varargin{1}.FamilyName;
+0218         BPMxList = varargin{1}.DeviceList;
+0219         <span class="keyword">if</span> isempty(UnitsFlag)
+0220             UnitsFlag = varargin{1}.Units;
+0221         <span class="keyword">end</span>
+0222         <span class="keyword">if</span> ~NumericOutputFlag
+0223             <span class="comment">% Only change StructOutputFlag if 'numeric' is not on the input line</span>
+0224             StructOutputFlag = 1;
+0225         <span class="keyword">end</span>
+0226         varargin(1) = [];      
+0227     <span class="keyword">end</span>
+0228 <span class="keyword">end</span>
+0229 
+0230 <span class="comment">% Look for BPMy family info</span>
+0231 <span class="keyword">if</span> length(varargin) &gt;= 1
+0232     <span class="keyword">if</span> ischar(varargin{1})
+0233         BPMyFamily = varargin{1};
+0234         varargin(1) = [];
+0235         <span class="keyword">if</span> length(varargin) &gt;= 1
+0236             <span class="keyword">if</span> isnumeric(varargin{1})
+0237                 BPMyList = varargin{1};
+0238                 varargin(1) = [];
+0239             <span class="keyword">end</span>
+0240         <span class="keyword">end</span>
+0241     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0242         BPMyList = varargin{1};
+0243         varargin(1) = [];
+0244     <span class="keyword">elseif</span> isstruct(varargin{1})
+0245         BPMyFamily = varargin{1}.FamilyName;
+0246         BPMyList = varargin{1}.DeviceList;
+0247         <span class="keyword">if</span> isempty(UnitsFlag)
+0248             UnitsFlag = varargin{1}.Units;
+0249         <span class="keyword">end</span>
+0250         <span class="keyword">if</span> ~NumericOutputFlag
+0251             <span class="comment">% Only change StructOutputFlag if 'numeric' is not on the input line</span>
+0252             StructOutputFlag = 1;
+0253         <span class="keyword">end</span>
+0254         varargin(1) = [];      
+0255     <span class="keyword">end</span>
+0256 <span class="keyword">end</span>
+0257 
+0258 <span class="comment">% Look for WaitFlag input</span>
+0259 <span class="keyword">if</span> length(varargin) &gt;= 1
+0260     <span class="keyword">if</span> isnumeric(varargin{1}) &amp;&amp; ~isempty(varargin{1})
+0261         WaitFlag = varargin{1}; 
+0262         varargin(1) = [];
+0263     <span class="keyword">end</span>
+0264 <span class="keyword">end</span>
+0265 <span class="comment">% End of input parsing</span>
+0266 
+0267 
+0268 <span class="comment">% Archive data structure</span>
+0269 <span class="keyword">if</span> ArchiveFlag
+0270     <span class="keyword">if</span> isempty(FileName)
+0271         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'DispArchiveFile'</span>));
+0272         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DispData'</span>);
+0273         <span class="keyword">if</span> isempty(DirectoryName)
+0274             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'Dispersion'</span>, filesep];
+0275         <span class="keyword">else</span>
+0276             <span class="comment">% Make sure default directory exists</span>
+0277             DirStart = pwd;
+0278             [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0279             cd(DirStart);
+0280         <span class="keyword">end</span>
+0281         [FileName, DirectoryName] = uiputfile(<span class="string">'*.mat'</span>, <span class="string">'Select Dispersion File'</span>, [DirectoryName FileName]);
+0282         drawnow;
+0283         <span class="keyword">if</span> FileName == 0
+0284             ArchiveFlag = 0;
+0285             disp(<span class="string">'   Dispersion measurement canceled.'</span>);
+0286             Dx=[]; Dy=[]; FileName=<span class="string">''</span>;
+0287             <span class="keyword">return</span>
+0288         <span class="keyword">end</span>
+0289         FileName = [DirectoryName, FileName];
+0290     <span class="keyword">elseif</span> FileName == -1
+0291         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'DispArchiveFile'</span>));
+0292         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DispData'</span>);
+0293         <span class="keyword">if</span> isempty(DirectoryName)
+0294             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'Dispersion'</span>, filesep];
+0295         <span class="keyword">end</span>
+0296         FileName = [DirectoryName, FileName];
+0297     <span class="keyword">end</span>
+0298 <span class="keyword">end</span>
+0299 
+0300 
+0301 <span class="comment">% Get the input units</span>
+0302 <span class="keyword">if</span> isempty(UnitsFlag)
+0303     RFUnitsInput = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'Units'</span>);
+0304     UnitsFlag = RFUnitsInput;
+0305 <span class="keyword">else</span>
+0306     RFUnitsInput = UnitsFlag;
+0307 <span class="keyword">end</span>
+0308 
+0309 
+0310 <span class="comment">% Get DeltaRF in Hardware units</span>
+0311 RFHWUnits = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'HWUnits'</span>);
+0312 
+0313 
+0314 <span class="comment">% Make sure DeltaRF is in hardware units</span>
+0315 <span class="keyword">if</span> isempty(DeltaRF) || ~isnumeric(DeltaRF)
+0316     <span class="comment">% Get the default from the AD is in Hardware units</span>
+0317     DeltaRF = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'DeltaRFDisp'</span>);
+0318     
+0319     <span class="comment">% If the default is not in the AD</span>
+0320     <span class="keyword">if</span> isempty(DeltaRF)
+0321         <span class="comment">% Here is the second level default</span>
+0322         DeltaRF = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Hardware'</span>, ModeFlag{:}) * <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> * .002;  <span class="comment">% .2% energy change</span>
+0323     <span class="keyword">end</span>
+0324 
+0325 <span class="keyword">else</span>
+0326     <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Physics'</span>)
+0327         <span class="comment">% Change to hardware</span>
+0328         RFUnitsInput = UnitsFlag;
+0329         DeltaRF = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(<span class="string">'RF'</span>, <span class="string">'Setpoint'</span>, DeltaRF, []);
+0330     <span class="keyword">end</span>
+0331 <span class="keyword">end</span>
+0332 
+0333 <span class="comment">% DeltaRF must be in hardware units at this point</span>
+0334 
+0335 
+0336 <span class="comment">% Use the AT model directly (measdisp or modeldisp)</span>
+0337 <span class="keyword">if</span> ~isempty(ModeFlag) &amp;&amp; strcmpi(ModeFlag{1}, <span class="string">'Model'</span>)
+0338     <span class="comment">% Measure in hardware and convert later</span>
+0339     <span class="keyword">if</span> ~isempty(getcavity)
+0340         <span class="comment">% Simulator mode (just so that the BPM gain or rotation errors are in the dispersion)</span>
+0341         [HorDisp, VertDisp] = <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>(DeltaRF, BPMxFamily, BPMxList, BPMyFamily, BPMyList, WaitFlag, ModulationMethod, <span class="string">'Simulator'</span>, <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>);
+0342     <span class="keyword">else</span>
+0343         <span class="comment">% Use the AT model directly (Note:  no BPM gain or rotation errors!!!)</span>
+0344         [HorDisp, VertDisp] = modeldisp(DeltaRF, BPMxFamily, BPMxList, BPMyFamily, BPMyList, ModulationMethod, <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>);
+0345         HorDisp.Actuator  = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Model'</span>, <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>);
+0346         VertDisp.Actuator = HorDisp.Actuator;
+0347         
+0348         <span class="comment">% Add BPM roll/crunch ???</span>
+0349     <span class="keyword">end</span>
+0350     
+0351     <span class="comment">% This might not always work (it's only a problem if the first input family is in the vertical plane)</span>
+0352     <span class="keyword">if</span> ~isempty(strfind(lower(BPMxFamily),<span class="string">'y'</span>)) || ~isempty(strfind(lower(BPMxFamily),<span class="string">'v'</span>))
+0353         d(1) = VertDisp;
+0354         d(2) = HorDisp;
+0355         d(1).Monitor = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyList, <span class="string">'Model'</span>, <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>);
+0356         d(2).Monitor = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxList, <span class="string">'Model'</span>, <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>);
+0357     <span class="keyword">else</span>
+0358         d(1) = HorDisp;
+0359         d(2) = VertDisp;
+0360         d(1).Monitor = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxList, <span class="string">'Model'</span>, <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>);
+0361         d(2).Monitor = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyList, <span class="string">'Model'</span>, <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>);
+0362     <span class="keyword">end</span>
+0363     
+0364     <span class="keyword">if</span> isempty(MCF)
+0365         MCF = <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>(<span class="string">'Model'</span>);
+0366     <span class="keyword">end</span>
+0367         
+0368 <span class="keyword">else</span>
+0369     <span class="comment">% Online &amp; Simulation Modes</span>
+0370         
+0371     <span class="comment">% Check DeltaRF for resonable values</span>
+0372     DeltaRFphysics = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(<span class="string">'RF'</span>, <span class="string">'Setpoint'</span>, DeltaRF, []);
+0373     <span class="keyword">if</span> DeltaRFphysics &gt; 15000;  <span class="comment">% Hz</span>
+0374         tmp = questdlg(sprintf(<span class="string">'%f Hz is a large RF change.  Do you want to continue?'</span>, DeltaRFphysics),<span class="string">'Dispersion Measurement'</span>,<span class="string">'YES'</span>,<span class="string">'NO'</span>,<span class="string">'YES'</span>);
+0375         <span class="keyword">if</span> strcmp(tmp,<span class="string">'NO'</span>)
+0376             Dx=[];  Dy=[];
+0377             <span class="keyword">return</span>
+0378         <span class="keyword">end</span>
+0379     <span class="keyword">end</span>
+0380 
+0381 
+0382     <span class="comment">% Dispersion can be found using the response matrix generation program</span>
+0383     <span class="keyword">if</span> DisplayFlag
+0384         <span class="comment">%DispRespMat = measrespmat({getam(BPMxFamily,BPMxList,'Struct','Hardware',ModeFlag), getam(BPMyFamily,BPMyList,'Struct',ModeFlag)}, getsp('RF','Struct',ModeFlag), DeltaRF, ModulationMethod, WaitFlag, ExtraDelay, 'Struct', 'Display', 'Hardware', ModeFlag{:});</span>
+0385         DispRespMat = <a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>({BPMxFamily,BPMyFamily}, {BPMxList,BPMyList}, <span class="string">'RF'</span>, [], DeltaRF, ModulationMethod, WaitFlag, ExtraDelay, <span class="string">'Struct'</span>, <span class="string">'Display'</span>, <span class="string">'Hardware'</span>, ModeFlag{:});
+0386     <span class="keyword">else</span>
+0387         <span class="comment">%DispRespMat = measrespmat({getam(BPMxFamily,BPMxList,'Struct','Hardware',ModeFlag), getam(BPMyFamily,BPMyList,'Struct',ModeFlag)}, getsp('RF','Struct',ModeFlag), DeltaRF, ModulationMethod, WaitFlag, ExtraDelay, 'Struct', 'NoDisplay', 'Hardware', ModeFlag{:});</span>
+0388         DispRespMat = <a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>({BPMxFamily,BPMyFamily}, {BPMxList,BPMyList}, <span class="string">'RF'</span>, [], DeltaRF, ModulationMethod, WaitFlag, ExtraDelay, <span class="string">'Struct'</span>, <span class="string">'NoDisplay'</span>, <span class="string">'Hardware'</span>, ModeFlag{:});
+0389     <span class="keyword">end</span>
+0390     
+0391     d(1) = DispRespMat{1};
+0392     d(2) = DispRespMat{2};
+0393 
+0394     
+0395     <span class="comment">% For multiple RF cavities in the model it's possible to get multiple columns in the response matrix</span>
+0396     <span class="keyword">if</span> size(d(1).Data,2) &gt; 1
+0397         <span class="comment">% More Actuators means the RF was implemented as multiple cavities and not 1 RF frequency</span>
+0398         <span class="comment">% This is really not recommended!!!</span>
+0399         d(1).Data = sum(d(1).Data,2);        
+0400         d(1).Actuator.Data       = d(1).Actuator.Data(1);
+0401         d(1).Actuator.DeviceList = d(1).Actuator.DeviceList(1);
+0402         d(1).Actuator.Status     = d(1).Actuator.Status(1);
+0403         d(1).Actuator.DataTime   = d(1).Actuator.DataTime(1);
+0404         
+0405         d(2).Data = sum(d(2).Data,2);
+0406         d(2).Actuator.Data       = d(2).Actuator.Data(1);
+0407         d(2).Actuator.DeviceList = d(2).Actuator.DeviceList(1);
+0408         d(2).Actuator.Status     = d(2).Actuator.Status(1);
+0409         d(2).Actuator.DataTime   = d(2).Actuator.DataTime(1);
+0410         
+0411         DeltaRFphysics = DeltaRFphysics(1);
+0412     <span class="keyword">end</span>
+0413 
+0414 
+0415     <span class="comment">% Get the momentum compaction factor in if was not on the input line</span>
+0416     <span class="keyword">if</span> isempty(MCF)
+0417         MCF = <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>(ModeFlag);
+0418     <span class="keyword">end</span>
+0419 <span class="keyword">end</span>
+0420 
+0421 
+0422 <span class="comment">% Family name is not needed</span>
+0423 <span class="comment">%d(1).FamilyName = 'DispersionX';</span>
+0424 <span class="comment">%d(2).FamilyName = 'DispersionY';</span>
+0425 
+0426 d(1).GeV = <a href="getenergy.html" class="code" title="function [Energy, HCMEnergy] = getenergy(varargin)">getenergy</a>(ModeFlag{:});
+0427 d(2).GeV = d(1).GeV;
+0428 
+0429 
+0430 <span class="keyword">for</span> i = 1:2
+0431     d(i).MCF = MCF;
+0432     d(i).dp = -DeltaRF / (d(i).Actuator.Data * MCF);    
+0433     d(i).Mode = d(i).Actuator.Mode;
+0434     d(i).Units = d(i).Actuator.Units;
+0435     d(i).UnitsString = [d(i).Monitor.UnitsString,<span class="string">'/'</span>,d(i).Actuator.UnitsString];
+0436     d(i).OperationalMode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OperationalMode'</span>);
+0437     d(i).DataDescriptor = <span class="string">'Dispersion'</span>;
+0438     d(i).CreatedBy = <span class="string">'measdisp'</span>;
+0439 <span class="keyword">end</span>
+0440 
+0441 
+0442 <span class="comment">% Final units conversion</span>
+0443 <span class="keyword">if</span> strcmpi(RFUnitsInput, <span class="string">'Physics'</span>)
+0444     d = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(d);
+0445 <span class="keyword">end</span>
+0446 
+0447 
+0448 <span class="comment">% Plot if no output</span>
+0449 <span class="keyword">if</span> DisplayFlag
+0450     <span class="comment">%figure;</span>
+0451     <a href="plotdisp.html" class="code" title="function [DxOut, DyOut, FileName] = plotdisp(varargin)">plotdisp</a>(d(1),d(2));
+0452 <span class="keyword">end</span>
+0453 
+0454 
+0455 <span class="comment">% Archive data structure</span>
+0456 <span class="keyword">if</span> ArchiveFlag
+0457     <span class="comment">% If the filename contains a directory then make sure it exists</span>
+0458     [DirectoryName, FileName, Ext] = fileparts(FileName);
+0459     DirStart = pwd;
+0460     [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0461     BPMxDisp = d(1);
+0462     BPMyDisp = d(2);
+0463     save(FileName, <span class="string">'BPMxDisp'</span>, <span class="string">'BPMyDisp'</span>);
+0464     <span class="keyword">if</span> DisplayFlag
+0465         fprintf(<span class="string">'   Dispersion data saved to %s.mat\n'</span>, [DirectoryName FileName]);
+0466         <span class="keyword">if</span> ErrorFlag
+0467             fprintf(<span class="string">'   Warning: %s was not the desired directory\n'</span>, DirectoryName);
+0468         <span class="keyword">end</span>
+0469     <span class="keyword">end</span>
+0470     cd(DirStart);
+0471     FileName = [DirectoryName, FileName, <span class="string">'.mat'</span>];
+0472 <span class="keyword">end</span>
+0473 <span class="keyword">if</span> FileName == -1
+0474     FileName = <span class="string">''</span>;
+0475 <span class="keyword">end</span>
+0476 
+0477 
+0478 <span class="comment">% Output</span>
+0479 <span class="keyword">if</span> StructOutputFlag
+0480     Dx = d(1);
+0481     Dy = d(2);
+0482 <span class="keyword">else</span>
+0483     Dx = d(1).Data;
+0484     Dy = d(2).Data;
+0485 <span class="keyword">end</span>
+0486 
+0487 
+0488 <span class="keyword">if</span> DisplayFlag
+0489     fprintf(<span class="string">'   Dispersion measurement complete\n'</span>);
+0490 <span class="keyword">end</span>
+0491 
+0492 
+0493</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

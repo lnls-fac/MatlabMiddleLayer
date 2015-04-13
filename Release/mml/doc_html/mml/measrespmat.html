@@ -1,0 +1,935 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measrespmat</title>
+  <meta name="keywords" content="measrespmat">
+  <meta name="description" content="MEASRESPMAT - Measure a response matrix">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measrespmat.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measrespmat
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASRESPMAT - Measure a response matrix</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function S = measrespmat(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MEASRESPMAT - Measure a response matrix
+
+  For family name, device list inputs:
+  S = measrespmat(MonitorFamily, MonitorDeviceList, ActuatorFamily, ActuatorDeviceList, ActuatorDelta, ModulationMethod, WaitFlag, ExtraDelay)
+
+  For data structure inputs: 
+  S = measrespmat(MonitorStruct, ActuatorStruct, ActuatorDelta, ModulationMethod, WaitFlag, ExtraDelay)
+
+  INPUTS
+  1. MonitorFamily       - AcceleratorObjects family name for monitors
+     MonitorDeviceList   - AcceleratorObjects device list for monitors (element or device)
+                           (MonitorFamily and MonitorDeviceList can be cell arrays)
+     or 
+     MonitorStruct can replace MonitorFamily and MonitorDeviceList
+
+  2. ActuatorFamily      - AcceleratorObjects family name for actuators
+     ActuatorDeviceList  - AcceleratorObjects device list for actuators (element or device)
+     or 
+     ActuatorStruct can replace ActuatorFamily and ActuatorDeviceList
+
+  3. ActuatorDelta    - Change in actuator {Default: getfamilydata('ActuatorFamily','Setpoint','DeltaRespMat')}
+  4. ModulationMethod - Method for changing the ActuatorFamily
+                       'bipolar' changes the ActuatorFamily by +/- ActuatorDelta/2 on each step {Default}
+                       'unipolar' changes the ActuatorFamily from 0 to ActuatorDelta on each step
+  5. WaitFlag - (see setpv for WaitFlag definitions) {Default: []}
+                WaitFlag = -5 will override gets to manual mode
+
+  6. ExtraDelay - Extra time delay [seconds] after a setpoint change
+
+  7. 'Struct'  - Output will be a response matrix structure {Default for data structure inputs}
+     'Numeric' - Output will be a numeric matrix            {Default for non-data structure inputs}
+
+  8. Optional override of the units:
+     'Physics'  - Use physics  units
+     'Hardware' - Use hardware units
+
+  9. Optional override of the mode:
+     'Online' - Set/Get data online  
+     'Model'  - Set/Get data on the model (same as 'Simulator')
+     'Manual' - Set/Get data manually
+
+  10. 'Display'    - Prints status information to the command window {Default}
+      'NoDisplay'  - Nothing is printed to the command window
+
+  11. 'MinimumBeamCurrent' - Minimum beam current before prompting for a refill
+                             The current (as returned by getdcct) must follow the flag. 
+                             measbpmresp('MinimumBeamCurrent', 32.1) 
+                             will pause at a beam current of 32.1 and prompt for a refill.
+
+  OUTPUTS
+  1. S = Response matrix
+
+     For stucture outputs:
+     S(Monitor, Actuator).Data - Response matrix
+                         .Monitor - Monitor data structure (starting orbit)
+                         .Monitor1 - First  data point matrix
+                         .Monitor2 - Second data point matrix
+                         .Actuator - Corrector data structure
+                         .ActuatorDelta - Corrector kick vector
+                         .GeV - Electron beam energy
+                         .ModulationMethod - 'unipolar' or 'bipolar'
+                         .WaitFlag - Wait flag used when acquiring data
+                         .ExtraDelay - Extra time delay 
+                         .TimeStamp - Matlab clock at the start of each actuator family
+                         .CreatedBy
+                         .DCCT
+
+  NOTES
+  1. If MonitorFamily and MonitorDeviceList are cell arrrays, then S is a cell array of response matrices.
+  2. ActuatorFamily, ActuatorDeviceList, ActuatorDelta, ModulationMethod, WaitFlag are not cell arrrays.
+  3. If ActuatorDeviceList is empty, then the entire family is change together.
+  4. Bipolar mode changes the actuator by +/- ActuatorDelta/2
+  5. Unipolar mode changes the actuator by ActuatorDelta
+  6. Return values are MonitorChange/ActuatorDelta (normalized)
+  7. When using cell array inputs don't mix structure data inputs with non-structure data
+
+  EXAMPLES
+  1. 2x2 tune response matrix for QF and QD families:
+     TuneRmatrix = [measrespmat('TUNE',[1;2],'QF',[],.5,'unipolar') ... 
+                    measrespmat('TUNE',[1;2],'QD',[],.5,'unipolar')];
+
+  2. Orbit response matrix for all the horizontal correctors (+/-1 kick amplitude):
+     Smat = measrespmat({'BPMx','BPMy'}, {family2dev('BPMx'),family2dev('BPMy')}, 'HCM', family2dev('HCM'),1,'bipolar',-2);
+     The output is stored in a cell array.  Smat{1} is the horizontal plane and Smat{2} is the vertical cross plane.
+
+  3. Orbit response matrix for all the horizontal correctors (Default kick amplitude):
+     Smat = measrespmat(getx('Struct'), getsp('HCM','struct'));</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="checklimits.html" class="code" title="function [LimitFlag, LimitList] = checklimits(varargin)">checklimits</a>	CHECKLIMITS - Checks if the setpoint will exceed a limit</li><li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="family2common.html" class="code" title="function [CommonNames, ErrorFlag] = family2common(Family, DeviceList)">family2common</a>	FAMILY2COMMON - Convert a family name, device list to a common name list</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="family2units.html" class="code" title="function [Units, UnitsString] = family2units(varargin)">family2units</a>	FAMILY2UNITS - Return the present family units and units string</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li><li><a href="getenergy.html" class="code" title="function [Energy, HCMEnergy] = getenergy(varargin)">getenergy</a>	GETENERGY - Returns the beam energy base on the bend magnet</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="measbpmresp.html" class="code" title="function [Rmat, OutputFileName] = measbpmresp(varargin)">measbpmresp</a>	MEASBPMRESP - Measures the BPM response matrix in the horizontal and vertical planes</li><li><a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>	MEASDISP - Measures the dispersion function</li><li><a href="meastuneresp.html" class="code" title="function [Rmat, OutputFileName] = meastuneresp(varargin)">meastuneresp</a>	MEASTUNERESP - Measures the response from quadrupole to tune</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function S = measrespmat(varargin)</a>
+0002 <span class="comment">%MEASRESPMAT - Measure a response matrix</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  For family name, device list inputs:</span>
+0005 <span class="comment">%  S = measrespmat(MonitorFamily, MonitorDeviceList, ActuatorFamily, ActuatorDeviceList, ActuatorDelta, ModulationMethod, WaitFlag, ExtraDelay)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  For data structure inputs:</span>
+0008 <span class="comment">%  S = measrespmat(MonitorStruct, ActuatorStruct, ActuatorDelta, ModulationMethod, WaitFlag, ExtraDelay)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  INPUTS</span>
+0011 <span class="comment">%  1. MonitorFamily       - AcceleratorObjects family name for monitors</span>
+0012 <span class="comment">%     MonitorDeviceList   - AcceleratorObjects device list for monitors (element or device)</span>
+0013 <span class="comment">%                           (MonitorFamily and MonitorDeviceList can be cell arrays)</span>
+0014 <span class="comment">%     or</span>
+0015 <span class="comment">%     MonitorStruct can replace MonitorFamily and MonitorDeviceList</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  2. ActuatorFamily      - AcceleratorObjects family name for actuators</span>
+0018 <span class="comment">%     ActuatorDeviceList  - AcceleratorObjects device list for actuators (element or device)</span>
+0019 <span class="comment">%     or</span>
+0020 <span class="comment">%     ActuatorStruct can replace ActuatorFamily and ActuatorDeviceList</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  3. ActuatorDelta    - Change in actuator {Default: getfamilydata('ActuatorFamily','Setpoint','DeltaRespMat')}</span>
+0023 <span class="comment">%  4. ModulationMethod - Method for changing the ActuatorFamily</span>
+0024 <span class="comment">%                       'bipolar' changes the ActuatorFamily by +/- ActuatorDelta/2 on each step {Default}</span>
+0025 <span class="comment">%                       'unipolar' changes the ActuatorFamily from 0 to ActuatorDelta on each step</span>
+0026 <span class="comment">%  5. WaitFlag - (see setpv for WaitFlag definitions) {Default: []}</span>
+0027 <span class="comment">%                WaitFlag = -5 will override gets to manual mode</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%  6. ExtraDelay - Extra time delay [seconds] after a setpoint change</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  7. 'Struct'  - Output will be a response matrix structure {Default for data structure inputs}</span>
+0032 <span class="comment">%     'Numeric' - Output will be a numeric matrix            {Default for non-data structure inputs}</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">%  8. Optional override of the units:</span>
+0035 <span class="comment">%     'Physics'  - Use physics  units</span>
+0036 <span class="comment">%     'Hardware' - Use hardware units</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">%  9. Optional override of the mode:</span>
+0039 <span class="comment">%     'Online' - Set/Get data online</span>
+0040 <span class="comment">%     'Model'  - Set/Get data on the model (same as 'Simulator')</span>
+0041 <span class="comment">%     'Manual' - Set/Get data manually</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%  10. 'Display'    - Prints status information to the command window {Default}</span>
+0044 <span class="comment">%      'NoDisplay'  - Nothing is printed to the command window</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">%  11. 'MinimumBeamCurrent' - Minimum beam current before prompting for a refill</span>
+0047 <span class="comment">%                             The current (as returned by getdcct) must follow the flag.</span>
+0048 <span class="comment">%                             measbpmresp('MinimumBeamCurrent', 32.1)</span>
+0049 <span class="comment">%                             will pause at a beam current of 32.1 and prompt for a refill.</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">%  OUTPUTS</span>
+0052 <span class="comment">%  1. S = Response matrix</span>
+0053 <span class="comment">%</span>
+0054 <span class="comment">%     For stucture outputs:</span>
+0055 <span class="comment">%     S(Monitor, Actuator).Data - Response matrix</span>
+0056 <span class="comment">%                         .Monitor - Monitor data structure (starting orbit)</span>
+0057 <span class="comment">%                         .Monitor1 - First  data point matrix</span>
+0058 <span class="comment">%                         .Monitor2 - Second data point matrix</span>
+0059 <span class="comment">%                         .Actuator - Corrector data structure</span>
+0060 <span class="comment">%                         .ActuatorDelta - Corrector kick vector</span>
+0061 <span class="comment">%                         .GeV - Electron beam energy</span>
+0062 <span class="comment">%                         .ModulationMethod - 'unipolar' or 'bipolar'</span>
+0063 <span class="comment">%                         .WaitFlag - Wait flag used when acquiring data</span>
+0064 <span class="comment">%                         .ExtraDelay - Extra time delay</span>
+0065 <span class="comment">%                         .TimeStamp - Matlab clock at the start of each actuator family</span>
+0066 <span class="comment">%                         .CreatedBy</span>
+0067 <span class="comment">%                         .DCCT</span>
+0068 <span class="comment">%</span>
+0069 <span class="comment">%  NOTES</span>
+0070 <span class="comment">%  1. If MonitorFamily and MonitorDeviceList are cell arrrays, then S is a cell array of response matrices.</span>
+0071 <span class="comment">%  2. ActuatorFamily, ActuatorDeviceList, ActuatorDelta, ModulationMethod, WaitFlag are not cell arrrays.</span>
+0072 <span class="comment">%  3. If ActuatorDeviceList is empty, then the entire family is change together.</span>
+0073 <span class="comment">%  4. Bipolar mode changes the actuator by +/- ActuatorDelta/2</span>
+0074 <span class="comment">%  5. Unipolar mode changes the actuator by ActuatorDelta</span>
+0075 <span class="comment">%  6. Return values are MonitorChange/ActuatorDelta (normalized)</span>
+0076 <span class="comment">%  7. When using cell array inputs don't mix structure data inputs with non-structure data</span>
+0077 <span class="comment">%</span>
+0078 <span class="comment">%  EXAMPLES</span>
+0079 <span class="comment">%  1. 2x2 tune response matrix for QF and QD families:</span>
+0080 <span class="comment">%     TuneRmatrix = [measrespmat('TUNE',[1;2],'QF',[],.5,'unipolar') ...</span>
+0081 <span class="comment">%                    measrespmat('TUNE',[1;2],'QD',[],.5,'unipolar')];</span>
+0082 <span class="comment">%</span>
+0083 <span class="comment">%  2. Orbit response matrix for all the horizontal correctors (+/-1 kick amplitude):</span>
+0084 <span class="comment">%     Smat = measrespmat({'BPMx','BPMy'}, {family2dev('BPMx'),family2dev('BPMy')}, 'HCM', family2dev('HCM'),1,'bipolar',-2);</span>
+0085 <span class="comment">%     The output is stored in a cell array.  Smat{1} is the horizontal plane and Smat{2} is the vertical cross plane.</span>
+0086 <span class="comment">%</span>
+0087 <span class="comment">%  3. Orbit response matrix for all the horizontal correctors (Default kick amplitude):</span>
+0088 <span class="comment">%     Smat = measrespmat(getx('Struct'), getsp('HCM','struct'));</span>
+0089 
+0090 <span class="comment">%  Written by Greg Portmann</span>
+0091 
+0092 
+0093 <span class="comment">% Initialize</span>
+0094 ActuatorDelta = [];
+0095 ActuatorDeviceList = [];
+0096 ModulationMethod = <span class="string">'bipolar'</span>;
+0097 WaitFlag = [];
+0098 WaitFlagMonitor = 0;
+0099 ExtraDelay = 0; 
+0100 StructOutputFlag = 0;
+0101 NumericOutputFlag = 0;
+0102 DisplayFlag = 1;
+0103 ModeFlagCell = {};
+0104 UnitsFlagCell = {};
+0105 DCCTStopFlag = 0;
+0106 
+0107 InputFlags = {};
+0108 <span class="keyword">for</span> i = length(varargin):-1:1
+0109     <span class="keyword">if</span> isstruct(varargin{i})
+0110         <span class="comment">% Ignor structures</span>
+0111     <span class="keyword">elseif</span> iscell(varargin{i})
+0112         <span class="comment">% Ignor cells</span>
+0113     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Struct'</span>)
+0114         StructOutputFlag = 1;
+0115         varargin(i) = [];
+0116     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Numeric'</span>)
+0117         NumericOutputFlag = 1;
+0118         StructOutputFlag = 0;
+0119         varargin(i) = [];
+0120     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Simulator'</span>) || strcmpi(varargin{i},<span class="string">'Model'</span>)
+0121         ModeFlagCell = varargin(i);
+0122         InputFlags = [InputFlags varargin(i)];
+0123         varargin(i) = [];
+0124     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0125         ModeFlagCell = varargin(i);
+0126         InputFlags = [InputFlags varargin(i)];
+0127         varargin(i) = [];
+0128     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0129         ModeFlagCell = varargin(i);
+0130         InputFlags = [InputFlags varargin(i)];
+0131         varargin(i) = [];
+0132     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Physics'</span>)
+0133         UnitsFlagCell = varargin(i);
+0134         InputFlags = [InputFlags varargin(i)];
+0135         varargin(i) = [];
+0136     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0137         UnitsFlagCell = varargin(i);
+0138         InputFlags = [InputFlags varargin(i)];
+0139         varargin(i) = [];
+0140     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0141         DisplayFlag = 0;
+0142         varargin(i) = [];
+0143     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0144         DisplayFlag = 1;
+0145         varargin(i) = [];
+0146     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'MinimumBeamCurrent'</span>)
+0147         DCCTStopFlag = 1;
+0148         DCCTStop = varargin{i+1};
+0149         varargin(i+1) = [];
+0150         varargin(i) = [];
+0151     <span class="keyword">end</span>
+0152 <span class="keyword">end</span>
+0153 
+0154 
+0155 <span class="keyword">if</span> length(varargin) &lt; 2
+0156     error(<span class="string">'Not enough inputs'</span>)
+0157 <span class="keyword">end</span>
+0158 
+0159 
+0160 
+0161 <span class="comment">% Find out if the inputs are data structures</span>
+0162 StructInputFlag = 0;
+0163 <span class="keyword">if</span> isstruct(varargin{1})
+0164     StructInputFlag = 1;
+0165 <span class="keyword">elseif</span> iscell(varargin{1})
+0166     <span class="keyword">if</span> isstruct(varargin{1}{1})
+0167         StructInputFlag = 1;
+0168     <span class="keyword">end</span>
+0169 <span class="keyword">end</span>
+0170 
+0171 
+0172 <span class="keyword">if</span> StructInputFlag
+0173     <span class="comment">% S = measrespmat(MonitorStruct, ActuatorStruct, ActuatorDelta, ModulationMethod, WaitFlag, ExtraDelay)</span>
+0174     <span class="keyword">if</span> length(varargin) &lt; 2
+0175         error(<span class="string">'At least 2 inputs required in structure mode.'</span>);
+0176     <span class="keyword">end</span>
+0177     
+0178     <span class="comment">% Only change StructOutputFlag if 'numeric' is not on the input line</span>
+0179     <span class="keyword">if</span> ~NumericOutputFlag
+0180         StructOutputFlag = 1;
+0181     <span class="keyword">end</span>
+0182     
+0183     MonitorStruct = varargin{1};
+0184     ActuatorStruct = varargin{2};
+0185     <span class="keyword">if</span> ~isstruct(ActuatorStruct)
+0186         error(<span class="string">'If monitors are data structures, then the actuator must also be a data structure.'</span>);
+0187     <span class="keyword">end</span>
+0188     
+0189     <span class="keyword">if</span> iscell(varargin{1})
+0190         <span class="keyword">for</span> j = 1:length(MonitorStruct)
+0191             <span class="keyword">if</span> ~isstruct(MonitorStruct{j})
+0192                 error(<span class="string">'All monitors in the cell must be data structures or not (mixing methods not allowed).'</span>);
+0193             <span class="keyword">end</span>
+0194             
+0195             MonitorFamily{j} = MonitorStruct{j}.FamilyName;
+0196             MonitorDeviceList{j} = MonitorStruct{j}.DeviceList;
+0197         <span class="keyword">end</span>
+0198     <span class="keyword">else</span>
+0199         MonitorFamily = MonitorStruct.FamilyName;
+0200         MonitorDeviceList = MonitorStruct.DeviceList;
+0201     <span class="keyword">end</span>
+0202     ActuatorFamily = ActuatorStruct.FamilyName;
+0203     ActuatorDeviceList = ActuatorStruct.DeviceList;
+0204     <span class="keyword">if</span> length(varargin) &gt;= 3
+0205         ActuatorDelta = varargin{3};
+0206     <span class="keyword">end</span>
+0207     <span class="keyword">if</span> length(varargin) &gt;= 4
+0208         ModulationMethod = varargin{4};
+0209     <span class="keyword">end</span>
+0210     <span class="keyword">if</span> length(varargin) &gt;= 5
+0211         WaitFlag = varargin{5};
+0212     <span class="keyword">end</span>
+0213     <span class="keyword">if</span> length(varargin) &gt;= 6
+0214         ExtraDelay = varargin{6};
+0215     <span class="keyword">end</span>
+0216 <span class="keyword">else</span>
+0217     <span class="comment">% S = measrespmat(MonitorFamily, MonitorDeviceList, ActuatorFamily, ActuatorDeviceList, ActuatorDelta, ModulationMethod, WaitFlag, ExtraDelay)</span>
+0218     <span class="keyword">if</span> length(varargin) &lt; 3
+0219         error(<span class="string">'At least 3 inputs required '</span>);
+0220     <span class="keyword">end</span>
+0221     MonitorFamily = varargin{1};
+0222     MonitorDeviceList = varargin{2};
+0223     ActuatorFamily = varargin{3};
+0224     <span class="keyword">if</span> length(varargin) &gt;= 4
+0225         ActuatorDeviceList = varargin{4};
+0226     <span class="keyword">end</span>
+0227     <span class="keyword">if</span> length(varargin) &gt;= 5
+0228         ActuatorDelta = varargin{5};
+0229     <span class="keyword">end</span>
+0230     <span class="keyword">if</span> length(varargin) &gt;= 6
+0231         ModulationMethod = varargin{6};
+0232     <span class="keyword">end</span>
+0233     <span class="keyword">if</span> length(varargin) &gt;= 7
+0234         WaitFlag = varargin{7};
+0235     <span class="keyword">end</span>
+0236     <span class="keyword">if</span> length(varargin) &gt;= 8
+0237         ExtraDelay = varargin{8};
+0238     <span class="keyword">end</span>
+0239 <span class="keyword">end</span>
+0240 
+0241 <span class="comment">% Remove extra delay for model</span>
+0242 <span class="keyword">if</span> any(strcmpi(<span class="string">'Model'</span>, ModeFlagCell)) || any(strcmpi(<span class="string">'Simulator'</span>, ModeFlagCell))
+0243     ExtraDelay = 0;
+0244 <span class="keyword">end</span>
+0245 
+0246 <span class="keyword">if</span> isempty(ModulationMethod)
+0247     ModulationMethod = <span class="string">'bipolar'</span>;
+0248 <span class="keyword">elseif</span> ~strcmpi(ModulationMethod, <span class="string">'unipolar'</span>) &amp;&amp; ~strcmpi(ModulationMethod, <span class="string">'bipolar'</span>)
+0249     error(<span class="string">'ModulationMethod must be ''unipolar'' or ''bipolar'''</span>);
+0250 <span class="keyword">end</span>
+0251 
+0252 
+0253 <span class="comment">% Force to be a cells of equal length</span>
+0254 <span class="keyword">if</span> ~iscell(MonitorFamily)
+0255     MonitorFamily = {MonitorFamily};
+0256 <span class="keyword">end</span>
+0257 <span class="keyword">if</span> ~iscell(MonitorDeviceList)
+0258     MonitorDeviceList = {MonitorDeviceList};
+0259 <span class="keyword">end</span>
+0260 <span class="keyword">if</span> ~iscell(ActuatorFamily)
+0261     ActuatorFamily = {ActuatorFamily};
+0262 <span class="keyword">end</span>
+0263 <span class="keyword">if</span> isempty(ActuatorDeviceList)
+0264     <span class="keyword">for</span> i = 1:length(ActuatorFamily)
+0265         ActuatorDeviceList{i} = [];
+0266     <span class="keyword">end</span>
+0267 <span class="keyword">elseif</span> ~iscell(ActuatorDeviceList)
+0268     ActuatorDeviceList = {ActuatorDeviceList};
+0269 <span class="keyword">end</span>
+0270 <span class="keyword">if</span> isempty(ActuatorDelta)
+0271     <span class="keyword">for</span> i = 1:length(ActuatorFamily)
+0272         ActuatorDelta{i} = [];
+0273     <span class="keyword">end</span>
+0274 <span class="keyword">elseif</span> ~iscell(ActuatorDelta)
+0275     ActuatorDelta = {ActuatorDelta};
+0276 <span class="keyword">end</span>
+0277 
+0278 
+0279 <span class="comment">% Force column for monitors and rows for actuators</span>
+0280 MonitorFamily = MonitorFamily(:);
+0281 MonitorDeviceList = MonitorDeviceList(:);
+0282 ActuatorFamily = ActuatorFamily(:)';
+0283 ActuatorDeviceList = ActuatorDeviceList(:)';
+0284 ActuatorDelta = ActuatorDelta(:)';
+0285 
+0286 
+0287 <span class="comment">% Check length of cell inputs</span>
+0288 <span class="keyword">if</span> length(MonitorFamily) ~= length(MonitorDeviceList)
+0289     error(<span class="string">'The length of MonitorFamily (cell) must equal the length of MonitorDeviceList (cell)'</span>);
+0290 <span class="keyword">end</span>
+0291 <span class="keyword">if</span> length(ActuatorFamily) ~= length(ActuatorDeviceList)
+0292     error(<span class="string">'The length of ActuatorFamily (cell) must equal the length of ActuatorDeviceList (cell)'</span>);
+0293 <span class="keyword">end</span>
+0294 <span class="keyword">if</span> length(ActuatorFamily) ~= length(ActuatorDelta)
+0295     error(<span class="string">'The length of ActuatorFamily (cell) must equal the length of ActuatorDelta (cell)'</span>);
+0296 <span class="keyword">end</span>
+0297 
+0298 
+0299 <span class="comment">% Manual mode for monitors</span>
+0300 WaitFlagMonitor = WaitFlag;
+0301 <span class="keyword">if</span> WaitFlag == -5
+0302     WaitFlag = 0;
+0303 <span class="keyword">end</span>
+0304 
+0305 
+0306 <span class="comment">% First get all defaults and do some error checking</span>
+0307 <span class="keyword">for</span> iActFam = 1:length(ActuatorFamily)
+0308     <span class="comment">% Convert element list to a device list if necessary</span>
+0309     <span class="keyword">if</span> size(ActuatorDeviceList{iActFam},2) == 1
+0310         ActuatorDeviceList{iActFam} = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam});
+0311     <span class="keyword">end</span>
+0312     
+0313     <span class="comment">% Get ActuatorDelta if empty</span>
+0314     <span class="keyword">if</span> isempty(ActuatorDelta{iActFam})
+0315         <span class="comment">% Find the delta from the AO (.DeltaRespMat is always hardware!!!)</span>
+0316         ActuatorDelta{iActFam} = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, <span class="string">'DeltaRespMat'</span>, ActuatorDeviceList{iActFam});
+0317         <span class="keyword">if</span> isempty(ActuatorDelta{iActFam})
+0318             error(sprintf(<span class="string">'%s.Setpoint.DeltaRespMat field must be set properly'</span>,ActuatorFamily{iActFam}));
+0319         <span class="keyword">end</span>
+0320         
+0321         <span class="comment">% Check if ActuatorDelta needs a units conversion</span>
+0322         <span class="keyword">if</span> strcmpi(UnitsFlagCell,{<span class="string">'Physics'</span>})
+0323             <span class="comment">% UnitsFlagCell comes from an input</span>
+0324             <span class="comment">% Since hw2physics conversion can be nonlinear, do conversion about the present setpoint</span>
+0325             SPh = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, ActuatorDeviceList{iActFam}, <span class="string">'Hardware'</span>, ModeFlagCell{:});
+0326             SPp = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, ActuatorDeviceList{iActFam}, <span class="string">'Physics'</span>,  ModeFlagCell{:});
+0327             ActuatorDelta{iActFam} = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, SPh+ActuatorDelta{iActFam}, ActuatorDeviceList{iActFam}, ModeFlagCell{:}) - SPp;
+0328         <span class="keyword">else</span>
+0329             <span class="comment">% If units were not input, then get the present family units</span>
+0330             Units = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, <span class="string">'Units'</span>);
+0331             <span class="keyword">if</span> strcmpi(Units, <span class="string">'Physics'</span>)
+0332                 <span class="comment">% Since hw2physics conversion can be nonlinear, do conversion about the present setpoint</span>
+0333                 SPh = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, ActuatorDeviceList{iActFam}, <span class="string">'Hardware'</span>, ModeFlagCell{:});
+0334                 SPp = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, ActuatorDeviceList{iActFam}, <span class="string">'Physics'</span>,  ModeFlagCell{:});
+0335                 ActuatorDelta{iActFam} = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, SPh+ActuatorDelta{iActFam}, ActuatorDeviceList{iActFam}, ModeFlagCell{:}) - SPp;
+0336             <span class="keyword">end</span>
+0337         <span class="keyword">end</span>
+0338         <span class="comment">% Old method checked for the default units of the .DeltaRespMat field.  Now it's always hardware units</span>
+0339         <span class="comment">%if strcmpi(UnitsFlagCell,{'Hardware'}) &amp; strcmpi(Units, 'Physics')</span>
+0340         <span class="comment">%    ActuatorDelta{iActFam} = physics2hw(ActuatorFamily{iActFam}, 'Setpoint', ActuatorDelta{iActFam}, ActuatorDeviceList{iActFam}, ModeFlagCell{:});</span>
+0341         <span class="comment">%end</span>
+0342     <span class="keyword">end</span>
+0343     <span class="keyword">if</span> isempty(ActuatorDelta{iActFam})
+0344         error(<span class="string">'ActuatorDelta is empty.  Must be an input or in the family structure (.DeltaRespMat in hardware units)'</span>);
+0345     <span class="keyword">end</span>
+0346     <span class="keyword">if</span> ~isnumeric(ActuatorDelta{iActFam})
+0347         error(<span class="string">'ActuatorDelta must be numeric.'</span>);
+0348     <span class="keyword">end</span>
+0349     
+0350     <span class="comment">% Force ActuatorDelta to be a column vector</span>
+0351     ActuatorDelta{iActFam} = ActuatorDelta{iActFam}(:);
+0352     
+0353     <span class="comment">% Check for entire family</span>
+0354     <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0355         <span class="comment">% Set the entire family at once</span>
+0356         iActDeviceTotal{iActFam} = 1;
+0357         
+0358         <span class="comment">% Expand a scalar to all devices</span>
+0359         <span class="keyword">if</span> length(ActuatorDelta{iActFam}) == 1
+0360             <span class="comment">% OK</span>
+0361         <span class="keyword">elseif</span> length(ActuatorDelta{iActFam}) == length(<a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(ActuatorFamily{iActFam}))
+0362             <span class="comment">% OK</span>
+0363         <span class="keyword">else</span>
+0364             error(<span class="string">'ActuatorDelta must be a scalar or equal in length to the number of devices'</span>);
+0365         <span class="keyword">end</span>
+0366     <span class="keyword">else</span>
+0367         iActDeviceTotal{iActFam} = size(ActuatorDeviceList{iActFam},1);
+0368         
+0369         <span class="comment">% Expand a scalar to all devices if scalar</span>
+0370         <span class="keyword">if</span> length(ActuatorDelta{iActFam}) == 1
+0371             ActuatorDelta{iActFam} = ActuatorDelta{iActFam} * ones(iActDeviceTotal{iActFam},1);
+0372         <span class="keyword">end</span>
+0373         <span class="comment">% Size of ActuatorDelta must equal total number of devices</span>
+0374         <span class="keyword">if</span> length(ActuatorDelta{iActFam}) ~= iActDeviceTotal{iActFam}
+0375             error(<span class="string">'ActuatorDelta must be a scalar or equal in length to the number of devices'</span>);
+0376         <span class="keyword">end</span>
+0377     <span class="keyword">end</span>
+0378     
+0379     <span class="comment">% Check for zeros</span>
+0380     <span class="keyword">if</span> any(ActuatorDelta{iActFam} == 0)
+0381         error(<span class="string">'At least one the actuator deltas is zero.'</span>);
+0382     <span class="keyword">end</span>
+0383 
+0384     <span class="comment">% Get initial actuator values</span>
+0385     ActuatorStart{iActFam} = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}, <span class="string">'Struct'</span>, InputFlags{:});
+0386     InitActuator = ActuatorStart{iActFam}.Data;
+0387     
+0388     <span class="comment">% Check actuator limits</span>
+0389     <span class="keyword">if</span> strcmpi(ModulationMethod, <span class="string">'unipolar'</span>)
+0390         <span class="comment">% unipolar measurement</span>
+0391         [LimitFlag, LimitList] = <a href="checklimits.html" class="code" title="function [LimitFlag, LimitList] = checklimits(varargin)">checklimits</a>(ActuatorFamily{iActFam}, InitActuator+ActuatorDelta{iActFam}, ActuatorDeviceList{iActFam}, UnitsFlagCell{:});
+0392         <span class="keyword">if</span> LimitFlag
+0393             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0394                 ActuatorDeviceList{iActFam} = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(ActuatorFamily{iActFam});
+0395             <span class="keyword">end</span>
+0396             MagnetString = sprintf(<span class="string">'%s(%d,%d)=%f, Delta=%f'</span>, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(LimitList(1),:), InitActuator(LimitList(1)), ActuatorDelta{iActFam}(LimitList(1)));
+0397             error([<span class="string">'Actuator limit would be exceeded (Setpoint+Delta) ('</span>, MagnetString, <span class="string">')'</span>]);
+0398         <span class="keyword">end</span>
+0399     <span class="keyword">elseif</span> strcmpi(ModulationMethod, <span class="string">'bipolar'</span>)
+0400         <span class="comment">% bipolar measurement</span>
+0401         [LimitFlag, LimitList] = <a href="checklimits.html" class="code" title="function [LimitFlag, LimitList] = checklimits(varargin)">checklimits</a>(ActuatorFamily{iActFam}, InitActuator-ActuatorDelta{iActFam}/2, ActuatorDeviceList{iActFam}, UnitsFlagCell{:});
+0402         <span class="keyword">if</span> LimitFlag
+0403             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0404                 ActuatorDeviceList{iActFam} = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(ActuatorFamily{iActFam});
+0405             <span class="keyword">end</span>
+0406             MagnetString = sprintf(<span class="string">'%s(%d,%d)=%f, Delta=%f'</span>, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(LimitList(1),:), InitActuator(LimitList(1)), ActuatorDelta{iActFam}(LimitList(1)));
+0407             error([<span class="string">'Actuator limit would be exceeded (Setpoint-Delta/2) ('</span>, MagnetString, <span class="string">')'</span>]);
+0408         <span class="keyword">end</span>
+0409         [LimitFlag, LimitList] = <a href="checklimits.html" class="code" title="function [LimitFlag, LimitList] = checklimits(varargin)">checklimits</a>(ActuatorFamily{iActFam}, InitActuator+ActuatorDelta{iActFam}/2, ActuatorDeviceList{iActFam}, UnitsFlagCell{:});
+0410         <span class="keyword">if</span> LimitFlag
+0411             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0412                 ActuatorDeviceList{iActFam} = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(ActuatorFamily{iActFam});
+0413             <span class="keyword">end</span>
+0414             MagnetString = sprintf(<span class="string">'%s(%d,%d)=%f, Delta=%f'</span>, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(LimitList(1),:), InitActuator(LimitList(1)), ActuatorDelta{iActFam}(LimitList(1)));
+0415             error([<span class="string">'Actuator limit would be exceeded (Setpoint+Delta/2) ('</span>, MagnetString, <span class="string">')'</span>]);
+0416         <span class="keyword">end</span>
+0417     <span class="keyword">end</span>
+0418 <span class="keyword">end</span>
+0419 
+0420 
+0421 <span class="keyword">if</span> DisplayFlag
+0422     fprintf(<span class="string">'   Measuring response using a %s actuator method\n'</span>, lower(ModulationMethod));
+0423 <span class="keyword">end</span>
+0424 
+0425 <span class="comment">% Begin main loop over actuators</span>
+0426 StopNow = 0;
+0427 <span class="keyword">for</span> iActFam = 1:length(ActuatorFamily)
+0428     t0 = clock;
+0429     clear R;
+0430         
+0431     <span class="comment">% Get initial monitor values</span>
+0432     <span class="keyword">if</span> StructOutputFlag
+0433         <span class="keyword">if</span> WaitFlagMonitor == -5
+0434             MonitorStart = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(MonitorFamily, MonitorDeviceList, <span class="string">'Struct'</span>, <span class="string">'Manual'</span>, UnitsFlagCell{:});
+0435         <span class="keyword">else</span>
+0436             MonitorStart = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(MonitorFamily, MonitorDeviceList, <span class="string">'Struct'</span>, InputFlags{:});
+0437         <span class="keyword">end</span>
+0438         <span class="keyword">if</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'DCCT'</span>)
+0439             DCCTStart = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>(ModeFlagCell{:});
+0440         <span class="keyword">else</span>
+0441             DCCTStart = NaN;
+0442         <span class="keyword">end</span>
+0443     <span class="keyword">end</span>
+0444     
+0445     <span class="comment">% Get initial actuator values</span>
+0446     InitActuator = ActuatorStart{iActFam}.Data;
+0447     
+0448     <span class="comment">% Just to display common names (empty if not using common names)</span>
+0449     CommonNameList = <a href="family2common.html" class="code" title="function [CommonNames, ErrorFlag] = family2common(Family, DeviceList)">family2common</a>(ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam});
+0450 
+0451     <span class="comment">% Iterate on each actuator in the device list</span>
+0452     <span class="keyword">if</span> DisplayFlag <span class="comment">% &amp; ~isempty(ActuatorDeviceList{iActFam})  %iActDeviceTotal{iActFam} &gt; 1</span>
+0453         fprintf(<span class="string">'\n   %s family response matrix\n'</span>, ActuatorFamily{iActFam});
+0454     <span class="keyword">end</span>
+0455     
+0456     <span class="comment">% Individual actuator loop</span>
+0457     <span class="keyword">for</span> iActDevice = 1:iActDeviceTotal{iActFam}
+0458         <span class="keyword">if</span> ~isempty(CommonNameList)
+0459             CommonName = [deblank(CommonNameList(iActDevice,:)), <span class="string">' '</span>];
+0460             <span class="keyword">if</span> strcmpi(deblank(CommonName), ActuatorFamily{iActFam})
+0461                 CommonName = <span class="string">''</span>;
+0462             <span class="keyword">end</span>
+0463         <span class="keyword">end</span>
+0464 
+0465         <span class="comment">% Remove the CommonName for now</span>
+0466         CommonName = <span class="string">''</span>;
+0467 
+0468         <span class="comment">% Step actuator down for bipolar</span>
+0469         <span class="keyword">try</span>
+0470             <span class="keyword">if</span> strcmpi(ModulationMethod, <span class="string">'bipolar'</span>)
+0471                 <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0472                     <span class="keyword">if</span> DisplayFlag
+0473                         fprintf(<span class="string">'   %s family nominal value is %f [%s]\n'</span>, ActuatorFamily{iActFam}, InitActuator(1), ActuatorStart{iActFam}.UnitsString);
+0474                         fprintf(<span class="string">'   Changing family by %+f [%s] from nominal\n'</span>, -ActuatorDelta{iActFam}(1)/2, ActuatorStart{iActFam}.UnitsString);
+0475                         drawnow;
+0476                     <span class="keyword">end</span>
+0477                     DeltaActuator =                InitActuator-ActuatorDelta{iActFam}/2;
+0478                     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator-ActuatorDelta{iActFam}/2, ActuatorDeviceList{iActFam}, WaitFlag, InputFlags{:});
+0479                 <span class="keyword">else</span>
+0480                     <span class="keyword">if</span> DisplayFlag
+0481                         fprintf(<span class="string">'   %d. %s%s(%d,%d) nominal value is %f [%s]\n'</span>, iActDevice, CommonName, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(iActDevice,:), InitActuator(iActDevice), ActuatorStart{iActFam}.UnitsString);
+0482                         fprintf(<span class="string">'   %d. Changing actuator by %+f [%s] from nominal\n'</span>, iActDevice, -ActuatorDelta{iActFam}(iActDevice)/2, ActuatorStart{iActFam}.UnitsString);
+0483                         drawnow;
+0484                     <span class="keyword">end</span>
+0485                     DeltaActuator =                InitActuator(iActDevice)-ActuatorDelta{iActFam}(iActDevice)/2;
+0486                     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator(iActDevice)-ActuatorDelta{iActFam}(iActDevice)/2, ActuatorDeviceList{iActFam}(iActDevice,:), WaitFlag, InputFlags{:});
+0487                 <span class="keyword">end</span>
+0488             <span class="keyword">elseif</span> strcmpi(ModulationMethod, <span class="string">'unipolar'</span>)
+0489                 <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0490                     DeltaActuator = InitActuator(1);
+0491                 <span class="keyword">else</span>
+0492                     DeltaActuator = InitActuator(iActDevice);
+0493                 <span class="keyword">end</span>
+0494                 <span class="keyword">if</span> DisplayFlag
+0495                     <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0496                         fprintf(<span class="string">'   %s family nominal value is %f [%s]\n'</span>, ActuatorFamily{iActFam}, InitActuator(1), ActuatorStart{iActFam}.UnitsString);
+0497                         <span class="comment">%fprintf('   No change to actuator\n');</span>
+0498                         drawnow;
+0499                     <span class="keyword">else</span>
+0500                         fprintf(<span class="string">'   %d. %s%s(%d,%d) nominal value is %f [%s]\n'</span>, iActDevice, CommonName, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(iActDevice,:), InitActuator(iActDevice), ActuatorStart{iActFam}.UnitsString);
+0501                         <span class="comment">%fprintf('   %d. No change to actuator\n', iActDevice);</span>
+0502                         drawnow;
+0503                     <span class="keyword">end</span>
+0504                 <span class="keyword">end</span>
+0505             <span class="keyword">end</span>
+0506             
+0507         <span class="keyword">catch</span>
+0508             fprintf(<span class="string">'   %s\n'</span>, lasterr);
+0509             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0510                 FamilyMessage = sprintf(<span class="string">'An error occurred setting %s to %f [%s].\n'</span>, ActuatorFamily{iActFam}, InitActuator(iActDevice), DeltaActuator, ActuatorStart{iActFam}.UnitsString);
+0511             <span class="keyword">else</span>
+0512                 FamilyMessage = sprintf(<span class="string">'An error occurred setting %s(%d,%d) to %f [%s].\n'</span>, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(iActDevice,:), DeltaActuator, ActuatorStart{iActFam}.UnitsString);
+0513             <span class="keyword">end</span>
+0514             CommandInput = questdlg( <span class="keyword">...</span>
+0515                 strvcat(FamilyMessage, <span class="keyword">...</span>
+0516                 strvcat(<span class="string">'Either manually varify that the magnet is at the proper setpoint'</span>, <span class="keyword">...</span>
+0517                 strvcat(<span class="string">'and continue measuring the response matrix or stop'</span>,<span class="string">'the response matrix measurement?'</span>))), <span class="keyword">...</span>
+0518                 <span class="string">'MEASRESPMAT'</span>, <span class="keyword">...</span>
+0519                 <span class="string">'Continue'</span>, <span class="keyword">...</span>
+0520                 <span class="string">'Stop'</span>, <span class="keyword">...</span>
+0521                 <span class="string">'Continue'</span>);
+0522             <span class="keyword">switch</span> CommandInput
+0523                 <span class="keyword">case</span> <span class="string">'Stop'</span>
+0524                     error(<span class="string">'Response matrix measurement stopped.'</span>);
+0525                     <span class="comment">%S = {}</span>
+0526                     <span class="comment">%return;</span>
+0527                 <span class="keyword">case</span> <span class="string">'Continue'</span>
+0528                     <span class="comment">%keyboard</span>
+0529             <span class="keyword">end</span>
+0530         <span class="keyword">end</span>
+0531 
+0532         <span class="comment">% Wait for signal processing if requested</span>
+0533         sleep(ExtraDelay);
+0534 
+0535         <span class="comment">%if DisplayFlag</span>
+0536         <span class="comment">%    fprintf('   Recording data point #1\n'); drawnow;</span>
+0537         <span class="comment">%end</span>
+0538 
+0539         <span class="comment">% Acquire data</span>
+0540         <span class="keyword">if</span> WaitFlagMonitor == -5
+0541             Xm = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(MonitorFamily, MonitorDeviceList, <span class="string">'Manual'</span>, UnitsFlagCell{:});
+0542         <span class="keyword">else</span>
+0543             Xm = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(MonitorFamily, MonitorDeviceList, InputFlags{:});
+0544         <span class="keyword">end</span>
+0545 
+0546         <span class="comment">% Step actuator up</span>
+0547         <span class="keyword">try</span>
+0548             <span class="keyword">if</span> strcmpi(ModulationMethod, <span class="string">'bipolar'</span>)
+0549                 <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0550                     <span class="keyword">if</span> DisplayFlag
+0551                         fprintf(<span class="string">'   Changing family by %+f [%s] from nominal\n'</span>, ActuatorDelta{iActFam}(1)/2, ActuatorStart{iActFam}.UnitsString);
+0552                         drawnow;
+0553                     <span class="keyword">end</span>
+0554                     DeltaActuator =                InitActuator+ActuatorDelta{iActFam}/2;
+0555                     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator+ActuatorDelta{iActFam}/2, ActuatorDeviceList{iActFam}, WaitFlag, InputFlags{:});
+0556                 <span class="keyword">else</span>
+0557                     <span class="keyword">if</span> DisplayFlag
+0558                         fprintf(<span class="string">'   %d. Changing actuator by %+f [%s] from nominal\n'</span>, iActDevice, ActuatorDelta{iActFam}(iActDevice)/2, ActuatorStart{iActFam}.UnitsString);
+0559                         drawnow;
+0560                     <span class="keyword">end</span>
+0561                     DeltaActuator =                InitActuator(iActDevice)+ActuatorDelta{iActFam}(iActDevice)/2;
+0562                     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator(iActDevice)+ActuatorDelta{iActFam}(iActDevice)/2, ActuatorDeviceList{iActFam}(iActDevice,:), WaitFlag, InputFlags{:});
+0563                 <span class="keyword">end</span>
+0564             <span class="keyword">elseif</span> strcmpi(ModulationMethod, <span class="string">'unipolar'</span>)
+0565                 <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0566                     <span class="keyword">if</span> DisplayFlag
+0567                         fprintf(<span class="string">'   Changing family by %+f [%s] from nominal\n'</span>, ActuatorDelta{iActFam}(1), ActuatorStart{iActFam}.UnitsString);
+0568                         drawnow;
+0569                     <span class="keyword">end</span>
+0570                     DeltaActuator =                InitActuator+ActuatorDelta{iActFam};
+0571                     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator+ActuatorDelta{iActFam}, ActuatorDeviceList{iActFam}, WaitFlag, InputFlags{:});
+0572                 <span class="keyword">else</span>
+0573                     <span class="keyword">if</span> DisplayFlag
+0574                         fprintf(<span class="string">'   %d. Changing actuator by %+f [%s] from nominal\n'</span>, iActDevice, ActuatorDelta{iActFam}(iActDevice), ActuatorStart{iActFam}.UnitsString);
+0575                         drawnow;
+0576                     <span class="keyword">end</span>
+0577                     DeltaActuator =                InitActuator(iActDevice)+ActuatorDelta{iActFam}(iActDevice);
+0578                     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator(iActDevice)+ActuatorDelta{iActFam}(iActDevice), ActuatorDeviceList{iActFam}(iActDevice,:), WaitFlag, InputFlags{:});
+0579                 <span class="keyword">end</span>
+0580             <span class="keyword">end</span>
+0581         <span class="keyword">catch</span>
+0582             fprintf(<span class="string">'   %s\n'</span>, lasterr);
+0583             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0584                 FamilyMessage = sprintf(<span class="string">'An error occurred setting %s to %f [%s].\n'</span>, ActuatorFamily{iActFam}, InitActuator(iActDevice), DeltaActuator, ActuatorStart{iActFam}.UnitsString);
+0585             <span class="keyword">else</span>
+0586                 FamilyMessage = sprintf(<span class="string">'An error occurred setting %s(%d,%d) to %f [%s].\n'</span>, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(iActDevice,:), DeltaActuator, ActuatorStart{iActFam}.UnitsString);
+0587             <span class="keyword">end</span>
+0588             CommandInput = questdlg( <span class="keyword">...</span>
+0589                 strvcat(FamilyMessage, <span class="keyword">...</span>
+0590                 strvcat(<span class="string">'Either manually varify that the magnet is at the proper setpoint'</span>, <span class="keyword">...</span>
+0591                 strvcat(<span class="string">'and continue measuring the response matrix or stop'</span>,<span class="string">'the response matrix measurement?'</span>))), <span class="keyword">...</span>
+0592                 <span class="string">'MEASRESPMAT'</span>, <span class="keyword">...</span>
+0593                 <span class="string">'Continue'</span>, <span class="keyword">...</span>
+0594                 <span class="string">'Stop'</span>, <span class="keyword">...</span>
+0595                 <span class="string">'Continue'</span>);
+0596             <span class="keyword">switch</span> CommandInput
+0597                 <span class="keyword">case</span> <span class="string">'Stop'</span>
+0598                     error(<span class="string">'Response matrix measurement stopped.'</span>);
+0599                     <span class="comment">%S = {}</span>
+0600                     <span class="comment">%return;</span>
+0601                 <span class="keyword">case</span> <span class="string">'Continue'</span>
+0602                     <span class="comment">%keyboard</span>
+0603             <span class="keyword">end</span>
+0604         <span class="keyword">end</span>
+0605 
+0606         <span class="comment">% Wait for signal processing if requested</span>
+0607         sleep(ExtraDelay);
+0608 
+0609         <span class="keyword">if</span> DisplayFlag
+0610             <span class="comment">%fprintf('   Recording data point #2\n'); drawnow;</span>
+0611         <span class="keyword">end</span>
+0612 
+0613         <span class="comment">% Acquire data</span>
+0614         <span class="keyword">if</span> WaitFlagMonitor == -5
+0615             Xp = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(MonitorFamily, MonitorDeviceList, <span class="string">'Manual'</span>, UnitsFlagCell{:});
+0616         <span class="keyword">else</span>
+0617             Xp = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(MonitorFamily, MonitorDeviceList, InputFlags{:});
+0618         <span class="keyword">end</span>
+0619 
+0620         <span class="comment">% Restore actuators</span>
+0621         <span class="keyword">try</span>
+0622             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0623                 DeltaActuator = InitActuator;
+0624                 <span class="keyword">if</span> WaitFlag == -2
+0625                     WaitFlagReset = -1;
+0626                 <span class="keyword">else</span>
+0627                     WaitFlagReset = WaitFlag;
+0628                 <span class="keyword">end</span>
+0629                 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator, ActuatorDeviceList{iActFam}, WaitFlagReset, InputFlags{:});
+0630                 <span class="keyword">if</span> DisplayFlag
+0631                     <span class="keyword">if</span> strcmpi(ActuatorStart{iActFam}.Mode, <span class="string">'Manual'</span>)
+0632                         fprintf(<span class="string">'   %s family reset\n'</span>, ActuatorFamily{iActFam});
+0633                     <span class="keyword">else</span>
+0634                         FinalSP = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(ActuatorFamily{iActFam}, InputFlags{:});
+0635                         fprintf(<span class="string">'   %s family reset to %f [%s]\n'</span>, ActuatorFamily{iActFam}, FinalSP(1), ActuatorStart{iActFam}.UnitsString);
+0636                     <span class="keyword">end</span>
+0637                 <span class="keyword">end</span>
+0638             <span class="keyword">else</span>
+0639                 DeltaActuator = InitActuator(iActDevice);
+0640                 <span class="keyword">if</span> WaitFlag == -2
+0641                     WaitFlagReset = -1;
+0642                 <span class="keyword">else</span>
+0643                     WaitFlagReset = WaitFlag;
+0644                 <span class="keyword">end</span>
+0645                 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{iActFam}, InitActuator(iActDevice), ActuatorDeviceList{iActFam}(iActDevice,:), WaitFlagReset, InputFlags{:});
+0646                 <span class="keyword">if</span> DisplayFlag
+0647                     <span class="keyword">if</span> strcmpi(ActuatorStart{iActFam}.Mode,<span class="string">'Manual'</span>)
+0648                         fprintf(<span class="string">'   %d. %s%s(%d,%d) reset\n'</span>, iActDevice, CommonName, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(iActDevice,:));
+0649                     <span class="keyword">else</span>
+0650                         fprintf(<span class="string">'   %d. %s%s(%d,%d) reset to %f [%s]\n'</span>, iActDevice, CommonName, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(iActDevice,:), <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(ActuatorFamily{iActFam},ActuatorDeviceList{iActFam}(iActDevice,:)), ActuatorStart{iActFam}.UnitsString);
+0651                     <span class="keyword">end</span>
+0652                 <span class="keyword">end</span>
+0653             <span class="keyword">end</span>
+0654             drawnow;
+0655         <span class="keyword">catch</span>
+0656             fprintf(<span class="string">'   %s\n'</span>, lasterr);
+0657             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0658                 FamilyMessage = sprintf(<span class="string">'An error occurred setting %s to %f [%s].\n'</span>, ActuatorFamily{iActFam}, InitActuator(iActDevice), DeltaActuator, ActuatorStart{iActFam}.UnitsString);
+0659             <span class="keyword">else</span>
+0660                 FamilyMessage = sprintf(<span class="string">'An error occurred setting %s(%d,%d) to %f [%s].\n'</span>, ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam}(iActDevice,:), DeltaActuator, ActuatorStart{iActFam}.UnitsString);
+0661             <span class="keyword">end</span>
+0662             CommandInput = questdlg( <span class="keyword">...</span>
+0663                 strvcat(FamilyMessage, <span class="keyword">...</span>
+0664                 strvcat(<span class="string">'Either manually varify that the magnet is at the proper setpoint'</span>, <span class="keyword">...</span>
+0665                 strvcat(<span class="string">'and continue measuring the response matrix or stop'</span>,<span class="string">'the response matrix measurement?'</span>))), <span class="keyword">...</span>
+0666                 <span class="string">'MEASRESPMAT'</span>, <span class="keyword">...</span>
+0667                 <span class="string">'Continue'</span>, <span class="keyword">...</span>
+0668                 <span class="string">'Stop'</span>, <span class="keyword">...</span>
+0669                 <span class="string">'Continue'</span>);
+0670             <span class="keyword">switch</span> CommandInput
+0671                 <span class="keyword">case</span> <span class="string">'Stop'</span>
+0672                     error(<span class="string">'Response matrix measurement stopped.'</span>);
+0673                     <span class="comment">%S = {}</span>
+0674                     <span class="comment">%return;</span>
+0675                 <span class="keyword">case</span> <span class="string">'Continue'</span>
+0676                     <span class="comment">%keyboard</span>
+0677             <span class="keyword">end</span>
+0678         <span class="keyword">end</span>
+0679 
+0680         <span class="keyword">if</span> DisplayFlag &amp;&amp; (iActDevice &lt; iActDeviceTotal{iActFam})
+0681             fprintf(<span class="string">'\n'</span>);
+0682         <span class="keyword">end</span>
+0683         
+0684         <span class="comment">% Compute differences</span>
+0685         <span class="keyword">for</span> iMonFam = 1:length(MonitorFamily)
+0686             <span class="keyword">if</span> isempty(ActuatorDeviceList{iActFam})
+0687                 <span class="comment">% Compute response matrix columns</span>
+0688                 <span class="comment">% For each magnet:  1. Divide by the change in amperes, like [Tune / Ampere]</span>
+0689                 <span class="comment">%                   2. Scale each magnet by its fractional contribution in physics units (should use K*L, not just K)</span>
+0690                 <span class="keyword">if</span> strcmpi(<a href="family2units.html" class="code" title="function [Units, UnitsString] = family2units(varargin)">family2units</a>(ActuatorFamily{iActFam},<span class="string">'Setpoint'</span>),<span class="string">'Hardware'</span>)
+0691                     DeltaPhysics = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, InitActuator+ActuatorDelta{iActFam}, ActuatorDeviceList{iActFam}, ModeFlagCell{:}) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{iActFam}, <span class="string">'Setpoint'</span>, InitActuator, ActuatorDeviceList{iActFam}, ModeFlagCell{:});
+0692                 <span class="keyword">else</span>
+0693                     DeltaPhysics = ActuatorDelta{iActFam};
+0694                 <span class="keyword">end</span>
+0695                 
+0696                 <span class="comment">% DeltaPhysics should be scaled by K*Leff (not just &quot;K&quot;)</span>
+0697                 <span class="keyword">try</span>
+0698                     Leff = getleff(ActuatorFamily{iActFam}, ActuatorDeviceList{iActFam});
+0699                 <span class="keyword">catch</span>
+0700                     Leff = 0;
+0701                 <span class="keyword">end</span>
+0702                 i = find(Leff==0);      <span class="comment">% Zero Leff is trouble, just divide by the number of actuators</span>
+0703                 Leff(i) = 1 / length(Leff);
+0704                 DeltaPhysics = DeltaPhysics .* Leff / mean(Leff);
+0705                 
+0706                 <span class="comment">% In order to backout the response at each magnet, assume that</span>
+0707                 <span class="comment">% the response at each magnet is equal in physics units.</span>
+0708                 DeltaMonitorPerPhysicsUnit = (Xp{iMonFam}-Xm{iMonFam}) / sum(DeltaPhysics);
+0709                 
+0710                 <span class="comment">% Expand to each magnet</span>
+0711                 R{iMonFam} = DeltaMonitorPerPhysicsUnit * ones(1,length(DeltaPhysics));
+0712                 
+0713                 <span class="comment">% When in hardware unit convert to delta monitor / hardware delta actuator</span>
+0714                 <span class="keyword">if</span> strcmpi(<a href="family2units.html" class="code" title="function [Units, UnitsString] = family2units(varargin)">family2units</a>(ActuatorFamily{iActFam},<span class="string">'Setpoint'</span>),<span class="string">'Hardware'</span>)
+0715                     PhysicsUnitPerAmp = DeltaPhysics ./ ActuatorDelta{iActFam};
+0716                     <span class="keyword">for</span> n = 1:length(DeltaPhysics)
+0717                         R{iMonFam}(:,n) = PhysicsUnitPerAmp(n) * R{iMonFam}(:,n);
+0718                     <span class="keyword">end</span>
+0719                 <span class="keyword">end</span>
+0720                 
+0721             <span class="keyword">else</span>
+0722                 <span class="comment">% Just divide the monitor value by the actuator value</span>
+0723                 R{iMonFam}(:,iActDevice) = (Xp{iMonFam}-Xm{iMonFam}) / ActuatorDelta{iActFam}(iActDevice); 
+0724             <span class="keyword">end</span>
+0725             
+0726             <span class="comment">% Save the measurements</span>
+0727             Monitor1{iMonFam}(:,iActDevice) = Xm{iMonFam};
+0728             Monitor2{iMonFam}(:,iActDevice) = Xp{iMonFam};
+0729 
+0730         <span class="keyword">end</span> <span class="comment">% iMonFam</span>
+0731         
+0732         <span class="comment">% If the beam current is too low, prompt for a refill</span>
+0733         <span class="keyword">if</span> DCCTStopFlag
+0734             <span class="keyword">if</span> (<a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a> - DCCTStop) &lt; 0
+0735                 CommandInput = questdlg( <span class="keyword">...</span>
+0736                     {sprintf(<span class="string">'The present beam current is %f'</span>, <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>), <span class="keyword">...</span>
+0737                     sprintf(<span class="string">'A refill prompt was requested at %f'</span>, DCCTStop), <span class="keyword">...</span>
+0738                     <span class="string">'   '</span>, <span class="keyword">...</span>
+0739                     <span class="string">'Your choices are:'</span>
+0740                     sprintf(<span class="string">'Continue - Continue and you will be prompted again a %f'</span>, DCCTStop), <span class="keyword">...</span>
+0741                     <span class="string">'Stop - Stop the measure right now'</span>, <span class="keyword">...</span>
+0742                     <span class="string">'Don''t ask again - Continue on without another interruption'</span>}, <span class="keyword">...</span>
+0743                     <span class="string">'MEASRESPMAT'</span>, <span class="keyword">...</span>
+0744                     <span class="string">'Continue'</span>, <span class="keyword">...</span>
+0745                     <span class="string">'Stop'</span>, <span class="keyword">...</span>
+0746                     <span class="string">'Don''t ask again'</span>, <span class="string">'Don''t ask again'</span>);
+0747                 <span class="keyword">if</span> isempty(CommandInput) || strcmp(CommandInput, <span class="string">'Don''t ask again'</span>)
+0748                     DCCTStopFlag = 0;
+0749                 <span class="keyword">elseif</span> strcmp(CommandInput, <span class="string">'Stop'</span>)
+0750                     StopNow = 1;
+0751                     <span class="keyword">break</span>;
+0752                 <span class="keyword">end</span>
+0753             <span class="keyword">end</span>
+0754         <span class="keyword">end</span>
+0755     
+0756     <span class="keyword">end</span> <span class="comment">% iActDevice</span>
+0757         
+0758     <span class="keyword">for</span> iMonFam = 1:length(MonitorFamily)
+0759         <span class="keyword">if</span> StructOutputFlag
+0760             S{iMonFam,iActFam}.Data = R{iMonFam};
+0761             
+0762             S{iMonFam,iActFam}.Monitor = MonitorStart{iMonFam};
+0763             S{iMonFam,iActFam}.Actuator = ActuatorStart{iActFam};
+0764             S{iMonFam,iActFam}.ActuatorDelta = ActuatorDelta{iActFam};
+0765             
+0766             S{iMonFam,iActFam}.Monitor1 = Monitor1{iMonFam};
+0767             S{iMonFam,iActFam}.Monitor2 = Monitor2{iMonFam};
+0768             
+0769             <span class="keyword">if</span> ~strcmpi(MonitorStart{iMonFam}.Units, ActuatorStart{iActFam}.Units)
+0770                 S{iMonFam,iActFam}.Units =  [MonitorStart{iMonFam}.Units, <span class="string">'/'</span>, ActuatorStart{iActFam}.Units];
+0771                 fprintf(<span class="string">'   Warning: Units are in a mixed mode'</span>);
+0772             <span class="keyword">else</span>
+0773                 S{iMonFam,iActFam}.Units = MonitorStart{iMonFam}.Units;
+0774             <span class="keyword">end</span>
+0775             <span class="comment">%S{iMonFam,iActFam}.UnitsString = ['[',MonitorStart{iMonFam}.UnitsString,']', '/', '[',ActuatorStart{iActFam}.UnitsString,']'];</span>
+0776             S{iMonFam,iActFam}.UnitsString = [MonitorStart{iMonFam}.UnitsString, <span class="string">'/'</span>, ActuatorStart{iActFam}.UnitsString];
+0777 
+0778             S{iMonFam,iActFam}.GeV = <a href="getenergy.html" class="code" title="function [Energy, HCMEnergy] = getenergy(varargin)">getenergy</a>(ModeFlagCell{:}); 
+0779             S{iMonFam,iActFam}.TimeStamp = t0;
+0780             S{iMonFam,iActFam}.DCCT = DCCTStart;
+0781             S{iMonFam,iActFam}.ModulationMethod = ModulationMethod;
+0782             S{iMonFam,iActFam}.WaitFlag = WaitFlagMonitor;
+0783             S{iMonFam,iActFam}.ExtraDelay = ExtraDelay;
+0784             S{iMonFam,iActFam}.DataDescriptor = <span class="string">'Response Matrix'</span>;
+0785             S{iMonFam,iActFam}.CreatedBy = <span class="string">'measrespmat'</span>;
+0786             S{iMonFam,iActFam}.OperationalMode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OperationalMode'</span>);
+0787         <span class="keyword">else</span>
+0788             S{iMonFam,iActFam} = R{iMonFam};
+0789         <span class="keyword">end</span>
+0790     <span class="keyword">end</span>
+0791 
+0792     <span class="keyword">if</span> StopNow
+0793         <span class="keyword">break</span>;
+0794     <span class="keyword">end</span>
+0795 
+0796 <span class="keyword">end</span>
+0797 
+0798 
+0799 <span class="comment">% For one family inputs, there is no need for a cell output</span>
+0800 <span class="keyword">if</span> all(size(S) == [1 1])
+0801     S = S{1};
+0802 <span class="keyword">end</span>
+0803</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

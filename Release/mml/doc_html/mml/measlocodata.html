@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measlocodata</title>
+  <meta name="keywords" content="measlocodata">
+  <meta name="description" content="MEASLOCODATA - Measures a set of LOCO data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measlocodata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measlocodata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASLOCODATA - Measures a set of LOCO data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function measlocodata(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MEASLOCODATA - Measures a set of LOCO data
+
+  measlocodata(DirectoryName, DisplayFlag)
+
+  INPUTS
+  1. DirectoryName - Directory name for where to write the LOCO data files.
+                     If empty and DisplayFlag is on, then a dialog box will be used to select a directory.
+                     If empty and DisplayFlag is off, then the directory will chosen based on the date &amp; time.
+
+  2. DisplayFlag -   'Display' - Dialog boxes will ask questions for what to measure, orbit correction, and pause 
+                                 before starting the measurement.  {'Display' is the default behavior} 
+                   'NoDisplay' - No questions will be asked.  The behavior for 'NoDisplay' is,
+                                 a. Measure dispersion
+                                 b. Measure the BPM response matrix
+                                 c. Measure the BPM noise (sigma)
+                                 d. Do not correct the orbit (the use should already have the proper orbit loaded)
+  3. ModeFlag - Optional mode overrides: 'Online', 'Simulator', 'Model'</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="measbpmresp.html" class="code" title="function [Rmat, OutputFileName] = measbpmresp(varargin)">measbpmresp</a>	MEASBPMRESP - Measures the BPM response matrix in the horizontal and vertical planes</li><li><a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>	MEASDISP - Measures the dispersion function</li><li><a href="monbpm.html" class="code" title="function varargout = monbpm(varargin)">monbpm</a>	MONBPM - Monitors the orbit</li><li><a href="plotbpmresp.html" class="code" title="function plotbpmresp(varargin)">plotbpmresp</a>	PLOTBPMRESP - Plots the orbit response matrix in various ways</li><li><a href="plotdisp.html" class="code" title="function [DxOut, DyOut, FileName] = plotdisp(varargin)">plotdisp</a>	PLOTDISP - Plots the dispersion function</li><li><a href="plotorbit.html" class="code" title="function varargout = plotorbit(varargin)">plotorbit</a>	PLOTORBIT - Plot the present orbit w.r.t. the golden or offset orbit</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function measlocodata(varargin)</a>
+0002 <span class="comment">%MEASLOCODATA - Measures a set of LOCO data</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  measlocodata(DirectoryName, DisplayFlag)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. DirectoryName - Directory name for where to write the LOCO data files.</span>
+0008 <span class="comment">%                     If empty and DisplayFlag is on, then a dialog box will be used to select a directory.</span>
+0009 <span class="comment">%                     If empty and DisplayFlag is off, then the directory will chosen based on the date &amp; time.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  2. DisplayFlag -   'Display' - Dialog boxes will ask questions for what to measure, orbit correction, and pause</span>
+0012 <span class="comment">%                                 before starting the measurement.  {'Display' is the default behavior}</span>
+0013 <span class="comment">%                   'NoDisplay' - No questions will be asked.  The behavior for 'NoDisplay' is,</span>
+0014 <span class="comment">%                                 a. Measure dispersion</span>
+0015 <span class="comment">%                                 b. Measure the BPM response matrix</span>
+0016 <span class="comment">%                                 c. Measure the BPM noise (sigma)</span>
+0017 <span class="comment">%                                 d. Do not correct the orbit (the use should already have the proper orbit loaded)</span>
+0018 <span class="comment">%  3. ModeFlag - Optional mode overrides: 'Online', 'Simulator', 'Model'</span>
+0019 <span class="comment">%</span>
+0020 
+0021 <span class="comment">%  Written by Greg Portmann</span>
+0022 
+0023 
+0024 <span class="comment">% Minimum beam current to make measurement</span>
+0025 MinCurrent = .1;
+0026 
+0027 
+0028 <span class="comment">% Input checking</span>
+0029 DirectoryName = <span class="string">''</span>;
+0030 DisplayFlag = 1;
+0031 ModeFlag = <span class="string">''</span>;
+0032 <span class="keyword">for</span> i = length(varargin):-1:1
+0033     <span class="keyword">if</span> isstruct(varargin{i})
+0034         <span class="comment">% Ignor structures</span>
+0035     <span class="keyword">elseif</span> iscell(varargin{i})
+0036         <span class="comment">% Ignor cells</span>
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Model'</span>)
+0038         ModeFlag = <span class="string">'Model'</span>;
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0041         ModeFlag = <span class="string">'Online'</span>;
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Simulator'</span>)
+0044         ModeFlag = <span class="string">'Simulator'</span>;
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0047         DisplayFlag = 1;
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0050         DisplayFlag = 0;
+0051         varargin(i) = [];
+0052     <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 
+0055 
+0056 <span class="keyword">if</span> length(varargin) &gt;=1 
+0057     DirectoryName = varargin{1};
+0058 <span class="keyword">end</span>
+0059 
+0060 
+0061 
+0062 <span class="comment">% Get the directory location</span>
+0063 <span class="keyword">if</span> isempty(DirectoryName)
+0064     c = clock;
+0065     DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep];
+0066     DirectoryName = sprintf(<span class="string">'%s%s'</span>, DirectoryName, datestr(c,29));  <span class="comment">% Year-Month-Day</span>
+0067     DirectoryName = [DirectoryName, filesep, sprintf(<span class="string">'%02d-%02d-%02.0f'</span>, c(4), c(5), c(6))];  <span class="comment">% Hour-Minute-Second</span>
+0068 
+0069     <span class="keyword">if</span> DisplayFlag
+0070         AnswerString = questdlg(strvcat(strvcat(strvcat(strvcat(strvcat( <span class="keyword">...</span>
+0071             <span class="string">'Choose directory where all the LOCO data is written.'</span>, <span class="keyword">...</span>
+0072             <span class="string">'The default directory location is:'</span>), <span class="keyword">...</span>
+0073             sprintf(<span class="string">'%s\n'</span>,DirectoryName)),<span class="string">' '</span>), <span class="keyword">...</span>
+0074             <span class="string">'Yes - Use this directory'</span>),<span class="string">'No - Select a new directory'</span>), <span class="keyword">...</span>
+0075             <span class="string">'LOCO Mesurement Setup'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Yes'</span>);
+0076 
+0077         <span class="keyword">if</span> strcmp(AnswerString,<span class="string">'No'</span>)
+0078             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep];
+0079             DirectoryName = uigetdir(DirectoryName, <span class="string">'Select a directory to put the LOCO data'</span>);
+0080             <span class="keyword">if</span> DirectoryName == 0
+0081                 fprintf(<span class="string">'   LOCO data measurement cancelled\n'</span>);
+0082                 <span class="keyword">return</span>
+0083             <span class="keyword">end</span>
+0084         <span class="keyword">end</span>
+0085     <span class="keyword">end</span>
+0086 <span class="keyword">end</span>
+0087 
+0088 
+0089 <span class="comment">% Create the directory</span>
+0090 DirStart = pwd;
+0091 [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0092 cd(DirStart);
+0093        
+0094 
+0095 
+0096 <span class="keyword">if</span> DisplayFlag
+0097     DispersionString   = questdlg({<span class="string">'A Dispersion function measurement is needed for LOCO.'</span>, <span class="string">' '</span>,<span class="string">'Should this function measure a Dispersion function?'</span>},<span class="string">'LOCO Mesurement Setup'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Yes'</span>);
+0098     BPMSigmaString     = questdlg({<span class="string">'A BPM Sigma measurement is needed for LOCO.'</span>, <span class="string">' '</span>,<span class="string">'Should this function measure the BPM Sigma?'</span>},<span class="string">'LOCO Mesurement Setup'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Yes'</span>);
+0099     BPMResponseMatrix  = questdlg({<span class="string">'A BPM Response Matrix measurement is needed for LOCO.'</span>, <span class="string">' '</span>,<span class="string">'Should this function measure the BPM Response Matrix?'</span>},<span class="string">'LOCO Mesurement Setup'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Yes'</span>);
+0100     CorrectorOrbitFlag = <span class="string">'No'</span>; <span class="comment">%questdlg({'The proper orbit can be important for a LOCO measurement.', ' ','Should this function correct the orbit (using setorbitdefault) at the start?'},'LOCO Mesurement Setup','Yes','No','No');</span>
+0101 
+0102     <span class="comment">%StartFlag = questdlg('Start the LOCO measurement?','LOCO Mesurement','Yes','No','Yes');</span>
+0103     StartFlag = questdlg({<span class="string">'Start the LOCO measurement?'</span>,<span class="string">' '</span>,<span class="string">'(Make sure the orbit is ok.)'</span>},<span class="string">'LOCO Mesurement'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Yes'</span>);
+0104     <span class="keyword">if</span> ~strcmpi(StartFlag, <span class="string">'Yes'</span>)
+0105         fprintf(<span class="string">'   LOCO data measurement cancelled\n'</span>);
+0106         <span class="keyword">return</span>
+0107     <span class="keyword">end</span>
+0108 <span class="keyword">else</span>
+0109     DispersionString = <span class="string">'Yes'</span>;
+0110     BPMSigmaString = <span class="string">'Yes'</span>;
+0111     BPMResponseMatrix = <span class="string">'Yes'</span>;
+0112     CorrectorOrbitFlag = <span class="string">'No'</span>;
+0113 <span class="keyword">end</span>
+0114 
+0115 
+0116 TimeStart = gettime;
+0117 [N, T] = getbpmaverages;
+0118 T = max(T);
+0119 
+0120 
+0121 <span class="comment">% Correct the orbit</span>
+0122 <span class="keyword">if</span> strcmpi(CorrectorOrbitFlag, <span class="string">'Yes'</span>)
+0123     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0124         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0125         <span class="keyword">return</span>
+0126     <span class="keyword">end</span>
+0127     <span class="keyword">try</span>
+0128         fprintf(<span class="string">'   Correcting the orbit\n'</span>);
+0129         setorbitdefault(<span class="string">'NoDisplay'</span>);
+0130         pause(T * 2.5);
+0131         clf reset
+0132         <a href="plotorbit.html" class="code" title="function varargout = plotorbit(varargin)">plotorbit</a>;
+0133         drawnow;
+0134         fprintf(<span class="string">'   Orbit correction complete\n\n'</span>);
+0135 
+0136         <span class="keyword">if</span> DisplayFlag
+0137             ContinueFlag = questdlg(strvcat(strvcat(<span class="string">'The orbit has been corrected using the setorbitdefault function.'</span>, <span class="string">' '</span>),<span class="string">'Check that the orbit is good before continuing.  Continue?'</span>),<span class="string">'LOCO Mesurement Setup'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Yes'</span>);
+0138             <span class="keyword">if</span> ~strcmpi(ContinueFlag, <span class="string">'Yes'</span>)
+0139                 fprintf(<span class="string">'   LOCO data measurement cancelled\n'</span>);
+0140                 <span class="keyword">return</span>
+0141             <span class="keyword">end</span>
+0142         <span class="keyword">end</span>
+0143     <span class="keyword">catch</span>
+0144         ErrorString = questdlg(strvcat(<span class="string">'There was a problem correcting the orbit.'</span>,<span class="string">'Do you want to continue taking LOCO data?'</span>),<span class="string">'LOCO'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0145         <span class="keyword">if</span> ~strcmpi(ErrorString, <span class="string">'Yes'</span>)
+0146             fprintf(<span class="string">'   LOCO data measurement cancelled\n'</span>);
+0147             <span class="keyword">return</span>
+0148         <span class="keyword">end</span>
+0149     <span class="keyword">end</span>
+0150 <span class="keyword">end</span>
+0151 
+0152 
+0153 <span class="comment">% Measure dispersion</span>
+0154 <span class="keyword">if</span> strcmpi(DispersionString, <span class="string">'Yes'</span>)
+0155     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0156         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0157         <span class="keyword">return</span>
+0158     <span class="keyword">end</span>
+0159     fprintf(<span class="string">'   Measuring dispersion\n'</span>);
+0160     <span class="keyword">if</span> isempty(ModeFlag)
+0161         [Dx, Dy, FileName] = <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>(<span class="string">'Struct'</span>,<span class="string">'Archive'</span>,<span class="string">'Display'</span>);
+0162     <span class="keyword">else</span>
+0163         [Dx, Dy, FileName] = <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>(<span class="string">'Struct'</span>,<span class="string">'Archive'</span>,<span class="string">'Display'</span>,ModeFlag);
+0164     <span class="keyword">end</span>
+0165     copyfile(FileName, DirectoryName);
+0166     <span class="keyword">try</span>
+0167         clf reset
+0168         <a href="plotdisp.html" class="code" title="function [DxOut, DyOut, FileName] = plotdisp(varargin)">plotdisp</a>(Dx, Dy, <span class="string">'Physics'</span>);
+0169         drawnow;
+0170     <span class="keyword">catch</span>
+0171         fprintf(<span class="string">'\n   There was a problem plotting the dispersion function.\n'</span>);
+0172         fprintf(  <span class="string">'   Take a good look at the dispersion data before using it.\n'</span>);
+0173     <span class="keyword">end</span>
+0174     fprintf(<span class="string">'\n'</span>);
+0175 <span class="keyword">end</span>
+0176 
+0177 
+0178 <span class="comment">% Measure BPM response matrix</span>
+0179 <span class="keyword">if</span> strcmpi(BPMResponseMatrix, <span class="string">'Yes'</span>)
+0180     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0181         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0182         <span class="keyword">return</span>
+0183     <span class="keyword">end</span>
+0184     FileName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'BPMResponse'</span>), <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'BPMRespFile'</span>)];
+0185     FileName = appendtimestamp(FileName);
+0186     <span class="keyword">if</span> isempty(ModeFlag)
+0187         [Rmat, FileName] = <a href="measbpmresp.html" class="code" title="function [Rmat, OutputFileName] = measbpmresp(varargin)">measbpmresp</a>(<span class="string">'Archive'</span>, FileName);
+0188         <span class="comment">%[Rmat, FileName] = measbpmresp;</span>
+0189     <span class="keyword">else</span>
+0190         [Rmat, FileName] = <a href="measbpmresp.html" class="code" title="function [Rmat, OutputFileName] = measbpmresp(varargin)">measbpmresp</a>(<span class="string">'Archive'</span>, FileName, ModeFlag);
+0191     <span class="keyword">end</span>
+0192     copyfile(FileName, DirectoryName);
+0193 
+0194     <span class="keyword">try</span>
+0195         clf reset
+0196         <a href="plotbpmresp.html" class="code" title="function plotbpmresp(varargin)">plotbpmresp</a>(FileName);
+0197         drawnow;
+0198     <span class="keyword">catch</span>
+0199         fprintf(<span class="string">'\n   There was a problem plotting the BPM response matrix.\n'</span>);
+0200         fprintf(  <span class="string">'   Take a good look at the data before using it.\n'</span>);
+0201     <span class="keyword">end</span>
+0202     fprintf(<span class="string">'   BPM response matrix measurement complete\n\n'</span>);
+0203 <span class="keyword">end</span>
+0204 
+0205 
+0206 <span class="comment">% Measure BPM sigma</span>
+0207 <span class="keyword">if</span> strcmpi(BPMSigmaString, <span class="string">'Yes'</span>)
+0208     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0209         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0210         <span class="keyword">return</span>
+0211     <span class="keyword">end</span>
+0212     fprintf(<span class="string">'   Measuring BPM sigma\n'</span>);
+0213     <span class="keyword">if</span> T == 0
+0214         T = .5;
+0215     <span class="keyword">end</span>
+0216     <span class="keyword">if</span> isempty(ModeFlag)
+0217         [BPMx, BPMy, FileName] = <a href="monbpm.html" class="code" title="function varargout = monbpm(varargin)">monbpm</a>(0:T:3*60, <span class="string">'Struct'</span>, <span class="string">'Archive'</span>);
+0218     <span class="keyword">else</span>
+0219         [BPMx, BPMy, FileName] = <a href="monbpm.html" class="code" title="function varargout = monbpm(varargin)">monbpm</a>(0:T:3*60, <span class="string">'Struct'</span>, <span class="string">'Archive'</span>, ModeFlag);
+0220     <span class="keyword">end</span>
+0221     copyfile(FileName, DirectoryName);
+0222     fprintf(<span class="string">'   BPM noise measurement complete\n\n'</span>);
+0223 <span class="keyword">end</span>
+0224 
+0225 fprintf(<span class="string">'   The total measurement time was %.2f minutes.\n'</span>, (gettime-TimeStart)/60);
+0226 fprintf(<span class="string">'   LOCO measurement complete\n\n'</span>);
+0227 
+0228 
+0229</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

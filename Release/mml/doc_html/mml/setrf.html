@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setrf</title>
+  <meta name="keywords" content="setrf">
+  <meta name="description" content="SETRF - Sets the RF frequency">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setrf.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setrf
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETRF - Sets the RF frequency</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function setrf(RF, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETRF - Sets the RF frequency
+  setrf(RF, WaitFlag)
+
+  INPUTS
+  1. RF - RF frequency
+  2. WaitFlag = 0    -&gt; return immediately {Default}
+                &gt; 0  -&gt; wait until ramping is done then adds an extra delay equal to WaitFlag 
+                = -1 -&gt; wait until ramping is done
+                = -2 -&gt; wait until ramping is done then adds an extra delay for fresh data 
+                        from the BPMs
+                = -3 -&gt; wait until ramping is done then adds an extra delay for fresh data 
+                        from the tune measurement system
+                = -4 -&gt; wait until ramping is done then wait for a carriage return
+  3. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+     The actual physics or hardware strings can also be used.  
+     For example, if the physics and hardware modes corresponds 
+     to Hz and MHz then strings 'Hz' or 'MHz' can be used to specify units.
+  4. 'Online' - Set data online (optional override of the mode)
+     'Model'  - Set data on the model (optional override of the mode)
+     'Manual' - Set data manually (optional override of the mode)
+
+  setrf converts a string input to a number, hence, setrf 476.3 is the same as setrf(476.3)
+
+  EXAMPES
+  1. setrf(476, 'MHz')  or  setrf 476 MHz  =&gt; sets the RF frequency 476 KHz
+  2. setrf 476000000 Hz                    =&gt; sets the RF frequency 476 KHz
+
+  NOTES
+  1. 'Hardware', 'Physics', 'MHz', 'Hz', 'Numeric', and 'Struct' are not case sensitive
+  2. The length(RFam) will equal the number of cavities in the ring
+
+ See also <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>, <a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findrf1.html" class="code" title="function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName)">findrf1</a>	FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion</li><li><a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>	MEASCHRO -  measures the chromaticity function emperically</li><li><a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a>	STEPRF - Increment change in the RF frequency</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setrf(RF, varargin)</a>
+0002 <span class="comment">%SETRF - Sets the RF frequency</span>
+0003 <span class="comment">%  setrf(RF, WaitFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. RF - RF frequency</span>
+0007 <span class="comment">%  2. WaitFlag = 0    -&gt; return immediately {Default}</span>
+0008 <span class="comment">%                &gt; 0  -&gt; wait until ramping is done then adds an extra delay equal to WaitFlag</span>
+0009 <span class="comment">%                = -1 -&gt; wait until ramping is done</span>
+0010 <span class="comment">%                = -2 -&gt; wait until ramping is done then adds an extra delay for fresh data</span>
+0011 <span class="comment">%                        from the BPMs</span>
+0012 <span class="comment">%                = -3 -&gt; wait until ramping is done then adds an extra delay for fresh data</span>
+0013 <span class="comment">%                        from the tune measurement system</span>
+0014 <span class="comment">%                = -4 -&gt; wait until ramping is done then wait for a carriage return</span>
+0015 <span class="comment">%  3. 'Physics'  - Use physics  units (optional override of units)</span>
+0016 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0017 <span class="comment">%     The actual physics or hardware strings can also be used.</span>
+0018 <span class="comment">%     For example, if the physics and hardware modes corresponds</span>
+0019 <span class="comment">%     to Hz and MHz then strings 'Hz' or 'MHz' can be used to specify units.</span>
+0020 <span class="comment">%  4. 'Online' - Set data online (optional override of the mode)</span>
+0021 <span class="comment">%     'Model'  - Set data on the model (optional override of the mode)</span>
+0022 <span class="comment">%     'Manual' - Set data manually (optional override of the mode)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  setrf converts a string input to a number, hence, setrf 476.3 is the same as setrf(476.3)</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  EXAMPES</span>
+0027 <span class="comment">%  1. setrf(476, 'MHz')  or  setrf 476 MHz  =&gt; sets the RF frequency 476 KHz</span>
+0028 <span class="comment">%  2. setrf 476000000 Hz                    =&gt; sets the RF frequency 476 KHz</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  NOTES</span>
+0031 <span class="comment">%  1. 'Hardware', 'Physics', 'MHz', 'Hz', 'Numeric', and 'Struct' are not case sensitive</span>
+0032 <span class="comment">%  2. The length(RFam) will equal the number of cavities in the ring</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% See also getrf, steprf</span>
+0035 
+0036 <span class="comment">%  Written by Greg Portmann</span>
+0037 
+0038 
+0039 <span class="keyword">if</span> nargin &lt; 1
+0040     error(<span class="string">'No RF frequency input'</span>)
+0041 <span class="keyword">end</span>
+0042 <span class="keyword">if</span> ischar(RF)
+0043     RF = str2num(RF);
+0044 <span class="keyword">end</span>
+0045 
+0046 WaitFlag = [];
+0047 
+0048 
+0049 <span class="comment">% Allow actual units for conversions</span>
+0050 HWUnits      = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'HWUnits'</span>);
+0051 PhysicsUnits = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'PhysicsUnits'</span>);
+0052 
+0053 
+0054 <span class="comment">% Input line search</span>
+0055 <span class="keyword">for</span> i = length(varargin):-1:1
+0056     <span class="keyword">if</span> strcmpi(varargin{i}, <span class="string">'Struct'</span>)
+0057         <span class="comment">% Pass input thru to setpv</span>
+0058     <span class="keyword">elseif</span> strcmpi(varargin{i}, <span class="string">'Numeric'</span>)
+0059         <span class="comment">% Pass input thru to setpv</span>
+0060     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0061         <span class="comment">% Pass input thru to setpv</span>
+0062     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0063         <span class="comment">% Pass input thru to setpv</span>
+0064     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0065         <span class="comment">% Pass input thru to setpv</span>
+0066     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Inc'</span>) || strcmpi(varargin{i},<span class="string">'Incremental'</span>)
+0067         <span class="comment">% Pass input thru to setpv</span>
+0068         IncrementalFlag = 1;
+0069     <span class="keyword">elseif</span> strcmpi(varargin{i}, <span class="string">'Physics'</span>) || strcmpi(varargin{i}, PhysicsUnits)
+0070         varargin{i} = <span class="string">'Physics'</span>;
+0071     <span class="keyword">elseif</span> strcmpi(varargin{i}, <span class="string">'Hardware'</span>) || strcmpi(varargin{i}, HWUnits)
+0072         varargin{i} = <span class="string">'Hardware'</span>;
+0073     <span class="keyword">elseif</span> isnumeric(varargin{i})
+0074         WaitFlag = varargin{i};
+0075         varargin(i) = [];
+0076     <span class="keyword">else</span>
+0077         <span class="keyword">if</span> ~isempty(varargin{i})
+0078             <span class="keyword">if</span> ischar(varargin{i})
+0079                 fprintf(<span class="string">'   Input ''%s'' ignored'</span>, varargin{i});
+0080             <span class="keyword">else</span>
+0081                 fprintf(<span class="string">'   Input ''%f'' ignored'</span>, varargin{i});
+0082             <span class="keyword">end</span>
+0083         <span class="keyword">end</span>
+0084         varargin(i) = [];
+0085     <span class="keyword">end</span>
+0086 <span class="keyword">end</span>
+0087 
+0088 
+0089 <span class="comment">% Set RF</span>
+0090 <span class="keyword">if</span> isstruct(RF)
+0091     <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(RF, WaitFlag, varargin{:});
+0092 <span class="keyword">else</span>
+0093     <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(<span class="string">'RF'</span>, <span class="string">'Setpoint'</span>, RF, [], WaitFlag, varargin{:});
+0094 <span class="keyword">end</span>
+0095 
+0096 
+0097 
+0098 
+0099 
+0100 <span class="comment">% % Used for conversions</span>
+0101 <span class="comment">% Units        = getfamilydata('RF','Setpoint','Units');</span>
+0102 <span class="comment">% HWUnits      = getfamilydata('RF','Setpoint','HWUnits');</span>
+0103 <span class="comment">% PhysicsUnits = getfamilydata('RF','Setpoint','PhysicsUnits');</span>
+0104 <span class="comment">%</span>
+0105 <span class="comment">%</span>
+0106 <span class="comment">% % Input line search (if not a data structure)</span>
+0107 <span class="comment">% if isstruct(RF)</span>
+0108 <span class="comment">%     UnitsInput = RF.Units;</span>
+0109 <span class="comment">%     UnitsString = RF.UnitsString;</span>
+0110 <span class="comment">%     RF = RF.Data;</span>
+0111 <span class="comment">% else</span>
+0112 <span class="comment">%     UnitsInput = '';</span>
+0113 <span class="comment">%     for i = length(varargin):-1:1</span>
+0114 <span class="comment">%         if strcmpi(varargin{i}, 'Physics') | strcmpi(varargin{i}, PhysicsUnits)</span>
+0115 <span class="comment">%             UnitsInput = 'Physics';</span>
+0116 <span class="comment">%         elseif strcmpi(varargin{i}, 'Hardware') | strcmpi(varargin{i}, HWUnits)</span>
+0117 <span class="comment">%             UnitsInput = 'Hardware';</span>
+0118 <span class="comment">%         else</span>
+0119 <span class="comment">%             if ~isempty(varargin{i})</span>
+0120 <span class="comment">%                 if ischar(varargin{i})</span>
+0121 <span class="comment">%                     fprintf('   Input %s ignored', varargin{i});</span>
+0122 <span class="comment">%                 else</span>
+0123 <span class="comment">%                     fprintf('   Input %f ignored', varargin{i});</span>
+0124 <span class="comment">%                 end</span>
+0125 <span class="comment">%             end</span>
+0126 <span class="comment">%         end</span>
+0127 <span class="comment">%         varargin(i) = [];</span>
+0128 <span class="comment">%     end</span>
+0129 <span class="comment">% end</span>
+0130 <span class="comment">%</span>
+0131 <span class="comment">% % Convert units if necessary</span>
+0132 <span class="comment">% if ~isempty(UnitsInput)</span>
+0133 <span class="comment">%     % 'Physics', 'Hardware', 'Hz', or 'Mz' was input</span>
+0134 <span class="comment">%     if strcmpi(UnitsInput, 'Physics') &amp; strcmpi(Units, 'Hardware')</span>
+0135 <span class="comment">%         RF = physics2hw('RF', 'Setpoint', RF);</span>
+0136 <span class="comment">%     elseif strcmpi(UnitsInput, 'Physics') &amp; strcmpi(Units, 'Physics')</span>
+0137 <span class="comment">%         % OK as is</span>
+0138 <span class="comment">%     elseif strcmpi(UnitsInput, 'Hardware') &amp; strcmpi(Units, 'Physics')</span>
+0139 <span class="comment">%         RF = hw2physics('RF', 'Setpoint', RF);</span>
+0140 <span class="comment">%     elseif strcmpi(UnitsInput, 'Hardware') &amp; strcmpi(Units, 'Hardware')</span>
+0141 <span class="comment">%         % OK as is</span>
+0142 <span class="comment">%     else</span>
+0143 <span class="comment">%         error(sprintf('&quot;%s&quot; units are an unknown type, hence no change to the RF frequency', UnitsInput));</span>
+0144 <span class="comment">%     end</span>
+0145 <span class="comment">% end</span>
+0146 <span class="comment">%</span>
+0147 <span class="comment">%</span>
+0148 <span class="comment">% setsp('RF', RF);</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of archive_sr</title>
+  <meta name="keywords" content="archive_sr">
+  <meta name="description" content="ARCHIVE_SR - Archive storage ring data to the mysql database">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; archive_sr.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>archive_sr
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>ARCHIVE_SR - Archive storage ring data to the mysql database</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function archive_sr(DropTableFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">ARCHIVE_SR - Archive storage ring data to the mysql database
+
+  archive_sr(DropTableFlag)
+
+  DropTableFlag - Drop the table before creating it
+
+  See also <a href="archive_size.html" class="code" title="function archive_size">archive_size</a>, <a href="getmysqldata.html" class="code" title="function [data, t, StartTime, EndTime] = getmysqldata(ColumnNames, StartTime, EndTime, Table, User, DataBaseName)">getmysqldata</a>, <a href="buildsrdatabase.html" class="code" title="function buildsrdatabase">buildsrdatabase</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="switch2allbpms.html" class="code" title="function switch2alsbpms(DisplayFlag)">switch2allbpms</a>	SWITCH2ALSBPMS - Set BPMx & BPMy status flag to ALL BPMs</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="mysqldatalogger.html" class="code" title="function varargout = mysqldatalogger(varargin)">mysqldatalogger</a>	MYSQLDATALOGGER M-file for mysqldatalogger.fig</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [ColumnNamesWithTypes, ColumnNames, ChanNames] = CreateTableString(ColumnNamesWithTypes, ColumnNames, ChanNames, Family)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function archive_sr(DropTableFlag)</a>
+0002 <span class="comment">%ARCHIVE_SR - Archive storage ring data to the mysql database</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  archive_sr(DropTableFlag)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  DropTableFlag - Drop the table before creating it</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  See also archive_size, getmysqldata, buildsrdatabase</span>
+0009 
+0010 <span class="comment">%  Written by Greg Portmann</span>
+0011 
+0012 
+0013 <span class="comment">% Connect as localhost/root at the command line:</span>
+0014 <span class="comment">% shell&gt; mysql -u root -p</span>
+0015 
+0016 <span class="comment">% To change a password</span>
+0017 <span class="comment">% mysql&gt; update user set Password=password('new_password') where User='mysql';</span>
+0018 <span class="comment">%  or</span>
+0019 <span class="comment">% shell&gt; mysql -u root mysql</span>
+0020 <span class="comment">% mysql&gt; SET PASSWORD FOR root@localhost=PASSWORD('new_password');</span>
+0021 
+0022 
+0023 <span class="comment">% To create a user account with full privilege using password 'pw'</span>
+0024 <span class="comment">% GRANT ALL PRIVILEGES ON *.* TO 'physdata'@'localhost' IDENTIFIED BY 'pw' WITH GRANT OPTION;</span>
+0025 <span class="comment">% GRANT ALL PRIVILEGES ON *.* TO 'physdata'@'%' IDENTIFIED BY 'pw' WITH GRANT OPTION;</span>
+0026 <span class="comment">% FLUSH PRIVILEGES;</span>
+0027 
+0028 <span class="comment">% To creat a new database???</span>
+0029 <span class="comment">% shell&gt; mysql -h host -u user -p physlogs</span>
+0030 <span class="comment">% Enter password: ********</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% To creat a new database and table</span>
+0033 <span class="comment">% CREATE DATABASE physlogs;</span>
+0034 
+0035 
+0036 <span class="comment">% This is for the compiled version</span>
+0037 checkforao;
+0038 
+0039 
+0040 <span class="comment">% Sampling period in seconds</span>
+0041 T = 10;  
+0042 
+0043 <span class="comment">% Archive all BPMs (even bad ones)</span>
+0044 <a href="switch2allbpms.html" class="code" title="function switch2alsbpms(DisplayFlag)">switch2allbpms</a>(<span class="string">'Display'</span>);
+0045 
+0046 
+0047 <span class="keyword">global</span> StopMySQLDataLogger
+0048 StopMySQLDataLogger = 0;
+0049 
+0050 
+0051 <span class="keyword">if</span> nargin == 0
+0052     DropTableFlag = 0;
+0053 <span class="keyword">end</span>
+0054 
+0055 
+0056 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0057 <span class="comment">% Open a connection %</span>
+0058 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0059 <span class="comment">%Host = 'cgsrv';</span>
+0060 <span class="comment">%User = 'croper';</span>
+0061 
+0062 <span class="comment">%Host = 'pharos';</span>
+0063 <span class="comment">%User = 'crdev';</span>
+0064 
+0065 
+0066 
+0067 <span class="comment">% This works on crconlnx1, crconm12,</span>
+0068 <span class="comment">%Host = 'thor.als.lbl.gov';</span>
+0069 <span class="comment">%User = 'physdata';   % alsoper</span>
+0070 <span class="comment">%PassWord = 'EightBall';</span>
+0071 
+0072 Host = <span class="string">'ps3.als.lbl.gov'</span>;  
+0073 User = <span class="string">'portmann'</span>;
+0074 PassWord = <span class="string">'gp80_12!op'</span>;
+0075 
+0076 
+0077 <span class="comment">%[User, PassWord] = logindlg('MySQL Connection', User);</span>
+0078 <span class="keyword">if</span> ~isempty(User)
+0079     OpenResult = mym(<span class="string">'open'</span>, Host, User, PassWord);
+0080 <span class="keyword">else</span>
+0081     <span class="keyword">return</span>
+0082 <span class="keyword">end</span>
+0083 clear PassWord
+0084 
+0085 
+0086 
+0087 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0088 <span class="comment">% Select a database %</span>
+0089 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0090 mym(<span class="string">'use physlogs'</span>);
+0091 
+0092 
+0093     
+0094 <span class="comment">%%%%%%%%%%%%%%%</span>
+0095 <span class="comment">% SRLOG TABLE %</span>
+0096 <span class="comment">%%%%%%%%%%%%%%%</span>
+0097 
+0098 <span class="keyword">if</span> DropTableFlag
+0099     <span class="comment">% Drop the table and create a new one</span>
+0100     ButtonName = questdlg({<span class="string">'Are you sure you want to drop the SRLOG2007b'</span>,<span class="string">'database before creating a new one?'</span>}, <span class="string">'SRLOG2007b'</span>, <span class="string">'Yes'</span>, <span class="string">'No'</span>, <span class="string">'No'</span>);
+0101     <span class="keyword">if</span> strcmp(ButtonName, <span class="string">'Yes'</span>)
+0102         mym(<span class="string">'drop table if exists SRLOG2007b'</span>);
+0103     <span class="keyword">end</span>
+0104 <span class="keyword">end</span>
+0105 
+0106 
+0107 <span class="comment">% Create the table</span>
+0108 ColumnNamesWithTypes = [
+0109     <span class="string">'Time datetime not null PRIMARY KEY'</span>, <span class="keyword">...</span>
+0110     <span class="string">', TimeSec double'</span>, <span class="keyword">...</span>
+0111     <span class="string">', DCCT float'</span>, <span class="keyword">...</span>
+0112     <span class="string">', Energy float'</span>, <span class="keyword">...</span>
+0113     <span class="string">', UserBeam int'</span>, <span class="keyword">...</span>
+0114     <span class="string">', LCW float'</span>];
+0115 
+0116 ChanNames = family2channel(<span class="string">'DCCT'</span>);
+0117 ChanNames = strvcat(ChanNames, <span class="string">'cmm:sr_energy'</span>);
+0118 ChanNames = strvcat(ChanNames, <span class="string">'sr:user_beam'</span>);
+0119 ChanNames = strvcat(ChanNames, <span class="string">'SR03S___LCWTMP_AM00'</span>);
+0120 
+0121 ColumnNames = [<span class="string">'Time, TimeSec, DCCT, Energy, UserBeam, LCW'</span>];
+0122 
+0123 <span class="comment">%FamilyCell = {'BPMx', 'BPMy', 'HCM', 'VCM', 'QF', 'QD', 'QFA', 'QDA', 'SQSF', 'SQSD', 'SF', 'SD', 'BEND', 'ID', 'EPU','RF','HCMCHICANE','HCMCHICANEM','IonGauge','IonPump'};</span>
+0124 FamilyCell = {<span class="string">'BPMx'</span>, <span class="string">'BPMy'</span>, <span class="string">'HCM'</span>, <span class="string">'VCM'</span>, <span class="string">'QF'</span>, <span class="string">'QD'</span>, <span class="string">'QFA'</span>, <span class="string">'QDA'</span>, <span class="string">'SQSF'</span>, <span class="string">'SQSD'</span>, <span class="string">'SF'</span>, <span class="string">'SD'</span>, <span class="string">'BEND'</span>, <span class="string">'ID'</span>, <span class="string">'EPU'</span>,<span class="string">'RF'</span>,<span class="string">'HCMCHICANE'</span>,<span class="string">'HCMCHICANEM'</span>};
+0125 [ColumnNamesWithTypes, ColumnNames, ChanNames] = <a href="#_sub1" class="code" title="subfunction [ColumnNamesWithTypes, ColumnNames, ChanNames] = CreateTableString(ColumnNamesWithTypes, ColumnNames, ChanNames, Family)">CreateTableString</a>(ColumnNamesWithTypes, ColumnNames, ChanNames, FamilyCell);
+0126 
+0127 
+0128 CommandString = [<span class="string">'create table if not exists SRLOG2007b ('</span>, ColumnNamesWithTypes, <span class="string">');'</span>];
+0129 
+0130 
+0131 <span class="keyword">if</span> DropTableFlag
+0132     <span class="comment">% Create the SQL table</span>
+0133     mym(CommandString);
+0134 
+0135 <span class="keyword">else</span>
+0136     <span class="comment">% Print table info</span>
+0137     <span class="comment">%mym('show table status from physlogs;');</span>
+0138 
+0139     TableInfo = mym(<span class="string">'show table status from physlogs;'</span>);
+0140 
+0141     <span class="keyword">for</span> i = 1:length(TableInfo.Name)
+0142         <span class="keyword">if</span> strcmp(TableInfo.Name{i}, <span class="string">'SRLOG2007b'</span>)
+0143             <span class="keyword">break</span>
+0144         <span class="keyword">end</span>
+0145     <span class="keyword">end</span>
+0146 
+0147     fprintf(<span class="string">'   %s was created %s and the last update was %s\n'</span>, TableInfo.Name{i}, TableInfo.Create_time{i}, TableInfo.Update_time{i});
+0148     fprintf(<span class="string">'   It is presently %f GBytes with %d rows\n'</span>, TableInfo.Data_length(i)/2^30, TableInfo.Rows(i));
+0149 <span class="keyword">end</span>
+0150  
+0151 
+0152 <span class="comment">% Connect to all the channels</span>
+0153 <span class="keyword">try</span>
+0154     Data = getpv(ChanNames);
+0155 <span class="keyword">catch</span>
+0156     fprintf(<span class="string">'%s\n'</span>,lasterr);
+0157     mym(<span class="string">'close'</span>);
+0158     <span class="keyword">return</span>;
+0159 <span class="keyword">end</span>
+0160 
+0161 
+0162 <span class="comment">% Add a NULL whenever starting (so plots see the breaks)</span>
+0163 <span class="keyword">if</span> ~DropTableFlag
+0164     [MatlabTime, MatlabClock] = gettime;
+0165     DataString = [<span class="string">'insert into SRLOG2007b ('</span>, ColumnNames, <span class="string">') values ('</span>, sprintf(<span class="string">'&quot;%s&quot;, %f'</span>, datestr(MatlabClock,31), MatlabTime)];
+0166     <span class="keyword">for</span> i = 1:size(ChanNames,1)
+0167         DataString = [DataString , <span class="string">', NULL'</span>];
+0168     <span class="keyword">end</span>
+0169     DataString = [DataString , <span class="string">');'</span>];
+0170     mym(DataString);
+0171     pause(2);  <span class="comment">% So that the next data point is separated in time</span>
+0172 <span class="keyword">end</span>
+0173 
+0174 
+0175 
+0176 <span class="comment">% Get data</span>
+0177 <span class="keyword">for</span> i = 1:Inf
+0178     <span class="keyword">try</span>
+0179         [MatlabTime, MatlabClock] = gettime;
+0180         tic;
+0181         Data = getpv(ChanNames);
+0182         DataTime = toc;
+0183         tic;
+0184         DataString = [<span class="string">'insert into SRLOG2007b ('</span>, ColumnNames, <span class="string">') values ('</span>, sprintf(<span class="string">'&quot;%s&quot;, %f'</span>, datestr(MatlabClock,31), MatlabTime), sprintf(<span class="string">', %f'</span>,Data),<span class="string">');'</span>];
+0185         <span class="comment">%DataString = ['insert into SRLOG2007b values (', sprintf('&quot;%s&quot;, %f', datestr(MatlabClock,31), MatlabTime), sprintf(', %f',Data),');'];</span>
+0186         mym(DataString);
+0187         SQLTime = toc;
+0188         fprintf(<span class="string">'%d.  %s  %f seconds to get data   %f seconds for MYSQL write\n'</span>, i, datestr(MatlabClock,31), DataTime, SQLTime);
+0189         fprintf(<span class="string">'This is G. Portmann''s storage ring archive.  If it fails let me know (x4105). \n\n'</span>);
+0190         
+0191         sleep(T-(gettime-MatlabTime));
+0192     <span class="keyword">catch</span>
+0193         fprintf(<span class="string">'%s\n'</span>,lasterr);
+0194         <span class="comment">%mym('close');</span>
+0195         fprintf(<span class="string">'This is G. Portmann''s storage ring archive.  It appears to be failing.  \nPlease called me (x5924) or kill it (ctrl-c) and try to restart (archive_sr). \n\n'</span>);
+0196         sleep(T-(gettime-MatlabTime));
+0197         <span class="comment">%return;</span>
+0198     <span class="keyword">end</span>
+0199     
+0200     <span class="keyword">if</span> StopMySQLDataLogger
+0201         fprintf(<span class="string">'   Stop request came from global variable StopMySQLDataLogger.\n'</span>);
+0202         <span class="keyword">break</span>;
+0203     <span class="keyword">end</span>
+0204 <span class="keyword">end</span>
+0205 
+0206 
+0207 
+0208 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0209 <span class="comment">% Print some output to the screen %</span>
+0210 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0211 <span class="comment">%mym('explain SRLOG2007b;');</span>
+0212 
+0213 
+0214 
+0215 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0216 <span class="comment">% Close the database %</span>
+0217 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0218 mym(<span class="string">'close'</span>);
+0219 
+0220 
+0221 
+0222 <a name="_sub1" href="#_subfunctions" class="code">function [ColumnNamesWithTypes, ColumnNames, ChanNames] = CreateTableString(ColumnNamesWithTypes, ColumnNames, ChanNames, Family)</a>
+0223 
+0224 
+0225 <span class="keyword">for</span> j = 1:length(Family)
+0226     DevList = family2dev(Family{j}, 1, 1);
+0227 
+0228     <span class="comment">% Monitors</span>
+0229     ChannelNames = family2channel(Family{j}, <span class="string">'Monitor'</span>, DevList);
+0230     <span class="keyword">if</span> strcmp(Family{j}, <span class="string">'HCMCHICANEM'</span>)
+0231         <span class="comment">% &quot;.&quot; cause trouble in column names</span>
+0232         tmp = ChannelNames;
+0233         <span class="comment">%tmp = tmp(:,1:19);</span>
+0234         <span class="comment">%tmp(:,17) = 'M';</span>
+0235         tmp(:,20) = <span class="string">'_'</span>;
+0236         <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0237             ColumnNamesWithTypes = [ColumnNamesWithTypes, sprintf(<span class="string">', %s float'</span>, deblank(tmp(i,:)))];
+0238             ColumnNames          = [ColumnNames         , sprintf(<span class="string">', %s'</span>,       deblank(tmp(i,:)))];
+0239         <span class="keyword">end</span>
+0240     <span class="keyword">else</span>
+0241         <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0242             ColumnNamesWithTypes = [ColumnNamesWithTypes, sprintf(<span class="string">', %s float'</span>, deblank(ChannelNames(i,:)))];
+0243             ColumnNames          = [ColumnNames         , sprintf(<span class="string">', %s'</span>,       deblank(ChannelNames(i,:)))];
+0244         <span class="keyword">end</span>
+0245     <span class="keyword">end</span>
+0246     ChanNames = strvcat(ChanNames, ChannelNames);
+0247 
+0248     <span class="comment">% Setpoints</span>
+0249     ChannelNames = family2channel(Family{j}, <span class="string">'Setpoint'</span>, DevList);
+0250     <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0251         ColumnNamesWithTypes = [ColumnNamesWithTypes, sprintf(<span class="string">', %s float'</span>, deblank(ChannelNames(i,:)))];
+0252         ColumnNames          = [ColumnNames         , sprintf(<span class="string">', %s'</span>,       deblank(ChannelNames(i,:)))];
+0253     <span class="keyword">end</span>
+0254     ChanNames = strvcat(ChanNames, ChannelNames);
+0255     
+0256     <span class="keyword">if</span> strcmp(Family{j}, <span class="string">'HCM'</span>) | strcmp(Family{j}, <span class="string">'VCM'</span>)
+0257         <span class="comment">% Trim channels for correctors</span>
+0258         ChannelNames = unique(family2channel(Family{j}, <span class="string">'Trim'</span>, DevList),<span class="string">'rows'</span>);
+0259         <span class="keyword">if</span> ChannelNames(1,1) == <span class="string">' '</span>
+0260             ChannelNames(1,:) = [];
+0261         <span class="keyword">end</span>
+0262         <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0263             ColumnNamesWithTypes = [ColumnNamesWithTypes, sprintf(<span class="string">', %s float'</span>, deblank(ChannelNames(i,:)))];
+0264             ColumnNames          = [ColumnNames         , sprintf(<span class="string">', %s'</span>,       deblank(ChannelNames(i,:)))];
+0265         <span class="keyword">end</span>
+0266         ChanNames = strvcat(ChanNames, ChannelNames);
+0267 
+0268         <span class="comment">% FF1 and FF2 channels for correctors</span>
+0269         ChannelNames = unique(family2channel(Family{j}, <span class="string">'FF1'</span>, DevList),<span class="string">'rows'</span>);
+0270         <span class="keyword">if</span> ChannelNames(1,1) == <span class="string">' '</span>
+0271             ChannelNames(1,:) = [];
+0272         <span class="keyword">end</span>
+0273         <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0274             ColumnNamesWithTypes = [ColumnNamesWithTypes, sprintf(<span class="string">', %s float'</span>, deblank(ChannelNames(i,:)))];
+0275             ColumnNames          = [ColumnNames         , sprintf(<span class="string">', %s'</span>,       deblank(ChannelNames(i,:)))];
+0276         <span class="keyword">end</span>
+0277         ChanNames = strvcat(ChanNames, ChannelNames);
+0278         ChannelNames = unique(family2channel(Family{j}, <span class="string">'FF2'</span>, DevList),<span class="string">'rows'</span>);
+0279         <span class="keyword">if</span> ChannelNames(1,1) == <span class="string">' '</span>
+0280             ChannelNames(1,:) = [];
+0281         <span class="keyword">end</span>
+0282         <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0283             ColumnNamesWithTypes = [ColumnNamesWithTypes, sprintf(<span class="string">', %s float'</span>, deblank(ChannelNames(i,:)))];
+0284             ColumnNames          = [ColumnNames         , sprintf(<span class="string">', %s'</span>,       deblank(ChannelNames(i,:)))];
+0285         <span class="keyword">end</span>
+0286         ChanNames = strvcat(ChanNames, ChannelNames);
+0287     <span class="keyword">end</span>
+0288     <span class="keyword">if</span> strcmp(Family{j}, <span class="string">'QF'</span>) | strcmp(Family{j}, <span class="string">'QD'</span>)
+0289         <span class="comment">% FF channels</span>
+0290         ChannelNames = unique(family2channel(Family{j}, <span class="string">'FF'</span>, DevList),<span class="string">'rows'</span>);
+0291         <span class="keyword">if</span> ChannelNames(1,1) == <span class="string">' '</span>
+0292             ChannelNames(1,:) = [];
+0293         <span class="keyword">end</span>
+0294         <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0295             ColumnNamesWithTypes = [ColumnNamesWithTypes, sprintf(<span class="string">', %s float'</span>, deblank(ChannelNames(i,:)))];
+0296             ColumnNames          = [ColumnNames         , sprintf(<span class="string">', %s'</span>,       deblank(ChannelNames(i,:)))];
+0297         <span class="keyword">end</span>
+0298         ChanNames = strvcat(ChanNames, ChannelNames);
+0299     <span class="keyword">end</span>
+0300 <span class="keyword">end</span>
+0301 
+0302 fprintf(<span class="string">'   %d channels to be logged.\n'</span>,size(ChanNames,1)+2);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

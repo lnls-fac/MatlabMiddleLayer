@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of copychicanerespfile</title>
+  <meta name="keywords" content="copychicanerespfile">
+  <meta name="description" content="COPYCHICANERESPFILE - Copies a chicane magnet to BPM response matrix file to the golden file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; copychicanerespfile.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>copychicanerespfile
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>COPYCHICANERESPFILE - Copies a chicane magnet to BPM response matrix file to the golden file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function copychicanerespfile(DataFileName, ToFileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">COPYCHICANERESPFILE - Copies a chicane magnet to BPM response matrix file to the golden file 
+  copychicanerespfile(FromFileName, ToFileName)
+
+  INPUTS
+  1. FromFileName - File name to get data from
+  2. ToFileName - File name to write data to (Default: Golden Filename) 
+
+  See also copychrorespfile, copybpmsigmafile, copydispersionfile,
+           copybpmrespfile, copymachineconfigfile, copytunerespfile</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function copychicanerespfile(DataFileName, ToFileName)</a>
+0002 <span class="comment">%COPYCHICANERESPFILE - Copies a chicane magnet to BPM response matrix file to the golden file</span>
+0003 <span class="comment">%  copychicanerespfile(FromFileName, ToFileName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. FromFileName - File name to get data from</span>
+0007 <span class="comment">%  2. ToFileName - File name to write data to (Default: Golden Filename)</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%  See also copychrorespfile, copybpmsigmafile, copydispersionfile,</span>
+0010 <span class="comment">%           copybpmrespfile, copymachineconfigfile, copytunerespfile</span>
+0011 
+0012 <span class="comment">%  Written by Greg Portmann</span>
+0013 
+0014 
+0015 <span class="keyword">if</span> nargin &lt; 1
+0016     DataFileName = <span class="string">''</span>;
+0017 <span class="keyword">end</span>
+0018 
+0019 <span class="keyword">if</span> nargin &lt; 2
+0020     ToFileName = <span class="string">'Golden'</span>;
+0021 <span class="keyword">end</span>
+0022 
+0023 
+0024 <span class="keyword">if</span> isempty(DataFileName)
+0025     DataDirectoryName = getfamilydata(<span class="string">'Directory'</span>,<span class="string">'BPMResponse'</span>);
+0026     <span class="keyword">if</span> isempty(DataDirectoryName)
+0027         DataDirectoryName = getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>);
+0028     <span class="keyword">end</span>
+0029     [DataFileName, DataDirectoryName, FilterIndex] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select the Chicane Magnet Response Matrix File to Copy'</span>, DataDirectoryName);
+0030     <span class="keyword">if</span> FilterIndex == 0 
+0031         fprintf(<span class="string">'   File not copied (copychicanerespfile)\n'</span>);
+0032         <span class="keyword">return</span>;
+0033     <span class="keyword">end</span>
+0034 <span class="keyword">else</span>
+0035     [DataDirectoryName, DataFileName, ExtName] = fileparts(DataFileName);
+0036     DataDirectoryName = [DataDirectoryName, filesep];
+0037     DataFileName = [DataFileName, ExtName];
+0038 <span class="keyword">end</span>
+0039 
+0040 
+0041 <span class="keyword">if</span> strcmpi(ToFileName, <span class="string">'Golden'</span>)
+0042     FileName = [getfamilydata(<span class="string">'OpsData'</span>,<span class="string">'ChicaneRespFile'</span>),<span class="string">'.mat'</span>];
+0043     DirectoryName = getfamilydata(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>);
+0044     AnswerString = questdlg(strvcat(strvcat(strvcat(<span class="string">'Are you sure you want to overwrite the default chicane magnet response matrix file?'</span>,sprintf(<span class="string">'%s'</span>,[DirectoryName FileName])),<span class="string">'With file:'</span>),[DataDirectoryName, DataFileName]),<span class="string">'Default Chicane Magnet Response'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0045     <span class="keyword">if</span> strcmp(AnswerString,<span class="string">'Yes'</span>)
+0046         DirStart = pwd;
+0047         [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0048         cd(DirStart);
+0049     <span class="keyword">else</span>
+0050         fprintf(<span class="string">'   File not copied (copychicanerespfile)\n'</span>);
+0051         <span class="keyword">return</span>;
+0052     <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 
+0055 
+0056 <span class="comment">% Backup first</span>
+0057 BackupDirectoryName = [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'Backup'</span> filesep];
+0058 BackupDataFileName  = prependtimestamp(FileName);
+0059 <span class="keyword">if</span> exist([DirectoryName, FileName],<span class="string">'file'</span>)
+0060     DirStart = pwd;
+0061     [FinalDir, ErrorFlag] = gotodirectory(BackupDirectoryName);
+0062     <span class="keyword">if</span> ~ErrorFlag
+0063         copyfile([DirectoryName, FileName], [BackupDirectoryName, BackupDataFileName], <span class="string">'f'</span>);
+0064         fprintf(<span class="string">'   File %s backup to %s\n'</span>, [DirectoryName, FileName], [BackupDirectoryName, BackupDataFileName]);
+0065     <span class="keyword">else</span>
+0066         fprintf(<span class="string">'   Problem finding/creating backup directory, hence backup made to ops directory.\n'</span>);
+0067         copyfile([DirectoryName, FileName], [DirectoryName, BackupDataFileName], <span class="string">'f'</span>);
+0068     <span class="keyword">end</span>
+0069     cd(DirStart);
+0070 <span class="keyword">end</span>
+0071 
+0072 
+0073 <span class="comment">% Do the copy</span>
+0074 copyfile([DataDirectoryName, DataFileName], [DirectoryName, FileName], <span class="string">'f'</span>);
+0075 fprintf(<span class="string">'   File %s copied to %s\n'</span>, [DataDirectoryName, DataFileName], [DirectoryName, FileName]);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

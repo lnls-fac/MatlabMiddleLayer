@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of liberainit</title>
+  <meta name="keywords" content="liberainit">
+  <meta name="description" content="LIBERAINIT - Initialization program for the booster ring Libera BPMs">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; liberainit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>liberainit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LIBERAINIT - Initialization program for the booster ring Libera BPMs</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function liberainit(DevList) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LIBERAINIT - Initialization program for the booster ring Libera BPMs</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li><li><a href="liberainit.html" class="code" title="function liberainit(DevList)">liberainit</a>	LIBERAINIT - Initialization program for the booster ring Libera BPMs</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="liberainit.html" class="code" title="function liberainit(DevList)">liberainit</a>	LIBERAINIT - Initialization program for the booster ring Libera BPMs</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function liberainit(DevList)</a>
+0002 <span class="comment">%LIBERAINIT - Initialization program for the booster ring Libera BPMs</span>
+0003 
+0004 <span class="keyword">if</span> nargin &lt; 1 || isempty(DevList)
+0005     DevList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Libera'</span>);
+0006 <span class="keyword">end</span>
+0007 
+0008 <span class="comment">% More than 1 libera</span>
+0009 <span class="keyword">if</span> size(DevList,1) &gt; 1
+0010     <span class="keyword">for</span> i = 1:size(DevList,1)
+0011         <a href="liberainit.html" class="code" title="function liberainit(DevList)">liberainit</a>(DevList(i,:));
+0012     <span class="keyword">end</span>
+0013     <span class="keyword">return</span>
+0014 <span class="keyword">end</span>
+0015 
+0016 
+0017 <span class="keyword">if</span> ischar(DevList)
+0018     <span class="comment">% Input can be BPMName directly</span>
+0019     BPMName = DevList;
+0020 <span class="keyword">else</span>
+0021     <span class="comment">% BPMName is a DeviceList</span>
+0022     BPMName = <span class="string">'LIBERA_0A7E'</span>;     <span class="comment">% 0-d0-50-31-a-7e.dhcp.lbl.gov</span>
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="comment">% % 'ADC'</span>
+0026 <span class="comment">% 'ADC_IGNORE_TRIG_SP'</span>
+0027 <span class="comment">% 'ADC_ON_NEXT_TRIG_CMD'</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% % 'PM'</span>
+0030 <span class="comment">% 'PM_IGNORE_TRIG_SP'</span>
+0031 <span class="comment">% 'PM_ON_NEXT_TRIG_CMD'</span>
+0032 <span class="comment">% 'PM_REQUEST_CMD'</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% % 'FA'</span>
+0035 <span class="comment">% 'FA_MEM_READ_CMD'</span>
+0036 <span class="comment">% 'FA_MEM_WRITE_CMD'</span>
+0037 <span class="comment">% 'FA_LENGTH_SP'</span>
+0038 <span class="comment">% 'FA_OFFSET_SP'</span>
+0039 <span class="comment">% 'FA_MEM_SP'</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">% % {'DD1','DD2','DD3','DD4'}</span>
+0043 <span class="comment">% 'DD_IGNORE_TRIG_SP'</span>
+0044 <span class="comment">% 'DD_ON_NEXT_TRIG_CMD'</span>
+0045 <span class="comment">% 'DD_REQUEST_CMD'</span>
+0046 <span class="comment">% 'DD_SEEK_POINT_SP'</span>
+0047 <span class="comment">% 'DD_MT_OFFSET_SP'</span>
+0048 <span class="comment">% 'DD_ST_OFFSET_SP'</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">% % 'ENV'</span>
+0051 <span class="comment">% 'ENV_AGC_SP'</span>
+0052 <span class="comment">% 'ENV_DSC_SP'</span>
+0053 <span class="comment">% 'ENV_GAIN_SP'</span>
+0054 <span class="comment">% 'ENV_KX_SP'</span>
+0055 <span class="comment">% 'ENV_KY_SP'</span>
+0056 <span class="comment">% 'ENV_Q_OFFSET_SP'</span>
+0057 <span class="comment">% 'ENV_X_OFFSET_SP'</span>
+0058 <span class="comment">% 'ENV_Y_OFFSET_SP'</span>
+0059 <span class="comment">% 'ENV_SWITCHES_SP'</span>
+0060 <span class="comment">% 'ENV_COMMIT_MTST_CMD'</span>
+0061 <span class="comment">% 'ENV_COMMIT_MT_CMD'</span>
+0062 <span class="comment">% 'ENV_COMMIT_ST_CMD'</span>
+0063 <span class="comment">% 'ENV_INTERLOCK_CLEAR_CMD'</span>
+0064 <span class="comment">% 'ENV_SET_INTERLOCK_PARAM_CMD'</span>
+0065 <span class="comment">% 'ENV_ILK_GAIN_LIMIT_SP'</span>
+0066 <span class="comment">% 'ENV_ILK_OF_DUR_SP'</span>
+0067 <span class="comment">% 'ENV_ILK_OF_LIMIT_SP'</span>
+0068 <span class="comment">% 'ENV_ILK_X_HIGH_SP'</span>
+0069 <span class="comment">% 'ENV_ILK_X_LOW_SP'</span>
+0070 <span class="comment">% 'ENV_ILK_Y_HIGH_SP'</span>
+0071 <span class="comment">% 'ENV_ILK_Y_LOW_SP'</span>
+0072 <span class="comment">% 'ENV_ILK_MODE_SP'</span>
+0073 <span class="comment">% 'ENV_SETMTPHASE_SP'</span>
+0074 <span class="comment">% 'ENV_SETMT_SP'</span>
+0075 <span class="comment">% 'ENV_SETST_SP'</span>
+0076 
+0077 
+0078 
+0079 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0080 <span class="comment">% Environmental Fields %</span>
+0081 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0082 
+0083 <span class="comment">% Switches: 255=AUTO, 15=DIRECT(fixed switches, automatically turns DSC OFF)</span>
+0084 setpvonline([BPMName, <span class="string">':ENV:ENV_SWITCHES_SP'</span>], 0);
+0085 
+0086 <span class="comment">% DSC: 0=OFF, 1=UNITY, 2=AUTO (automatically turns switching on), 3=SAVE_LASTGOOD</span>
+0087 setpvonline([BPMName, <span class="string">':ENV:ENV_DSC_SP'</span>], 0);
+0088 
+0089 <span class="comment">% AGC: 0=MANUAL, 1=AUTO</span>
+0090 setpvonline([BPMName, <span class="string">':ENV:ENV_AGC_SP'</span>], 0);
+0091 
+0092 
+0093 <span class="comment">% FA Port  ???</span>
+0094 setpvonline([BPMName, <span class="string">':FA:FA_LENGTH_SP'</span>], 8192);
+0095 setpvonline([BPMName, <span class="string">':FA:FA_OFFSET_SP'</span>], 0);
+0096 <span class="comment">%setpvonline([BPMName, ':FA:FA_MEM_READ_CMD'], 1);</span>
+0097 <span class="comment">%setpvonline([BPMName, ':FA:FA_MEM_WRITE_CMD'], 1);</span>
+0098 <span class="comment">%setpvonline([BPMName, ':FA:FA_MEM_SP'], 0);</span>
+0099 
+0100 
+0101 <span class="comment">% Disable port acquisitions</span>
+0102 setpvonline([BPMName, <span class="string">':DD1:DD_IGNORE_TRIG_SP'</span>],  1, <span class="string">'double'</span>, 1);
+0103 setpvonline([BPMName, <span class="string">':DD2:DD_IGNORE_TRIG_SP'</span>],  1, <span class="string">'double'</span>, 1);
+0104 setpvonline([BPMName, <span class="string">':DD3:DD_IGNORE_TRIG_SP'</span>],  1, <span class="string">'double'</span>, 1);
+0105 setpvonline([BPMName, <span class="string">':DD4:DD_IGNORE_TRIG_SP'</span>],  1, <span class="string">'double'</span>, 1);
+0106 setpvonline([BPMName, <span class="string">':ADC:ADC_IGNORE_TRIG_SP'</span>], 1, <span class="string">'double'</span>, 1);
+0107 setpvonline([BPMName, <span class="string">':PM:PM_IGNORE_TRIG_SP'</span>],   1, <span class="string">'double'</span>, 1);
+0108 
+0109 
+0110 
+0111 <span class="comment">% Gains ???</span>
+0112 <span class="comment">% kx, ky in nm</span>
+0113 
+0114 
+0115 
+0116 <span class="comment">%PV = [BPMName, 'ENV_DSC_SP'];</span>
+0117 <span class="comment">%fprintf('   %s = %s\n', PV, getpvonline(PV, 'char'));</span>
+0118</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

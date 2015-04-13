@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of qmsdelta</title>
+  <meta name="keywords" content="qmsdelta">
+  <meta name="description" content="QUADBUILDOFFSETLIST - Collect the date from a quadrupole center run.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; qmsdelta.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>qmsdelta
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>QUADBUILDOFFSETLIST - Collect the date from a quadrupole center run.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [x, y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily] = quadbuildoffsetlist(DirName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">QUADBUILDOFFSETLIST - Collect the date from a quadrupole center run.
+                      When all the quadrupole center data files are stored in a directory this function
+                      will go through all the files and pull out and plot some of the important information.
+
+  [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily] = quadbuildoffsetlist(DirName)
+
+  DirName - Directory name to look for quadrupole center files  
+            [] to browse
+            {Default: '.'}
+  
+  X - Horizontal output matrix (format below)
+  Y - Vertical output matrix (format below)
+  BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily - Family name for each center measurement6
+
+             1&amp;2     3       4        5     6       7         8         9      10       11      12       13
+  Output = [BPMDev Center CenterSTD BPMpos DCCT BPMATIndex Quadpos QuadATIndex BPMBeta BPMPhi QuadBeta QuadPhi]
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [x, y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily] = quadbuildoffsetlist(DirName)</a>
+0002 <span class="comment">%QUADBUILDOFFSETLIST - Collect the date from a quadrupole center run.</span>
+0003 <span class="comment">%                      When all the quadrupole center data files are stored in a directory this function</span>
+0004 <span class="comment">%                      will go through all the files and pull out and plot some of the important information.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily] = quadbuildoffsetlist(DirName)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  DirName - Directory name to look for quadrupole center files</span>
+0009 <span class="comment">%            [] to browse</span>
+0010 <span class="comment">%            {Default: '.'}</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  X - Horizontal output matrix (format below)</span>
+0013 <span class="comment">%  Y - Vertical output matrix (format below)</span>
+0014 <span class="comment">%  BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily - Family name for each center measurement6</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%             1&amp;2     3       4        5     6       7         8         9      10       11      12       13</span>
+0017 <span class="comment">%  Output = [BPMDev Center CenterSTD BPMpos DCCT BPMATIndex Quadpos QuadATIndex BPMBeta BPMPhi QuadBeta QuadPhi]</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  Written by Greg Portmann</span>
+0020 
+0021 
+0022 <span class="keyword">if</span> nargin == 0 
+0023     DirName = <span class="string">''</span>;
+0024 <span class="keyword">end</span>
+0025 
+0026 <span class="keyword">if</span> isempty(DirName)
+0027     DirName = [getfamilydata(<span class="string">'Directory'</span>, <span class="string">'DataRoot'</span>),<span class="string">'QMS\'</span>];
+0028     DirName = uigetdir(DirName, <span class="string">'Select directory where the QMS data are located'</span>);
+0029 <span class="keyword">end</span>
+0030 
+0031 StartDir = pwd;
+0032 cd(DirName);
+0033 
+0034 Files = dir;
+0035 
+0036 X = [];
+0037 Y = [];
+0038 BPMxFamily = [];
+0039 QUADxFamily = [];
+0040 BPMyFamily = [];
+0041 QUADyFamily = [];
+0042 <span class="keyword">for</span> i = 1:length(Files)
+0043     <span class="keyword">if</span> exist(Files(i).name) == 2
+0044         clear QMS
+0045         <span class="keyword">try</span>
+0046             load(Files(i).name)
+0047             q = QMS;
+0048             
+0049             <span class="keyword">if</span> q.QuadPlane == 1
+0050                 X = [X; q.BPMDev q.Center q.CenterSTD getspos(q.BPMFamily, q.BPMDev) min(q.DCCT) family2atindex(q.BPMFamily, q.BPMDev) getspos(q.QuadFamily, q.QuadDev) family2atindex(q.QuadFamily, q.QuadDev) ];
+0051                 BPMxFamily = strvcat(BPMxFamily, q.BPMFamily);
+0052                 QUADxFamily = strvcat(QUADxFamily, q.QuadFamily);
+0053             <span class="keyword">else</span>
+0054                 Y = [Y; q.BPMDev q.Center q.CenterSTD getspos(q.BPMFamily, q.BPMDev) min(q.DCCT) family2atindex(q.BPMFamily, q.BPMDev) getspos(q.QuadFamily, q.QuadDev) family2atindex(q.QuadFamily, q.QuadDev) ];
+0055                 BPMyFamily = strvcat(BPMyFamily, q.BPMFamily);
+0056                 QUADyFamily = strvcat(QUADyFamily, q.QuadFamily);
+0057             <span class="keyword">end</span>
+0058             <span class="keyword">if</span> any(q.DCCT&lt;5)
+0059                 fprintf(<span class="string">'   %s(%d,%d) (%s) shows a beam less than 5 mamps during the experiment!\n'</span>, q.BPMFamily, q.BPMDev, Files(i).name);
+0060             <span class="keyword">end</span>
+0061         <span class="keyword">catch</span>
+0062         <span class="keyword">end</span>
+0063     <span class="keyword">end</span>
+0064 <span class="keyword">end</span>
+0065 cd(StartDir);
+0066 
+0067 dx = getlist(<span class="string">'BPMx'</span>,0);
+0068 Xnew = NaN * ones(size(dx,1),size(X,2));
+0069 Xnew(:,1:2) = dx;
+0070 i = findrowindex(X(:,1:2), dx);
+0071 Xnew(i,:) = X; 
+0072 
+0073 
+0074 dy = getlist(<span class="string">'BPMy'</span>,0);
+0075 Ynew = NaN * ones(size(dy,1),size(Y,2));
+0076 Ynew(:,1:2) = dy;
+0077 j = findrowindex(Y(:,1:2), dy);
+0078 Ynew(j,:) = Y; 
+0079 
+0080 
+0081 <span class="comment">% Get the average Beta and Phi</span>
+0082 [BetaX, BetaY] = modeltwiss(<span class="string">'Beta'</span>); 
+0083 BetaX = [(BetaX(1:end-1)+BetaX(2:end))/2; BetaX(end)];
+0084 BetaY = [(BetaY(1:end-1)+BetaY(2:end))/2; BetaY(end)];
+0085 
+0086 [PhiX,  PhiY]  = modeltwiss(<span class="string">'Phase'</span>); 
+0087 PhiX = [(PhiX(1:end-1)+PhiX(2:end))/2; PhiX(end)];
+0088 PhiY = [(PhiY(1:end-1)+PhiY(2:end))/2; PhiY(end)];
+0089 
+0090 i = findrowindex(X(:,1:2), dx);
+0091 j = findrowindex(Y(:,1:2), dy);
+0092 Xnew = [Xnew NaN*ones(size(Xnew,1),4)];
+0093 Xnew(i,end-3:end) = [BetaX(Xnew(i,7)) PhiX(Xnew(i,7)) BetaX(Xnew(i,9)) PhiX(Xnew(i,9))];
+0094 Ynew = [Ynew NaN*ones(size(Ynew,1),4)];
+0095 Ynew(j,end-3:end) = [BetaY(Ynew(j,7)) PhiY(Ynew(j,7)) BetaY(Ynew(j,9)) PhiY(Ynew(j,9))];
+0096 
+0097 x = Xnew;
+0098 y = Ynew;
+0099 
+0100 L = getfamilydata(<span class="string">'Circumference'</span>);
+0101 Nx = size(dx,1); 
+0102 Ny = size(dy,1); 
+0103 
+0104 figure;
+0105 subplot(2,1,1);
+0106 errorbar(x(:,5), x(:,3), x(:,4), <span class="string">'.b'</span>);
+0107 <span class="comment">%errorbar(1:Nx, x(:,3), x(:,4), '.b');</span>
+0108 xlabel(<span class="string">'BPM Position [meters]'</span>);
+0109 <span class="comment">%xlabel('BPM Number');</span>
+0110 ylabel(<span class="string">'Horizontal [mm]'</span>);
+0111 xaxis([0 L]);
+0112 title(<span class="string">'BPM Offset'</span>);
+0113 
+0114 subplot(2,1,2);
+0115 errorbar(x(:,5), y(:,3), y(:,4), <span class="string">'.b'</span>);
+0116 <span class="comment">%errorbar(1:Ny, y(:,3), y(:,4), '.b');</span>
+0117 xlabel(<span class="string">'BPM Position [meters]'</span>);
+0118 ylabel(<span class="string">'Vertical [mm]'</span>);
+0119 xaxis([0 L]);
+0120 
+0121 
+0122 
+0123 subplot(2,1,2);
+0124 plot(x(:,5), y(:,10) - y(:,3),<span class="string">'.b'</span>);
+0125 <span class="comment">%errorbar(1:Ny, y(:,3), y(:,4), '.b');</span>
+0126 xlabel(<span class="string">'BPM Position [meters]'</span>);
+0127 ylabel(<span class="string">'Vertical [mm]'</span>);
+0128 xaxis([0 L]);
+0129 
+0130 
+0131 figure;
+0132 subplot(2,1,1);
+0133 plot(x(:,5),360*(x(:,11)-x(:,13))/2/pi,<span class="string">'.r'</span>);
+0134 xlabel(<span class="string">'BPM Position [meters]'</span>);
+0135 ylabel(<span class="string">'Horizontal [degrees]'</span>);
+0136 xaxis([0 L]);
+0137 title(<span class="string">'Phase Advance Between the BPM and Quadrupole'</span>);
+0138 
+0139 subplot(2,1,2);
+0140 plot(x(:,5),360*(y(:,11)-y(:,13))/2/pi,<span class="string">'.r'</span>);
+0141 xlabel(<span class="string">'BPM Position [meters]'</span>);
+0142 ylabel(<span class="string">'Vertical [degrees]'</span>);
+0143 xaxis([0 L]);
+0144 
+0145 figure;
+0146 subplot(2,1,1);
+0147 plot(x(:,5),x(:,10),<span class="string">'.b'</span>, x(:,8),x(:,12),<span class="string">'.r'</span>);
+0148 xlabel(<span class="string">'Position [meters]'</span>);
+0149 ylabel(<span class="string">'Horizontal [meters]'</span>);
+0150 xaxis([0 L]);
+0151 legend(<span class="string">'BPM'</span>, <span class="string">'Quadrupole'</span>);
+0152 title(<span class="string">'Beta Function at the BPM and Quadrupole'</span>);
+0153 
+0154 subplot(2,1,2);
+0155 plot(y(:,5),y(:,10),<span class="string">'.b'</span>, y(:,8),y(:,12),<span class="string">'.r'</span>);
+0156 xlabel(<span class="string">'Position [meters]'</span>);
+0157 ylabel(<span class="string">'Vertical [meters]'</span>);
+0158 xaxis([0 L]);
+0159 legend(<span class="string">'BPM'</span>, <span class="string">'Quadrupole'</span>);
+0160 
+0161 
+0162 figure;
+0163 subplot(2,1,1);
+0164 plot(x(:,5),x(:,6),<span class="string">'.'</span>);
+0165 xlabel(<span class="string">'Position [meters]'</span>);
+0166 ylabel(<span class="string">'DCCT [mamps]'</span>);
+0167 xaxis([0 L]);
+0168 title(<span class="string">'Beam Current During the Horizontal Measurement'</span>);
+0169 
+0170 subplot(2,1,2);
+0171 plot(y(:,5),y(:,6),<span class="string">'.'</span>);
+0172 xlabel(<span class="string">'Position [meters]'</span>);
+0173 ylabel(<span class="string">'DCCT [mamps]'</span>);
+0174 xaxis([0 L]);
+0175 title(<span class="string">'Beam Current During the Vertical Measurement'</span>);
+0176 
+0177 
+0178 <span class="comment">% Only return the measure centers</span>
+0179 i = find(~isnan(x(:,3)));
+0180 x = x(i,:);
+0181 
+0182 i = find(~isnan(y(:,3)));
+0183 y = y(i,:);</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bbasearch</title>
+  <meta name="keywords" content="bbasearch">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; bbasearch.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>bbasearch
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [XOffset, YOffset] = bbasearch(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="bbasearch.html" class="code" title="function [XOffset, YOffset] = bbasearch(varargin)">bbasearch</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="bbasearch.html" class="code" title="function [XOffset, YOffset] = bbasearch(varargin)">bbasearch</a>	</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [XOffset, YOffset] = bbasearch(varargin)</a>
+0002 
+0003 <span class="keyword">global</span> THERING
+0004 
+0005 <span class="comment">% Planes to fit</span>
+0006 XFlag = 1;
+0007 YFlag = 1;
+0008 
+0009 <span class="comment">% Deltas for the gradient</span>
+0010 DeltaBump1 = .002;
+0011 DeltaBump2 = 10 * DeltaBump1;
+0012 
+0013 
+0014 FileName = <span class="string">''</span>;
+0015 <span class="keyword">if</span> nargin &gt;= 1
+0016     FileName = varargin{1};
+0017 <span class="keyword">end</span>
+0018 
+0019 <span class="keyword">if</span> isempty(FileName)
+0020     <span class="comment">%[FileName, PathName] = uigetfile('*.mat', 'Select a Quadrupole Center File', [getfamilydata('Directory','DataRoot'), 'QMS', filesep]);</span>
+0021     [FileName, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a Quadrupole Center File'</span>);
+0022     drawnow;
+0023     <span class="keyword">if</span> ~isstr(FileName)
+0024         XOffset = [];
+0025         YOffset = [];
+0026         <span class="keyword">return</span>
+0027     <span class="keyword">else</span>
+0028         FileName = [PathName,FileName];
+0029         load(FileName);
+0030     <span class="keyword">end</span>
+0031 <span class="keyword">else</span>
+0032     load(FileName);
+0033 <span class="keyword">end</span>
+0034 
+0035 
+0036 <span class="keyword">if</span> exist(<span class="string">'QMS'</span>,<span class="string">'var'</span>)
+0037 
+0038     QuadFamily = QMS.QuadFamily;
+0039     QuadDev = QMS.QuadDev;
+0040     QuadDelta = QMS.QuadDelta;
+0041     ModulationMethod = QMS.ModulationMethod;
+0042 
+0043     BPMFamily = QMS.BPMFamily;
+0044     BPMDev  = QMS.BPMDev;
+0045     Orbit0 = QMS.Orbit0;
+0046     iBPM = findrowindex(BPMDev, QMS.Orbit0.DeviceList);
+0047 
+0048     <span class="keyword">if</span> nargin &gt;= 2
+0049         i = varargin{2};
+0050     <span class="keyword">else</span>
+0051         <span class="comment">% i = 3;</span>
+0052         <span class="keyword">for</span> i = 1:size(QMS.x1,2)
+0053             [XOffset(i), YOffset(i)] = <a href="bbasearch.html" class="code" title="function [XOffset, YOffset] = bbasearch(varargin)">bbasearch</a>(FileName, i);
+0054         <span class="keyword">end</span>
+0055         <span class="keyword">return</span>;
+0056     <span class="keyword">end</span>
+0057 
+0058     <span class="comment">%x0 = (QMS.x1(:,i)+QMS.x2(:,i))/2; %QMS.x0(:,i);  % Sweep and bipolar???</span>
+0059     x0 = QMS.x0(:,i);  <span class="comment">% Sweep and bipolar???</span>
+0060     x1 = QMS.x1(:,i);
+0061     x2 = QMS.x2(:,i);
+0062     
+0063     <span class="comment">%y0 = (QMS.y1(:,i)+QMS.y2(:,i))/2; %QMS.y0(:,i);</span>
+0064     y0 = QMS.y0(:,i);
+0065     y1 = QMS.y1(:,i);
+0066     y2 = QMS.y2(:,i);
+0067 
+0068     MeasData = [QMS.x2(:,i)-QMS.x1(:,i)  QMS.y2(:,i)-QMS.y1(:,i)];
+0069 
+0070     fprintf(<span class="string">'   Bow tie method offset %s(%d,%d)= %f (%s)\n'</span>,  QMS.BPMFamily, QMS.BPMDev, QMS.Center, FileName);
+0071     
+0072     <span class="comment">% Note: this must be the offset when the data was taken</span>
+0073     XOffsetOld = QMS.XOffsetOld;
+0074     YOffsetOld = QMS.YOffsetOld;
+0075 
+0076 <span class="keyword">else</span>
+0077     <span class="comment">%load QF71test1</span>
+0078     <span class="comment">%load QF71simxbump</span>
+0079     <span class="comment">%load QF71simybump</span>
+0080 
+0081     <span class="comment">%QuadFamily = 'QF';</span>
+0082     <span class="comment">%QuadDev = [7 1];</span>
+0083     QuadDelta = 1
+0084     ModulationMethod = <span class="string">'bipolar'</span>;
+0085     
+0086     <span class="comment">%BPMFamily = 'BPMx';</span>
+0087     <span class="comment">%BPMDev  = [7 2];</span>
+0088     Orbit0 = y00;
+0089     BPMDevTotal = y00.DeviceList;
+0090     iBPM = findrowindex(BPMDev, y00.DeviceList);
+0091 
+0092     i = 3;
+0093     <span class="comment">%Yavg = (y2(iBPM,i)+y1(iBPM,i))/2;</span>
+0094     MeasData = [x2(:,i)-x1(:,i)  y2(:,i)-y1(:,i)];
+0095     x0 = x0(:,i);
+0096     y0 = y0(:,i);
+0097     x1 = x1(:,i);
+0098     y1 = y1(:,i);
+0099     x2 = x2(:,i);
+0100     y2 = y2(:,i);
+0101 
+0102     <span class="comment">% Note: this must be the offset when the data was taken</span>
+0103     XOffsetOld = getoffset(<span class="string">'BPMx'</span>, BPMDev);
+0104     YOffsetOld = getoffset(<span class="string">'BPMy'</span>, BPMDev);
+0105 <span class="keyword">end</span>
+0106 
+0107 <span class="comment">% Model index</span>
+0108 ATIndexQuad = family2atindex(QuadFamily, QuadDev);
+0109 ATIndexBPM  = family2atindex(<span class="string">'BPMx'</span>, BPMDev);
+0110 s = getspos(Orbit0);
+0111 
+0112 
+0113 <span class="comment">% Reset the model</span>
+0114 setsp(<span class="string">'HCM'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0115 setsp(<span class="string">'VCM'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0116 setshift(ATIndexQuad, 0, 0);
+0117 PolynomA = THERING{ATIndexQuad}.PolynomA;
+0118 PolynomB = THERING{ATIndexQuad}.PolynomB;
+0119 THERING{ATIndexQuad}.PolynomA(1) = 0;
+0120 THERING{ATIndexQuad}.PolynomB(1) = 0;
+0121 
+0122 
+0123 <span class="comment">% Add any known orbit change to the model</span>
+0124 <span class="keyword">if</span> exist(<span class="string">'QMS'</span>,<span class="string">'var'</span>)
+0125     <span class="comment">% 1-magnet &quot;bump&quot;</span>
+0126     stepsp(QMS.CorrFamily, -QMS.CorrDelta, QMS.CorrDevList, 0, <span class="string">'Model'</span>);
+0127 
+0128     <span class="comment">% Corrector step size</span>
+0129     N = abs(round(QMS.NumberOfPoints));
+0130     CorrStep = 2 * QMS.CorrDelta / (N-1);
+0131     stepsp(QMS.CorrFamily, CorrStep*(i-1), QMS.CorrDevList, 0, <span class="string">'Model'</span>);
+0132     
+0133     <span class="comment">% For sweep method:  quadrupole starting point</span>
+0134     Quad0 = getsp(QuadFamily, QuadDev, <span class="string">'Model'</span>);
+0135     <span class="keyword">if</span> strcmpi(ModulationMethod,<span class="string">'sweep'</span>)
+0136         stepsp(QuadFamily, (i-1)*QuadDelta, QuadDev);
+0137     <span class="keyword">end</span>
+0138 
+0139     <span class="comment">% Starting Quadrupole displacement</span>
+0140     XBump = 0; <span class="comment">%x0(iBPM) - XOffsetOld;</span>
+0141     YBump = 0; <span class="comment">%y0(iBPM) - YOffsetOld;</span>
+0142 
+0143 <span class="keyword">else</span>
+0144 
+0145     <span class="keyword">if</span> i &gt; 1
+0146         <span class="comment">% Local bump</span>
+0147         <span class="comment">%[OCS, RF, OCS0] = setorbitbump('BPMx', [7 2], .5*(i-1), 'HCM', [-2 -1 1 2], 4, 'Model', 'NoDisplay');</span>
+0148         [OCS, RF, OCS0] = setorbitbump(<span class="string">'BPMy'</span>, [7 2], .5*(i-1), <span class="string">'VCM'</span>, [-2 -1 1 2], 4, <span class="string">'Model'</span>, <span class="string">'NoDisplay'</span>);
+0149 
+0150         <span class="comment">% Starting Quadrupole displacement</span>
+0151         XBump = 0; <span class="comment">%x0(iBPM) - XOffsetOld;</span>
+0152         YBump = 0; <span class="comment">%y0(iBPM) - YOffsetOld;</span>
+0153     <span class="keyword">else</span>
+0154         <span class="comment">% Starting Quadrupole displacement</span>
+0155         XBump = x0(iBPM) - XOffsetOld;
+0156         YBump = y0(iBPM) - YOffsetOld;
+0157     <span class="keyword">end</span>
+0158 <span class="keyword">end</span>
+0159 
+0160 <span class="comment">% Starting model orbit</span>
+0161 XModelStart = getx(BPMDev, <span class="string">'Model'</span>) - getoffset(<span class="string">'BPMx'</span>,BPMDev);
+0162 YModelStart = gety(BPMDev, <span class="string">'Model'</span>) - getoffset(<span class="string">'BPMy'</span>,BPMDev);
+0163 
+0164 fprintf(<span class="string">'       XOffsetOld = %7.4f   YOffsetOld = %7.4f\n'</span>, XOffsetOld, YOffsetOld);
+0165 
+0166 j = 0;
+0167 XBumpOld = Inf;
+0168 YBumpOld = Inf;
+0169 XQuadShift = 0;
+0170 YQuadShift = 0;
+0171 <span class="keyword">while</span> (XFlag==1 &amp; abs(XBump-XBumpOld)&gt;.0005) | (YFlag==1 &amp; abs(YBump-YBumpOld)&gt;.0005)
+0172     j = j + 1;
+0173     
+0174     <span class="keyword">if</span> XFlag
+0175         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0176         XQuadShift = -DeltaBump2/2 - DeltaBump1/2 + XBump;
+0177         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0178         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0179         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0180         [MeritXa, MeritYa] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0181         xa = XQuadShift;
+0182 
+0183         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0184         XQuadShift = -DeltaBump2/2 + DeltaBump1/2 + XBump;
+0185         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0186         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0187         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0188         [MeritXb, MeritYb] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0189         xb = XQuadShift;
+0190 
+0191 
+0192         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0193         XQuadShift = DeltaBump2/2 - DeltaBump1/2 + XBump;
+0194         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0195         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0196         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0197         [MeritXc, MeritYc, xm1, xm2, ym1, ym2] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0198         xc = XQuadShift;
+0199 
+0200         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0201         XQuadShift = DeltaBump2/2  + DeltaBump1/2 + XBump;
+0202         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0203         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0204         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0205         [MeritXd, MeritYd] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0206         xd = XQuadShift;
+0207 
+0208         m1 = (MeritXb - MeritXa) / (xb-xa);
+0209         m2 = (MeritXd - MeritXc) / (xd-xc);
+0210         DelSlope = (m2-m1) / ((xc+xd)/2 - (xa+xb)/2);
+0211 
+0212         XBumpOld = XBump;
+0213         XBump = XBump - (m1+m2)/2 / DelSlope;
+0214     <span class="keyword">end</span>
+0215 
+0216     <span class="keyword">if</span> YFlag
+0217         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0218         YQuadShift = -DeltaBump2/2 - DeltaBump1/2 + YBump;
+0219         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0220         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0221         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0222         [MeritXa, MeritYa] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0223         ya = YQuadShift;
+0224 
+0225         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0226         YQuadShift = -DeltaBump2/2 + DeltaBump1/2 + YBump;
+0227         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0228         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0229         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0230         [MeritXb, MeritYb] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0231         yb = YQuadShift;
+0232 
+0233 
+0234         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0235         YQuadShift = DeltaBump2/2 - DeltaBump1/2 + YBump;
+0236         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0237         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0238         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0239         [MeritXc, MeritYc, xm1, xm2, ym1, ym2] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0240         yc = YQuadShift;
+0241 
+0242         <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0243         YQuadShift = DeltaBump2/2 + DeltaBump1/2 + YBump;
+0244         setshift(ATIndexQuad, -XQuadShift/1000, -YQuadShift/1000);
+0245         THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0246         THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0247         [MeritXd, MeritYd] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0248         yd = YQuadShift;
+0249 
+0250         m1 = (MeritYb - MeritYa) / (yb-ya);
+0251         m2 = (MeritYd - MeritYc) / (yd-yc);
+0252         DelSlope = (m2-m1) / ((yc+yd)/2 - (ya+yb)/2);
+0253 
+0254         YBumpOld = YBump;
+0255         YBump = YBump - (m1+m2)/2 / DelSlope;
+0256     <span class="keyword">end</span>
+0257 
+0258 
+0259     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0260     <span class="comment">% Get the merit function at the predicted minimum %</span>
+0261     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0262 
+0263     <span class="comment">% Shift the quadrupole without changing the orbit (-shift is up)</span>
+0264     XQuadShift = XBump;
+0265     YQuadShift = YBump;
+0266     setshift(ATIndexQuad,  -XQuadShift/1000, -YQuadShift/1000);
+0267     THERING{ATIndexQuad}.PolynomB(1) = THERING{ATIndexQuad}.PolynomB(2) * (-XQuadShift/1000);
+0268     THERING{ATIndexQuad}.PolynomA(1) = THERING{ATIndexQuad}.PolynomB(2) * (-YQuadShift/1000);
+0269     [MeritX, MeritY, xm1, xm2, ym1, ym2] = <a href="#_sub1" class="code" title="subfunction [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)">bbaquadchangemodel</a>(QuadFamily, QuadDelta, QuadDev, MeasData, ModulationMethod);
+0270 
+0271     Merit(:,j) = [MeritX; MeritY];
+0272     Bumps(:,j) = [XBump; YBump];
+0273 
+0274 
+0275     <span class="keyword">if</span> XFlag
+0276         <span class="comment">%       -Amount quadrupole is displaced in the model</span>
+0277         <span class="comment">%                  Starting orbit at the quadupole</span>
+0278         <span class="comment">%                                 Measured (unknown) displacement at the quad when the data was taken</span>
+0279         <span class="comment">%                                                        Old Offset</span>
+0280         XOffset = XBump + XModelStart - (x0(iBPM)-XOffsetOld) + XOffsetOld;
+0281     <span class="keyword">else</span>
+0282         XOffset = XOffsetOld;
+0283     <span class="keyword">end</span>
+0284     <span class="keyword">if</span> YFlag
+0285         <span class="comment">%       -Amount quadrupole is displaced in the model</span>
+0286         <span class="comment">%                  Starting orbit at the quadupole</span>
+0287         <span class="comment">%                                 Measured (unknown) displacement at the quad when the data was taken</span>
+0288         <span class="comment">%                                                        Old Offset</span>
+0289         YOffset = YBump + YModelStart - (y0(iBPM)-YOffsetOld) + YOffsetOld;
+0290     <span class="keyword">else</span>
+0291         YOffset = YOffsetOld;
+0292     <span class="keyword">end</span>
+0293 
+0294     fprintf(<span class="string">'   %d.  XOffsetNew=%7.4f   YOffsetNew=%7.4f   XBump=%.5g   YBump=%.5g   XMerit=%.5g   YMerit=%.5g\n'</span>, j, XOffset, YOffset, XBump, YBump, Merit(1,j), Merit(2,j));
+0295 
+0296 <span class="keyword">end</span>
+0297 fprintf(<span class="string">'        New - Old = %7.4f    New - Old = %7.4f\n'</span>, XOffset-XOffsetOld, YOffset-YOffsetOld);
+0298 
+0299 
+0300 
+0301 <span class="comment">% Reset the model</span>
+0302 setsp(<span class="string">'HCM'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0303 setsp(<span class="string">'VCM'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0304 setshift(ATIndexQuad, 0, 0);
+0305 THERING{ATIndexQuad}.PolynomA = PolynomA;
+0306 THERING{ATIndexQuad}.PolynomB = PolynomB;
+0307 <span class="comment">%THERING{ATIndexQuad}.PolynomA(1) = 0;</span>
+0308 <span class="comment">%THERING{ATIndexQuad}.PolynomB(1) = 0;</span>
+0309 
+0310 setsp(QuadFamily, Quad0, QuadDev, <span class="string">'Model'</span>);
+0311 
+0312 
+0313 <span class="comment">% Find the average orbit change at the quadrupole</span>
+0314 [xAT,yAT] = modeltwiss(<span class="string">'x'</span>,<span class="string">'All'</span>,<span class="string">'All'</span>);
+0315 yQF = 1000*(yAT(ATIndexQuad)+yAT(ATIndexQuad+1))/2;
+0316 
+0317 [mux,muy] = modeltwiss(<span class="string">'Phase'</span>,<span class="string">'All'</span>,<span class="string">'All'</span>);
+0318 BPM2QuadPhase = 180*( (muy(ATIndexQuad)+muy(ATIndexQuad+1))/2 - muy(ATIndexBPM)) /pi;  <span class="comment">% phase in degrees</span>
+0319 fprintf(<span class="string">'   BPM2QuadPhase=%.3f [degrees]\n'</span>, BPM2QuadPhase);
+0320 
+0321 
+0322 <span class="comment">% figure(1);</span>
+0323 <span class="comment">% clf reset</span>
+0324 <span class="comment">% %plot(s, y2-y1, '.-');</span>
+0325 <span class="comment">% plot(s, y2-y1, '.-');</span>
+0326 <span class="comment">% hold on;</span>
+0327 
+0328 <span class="comment">%fprintf('   YBump    = %f\n', YBump);</span>
+0329 <span class="comment">%fprintf('   Yoffset = %f\n', Yoffset);</span>
+0330 <span class="comment">%fprintf('   Y0      = %f\n', y0.Data(iBPM));</span>
+0331 
+0332 
+0333 
+0334 
+0335 <a name="_sub1" href="#_subfunctions" class="code">function [Meritx, Merity, x1, x2, y1, y2] = bbaquadchangemodel(Family, Delta, DeviceList, MeasData, ModulationMethod)</a>
+0336 
+0337 <span class="keyword">if</span> strcmpi(ModulationMethod,<span class="string">'bipolar'</span>)
+0338     stepsp(Family, Delta, DeviceList, 0, <span class="string">'Model'</span>);
+0339     x1 = getx(<span class="string">'Model'</span>);
+0340     y1 = gety(<span class="string">'Model'</span>);
+0341     stepsp(Family, -2*Delta, DeviceList, 0, <span class="string">'Model'</span>);
+0342     x2 = getx(<span class="string">'Model'</span>);
+0343     y2 = gety(<span class="string">'Model'</span>);
+0344     stepsp(Family, Delta, DeviceList, 0, <span class="string">'Model'</span>);
+0345 <span class="keyword">elseif</span> strcmpi(ModulationMethod,<span class="string">'sweep'</span>) | strcmpi(ModulationMethod,<span class="string">'unipolar'</span>)
+0346     x1 = getx(<span class="string">'Model'</span>);
+0347     y1 = gety(<span class="string">'Model'</span>);
+0348     stepsp(Family, Delta, DeviceList, 0, <span class="string">'Model'</span>);
+0349     x2 = getx(<span class="string">'Model'</span>);
+0350     y2 = gety(<span class="string">'Model'</span>);
+0351     stepsp(Family,-Delta, DeviceList, 0, <span class="string">'Model'</span>);
+0352 <span class="keyword">else</span>
+0353     error(<span class="string">'Quadrupole modulation method unknown.'</span>);
+0354 <span class="keyword">end</span>
+0355 
+0356 
+0357 Meritx = sum((MeasData(:,1) - (x2-x1)).^2);
+0358 Merity = sum((MeasData(:,2) - (y2-y1)).^2);
+0359 
+0360 
+0361</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

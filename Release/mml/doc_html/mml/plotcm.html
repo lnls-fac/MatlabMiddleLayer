@@ -1,0 +1,315 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotcm</title>
+  <meta name="keywords" content="plotcm">
+  <meta name="description" content="PLOTCM - Plots the horizontal and vertical corrector magnet families and">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; plotcm.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plotcm
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>PLOTCM - Plots the horizontal and vertical corrector magnet families and</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTCM - Plots the horizontal and vertical corrector magnet families and
+         computes the energy change due to the horizontal correctors.
+
+  [DeltaRF, DeltaEnergy, DeltaL] = plotcm(DeviceList, ...)
+
+  INPUTS (optional)
+  1.  DeviceList
+  2. 'Position' {Default} or 'Phase' for the x-axis units 
+  3. 'Display' - Plot orbit information {Default}
+     'NoDisplay' - No plot
+  4. 'Online', 'Model', 'Manual', 'Hardware', 'Physics', etc. (the usual Units and Mode flags)
+  
+
+  OUTPUTS
+  1. DeltaRF - RF change that equates to the energy change
+  2. DeltaEnergy - Total energy change due to the horizontal correctors
+  3. DeltaL - Path length change that equates to changing the RF by DeltaRF
+ 
+  See also <a href="findrf.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = findrf(varargin)">findrf</a>, <a href="findrf1.html" class="code" title="function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName)">findrf1</a>, <a href="rmdisp.html" class="code" title="function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)">rmdisp</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>	GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>	GETVCMFAMILY - Returns the default vertical corrector family</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findrf.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = findrf(varargin)">findrf</a>	FINDRF - Finds the RF frequency that minimizes the energy change due</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)</a>
+0002 <span class="comment">%PLOTCM - Plots the horizontal and vertical corrector magnet families and</span>
+0003 <span class="comment">%         computes the energy change due to the horizontal correctors.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  [DeltaRF, DeltaEnergy, DeltaL] = plotcm(DeviceList, ...)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS (optional)</span>
+0008 <span class="comment">%  1.  DeviceList</span>
+0009 <span class="comment">%  2. 'Position' {Default} or 'Phase' for the x-axis units</span>
+0010 <span class="comment">%  3. 'Display' - Plot orbit information {Default}</span>
+0011 <span class="comment">%     'NoDisplay' - No plot</span>
+0012 <span class="comment">%  4. 'Online', 'Model', 'Manual', 'Hardware', 'Physics', etc. (the usual Units and Mode flags)</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  OUTPUTS</span>
+0016 <span class="comment">%  1. DeltaRF - RF change that equates to the energy change</span>
+0017 <span class="comment">%  2. DeltaEnergy - Total energy change due to the horizontal correctors</span>
+0018 <span class="comment">%  3. DeltaL - Path length change that equates to changing the RF by DeltaRF</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  See also findrf, findrf1, rmdisp</span>
+0021 
+0022 <span class="comment">%  Written by Greg Portmann</span>
+0023 
+0024 
+0025 DisplayFlag = 1;
+0026 XAxisFlag = <span class="string">'Position'</span>;
+0027 
+0028 
+0029 <span class="comment">% Input parsing</span>
+0030 InputFlags = {};
+0031 <span class="keyword">for</span> i = length(varargin):-1:1
+0032     <span class="keyword">if</span> isstruct(varargin{i})
+0033         <span class="comment">% Ignor structures</span>
+0034     <span class="keyword">elseif</span> iscell(varargin{i})
+0035         <span class="comment">% Ignor cells</span>
+0036     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0037         <span class="comment">% Just remove</span>
+0038         varargin(i) = [];
+0039     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0040         <span class="comment">% Just remove</span>
+0041         varargin(i) = [];
+0042     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Position'</span>)
+0043         XAxisFlag = <span class="string">'Position'</span>;
+0044         varargin(i) = [];
+0045     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Phase'</span>)
+0046         XAxisFlag = <span class="string">'Phase'</span>;
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0049         DisplayFlag = 1;
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0052         DisplayFlag = 0;
+0053         varargin(i) = [];
+0054     <span class="keyword">end</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 
+0058 <span class="comment">% Get the default corrector families</span>
+0059 Family1 = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0060 Family2 = <a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>;
+0061 
+0062 
+0063 <span class="comment">% SP or AM ???</span>
+0064 x = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(Family1, <span class="string">'Struct'</span>, varargin{:});
+0065 y = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(Family2, <span class="string">'Struct'</span>, varargin{:});
+0066 
+0067 
+0068 <span class="comment">% Compute the energy change due to the correctors</span>
+0069 L = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0070 HCM = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x);
+0071 HCM = HCM.Data;
+0072 
+0073 
+0074 <span class="keyword">if</span> strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Machine'</span>),<span class="string">'ALS'</span>)
+0075     <span class="comment">% For the ALS, either the HCMChicane magnets need to be included or</span>
+0076     <span class="comment">% the chicane &quot;part&quot; of the HCMs needs to be removed</span>
+0077     Energy = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Energy'</span>);
+0078     
+0079     <span class="comment">% Sector 6</span>
+0080     <span class="comment">%                   Off    1.9 GeV   1.5 GeV</span>
+0081     <span class="comment">% HCMCHICANEM(6,1)  80.0    18.0       ?</span>
+0082     <span class="comment">% HCMCHICANEM(6,1)  80.0    20.0       ?</span>
+0083     <span class="comment">% HCM(6,1)           0.0    18.8       ?</span>
+0084     ihcm = findrowindex([6 1], x.DeviceList);
+0085     <span class="keyword">if</span> length(ihcm) == 1
+0086         <span class="keyword">try</span>
+0087             <span class="keyword">if</span> <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'HCMCHICANEM'</span>,[6 1]) &lt; 70
+0088                 <span class="comment">% Assume sector 6 chicane is on</span>
+0089                 <span class="keyword">if</span> Energy == 1.9
+0090                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, -18.8, [6 1]);
+0091                     x.Data(ihcm) = x.Data(ihcm) - 18.8;
+0092                 <span class="keyword">else</span>
+0093                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, -18.8*1.5/1.9, [6 1]);
+0094                     x.Data(ihcm) = x.Data(ihcm) - 18.8*1.5/1.9;
+0095                 <span class="keyword">end</span>
+0096             <span class="keyword">end</span>
+0097         <span class="keyword">catch</span>
+0098             fprintf(<span class="string">'%s\n'</span>, lasterr);
+0099             fprintf(<span class="string">'Problem reading HCMCHICANEM(6,1).  The chicane &quot;offset&quot; on HCM(6,1) will not be removed.\n\n'</span>);
+0100         <span class="keyword">end</span>
+0101     <span class="keyword">end</span>
+0102 
+0103     <span class="comment">% Sector 11</span>
+0104     <span class="comment">%                    Off    1.9 GeV   1.5 GeV</span>
+0105     <span class="comment">% HCMCHICANEM(11,1)  80.0    40.5      52.0</span>
+0106     <span class="comment">% HCMCHICANEM(11,1)  80.0    40.5      52.0</span>
+0107     <span class="comment">% HCM[ 6 1]           0.0    18.8      18.8*1.5/1.9</span>
+0108     <span class="comment">% HCM(10,8)           0.0   -17.0     -14.0</span>
+0109     <span class="comment">% HCM(11,1)           0.0   -17.0     -14.0</span>
+0110     ihcm = findrowindex([6 1], x.DeviceList);
+0111     <span class="keyword">if</span> length(ihcm) == 1
+0112         <span class="keyword">try</span>
+0113             <span class="keyword">if</span> <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'HCMCHICANEM'</span>,[11 1]) &lt; 60
+0114                 <span class="comment">% Assume sector 11 chicane is on</span>
+0115                 <span class="keyword">if</span> Energy &gt; 1.8
+0116                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, 17, [10 8]);
+0117                     x.Data(ihcm) = x.Data(ihcm) - 18.8;
+0118                 <span class="keyword">else</span>
+0119                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, 14, [10 8]);
+0120                     x.Data(ihcm) = x.Data(ihcm) - 18.8*1.5/1.9;
+0121                 <span class="keyword">end</span>
+0122             <span class="keyword">end</span>
+0123         <span class="keyword">catch</span>
+0124             fprintf(<span class="string">'%s\n'</span>, lasterr);
+0125             fprintf(<span class="string">'Due to an error, the chicane &quot;offset&quot; on HCM(6,1) will not be removed.n\n'</span>);
+0126         <span class="keyword">end</span>
+0127     <span class="keyword">end</span>
+0128     ihcm = findrowindex([10 8], x.DeviceList);
+0129     <span class="keyword">if</span> length(ihcm) == 1
+0130         <span class="keyword">try</span>
+0131             <span class="keyword">if</span> <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'HCMCHICANEM'</span>,[11 1]) &lt; 60
+0132                 <span class="comment">% Assume sector 11 chicane is on</span>
+0133                 <span class="keyword">if</span> Energy &gt; 1.8
+0134                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, 17, [10 8]);
+0135                     x.Data(ihcm) = x.Data(ihcm) + 17;
+0136                 <span class="keyword">else</span>
+0137                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, 14, [10 8]);
+0138                     x.Data(ihcm) = x.Data(ihcm) + 14;
+0139                 <span class="keyword">end</span>
+0140             <span class="keyword">end</span>
+0141         <span class="keyword">catch</span>
+0142             fprintf(<span class="string">'%s\n'</span>, lasterr);
+0143             fprintf(<span class="string">'Due to an error, the chicane &quot;offset&quot; on HCM(10,8) will not be removed.n\n'</span>);
+0144         <span class="keyword">end</span>
+0145     <span class="keyword">end</span>
+0146     ihcm = findrowindex([11 1], x.DeviceList);
+0147     <span class="keyword">if</span> length(ihcm) == 1
+0148         <span class="keyword">try</span>
+0149             <span class="keyword">if</span> <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'HCMCHICANEM'</span>,[11 1]) &lt; 60
+0150                 <span class="comment">% Assume sector 11 chicane is on</span>
+0151                 <span class="keyword">if</span> Energy &gt; 1.8
+0152                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, 17, [11 1]);
+0153                     x.Data(ihcm) = x.Data(ihcm) + 17;
+0154                 <span class="keyword">else</span>
+0155                     HCM(ihcm) = HCM(ihcm) + <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(x.FamilyName, x.Field, 14, [11 1]);
+0156                     x.Data(ihcm) = x.Data(ihcm) + 14;
+0157                 <span class="keyword">end</span>
+0158             <span class="keyword">end</span>
+0159         <span class="keyword">catch</span>
+0160             fprintf(<span class="string">'%s\n'</span>, lasterr);
+0161             fprintf(<span class="string">'Due to an error, the chicane &quot;offset&quot; on HCM(11,1) will not be removed.n\n'</span>);
+0162         <span class="keyword">end</span>
+0163     <span class="keyword">end</span>
+0164 <span class="keyword">end</span>
+0165 
+0166 
+0167 [DxHCM, DyHCM] = modeldisp([], x.FamilyName, x.DeviceList, <span class="string">'Numeric'</span>, <span class="string">'Physics'</span>);
+0168 HCMEnergyChange = -1 * HCM .* DxHCM / <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> / L; 
+0169 HCMEnergyChangeTotal = sum(HCMEnergyChange);
+0170 
+0171 <span class="comment">% Delta RF to move the energy change due to the corrector to the RF frequency</span>
+0172 DeltaRF = -1 * <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a> * <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> * HCMEnergyChangeTotal;                     <span class="comment">% Default units of getrf/setrf</span>
+0173 DeltaRFPhysics = -1 * <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Physics'</span>) * <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> * HCMEnergyChangeTotal;   <span class="comment">% Must be Hz</span>
+0174 
+0175 DeltaL = L * <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> * HCMEnergyChangeTotal;
+0176 
+0177 
+0178 <span class="keyword">if</span> DisplayFlag
+0179     LeftGraphColor = <span class="string">'b'</span>;
+0180     RightGraphColor = <span class="string">'r'</span>;
+0181 
+0182     [RFUnits, RFUnitsString] = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(<span class="string">'RF'</span>);
+0183 
+0184     <span class="keyword">if</span> strcmpi(XAxisFlag, <span class="string">'Phase'</span>)
+0185         [BPMxspos, BPMyspos, Sx, Sy, Tune] = modeltwiss(<span class="string">'Phase'</span>, x.FamilyName, x.DeviceList, y.FamilyName, y.DeviceList);
+0186         BPMxspos = BPMxspos/2/pi;
+0187         BPMyspos = BPMyspos/2/pi;
+0188         XLabel = <span class="string">'Phase'</span>;
+0189     <span class="keyword">else</span>
+0190         BPMxspos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(x.FamilyName, x.DeviceList);
+0191         BPMyspos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(y.FamilyName, y.DeviceList);
+0192         XLabel = <span class="string">'Position [meters]'</span>;
+0193     <span class="keyword">end</span>
+0194 
+0195 
+0196     hfig = gcf;
+0197     clf reset
+0198     <span class="comment">%p = get(hfig, 'Position');</span>
+0199     <span class="comment">%set(hfig, 'Position', [p(1) p(2)-.8*p(4) p(3) p(4)+.8*p(4)]);</span>
+0200     
+0201     
+0202     subplot(2,1,1);
+0203     [ax, h1, h2] = plotyy(BPMxspos, x.Data, BPMxspos, -HCMEnergyChange);
+0204     FontSize = get(ax(1), <span class="string">'Fontsize'</span>);
+0205     title(sprintf(<span class="string">'%s (%g rms [%s]):  Energy Change  \\Delta p / p  = \\Sigma \\delta_{hcm} \\eta_{hcm} / (-\\alpha L) = %.3e'</span>, Family1, std(x.Data), x.UnitsString, HCMEnergyChangeTotal), <span class="string">'Fontsize'</span>,FontSize);
+0206     set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, sprintf(<span class="string">'%s [%s]'</span>, Family1, x.UnitsString), <span class="string">'Fontsize'</span>,FontSize);
+0207     set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'-\Delta p/p'</span>, <span class="string">'Color'</span>, RightGraphColor, <span class="string">'Fontsize'</span>,FontSize);
+0208     set(h1, <span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0209     set(h2, <span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0210     <span class="comment">%'\fontsize{14}\sigma_y \fontsize{10}BL 3.1 [\mum]'</span>
+0211     set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0212     set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0213     grid on
+0214 
+0215     <span class="keyword">if</span> ~strcmpi(XAxisFlag, <span class="string">'Phase'</span>)
+0216         axes(ax(1));
+0217         aa = axis;
+0218         aa(1) = 0;
+0219         aa(2) = L;
+0220         axis(aa);
+0221         axes(ax(2));
+0222         aa = axis;
+0223         aa(1) = 0;
+0224         aa(2) = L;
+0225         axis(aa);
+0226     <span class="keyword">end</span>
+0227 
+0228 
+0229     ax(3) = subplot(2,1,2);
+0230     plot(BPMyspos, y.Data, <span class="string">'.-'</span>);
+0231     title(sprintf(<span class="string">'%s (%g rms [%s])'</span>, Family2, std(y.Data), y.UnitsString), <span class="string">'Fontsize'</span>,FontSize);
+0232     xlabel(XLabel, <span class="string">'Fontsize'</span>,FontSize);
+0233     ylabel(sprintf(<span class="string">'%s [%s]'</span>,Family2, x.UnitsString), <span class="string">'Color'</span>, LeftGraphColor, <span class="string">'Fontsize'</span>,FontSize);
+0234     set(gca,<span class="string">'YColor'</span>, LeftGraphColor);
+0235     <span class="keyword">if</span> ~strcmpi(XAxisFlag, <span class="string">'Phase'</span>)
+0236         xaxis([0 L]);
+0237     <span class="keyword">end</span>
+0238     grid on;
+0239 
+0240     <span class="comment">% Link the x-axes</span>
+0241     linkaxes(ax, <span class="string">'x'</span>);
+0242 
+0243     addlabel(1, 0, datestr(clock,0), 7);
+0244     addlabel(0, 0, sprintf(<span class="string">'Equivalent energy change using the RF is  \\DeltaRF = %g [%s]  \\DeltaL = %g [m]'</span>, DeltaRF, RFUnitsString, DeltaL), 7);
+0245 
+0246     <span class="keyword">if</span> strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Machine'</span>),<span class="string">'ALS'</span>)
+0247         addlabel(1, .5, <span class="string">'Nominal chicane setting may have been removed from the HCM family'</span>, 7);
+0248     <span class="keyword">end</span>
+0249 <span class="keyword">end</span>
+0250 
+0251</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

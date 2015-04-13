@@ -1,0 +1,359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of buildsrdatabase</title>
+  <meta name="keywords" content="buildsrdatabase">
+  <meta name="description" content="BUILDSRDATABASE - Build the storage ring database tables BPM, Lattice, MPS">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; buildsrdatabase.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>buildsrdatabase
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BUILDSRDATABASE - Build the storage ring database tables BPM, Lattice, MPS</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function buildsrdatabase </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BUILDSRDATABASE - Build the storage ring database tables BPM, Lattice, MPS
+
+  See also <a href="buildbpmrespdatabase.html" class="code" title="function buildbpmrespdatabase">buildbpmrespdatabase</a>, <a href="getmysqldata.html" class="code" title="function [data, t, StartTime, EndTime] = getmysqldata(ColumnNames, StartTime, EndTime, Table, User, DataBaseName)">getmysqldata</a>
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [N, Ntotal] = writelatticetable(Family, Type, Offset)</a></li><li><a href="#_sub2" class="code">function [N, Ntotal] = writebpmtable(Family, NOffset)</a></li><li><a href="#_sub3" class="code">function [N, Ntotal] = writesrmpstable(Family, Type, NOffset)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function buildsrdatabase</a>
+0002 <span class="comment">%BUILDSRDATABASE - Build the storage ring database tables BPM, Lattice, MPS</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  See also buildbpmrespdatabase, getmysqldata</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  Written by Greg Portmann</span>
+0007 
+0008 
+0009 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0010 <span class="comment">% Open a connection %</span>
+0011 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0012 
+0013 <span class="comment">%Host = 'thor.als.lbl.gov';</span>
+0014 <span class="comment">%User = 'physdata';   % alsoper</span>
+0015 <span class="comment">%PassWord = 'EightBall';</span>
+0016 
+0017 Host = <span class="string">'ps3.als.lbl.gov'</span>;  
+0018 User = <span class="string">'portmann'</span>;
+0019 PassWord = <span class="string">'gp80_12!op'</span>;
+0020 
+0021 <span class="keyword">if</span> isempty(PassWord)
+0022     [User, PassWord] = logindlg(<span class="string">'MySQL Connection'</span>, User);
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="keyword">if</span> ~isempty(User)
+0026     OpenResult = mym(<span class="string">'open'</span>, Host, User, PassWord);
+0027 <span class="keyword">else</span>
+0028     <span class="keyword">return</span>
+0029 <span class="keyword">end</span>
+0030 
+0031 clear PassWord
+0032 
+0033 
+0034 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0035 <span class="comment">% Select a Database %</span>
+0036 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0037 <span class="comment">%UseResult = mym('use controls');</span>
+0038 <span class="keyword">try</span>
+0039     UseResult = mym(<span class="string">'use StorageRing'</span>);
+0040 <span class="keyword">catch</span>
+0041     mym(<span class="string">'create DATABASE StorageRing;'</span>);
+0042     UseResult = mym(<span class="string">'use StorageRing'</span>);
+0043 <span class="keyword">end</span>
+0044 
+0045 
+0046 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0047 <span class="comment">% LATTICE TABLE %</span>
+0048 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0049 
+0050 <span class="comment">% Drop the table and create a new one</span>
+0051 mym(<span class="string">'drop table if exists LATTICE'</span>);
+0052 
+0053 <span class="comment">% Create a new table</span>
+0054 CommandString = [
+0055     <span class="string">'create table if not exists LATTICE ('</span>, <span class="keyword">...</span>
+0056     <span class="string">'TableIndex INT AUTO_INCREMENT PRIMARY KEY, '</span>, <span class="keyword">...</span>
+0057     <span class="string">'Element int, '</span>, <span class="keyword">...</span>
+0058     <span class="string">'SPosition float, '</span> , <span class="keyword">...</span>
+0059     <span class="string">'Length float, '</span> , <span class="keyword">...</span>
+0060     <span class="string">'Family char(15), '</span>, <span class="keyword">...</span>
+0061     <span class="string">'Type char(10), '</span>, <span class="keyword">...</span><span class="comment">    </span>
+0062     <span class="string">'Sector int, '</span>, <span class="keyword">...</span>
+0063     <span class="string">'Device int, '</span>, <span class="keyword">...</span>
+0064     <span class="string">'CommonName char(25) '</span>, <span class="keyword">...</span>
+0065     <span class="string">');'</span>];
+0066 
+0067 mym(CommandString);
+0068 
+0069 Ntotal   = 0;
+0070 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'BPMx'</span>, <span class="string">'BPM'</span>,      Ntotal);
+0071 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'BPMy'</span>, <span class="string">'BPM'</span>,      Ntotal);
+0072 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'HCM'</span>,  <span class="string">'COR'</span>,      Ntotal);
+0073 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'VCM'</span>,  <span class="string">'COR'</span>,      Ntotal);
+0074 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'QF'</span>,   <span class="string">'QUAD'</span>,     Ntotal);
+0075 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'QD'</span>,   <span class="string">'QUAD'</span>,     Ntotal);
+0076 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'QFA'</span>,  <span class="string">'QUAD'</span>,     Ntotal);
+0077 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'QDA'</span>,  <span class="string">'QUAD'</span>,     Ntotal);
+0078 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'SF'</span>,   <span class="string">'SEXT'</span>,     Ntotal);
+0079 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'SD'</span>,   <span class="string">'SEXT'</span>,     Ntotal);
+0080 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'SQSF'</span>, <span class="string">'SKEWQUAD'</span>, Ntotal);
+0081 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'SQSD'</span>, <span class="string">'SKEWQUAD'</span>, Ntotal);
+0082 [N, Ntotal] = <a href="#_sub1" class="code" title="subfunction [N, Ntotal] = writelatticetable(Family, Type, Offset)">writelatticetable</a>(<span class="string">'BEND'</span>, <span class="string">'BEND'</span>,     Ntotal);
+0083 
+0084 
+0085 
+0086 
+0087 <span class="comment">%%%%%%%%%%%%%</span>
+0088 <span class="comment">% BPM TABLE %</span>
+0089 <span class="comment">%%%%%%%%%%%%%</span>
+0090 
+0091 <span class="comment">% Drop the table and create a new one</span>
+0092 mym(<span class="string">'drop table if exists BPM'</span>);
+0093 
+0094 <span class="comment">% Create a new table</span>
+0095 CommandString = [
+0096     <span class="string">'create table if not exists BPM ('</span>, <span class="keyword">...</span>
+0097     <span class="string">'TableIndex INT AUTO_INCREMENT PRIMARY KEY, '</span>, <span class="keyword">...</span>
+0098     <span class="string">'Element int, '</span>, <span class="keyword">...</span>
+0099     <span class="string">'SPosition float, '</span> , <span class="keyword">...</span>
+0100     <span class="string">'Family char(15), '</span>, <span class="keyword">...</span>
+0101     <span class="string">'Sector int, '</span>, <span class="keyword">...</span>
+0102     <span class="string">'Device int, '</span>, <span class="keyword">...</span>
+0103     <span class="string">'CommonName char(25), '</span>, <span class="keyword">...</span>
+0104     <span class="string">'ARC int, '</span>, <span class="keyword">...</span>
+0105     <span class="string">'Bergoz int, '</span>, <span class="keyword">...</span>
+0106     <span class="string">'AM char(25), '</span>, <span class="keyword">...</span>
+0107     <span class="string">'AVG char(25), '</span>, <span class="keyword">...</span>
+0108     <span class="string">'TimeConstant char(25), '</span>, <span class="keyword">...</span>
+0109     <span class="string">'Status int, '</span> , <span class="keyword">...</span>
+0110     <span class="string">'Golden float, '</span> , <span class="keyword">...</span>
+0111     <span class="string">'Offset float '</span> , <span class="keyword">...</span>
+0112     <span class="string">');'</span>];
+0113 mym(CommandString);
+0114 
+0115 
+0116 Ntotal = 0;
+0117 [N, Ntotal] = <a href="#_sub2" class="code" title="subfunction [N, Ntotal] = writebpmtable(Family, NOffset)">writebpmtable</a>(<span class="string">'BPMx'</span>, Ntotal);
+0118 [N, Ntotal] = <a href="#_sub2" class="code" title="subfunction [N, Ntotal] = writebpmtable(Family, NOffset)">writebpmtable</a>(<span class="string">'BPMy'</span>, Ntotal);
+0119 
+0120 
+0121 
+0122 <span class="comment">%%%%%%%%%%%%%</span>
+0123 <span class="comment">% MPS TABLE %</span>
+0124 <span class="comment">%%%%%%%%%%%%%</span>
+0125 
+0126 <span class="comment">% Drop the table and create a new one</span>
+0127 mym(<span class="string">'drop table if exists MPS'</span>);
+0128 
+0129 <span class="comment">% Create a new table</span>
+0130 CommandString = [
+0131     <span class="string">'create table if not exists MPS ('</span>, <span class="keyword">...</span>
+0132     <span class="string">'TableIndex INT AUTO_INCREMENT PRIMARY KEY, '</span>, <span class="keyword">...</span>
+0133     <span class="string">'Element int, '</span>, <span class="keyword">...</span>
+0134     <span class="string">'SPosition float, '</span> , <span class="keyword">...</span>
+0135     <span class="string">'Family char(15), '</span>, <span class="keyword">...</span>
+0136     <span class="string">'Type char(10), '</span>, <span class="keyword">...</span><span class="comment">    </span>
+0137     <span class="string">'Sector int, '</span>, <span class="keyword">...</span>
+0138     <span class="string">'Device int, '</span>, <span class="keyword">...</span>
+0139     <span class="string">'CommonName char(25), '</span>, <span class="keyword">...</span>
+0140     <span class="string">'MonitorChanName char(25), '</span>, <span class="keyword">...</span>
+0141     <span class="string">'SetpointChanName char(25), '</span>, <span class="keyword">...</span>
+0142     <span class="string">'OnMonitorChanName char(25), '</span>, <span class="keyword">...</span>
+0143     <span class="string">'OnControlChanName char(25), '</span>, <span class="keyword">...</span>
+0144     <span class="string">'ResetChanName char(25), '</span>, <span class="keyword">...</span>
+0145     <span class="string">'ReadyChanName char(25), '</span>, <span class="keyword">...</span>
+0146     <span class="string">'RampRateChanName char(25), '</span>, <span class="keyword">...</span>
+0147     <span class="string">'DACChanName char(25), '</span>, <span class="keyword">...</span>
+0148     <span class="string">'TimeConstantChanName char(25), '</span>, <span class="keyword">...</span>
+0149     <span class="string">'Status int, '</span> , <span class="keyword">...</span>
+0150     <span class="string">'SetpointMin float, '</span> , <span class="keyword">...</span>
+0151     <span class="string">'SetpointMax float, '</span> , <span class="keyword">...</span>
+0152     <span class="string">'Tolerance float, '</span> , <span class="keyword">...</span>
+0153     <span class="string">'SetpointProduction float, '</span> , <span class="keyword">...</span>
+0154     <span class="string">'SetpointInjection float '</span> , <span class="keyword">...</span>
+0155     <span class="string">');'</span>];
+0156 
+0157 mym(CommandString);
+0158 
+0159 Ntotal = 0;
+0160 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'HCM'</span>,  <span class="string">'COR'</span>, Ntotal);
+0161 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'VCM'</span>,  <span class="string">'COR'</span>, Ntotal);
+0162 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'QF'</span>,   <span class="string">'QUAD'</span>, Ntotal);
+0163 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'QD'</span>,   <span class="string">'QUAD'</span>, Ntotal);
+0164 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'QFA'</span>,  <span class="string">'QUAD'</span>, Ntotal);
+0165 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'QDA'</span>,  <span class="string">'QUAD'</span>, Ntotal);
+0166 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'SQSF'</span>, <span class="string">'SKEWQUAD'</span>, Ntotal);
+0167 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'SQSD'</span>, <span class="string">'SKEWQUAD'</span>, Ntotal);
+0168 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'SF'</span>,   <span class="string">'SEXT'</span>, Ntotal);
+0169 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'SD'</span>,   <span class="string">'SEXT'</span>, Ntotal);
+0170 [N, Ntotal] = <a href="#_sub3" class="code" title="subfunction [N, Ntotal] = writesrmpstable(Family, Type, NOffset)">writesrmpstable</a>(<span class="string">'BEND'</span>, <span class="string">'BEND'</span>, Ntotal);
+0171 
+0172 
+0173 
+0174 
+0175 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0176 <span class="comment">% Print some output to the screen %</span>
+0177 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0178 mym(<span class="string">'select * from LATTICE;'</span>);
+0179 mym(<span class="string">'select * from BPM;'</span>);
+0180 mym(<span class="string">'select * from MPS;'</span>);
+0181 
+0182 mym(<span class="string">'explain LATTICE;'</span>);
+0183 mym(<span class="string">'explain BPM;'</span>);
+0184 mym(<span class="string">'explain MPS;'</span>);
+0185 
+0186 
+0187 
+0188 
+0189 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0190 <span class="comment">% Close the database %</span>
+0191 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0192 mym(<span class="string">'close'</span>);
+0193 
+0194 
+0195 
+0196 
+0197 <a name="_sub1" href="#_subfunctions" class="code">function [N, Ntotal] = writelatticetable(Family, Type, Offset)</a>
+0198 
+0199 DevList = family2dev(Family,0);
+0200 <span class="comment">%Element = dev2elem(Family, DevList);</span>
+0201 Spos = getspos(Family, DevList);
+0202 L = getleff(Family, DevList);
+0203 
+0204 <span class="keyword">for</span> i = 1:size(DevList,1)
+0205     mym(sprintf(<span class="string">'insert into LATTICE values (%d, %d, %.5f, %.5f, &quot;%s&quot;, &quot;%s&quot;, %d, %d, &quot;%s&quot;);'</span>, i+Offset, i, Spos(i), L(i),Family, Type, DevList(i,1), DevList(i,2), family2common(Family, DevList(i,:))));
+0206 <span class="keyword">end</span>
+0207 N = size(DevList,1);
+0208 Ntotal = Offset + N;
+0209 
+0210 
+0211 
+0212 
+0213 <a name="_sub2" href="#_subfunctions" class="code">function [N, Ntotal] = writebpmtable(Family, NOffset)</a>
+0214 
+0215 DevList = family2dev(Family,0);
+0216 <span class="comment">%Element = dev2elem(Family, DevList);</span>
+0217 Spos = getspos(Family, DevList);
+0218 CommonName = family2common(Family, DevList);
+0219 AM = family2channel(Family, <span class="string">'Monitor'</span>, DevList);
+0220 AVG = family2channel(Family, <span class="string">'NumberOfAverages'</span>, DevList);
+0221 TC = family2channel(Family, <span class="string">'TimeConstant'</span>, DevList);
+0222 IsBergoz = zeros(size(DevList,1),1);
+0223 [tmp, i] = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(Family, <span class="string">'Bergoz'</span>);
+0224 IsBergoz(i) = 1;
+0225 IsArc = zeros(size(DevList,1),1);
+0226 [tmp, i] = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(Family, <span class="string">'Arc'</span>);
+0227 IsArc(i) = 1;
+0228 Status = family2status(Family, DevList);
+0229 Golden = getgolden(Family, DevList);
+0230 Offset = getoffset(Family, DevList);
+0231 
+0232 <span class="keyword">for</span> i = 1:size(DevList,1)
+0233     mym(sprintf(<span class="string">'insert into BPM values (%d, %d, %.5f, &quot;%s&quot;, %d, %d, &quot;%s&quot;, %d, %d, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, %d, %.5f, %.5f);'</span>, <span class="keyword">...</span>
+0234         i+NOffset, i, Spos(i), Family, DevList(i,1), DevList(i,2), deblank(CommonName(i,:)), IsArc(i), IsBergoz(i), <span class="keyword">...</span>
+0235         deblank(AM(i,:)), deblank(AVG(i,:)), deblank(TC(i,:)), Status(i), Golden(i), Offset(i) ) );
+0236 <span class="keyword">end</span>
+0237 N = size(DevList,1);
+0238 Ntotal = NOffset + N;
+0239 
+0240 
+0241 
+0242 
+0243 <a name="_sub3" href="#_subfunctions" class="code">function [N, Ntotal] = writesrmpstable(Family, Type, NOffset)</a>
+0244 
+0245 DevList = family2dev(Family, 0, 1);   <span class="comment">% All status, By power supply</span>
+0246 <span class="comment">%Element = dev2elem(Family, DevList);</span>
+0247 Spos = getspos(Family, DevList);
+0248 CommonName = family2common(Family, DevList);
+0249 AM = family2channel(Family, <span class="string">'Monitor'</span>, DevList);
+0250 SP = family2channel(Family, <span class="string">'Setpoint'</span>, DevList);
+0251 ONBM = family2channel(Family, <span class="string">'On'</span>, DevList);
+0252 ONBC = family2channel(Family, <span class="string">'OnControl'</span>, DevList);
+0253 Reset = family2channel(Family, <span class="string">'Reset'</span>, DevList);
+0254 Ready = family2channel(Family, <span class="string">'Ready'</span>, DevList);
+0255 RampRate = family2channel(Family, <span class="string">'RampRate'</span>, DevList);
+0256 DAC = family2channel(Family, <span class="string">'DAC'</span>, DevList);
+0257 <span class="keyword">if</span> isempty(DAC)
+0258     DAC = SP(:,1);
+0259     DAC(:,1) = <span class="string">' '</span>;
+0260 <span class="keyword">end</span>
+0261 
+0262 TC = family2channel(Family, <span class="string">'TimeConstant'</span>, DevList);
+0263 <span class="keyword">if</span> isempty(TC)
+0264     TC = SP(:,1);
+0265     TC(:,1) = <span class="string">' '</span>;
+0266 <span class="keyword">end</span>
+0267 
+0268 Status = family2status(Family, DevList);
+0269 
+0270 MagStruct = getproductionlattice(Family, <span class="string">'Setpoint'</span>);
+0271 [i, iNotFound, iFoundList1] = findrowindex(DevList, MagStruct.DeviceList);
+0272 <span class="keyword">if</span> isempty(iNotFound)
+0273     <span class="comment">% All the devices are in the lattice file</span>
+0274     Prod = MagStruct.Data(i);
+0275 <span class="keyword">else</span>
+0276     <span class="comment">% Probably just a status off</span>
+0277     fprintf(<span class="string">'   Not all the %s power supplies were found in the production lattice file.\n'</span>, Family);
+0278     Prod = zeros(size(DevList,1),1);
+0279     Prod(iFoundList1) = MagStruct.Data(i);
+0280 <span class="keyword">end</span>
+0281 
+0282 MagStruct = getinjectionlattice(Family, <span class="string">'Setpoint'</span>);
+0283 [i, iNotFound, iFoundList1] = findrowindex(DevList, MagStruct.DeviceList);
+0284 <span class="keyword">if</span> isempty(iNotFound)
+0285     <span class="comment">% All the devices are in the lattice file</span>
+0286     Inj = MagStruct.Data(i);
+0287 <span class="keyword">else</span>
+0288     <span class="comment">% Probably just a status off</span>
+0289     fprintf(<span class="string">'   Not all the %s power supplies were found in the injection lattice file.\n'</span>, Family);
+0290     Inj = zeros(size(DevList,1),1);
+0291     Inj(iFoundList1) = MagStruct.Data(i);
+0292 <span class="keyword">end</span>
+0293 
+0294 Min = minsp(Family, DevList);
+0295 Max = maxsp(Family, DevList);
+0296 Tol = family2tol(Family, DevList);
+0297 
+0298 
+0299 <span class="keyword">for</span> i = 1:size(DevList,1)
+0300     mym(sprintf(<span class="string">'insert into MPS values (%d, %d, %.5f, &quot;%s&quot;, &quot;%s&quot;, %d, %d, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, %d, %.5f, %.5f, %.5f, %.5f, %.5f);'</span>, <span class="keyword">...</span>
+0301         i+NOffset, i, Spos(i), Family, Type, DevList(i,1), DevList(i,2), <span class="keyword">...</span>
+0302         deblank(CommonName(i,:)), deblank(AM(i,:)), deblank(SP(i,:)), deblank(ONBM(i,:)), deblank(ONBC(i,:)), deblank(Reset(i,:)), deblank(Ready(i,:)), deblank(RampRate(i,:)), deblank(DAC(i,:)), deblank(TC(i,:)), Status(i), Min(i), Max(i), Tol(i), Prod(i), Inj(i) ) );
+0303 <span class="keyword">end</span>
+0304 N = size(DevList,1);
+0305 Ntotal = NOffset + N;
+0306 
+0307</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getidinfo</title>
+  <meta name="keywords" content="getidinfo">
+  <meta name="description" content="function [FFEnableBM, FFEnableBC, GapEnableBM, GapEnableBC, Sector] = getidinfo(Sector)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getidinfo.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getidinfo
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [FFEnableBM, FFEnableBC, GapEnableBM, GapEnableBC, Sector] = getidinfo(Sector)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [FFEnableBM, FFEnableBC, GapEnableBM, GapEnableBC, Sector] = getidinfo(Sector) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> function [FFEnableBM, FFEnableBC, GapEnableBM, GapEnableBC, Sector] = getidinfo(Sector)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getid.html" class="code" title="function [Position, Velocity, RunFlag, UserGap] = getid(DeviceList, ChanType)">getid</a>	GETID - Get the insertion device position, velocity, run flag, and user requested gap</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [FFEnableBM, FFEnableBC, GapEnableBM, GapEnableBC, Sector] = getidinfo(Sector)</a>
+0002 <span class="comment">% function [FFEnableBM, FFEnableBC, GapEnableBM, GapEnableBC, Sector] = getidinfo(Sector)</span>
+0003 <span class="comment">%</span>
+0004 
+0005 <span class="keyword">if</span> nargin == 0
+0006     Sector = getlist(<span class="string">'IDpos'</span>);
+0007 <span class="keyword">end</span>
+0008 
+0009 
+0010 <span class="keyword">for</span> i = 1:length(Sector)
+0011    <span class="keyword">if</span> Sector(i)==5
+0012       <span class="comment">% CMM Channels</span>
+0013       [GapMonitor(i,1), GapVelocityMonitor(i,1), GapMoveCount(i,1)] = <a href="getid.html" class="code" title="function [Position, Velocity, RunFlag, UserGap] = getid(DeviceList, ChanType)">getid</a>(Sector(i));
+0014       
+0015       ChanName = getname(<span class="string">'IDpos'</span>, Sector(i), 1);
+0016       GapSetPoint(i,1) = getam(ChanName);
+0017       
+0018       ChanName = sprintf(<span class="string">'SR%02dW___GDS1PS_BC00'</span>, Sector(i));
+0019       GapDisabledFlag(i,1) = getam(ChanName);
+0020       
+0021       ChanName = sprintf(<span class="string">'SR%02dW___GDS1V__AC01'</span>, Sector(i));
+0022       GapVelocitySetPoint(i,1) = getam(ChanName);
+0023       
+0024       ChanName = sprintf(<span class="string">'SR%02dW___GDS1V__BC01'</span>, Sector(i));
+0025       GapReset(i,1) = getam(ChanName);
+0026       
+0027       ChanName = sprintf(<span class="string">'SR%02dW___GDS1V__BM02'</span>, Sector(i));
+0028       GapLimitFlag(i,1) = getam(ChanName);
+0029       
+0030       ChanName = sprintf(<span class="string">'SR%02dW___GDS1E__BC02'</span>, Sector(i));
+0031       GapVelocityProfile(i,1) = getam(ChanName);
+0032       
+0033       ChanName = sprintf(<span class="string">'SR%02dW___GDS1PS_BC00'</span>, Sector(i));
+0034       GapDriveDisable(i,1) = getam(ChanName);
+0035       
+0036       <span class="comment">% EPICs Only Channels</span>
+0037       ChanName = sprintf(<span class="string">'sr%02dw:FFEnable:bo'</span>, Sector(i));
+0038       FFEnableBC(i,1) = getam(ChanName);
+0039       
+0040       ChanName = sprintf(<span class="string">'sr%02dw:FFEnable:bi'</span>, Sector(i));
+0041       FFEnableBM(i,1) = getam(ChanName);
+0042       
+0043       ChanName = sprintf(<span class="string">'cmm:ID%d_opr_grant'</span>, Sector(i));
+0044       <span class="comment">%ChanName = sprintf('sr%02du:GapEnable:bo', Sector(i));</span>
+0045       GapEnableBC(i,1) = getam(ChanName);
+0046       
+0047       ChanName = sprintf(<span class="string">'sr%02dw:GapEnable:bi'</span>, Sector(i));
+0048       GapEnableBM(i,1) = getam(ChanName);
+0049       
+0050       ChanName = sprintf(<span class="string">'cmm:ID%d_bl_input'</span>, Sector(i));
+0051       UserGap(i,1) = getam(ChanName);
+0052       
+0053       ChanName = sprintf(<span class="string">'sr%02dw:FFActiveCnt:ai'</span>, Sector(i));
+0054       FFActiveCount(i,1) = getam(ChanName);
+0055       
+0056       ChanName = sprintf(<span class="string">'sr%02dw:FFError:ai'</span>, Sector(i));
+0057       FFError(i,1) = getam(ChanName);
+0058       
+0059       ChanName = sprintf(<span class="string">'sr%02dw:FFRead:bo'</span>, Sector(i));
+0060       FFTableRead(i,1) = getam(ChanName); 
+0061    <span class="keyword">else</span>
+0062       <span class="comment">% CMM Channels</span>
+0063       [GapMonitor(i,1), GapVelocityMonitor(i,1), GapMoveCount(i,1)] = <a href="getid.html" class="code" title="function [Position, Velocity, RunFlag, UserGap] = getid(DeviceList, ChanType)">getid</a>(Sector(i));
+0064       
+0065       ChanName = getname(<span class="string">'IDpos'</span>, Sector(i), 1);
+0066       GapSetPoint(i,1) = getam(ChanName);
+0067       
+0068       ChanName = sprintf(<span class="string">'SR%02dU___GDS1V__AC01'</span>, Sector(i));
+0069       GapVelocitySetPoint(i,1) = getam(ChanName);
+0070       
+0071       ChanName = sprintf(<span class="string">'SR%02dU___GDS1PS_BC00'</span>, Sector(i));
+0072       GapDisabledFlag(i,1) = getam(ChanName);
+0073             
+0074       ChanName = sprintf(<span class="string">'SR%02dU___GDS1V__BC01'</span>, Sector(i));
+0075       GapReset(i,1) = getam(ChanName);
+0076       
+0077       ChanName = sprintf(<span class="string">'SR%02dU___GDS1V__BM02'</span>, Sector(i));
+0078       GapLimitFlag(i,1) = getam(ChanName);
+0079       
+0080       ChanName = sprintf(<span class="string">'SR%02dU___GDS1E__BC02'</span>, Sector(i));
+0081       GapVelocityProfile(i,1) = getam(ChanName);
+0082       
+0083       ChanName = sprintf(<span class="string">'SR%02dU___GDS1PS_BC00'</span>, Sector(i));
+0084       GapDriveDisable(i,1) = getam(ChanName);
+0085 
+0086       <span class="comment">% EPICs Only Channels</span>
+0087       ChanName = sprintf(<span class="string">'sr%02du:FFEnable:bo'</span>, Sector(i));
+0088       FFEnableBC(i,1) = getam(ChanName);
+0089       
+0090       ChanName = sprintf(<span class="string">'sr%02du:FFEnable:bi'</span>, Sector(i));
+0091       FFEnableBM(i,1) = getam(ChanName);
+0092       
+0093       ChanName = sprintf(<span class="string">'cmm:ID%d_opr_grant'</span>, Sector(i));
+0094       <span class="comment">%ChanName = sprintf('sr%02du:GapEnable:bo', Sector(i));</span>
+0095       GapEnableBC(i,1) = getam(ChanName);
+0096       
+0097       ChanName = sprintf(<span class="string">'sr%02du:GapEnable:bi'</span>, Sector(i));
+0098       GapEnableBM(i,1) = getam(ChanName);
+0099       
+0100       ChanName = sprintf(<span class="string">'cmm:ID%d_bl_input'</span>, Sector(i));
+0101       UserGap(i,1) = getam(ChanName);
+0102       
+0103       ChanName = sprintf(<span class="string">'sr%02du:FFActiveCnt:ai'</span>, Sector(i));
+0104       FFActiveCount(i,1) = getam(ChanName);
+0105       
+0106       ChanName = sprintf(<span class="string">'sr%02du:FFError:ai'</span>, Sector(i));
+0107       FFError(i,1) = getam(ChanName);
+0108       
+0109       ChanName = sprintf(<span class="string">'sr%02du:FFRead:bo'</span>, Sector(i));
+0110       FFTableRead(i,1) = getam(ChanName);
+0111    <span class="keyword">end</span>
+0112 <span class="keyword">end</span>
+0113 
+0114 
+0115 <span class="keyword">if</span> nargout == 0
+0116    <span class="keyword">for</span> i = 1:length(Sector)
+0117       fprintf(<span class="string">'  Sector %d\n'</span>, Sector(i));
+0118       fprintf(<span class="string">'  Gap Setpoint = %7.4f [mm]\n'</span>, GapSetPoint(i));
+0119       fprintf(<span class="string">'  Gap Monitor  = %7.4f [mm]\n'</span>, GapMonitor(i));
+0120       fprintf(<span class="string">'  User Gap     = %7.4f [mm]\n'</span>, UserGap(i));
+0121       fprintf(<span class="string">'  Gap Velocity Setpoint = %5.3f [mm/second]\n'</span>, GapVelocitySetPoint(i));
+0122       fprintf(<span class="string">'  Gap Velocity Monitor  = %5.3f [mm/second]\n'</span>, GapVelocityMonitor(i));
+0123       fprintf(<span class="string">'  Move Count / Error Monitor = %.1f \n'</span>, GapMoveCount(i));
+0124       fprintf(<span class="string">'  Reset Flag = %d \n'</span>, GapReset(i));
+0125       fprintf(<span class="string">'  Limit Flag = %d \n'</span>, GapLimitFlag(i));
+0126       fprintf(<span class="string">'  Velocity Profile Control = %d \n'</span>, GapVelocityProfile(i,1));
+0127       fprintf(<span class="string">'  Motor Drive Disable Control = %d \n'</span>, GapDriveDisable(i,1));
+0128       
+0129       <span class="keyword">if</span> Sector(i)==4
+0130          fprintf(<span class="string">'  Vertical Home Control = %d \n'</span>, scaget(<span class="string">'SR04U___GDS1HS_BC03'</span>));
+0131          fprintf(<span class="string">'  Vertical Home Status  = %d \n'</span>, scaget(<span class="string">'SR04U___GDS1HS_BM03'</span>));
+0132          fprintf(<span class="string">'  Vertical Servo Amplifier Control = %d \n'</span>, scaget(<span class="string">'SR04U___GDS1PS_BC04'</span>));
+0133          fprintf(<span class="string">'  Vertical Servo Amplifier Status  = %d \n'</span>, scaget(<span class="string">'SR04U___GDS1PS_BM04'</span>));
+0134          fprintf(<span class="string">'  Horizontal User Gap          = %7.4f [mm]\n'</span>, scaget(<span class="string">'cmm:ID4_bl_input_h'</span>));
+0135          fprintf(<span class="string">'  Horizontal Offset Setpoint   = %7.4f [mm]\n'</span>, scaget(<span class="string">'SR04U___ODS1PS_AC00'</span>));
+0136          fprintf(<span class="string">'  Horizontal Offset Monitor    = %7.4f [mm]\n'</span>, scaget(<span class="string">'SR04U___ODS1PS_AM00'</span>));
+0137          fprintf(<span class="string">'  Horizontal Offset Setpoint A = %7.4f [mm]\n'</span>, scaget(<span class="string">'SR04U___ODA1PS_AC02'</span>));
+0138          fprintf(<span class="string">'  Horizontal Offset Monitor  A = %7.4f [mm]\n'</span>, scaget(<span class="string">'SR04U___ODA1PS_AM00'</span>));
+0139          fprintf(<span class="string">'  Horizontal Offset Setpoint B = %7.4f [mm]\n'</span>, scaget(<span class="string">'SR04U___ODB1PS_AC03'</span>));
+0140          fprintf(<span class="string">'  Horizontal Offset Monitor  B = %7.4f [mm]\n'</span>, scaget(<span class="string">'SR04U___ODB1PS_AM01'</span>));
+0141          fprintf(<span class="string">'  Horizontal Velocity Setpoint  = %7.4f [mm/second]\n'</span>, scaget(<span class="string">'SR04U___ODS1V__AC01'</span>));
+0142          fprintf(<span class="string">'  Horizontal Velocity Monitor   = %7.4f [mm/second]\n'</span>, scaget(<span class="string">'SR04U___ODS1V__AM01'</span>));
+0143          fprintf(<span class="string">'  Horizontal Velocity Monitor A = %7.4f [mm/second]\n'</span>, scaget(<span class="string">'SR04U___ODA1V__AM01'</span>));
+0144          fprintf(<span class="string">'  Horizontal Velocity Monitor B = %7.4f [mm/second]\n'</span>, scaget(<span class="string">'SR04U___ODB1V__AM01'</span>));
+0145          fprintf(<span class="string">'  Horizontal Move Count / Error Flag = %.1f \n'</span>, scaget(<span class="string">'SR04U___ODS1E__AM02'</span>));
+0146          fprintf(<span class="string">'  Horizontal Reset Flag = %d \n'</span>, scaget(<span class="string">'SR04U___ODS1V__BC01'</span>));
+0147          fprintf(<span class="string">'  Horizontal Limit Flag = %d \n'</span>, scaget(<span class="string">'SR04U___ODS1V__BM02'</span>));
+0148          fprintf(<span class="string">'  Horizontal Home Control = %d \n'</span>, scaget(<span class="string">'SR04U___ODS1HS_BC03'</span>));
+0149          fprintf(<span class="string">'  Horizontal Home Status  = %d \n'</span>, scaget(<span class="string">'SR04U___ODS1HS_BM03'</span>));
+0150          fprintf(<span class="string">'  Horizontal Servo Amplifier Control = %d \n'</span>, scaget(<span class="string">'SR04U___ODS1PS_BC04'</span>));
+0151          fprintf(<span class="string">'  Horizontal Servo Amplifier Status  = %d \n'</span>, scaget(<span class="string">'SR04U___ODS1PS_BM04'</span>));
+0152          fprintf(<span class="string">'  Horizontal Status Word = %s \n'</span>, dec2bin(scaget(<span class="string">'SR04U___ODS1ST_AM03'</span>),16));
+0153          fprintf(<span class="string">'  Vertical   Status Word = %s \n'</span>, dec2bin(scaget(<span class="string">'SR04U___GDS1ST_AM03'</span>),16));
+0154          fprintf(<span class="string">'                           0123456789ABCDEF\n'</span>);
+0155       <span class="keyword">end</span>
+0156       
+0157       fprintf(<span class="string">'  Gap Control  Enabled Control = %d \n'</span>, GapEnableBC(i));
+0158       fprintf(<span class="string">'  Gap Control  Enabled Monitor = %d \n'</span>, GapEnableBM(i));
+0159       fprintf(<span class="string">'  Feed Forward Enabled Control = %d \n'</span>, FFEnableBC(i));
+0160       fprintf(<span class="string">'  Feed Forward Enabled Monitor = %d \n'</span>, FFEnableBM(i));
+0161       fprintf(<span class="string">'  Feed Forward Active Count = %d \n'</span>, FFActiveCount(i));
+0162       fprintf(<span class="string">'  Feed Forward Table Read = %d \n'</span>, FFTableRead(i));
+0163       fprintf(<span class="string">'  Feed Forward Error = %d \n'</span>, FFError(i));
+0164       <span class="keyword">if</span> isunix
+0165          fprintf(<span class="string">'  Feed Forward Header: %s \n'</span>, getffheader(Sector(i)));
+0166       <span class="keyword">end</span>
+0167       
+0168       fprintf(<span class="string">' \n'</span>);
+0169    <span class="keyword">end</span>
+0170 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

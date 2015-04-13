@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of reson</title>
+  <meta name="keywords" content="reson">
+  <meta name="description" content="reson(ordre, period, fen)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; reson.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>reson
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>reson(ordre, period, fen)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [k, tab]=reson(ordre,period,fen) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> reson(ordre, period, fen)
+ Recherche des droites de resonance a x + b y = c
+ passant dans la fenetre [x1 x2 y1 y2]
+ Ordre de la resonance |a| + |b|
+ Critere de recherche c = period * entie
+ eg:
+ Soleil
+ [k, tab] = reson(4,1,[18 19 10 11])
+
+ ALS
+ [k, tab] = reson(4,1,[14 15 9 10])</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="reson.html" class="code" title="function [k, tab]=reson(ordre,period,fen)">reson</a>	reson(ordre, period, fen)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="reson.html" class="code" title="function [k, tab]=reson(ordre,period,fen)">reson</a>	reson(ordre, period, fen)</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function d = distance(m1,m2,m3,fen)</a></li><li><a href="#_sub2" class="code">function d = dist_point_droite(m1,m2,m3,pt)</a></li><li><a href="#_sub3" class="code">function plot_reson(a,b,c,fen)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [k, tab]=reson(ordre,period,fen)</a>
+0002 <span class="comment">% reson(ordre, period, fen)</span>
+0003 <span class="comment">% Recherche des droites de resonance a x + b y = c</span>
+0004 <span class="comment">% passant dans la fenetre [x1 x2 y1 y2]</span>
+0005 <span class="comment">% Ordre de la resonance |a| + |b|</span>
+0006 <span class="comment">% Critere de recherche c = period * entie</span>
+0007 <span class="comment">% eg:</span>
+0008 <span class="comment">% Soleil</span>
+0009 <span class="comment">% [k, tab] = reson(4,1,[18 19 10 11])</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% ALS</span>
+0012 <span class="comment">% [k, tab] = reson(4,1,[14 15 9 10])</span>
+0013 <span class="comment">%</span>
+0014 
+0015 <span class="comment">% Laurent S. Nadolski, Synchrotron SOLEIL, 02/04</span>
+0016 
+0017 <span class="comment">%% check argument number</span>
+0018 <span class="keyword">if</span> nargin &lt; 2
+0019     help <a href="reson.html" class="code" title="function [k, tab]=reson(ordre,period,fen)">reson</a>
+0020     <span class="keyword">return</span>
+0021 <span class="keyword">end</span>
+0022 
+0023 
+0024 <span class="comment">%% window dimensions</span>
+0025 x1=fen(1); 
+0026 x2=fen(2); 
+0027 y1=fen(3); 
+0028 y2=fen(4);
+0029 
+0030 tab = [];
+0031 k=0;
+0032 <span class="comment">%% diagonal of the window used to check wether resonsonce is within the</span>
+0033 <span class="comment">%% window frame</span>
+0034 d0 = sqrt(power(fen(2)-fen(1),2) + power(fen(4)-fen(3),2))/2;
+0035 
+0036 <span class="comment">%% Look for resonance</span>
+0037 <span class="keyword">for</span> m1 = -ordre:ordre
+0038     am1 = abs(m1);
+0039     <span class="keyword">for</span> m2 = -ordre+am1:ordre-am1
+0040         <span class="comment">%%% Recherche des bornes de C</span>
+0041         <span class="keyword">if</span> (m2 == 0)
+0042             c(1)=m1*x1;
+0043             c(2)=m1*x2;            
+0044         <span class="keyword">elseif</span> (m1/m2&lt;=0)
+0045             c(1)= m1*x1+m2*y2;
+0046             c(2)= m1*x2+m2*y1;
+0047         <span class="keyword">else</span>
+0048             c(1)= m1*x1+m2*y1;
+0049             c(2)= m1*x2+m2*y2;
+0050         <span class="keyword">end</span>
+0051         cmin = floor(min(c));
+0052         cmax= floor(max(c));
+0053         
+0054         <span class="keyword">for</span> m3=cmin:cmax        
+0055             <span class="keyword">if</span> (mod(m3,period) == 0) 
+0056                 <span class="keyword">if</span> (abs(m1) + abs(m2) == ordre)
+0057                     <span class="comment">% check whether resonance within the window</span>
+0058                     d = <a href="#_sub1" class="code" title="subfunction d = distance(m1,m2,m3,fen)">distance</a>(m1,m2,m3,fen);   
+0059                     <span class="keyword">if</span> (d &lt; d0)
+0060                         k=k+1;
+0061                         tab(k,:)=[m1 m2 m3];
+0062                         <a href="#_sub3" class="code" title="subfunction plot_reson(a,b,c,fen)">plot_reson</a>(m1,m2,m3,fen)
+0063                     <span class="keyword">end</span>
+0064                     
+0065                 <span class="keyword">end</span>
+0066             <span class="keyword">end</span>
+0067         <span class="keyword">end</span>
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">end</span>        
+0070 
+0071 axis(fen);
+0072 
+0073 
+0074 <a name="_sub1" href="#_subfunctions" class="code">function d = distance(m1,m2,m3,fen)</a>
+0075 <span class="comment">% calcul la distance entre la droite et la centre de la fenetre</span>
+0076 <span class="comment">% centre de la fenetre</span>
+0077 pt= [fen(1) + (fen(2)-fen(1))/2, fen(3) + (fen(4)-fen(3))/2];
+0078 
+0079 d = <a href="#_sub2" class="code" title="subfunction d = dist_point_droite(m1,m2,m3,pt)">dist_point_droite</a>(m1,m2,m3,pt);
+0080 
+0081 
+0082 
+0083 <a name="_sub2" href="#_subfunctions" class="code">function d = dist_point_droite(m1,m2,m3,pt)</a>
+0084 <span class="comment">% calcul la distance entre la droite et un point pt</span>
+0085 <span class="comment">% droite m1 *x + m2 *y =m3</span>
+0086 <span class="comment">% pt =[0 2]</span>
+0087 <span class="comment">% dist_point_droite(1,2,4,pt)</span>
+0088 
+0089 <span class="comment">% centre de la fenetre</span>
+0090 P= [pt 0];
+0091 
+0092 <span class="comment">%vecteur directeur normalise</span>
+0093 u = [-m2 m1 0];
+0094 
+0095 <span class="keyword">if</span> (norm(u)~=0) 
+0096     u = u/norm(u);
+0097 <span class="keyword">end</span>
+0098 
+0099 <span class="comment">% vecteur AP, ou A appartient a la droite et P est le centre de la fenetre</span>
+0100 <span class="keyword">if</span> (m1 ~= 0)
+0101     A = [m3/m1 0 0];
+0102 <span class="keyword">elseif</span> (m2 ~=0)
+0103     A=[0 m3/m2 0];
+0104 <span class="keyword">else</span>
+0105     A=[0 0 0]
+0106 <span class="keyword">end</span>
+0107 
+0108 AP= P - A;
+0109 
+0110 d = norm(cross(AP,u),2);
+0111 
+0112 
+0113 <a name="_sub3" href="#_subfunctions" class="code">function plot_reson(a,b,c,fen)</a>
+0114 <span class="comment">% plot_reson(a,b,c,fen)</span>
+0115 <span class="comment">% plot resonance whose equation is: a*fx+ b*fz = c</span>
+0116 <span class="comment">% in a windows whose dimensions are in fen=[xmin xmax zmin zmax]</span>
+0117 <span class="comment">% eg:</span>
+0118 <span class="comment">% plot_reson(3,1,65,[18 19 10 11])</span>
+0119 
+0120 <span class="comment">% Laurent S. Nadolski, Synchrotron SOLEIL, 02/04</span>
+0121 
+0122 <span class="comment">%% Check input argument</span>
+0123 <span class="keyword">if</span> nargin &lt; 3
+0124     help <a href="reson.html" class="code" title="function [k, tab]=reson(ordre,period,fen)">reson</a>
+0125     <span class="keyword">return</span>
+0126 <span class="keyword">end</span>
+0127 
+0128 <span class="comment">%% build straight line equation</span>
+0129 x=[fen(1) fen(2)];
+0130 
+0131 <span class="keyword">if</span> (b ~=0)
+0132     y = (c-a*x)/b;
+0133 <span class="keyword">elseif</span> (a ==0 &amp; b ==0)
+0134     <span class="comment">% ne fait rien</span>
+0135     <span class="keyword">return</span>
+0136 <span class="keyword">else</span>
+0137     x = c/a*ones(2,1);
+0138     y = [fen(3) fen(4)];
+0139 <span class="keyword">end</span>
+0140 
+0141 <span class="comment">%% define resonance order</span>
+0142 order = abs(a)+abs(b);
+0143 
+0144 <span class="comment">%% appearance options depending on order</span>
+0145 <span class="comment">% - for regular</span>
+0146 <span class="comment">% -- for skew</span>
+0147 width = 1;
+0148 style = <span class="string">'-'</span>;
+0149 <span class="keyword">if</span> ( mod(order-abs(a),2)==1 )
+0150     style= <span class="string">'--'</span>;
+0151 <span class="keyword">end</span> 
+0152 <span class="keyword">switch</span> order
+0153     <span class="keyword">case</span> 1
+0154         color = <span class="string">'k'</span>;
+0155         width = 4;
+0156     <span class="keyword">case</span> 2
+0157         color = <span class="string">'b'</span>;
+0158         width = 3 ;
+0159     <span class="keyword">case</span> 3
+0160         color = <span class="string">'r'</span>;
+0161         width = 2 ;
+0162     <span class="keyword">case</span> 4
+0163         color = <span class="string">'g'</span>;
+0164          width = 2 ;
+0165     <span class="keyword">case</span> 5
+0166         color = <span class="string">'m'</span>;
+0167     <span class="keyword">case</span> 6
+0168         color = <span class="string">'c'</span>;
+0169     <span class="keyword">case</span> 7
+0170         color = <span class="string">'y'</span>;
+0171     <span class="keyword">case</span> 8
+0172         color = <span class="string">'c'</span>;     
+0173     <span class="keyword">case</span> 9
+0174         color = <span class="string">'g'</span>;
+0175     <span class="keyword">case</span> 10
+0176         color = [0.1 0.1 0.1];
+0177     <span class="keyword">case</span> 11
+0178         color = [0.2 0.2 0.2];
+0179     <span class="keyword">case</span> 12
+0180        color = [0.3 0.3 0.3];
+0181     <span class="keyword">case</span> 13
+0182         color = [0.4 0.4 0.4];
+0183     <span class="keyword">case</span> 14
+0184         color = [0.5 0.5 0.5];
+0185     <span class="keyword">case</span> 15
+0186         color = [0.6 0.6 0.6];
+0187     <span class="keyword">otherwise</span>
+0188        color = [0.7 0.7 0.7];
+0189 <span class="keyword">end</span>
+0190 
+0191 line(x,y,<span class="string">'LineWidth'</span>, width, <span class="string">'LineStyle'</span>, style, <span class="string">'Color'</span>,color);
+0192</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

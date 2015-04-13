@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotmeasbeta</title>
+  <meta name="keywords" content="plotmeasbeta">
+  <meta name="description" content="PLOTMEASBETA - plot quadrupole betatron function from measurement">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; plotmeasbeta.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plotmeasbeta
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>PLOTMEASBETA - plot quadrupole betatron function from measurement</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function plotmeasbeta(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTMEASBETA - plot quadrupole betatron function from measurement
+
+  INPUTS
+  None - Ask user to select a file
+  1. AO - output structure from measbeta programme
+
+  See also <a href="measbeta.html" class="code" title="function AO = measbeta(varargin)">measbeta</a>, plotbeta</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="measbeta.html" class="code" title="function AO = measbeta(varargin)">measbeta</a>	MEASBETA - Measure the betatron functions</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function plotmeasbeta(varargin)</a>
+0002 <span class="comment">%PLOTMEASBETA - plot quadrupole betatron function from measurement</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  INPUTS</span>
+0005 <span class="comment">%  None - Ask user to select a file</span>
+0006 <span class="comment">%  1. AO - output structure from measbeta programme</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  See also measbeta, plotbeta</span>
+0009 
+0010 <span class="comment">%  Written by Laurent S. Nadolski</span>
+0011 
+0012 
+0013 FileName = <span class="string">''</span>;
+0014 
+0015 <span class="keyword">if</span> isempty(varargin)
+0016     <span class="keyword">if</span> isempty(FileName)
+0017         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'QUAD'</span>);
+0018         DirStart = pwd;
+0019         cd(DirectoryName);
+0020         [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a Quad File'</span>);
+0021         <span class="keyword">if</span> FileName == 0 
+0022             ArchiveFlag = 0;
+0023             disp(<span class="string">'   Quadrupole betatron plotting canceled.'</span>);
+0024             <span class="keyword">return</span>
+0025         <span class="keyword">end</span>
+0026         FileName = [DirectoryName, FileName];
+0027     <span class="keyword">end</span>    
+0028     <span class="comment">% Load from file</span>
+0029     load(FileName);
+0030     cd(DirStart);
+0031 <span class="keyword">else</span>
+0032     AO = varargin{1};
+0033 <span class="keyword">end</span>
+0034 
+0035 QuadFam = fieldnames(AO.FamilyName);
+0036 
+0037 spos  = [];
+0038 betax = [];
+0039 betaz = [];
+0040 
+0041 <span class="keyword">for</span> k = 1:length(QuadFam)
+0042 <span class="comment">%     spos  = [spos AO.FamilyName.(QuadFam{k}).Position];</span>
+0043 <span class="comment">%     betax = [betax AO.FamilyName.(QuadFam{k}).beta(:,1)];</span>
+0044 <span class="comment">%     betaz = [betaz AO.FamilyName.(QuadFam{k}).beta(:,2)];</span>
+0045      betax = AO.FamilyName.(QuadFam{k}).beta(:,1);
+0046      betaz = AO.FamilyName.(QuadFam{k}).beta(:,2);
+0047     
+0048     figure
+0049     subplot(2,1,1)
+0050     bar(betax)
+0051     xlabel(<span class="string">'Quadrupole number'</span>)
+0052     ylabel(<span class="string">'\beta_x [m]'</span>);
+0053     title(sprintf(<span class="string">'%s quadrupole family'</span>, QuadFam{k}))
+0054 
+0055     subplot(2,1,2)
+0056     bar(betaz)
+0057     xlabel(<span class="string">'Quadrupole number'</span>)
+0058     ylabel(<span class="string">'\beta_z [m]'</span>);
+0059     addlabel(1,0,sprintf(<span class="string">'%s'</span>, datestr(AO.TimeStamp,0)));
+0060 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

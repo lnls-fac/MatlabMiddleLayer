@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of updateatindex</title>
+  <meta name="keywords" content="updateatindex">
+  <meta name="description" content="UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; updateatindex.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>updateatindex
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function updateatindex </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function updateatindex</a>
+0002 <span class="comment">%UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</span>
+0003 
+0004 
+0005 <span class="keyword">global</span> THERING
+0006 
+0007 
+0008 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0009 <span class="comment">% Append Accelerator Toolbox information %</span>
+0010 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0011 
+0012 <span class="comment">% Since changes in the AT model could change the AT indexes, etc,</span>
+0013 <span class="comment">% It's best to regenerate all the model indices whenever a model is loaded</span>
+0014 
+0015 <span class="comment">% Sort by family first (findcells is linear and slow)</span>
+0016 Indices = atindex(THERING);
+0017 
+0018 AO = getao;
+0019 
+0020 
+0021 <span class="comment">% BPMS</span>
+0022 <span class="keyword">try</span>
+0023     AO.BPMx.AT.ATType = <span class="string">'x'</span>;  <span class="comment">% 'xTurns';</span>
+0024     AO.BPMx.AT.ATIndex = [Indices.BPM(:)]; <span class="comment">% findcells(THERING,'FamName','BPM')';</span>
+0025     AO.BPMx.Position = findspos(THERING, AO.BPMx.AT.ATIndex)';
+0026 
+0027     AO.BPMy.AT.ATType = <span class="string">'y'</span>;
+0028     AO.BPMy.AT.ATIndex = [Indices.BPM(:)]; <span class="comment">% findcells(THERING,'FamName','BPM')';</span>
+0029     AO.BPMy.Position = findspos(THERING, AO.BPMy.AT.ATIndex)';
+0030 <span class="keyword">catch</span>
+0031     warning(<span class="string">'BPM family not found in the model.'</span>);
+0032 <span class="keyword">end</span>
+0033 
+0034 
+0035 <span class="comment">% CORRECTORS</span>
+0036 <span class="keyword">try</span>
+0037     <span class="comment">% Horizontal correctors are at every AT corrector</span>
+0038     AO.HCM.AT.ATType = <span class="string">'HCM'</span>;
+0039     AO.HCM.AT.ATIndex = buildatindex(AO.HCM.FamilyName, Indices.HCM);
+0040     AO.HCM.Position = findspos(THERING, AO.HCM.AT.ATIndex(:,1))';
+0041 
+0042     <span class="comment">% Not all correctors are vertical correctors</span>
+0043     AO.VCM.AT.ATType = <span class="string">'VCM'</span>;
+0044     AO.VCM.AT.ATIndex = buildatindex(AO.VCM.FamilyName, Indices.VCM);
+0045     AO.VCM.Position = findspos(THERING, AO.VCM.AT.ATIndex(:,1))';
+0046 <span class="keyword">catch</span>
+0047     warning(<span class="string">'Corrector family not found in the model.'</span>);
+0048 <span class="keyword">end</span>
+0049 
+0050 
+0051 <span class="comment">% QUADRUPOLES</span>
+0052 <span class="keyword">try</span>
+0053     AO.QF.AT.ATType = <span class="string">'QUAD'</span>;
+0054     AO.QF.AT.ATIndex = buildatindex(AO.QF.FamilyName, Indices.QF);
+0055     AO.QF.Position = findspos(THERING, AO.QF.AT.ATIndex(:,1))';
+0056 <span class="keyword">catch</span>
+0057     warning(<span class="string">'QF family not found in the model.'</span>);
+0058 <span class="keyword">end</span>
+0059 
+0060 <span class="keyword">try</span>
+0061     AO.QD.AT.ATType = <span class="string">'QUAD'</span>;
+0062     AO.QD.AT.ATIndex = buildatindex(AO.QD.FamilyName, Indices.QD);
+0063     AO.QD.Position = findspos(THERING, AO.QD.AT.ATIndex(:,1))';
+0064 <span class="keyword">catch</span>
+0065     warning(<span class="string">'QD family not found in the model.'</span>);
+0066 <span class="keyword">end</span>
+0067 
+0068 
+0069 <span class="comment">% SEXTUPOLES</span>
+0070 <span class="keyword">try</span>
+0071     AO.SF.AT.ATType = <span class="string">'SEXT'</span>;
+0072     AO.SF.AT.ATIndex = buildatindex(AO.SF.FamilyName, Indices.SF);
+0073     AO.SF.Position = findspos(THERING, AO.SF.AT.ATIndex(:,1))';
+0074 <span class="keyword">catch</span>
+0075     warning(<span class="string">'SF family not found in the model.'</span>);
+0076 <span class="keyword">end</span>
+0077 
+0078 <span class="keyword">try</span>
+0079     AO.SD.AT.ATType = <span class="string">'SEXT'</span>;
+0080     AO.SD.AT.ATIndex = buildatindex(AO.SD.FamilyName, Indices.SD);
+0081     AO.SD.Position = findspos(THERING, AO.SD.AT.ATIndex(:,1))';
+0082 <span class="keyword">catch</span>
+0083     warning(<span class="string">'SD family not found in the model.'</span>);
+0084 <span class="keyword">end</span>
+0085 
+0086 
+0087 <span class="comment">% BEND</span>
+0088 <span class="keyword">try</span>
+0089     AO.BEND.AT.ATType = <span class="string">'BEND'</span>;
+0090     AO.BEND.AT.ATIndex = buildatindex(AO.BEND.FamilyName, Indices.BEND);
+0091     AO.BEND.Position = findspos(THERING, AO.BEND.AT.ATIndex(:,1))';
+0092 <span class="keyword">catch</span>
+0093     warning(<span class="string">'BEND family not found in the model.'</span>);
+0094 <span class="keyword">end</span>
+0095 
+0096 
+0097 <span class="comment">% %TV</span>
+0098 <span class="comment">% try</span>
+0099 <span class="comment">%     AO.TV.AT.ATType = 'TV';</span>
+0100 <span class="comment">%     AO.TV.AT.ATIndex = buildatindex(AO.TV.FamilyName, Indices.TV);</span>
+0101 <span class="comment">%     AO.TV.Position = findspos(THERING, AO.TV.AT.ATIndex(:,1))';</span>
+0102 <span class="comment">% catch</span>
+0103 <span class="comment">%     warning('TV family not found in the model.');</span>
+0104 <span class="comment">% end</span>
+0105 
+0106 setao(AO);
+0107 
+0108 
+0109 
+0110 
+0111 <span class="comment">% Set TwissData at the start of the BTS</span>
+0112 <span class="keyword">try</span>
+0113     
+0114     <span class="comment">% BTS twiss parameters at the input</span>
+0115     TwissData.alpha = [0 0]';
+0116     TwissData.beta  = [.67 11.89]';
+0117     TwissData.mu    = [0 0]';
+0118     TwissData.ClosedOrbit = [0 0 0 0]';
+0119     TwissData.dP = 0;
+0120     TwissData.dL = 0;
+0121     TwissData.Dispersion  = [.03 0 0 0]';
+0122     
+0123     setpvmodel(<span class="string">'TwissData'</span>, <span class="string">''</span>, TwissData);  <span class="comment">% Same as, THERING{1}.TwissData = TwissData;</span>
+0124 
+0125 <span class="keyword">catch</span>
+0126      warning(<span class="string">'Setting the twiss data parameters in the MML failed.'</span>);
+0127 <span class="keyword">end</span>
+0128</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

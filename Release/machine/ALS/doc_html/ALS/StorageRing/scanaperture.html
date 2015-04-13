@@ -1,0 +1,522 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of scanaperture</title>
+  <meta name="keywords" content="scanaperture">
+  <meta name="description" content="SCANAPERTURE - Aperture scan program">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; scanaperture.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>scanaperture
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>SCANAPERTURE - Aperture scan program</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function scanaperture(BPMList, MaxChangeX, NStepsX, MaxChangeY, NStepsY, FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SCANAPERTURE - Aperture scan program
+
+  scanaperture(BPMList, MaxChangeX, NStepsX, MaxChangeY, NStepsY, FileName)
+
+  INPUTS
+  1. BPMList    - BPM list for the bump
+  2. MaxChangeX - Maximum horizontal change from the offset orbit (must be the same number of rows as BPMList)
+  3. NStepsX    - Vector of horizontal scaling steps of MaxChangeX {Default: 0} 
+  4. MaxChangeY - Maximum vertical change from the offset orbit (must be the same number of rows as BPMList) {Default: [4;4] mm} 
+  3. NStepsY    - Vector of vertical scaling steps of MaxChangeY {Default: 0:.1:1} 
+  6. FileName   - Output file name
+
+  OUTPUT
+  Output goes to a .mat file 
+  If no input filename is given, a name will be derived from the BPM devicelist, date, and time
+
+  NOTES
+  1. This function looks for a bump coefficient file corresponding to BPM list in the working directory.  
+     For instance, VerticalBumpCoef-7_8-6_1 is the vertical file for [7 8;6 1].
+     If you don't want to use this file, delete it and a new one will be created.
+  2. If MaxChangeX = 0, then vertical scan only
+     If MaxChangeY = 0, then horizontal scan only
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>	GETBPMAVERAGES - Gets the BPM averages</li><li><a href="getspiricon.html" class="code" title="function Output = getspiricon(Action, InfoFlag)">getspiricon</a>	Output = getspiricon(Action, InfoFlag);</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function scanaperture(BPMList, MaxChangeX, NStepsX, MaxChangeY, NStepsY, FileName)</a>
+0002 <span class="comment">%SCANAPERTURE - Aperture scan program</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  scanaperture(BPMList, MaxChangeX, NStepsX, MaxChangeY, NStepsY, FileName)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. BPMList    - BPM list for the bump</span>
+0008 <span class="comment">%  2. MaxChangeX - Maximum horizontal change from the offset orbit (must be the same number of rows as BPMList)</span>
+0009 <span class="comment">%  3. NStepsX    - Vector of horizontal scaling steps of MaxChangeX {Default: 0}</span>
+0010 <span class="comment">%  4. MaxChangeY - Maximum vertical change from the offset orbit (must be the same number of rows as BPMList) {Default: [4;4] mm}</span>
+0011 <span class="comment">%  3. NStepsY    - Vector of vertical scaling steps of MaxChangeY {Default: 0:.1:1}</span>
+0012 <span class="comment">%  6. FileName   - Output file name</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUT</span>
+0015 <span class="comment">%  Output goes to a .mat file</span>
+0016 <span class="comment">%  If no input filename is given, a name will be derived from the BPM devicelist, date, and time</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  NOTES</span>
+0019 <span class="comment">%  1. This function looks for a bump coefficient file corresponding to BPM list in the working directory.</span>
+0020 <span class="comment">%     For instance, VerticalBumpCoef-7_8-6_1 is the vertical file for [7 8;6 1].</span>
+0021 <span class="comment">%     If you don't want to use this file, delete it and a new one will be created.</span>
+0022 <span class="comment">%  2. If MaxChangeX = 0, then vertical scan only</span>
+0023 <span class="comment">%     If MaxChangeY = 0, then horizontal scan only</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="comment">% Initialize</span>
+0029 MinLifeTime = -inf; <span class="comment">%.5;</span>
+0030 MinCurrent = .05;  <span class="comment">%5;</span>
+0031 <span class="comment">%LifeTimeFlag = 'Fast';</span>
+0032 LifeTimePeriod = 4*60;
+0033 
+0034 
+0035 
+0036 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0037 <span class="comment">% Input checking %</span>
+0038 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0039 
+0040 <span class="keyword">if</span> nargin &lt; 1
+0041     <span class="comment">%cd R:\Controls\matlab\spear3data\User\aperturescan\2004-04-21</span>
+0042 
+0043     <span class="comment">%setmachineconfig('Golden');</span>
+0044     
+0045     MaxChangeX = [0;0];
+0046     NStepsX = 0;
+0047     MaxChangeY = [3;3];
+0048     <span class="comment">%NStepsY = [0 .2 .4 .5 .6 .7 .75 .8 .85 .9 .95 1];</span>
+0049     NStepsY = [0 .2 .4 .6 .8  1];
+0050     <span class="comment">%NStepsY = [0 .1 .2 .25 .3 .35 .4 .45 .5 .55 .6 .65 .7 .75 .8 .85 .9 .95 1];</span>
+0051 
+0052     FileName = [];
+0053     
+0054     Sector = menu(<span class="string">'Choose a sector?'</span>,<span class="string">'Injection'</span>, <span class="string">'BL 5'</span>,<span class="string">'BL 6'</span>,<span class="string">'BL 9'</span>,<span class="string">'14 Straight'</span>,<span class="string">'Exit'</span>);
+0055     Direction = menu(<span class="string">'Choose a Direction?'</span>,<span class="string">'Positive'</span>, <span class="string">'Negative'</span>,<span class="string">'Exit'</span>);
+0056     <span class="keyword">if</span> Direction == 3
+0057         <span class="keyword">return</span>
+0058     <span class="keyword">end</span>
+0059 
+0060     SkewFlag = 2;  <span class="comment">% 1-Yesm 2-No</span>
+0061     
+0062     <span class="keyword">if</span> Sector == 1
+0063         <span class="comment">% Injection</span>
+0064         BPMList = [3 6; 4 1];
+0065         <span class="keyword">if</span> Direction == 1
+0066             MaxChangeY = [4.5; 4.5];     
+0067         <span class="keyword">else</span>
+0068             MaxChangeY = [-4.5; -4.5];
+0069         <span class="keyword">end</span>
+0070     <span class="keyword">elseif</span> Sector == 2
+0071         <span class="comment">% BL 5</span>
+0072         BPMList = [12 6; 13 1];
+0073         <span class="keyword">if</span> Direction == 1
+0074             MaxChangeY = [4.5; 4.5];     
+0075         <span class="keyword">else</span>
+0076             MaxChangeY = [-4.5; -4.5];
+0077         <span class="keyword">end</span>
+0078     <span class="keyword">elseif</span> Sector == 3
+0079         <span class="comment">% BL 6</span>
+0080         BPMList = [5 10; 5 11];
+0081         <span class="keyword">if</span> Direction == 1
+0082             MaxChangeY = [3; 3];     
+0083         <span class="keyword">else</span>
+0084             MaxChangeY = [-3; -3];
+0085         <span class="keyword">end</span>
+0086     <span class="keyword">elseif</span> Sector == 4
+0087         <span class="comment">% BL 9</span>
+0088         BPMList = [7 6; 8 1];
+0089         <span class="keyword">if</span> Direction == 1
+0090             MaxChangeY = [4.5; 4.5];     
+0091         <span class="keyword">else</span>
+0092             MaxChangeY = [-4.5; -4.5];
+0093         <span class="keyword">end</span>
+0094         <span class="comment">%SkewFlag = menu('SkeqQuad Correction?','Yes', 'No','Exit');</span>
+0095         <span class="comment">%if SkewFlag == 3</span>
+0096         <span class="comment">%    return</span>
+0097         <span class="comment">%end</span>
+0098     <span class="keyword">elseif</span> Sector == 5
+0099         <span class="comment">% 14 Straight</span>
+0100         BPMList = [14 6; 15 1];
+0101         <span class="keyword">if</span> Direction == 1
+0102             MaxChangeY = [6; 6];     <span class="comment">% 14S +  (can go to  8 before a PS limit is exceeded)</span>
+0103         <span class="keyword">else</span>
+0104             MaxChangeY = [-6; -6];   <span class="comment">% 14S -  (can go to -9 before a PS limit is exceeded)</span>
+0105         <span class="keyword">end</span>
+0106     <span class="keyword">else</span>
+0107         <span class="keyword">return</span>
+0108     <span class="keyword">end</span>
+0109     
+0110 <span class="keyword">else</span>
+0111     
+0112     <span class="keyword">if</span> nargin &lt; 2
+0113         MaxChangeX = [0;0];
+0114     <span class="keyword">end</span>
+0115     <span class="keyword">if</span> nargin &lt; 3
+0116         NStepsX = 0;
+0117     <span class="keyword">end</span>
+0118     
+0119     <span class="keyword">if</span> nargin &lt; 4
+0120         MaxChangeY = [5;5];
+0121         <span class="comment">%MaxChangeY = [8;8];     % 14S +</span>
+0122         <span class="comment">%MaxChangeY = [-9;-9];   % 14S -</span>
+0123     <span class="keyword">end</span>
+0124     <span class="keyword">if</span> nargin &lt; 5
+0125         NStepsY = [0 .2 .4 .5 .6 .7 .75 .8 .85 .9 .95 1];
+0126         <span class="comment">%NStepsY = 0:.1:1;</span>
+0127         <span class="comment">%NStepsY = 0:-.1:-1;</span>
+0128     <span class="keyword">end</span>
+0129     
+0130     <span class="keyword">if</span> nargin &lt; 6
+0131         FileName = [];
+0132     <span class="keyword">end</span>
+0133 <span class="keyword">end</span>
+0134 
+0135 
+0136 BPMxIndex = findrowindex(BPMList, getlist(<span class="string">'BPMx'</span>));
+0137 BPMyIndex = findrowindex(BPMList, getlist(<span class="string">'BPMy'</span>));
+0138 
+0139 
+0140 <span class="comment">% Corrector starting points</span>
+0141 HCM0 = getsp(<span class="string">'HCM'</span>); 
+0142 VCM0 = getsp(<span class="string">'VCM'</span>);
+0143 
+0144 
+0145 <span class="comment">% Offset</span>
+0146 Xoffset = getoffset(<span class="string">'BPMx'</span>, BPMList);
+0147 Yoffset = getoffset(<span class="string">'BPMy'</span>, BPMList);
+0148 
+0149 
+0150 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0151 <span class="comment">% Compute corrector coefficients %</span>
+0152 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0153 BPMWeight = 40;
+0154 SVDIndex = 1e-3;
+0155 
+0156 FileNumberString =  sprintf(<span class="string">'-%d_%d'</span>, BPMList');
+0157 DirectoryName = <span class="string">''</span>;  <span class="comment">% Work in the present director</span>
+0158 <span class="comment">%DirectoryName = [fullfile(getfamilydata('Directory','DataRoot'),'aperturescan'),filesep];  % Work off DataRoot</span>
+0159 
+0160 
+0161 <span class="comment">% Get horizontal bump coefficients</span>
+0162 <span class="keyword">if</span> any(NStepsX ~= 0)
+0163     HorizontalBumpFile = sprintf(<span class="string">'%sHorizontalBumpCoef%s'</span>, DirectoryName, FileNumberString);
+0164     <span class="keyword">if</span> exist([HorizontalBumpFile,<span class="string">'.mat'</span>], <span class="string">'file'</span>)
+0165         fprintf(<span class="string">'   Loading horizontal corrector magnet bump coefficients from %s\n'</span>, HorizontalBumpFile);
+0166         load(HorizontalBumpFile);
+0167     <span class="keyword">else</span>
+0168         fprintf(<span class="string">'   Finding horizontal corrector magnet bump coefficients\n'</span>);
+0169         
+0170         <span class="comment">% BPM gain (work in real coordinates)</span>
+0171         Xgain = getgain(<span class="string">'BPMx'</span>, BPMList);
+0172         DeltaXBump = MaxChangeX ./ Xgain;
+0173         
+0174         <span class="comment">% Scale bump to .3 mm at it's maximum</span>
+0175         BumpMagnitude = .3;
+0176         DeltaXBump = BumpMagnitude * DeltaXBump / max(abs(DeltaXBump));
+0177         
+0178         <span class="comment">% Set the hysteresis</span>
+0179         x0 = getam(<span class="string">'BPMx'</span>, BPMList);
+0180         [HOCS, RF, HOCS0] = setorbitbump(<span class="string">'BPMx'</span>, BPMList, DeltaXBump/6, <span class="string">'HCM'</span>, [-5 -4 -3 -2 -1 1 2 3 4 5], 1, SVDIndex, BPMWeight, <span class="string">'Inc'</span>, <span class="string">'NoDisplay'</span>);
+0181         x1 = getam(<span class="string">'BPMx'</span>, BPMList);
+0182         
+0183         <span class="comment">% Get a clean bump</span>
+0184         figure(1);
+0185         clf reset
+0186         x2 = getam(<span class="string">'BPMx'</span>, BPMList);
+0187         [HOCS, RF, HOCS0] = setorbitbump(<span class="string">'BPMx'</span>, BPMList, DeltaXBump, <span class="string">'HCM'</span>, [-5 4 -3 -2 -1 1 2 3 4 5], 1, SVDIndex, BPMWeight, <span class="string">'Inc'</span>, <span class="string">'NoDisplay'</span>);
+0188         x3 = getam(<span class="string">'BPMx'</span>, BPMList);
+0189         drawnow;
+0190         DeltaHCM = (HOCS.CM.Data - HOCS0.CM.Data) / BumpMagnitude;  <span class="comment">% amps/mm  (real units)</span>
+0191         BPMDeviceList = HOCS.BPM.DeviceList;
+0192         HCMDeviceList = HOCS.CM.DeviceList;
+0193         save(HorizontalBumpFile, <span class="string">'DeltaHCM'</span>, <span class="string">'HCMDeviceList'</span>, <span class="string">'BPMDeviceList'</span>, <span class="string">'HOCS'</span>, <span class="string">'HOCS0'</span>);
+0194         
+0195         tmp = questdlg(strvcat(<span class="string">'Horizontal local bump coefficients created.'</span>,<span class="string">'Continue with aperture scan?'</span>),<span class="string">'APERTURE SCAN'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0196         setsp(<span class="string">'HCM'</span>, HCM0);
+0197         <span class="keyword">if</span> ~strcmpi(tmp,<span class="string">'Yes'</span>)
+0198             <span class="keyword">return</span>
+0199         <span class="keyword">end</span>
+0200     <span class="keyword">end</span>
+0201 <span class="keyword">end</span>
+0202 
+0203 
+0204 
+0205 <span class="comment">% Get vertical bump coefficients</span>
+0206 <span class="keyword">if</span> any(NStepsY ~= 0)
+0207     VerticalBumpFile = sprintf(<span class="string">'%sVerticalBumpCoef%s'</span>, DirectoryName, FileNumberString);
+0208     <span class="keyword">if</span> exist([VerticalBumpFile,<span class="string">'.mat'</span>], <span class="string">'file'</span>)
+0209         fprintf(<span class="string">'   Loading vertical corrector magnet bump coefficients from %s\n'</span>, VerticalBumpFile);
+0210         load(VerticalBumpFile);
+0211     <span class="keyword">else</span>
+0212         fprintf(<span class="string">'   Finding vertical corrector magnet bump coefficients\n'</span>);
+0213         
+0214         <span class="comment">% BPM gain (work in real coordinates)</span>
+0215         Ygain = getgain(<span class="string">'BPMy'</span>, BPMList);
+0216         DeltaYBump = MaxChangeY ./ Ygain;
+0217         
+0218         <span class="comment">% Scale bump to .3 mm at it's maximum</span>
+0219         BumpMagnitude = .3;
+0220         DeltaYBump = BumpMagnitude * DeltaYBump / max(abs(DeltaYBump));
+0221                 
+0222    
+0223         <span class="comment">% Set the hysteresis</span>
+0224         y0 = getam(<span class="string">'BPMy'</span>, BPMList);
+0225         [VOCS, RF, VOCS0] = setorbitbump(<span class="string">'BPMy'</span>, BPMList, DeltaYBump/6, <span class="string">'VCM'</span>, [-4 -3 -2 -1 1 2 3 4], 1, SVDIndex, BPMWeight, <span class="string">'Inc'</span>, <span class="string">'NoDisplay'</span>);
+0226         y1 = getam(<span class="string">'BPMy'</span>, BPMList);
+0227         
+0228         <span class="comment">% Get a clean bump</span>
+0229         <span class="comment">%vcm0= getsp('VCM', VOCS.CM.DeviceList);</span>
+0230         <span class="comment">%figure(1);</span>
+0231         <span class="comment">%clf reset</span>
+0232         y2 = getam(<span class="string">'BPMy'</span>, BPMList);
+0233         [VOCS, RF, VOCS0] = setorbitbump(<span class="string">'BPMy'</span>, BPMList, DeltaYBump, <span class="string">'VCM'</span>, [-4 -3 -2 -1 1 2 3 4], 5, SVDIndex, BPMWeight, <span class="string">'Inc'</span>, <span class="string">'NoDisplay'</span>);
+0234         y3 = getam(<span class="string">'BPMy'</span>, BPMList);
+0235         <span class="comment">%drawnow;</span>
+0236         <span class="comment">%vcm1= getsp('VCM', VOCS.CM.DeviceList);</span>
+0237         DeltaVCM = (VOCS.CM.Data - VOCS0.CM.Data) / BumpMagnitude;  <span class="comment">% amps/mm  (real units)</span>
+0238         BPMDeviceList = VOCS.BPM.DeviceList;
+0239         VCMDeviceList = VOCS.CM.DeviceList;
+0240         save(VerticalBumpFile, <span class="string">'DeltaVCM'</span>, <span class="string">'VCMDeviceList'</span>, <span class="string">'BPMDeviceList'</span>, <span class="string">'VOCS'</span>, <span class="string">'VOCS0'</span>);
+0241         
+0242         tmp = questdlg(strvcat(<span class="string">'Vertical local bump coefficients created.'</span>,<span class="string">'Continue with aperture scan?'</span>),<span class="string">'APERTURE SCAN'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0243         setsp(<span class="string">'VCM'</span>, VCM0);
+0244         <span class="keyword">if</span> ~strcmpi(tmp,<span class="string">'Yes'</span>)
+0245             <span class="keyword">return</span>
+0246         <span class="keyword">end</span>
+0247     <span class="keyword">end</span>
+0248 <span class="keyword">end</span>
+0249 
+0250 
+0251 
+0252 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0253 <span class="comment">% Aperture scan %</span>
+0254 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0255 [Nbpm, Tbpm] = <a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>;
+0256 
+0257 
+0258 <span class="comment">% % Correct the orbit to the offsets</span>
+0259 <span class="comment">% if getdcct &gt; 10</span>
+0260 <span class="comment">%     setorbitdefault([],[],[],'NoDisplay');</span>
+0261 <span class="comment">%     pause(2.2*Tbpm);</span>
+0262 <span class="comment">%     setorbitdefault([],[],[],'NoDisplay');</span>
+0263 <span class="comment">% end</span>
+0264 
+0265 
+0266 <span class="comment">% Scan vectors</span>
+0267 <span class="keyword">if</span> MaxChangeX(1) ~= 0 
+0268     DeltaX = MaxChangeX(1) * NStepsX;
+0269 <span class="keyword">else</span>
+0270     DeltaX = MaxChangeX(2) * NStepsX;
+0271 <span class="keyword">end</span>
+0272 <span class="keyword">if</span> MaxChangeY(1) ~= 0 
+0273     DeltaY = MaxChangeY(1) * NStepsY;
+0274 <span class="keyword">else</span>
+0275     DeltaY = MaxChangeY(2) * NStepsY;
+0276 <span class="keyword">end</span>
+0277 
+0278 
+0279 <span class="keyword">if</span> any(NStepsX ~= 0)
+0280     hcm0 = getsp(<span class="string">'HCM'</span>, HCMDeviceList);
+0281     HCM = NaN * ones(size(HCMDeviceList,1), length(DeltaX));
+0282 <span class="keyword">else</span>
+0283     HCM = [];
+0284 <span class="keyword">end</span>
+0285 <span class="keyword">if</span> any(NStepsY ~= 0)
+0286     vcm0 = getsp(<span class="string">'VCM'</span>, VCMDeviceList);
+0287     VCM = NaN * ones(size(VCMDeviceList,1), length(DeltaY));
+0288     
+0289     <span class="comment">% Set hysteresis in an upward direction</span>
+0290     setsp(<span class="string">'VCM'</span>, vcm0 - 1 * DeltaVCM, VCMDeviceList, -1);
+0291     setsp(<span class="string">'VCM'</span>, vcm0, VCMDeviceList);
+0292     
+0293 <span class="keyword">else</span>
+0294     VCM = [];
+0295 <span class="keyword">end</span>
+0296 
+0297 
+0298 <span class="comment">% Data filename</span>
+0299 <span class="keyword">if</span> isempty(FileName)
+0300     FileNameArchive = appendtimestamp([<span class="string">'Aperture'</span>,FileNumberString]);
+0301     <span class="comment">%DirectoryName = fullfile(getfamilydata('Directory','DataRoot'),'aperturescan');</span>
+0302     <span class="comment">%DirStart = pwd;</span>
+0303     <span class="comment">%[DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);</span>
+0304     FileName = [DirectoryName FileNameArchive];
+0305 <span class="keyword">end</span>
+0306 
+0307 <span class="comment">%fprintf('\n   This scan will take about %f minutes\n', LifeTimePeriod * (length(NStepsY)+5) / 60);</span>
+0308 fprintf(<span class="string">'   Starting aperture scan at %s\n'</span>, datestr(clock));
+0309 
+0310 <span class="keyword">if</span> SkewFlag == 1
+0311     load SkewQuadCorrectionBL9
+0312     SkewSP = getsp(<span class="string">'SkewQuad'</span>);
+0313     
+0314     <span class="comment">% Get BPM and CM structures</span>
+0315     CM  = {getsp(<span class="string">'HCM'</span>,<span class="string">'struct'</span>),getsp(<span class="string">'VCM'</span>,<span class="string">'struct'</span>)};
+0316     BPM = {getx(<span class="string">'struct'</span>), gety(<span class="string">'struct'</span>)};
+0317 <span class="keyword">end</span>
+0318 
+0319 
+0320 CurrentDrop = 0;
+0321 i = 0;
+0322 <span class="keyword">for</span> x = DeltaX
+0323     i = i + 1;
+0324     
+0325     <span class="comment">% Horizontal bump</span>
+0326     <span class="keyword">if</span> any(NStepsX ~= 0)
+0327         setsp(<span class="string">'HCM'</span>, hcm0 + x * DeltaHCM, HCMDeviceList, -2);
+0328         HCM(:,i) = getsp(<span class="string">'HCM'</span>, HCMDeviceList);
+0329     <span class="keyword">end</span>
+0330     
+0331     j = 0;
+0332     yminus1 = DeltaY(1);
+0333     <span class="keyword">for</span> y = DeltaY
+0334         j = j + 1;
+0335         
+0336         
+0337         <span class="comment">% Vertical bump</span>
+0338         <span class="keyword">if</span> any(NStepsY ~= 0)
+0339             <span class="comment">% Step in .25 mm steps</span>
+0340             <span class="keyword">for</span> ystep = yminus1:sign(y-yminus1)*.25:y 
+0341                 setsp(<span class="string">'VCM'</span>, vcm0 + ystep * DeltaVCM, VCMDeviceList, 0);
+0342                 pause(.2);
+0343             <span class="keyword">end</span>
+0344             setsp(<span class="string">'VCM'</span>, vcm0 + y * DeltaVCM, VCMDeviceList, -2);
+0345             VCM(:,j) = getsp(<span class="string">'VCM'</span>, VCMDeviceList);
+0346         <span class="keyword">end</span>
+0347         yminus1 = y;
+0348         
+0349         <span class="keyword">if</span> SkewFlag == 1
+0350             BPMgoal = {getx, gety};
+0351             setsp(<span class="string">'SkewQuad'</span>, SkewSP + y * DcurrDmm);
+0352             
+0353             <span class="comment">% Corrector orbit</span>
+0354             setorbit(BPMgoal, BPM, CM, 2, 1e-3, <span class="string">'noDisplay'</span>);
+0355         <span class="keyword">end</span>
+0356         
+0357         <span class="comment">% Lifetime measurement</span>
+0358         pause(1);
+0359         LifeTime(i,j) = measlifetime;
+0360 
+0361         DCCT(i,j) = getdcct;
+0362         BPMx(i,j,:) = raw2real(<span class="string">'BPMx'</span>, getx);
+0363         BPMy(i,j,:) = raw2real(<span class="string">'BPMy'</span>, gety);
+0364         
+0365         IonGauge(:,j) = getam(<span class="string">'IonGauge'</span>);
+0366         IonPump(:,j)  = getam(<span class="string">'IonPump'</span>);
+0367         
+0368         Xrms(:,j) = <a href="getspiricon.html" class="code" title="function Output = getspiricon(Action, InfoFlag)">getspiricon</a>(<span class="string">'Xrms'</span>);
+0369         Yrms(:,j) = <a href="getspiricon.html" class="code" title="function Output = getspiricon(Action, InfoFlag)">getspiricon</a>(<span class="string">'Yrms'</span>);
+0370         
+0371         
+0372         fprintf(<span class="string">'  %2d %2d.  BPMx(%d,%d)=%6.3f mm,  BPMy(%d,%d)=%6.3f mm, DeltaY=%4.1f mm,  Lifetime=%5.3f hours %s\n'</span>, i, j, BPMList(1,:), BPMx(i,j,BPMxIndex(1)), BPMList(1,:), BPMy(i,j,BPMyIndex(1)), y, LifeTime(i,j), datestr(clock,0)); 
+0373         
+0374         figure(1)
+0375         clf reset
+0376         plot(squeeze(BPMy(1,:,BPMyIndex(1))), LifeTime(1,:),<span class="string">'.-b'</span>);
+0377 
+0378         drawnow;
+0379         
+0380         <span class="comment">%if LifeTime(i,j) &lt; MinLifeTime</span>
+0381         <span class="comment">%    break;</span>
+0382         <span class="comment">%end</span>
+0383         <span class="keyword">if</span> getdcct &lt; MinCurrent
+0384             CurrentDrop = 1;
+0385             <span class="keyword">break</span>;
+0386         <span class="keyword">end</span>
+0387         save(FileName);
+0388     <span class="keyword">end</span>
+0389     
+0390     <span class="comment">% Bring vertical back to the starting point</span>
+0391     <span class="keyword">if</span> any(NStepsY ~= 0)
+0392         <span class="keyword">for</span> k = linspace(1,0,6)
+0393             setsp(<span class="string">'VCM'</span>, vcm0 + k * y * DeltaVCM, VCMDeviceList, -1);
+0394         <span class="keyword">end</span>
+0395     <span class="keyword">end</span>
+0396 
+0397     <span class="keyword">if</span> CurrentDrop
+0398         <span class="comment">% Bring horizontal back to the starting point for a refill</span>
+0399         <span class="keyword">if</span> any(NStepsX ~= 0)
+0400             <span class="keyword">for</span> k = linspace(1,0,4)
+0401                 setsp(<span class="string">'HCM'</span>, hcm0 + k * x * DeltaHCM, HCMDeviceList, -1);
+0402             <span class="keyword">end</span>
+0403         <span class="keyword">end</span>
+0404         <span class="comment">%tmp = questdlg(strvcat(sprintf('Current dropped below %.2f mAmps.  Refill and Continue or Stop', MinCurrent),'(When refilling, do not change the lattice)'),'scanaperture','Continue','Stop','Stop');</span>
+0405         <span class="comment">%if strcmpi(tmp,'Continue')</span>
+0406         <span class="comment">%    CurrentDrop = 0;</span>
+0407         <span class="comment">%    % Put horizontal back</span>
+0408         <span class="comment">%    if any(NStepsX ~= 0)</span>
+0409         <span class="comment">%        for k = linspace(0,1,4)</span>
+0410         <span class="comment">%            setsp('HCM', hcm0 + k * x * DeltaHCM, HCMDeviceList, -1);</span>
+0411         <span class="comment">%        end</span>
+0412         <span class="comment">%    end</span>
+0413         <span class="comment">%else</span>
+0414         <span class="comment">%    fprintf('   Measurement stopped\n');</span>
+0415         <span class="comment">%    break;</span>
+0416         <span class="comment">%end</span>
+0417         
+0418         DeltaY = DeltaY(1:j);
+0419         save(FileName);
+0420         <span class="keyword">break</span>;
+0421     <span class="keyword">end</span>
+0422     
+0423     <span class="comment">% Other side??</span>
+0424     
+0425     save(FileName);
+0426 <span class="keyword">end</span>
+0427 
+0428 
+0429 
+0430 
+0431 <span class="comment">% % Save data</span>
+0432 <span class="comment">% if ~isempty(FileName)</span>
+0433 <span class="comment">%     save(FileName);</span>
+0434 <span class="comment">%     fprintf('   Aperature scan data saved to %s.mat\n', FileName);</span>
+0435 <span class="comment">% else</span>
+0436 <span class="comment">%     FileNameArchive = appendtimestamp(['Aperture',FileNumberString]);</span>
+0437 <span class="comment">%     %DirectoryName = fullfile(getfamilydata('Directory','DataRoot'),'aperturescan');</span>
+0438 <span class="comment">%     %DirStart = pwd;</span>
+0439 <span class="comment">%     %[DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);</span>
+0440 <span class="comment">%     save([DirectoryName FileNameArchive]);</span>
+0441 <span class="comment">%     %cd(DirStart);</span>
+0442 <span class="comment">%     fprintf('   Aperture scan data saved to %s.mat\n', [DirectoryName FileNameArchive]);</span>
+0443 <span class="comment">% end</span>
+0444 
+0445 fprintf(<span class="string">'   Aperture scan data saved to %s.mat\n'</span>, FileName);
+0446 fprintf(<span class="string">'   Aperture scan finished at %s\n'</span>, datestr(clock));
+0447 
+0448 
+0449 <span class="comment">% Reset correctors</span>
+0450 setsp(<span class="string">'HCM'</span>, HCM0);
+0451 setsp(<span class="string">'VCM'</span>, VCM0);
+0452 
+0453</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

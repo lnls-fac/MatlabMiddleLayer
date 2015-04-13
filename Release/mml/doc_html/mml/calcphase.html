@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcphase</title>
+  <meta name="keywords" content="calcphase">
+  <meta name="description" content="CALCPHASE - Calculate the betatron oscillation phase at the BPM using turn-by-turn data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; calcphase.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>calcphase
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>CALCPHASE - Calculate the betatron oscillation phase at the BPM using turn-by-turn data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [phix,phiy]=calcphase(nux,nuy,fadx,fady) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">CALCPHASE - Calculate the betatron oscillation phase at the BPM using turn-by-turn data
+   [phix,phiy]=calcphase(nux,nuy,fadx,fady)
+
+  This function calculates the betatron oscillation phase at the BPMs
+  using FAD data (turn by turn orbit measurement).
+
+  return values:
+  phix, phiy    horizontal and vertical betatron oscillation phase at every BPM
+
+  input values:
+  nux, nuy    horizontal and vertical tunes (as calculated by findfreq)
+  fadx        horizontal FAD data (number of BPMs and number of turns is variable)
+  fady        vertical FAD data</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [phix,phiy]=calcphase(nux,nuy,fadx,fady)</a>
+0002 <span class="comment">%CALCPHASE - Calculate the betatron oscillation phase at the BPM using turn-by-turn data</span>
+0003 <span class="comment">%   [phix,phiy]=calcphase(nux,nuy,fadx,fady)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  This function calculates the betatron oscillation phase at the BPMs</span>
+0006 <span class="comment">%  using FAD data (turn by turn orbit measurement).</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  return values:</span>
+0009 <span class="comment">%  phix, phiy    horizontal and vertical betatron oscillation phase at every BPM</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  input values:</span>
+0012 <span class="comment">%  nux, nuy    horizontal and vertical tunes (as calculated by findfreq)</span>
+0013 <span class="comment">%  fadx        horizontal FAD data (number of BPMs and number of turns is variable)</span>
+0014 <span class="comment">%  fady        vertical FAD data</span>
+0015 
+0016 <span class="comment">%  Christoph Steier, July 1999</span>
+0017 
+0018 tmpx = sum(nux./abs(nux-mean(nux)))/sum(ones(size(nux))./abs(nux-mean(nux)));
+0019 
+0020 tmpy = sum(nuy./abs(nuy-mean(nuy)))/sum(ones(size(nuy))./abs(nuy-mean(nuy)));
+0021 
+0022 qx = 0.0; tmpsumx = 0.0; qy = 0.0; tmpsumy = 0.0;
+0023 
+0024 <span class="keyword">for</span> n = 1:length(tmpx)
+0025     <span class="keyword">if</span> (abs(nux(n)-tmpx)&lt;std(nux))
+0026         qx = qx + nux(n)/abs(nux(n)-tmpx);
+0027         tmpsumx = tmpsumx + 1/abs(nux(n)-tmpx);
+0028     <span class="keyword">end</span>
+0029     <span class="keyword">if</span> (abs(nuy(n)-tmpy)&lt;std(nuy))
+0030         qy = qy + nuy(n)/abs(nuy(n)-tmpy);
+0031         tmpsumy = tmpsumy + 1/abs(nuy(n)-tmpy);
+0032     <span class="keyword">end</span>
+0033 <span class="keyword">end</span>
+0034 
+0035 qx = qx/tmpsumx;
+0036 qy = qy/tmpsumy;
+0037 
+0038 fprintf(<span class="string">'\n\nBPM #\tnu_x\t\tnu_y\n'</span>);
+0039 
+0040 <span class="keyword">for</span> n=1:length(nux)
+0041     fprintf(<span class="string">'%2d:\t%8.6g\t%8.6g\n'</span>,n,nux(n),nuy(n));
+0042 <span class="keyword">end</span>
+0043 
+0044 outstring = sprintf(<span class="string">'\nfractional horizontal tune (default=%g) '</span>,qx);
+0045 
+0046 inx = input(outstring);
+0047 
+0048 <span class="keyword">if</span> ~isempty(inx)
+0049     qx = inx;
+0050 <span class="keyword">end</span>
+0051 
+0052 outstring = sprintf(<span class="string">'\nfractional vertical tune (default=%g) '</span>,qy);
+0053 
+0054 iny = input(outstring);
+0055 
+0056 <span class="keyword">if</span> ~isempty(iny)
+0057     qy = iny;
+0058 <span class="keyword">end</span>
+0059 
+0060 sfx=size(fadx);
+0061 sfy=size(fady);
+0062 
+0063 mfadx = fadx-ones(sfx(1),1)*mean(fadx);
+0064 mfady = fady-ones(sfy(1),1)*mean(fady);
+0065 
+0066 sfadx = sum(mfadx .* (ones(sfx(2),1)*sin(2*pi*qx*[0:(sfx(1)-1)]))');
+0067 cfadx = sum(mfadx .* (ones(sfx(2),1)*cos(2*pi*qx*[0:(sfx(1)-1)]))');
+0068 sfady = sum(mfady .* (ones(sfy(2),1)*sin(2*pi*qy*[0:(sfy(1)-1)]))');
+0069 cfady =    sum(mfady .* (ones(sfy(2),1)*cos(2*pi*qy*[0:(sfy(1)-1)]))');
+0070 
+0071 phix = atan2(cfadx,sfadx)/(2*pi);
+0072 <span class="keyword">for</span> n = 1:length(phix)
+0073     <span class="keyword">if</span> (phix(n) &lt; 0.0)
+0074         phix(n) = phix(n)+1.0;
+0075     <span class="keyword">end</span>
+0076 <span class="keyword">end</span>
+0077 
+0078 phiy = atan2(cfady,sfady)/(2*pi);
+0079 <span class="keyword">for</span> n = 1:length(phiy)
+0080     <span class="keyword">if</span> (phiy(n) &lt; 0.0)
+0081         phiy(n) = phiy(n)+1.0;
+0082     <span class="keyword">end</span>
+0083 <span class="keyword">end</span>
+0084 
+0085 <span class="keyword">for</span> n = 2:length(phix)
+0086     <span class="keyword">while</span> (phix(n) &lt; (phix(n-1)-0.2))
+0087         phix(n) = phix(n)+1.0;
+0088     <span class="keyword">end</span>
+0089 <span class="keyword">end</span>
+0090 
+0091 <span class="keyword">for</span> n = 2:length(phiy)
+0092     <span class="keyword">while</span> (phiy(n) &lt; (phiy(n-1)-0.2))
+0093         phiy(n) = phiy(n)+1.0;
+0094     <span class="keyword">end</span>
+0095 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

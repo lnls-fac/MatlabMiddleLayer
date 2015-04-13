@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setepu</title>
+  <meta name="keywords" content="setepu">
+  <meta name="description" content="Error = setepu(Sector, Offset, OffsetA, OffsetB, New Velocity, WaitFlag, VelocityProfile, InfoFlag);">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setepu.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setepu
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Error = setepu(Sector, Offset, OffsetA, OffsetB, New Velocity, WaitFlag, VelocityProfile, InfoFlag);</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function Err = setepu(Sector, Offset, OffsetA, OffsetB, NewVel, WaitFlag, VelocityProfile, InfoFlag); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Error = setepu(Sector, Offset, OffsetA, OffsetB, New Velocity, WaitFlag, VelocityProfile, InfoFlag);
+
+   Sector = Sector Number {default: 4}
+   Offset  = hoizontal offset between upper and lower magnets [mm] {default: no change}
+   OffsetA = hoizontal offset A from &quot;zero&quot; [mm] {default: no change}
+   OffsetB = hoizontal offset B from &quot;zero&quot; [mm] {default: no change}
+   Velocity = Insertion device velocity [mm/sec] {default: no change}
+   WaitFlag = 0    -&gt; return immediately
+              else -&gt; return when ramp is done {default: 1}
+   VelocityProfile = 0    -&gt; profile off
+                     else -&gt; profile on {default: no change}
+   InfoFlag = 0    -&gt; do not print status information {default: 0}, 
+              else -&gt; print status information
+
+   NOTE:  The wait is only done on the Offset, not OffsetA or OffsetB</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>	[Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector {4}, ChanType)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Err = setepu(Sector, Offset, OffsetA, OffsetB, NewVel, WaitFlag, VelocityProfile, InfoFlag);</a>
+0002 <span class="comment">% Error = setepu(Sector, Offset, OffsetA, OffsetB, New Velocity, WaitFlag, VelocityProfile, InfoFlag);</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   Sector = Sector Number {default: 4}</span>
+0005 <span class="comment">%   Offset  = hoizontal offset between upper and lower magnets [mm] {default: no change}</span>
+0006 <span class="comment">%   OffsetA = hoizontal offset A from &quot;zero&quot; [mm] {default: no change}</span>
+0007 <span class="comment">%   OffsetB = hoizontal offset B from &quot;zero&quot; [mm] {default: no change}</span>
+0008 <span class="comment">%   Velocity = Insertion device velocity [mm/sec] {default: no change}</span>
+0009 <span class="comment">%   WaitFlag = 0    -&gt; return immediately</span>
+0010 <span class="comment">%              else -&gt; return when ramp is done {default: 1}</span>
+0011 <span class="comment">%   VelocityProfile = 0    -&gt; profile off</span>
+0012 <span class="comment">%                     else -&gt; profile on {default: no change}</span>
+0013 <span class="comment">%   InfoFlag = 0    -&gt; do not print status information {default: 0},</span>
+0014 <span class="comment">%              else -&gt; print status information</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%   NOTE:  The wait is only done on the Offset, not OffsetA or OffsetB</span>
+0017 <span class="comment">%</span>
+0018 
+0019 Err = 0;
+0020 SleepExtra = 1.1;
+0021 
+0022 <span class="keyword">if</span> nargin &lt; 1
+0023    Sector = 4;
+0024 <span class="keyword">end</span>
+0025 <span class="keyword">if</span> isempty(Sector)
+0026    Sector = 4;
+0027 <span class="keyword">end</span>
+0028 
+0029 <span class="keyword">if</span> nargin &lt; 2
+0030    <span class="keyword">for</span> i = 1:length(Sector)
+0031       Offset(i,1) = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0032    <span class="keyword">end</span>
+0033 <span class="keyword">end</span>
+0034 <span class="keyword">if</span> isempty(Offset)
+0035    <span class="keyword">for</span> i = 1:length(Sector)
+0036       Offset(i,1) = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0037    <span class="keyword">end</span>
+0038 <span class="keyword">end</span>
+0039 
+0040 <span class="keyword">if</span> nargin &lt; 3
+0041    <span class="keyword">for</span> i = 1:length(Sector)
+0042       [tmp, OffsetA(i,1)] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0043    <span class="keyword">end</span>
+0044 <span class="keyword">end</span>
+0045 <span class="keyword">if</span> isempty(Offset)
+0046    <span class="keyword">for</span> i = 1:length(Sector)
+0047       [tmp, OffsetA(i,1)] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0048    <span class="keyword">end</span>
+0049 <span class="keyword">end</span>
+0050 
+0051 <span class="keyword">if</span> nargin &lt; 4
+0052    <span class="keyword">for</span> i = 1:length(Sector)
+0053       [tmp1, tmp2, OffsetB(i,1)] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0054    <span class="keyword">end</span>
+0055 <span class="keyword">end</span>
+0056 <span class="keyword">if</span> isempty(Offset)
+0057    <span class="keyword">for</span> i = 1:length(Sector)
+0058       [tmp1, tmp2, OffsetB(i,1)] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0059    <span class="keyword">end</span>
+0060 <span class="keyword">end</span>
+0061 
+0062 <span class="keyword">if</span> nargin &lt; 5
+0063    <span class="keyword">for</span> i = 1:length(Sector)
+0064       [tmp1, tmp2, tmp3, NewVel(i,1)] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0065    <span class="keyword">end</span>
+0066 <span class="keyword">end</span>
+0067 <span class="keyword">if</span> isempty(NewVel)
+0068    <span class="keyword">for</span> i = 1:length(Sector)
+0069       [tmp1, tmp2, tmp3, NewVel(i,1)] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i), 1);
+0070    <span class="keyword">end</span>
+0071 <span class="keyword">end</span>
+0072 
+0073 <span class="keyword">if</span> nargin &lt; 6
+0074    WaitFlag = 1;
+0075 <span class="keyword">end</span>
+0076 <span class="keyword">if</span> isempty(WaitFlag)
+0077    WaitFlag = 1;
+0078 <span class="keyword">end</span>
+0079 
+0080 <span class="keyword">if</span> nargin &lt; 8
+0081    InfoFlag = 0;
+0082 <span class="keyword">end</span>
+0083 <span class="keyword">if</span> isempty(InfoFlag)
+0084    InfoFlag = 1;
+0085 <span class="keyword">end</span>
+0086 
+0087 <span class="comment">% For now velocity profile is the same channel as the vertical drive</span>
+0088 <span class="keyword">if</span> nargin &gt;= 7
+0089    <span class="keyword">if</span> ~isempty(VelocityProfile)
+0090       <span class="keyword">for</span> i = 1:length(Sector)
+0091          <span class="keyword">if</span> Sector(i) == 5
+0092             ChanName = sprintf(<span class="string">'SR%02dW___GDS1E__BC02'</span>, Sector(i));
+0093          <span class="keyword">else</span>
+0094             ChanName = sprintf(<span class="string">'SR%02dU___GDS1E__BC02'</span>, Sector(i));
+0095          <span class="keyword">end</span>
+0096          scaput(ChanName, VelocityProfile);
+0097       <span class="keyword">end</span>
+0098    <span class="keyword">end</span>
+0099 <span class="keyword">end</span>
+0100 
+0101 
+0102 <span class="keyword">if</span> size(Offset) == [1 1]
+0103    Offset = Offset*ones(size(Sector,1),1);
+0104 <span class="keyword">elseif</span> size(Offset) == [size(Sector,1) 1]
+0105    <span class="comment">% input OK</span>
+0106 <span class="keyword">else</span>
+0107    error(<span class="string">'Size of Offset must be equal to the Sector or a scalar!'</span>);
+0108 <span class="keyword">end</span>    
+0109 
+0110 <span class="keyword">if</span> size(NewVel) == [1 1]
+0111    NewVel = NewVel*ones(size(Sector,1),1);
+0112 <span class="keyword">elseif</span> size(NewVel) == [size(Sector,1) 1]
+0113    <span class="comment">% input OK</span>
+0114 <span class="keyword">else</span>
+0115    error(<span class="string">'Size of NewVel must be equal to the Sector or a scalar!'</span>);
+0116 <span class="keyword">end</span>    
+0117 
+0118 
+0119 <span class="comment">% Print to screen</span>
+0120 <span class="keyword">if</span> InfoFlag
+0121    fprintf(<span class="string">'           '</span>);
+0122    <span class="keyword">for</span> i = 1:length(Sector)
+0123       fprintf(<span class="string">'    ID%d       '</span>, Sector(i));
+0124    <span class="keyword">end</span>
+0125    fprintf(<span class="string">'\n'</span>);
+0126    
+0127    fprintf(<span class="string">'  Old SP: '</span>);
+0128    <span class="keyword">for</span> i = 1:length(Sector)
+0129       fprintf(<span class="string">'  %7.3f mm  '</span>, <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector(i),1));
+0130    <span class="keyword">end</span>
+0131    fprintf(<span class="string">'\n'</span>);
+0132    
+0133    fprintf(<span class="string">'  New SP: '</span>);
+0134    <span class="keyword">for</span> i = 1:length(Sector)
+0135       fprintf(<span class="string">'  %7.3f mm  '</span>, Offset(i));
+0136    <span class="keyword">end</span>
+0137    fprintf(<span class="string">'\n'</span>);
+0138 <span class="keyword">end</span>
+0139 
+0140 <span class="comment">% Set the velocity then get the horizontal gaps moving</span>
+0141 <span class="keyword">for</span> i = 1:length(Sector)
+0142    scaput(sprintf(<span class="string">'SR%02dU___ODS1V__AC01'</span>, Sector(i)), NewVel(i));
+0143    scasleep(.2);
+0144 <span class="keyword">end</span>
+0145 <span class="keyword">for</span> i = 1:length(Sector)
+0146    scaput(sprintf(<span class="string">'SR%02dU___ODA1PS_AC02'</span>, Sector(i)), OffsetA(i));
+0147    scaput(sprintf(<span class="string">'SR%02dU___ODB1PS_AC03'</span>, Sector(i)), OffsetB(i));
+0148    scaput(sprintf(<span class="string">'SR%02dU___ODS1PS_AC00'</span>, Sector(i)), Offset(i));
+0149 <span class="keyword">end</span>
+0150 
+0151 <span class="comment">% Warn if there is an error</span>
+0152 [Offset_AM, OffsetA_AM, OffsetB_AM, OffsetVel_AM, GapRunFlag] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector, 0);
+0153 <span class="keyword">if</span> any(GapRunFlag &lt; 0)
+0154    Err = -1;
+0155    error(<span class="string">'EPU error'</span>);
+0156 <span class="keyword">end</span>
+0157 
+0158 <span class="keyword">if</span> WaitFlag
+0159    [Offset_AM, OffsetA_AM, OffsetB_AM, OffsetVel_AM, GapRunFlag] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector, 0);
+0160    Offset0 = Offset_AM;
+0161    t0 = gettime;
+0162    <span class="keyword">while</span> any(abs(Offset_AM-Offset) &gt; .050)
+0163       [Offset_AM, OffsetA_AM, OffsetB_AM, OffsetVel_AM, GapRunFlag] = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector, 0);
+0164       
+0165       <span class="keyword">if</span> any(GapRunFlag &lt; 0)
+0166          Err = -1;
+0167          error(sprintf(<span class="string">'EPU error (RunFlag = %d)'</span>, GapRunFlag));
+0168       <span class="keyword">end</span>
+0169       
+0170       <span class="keyword">if</span> InfoFlag
+0171          fprintf(<span class="string">'  New AM: '</span>);
+0172          <span class="keyword">for</span> i = 1:length(Sector)
+0173             fprintf(<span class="string">'  %7.3f mm  '</span>, Offset_AM(i));
+0174          <span class="keyword">end</span>
+0175          fprintf(<span class="string">'\r'</span>);
+0176          pause(0);
+0177          scasleep(1);
+0178       <span class="keyword">end</span>
+0179       
+0180       <span class="comment">% If all the gaps have not changed for 10 seconds break</span>
+0181       <span class="keyword">if</span> t0+10 &lt; gettime
+0182          <span class="keyword">if</span> any([abs(Offset_AM-Offset0)&lt;.050 &amp; abs(Offset_AM-Offset)&gt;.050]) 
+0183             <span class="comment">% There is a problem</span>
+0184             disp(<span class="string">'WARNING:  The EPU is not moving.'</span>);
+0185             Err = -2;
+0186             fprintf(<span class="string">'EPU:  SP=%.4f,  AM=%.4f,  RunFlag=%d\n'</span>, <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector, 1), <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector, 0), GapRunFlag);
+0187             error(<span class="string">'EPU:  SP-AM error'</span>);
+0188          <span class="keyword">end</span>
+0189          t0 = gettime;
+0190          Offset0 = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector, 0);
+0191          scasleep(.05);
+0192       <span class="keyword">end</span>
+0193    <span class="keyword">end</span>
+0194    
+0195    <span class="comment">% Extra delay</span>
+0196    scasleep(SleepExtra);   
+0197    
+0198    <span class="keyword">if</span> InfoFlag
+0199       Offset_AM = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector, 0);
+0200       fprintf(<span class="string">'  New AM: '</span>);
+0201       <span class="keyword">for</span> i = 1:length(Sector)
+0202          fprintf(<span class="string">'  %7.3f mm  '</span>, Offset_AM(i));
+0203       <span class="keyword">end</span>
+0204       fprintf(<span class="string">'\r'</span>);
+0205       pause(0);
+0206    <span class="keyword">end</span>
+0207    
+0208 <span class="keyword">else</span>
+0209    <span class="comment">% Return immediately</span>
+0210 <span class="keyword">end</span>
+0211 
+0212 <span class="keyword">if</span> InfoFlag
+0213    fprintf(<span class="string">'\n'</span>);
+0214 <span class="keyword">end</span>
+0215</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of emit_spread</title>
+  <meta name="keywords" content="emit_spread">
+  <meta name="description" content="[emittance, energyspread, Xrms31, Xrms72] = function emit_spread(Xrms31, Xrms72)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; emit_spread.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>emit_spread
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[emittance, energyspread, Xrms31, Xrms72] = function emit_spread(Xrms31, Xrms72)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [emittance, energyspread, Xrms31, Xrms72] = emit_spread(Xrms31raw, Xrms72averaw); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [emittance, energyspread, Xrms31, Xrms72] = function emit_spread(Xrms31, Xrms72)
+
+ This function calculates the natural emittance (epsilon_x) and energy spread (dp/p)
+ of the ring from the horizontal beamsizes measured at BL3.1 and BL7.2 (in microns)
+
+ The values for dispersion and beta at each beamline source point are
+ taken from the ring technical specifications found at the ALS homepage</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arplot_diagbl.html" class="code" title="function arplot_diagbl(monthStr, days, year1, month2Str, days2, year2)">arplot_diagbl</a>	arplot_diagbl(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [emittance, energyspread, Xrms31, Xrms72] = emit_spread(Xrms31raw, Xrms72averaw);</a>
+0002 
+0003 <span class="comment">% [emittance, energyspread, Xrms31, Xrms72] = function emit_spread(Xrms31, Xrms72)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% This function calculates the natural emittance (epsilon_x) and energy spread (dp/p)</span>
+0006 <span class="comment">% of the ring from the horizontal beamsizes measured at BL3.1 and BL7.2 (in microns)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% The values for dispersion and beta at each beamline source point are</span>
+0009 <span class="comment">% taken from the ring technical specifications found at the ALS homepage</span>
+0010 
+0011 <span class="comment">% 2004-08-24 T. Scarvie</span>
+0012 
+0013 Xrms = [];
+0014 Xrms31 = [];
+0015 Xrms72 = [];
+0016 emittance = [];
+0017 energyspread = [];
+0018 Nave = 20;
+0019 
+0020 <span class="comment">% The values as reported for the ALS technical specs are below,</span>
+0021 <span class="comment">% but don't give very meaningful results.</span>
+0022 <span class="comment">%betaX31 = 0.35;   % [m]</span>
+0023 <span class="comment">%betaX72 = 0.90;   % [m]</span>
+0024 <span class="comment">%etaX31  = 0.03;   % [m]</span>
+0025 <span class="comment">%etaX72  = 0.07;   % [m]</span>
+0026 <span class="comment">% The values as discovered via s-matrix (measured 2005-02-08) analysis using diagnostic beamline beam positions as BPMs</span>
+0027 betaX31 = 0.3534;   <span class="comment">% [m]</span>
+0028 betaX72 = 0.8763;   <span class="comment">% [m]</span>
+0029 etaX31  = 0.0302;   <span class="comment">% [m]</span>
+0030 etaX72  = 0.0700;   <span class="comment">% [m]</span>
+0031 
+0032 <span class="comment">% Beamline resolutions in [m], as measured on 9/13/04 physics shift by F.Sannibale and T.Scarvie</span>
+0033 res31   = 30.7/1e6;
+0034 <span class="comment">%res72   = 37.9/1e6;</span>
+0035 res72   = 26/1e6; <span class="comment">%resolution of 7.2 seems better now that the BPM/pinhole has been moved (10-11-05)</span>
+0036 
+0037 <span class="keyword">if</span> nargin &gt; 2
+0038     error(<span class="string">'  emit_spread.m needs 0 or 2 input arguments!'</span>);
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="keyword">if</span> nargin &lt; 2
+0042    disp(<span class="string">' '</span>);
+0043 <span class="comment">%   fprintf('  Averaging BL 3.1 beamsize for %i seconds\n',Nave);</span>
+0044    fprintf(<span class="string">'  Using BL 3.1 averaged beamsize channel (not spiricon)\n'</span>);
+0045    fprintf(<span class="string">'  Using BL 7.2 averaged beamsize channel\n'</span>);
+0046    disp(<span class="string">' '</span>);
+0047 <span class="comment">%   for loop = 1:Nave</span>
+0048 <span class="comment">%      Xrms(loop) = getspiricon('Xrms')/1e6;</span>
+0049 <span class="comment">%      pause(1)</span>
+0050 <span class="comment">%   end</span>
+0051 <span class="comment">%  Xrms31raw    = mean(Xrms);                %[m]</span>
+0052     Xrms31averaw = getam(<span class="string">'bl31:XRMSAve'</span>)/1e6; <span class="comment">%[m]</span>
+0053     Xrms72raw    = getam(<span class="string">'bl72:XRMSNow'</span>)/1e6; <span class="comment">%[m]</span>
+0054     Xrms72averaw = getam(<span class="string">'bl72:XRMSAve'</span>)/1e6; <span class="comment">%[m]</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 <span class="keyword">if</span> nargin == 2
+0058    Xrms72averaw = Xrms72averaw/1e6;
+0059    Xrms31raw    = Xrms31raw/1e6;
+0060 <span class="keyword">end</span>
+0061 
+0062 <span class="comment">% adjust measured beamsize for resolution of beamlines</span>
+0063 <span class="comment">%Xrms31ave    = sqrt(Xrms31averaw^2 - res31^2);</span>
+0064 Xrms31ave    = Xrms31averaw;
+0065 <span class="comment">%Xrms72ave = sqrt(Xrms72averaw^2 - res72^2);</span>
+0066 Xrms72ave = Xrms72averaw;
+0067 
+0068 Xrms31 = Xrms31ave*1e6; <span class="comment">%[microns]</span>
+0069 Xrms72 = Xrms72ave*1e6; <span class="comment">%[microns]</span>
+0070 
+0071 <span class="comment">% Fernando's formula below</span>
+0072 emittance = ((Xrms31ave^2 * etaX72^2) - (Xrms72ave^2 * etaX31^2)) / ((betaX31 * etaX72^2) - (betaX72 * etaX31^2));
+0073 
+0074 <span class="comment">% Christoph's formula below (gives same result as Fernando's)</span>
+0075 <span class="comment">%emittance = ((Xrms31ave^2)/betaX31 - ((etaX31^2)/(etaX72^2))*(Xrms72ave^2)/betaX31)/(1-((etaX31^2)/(etaX72^2))*betaX72/betaX31);</span>
+0076 
+0077 <span class="comment">% energy spread calculation using averaged beamsizes</span>
+0078 energyspread = sqrt(((Xrms72ave^2 * betaX31) - (Xrms31ave^2 * betaX72)) / ((betaX31 * etaX72^2) - (betaX72 * etaX31^2)));
+0079 
+0080 <span class="comment">% energy spread calculation using instantaneous beamsizes</span>
+0081 <span class="comment">%energyspread = sqrt(((Xrms72^2 * betaX31) - (Xrms31ave^2 * betaX72)) / ((betaX31 * etaX72^2) - (betaX72 * etaX31^2)));</span>
+0082 
+0083 <span class="comment">% Christoph's formula below (same result as Fernando's)</span>
+0084 <span class="comment">%energyspread = sqrt(Xrms72ave^2-betaX72*emittance)/etaX72;</span>
+0085 
+0086 <span class="keyword">if</span> nargout == 0
+0087    fprintf(<span class="string">'  Natural emittance = %.2f [nm]\n'</span>, emittance*1e9);
+0088    fprintf(<span class="string">'  Energy spread     = %.3f %%\n'</span>, energyspread*100);
+0089    fprintf(<span class="string">'  BL31 Xrms         = %.2f [microns]\n'</span>, Xrms31);
+0090    fprintf(<span class="string">'  BL72 Xrms         = %.2f [microns]\n'</span>, Xrms72);
+0091    fprintf(<span class="string">'\n'</span>);
+0092 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

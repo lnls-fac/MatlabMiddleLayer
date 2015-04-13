@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of matchramp_test2</title>
+  <meta name="keywords" content="matchramp_test2">
+  <meta name="description" content="clear">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; matchramp_test2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>matchramp_test2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>clear</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">clear</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%clear</span>
+0002 
+0003 Fig1 = 2;
+0004 
+0005 
+0006 <span class="comment">% Power supply TF</span>
+0007 w = 2 * pi * 100;
+0008 sys = tf(1,[1/w 1]);
+0009 <span class="comment">%bode(H)</span>
+0010 
+0011 
+0012 <span class="comment">% The inverse system</span>
+0013 Fc = 2 * pi * 10000000000000;   <span class="comment">% High frequency poles for the compensation</span>
+0014 ws = 2 * pi * 100;
+0015 sysinv = tf([1/ws 1], conv([1/Fc 1],[1/Fc 1]));
+0016 
+0017 <span class="comment">%wc = 2 * pi * 10;</span>
+0018 <span class="comment">%sysinv = tf([1/ws 1], conv(conv([1/Fc 1],[1/Fc 1]),[1/wc 1]));</span>
+0019 
+0020 
+0021 
+0022 <span class="comment">% Input</span>
+0023 <span class="keyword">if</span> ~exist(<span class="string">'BEND'</span>,<span class="string">'var'</span>)
+0024     BEND =         [ones(1,50) linspace(1,400,2000) 400*ones(1,50)]';
+0025     QFcommand = .6*[ones(1,50) linspace(1,100,2000) 100*ones(1,50)]';
+0026 
+0027     <span class="comment">% Monitor sample rate</span>
+0028     fs = 4000;
+0029     t = (0:(length(BEND)-1)) / fs;
+0030 
+0031 <span class="keyword">else</span>
+0032     QFcommand = QFcommand + dQFcommand;
+0033 <span class="keyword">end</span>
+0034 
+0035 
+0036 <span class="comment">% Simulate the power supply response</span>
+0037 [QF, t1, x1] = lsim(sys, QFcommand-QFcommand(1), t); 
+0038 QF = QF + QFcommand(1);
+0039 
+0040 
+0041 <span class="comment">% Goal</span>
+0042 QFratio = QF./BEND; 
+0043 
+0044 
+0045 figure(Fig1);
+0046 clf reset
+0047 subplot(4,1,1);
+0048 plot(t, [QF(:) BEND(:)]);
+0049 legend(<span class="string">'QF'</span>, <span class="string">'BEND'</span>, 0);
+0050 axis tight;
+0051 
+0052 subplot(4,1,2);
+0053 plot(t, QFratio);
+0054 hold on
+0055 plot([min(t) max(t)],[.520 .520],<span class="string">':r'</span>);
+0056 hold off
+0057 ylabel(<span class="string">'QF/BEND (Goal .520)'</span>);
+0058 axis tight;
+0059 <span class="comment">%yaxis([.45 .6]);</span>
+0060 grid on;
+0061 
+0062 
+0063 <span class="comment">% Base on time</span>
+0064 [tmp, i2]   = max(find(t &lt; .0177));
+0065 [tmp, i100] = max(find(t &lt; .4135));
+0066 Index = linspace(i2,i100,100);
+0067 dIndex = round(mean(diff(Index)));
+0068 Index = dIndex*(0:length(Index)-1)+Index(1);
+0069 
+0070 
+0071 <span class="comment">% Put the waveform to track through the inverse system</span>
+0072 [dQFcommand, tinv, xinv] = lsim(sysinv, BEND.*(.520-QFratio), t);
+0073 
+0074 [dQFcommandILC, tinv, xinv] = lsim(sysinv, BEND(Index).*(.520-QFratio(Index)), t(Index));
+0075 
+0076 
+0077 <span class="comment">% Simulate on 4096 point wave form</span>
+0078 dQFcommand = dQFcommand * 0;
+0079 <span class="keyword">for</span> i = 0:dIndex-1
+0080     <span class="comment">%dQFcommand(Index+i) = dQFcommandILC;</span>
+0081     dQFcommand(Index+i-dIndex) = dQFcommandILC;
+0082 <span class="keyword">end</span>
+0083 
+0084 
+0085 <span class="comment">% % May want to low pass the command but don't add phase delay</span>
+0086 <span class="comment">% [b,a] = butter(5,.2);</span>
+0087 <span class="comment">% dQFcommand1 = filtfilt(b, a, dQFcommand);</span>
+0088 
+0089 
+0090 <span class="comment">% Simulate the result</span>
+0091 [QFsim, t1, x1] = lsim(sys, dQFcommand, t);
+0092 
+0093 
+0094 
+0095 figure(Fig1);
+0096 subplot(4,1,3);
+0097 plot(t,[(QFratio-.520) dQFcommand./BEND QFsim./BEND (QFratio-.520)+QFsim./BEND]);
+0098 ylabel(<span class="string">'QF/BEND Error'</span>);
+0099 legend(<span class="string">'QF/BEND-.520'</span>, <span class="string">'\DeltaQFcommand/BEND'</span>, <span class="string">'\DeltaQFsim/BEND'</span>, <span class="string">'QF/BEND-.520+\DeltaQFsim/BEND'</span>, 0); <span class="comment">%'Location', 'SouthWest');</span>
+0100 axis tight;
+0101 <span class="comment">%yaxis([-.1 .1]);</span>
+0102 
+0103 subplot(4,1,4);
+0104 plot(t, dQFcommand);
+0105 hold on
+0106 plot(t(Index), dQFcommand(Index), <span class="string">'.'</span>);
+0107 ylabel(<span class="string">'\DeltaQF [Amps]'</span>);
+0108 xlabel(<span class="string">'Time [Seconds]'</span>);
+0109 axis tight;
+0110 <span class="comment">%yaxis([-20 20]);</span>
+0111 grid on;
+0112</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

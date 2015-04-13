@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setrf_hp</title>
+  <meta name="keywords" content="setrf_hp">
+  <meta name="description" content="[RFam, VOLTS] = setrf_hp(Family, Field, RFnew, DeviceList, WaitFlag, RampFlag);">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setrf_hp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setrf_hp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[RFam, VOLTS] = setrf_hp(Family, Field, RFnew, DeviceList, WaitFlag, RampFlag);</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [RFam, VOLTS] = setrf_hp(Family, Field, RFnew, DeviceList, WaitFlag, RampFlag); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  [RFam, VOLTS] = setrf_hp(Family, Field, RFnew, DeviceList, WaitFlag, RampFlag);
+  [RFam, VOLTS] = setrf_hp(Family, RFnew, DeviceList, WaitFlag, RampFlag);
+  [RFam, VOLTS] = setrf_hp(RFnew, DeviceList, WaitFlag, RampFlag);
+
+  RFnew = new RF frequency [MHz]
+          if RFac is within 100 kHz of 499.64 MHz, it is interpreted as a frequency in MHz,
+          if RFac is between -2 and 2 it is interpreted as a voltage for the FM input
+                  of the user synthesizer (scaling factor is 1 V equals 4.988 kHz).
+  RFam = monitor value for the RF frequency  [MHz]
+  VOLTS = new EG HQMOFM voltage [V]
+
+  if RampFlag
+     Ramp the RF frequency slowly {Default}
+  else
+     Set the RF frequency in one step
+
+  Notes:  1.  The RF must be connected to the user synthesizer for this function to work
+          2.  The HQMOFM ILC must be connected to the user synthesizer for this function to work</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setrf_als.html" class="code" title="function ErrorFlag = setrf_als(varargin)">setrf_als</a>	ErrorFlag = setrf_als(Family, Field, RFnew, DeviceList, WaitFlag, RampFlag);</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [RFam, VOLTS] = setrf_hp(Family, Field, RFnew, DeviceList, WaitFlag, RampFlag);</a>
+0002 <span class="comment">%  [RFam, VOLTS] = setrf_hp(Family, Field, RFnew, DeviceList, WaitFlag, RampFlag);</span>
+0003 <span class="comment">%  [RFam, VOLTS] = setrf_hp(Family, RFnew, DeviceList, WaitFlag, RampFlag);</span>
+0004 <span class="comment">%  [RFam, VOLTS] = setrf_hp(RFnew, DeviceList, WaitFlag, RampFlag);</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  RFnew = new RF frequency [MHz]</span>
+0007 <span class="comment">%          if RFac is within 100 kHz of 499.64 MHz, it is interpreted as a frequency in MHz,</span>
+0008 <span class="comment">%          if RFac is between -2 and 2 it is interpreted as a voltage for the FM input</span>
+0009 <span class="comment">%                  of the user synthesizer (scaling factor is 1 V equals 4.988 kHz).</span>
+0010 <span class="comment">%  RFam = monitor value for the RF frequency  [MHz]</span>
+0011 <span class="comment">%  VOLTS = new EG HQMOFM voltage [V]</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  if RampFlag</span>
+0014 <span class="comment">%     Ramp the RF frequency slowly {Default}</span>
+0015 <span class="comment">%  else</span>
+0016 <span class="comment">%     Set the RF frequency in one step</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  Notes:  1.  The RF must be connected to the user synthesizer for this function to work</span>
+0019 <span class="comment">%          2.  The HQMOFM ILC must be connected to the user synthesizer for this function to work</span>
+0020 
+0021 <span class="comment">% Tom Scarvie, Christoph Steier, November 2001</span>
+0022 
+0023 <span class="comment">% 11-18-2002. T.Scarvie</span>
+0024 <span class="comment">% Added PauseFlag argument to allow ramping algorithm to set the RF frequency quickly (no 3 sec scasleep)</span>
+0025 
+0026 
+0027 TolSP_AM = .00001;
+0028 
+0029 
+0030 <span class="keyword">if</span> nargin &lt; 1
+0031     error(<span class="string">'RF frequency input is required.'</span>);
+0032 <span class="keyword">end</span>
+0033 
+0034 
+0035 <span class="comment">% Family or Field maybe numeric</span>
+0036 <span class="keyword">if</span> isnumeric(Family)
+0037     <span class="comment">% RFnew, DeviceList, WaitFlag, RampFlag</span>
+0038     <span class="keyword">if</span> nargin &gt;= 4
+0039         RampFlag = DeviceList; 
+0040     <span class="keyword">else</span>
+0041         RampFlag = 1;
+0042     <span class="keyword">end</span>
+0043 
+0044     <span class="keyword">if</span> nargin &gt;= 3
+0045         WaitFlag = RFnew; 
+0046     <span class="keyword">else</span>
+0047         WaitFlag = 0;
+0048     <span class="keyword">end</span>
+0049     
+0050     <span class="keyword">if</span> nargin &gt;= 2
+0051         DeviceList = Field;
+0052     <span class="keyword">else</span>
+0053         DeviceList = [];
+0054     <span class="keyword">end</span>
+0055     
+0056     RFnew = Family;
+0057 <span class="keyword">elseif</span> isnumeric(Field)
+0058     <span class="comment">% Family, RFnew, DeviceList, WaitFlag, RampFlag</span>
+0059     <span class="keyword">if</span> nargin &lt; 2
+0060         error(<span class="string">'RF frequency input is required.'</span>);
+0061     <span class="keyword">end</span>
+0062     <span class="keyword">if</span> nargin &gt;= 5
+0063         RampFlag = WaitFlag; 
+0064     <span class="keyword">else</span>
+0065         RampFlag = 1;
+0066     <span class="keyword">end</span>
+0067 
+0068     <span class="keyword">if</span> nargin &gt;= 4
+0069         WaitFlag = DeviceList; 
+0070     <span class="keyword">else</span>
+0071         WaitFlag = 0;
+0072     <span class="keyword">end</span>
+0073     
+0074     <span class="keyword">if</span> nargin &gt;= 3
+0075         DeviceList = RFnew;
+0076     <span class="keyword">else</span>
+0077         DeviceList = [];
+0078     <span class="keyword">end</span>
+0079     
+0080     RFnew = Field;
+0081 <span class="keyword">else</span>
+0082     <span class="comment">% Family, Field, RFnew, DeviceList, WaitFlag, RampFlag</span>
+0083     <span class="keyword">if</span> nargin &lt; 3
+0084         error(<span class="string">'RF frequency input is required.'</span>);
+0085     <span class="keyword">end</span>
+0086     <span class="keyword">if</span> nargin &lt; 4
+0087         DeviceList = [];
+0088     <span class="keyword">end</span>
+0089     <span class="keyword">if</span> nargin &lt; 5
+0090         WaitFlag = 0;
+0091     <span class="keyword">end</span>
+0092     <span class="keyword">if</span> nargin &lt; 6
+0093         RampFlag = 1;
+0094     <span class="keyword">end</span>
+0095 <span class="keyword">end</span>
+0096 
+0097 
+0098 
+0099 <span class="comment">% if abs(RFnew-499.64) &lt;= 0.1      % input is a frequency</span>
+0100 <span class="comment">%     deltarfHQMO = (RFnew-RFold)/4.988e-3;</span>
+0101 <span class="comment">% elseif abs(RFnew) &lt;= 2    % input is a voltage</span>
+0102 <span class="comment">%     deltarfHQMO = RFnew-HQMOFMold;</span>
+0103 <span class="comment">% else</span>
+0104 <span class="comment">%     fprintf('Input must be either a frequency within 100 kHz of 499.640 MHz or a voltage between -2 and 2 Volts!');</span>
+0105 <span class="comment">%     return</span>
+0106 <span class="comment">% end</span>
+0107 
+0108 
+0109 <span class="keyword">for</span> i = 1:1
+0110     HQMOFMold = getpv(<span class="string">'EG______HQMOFM_AC01'</span>);
+0111     RFold = getpv(<span class="string">'SR01C___FREQB__AM00'</span>);
+0112 
+0113     deltarfHQMO = (RFnew-RFold) / 4.988e-3;
+0114     
+0115 <span class="comment">%     if abs(RFnew-499.64) &lt;= 0.1      % input is a frequency</span>
+0116 <span class="comment">%         deltarfHQMO = (RFnew-RFold)/4.988e-3;</span>
+0117 <span class="comment">%     elseif abs(RFnew) &lt;= 2    % input is a voltage</span>
+0118 <span class="comment">%         deltarfHQMO = RFnew-HQMOFMold;</span>
+0119 <span class="comment">%     else</span>
+0120 <span class="comment">%         fprintf('Input must be either a frequency within 100 kHz of 499.640 MHz or a voltage between -2 and 2 Volts!');</span>
+0121 <span class="comment">%         return</span>
+0122 <span class="comment">%     end</span>
+0123     
+0124     <span class="comment">% set rf or voltage</span>
+0125     setpv(<span class="string">'EG______HQMOFM_AC01'</span>, <span class="string">''</span>, HQMOFMold+deltarfHQMO, 0);
+0126 
+0127     <span class="comment">%pause(.5);</span>
+0128 <span class="keyword">end</span>
+0129 
+0130 <span class="comment">% set rf or voltage with a WaitFlag</span>
+0131 setpv(<span class="string">'EG______HQMOFM_AC01'</span>, <span class="string">''</span>, HQMOFMold+deltarfHQMO, WaitFlag);
+0132 
+0133     
+0134 <span class="comment">% Ramping section below to be used when we are able to do larger steps</span>
+0135 <span class="comment">% Using synthesizer &amp; EG HQMOFM</span>
+0136 <span class="comment">% MaxStep = .01;     % volts</span>
+0137 <span class="comment">%</span>
+0138 <span class="comment">%    HQMOFMac0 = getam('EG______HQMOFM_AC01')</span>
+0139 <span class="comment">%      Nsteps = ceil(abs((HQMOFMac0-deltarfHQMO)/MaxStep));</span>
+0140 <span class="comment">%</span>
+0141 <span class="comment">%      % For large setpoint changes, verify RampFlag=1</span>
+0142 <span class="comment">%       if RampFlag==1 &amp; abs(HQMOFMac0-deltarfHQMO) &gt; 1</span>
+0143 <span class="comment">%           RampFlag = questdlg(str1mat(sprintf('The RF change is %.5f MHz.',(HQMOFMac0-deltarfHQMO)*1.3661e-3),'How many steps do you want to make?'),'RF Synthesizer?','1 Step',sprintf('%d Steps',Nsteps),'1 Step');</span>
+0144 <span class="comment">%          if strcmp(RampFlag,'1 Step')</span>
+0145 <span class="comment">%              RampFlag = 0;</span>
+0146 <span class="comment">%          else</span>
+0147 <span class="comment">%             RampFlag = 1;</span>
+0148 <span class="comment">%          end</span>
+0149 <span class="comment">%      end</span>
+0150 <span class="comment">%</span>
+0151 <span class="comment">%       if RampFlag</span>
+0152 <span class="comment">%           for i = 1:Nsteps</span>
+0153 <span class="comment">%              setsp('EG______HQMOFM_AC01', HQMOFMac0 + i*(deltarfHQMO-HQMOFMac0)/Nsteps);</span>
+0154 <span class="comment">%            sleep(.03);</span>
+0155 <span class="comment">%         end</span>
+0156 <span class="comment">%         setsp('EG______HQMOFM_AC01', volts);</span>
+0157 <span class="comment">%      else</span>
+0158 <span class="comment">%         setsp('EG______HQMOFM_AC01', volts);</span>
+0159 <span class="comment">%      end</span>
+0160 
+0161 
+0162 <span class="comment">% Extra wait to make sure the RF GPIB commands got there</span>
+0163 <span class="keyword">if</span> WaitFlag &lt; 0
+0164     pause(1.5);
+0165 <span class="keyword">end</span>
+0166 
+0167 
+0168 <span class="comment">% if nargout == 0</span>
+0169 <span class="comment">%   fprintf('                 RF Frequency Information \n');</span>
+0170 <span class="comment">%   fprintf('                  HP Counter = %.6f MHz\n', getam('SR01C___FREQB__AM00'));</span>
+0171 <span class="comment">%   fprintf(' FM voltage user synthesizer = %.6f V\n', getsp('EG______HQMOFM_AC01'));</span>
+0172 <span class="comment">% end</span>
+0173 
+0174 RFam  = getpv(<span class="string">'SR01C___FREQB__AM00'</span>);
+0175 
+0176 <span class="keyword">if</span> nargout &gt;= 2
+0177     VOLTS = getpv(<span class="string">'EG______HQMOFM_AC01'</span>);
+0178 <span class="keyword">end</span>
+0179</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ffdeltaquadepu</title>
+  <meta name="keywords" content="ffdeltaquadepu">
+  <meta name="description" content="function [DelQF, DelQD] = ffdeltaquadepu(Sector, Gap, Shift, mode, GeV)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; ffdeltaquadepu.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>ffdeltaquadepu
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [DelQF, DelQD] = ffdeltaquadepu(Sector, Gap, Shift, mode, GeV)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [DelQF, DelQD] = ffdeltaquadepu(Sector, Gap, Shift, mode, GeV) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> function [DelQF, DelQD] = ffdeltaquadepu(Sector, Gap, Shift, mode, GeV)
+
+ Inputs:
+ Sector
+ Gap
+ Shift
+ Mode
+ GeV
+
+ Tom Scarvie, Christoph Steier, 2007</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="gap2tune.html" class="code" title="function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)">gap2tune</a>	GAP2TUNE - Computes the vertical tune shift for a insertion device gap change.</li><li><a href="shift2tune.html" class="code" title="function [Dnux, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = shift2tune(Sector, Gap, EPUshift, GeV)">shift2tune</a>	SHIFT2TUNE - Computes the horizontal tune shift for a EPU gap and horizontal shift</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DelQF, DelQD] = ffdeltaquadepu(Sector, Gap, Shift, mode, GeV)</a>
+0002 <span class="comment">% function [DelQF, DelQD] = ffdeltaquadepu(Sector, Gap, Shift, mode, GeV)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Inputs:</span>
+0005 <span class="comment">% Sector</span>
+0006 <span class="comment">% Gap</span>
+0007 <span class="comment">% Shift</span>
+0008 <span class="comment">% Mode</span>
+0009 <span class="comment">% GeV</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% Tom Scarvie, Christoph Steier, 2007</span>
+0012 
+0013 <span class="keyword">if</span> nargin &lt; 1
+0014     Sector = [];
+0015 <span class="keyword">end</span>
+0016 <span class="keyword">if</span> isempty(Sector)
+0017     Sector = family2dev(<span class="string">'ID'</span>);
+0018 <span class="keyword">end</span>
+0019 <span class="keyword">if</span> nargin &lt; 2
+0020     Gap = [];
+0021 <span class="keyword">end</span>
+0022 <span class="keyword">if</span> isempty(Gap)
+0023     Gap = getsp(<span class="string">'ID'</span>, Sector);
+0024 <span class="keyword">end</span>
+0025 <span class="keyword">if</span> nargin &lt; 3
+0026     Shift = [];
+0027 <span class="keyword">end</span>
+0028 <span class="keyword">if</span> isempty(Shift)
+0029     Shift = getsp(<span class="string">'EPU'</span>, Sector);
+0030 <span class="keyword">end</span>
+0031 <span class="keyword">if</span> nargin &lt; 4
+0032     mode = [];
+0033 <span class="keyword">end</span>
+0034 <span class="keyword">if</span> isempty(mode)
+0035     mode = 0;
+0036 <span class="keyword">end</span>
+0037 <span class="keyword">if</span> nargin &lt; 5
+0038     GeV = [];
+0039 <span class="keyword">end</span>
+0040 <span class="keyword">if</span> isempty(GeV)
+0041     GeV = getenergy;   <span class="comment">% or getfamilydata('Energy'); to assume production energy</span>
+0042 <span class="keyword">end</span>
+0043 
+0044 
+0045 <span class="keyword">if</span> size(Sector,2) == 1
+0046     Sector = elem2dev(<span class="string">'ID'</span>, Sector);
+0047 <span class="keyword">end</span>
+0048 <span class="keyword">if</span> size(Sector,1) ~= size(Gap,1)
+0049     <span class="keyword">if</span> size(Gap,1) == 1
+0050         Gap = ones(size(Sector,1),1) * Gap;
+0051         Shift = ones(size(Sector,1),1) * Shift;
+0052         mode = ones(size(Sector,1),1) * mode;
+0053     <span class="keyword">else</span>
+0054         error(<span class="string">'Rows of Sector &amp; Gap &amp; Shift must equal.'</span>);
+0055     <span class="keyword">end</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 
+0059 <span class="comment">% FF method</span>
+0060 FFTypeFlag = <span class="string">'Global'</span>; <span class="comment">% 'Local' or 'Global'</span>
+0061 
+0062 
+0063 <span class="comment">% Load lattice set for tune feed forward</span>
+0064 ConfigSetpoint = getproductionlattice;
+0065 QFsp = ConfigSetpoint.QF.Setpoint.Data;
+0066 QDsp = ConfigSetpoint.QD.Setpoint.Data;
+0067 
+0068 QFsp = QFsp * ones(1,size(Gap,2));
+0069 QDsp = QDsp * ones(1,size(Gap,2));
+0070 
+0071 SR_Mode = getfamilydata(<span class="string">'OperationalMode'</span>);
+0072 
+0073 
+0074 <span class="comment">% Tune response matrix</span>
+0075 <span class="comment">% gettuneresp is too slow for orbit feedback</span>
+0076 TuneResponseMat = [0.1641 -0.0245
+0077                    -0.1149 0.1477];
+0078 <span class="comment">%TuneResponseMat = gettuneresp({'QF','QD'}, {[],[]}, GeV);</span>
+0079 <span class="comment">%TuneResponseMat = gettuneresp;  %('NoEnergyScaling'); or scale at the operational energy</span>
+0080 
+0081 
+0082 <span class="comment">% Initialize</span>
+0083 DelQF  = zeros(length(QFsp), size(Gap,2));
+0084 DelQD  = zeros(length(QDsp), size(Gap,2));
+0085 
+0086 TuneW16Min = <a href="gap2tune.html" class="code" title="function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)">gap2tune</a>(5, 13.23, 1.8909);
+0087 
+0088 <span class="keyword">for</span> i = 1:size(Sector,1);
+0089 
+0090     <span class="keyword">if</span> strcmp(SR_Mode, <span class="string">'1.9 GeV, High Tune'</span>) ||  strcmp(SR_Mode, <span class="string">'1.9 GeV, Inject at 1.23'</span>) || strcmp(SR_Mode, <span class="string">'1.9 GeV, Two-Bunch'</span>)
+0091 
+0092         <span class="comment">% SR11 epu skew quadrupole feed forward</span>
+0093         <span class="comment">% scale= -0.06;    % for nu_y = 8.20 lattice</span>
+0094         <span class="comment">%               scale = -0.063;</span>
+0095         <span class="comment">%               mid = ceil(length(epu_shift5)/2);</span>
+0096 
+0097         <span class="comment">%               if getsp('SR11U___ODS1M__DC00')==0</span>
+0098         <span class="comment">%                  gap=getid(11);</span>
+0099         <span class="comment">%                  shift=getepu(11);</span>
+0100         <span class="comment">%                  [gapmin,gapmax] = gaplimit(11);</span>
+0101         <span class="comment">%                  if gap &lt; (gapmin-1)</span>
+0102         <span class="comment">%                     gap = gapmax;</span>
+0103         <span class="comment">%                  end</span>
+0104         <span class="comment">%                  corrval=sqrt(shift2tune(11,gap,25)/shift2tune(11,15.67,25))* ...</span>
+0105         <span class="comment">%                     scale*interp1(epu_shift5,int_epu_grad5-int_epu_grad5(mid),shift,'spline');</span>
+0106         <span class="comment">%                  setsp('SR11U___Q______AC01',corrval);</span>
+0107         <span class="comment">%               end</span>
+0108 
+0109         <span class="keyword">if</span> strcmp(FFTypeFlag,<span class="string">'Local'</span>)
+0110             <span class="comment">% Change in tune and [QF;QD] from maximum gap</span>
+0111             DeltaNuY = <a href="gap2tune.html" class="code" title="function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)">gap2tune</a>(Sector(i,:), Gap(i,:), GeV);
+0112             fraccorr = 1.15 * DeltaNuY / TuneW16Min;
+0113 
+0114             <span class="comment">% Find which quads to change</span>
+0115             QuadList = [Sector(i,1)-1 1;Sector(i,1)-1 2;Sector(i,1) 1;Sector(i,1) 2];
+0116             QuadElem = dev2elem(<span class="string">'QF'</span>, QuadList);
+0117 
+0118             <span class="keyword">if</span> (Sector(i,1)==7) | (Sector(i,1)==10) | (Sector(i,1)==11)
+0119                 QFfac = ([2.227520/2.237111; 2.239570/2.237111; 2.239570/2.237111; 2.227520/2.237111]-1) * fraccorr;
+0120                 QDfac = ([2.432264/2.511045; 2.543089/2.511045; 2.543080/2.511045; 2.432264/2.511045]-1) * fraccorr;
+0121             <span class="keyword">elseif</span> (Sector(i,1)==5) | (Sector(i,1)==9)
+0122                 QFfac = ([2.208418/2.219784; 2.225926/2.219784; 2.231777/2.237111; 2.233775/2.237111]-1) * fraccorr;
+0123                 QDfac = ([2.386512/2.483259; 2.545907/2.483259; 2.474571/2.511045; 2.491079/2.511045]-1) * fraccorr;
+0124             <span class="keyword">elseif</span> (Sector(i,1)==4) | (Sector(i,1)==8) | (Sector(i,1)==12)
+0125                 QFfac = ([2.233775/2.237111; 2.231777/2.237111; 2.225926/2.219784; 2.208418/2.219784]-1) * fraccorr;
+0126                 QDfac = ([2.491079/2.511045; 2.474571/2.511045; 2.545907/2.483259; 2.386512/2.483259]-1) * fraccorr;
+0127             <span class="keyword">else</span>
+0128                 QFfac = zeros(4,size(Gap,2));
+0129                 QDfac = zeros(4,size(Gap,2));
+0130             <span class="keyword">end</span>
+0131 
+0132             DelQF(QuadElem,:) = DelQF(QuadElem,:) + QFfac.*QFsp(QuadElem,:);
+0133             DelQD(QuadElem,:) = DelQD(QuadElem,:) + QDfac.*QDsp(QuadElem,:);
+0134 
+0135         <span class="keyword">elseif</span> strcmp(FFTypeFlag,<span class="string">'Global'</span>)
+0136             <span class="comment">% Change in tune and [QF;QD] from maximum gap</span>
+0137             
+0138             DeltaNuX = 0;
+0139             DeltaNuY = <a href="gap2tune.html" class="code" title="function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)">gap2tune</a>(Sector(i,:), Gap(i,:), GeV);
+0140 
+0141             <span class="keyword">if</span> (Sector(i,1) == 4) | (Sector(i,1) == 11)
+0142                 <span class="keyword">if</span> Sector(i,2)==2
+0143                     longshift=3;
+0144                 <span class="keyword">else</span>
+0145                     longshift=0;
+0146                 <span class="keyword">end</span>
+0147                 <span class="keyword">if</span> mode(i)==0
+0148                     DeltaNuX = <a href="shift2tune.html" class="code" title="function [Dnux, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = shift2tune(Sector, Gap, EPUshift, GeV)">shift2tune</a>(Sector(i,1),Gap(i,:),Shift(i,:)+longshift,GeV)+0.0015;
+0149                     DeltaNuY = 0;   <span class="comment">% vertical tune shift of EPUs is very small</span>
+0150                 <span class="keyword">else</span>
+0151                     DeltaNuX = 0;
+0152                     DeltaNuY = 0;
+0153                 <span class="keyword">end</span>
+0154             <span class="keyword">else</span>
+0155                 DeltaNuX = 0;
+0156             <span class="keyword">end</span>
+0157             
+0158          
+0159             fraccorr = DeltaNuY ./ TuneW16Min;
+0160 
+0161             <span class="comment">% Find which quads to change</span>
+0162             QuadList = [Sector(i,1)-1 2; Sector(i,1) 1];
+0163             QuadElem = dev2elem(<span class="string">'QF'</span>,QuadList);
+0164             
+0165             DeltaAmps = inv(TuneResponseMat) * [(fraccorr*6.23e-4); fraccorr*(-0.05301)];    <span class="comment">%  DelAmps =  [QF; QD];</span>
+0166 <span class="comment">%             if Sector(i,1)==5</span>
+0167 <span class="comment">%                 DeltaAmps</span>
+0168 <span class="comment">%             end</span>
+0169             <span class="keyword">for</span> j = 1:size(Gap,2)
+0170                 DelQF(:,j) = DelQF(:,j) + DeltaAmps(1,j);
+0171                 DelQD(:,j) = DelQD(:,j) + DeltaAmps(2,j);
+0172             <span class="keyword">end</span>
+0173             <span class="comment">%DelQF = DelQF + (DeltaAmps(1,:)' * ones(1,size(DelQF,1)))';  % Not any faster</span>
+0174             <span class="comment">%DelQD = DelQD + (DeltaAmps(2,:)' * ones(1,size(DelQD,1)))';</span>
+0175 
+0176             DeltaAmpsLocal = 12*inv(TuneResponseMat) * [-0.8*DeltaNuX;0];                       <span class="comment">%  DelAmps =  [QF; QD];</span>
+0177             DelQF(QuadElem) = DelQF(QuadElem)+DeltaAmpsLocal(1,1);
+0178             DelQD(QuadElem) = DelQD(QuadElem)+DeltaAmpsLocal(2,1);
+0179 
+0180             <span class="keyword">if</span> (Sector(i,1)==6) | (Sector(i,1)==7) | (Sector(i,1)==10) | (Sector(i,1)==11)
+0181                 QFfac = ([2.243127/2.237111; 2.243127/2.237111]-1) * fraccorr;
+0182                 QDfac = ([2.556392/2.511045; 2.556392/2.511045]-1) * fraccorr;
+0183             <span class="keyword">elseif</span> (Sector(i,1)==5) | (Sector(i,1)==9)
+0184                 QFfac = ([2.225965/2.219784; 2.243096/2.237111]-1) * fraccorr;
+0185                 QDfac = ([2.528950/2.483259; 2.556345/2.511045]-1) * fraccorr;
+0186             <span class="keyword">elseif</span> (Sector(i,1)==4) | (Sector(i,1)==8) | (Sector(i,1)==12)
+0187                 QFfac = ([2.243096/2.237111; 2.225965/2.219784]-1) * fraccorr;
+0188                 QDfac = ([2.556345/2.511045; 2.528950/2.483259]-1) * fraccorr;
+0189             <span class="keyword">else</span>
+0190                 QFfac = zeros(2,size(Gap,2));
+0191                 QDfac = zeros(2,size(Gap,2));
+0192             <span class="keyword">end</span>
+0193 
+0194             DelQF(QuadElem,:) = DelQF(QuadElem,:) + QFfac.*QFsp(QuadElem,:);
+0195             DelQD(QuadElem,:) = DelQD(QuadElem,:) + QDfac.*QDsp(QuadElem,:);
+0196 
+0197         <span class="keyword">else</span>
+0198             error(<span class="string">'Unknown type selected for tune FF'</span>);
+0199         <span class="keyword">end</span>
+0200 
+0201     <span class="keyword">else</span>
+0202 
+0203         <span class="comment">% SR11 epu skew quadrupole feed forward</span>
+0204 
+0205         <span class="comment">%               scale= -0.06;  % for nu_y = 8.20 lattice</span>
+0206         <span class="comment">% scale = -0.063;  % for nu_y = 9.20 lattice</span>
+0207         <span class="comment">%               mid = ceil(length(epu_shift5)/2);</span>
+0208 
+0209         <span class="comment">%               if getsp('SR11U___ODS1M__DC00')==0</span>
+0210         <span class="comment">%                  gap=getid(11);</span>
+0211         <span class="comment">%                  shift=getepu(11);</span>
+0212         <span class="comment">%                  corrval=shift2tune(11,gap,25)/shift2tune(11,15.67,25)* ...</span>
+0213         <span class="comment">%                     scale*interp1(epu_shift5,int_epu_grad5-int_epu_grad5(mid),shift,'spline');</span>
+0214         <span class="comment">%                  setsp('SR11U___Q______AC01',corrval);</span>
+0215         <span class="comment">%               end</span>
+0216         
+0217         <span class="comment">% Change in tune and [QF;QD] from maximum gap</span>
+0218         DeltaNuY = <a href="gap2tune.html" class="code" title="function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)">gap2tune</a>(Sector(i,:), Gap(i,:), GeV);
+0219 
+0220         <span class="keyword">if</span> (Sector(i,1)==7) | (Sector(i,1)==10) | (Sector(i,1)==11)
+0221             DeltaAmps = inv(TuneResponseMat/12) * [zeros(size(DeltaNuY)); -DeltaNuY];    <span class="comment">%  DelAmps =  [QF; QD];</span>
+0222             DeltaAmpsQF = [DeltaAmps(1,:); DeltaAmps(1,:)];
+0223             DeltaAmpsQD = [DeltaAmps(2,:); DeltaAmps(2,:)];
+0224         <span class="keyword">elseif</span> (Sector(i,1)==5) | (Sector(i,1)==9)
+0225             DeltaAmpsQF = [-1.0637; -0.5132] * DeltaNuY / 0.0181 * 0.37;
+0226             DeltaAmpsQD = [-6.6328; -3.3434] * DeltaNuY / 0.0181 * 0.37;
+0227         <span class="keyword">elseif</span> (Sector(i,1)==4) | (Sector(i,1)==8) | (Sector(i,1)==12)
+0228             DeltaAmpsQF = [-0.5132; -1.0637] * DeltaNuY / 0.0181 * 0.37;
+0229             DeltaAmpsQD = [-3.3434; -6.6328] * DeltaNuY / 0.0181 * 0.37;
+0230         <span class="keyword">else</span>
+0231             DeltaAmpsQF = zeros(2,size(Gap,2));
+0232             DeltaAmpsQD = zeros(2,size(Gap,2));
+0233         <span class="keyword">end</span>
+0234 
+0235         <span class="comment">% Find which quads to change</span>
+0236         QuadList = [Sector(i,1)-1 1;Sector(i,1) 2];
+0237         QuadElem = dev2elem(<span class="string">'QF'</span>, QuadList);
+0238 
+0239         DelQF(QuadElem,:) = DelQF(QuadElem,:) + DeltaAmpsQF;
+0240         DelQD(QuadElem,:) = DelQD(QuadElem,:) + DeltaAmpsQD;
+0241     <span class="keyword">end</span>
+0242 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

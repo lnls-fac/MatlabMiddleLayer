@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of addmenuad</title>
+  <meta name="keywords" content="addmenuad">
+  <meta name="description" content="ADDMENUAD - Adds a menu bar to view and edit the MML AD structure">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; addmenuad.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>addmenuad
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>ADDMENUAD - Adds a menu bar to view and edit the MML AD structure</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function varargout = addmenuad(h, Command) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">ADDMENUAD - Adds a menu bar to view and edit the MML AD structure
+  addmenuad(handle)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getad.html" class="code" title="function  AD = getad">getad</a>	GETAD - returns the Accelerator Data (AD) structure</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>	SETFAMILYDATA - Sets data associated with accelerator control</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = addmenuad(h, Command)</a>
+0002 <span class="comment">%ADDMENUAD - Adds a menu bar to view and edit the MML AD structure</span>
+0003 <span class="comment">%  addmenuad(handle)</span>
+0004 
+0005 <span class="comment">%  Written by Greg Portmann</span>
+0006 
+0007 
+0008 <span class="keyword">if</span> nargin &lt; 1
+0009     h = gcf;
+0010 <span class="keyword">end</span>
+0011 <span class="keyword">if</span> nargin &lt; 2
+0012     Command = <span class="string">'Build'</span>;
+0013 <span class="keyword">end</span>
+0014 
+0015 <span class="keyword">switch</span> lower(Command)
+0016     <span class="keyword">case</span> <span class="string">'build'</span>
+0017         
+0018         <span class="keyword">if</span> nargin &lt; 3
+0019             LabelString = <span class="string">'Middle Layer Parameter Setup'</span>;
+0020         <span class="keyword">end</span>
+0021         <span class="keyword">if</span> nargin &lt; 4
+0022             ParentLabelString = <span class="string">'MiddleLayer'</span>;
+0023         <span class="keyword">end</span>
+0024         
+0025         <span class="keyword">if</span> strcmpi(get(h,<span class="string">'Type'</span>), <span class="string">'figure'</span>)
+0026             h_childen = get(gcf,<span class="string">'children'</span>);
+0027             EditMenuFlag = 0;
+0028             <span class="keyword">for</span> i = 1:length(h_childen)
+0029                 <span class="keyword">if</span> strcmpi(get(h_childen,<span class="string">'label'</span>), ParentLabelString)
+0030                     EditMenuFlag = 1;
+0031                     h = h_childen(i);
+0032                     <span class="keyword">break</span>;
+0033                 <span class="keyword">end</span>
+0034             <span class="keyword">end</span>
+0035             <span class="keyword">if</span> ~EditMenuFlag
+0036                 <span class="comment">% Make an edit menu</span>
+0037                 h = uimenu(h, <span class="string">'Label'</span>, ParentLabelString, <span class="string">'Callback'</span>,<span class="string">''</span>);
+0038             <span class="keyword">end</span>
+0039             hmenu = uimenu(h, <span class="string">'Label'</span>, LabelString, <span class="string">'Callback'</span>,<span class="string">''</span>);
+0040         <span class="keyword">elseif</span> strcmpi(get(h,<span class="string">'Type'</span>), <span class="string">'uimenu'</span>)
+0041             <span class="keyword">if</span> isempty(findstr(get(h, <span class="string">'Label'</span>), <span class="string">'Middle Layer'</span>))
+0042                 hmenu = uimenu(h, <span class="string">'Label'</span>, LabelString, <span class="string">'Callback'</span>,<span class="string">''</span>);    
+0043             <span class="keyword">else</span>
+0044                 hmenu = h;
+0045             <span class="keyword">end</span>
+0046         <span class="keyword">else</span>
+0047             hmenu = h;
+0048         <span class="keyword">end</span>
+0049         
+0050         varargout{1} = hmenu;
+0051         
+0052         DataStructure0 = <a href="getad.html" class="code" title="function  AD = getad">getad</a>;
+0053         <span class="keyword">if</span> isempty(DataStructure0)
+0054             error(<span class="string">'Middle layer initialization needed'</span>);
+0055         <span class="keyword">end</span>
+0056         
+0057         
+0058         <span class="comment">% Build middle menu tree</span>
+0059         DataStructFieldName1 = fieldnames(DataStructure0);
+0060         <span class="keyword">for</span> i = 1:length(DataStructFieldName1)   
+0061             DataStructure1 = DataStructure0.(DataStructFieldName1{i});
+0062             <span class="keyword">if</span> isstruct(DataStructure1)
+0063                 hmenu1 = uimenu(hmenu, <span class="string">'Label'</span>,DataStructFieldName1{i}, <span class="string">'Callback'</span>,<span class="string">''</span>);       
+0064                 DataStructFieldName2 = fieldnames(DataStructure1);
+0065                 <span class="keyword">for</span> j = 1:length(DataStructFieldName2)
+0066                     DataStructure2 = DataStructure1.(DataStructFieldName2{j});
+0067                     <span class="keyword">if</span> isstruct(DataStructure2)
+0068                         hmenu2 = uimenu(hmenu1, <span class="string">'Label'</span>,DataStructFieldName2{j}, <span class="string">'Callback'</span>,<span class="string">''</span>);       
+0069                         DataStructFieldName3 = fieldnames(DataStructure2);
+0070                         <span class="keyword">for</span> k = 1:length(DataStructFieldName3)
+0071                             DataStructure3 = DataStructure2.(DataStructFieldName3{k});
+0072                             <span class="keyword">if</span> isstruct(DataStructure3)
+0073                                 hmenu3 = uimenu(hmenu2, <span class="string">'Label'</span>,DataStructFieldName3{k}, <span class="string">'Callback'</span>,<span class="string">''</span>);
+0074                                 DataStructFieldName4 = fieldnames(DataStructure3);
+0075                                 <span class="keyword">for</span> l = 1:length(DataStructFieldName4)
+0076                                     hmenu4 = uimenu(hmenu3, <span class="string">'Label'</span>, DataStructFieldName4{l});
+0077                                     set(hmenu4,<span class="string">'UserData'</span>, {DataStructure3.(DataStructFieldName4{l}) , DataStructFieldName1{l}, DataStructFieldName2{k}, DataStructFieldName3{k}, DataStructFieldName4{i}});      
+0078                                     set(hmenu4,<span class="string">'Callback'</span>, <span class="string">'addmenuad(gcbo,''Action'')'</span>);
+0079                                 <span class="keyword">end</span>
+0080                             <span class="keyword">else</span>
+0081                                 hmenu3 = uimenu(hmenu2, <span class="string">'Label'</span>,DataStructFieldName3{k});
+0082                                 set(hmenu3,<span class="string">'UserData'</span>, {DataStructure3, DataStructFieldName1{i}, DataStructFieldName2{j}, DataStructFieldName3{k}});      
+0083                                 set(hmenu3,<span class="string">'Callback'</span>, <span class="string">'addmenuad(gcbo,''Action'')'</span>);
+0084                             <span class="keyword">end</span>
+0085                         <span class="keyword">end</span>
+0086                     <span class="keyword">else</span>
+0087                         hmenu2 = uimenu(hmenu1, <span class="string">'Label'</span>,DataStructFieldName2{j});
+0088                         set(hmenu2,<span class="string">'UserData'</span>, {DataStructure2, DataStructFieldName1{i}, DataStructFieldName2{j}});      
+0089                         set(hmenu2,<span class="string">'Callback'</span>, <span class="string">'addmenuad(gcbo,''Action'')'</span>);
+0090                     <span class="keyword">end</span>
+0091                 <span class="keyword">end</span>
+0092             <span class="keyword">else</span>
+0093                 hmenu1 = uimenu(hmenu, <span class="string">'Label'</span>, DataStructFieldName1{i});                   
+0094                 set(hmenu1,<span class="string">'UserData'</span>, {DataStructure1, DataStructFieldName1{i}});      
+0095                 set(hmenu1,<span class="string">'Callback'</span>, <span class="string">'addmenuad(gcbo,''Action'')'</span>);
+0096             <span class="keyword">end</span>
+0097         <span class="keyword">end</span>
+0098         
+0099     <span class="keyword">case</span> <span class="string">'action'</span>
+0100                 
+0101         Data = get(h, <span class="string">'UserData'</span>);
+0102 
+0103         <span class="comment">% Get up-to-date data</span>
+0104         Data{1} = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Data{2:end});
+0105         
+0106         <span class="comment">%Label = get(h, 'Label');</span>
+0107         TitleString = sprintf(<span class="string">'%s '</span>,Data{2:end});
+0108         AddOpts.Resize=<span class="string">'on'</span>;
+0109         AddOpts.WindowStyle=<span class="string">'normal'</span>;
+0110         AddOpts.Interpreter=<span class="string">'tex'</span>;
+0111         <span class="keyword">if</span> isnumeric(Data{1})
+0112             answer = inputdlg({sprintf(<span class="string">'Change %s'</span>,TitleString)}, <span class="string">'Edit Middle Layer Parameter'</span>, size(Data{1},1), {num2str(Data{1})}, AddOpts);
+0113             <span class="keyword">if</span> isempty(answer)
+0114                 <span class="keyword">return</span>
+0115             <span class="keyword">end</span>
+0116             Data{1} = str2num(answer{1});
+0117             set(h, <span class="string">'UserData'</span>, Data);
+0118             <a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>(Data{1:end});
+0119         <span class="keyword">elseif</span> strcmpi(Data{2},<span class="string">'Directory'</span>)
+0120             answer = uigetdir(Data{1}, sprintf(<span class="string">'Change directory location for %s'</span>, Data{3}));
+0121             <span class="keyword">if</span> answer == 0
+0122                 <span class="keyword">return</span>
+0123             <span class="keyword">end</span>
+0124             Data{1} = answer;
+0125             set(h, <span class="string">'UserData'</span>, Data);
+0126             <a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>(Data{1:end});
+0127         <span class="keyword">elseif</span> ischar(Data{1})
+0128             answer = inputdlg({sprintf(<span class="string">'Change %s'</span>,TitleString)}, <span class="string">'Edit Middle Layer Parameter'</span>, size(Data{1},1), {num2str(Data{1})}, AddOpts);
+0129             <span class="keyword">if</span> isempty(answer)
+0130                 <span class="keyword">return</span>
+0131             <span class="keyword">end</span>
+0132             Data{1} = answer{1};
+0133             set(h, <span class="string">'UserData'</span>, Data);
+0134             <a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>(Data{1:end});
+0135         <span class="keyword">end</span>
+0136         
+0137     <span class="keyword">case</span> {<span class="string">'noaction'</span>, <span class="string">'no action'</span>}
+0138 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

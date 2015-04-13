@@ -1,0 +1,348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotlocodata</title>
+  <meta name="keywords" content="plotlocodata">
+  <meta name="description" content="PLOTLOCODATA - Plots for comparing LOCO runs">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; plotlocodata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>plotlocodata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>PLOTLOCODATA - Plots for comparing LOCO runs</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function FileName = plotlocodata(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTLOCODATA - Plots for comparing LOCO runs
+  plotlocodata(FileName)
+
+  INPUTS
+  1. FileName - LOCO data file name or leave blank for an inputdlg
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function FileName = plotlocodata(varargin)</a>
+0002 <span class="comment">%PLOTLOCODATA - Plots for comparing LOCO runs</span>
+0003 <span class="comment">%  plotlocodata(FileName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. FileName - LOCO data file name or leave blank for an inputdlg</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  Written by Greg Portmann</span>
+0009 
+0010 
+0011 FileName1 = <span class="string">''</span>;
+0012 
+0013 
+0014 <span class="comment">% LOCO file #1</span>
+0015 <span class="keyword">if</span> nargin &gt;= 1
+0016     FileName1 = varargin{1};
+0017     N = 1;
+0018 <span class="keyword">else</span>
+0019     N = inf;
+0020     FileName1 = <span class="string">''</span>;
+0021 <span class="keyword">end</span>
+0022 
+0023 
+0024 <span class="keyword">if</span> nargin &lt; 2
+0025     LineType = <span class="string">'.-b'</span>;
+0026 <span class="keyword">else</span>
+0027     LineType = varargin{2};
+0028 <span class="keyword">end</span>
+0029 
+0030 LineType = <span class="string">'.-'</span>;
+0031 
+0032 
+0033 figure(1);
+0034 clf reset
+0035 
+0036 figure(2);
+0037 clf reset
+0038 
+0039 figure(3);
+0040 clf reset
+0041 
+0042 <span class="keyword">for</span> iFile = 1:N
+0043     
+0044     <span class="keyword">if</span> isempty(FileName1)
+0045         [FileName1, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select A LOCO File (cancel to stop)'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0046         drawnow;
+0047         <span class="keyword">if</span> ~ischar(FileName1)
+0048             <span class="keyword">if</span> iFile == 1
+0049                 <span class="keyword">return</span>;
+0050             <span class="keyword">else</span>
+0051                 <span class="keyword">break</span>
+0052             <span class="keyword">end</span>
+0053         <span class="keyword">else</span>
+0054             FileName1 = [PathName, FileName1];
+0055         <span class="keyword">end</span>
+0056     <span class="keyword">end</span>
+0057 
+0058     load(FileName1);
+0059     BPMData1 = BPMData;
+0060     CMData1 = CMData;
+0061     FitParameters1 = FitParameters;
+0062     LocoFlags1 = LocoFlags;
+0063     LocoMeasData1 = LocoMeasData;
+0064     LocoMeasData1 = LocoMeasData;
+0065     LocoModel1 = LocoModel;
+0066     RINGData1 = RINGData;
+0067 
+0068 
+0069     <span class="comment">% Shorten the filenames</span>
+0070     i = findstr(FileName1, filesep);
+0071     <span class="keyword">if</span> length(FileName1) &gt; 1
+0072         FileName1(1:i(end)) = [];
+0073     <span class="keyword">end</span>
+0074 
+0075 
+0076     <span class="comment">% Iteration number to plot</span>
+0077     i1 = length(CMData1);
+0078 
+0079     nFig = 1; <span class="comment">%gcf;</span>
+0080     figure(nFig);
+0081     <span class="comment">%clf reset</span>
+0082     
+0083     ColorOrder = get(gca,<span class="string">'ColorOrder'</span>);
+0084     
+0085     x1 = 1:length(CMData1(i1).HCMKicks);
+0086     y1 = 1:length(CMData1(i1).VCMKicks);
+0087 
+0088     subplot(2,2,1);
+0089     <span class="keyword">if</span> 1 <span class="comment">% isempty(CMData1(i1).HCMKicksSTD)</span>
+0090         plot(x1(CMData1(i1).HCMGoodDataIndex), CMData1(i1).HCMKicks(CMData1(i1).HCMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0091         hold on
+0092     <span class="keyword">else</span>
+0093         errorbar(x1(CMData1(i1).HCMGoodDataIndex), CMData1(i1).HCMKicks(CMData1(i1).HCMGoodDataIndex), CMData1(i1).HCMKicksSTD(CMData1(i1).HCMGoodDataIndex), LineType)
+0094         hold on
+0095     <span class="keyword">end</span>
+0096     title(sprintf(<span class="string">'Horizontal Corrector Magnet Fits'</span>));
+0097     ylabel(<span class="string">'Horizontal Kick [mrad]'</span>);
+0098     <span class="comment">%xlabel('Horizontal Corrector Number');</span>
+0099     axis tight
+0100 
+0101 
+0102     subplot(2,2,2);
+0103     <span class="keyword">if</span> 1 <span class="comment">% isempty(CMData1(i1).VCMKicksSTD)</span>
+0104         plot(y1(CMData1(i1).VCMGoodDataIndex), CMData1(i1).VCMKicks(CMData1(i1).VCMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0105         hold on
+0106     <span class="keyword">else</span>
+0107         errorbar(y1(CMData1(i1).VCMGoodDataIndex), CMData1(i1).VCMKicks(CMData1(i1).VCMGoodDataIndex), CMData1(i1).VCMKicksSTD(CMData1(i1).VCMGoodDataIndex), LineType);
+0108         hold on
+0109     <span class="keyword">end</span>
+0110     title(sprintf(<span class="string">'Vertical Corrector Magnet Fits'</span>));
+0111     ylabel(<span class="string">'Vertical Kick [mrad]'</span>);
+0112     <span class="comment">%xlabel('Vertical Corrector Number');</span>
+0113     axis tight;
+0114 
+0115 
+0116     subplot(2,2,3);
+0117     <span class="keyword">if</span> 1 <span class="comment">% isempty(CMData1(i1).HCMKicksSTD)</span>
+0118         plot(x1(CMData1(i1).HCMGoodDataIndex), CMData1(i1).HCMCoupling(CMData1(i1).HCMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0119         hold on
+0120     <span class="keyword">else</span>
+0121         errorbar(x1(CMData1(i1).HCMGoodDataIndex), CMData1(i1).HCMCoupling(CMData1(i1).HCMGoodDataIndex), CMData1(i1).HCMCouplingSTD(CMData1(i1).HCMGoodDataIndex), LineType);
+0122         hold on
+0123     <span class="keyword">end</span>
+0124     <span class="comment">%title(sprintf('Horizontal Corrector Magnet Fits'));</span>
+0125     ylabel(<span class="string">'Horizontal Coupling'</span>);
+0126     xlabel(<span class="string">'Horizontal Corrector Number'</span>);
+0127     axis tight
+0128 
+0129 
+0130     subplot(2,2,4);
+0131     <span class="keyword">if</span> 1 <span class="comment">% isempty(CMData1(i1).VCMCouplingSTD)</span>
+0132         plot(y1(CMData1(i1).VCMGoodDataIndex), CMData1(i1).VCMCoupling(CMData1(i1).VCMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0133         hold on
+0134     <span class="keyword">else</span>
+0135         errorbar(y1(CMData1(i1).VCMGoodDataIndex), CMData1(i1).VCMCoupling(CMData1(i1).VCMGoodDataIndex), CMData1(i1).VCMCouplingSTD(CMData1(i1).VCMGoodDataIndex), LineType);
+0136         hold on
+0137     <span class="keyword">end</span>
+0138     <span class="comment">%title(sprintf('Vertical Corrector Magnet Fits'));</span>
+0139     ylabel(<span class="string">'Vertical Coupling'</span>);
+0140     xlabel(<span class="string">'Vertical Corrector Number'</span>);
+0141     axis tight;
+0142 
+0143     <span class="comment">% H = addlabel(0,0,sprintf('Blue-%s   Red-%s', FileName1, FileName2));</span>
+0144     <span class="comment">% set(H, 'Interpreter','None');</span>
+0145 
+0146     orient landscape
+0147 
+0148 
+0149 
+0150 
+0151     nFig = nFig + 1;
+0152     figure(nFig);
+0153     <span class="comment">%clf reset</span>
+0154 
+0155     x1 = 1:length(BPMData1(i1).HBPMGain);
+0156     y1 = 1:length(BPMData1(i1).VBPMGain);
+0157 
+0158     subplot(2,2,1);
+0159     <span class="keyword">if</span> 1 <span class="comment">% isempty(BPMData1(i1).HBPMGainSTD)</span>
+0160         plot(x1(BPMData1(i1).HBPMGoodDataIndex), BPMData1(i1).HBPMGain(BPMData1(i1).HBPMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0161         hold on
+0162     <span class="keyword">else</span>
+0163         errorbar(x1(BPMData1(i1).HBPMGoodDataIndex), BPMData1(i1).HBPMGain(BPMData1(i1).HBPMGoodDataIndex), BPMData1(i1).HBPMGainSTD(BPMData1(i1).HBPMGoodDataIndex), LineType);
+0164         hold on
+0165     <span class="keyword">end</span>
+0166     title(sprintf(<span class="string">'Horizontal BPM Fits'</span>));
+0167     ylabel(<span class="string">'Horizontal Gain'</span>);
+0168     axis tight
+0169 
+0170 
+0171     subplot(2,2,2);
+0172     <span class="keyword">if</span> 1 <span class="comment">% isempty(BPMData1(i1).VBPMGainSTD)</span>
+0173         plot(y1(BPMData1(i1).VBPMGoodDataIndex), BPMData1(i1).VBPMGain(BPMData1(i1).VBPMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0174         hold on
+0175     <span class="keyword">else</span>
+0176         errorbar(y1(BPMData1(i1).VBPMGoodDataIndex), BPMData1(i1).VBPMGain(BPMData1(i1).VBPMGoodDataIndex), BPMData1(i1).VBPMGainSTD(BPMData1(i1).VBPMGoodDataIndex), LineType);
+0177         hold on
+0178     <span class="keyword">end</span>
+0179     title(sprintf(<span class="string">'Vertical BPM Fits'</span>));
+0180     ylabel(<span class="string">'Vertical Gain'</span>);
+0181     axis tight;
+0182 
+0183 
+0184     subplot(2,2,3);
+0185     <span class="keyword">if</span> 1 <span class="comment">% isempty(BPMData1(i1).HBPMGainSTD)</span>
+0186         plot(x1(BPMData1(i1).HBPMGoodDataIndex), BPMData1(i1).HBPMCoupling(BPMData1(i1).HBPMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0187         hold on
+0188     <span class="keyword">else</span>
+0189         errorbar(x1(BPMData1(i1).HBPMGoodDataIndex), BPMData1(i1).HBPMCoupling(BPMData1(i1).HBPMGoodDataIndex), BPMData1(i1).HBPMCouplingSTD(BPMData1(i1).HBPMGoodDataIndex), LineType);
+0190         hold on
+0191     <span class="keyword">end</span>
+0192     <span class="comment">%title(sprintf('Horizontal Corrector Magnet Fits'));</span>
+0193     ylabel(<span class="string">'Horizontal Coupling'</span>);
+0194     xlabel(<span class="string">'Horizontal BPM Number'</span>);
+0195     axis tight
+0196 
+0197 
+0198     subplot(2,2,4);
+0199     <span class="keyword">if</span> 1 <span class="comment">% isempty(BPMData1(i1).VBPMCouplingSTD)</span>
+0200         plot(y1(BPMData1(i1).VBPMGoodDataIndex), BPMData1(i1).VBPMCoupling(BPMData1(i1).VBPMGoodDataIndex), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0201         hold on
+0202     <span class="keyword">else</span>
+0203         errorbar(y1(BPMData1(i1).VBPMGoodDataIndex), BPMData1(i1).VBPMCoupling(BPMData1(i1).VBPMGoodDataIndex), BPMData1(i1).VBPMCouplingSTD(BPMData1(i1).VBPMGoodDataIndex), LineType);
+0204         hold on
+0205     <span class="keyword">end</span>
+0206     ylabel(<span class="string">'Vertical Coupling'</span>);
+0207     xlabel(<span class="string">'Vertical BPM Number'</span>);
+0208     axis tight;
+0209 
+0210     <span class="comment">% H = addlabel(0,0,sprintf('Blue - %s    Red - %s', FileName1, FileName2));</span>
+0211     <span class="comment">% set(H, 'Interpreter','None');</span>
+0212 
+0213     orient landscape
+0214 
+0215 
+0216 
+0217     nFig = nFig + 1;
+0218     figure(nFig);
+0219     <span class="comment">%clf reset</span>
+0220 
+0221     ifit = 1:length(FitParameters1(i1).Values);
+0222     x1 = 1:length(FitParameters1(i1).Values);
+0223     
+0224     <span class="comment">%subplot(2,1,1);</span>
+0225     <span class="keyword">if</span> 1 <span class="comment">% isempty(FitParameters1(i1).ValuesSTD)</span>
+0226         plot(x1, FitParameters1(i1).Values(ifit), LineType, <span class="string">'Color'</span>, ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));
+0227         hold on
+0228     <span class="keyword">else</span>
+0229         errorbar(x1, FitParameters1(i1).Values(ifit), FitParameters1(i1).ValuesSTD(ifit), LineType);
+0230     <span class="keyword">end</span>
+0231     hold on
+0232     title(sprintf(<span class="string">'Other Parameter Fit Values'</span>));
+0233     ylabel(<span class="string">'Fit Values'</span>);
+0234     xlabel(<span class="string">'Fit Parameter Number'</span>);
+0235     axis tight
+0236 
+0237 
+0238 <span class="comment">%     ifit = 23:44;</span>
+0239 <span class="comment">%</span>
+0240 <span class="comment">%     subplot(2,1,2);</span>
+0241 <span class="comment">%     if 1 % isempty(FitParameters1(i1).ValuesSTD)</span>
+0242 <span class="comment">%         plot(x1, FitParameters1(i1).Values(ifit), LineType, 'Color', ColorOrder(mod(iFile-1,size(ColorOrder,1))+1,:));</span>
+0243 <span class="comment">%         hold on</span>
+0244 <span class="comment">%     else</span>
+0245 <span class="comment">%         errorbar(x1, FitParameters1(i1).Values(ifit), FitParameters1(i1).ValuesSTD(ifit), LineType);</span>
+0246 <span class="comment">%     end</span>
+0247 <span class="comment">%     hold on</span>
+0248 <span class="comment">%     ylabel('QD [K]');</span>
+0249 <span class="comment">%     axis tight</span>
+0250 
+0251 
+0252     <span class="comment">% H = addlabel(0,0,sprintf('Blue - %s    Red - %s', FileName1, FileName2));</span>
+0253     <span class="comment">% set(H, 'Interpreter','None');</span>
+0254 
+0255     orient tall
+0256 
+0257     
+0258     FileName{iFile} = FileName1;
+0259     FileName1 = <span class="string">''</span>;
+0260     
+0261     clear FitParameters
+0262 <span class="keyword">end</span>
+0263 
+0264 
+0265 figure(1);
+0266 subplot(2,2,1);
+0267 h = legend(FileName);
+0268 set(h,<span class="string">'Interpreter'</span>,<span class="string">'none'</span>);
+0269 hold off;
+0270 subplot(2,2,2);
+0271 hold off;
+0272 subplot(2,2,3);
+0273 hold off;
+0274 subplot(2,2,4);
+0275 hold off;
+0276 
+0277 
+0278 figure(2);
+0279 subplot(2,2,1);
+0280 h = legend(FileName);
+0281 set(h,<span class="string">'Interpreter'</span>,<span class="string">'none'</span>);
+0282 hold off;
+0283 subplot(2,2,2);
+0284 hold off;
+0285 subplot(2,2,3);
+0286 hold off;
+0287 subplot(2,2,4);
+0288 hold off;
+0289 
+0290 figure(3);
+0291 <span class="comment">%subplot(2,1,1);</span>
+0292 h = legend(FileName);
+0293 set(h,<span class="string">'Interpreter'</span>,<span class="string">'none'</span>);
+0294 hold off;
+0295 <span class="comment">%subplot(2,1,2);</span>
+0296 <span class="comment">%hold off;</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

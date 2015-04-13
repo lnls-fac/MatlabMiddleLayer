@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotbetatune</title>
+  <meta name="keywords" content="plotbetatune">
+  <meta name="description" content="derived from AT program PLOTBETA">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; plotbetatune.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plotbetatune
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>derived from AT program PLOTBETA</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function varargout = plotbetatune(action, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">derived from AT program PLOTBETA
+plots UNCOUPLED beta-functions
+Note: uses FINDORBIT4 and LINOPT which assume a no accelerating cavities and no radiation
+
+ July 21, 2005 added the following features for PLOTBETATUNE
+  1. tune increment pushbuttons
+  2. tune display fields
+  3. quadrupole strength display fields</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="plotbetatune.html" class="code" title="function varargout = plotbetatune(action, varargin)">plotbetatune</a>	derived from AT program PLOTBETA</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="plotbetatune.html" class="code" title="function varargout = plotbetatune(action, varargin)">plotbetatune</a>	derived from AT program PLOTBETA</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = plotbetatune(action, varargin)</a>
+0002 <span class="comment">%derived from AT program PLOTBETA</span>
+0003 <span class="comment">%plots UNCOUPLED beta-functions</span>
+0004 <span class="comment">%Note: uses FINDORBIT4 and LINOPT which assume a no accelerating cavities and no radiation</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% July 21, 2005 added the following features for PLOTBETATUNE</span>
+0007 <span class="comment">%  1. tune increment pushbuttons</span>
+0008 <span class="comment">%  2. tune display fields</span>
+0009 <span class="comment">%  3. quadrupole strength display fields</span>
+0010 
+0011 <span class="keyword">global</span> THERING
+0012 L = length(THERING);
+0013 spos = findspos(THERING,1:L+1);
+0014 
+0015 <span class="keyword">if</span> nargin==0   action=<span class="string">'Initialize'</span>; <span class="keyword">end</span>
+0016     
+0017 <span class="keyword">switch</span> action
+0018 
+0019 <span class="comment">%==========================================================</span>
+0020 <span class="keyword">case</span> <span class="string">'Initialize'</span>                               <span class="comment">%Initialize</span>
+0021 <span class="comment">%==========================================================</span>
+0022 <span class="comment">%generate a figure</span>
+0023 handles.figure=figure;
+0024 set(handles.figure,<span class="string">'Position'</span>,[200 200 700 500]);
+0025 
+0026 <span class="comment">% plot betax and betay in two subplots</span>
+0027 handles.betaxplot = axes(<span class="string">'YGrid'</span>,<span class="string">'on'</span>,<span class="string">'Position'</span>,[0.1 0.7 0.85 0.25],<span class="string">'YLim'</span>,[0 30]);
+0028 handles.betax   =    line(<span class="string">'parent'</span>,handles.betaxplot,<span class="string">'XData'</span>,spos,<span class="string">'YData'</span>,0*spos,<span class="string">'Color'</span>,<span class="string">'b'</span>);
+0029 A = axis; A(1) = 0; A(2) = spos(end); axis(A);
+0030 ylabel(<span class="string">'\beta_x [m]'</span>);
+0031 title(<span class="string">'\beta-functions'</span>);
+0032 
+0033 handles.betayplot = axes(<span class="string">'YGrid'</span>,<span class="string">'on'</span>,<span class="string">'Position'</span>,[0.1 0.4 0.85 0.25],<span class="string">'YLim'</span>,[0 30]);
+0034 handles.betay   =    line(<span class="string">'parent'</span>,handles.betayplot,<span class="string">'XData'</span>,spos,<span class="string">'YData'</span>,0*spos,<span class="string">'Color'</span>,<span class="string">'b'</span>);
+0035 B = axis; axis([A(1:2) B(3:4)]);
+0036 xlabel(<span class="string">'s - position [m]'</span>);
+0037 ylabel(<span class="string">'\beta_y [m]'</span>);
+0038 
+0039 <span class="comment">%create pushbuttons</span>
+0040 uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'units'</span>, <span class="string">'normalized'</span>,<span class="keyword">...</span>
+0041     <span class="string">'Position'</span>,[0.1 0.1 0.1 0.05],<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="string">'String'</span>,<span class="string">'Qy'</span>);
+0042 uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'units'</span>, <span class="string">'normalized'</span>,<span class="keyword">...</span>
+0043     <span class="string">'Position'</span>,[0.1 0.2 0.1 0.05],<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="string">'String'</span>,<span class="string">'Qx'</span>);
+0044 
+0045 
+0046 handles.editQy=uicontrol(<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="string">'units'</span>, <span class="string">'normalized'</span>,<span class="keyword">...</span>
+0047     <span class="string">'Position'</span>,[0.2 0.1 0.1 0.05],<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0048     <span class="string">'ToolTipString'</span>,<span class="string">'Enter Vertical Tune Increment'</span>,<span class="string">'String'</span>,<span class="string">'0.0'</span>);
+0049 
+0050 handles.editQx=uicontrol(<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="string">'units'</span>, <span class="string">'normalized'</span>,<span class="keyword">...</span>
+0051     <span class="string">'Position'</span>,[0.2 0.2 0.1 0.05],<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0052     <span class="string">'ToolTipString'</span>,<span class="string">'Enter Horizontal Tune Increment'</span>,<span class="string">'String'</span>,<span class="string">'0.0'</span>);
+0053 
+0054 handles.showQy=uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'units'</span>, <span class="string">'normalized'</span>,<span class="keyword">...</span>
+0055     <span class="string">'Position'</span>,[0.3 0.1 0.1 0.05],<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0056     <span class="string">'ToolTipString'</span>,<span class="string">'Calculated Vertical Tune Increment'</span>);
+0057 
+0058 handles.showQx=uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'units'</span>, <span class="string">'normalized'</span>,<span class="keyword">...</span>
+0059     <span class="string">'Position'</span>,[0.3 0.2 0.1 0.05],<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0060     <span class="string">'ToolTipString'</span>,<span class="string">'Calculated Horizontal Tune Increment'</span>);
+0061 
+0062 uicontrol(<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'units'</span>,<span class="string">'normalized'</span>, <span class="keyword">...</span>
+0063     <span class="string">'Position'</span>,[0.1 0.05 0.1 0.05],<span class="string">'String'</span>,<span class="string">'Update'</span>,<span class="string">'FontSize'</span>,9,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>,<span class="keyword">...</span>
+0064     <span class="string">'ToolTipString'</span>,<span class="string">'Update Optics'</span>, <span class="string">'Callback'</span>,<span class="string">'plotbetatune(''Update'')'</span>);
+0065 
+0066 
+0067 setappdata(0,<span class="string">'handles'</span>, handles);
+0068 
+0069 <a href="plotbetatune.html" class="code" title="function varargout = plotbetatune(action, varargin)">plotbetatune</a>(<span class="string">'Update'</span>)
+0070 
+0071 <span class="comment">%==========================================================</span>
+0072 <span class="keyword">case</span> <span class="string">'Update'</span>                               <span class="comment">%Update</span>
+0073 <span class="comment">%==========================================================</span>
+0074 handles=getappdata(0,<span class="string">'handles'</span>);
+0075 
+0076 dQx=str2double(get(handles.editQx,<span class="string">'string'</span>));
+0077 dQy=str2double(get(handles.editQy,<span class="string">'string'</span>));
+0078 steptune([dQx,dQy]');
+0079 
+0080 [TD, tune] = twissring(THERING,0,1:L+1);
+0081 BETA = cat(1,TD.beta);
+0082 S  = cat(1,TD.SPos);
+0083 
+0084 field=<span class="string">'betax'</span>;   <span class="comment">%dynamic referencing</span>
+0085 set(handles.(field),<span class="string">'YData'</span>,BETA(:,1));
+0086 set(handles.showQx,<span class="string">'String'</span>,num2str(tune(1)));
+0087 
+0088 set(handles.betay,<span class="string">'YData'</span>,BETA(:,2));
+0089 set(handles.showQy,<span class="string">'String'</span>,num2str(tune(2)));
+0090 
+0091 <span class="keyword">otherwise</span>
+0092 disp([<span class="string">'   Warning: CASE not found in PLOTBETATUNE: '</span> action]);
+0093 
+0094 <span class="keyword">end</span>  <span class="comment">%end switchyard</span>
+0095 
+0096</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

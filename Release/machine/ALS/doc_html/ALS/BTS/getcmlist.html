@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getcmlist</title>
+  <meta name="keywords" content="getcmlist">
+  <meta name="description" content="GETBPMLIST - Return a corrector magnet list based on key words and sector numbers">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">BTS</a> &gt; getcmlist.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\BTS&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getcmlist
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GETBPMLIST - Return a corrector magnet list based on key words and sector numbers</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [DeviceList, Index] = getcmlist(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETBPMLIST - Return a corrector magnet list based on key words and sector numbers 
+  [DeviceList, Index] = getbpmlist(KeyWord1, KeyWord2, ...)
+
+  INPUTS
+  1. KeyWord - 'Horizontal' {Default} or 'Vertical'
+
+     Note: 1. Devices can be selected by a number string
+              For example, '2 3 8 9' selects all devices numbered 2,3,8,9 
+     Note: 1. Sector can be selected by a vector 
+              For example, sectors 2, 10, 12 can be selected with input [2 10 12] 
+              The default is all sectors, 1:12.
+
+  OUTPUTS
+  1. DeviceList
+  2. Index - Index relative to the entire list (family2dev(Family))
+
+  See also family2dev <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DeviceList, Index] = getcmlist(varargin)</a>
+0002 <span class="comment">%GETBPMLIST - Return a corrector magnet list based on key words and sector numbers</span>
+0003 <span class="comment">%  [DeviceList, Index] = getbpmlist(KeyWord1, KeyWord2, ...)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. KeyWord - 'Horizontal' {Default} or 'Vertical'</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%     Note: 1. Devices can be selected by a number string</span>
+0009 <span class="comment">%              For example, '2 3 8 9' selects all devices numbered 2,3,8,9</span>
+0010 <span class="comment">%     Note: 1. Sector can be selected by a vector</span>
+0011 <span class="comment">%              For example, sectors 2, 10, 12 can be selected with input [2 10 12]</span>
+0012 <span class="comment">%              The default is all sectors, 1:12.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1. DeviceList</span>
+0016 <span class="comment">%  2. Index - Index relative to the entire list (family2dev(Family))</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  See also family2dev getbpmlist</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  Written by Greg Portmann</span>
+0021 
+0022 
+0023 PlaneFlag = 0;
+0024 <span class="keyword">for</span> i = length(varargin):-1:1
+0025     <span class="keyword">if</span> any(strcmpi(varargin{i}, {<span class="string">'Horizontal'</span>,<span class="string">'x'</span>,<span class="string">'h'</span>,<span class="string">'HCM'</span>}))
+0026         PlaneFlag = 1;
+0027         Family = <span class="string">'HCM'</span>;
+0028     <span class="keyword">elseif</span> any(strcmpi(varargin{i}, {<span class="string">'Vertical'</span>,<span class="string">'y'</span>,<span class="string">'v'</span>,<span class="string">'VCM'</span>}))
+0029         PlaneFlag = 1;
+0030         Family = <span class="string">'VCM'</span>;
+0031     <span class="keyword">end</span>
+0032 <span class="keyword">end</span>
+0033 
+0034 <span class="keyword">if</span> ~PlaneFlag
+0035     varargin = [varargin {<span class="string">'Horizontal'</span>}];
+0036     Family = <span class="string">'HCM'</span>;
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="keyword">if</span> length(varargin) == 0
+0040     varargin = {<span class="string">'Horizontal'</span>};
+0041 <span class="keyword">end</span>
+0042 
+0043 
+0044 <span class="comment">%  Sector Dev    H     V    ARC</span>
+0045 Table = [
+0046      1     1     1     1     0     0     0
+0047      1     2     1     1     0     0     0
+0048      1     3     1     1     0     0     0
+0049      1     4     1     1     0     0     0
+0050      1     5     1     1     0     0     0
+0051      1     6     1     1     0     0     0
+0052      1     7     1     1     0     0     0
+0053      1     8     1     1     0     0     0
+0054      1     9     1     1     0     0     0
+0055     ];
+0056 
+0057 
+0058 List = ones(size(Table,1),1);
+0059 <span class="keyword">for</span> i = 1:length(varargin)
+0060     <span class="keyword">if</span> any(strcmpi(varargin{i}, {<span class="string">'Horizontal'</span>,<span class="string">'x'</span>,<span class="string">'h'</span>,<span class="string">'HCM'</span>}))
+0061         Family = <span class="string">'HCM'</span>;
+0062         List = List &amp; Table(:,3);    
+0063     <span class="keyword">elseif</span> any(strcmpi(varargin{i}, {<span class="string">'Vertical'</span>,<span class="string">'y'</span>,<span class="string">'v'</span>,<span class="string">'VCM'</span>}))
+0064         Family = <span class="string">'VCM'</span>;
+0065         List = List &amp; Table(:,4);    
+0066     <span class="keyword">elseif</span> isnumeric(varargin{i})
+0067         <span class="comment">% Sector</span>
+0068         Sector = varargin{i};
+0069         Marker = zeros(size(Table,1),1);
+0070         <span class="keyword">for</span> j = 1:length(Sector)
+0071             Marker = Marker | (Table(:,1)==Sector(j));
+0072         <span class="keyword">end</span>
+0073         List = List &amp; Marker;
+0074     <span class="keyword">elseif</span> strcmpi(varargin{i}, <span class="string">'all'</span>)
+0075         <span class="comment">% All good status BPMs</span>
+0076         <span class="comment">%StatusFlag = family2status(Family);</span>
+0077         <span class="comment">%List = List &amp; StatusFlag;</span>
+0078     <span class="keyword">elseif</span> strcmpi(varargin{i}, <span class="string">'arc'</span>)
+0079         List = List &amp; Table(:,5);
+0080     <span class="keyword">elseif</span> any(strcmpi(varargin{i}, {<span class="string">'straight'</span>,<span class="string">'straightsection'</span>,<span class="string">'straight section'</span>}))
+0081         List = List &amp; ~Table(:,5);
+0082     <span class="keyword">elseif</span> isnumeric(str2num(varargin{i}))
+0083         <span class="comment">% Numeric Keyword - DeviceList</span>
+0084         <span class="comment">%       1 2 3 4 5 6 7 8 9 10</span>
+0085         Mask = [0 0 0 0 0 0 0 0 0  0]';
+0086         MaskNumber = str2num(varargin{i});
+0087         Mask(MaskNumber) = 1;
+0088         Mask = [Mask;Mask;Mask;Mask;Mask;Mask;Mask;Mask;Mask;Mask;Mask;Mask;];
+0089         List = List &amp; Mask;
+0090     <span class="keyword">else</span>
+0091         error(<span class="string">'Input not a known BPM list type'</span>);
+0092     <span class="keyword">end</span>
+0093 <span class="keyword">end</span>
+0094 
+0095 
+0096 <span class="comment">% Check middle layer status for what BPM are available</span>
+0097 DeviceList = family2dev(Family);
+0098 <span class="comment">%StatusFlag = family2status(Family);</span>
+0099 IndexDeviceList = findrowindex(DeviceList, Table(:,1:2));
+0100 <span class="comment">%List = List(IndexTotal) &amp; StatusFlag;</span>
+0101 List = List(IndexDeviceList);
+0102 
+0103 
+0104 <span class="comment">% List w.r.t. the middle layer device list</span>
+0105 Index = find(List);
+0106 DeviceList = DeviceList(Index, 1:2);
+0107</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

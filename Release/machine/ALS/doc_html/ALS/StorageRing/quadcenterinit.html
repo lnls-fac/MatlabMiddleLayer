@@ -1,0 +1,508 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of quadcenterinit</title>
+  <meta name="keywords" content="quadcenterinit">
+  <meta name="description" content="QMS = quadcenterinit(Family, Device, QuadPlane)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; quadcenterinit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>quadcenterinit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>QMS = quadcenterinit(Family, Device, QuadPlane)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function QMS = quadcenterinit(QuadFamily, QuadDev, QuadPlane) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> QMS = quadcenterinit(Family, Device, QuadPlane)
+
+ QuadFamily = Quadrupole family
+ QuadDev    = Quadrupole device 
+ QuadPlane  = Plane (1=horizontal {default}, 2=vertical)
+
+ QMS structure contains fields:
+ QMS.QuadFamily
+ QMS.QuadDev
+ QMS.QuadDelta
+ QMS.QuadPlane
+ QMS.BPMFamily
+ QMS.BPMDev
+ QMS.BPMDevList
+ QMS.CorrFamily
+ QMS.CorrDevList             % Often one magnet but bumps or anything else is fine
+ QMS.CorrDelta               % Scale factor for each magnet in CorrDevList
+ QMS.DataDirectory           % From AD or '.'
+ QMS.QuadraticFit = 1;       % 1=quadratic fit, else linear fit
+ QMS.OutlierFactor = 1;      % if abs(data - fit) &gt; OutlierFactor * BPMstd, then remove that BPM [mm]
+ QMS.NumberOfPoints = 3;
+ QMS.ModulationMethod = 'bipolar'
+ QMS.CorrectOrbit 'yes' or 'no'
+ QMS.CreatedBy
+ QMS.ExtraDelay              % Extra delay added before reading the BPMs</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>	GETBPMLIST - Return a corrector magnet list based on key words and sector numbers</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="quadcenter1of3.html" class="code" title="">quadcenter1of3</a>	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</li><li><a href="quadcenter2of3.html" class="code" title="">quadcenter2of3</a>	Quadrupole Center Measurement</li><li><a href="quadcenter3of3.html" class="code" title="">quadcenter3of3</a>	Quadrupole Center Measurement</li><li><a href="quadcenterall.html" class="code" title="">quadcenterall</a>	%%%%%%%%%%%%%%%%%%%%</li><li><a href="quadcenterqfa.html" class="code" title="">quadcenterqfa</a>	Quadrupole Center Measurement</li><li><a href="quadcenterqfa1of2.html" class="code" title="">quadcenterqfa1of2</a>	Quadrupole Center Measurement</li><li><a href="quadcenterqfa2of2.html" class="code" title="">quadcenterqfa2of2</a>	Quadrupole Center Measurement</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function CorrDevList = quad2cm(QMS)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function QMS = quadcenterinit(QuadFamily, QuadDev, QuadPlane)</a>
+0002 <span class="comment">% QMS = quadcenterinit(Family, Device, QuadPlane)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% QuadFamily = Quadrupole family</span>
+0005 <span class="comment">% QuadDev    = Quadrupole device</span>
+0006 <span class="comment">% QuadPlane  = Plane (1=horizontal {default}, 2=vertical)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% QMS structure contains fields:</span>
+0009 <span class="comment">% QMS.QuadFamily</span>
+0010 <span class="comment">% QMS.QuadDev</span>
+0011 <span class="comment">% QMS.QuadDelta</span>
+0012 <span class="comment">% QMS.QuadPlane</span>
+0013 <span class="comment">% QMS.BPMFamily</span>
+0014 <span class="comment">% QMS.BPMDev</span>
+0015 <span class="comment">% QMS.BPMDevList</span>
+0016 <span class="comment">% QMS.CorrFamily</span>
+0017 <span class="comment">% QMS.CorrDevList             % Often one magnet but bumps or anything else is fine</span>
+0018 <span class="comment">% QMS.CorrDelta               % Scale factor for each magnet in CorrDevList</span>
+0019 <span class="comment">% QMS.DataDirectory           % From AD or '.'</span>
+0020 <span class="comment">% QMS.QuadraticFit = 1;       % 1=quadratic fit, else linear fit</span>
+0021 <span class="comment">% QMS.OutlierFactor = 1;      % if abs(data - fit) &gt; OutlierFactor * BPMstd, then remove that BPM [mm]</span>
+0022 <span class="comment">% QMS.NumberOfPoints = 3;</span>
+0023 <span class="comment">% QMS.ModulationMethod = 'bipolar'</span>
+0024 <span class="comment">% QMS.CorrectOrbit 'yes' or 'no'</span>
+0025 <span class="comment">% QMS.CreatedBy</span>
+0026 <span class="comment">% QMS.ExtraDelay              % Extra delay added before reading the BPMs</span>
+0027 
+0028 
+0029 <span class="keyword">if</span> nargin &lt; 1
+0030     FamilyList = getfamilylist;
+0031     [tmp,i] = ismemberof(FamilyList,<span class="string">'QUAD'</span>);
+0032     <span class="keyword">if</span> ~isempty(i)
+0033         FamilyList = FamilyList(i,:);
+0034     <span class="keyword">end</span>
+0035     [i,ok] = listdlg(<span class="string">'PromptString'</span>, <span class="string">'Select a quadrupole family:'</span>, <span class="keyword">...</span>
+0036         <span class="string">'SelectionMode'</span>, <span class="string">'single'</span>, <span class="keyword">...</span>
+0037         <span class="string">'ListString'</span>, FamilyList);
+0038     drawnow;
+0039     <span class="keyword">if</span> ok == 0
+0040         <span class="keyword">return</span>
+0041     <span class="keyword">else</span>
+0042         QuadFamily = deblank(FamilyList(i,:));
+0043     <span class="keyword">end</span>
+0044 <span class="keyword">end</span>
+0045 <span class="keyword">if</span> ~isfamily(QuadFamily)
+0046     error(sprintf(<span class="string">'Quadrupole family %s does not exist.  Make sure the middle layer had been initialized properly.'</span>,QuadFamily));
+0047 <span class="keyword">end</span>
+0048 <span class="keyword">if</span> nargin &lt; 2
+0049     QuadDev = editlist(family2dev(QuadFamily),QuadFamily,zeros(length(family2dev(QuadFamily)),1));
+0050 <span class="keyword">end</span>
+0051 <span class="keyword">if</span> nargin &lt; 3
+0052     <span class="comment">%QuadPlane = 1;  % Horizontal default</span>
+0053     ButtonNumber = menu(<span class="string">'Which Plane?'</span>, <span class="string">'Horizontal'</span>,<span class="string">'Vertical'</span>,<span class="string">'Cancel'</span>);  
+0054     drawnow;
+0055     <span class="keyword">switch</span> ButtonNumber
+0056         <span class="keyword">case</span> 1
+0057             QuadPlane = 1;
+0058         <span class="keyword">case</span> 2
+0059             QuadPlane = 2;
+0060         <span class="keyword">otherwise</span>
+0061             fprintf(<span class="string">'   quadcenterinit cancelled'</span>);
+0062             <span class="keyword">return</span>
+0063     <span class="keyword">end</span>
+0064 <span class="keyword">end</span>
+0065 
+0066 
+0067 <span class="comment">% Initialize the QMS structure</span>
+0068 QMS.QuadPlane = QuadPlane;
+0069 QMS.QuadFamily = QuadFamily;
+0070 QMS.QuadDev = QuadDev;
+0071 QMS.OutlierFactor = 6;     <span class="comment">% BPM Outlier: abs(fit - measured data) &gt; OutlierFactor * std(BPM)</span>
+0072 QMS.CorrectOrbit = <span class="string">'No'</span>;   <span class="comment">% 'yes' or 'no';  % Only select 'yes' if the orbit is reasonably close to the offset orbit</span>
+0073 QMS.ExtraDelay = 0;        <span class="comment">% Eddy current has been put in setquad so ExtraDelay is not needed</span>
+0074 
+0075 
+0076 <span class="comment">% Note: DataDirectory must start with the root of the tree and end with filesep or be '.'</span>
+0077 QMSDirectory = [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'QMS'</span>, filesep];
+0078 <span class="keyword">if</span> isempty(QMSDirectory)
+0079     QMS.DataDirectory = <span class="string">'.'</span>;
+0080 <span class="keyword">else</span>
+0081     QMS.DataDirectory = QMSDirectory;
+0082 <span class="keyword">end</span>
+0083 
+0084 
+0085 <span class="comment">% The rest of the parameters depend on the magnet and the plane</span>
+0086 <span class="keyword">if</span> QMS.QuadPlane==1        
+0087     <span class="comment">%%%%%%%%%%%%%%</span>
+0088     <span class="comment">% Horizontal %</span>
+0089     <span class="comment">%%%%%%%%%%%%%%</span>
+0090 
+0091     CorrMethod = <span class="string">'MEC'</span>;
+0092     <span class="comment">%CorrMethod = 'LocalBump';</span>
+0093     <span class="comment">%CorrMethod = 'Fixed';</span>
+0094 
+0095     QMS.BPMFamily  = <span class="string">'BPMx'</span>;
+0096     QMS.CorrFamily = <span class="string">'HCM'</span>;
+0097     QMS.QuadraticFit = 0;       <span class="comment">% 0 = linear fit, else quadratic fit</span>
+0098     
+0099     <span class="comment">% Use all BPMs in the minimization</span>
+0100     QMS.BPMDevList = family2dev(QMS.BPMFamily);
+0101 
+0102     <span class="comment">% Find the BPM closest to the quadrupole</span>
+0103     [TmpFamily, QMS.BPMDev] = quad2bpm(QMS.QuadFamily, QMS.QuadDev);
+0104 
+0105     <span class="comment">% Pick the quadrupole and corrector delta</span>
+0106     <span class="keyword">if</span> strcmp(QMS.QuadFamily,<span class="string">'QF'</span>) == 1
+0107         QMS.ModulationMethod = <span class="string">'sweep'</span>;
+0108         QMS.QuadDelta = 0.9;
+0109         QMS.CorrDelta = 3.0;     <span class="comment">% Was 1.5;  If using MEC, this will get overwritten by the MaxOrbit condition.</span>
+0110         MaxOrbit = .75;
+0111         QMS.NumberOfPoints = 4;  
+0112     <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QD'</span>) == 1
+0113         <span class="comment">% The max dQD should &lt; 3.5 amps</span>
+0114         QMS.ModulationMethod = <span class="string">'sweep'</span>;
+0115         QMS.QuadDelta = 0.9;     <span class="comment">% Was .75</span>
+0116         QMS.CorrDelta = 3.5;     <span class="comment">% If using MEC, this will get overwritten by the MaxOrbit condition.</span>
+0117         MaxOrbit = 1.;
+0118         QMS.NumberOfPoints = 3;  <span class="comment">% 5 points @.75 amps had problems with tune shift</span>
+0119     <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QDA'</span>) == 1
+0120         QMS.ModulationMethod = <span class="string">'sweep'</span>;
+0121         QMS.QuadDelta = 1.5;     <span class="comment">% Was 2.0</span>
+0122         QMS.CorrDelta = 3.5;     <span class="comment">% If using MEC, this will get overwritten by the MaxOrbit condition.</span>
+0123         MaxOrbit = .75;          <span class="comment">% Was 1.0, 1.5</span>
+0124         QMS.NumberOfPoints = 4;
+0125     <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QFA'</span>) == 1
+0126         <span class="comment">% QuadDelta is for the model, in the machine a shunt is used</span>
+0127         QMS.ModulationMethod = <span class="string">'sweep'</span>;
+0128         <span class="keyword">if</span> any(strcmpi(getfamilydata(QMS.QuadFamily, <span class="string">'Setpoint'</span>, <span class="string">'Mode'</span>, QMS.QuadDev), {<span class="string">'Simulator'</span>, <span class="string">'Model'</span>}))
+0129             QMS.QuadDelta = 13.0;     <span class="comment">% Simulator</span>
+0130         <span class="keyword">else</span>
+0131             QMS.QuadDelta = 1.0;      <span class="comment">% QFA quad must be 1 if online (for the shunt)</span>
+0132         <span class="keyword">end</span>
+0133         QMS.CorrDelta = 5;       <span class="comment">% If using MEC, this will get overwritten by the MaxOrbit condition.</span>
+0134         MaxOrbit = .5;
+0135         QMS.NumberOfPoints = 2;
+0136     <span class="keyword">else</span>
+0137         error(<span class="string">'QuadFamily error.'</span>);
+0138     <span class="keyword">end</span>
+0139     
+0140     <span class="comment">% Find corrector the bump the beam in the quadrupole</span>
+0141     <span class="keyword">switch</span> CorrMethod
+0142         <span class="keyword">case</span> <span class="string">'Fixed'</span>
+0143             <span class="comment">% Old QMS method</span>
+0144             <span class="keyword">if</span> strcmp(QMS.QuadFamily,<span class="string">'QF'</span>)==1 || strcmp(QMS.QuadFamily,<span class="string">'QD'</span>)==1
+0145                 <span class="keyword">if</span> QMS.QuadDev(1,2) == 1,
+0146                     QMS.CorrDevList = [QMS.QuadDev(1) 1];
+0147                 <span class="keyword">else</span>
+0148                     QMS.CorrDevList = [QMS.QuadDev(1) 8];
+0149                 <span class="keyword">end</span>
+0150                 <span class="keyword">if</span> (QMS.QuadDev(1,1)==1 &amp;&amp; QMS.CorrDevList(1,2)==1)        <span class="comment">% for sector1,  use HCM8 was HCM1</span>
+0151                     QMS.CorrDevList = [QMS.QuadDev(1) 8];
+0152                 <span class="keyword">elseif</span> (QMS.QuadDev(1,1)==12 &amp;&amp; QMS.CorrDevList(1,2)==8)   <span class="comment">% for sector12, use HCM1 was HCM8</span>
+0153                     QMS.CorrDevList = [QMS.QuadDev(1) 1];
+0154                 <span class="keyword">end</span>
+0155             <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QDA'</span>)==1
+0156                 <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0157                     QMS.CorrDevList = [QMS.QuadDev(1) 4];
+0158                 <span class="keyword">else</span>
+0159                     QMS.CorrDevList = [QMS.QuadDev(1) 5];
+0160                 <span class="keyword">end</span>
+0161             <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QFA'</span>)==1
+0162                 <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0163                     QMS.CorrDevList = [QMS.QuadDev(1) 8];
+0164                 <span class="keyword">else</span>
+0165                     QMS.CorrDevList = [QMS.QuadDev(1) 1];
+0166                 <span class="keyword">end</span>
+0167                 <span class="keyword">if</span> (QMS.QuadDev(1,1)==1 &amp;&amp; QMS.CorrDevList(1,2)==1)
+0168                     QMS.CorrDevList = [QMS.QuadDev(1) 2];
+0169                 <span class="keyword">elseif</span> (QMS.QuadDev(1,1)==12 &amp;&amp; QMS.CorrDevList(1,2)==8)
+0170                     QMS.CorrDevList = [QMS.QuadDev(1) 7];
+0171                 <span class="keyword">end</span>
+0172             <span class="keyword">end</span>
+0173 
+0174         <span class="keyword">case</span> <span class="string">'MEC'</span>
+0175             <span class="comment">% Pick the corrector based on the most effective corrector in the response matrix</span>
+0176 
+0177             <span class="comment">% Only use corrector 10's</span>
+0178             HCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>,<span class="string">'10'</span>);
+0179             VCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>,<span class="string">'10'</span>);
+0180 
+0181             <span class="comment">% Remove the CM next to the quad</span>
+0182             CMDevRemove = <a href="#_sub1" class="code" title="subfunction CorrDevList = quad2cm(QMS)">quad2cm</a>(QMS);
+0183             i = findrowindex(CMDevRemove, HCMlist);
+0184             HCMlist(i,:) = [];
+0185             i = findrowindex(CMDevRemove, VCMlist);
+0186             VCMlist(i,:) = [];
+0187 
+0188             <span class="comment">% Base MEC on the response matrix</span>
+0189             R = getbpmresp(<span class="string">'BPMx'</span>, [], <span class="string">'BPMy'</span>, [], <span class="string">'HCM'</span>, HCMlist, <span class="string">'VCM'</span>, VCMlist, <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0190             <span class="comment">%R = getbpmresp('Struct','Physics');</span>
+0191 
+0192             [i, iNotFound] = findrowindex(QMS.BPMDev, R(1,1).Monitor.DeviceList);
+0193             m = R(1,1).Data(i,:);
+0194             [MaxValue10, j] = max(abs(m));
+0195             CorrDevList10 = R(1,1).Actuator.DeviceList(j,:);
+0196 
+0197 
+0198             <span class="comment">% Use all 1278</span>
+0199             HCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>,<span class="string">'1 2 7 8'</span>);
+0200             VCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>,<span class="string">'1 2 7 8'</span>);
+0201 
+0202             <span class="comment">% Remove the CM next to the quad</span>
+0203             CMDevRemove = <a href="#_sub1" class="code" title="subfunction CorrDevList = quad2cm(QMS)">quad2cm</a>(QMS);
+0204             i = findrowindex(CMDevRemove, HCMlist);
+0205             HCMlist(i,:) = [];
+0206             i = findrowindex(CMDevRemove, VCMlist);
+0207             VCMlist(i,:) = [];
+0208 
+0209             <span class="comment">% Base MEC on the response matrix</span>
+0210             R = getbpmresp(<span class="string">'BPMx'</span>, [], <span class="string">'BPMy'</span>, [], <span class="string">'HCM'</span>, HCMlist, <span class="string">'VCM'</span>, VCMlist, <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0211             <span class="comment">%R = getbpmresp('Struct','Physics');</span>
+0212 
+0213             [i, iNotFound] = findrowindex(QMS.BPMDev, R(1,1).Monitor.DeviceList);
+0214             m = R(1,1).Data(i,:);
+0215             [MaxValue, j] = max(abs(m));
+0216             QMS.CorrDevList = R(1,1).Actuator.DeviceList(j,:);
+0217 
+0218 
+0219             <span class="comment">%if abs(MaxValue10) &gt; .75 * abs(MaxValue)</span>
+0220             <span class="comment">%    % Use the corrector at position 10 if it's a pretty good corrector</span>
+0221             <span class="comment">%    QMS.CorrDelta = 5;</span>
+0222             <span class="comment">%    QMS.CorrDevList = CorrDevList10;</span>
+0223             <span class="comment">%end</span>
+0224             
+0225             <span class="keyword">if</span> 1
+0226                 <span class="comment">% Corrector delta based on response matrix and desired change at the BPM</span>
+0227                 R = getrespmat(<span class="string">'BPMx'</span>, QMS.BPMDev, <span class="string">'HCM'</span>, QMS.CorrDevList, <span class="string">'Hardware'</span>, <span class="string">'Numeric'</span>);
+0228                 <span class="keyword">if</span> any(R==0)
+0229                     fprintf(<span class="string">'HCM(%d,%d) to BPMx(%d,%d) response is zero.\n'</span>, QMS.CorrDevList, QMS.BPMDev);
+0230                     error(<span class="string">'Response matrix lookup problem.'</span>);
+0231                 <span class="keyword">else</span>
+0232                     QMS.CorrDelta = MaxOrbit / R;  <span class="comment">% +/- mm</span>
+0233                 <span class="keyword">end</span>
+0234             <span class="keyword">end</span>
+0235             
+0236         <span class="keyword">case</span> <span class="string">'LocalBump'</span>
+0237             <span class="comment">% Local bump corrector method</span>
+0238             [OCS, RF, OCS0] = setorbitbump(<span class="string">'BPMx'</span>,QMS.BPMDev,.1,<span class="string">'HCM'</span>,[-2 -1 1 2], <span class="string">'NoSetSP'</span>);
+0239             QMS.CorrDelta = OCS.CM.Data - OCS0.CM.Data;
+0240             QMS.CorrDevList = OCS.CM.DeviceList;
+0241         <span class="keyword">otherwise</span>
+0242             error(<span class="string">'Corrector method unknown.'</span>);
+0243     <span class="keyword">end</span>
+0244 
+0245 <span class="keyword">elseif</span> QMS.QuadPlane == 2
+0246     <span class="comment">%%%%%%%%%%%%</span>
+0247     <span class="comment">% Vertical %</span>
+0248     <span class="comment">%%%%%%%%%%%%</span>
+0249 
+0250     CorrMethod = <span class="string">'MEC'</span>;
+0251     <span class="comment">%CorrMethod = 'LocalBump';</span>
+0252     <span class="comment">%CorrMethod = 'Fixed';</span>
+0253 
+0254     QMS.BPMFamily  = <span class="string">'BPMy'</span>;
+0255     QMS.CorrFamily = <span class="string">'VCM'</span>;
+0256     QMS.NumberOfPoints = 5;
+0257     QMS.QuadraticFit = 0;       <span class="comment">% 0 = linear fit, else quadratic fit</span>
+0258 
+0259     <span class="comment">% Use all BPMs in the minimization</span>
+0260     QMS.BPMDevList = family2dev(QMS.BPMFamily);
+0261 
+0262     <span class="comment">% Find the BPM closest to the quadrupole</span>
+0263     [TmpFamily, QMS.BPMDev] = quad2bpm(QMS.QuadFamily, QMS.QuadDev);
+0264 
+0265     <span class="comment">% Pick the quadrupole and corrector delta</span>
+0266     <span class="keyword">if</span> strcmp(QMS.QuadFamily,<span class="string">'QF'</span>) == 1
+0267         <span class="keyword">if</span> 1
+0268             <span class="comment">% Bipolar method</span>
+0269             QMS.ModulationMethod = <span class="string">'bipolar'</span>;
+0270             QMS.QuadDelta = .75;
+0271             QMS.CorrDelta = 3.0;  <span class="comment">% was 0.75 1.0  If using MEC, this will get overwritten by the MaxOrbit condition.</span>
+0272             MaxOrbit = .5;
+0273         <span class="keyword">else</span>
+0274             <span class="comment">% Sweep method</span>
+0275             QMS.NumberOfPoints = 5;
+0276             QMS.ModulationMethod = <span class="string">'sweep'</span>;
+0277             QMS.QuadDelta = .5;
+0278             QMS.CorrDelta = 3;    <span class="comment">%  If using MEC, this will get overwritten by the MaxOrbit condition.</span>
+0279             MaxOrbit = .5;
+0280         <span class="keyword">end</span>
+0281     <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QD'</span>) == 1
+0282         QMS.ModulationMethod = <span class="string">'bipolar'</span>;
+0283         QMS.QuadDelta = 1.;
+0284         QMS.CorrDelta = 3;    <span class="comment">%  If using MEC, this will get overwritten by the MaxOrbit condition.</span>
+0285         MaxOrbit = .5;
+0286     <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QDA'</span>) == 1
+0287         QMS.ModulationMethod = <span class="string">'bipolar'</span>;
+0288         QMS.QuadDelta = 2.5;  <span class="comment">% was 2.0, 2.5</span>
+0289         QMS.CorrDelta = 2.0;  <span class="comment">% 1.5, 0.75, 2.5</span>
+0290         MaxOrbit = .5;
+0291     <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QFA'</span>) == 1
+0292         <span class="comment">% QuadDelta is for the model, in the machine a shunt is used</span>
+0293         QMS.ModulationMethod = <span class="string">'unipolar'</span>;
+0294         <span class="keyword">if</span> any(strcmpi(getfamilydata(QMS.QuadFamily, <span class="string">'Setpoint'</span>, <span class="string">'Mode'</span>, QMS.QuadDev), {<span class="string">'Simulator'</span>, <span class="string">'Model'</span>}))
+0295             QMS.QuadDelta = 13.0;     <span class="comment">% Simulator  13 amp for 1 shunt, 26 amps for both</span>
+0296         <span class="keyword">else</span>
+0297             QMS.QuadDelta = 1.0;     <span class="comment">% QFA quad must be 1 or 2 if online  (both shunts hits a resonance!!!)</span>
+0298         <span class="keyword">end</span>
+0299         QMS.CorrDelta = 4.0;
+0300         MaxOrbit = 0.75;       <span class="comment">% was 1.0</span>
+0301     <span class="keyword">else</span>
+0302         error(<span class="string">'QuadFamily error.'</span>);
+0303     <span class="keyword">end</span>
+0304 
+0305     <span class="comment">% Find corrector the bump the beam in the quadrupole</span>
+0306     <span class="keyword">switch</span> CorrMethod
+0307         <span class="keyword">case</span> <span class="string">'Fixed'</span>
+0308             <span class="comment">% Old QMS method</span>
+0309             <span class="keyword">if</span> strcmp(QMS.QuadFamily,<span class="string">'QF'</span>)==1 || strcmp(QMS.QuadFamily,<span class="string">'QD'</span>)==1
+0310                 <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0311                     QMS.CorrDevList = [QMS.QuadDev(1) 2];
+0312                 <span class="keyword">else</span>
+0313                     QMS.CorrDevList = [QMS.QuadDev(1) 7];
+0314                 <span class="keyword">end</span>
+0315             <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QDA'</span>)==1
+0316                 <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0317                     QMS.CorrDevList = [QMS.QuadDev(1) 4];
+0318                 <span class="keyword">else</span>
+0319                     QMS.CorrDevList = [QMS.QuadDev(1) 5];
+0320                 <span class="keyword">end</span>
+0321             <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QFA'</span>)==1
+0322                 <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0323                     QMS.CorrDevList = [QMS.QuadDev(1) 2];
+0324                 <span class="keyword">else</span>
+0325                     QMS.CorrDevList = [QMS.QuadDev(1) 7];
+0326                 <span class="keyword">end</span>
+0327             <span class="keyword">end</span>
+0328             
+0329         <span class="keyword">case</span> <span class="string">'MEC'</span>
+0330             <span class="comment">% Pick the corrector based on the most effective corrector in the response matrix</span>
+0331 
+0332             <span class="comment">% Only use corrector 10's</span>
+0333             HCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>,<span class="string">'10'</span>);
+0334             VCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>,<span class="string">'10'</span>);
+0335 
+0336             <span class="comment">% Remove the CM next to the quad</span>
+0337             CMDevRemove = <a href="#_sub1" class="code" title="subfunction CorrDevList = quad2cm(QMS)">quad2cm</a>(QMS);
+0338             i = findrowindex(CMDevRemove, HCMlist);
+0339             HCMlist(i,:) = [];
+0340             i = findrowindex(CMDevRemove, VCMlist);
+0341             VCMlist(i,:) = [];
+0342 
+0343             <span class="comment">% Base MEC on the response matrix</span>
+0344             R = getbpmresp(<span class="string">'BPMx'</span>, [], <span class="string">'BPMy'</span>, [], <span class="string">'HCM'</span>, HCMlist, <span class="string">'VCM'</span>, VCMlist, <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0345             <span class="comment">%R = getbpmresp('Struct','Physics');</span>
+0346 
+0347             [i, iNotFound] = findrowindex(QMS.BPMDev, R(2,2).Monitor.DeviceList);
+0348             m = R(2,2).Data(i,:);
+0349             [MaxValue10, j] = max(abs(m));
+0350             CorrDevList10 = R(2,2).Actuator.DeviceList(j,:);
+0351 
+0352 
+0353             <span class="comment">% Use all 1278</span>
+0354             HCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>,<span class="string">'1 2 7 8'</span>);
+0355             VCMlist = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>,<span class="string">'1 2 7 8'</span>);
+0356 
+0357             <span class="comment">% Remove the CM next to the quad</span>
+0358             CMDevRemove = <a href="#_sub1" class="code" title="subfunction CorrDevList = quad2cm(QMS)">quad2cm</a>(QMS);
+0359             i = findrowindex(CMDevRemove, HCMlist);
+0360             HCMlist(i,:) = [];
+0361             i = findrowindex(CMDevRemove, VCMlist);
+0362             VCMlist(i,:) = [];
+0363 
+0364             <span class="comment">% Base MEC on the response matrix</span>
+0365             R = getbpmresp(<span class="string">'BPMx'</span>, [], <span class="string">'BPMy'</span>, [], <span class="string">'HCM'</span>, HCMlist, <span class="string">'VCM'</span>, VCMlist, <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0366             <span class="comment">%R = getbpmresp('Struct','Physics');</span>
+0367 
+0368             [i, iNotFound] = findrowindex(QMS.BPMDev, R(2,2).Monitor.DeviceList);
+0369             m = R(2,2).Data(i,:);
+0370             [MaxValue, j] = max(abs(m));
+0371             QMS.CorrDevList = R(2,2).Actuator.DeviceList(j,:);
+0372             
+0373             
+0374             <span class="comment">%if abs(MaxValue10) &gt; .75 * abs(MaxValue)</span>
+0375             <span class="comment">%    % Use the corrector at position 10 if it's a pretty good corrector</span>
+0376             <span class="comment">%    QMS.CorrDelta = 10;</span>
+0377             <span class="comment">%    QMS.CorrDevList = CorrDevList10;</span>
+0378             <span class="comment">%end</span>
+0379             
+0380             <span class="keyword">if</span> 1
+0381                 <span class="comment">% Corrector delta based on response matrix and desired change at the BPM</span>
+0382                 R = getrespmat(<span class="string">'BPMy'</span>, QMS.BPMDev, <span class="string">'VCM'</span>, QMS.CorrDevList, <span class="string">'Hardware'</span>, <span class="string">'Numeric'</span>);
+0383                 <span class="keyword">if</span> any(R==0)
+0384                     fprintf(<span class="string">'VCM(%d,%d) to BPMy(%d,%d) response is zero.\n'</span>, QMS.CorrDevList, QMS.BPMDev);
+0385                     error(<span class="string">'Response matrix lookup problem.'</span>);
+0386                 <span class="keyword">else</span>
+0387                     QMS.CorrDelta = MaxOrbit / R;  <span class="comment">% +/- mm</span>
+0388                 <span class="keyword">end</span>
+0389             <span class="keyword">end</span>
+0390 
+0391         <span class="keyword">case</span> <span class="string">'LocalBump'</span>
+0392             <span class="comment">% Local bump corrector method</span>
+0393             [OCS, RF, OCS0] = setorbitbump(<span class="string">'BPMy'</span>, QMS.BPMDev, .25, <span class="string">'VCM'</span>, [-2 -1 1 2], <span class="string">'NoSetSP'</span>);
+0394             QMS.CorrDelta = OCS.CM.Data - OCS0.CM.Data;
+0395             <span class="comment">%[OCS, RF, OCS0] = setorbitbump('BPMy', QMS.BPMDev, .25, 'VCM', [-2 -1 1 2], 'Display');</span>
+0396             <span class="comment">%setsp(OCS0.CM);</span>
+0397             <span class="comment">%QMS.CorrDelta = OCS.CM.Data - OCS0.CM.Data;</span>
+0398             QMS.CorrDevList = OCS.CM.DeviceList;
+0399             
+0400         <span class="keyword">otherwise</span>
+0401             error(<span class="string">'Corrector method unknown.'</span>);
+0402     <span class="keyword">end</span>
+0403 
+0404 <span class="keyword">else</span>
+0405     error(<span class="string">'QMS.QuadPlane must be 1 or 2'</span>);
+0406 <span class="keyword">end</span>
+0407 
+0408 
+0409 QMS.CreatedBy = <span class="string">'quadcenterinit'</span>;
+0410 QMS = orderfields(QMS);
+0411 
+0412 
+0413 
+0414 
+0415 
+0416 
+0417 <a name="_sub1" href="#_subfunctions" class="code">function CorrDevList = quad2cm(QMS)</a>
+0418 <span class="keyword">if</span> strcmp(QMS.QuadFamily,<span class="string">'QF'</span>)==1 || strcmp(QMS.QuadFamily,<span class="string">'QD'</span>)==1
+0419     <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0420         CorrDevList = [QMS.QuadDev(1) 1; QMS.QuadDev(1) 2];
+0421     <span class="keyword">else</span>
+0422         CorrDevList = [QMS.QuadDev(1) 7; QMS.QuadDev(1) 8];
+0423     <span class="keyword">end</span>
+0424 <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QDA'</span>)==1
+0425     <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0426         CorrDevList = [QMS.QuadDev(1) 4];
+0427     <span class="keyword">else</span>
+0428         CorrDevList = [QMS.QuadDev(1) 5];
+0429     <span class="keyword">end</span>
+0430 <span class="keyword">elseif</span> strcmp(QMS.QuadFamily,<span class="string">'QFA'</span>)==1
+0431     <span class="keyword">if</span> QMS.QuadDev(1,2) == 1
+0432         CorrDevList = [QMS.QuadDev(1) 2];
+0433     <span class="keyword">else</span>
+0434         CorrDevList = [QMS.QuadDev(1) 7];
+0435     <span class="keyword">end</span>
+0436 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

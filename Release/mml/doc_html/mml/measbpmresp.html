@@ -1,0 +1,1404 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measbpmresp</title>
+  <meta name="keywords" content="measbpmresp">
+  <meta name="description" content="MEASBPMRESP - Measures the BPM response matrix in the horizontal and vertical planes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measbpmresp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measbpmresp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASBPMRESP - Measures the BPM response matrix in the horizontal and vertical planes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Rmat, OutputFileName] = measbpmresp(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MEASBPMRESP - Measures the BPM response matrix in the horizontal and vertical planes
+
+  For family name, device list inputs:
+  [R, FileName] = measbpmresp(BPMxFamily, BPMxList, BPMyFamily, BPMyList, HCMFamily, HCMList, VCMFamily, VCMList, HCMKicks, VCMKicks, ModulationMethod, WaitFlag, FileName, DirectoryName, ExtraDelay)
+
+  For data structure inputs: 
+  [R, FileName] = measbpmresp(BPMxStruct, BPMyStruct, HCMStruct, VCMStruct, HCMKicks, VCMKicks, ModulationMethod, WaitFlag, FileName, DirectoryName, ExtraDelay)
+
+  INPUTS
+  1. BPMxFamily       - BPMx family name {Default: gethbpmfamily}
+     BPMxDeviceList   - BPMx device list {Default: all devices with good status}
+     or 
+     BPMxStruct can replace BPMxFamily and BPMxList
+
+  2. BPMyFamily       - BPMy family name {Default: getvbpmfamily}
+     BPMyDeviceList   - BPMy device list {Default: all devices with good status}
+     or 
+     BPMyStruct can replace BPMyFamily and BPMyList
+
+  3. HCMFamily       - HCM family name {Default: gethcmfamily}
+     HCMDeviceList   - HCM device list {Default: all devices with good status}
+     or 
+     HCMStruct can replace HCMFamily and HCMList
+
+  4. VCMFamily       - VCM family name {Default: getvcmfamily}
+     VCMDeviceList   - VCM device list {Default: all devices with good status}
+     or 
+     VCMStruct can replace VCMFamily and VCMList
+
+  5. HCMKicks - Change in HCM correctors {Default: getfamilydata(HCMFamily,'Setpoint','DeltaRespMat',HCMDeviceList), then .05 mrad}
+  6. VCMKicks - Change in VCM correctors {Default: getfamilydata(VCMFamily,'Setpoint','DeltaRespMat',VCMDeviceList), then .05 mrad}
+
+  7. ModulationMethod - Method for changing the ActuatorFamily
+                       'bipolar' changes the ActuatorFamily by +/- ActuatorDelta/2 on each step {Default}
+                       'unipolar' changes the ActuatorFamily from 0 to ActuatorDelta on each step
+
+  8. WaitFlag - (see setpv for WaitFlag definitions) {Default: []}
+                WaitFlag = -5 will override gets to manual mode
+
+  9. Optional input to change the default filename and directory
+     FileName - Filename for the response matrix data
+                (Empty prompts for a filename)  
+     DirectoryName - Directory name to store the response matrix data file 
+     Note: a. FileName can include the path if DirectoryName is not used
+           b. For model response matrices, FileName must exist for a file save
+           c. The 'Achive' flag is another way to input the filename
+
+  10. ExtraDelay - extra time delay [seconds] after a setpoint change
+
+  11. 'Struct'  - Output will be a response matrix structure {Default for     data structure inputs}
+      'Numeric' - Output will be a numeric matrix            {Default for non-data structure inputs}
+
+  12. Optional override of the units:
+      'Physics'  - Use physics  units
+      'Hardware' - Use hardware units
+
+  13. Optional override of the mode:
+      'Online'    - Set/Get data online  
+      'Model'     - Set/Get data directly from AT (uses locoresponsematrix)
+      'Simulator' - Set/Get data on the simulated accelerator using AT (ie, same commands as 'Online')
+      'Manual'    - Set/Get data manually
+
+  14. 'Display'   - Prints status information to the command window {Default}
+      'NoDisplay' - Nothing is printed to the command window
+
+  15. 'NoArchive' - No file archive
+      'Archive'   - Save the response matrix data to \&lt;Directory.BPMResponse&gt;\&lt;BPMRespFile&gt;&lt;Date&gt;&lt;Time&gt;.mat
+                    To change the filename, included the filename after the 'Archive', '' to browse
+
+  16. 'MinimumBeamCurrent' - Minimum beam current before prompting for a refill
+                             The current (as returned by getdcct) must follow the flag. 
+                             measbpmresp('MinimumBeamCurrent', 32.1) 
+                             will pause at a beam current of 32.1 and prompt for a refill.
+
+  17. Optional inputs when computing model response matrices:
+      'FixedPathLength' or 'FixedMomentum' - hold the path length or momentum fixed  {Default: 'FixedPathLength'}
+      'Full' or 'Linear' - use full nonlinear model or linear approximation (faster) {Default: 'Linear'}
+      Note: The ModulationMethod input (7) is also used for the model calculation.
+
+  OUTPUTS
+  1. R = Orbit response matrix (delta(orbit)/delta(Kick))
+
+     Numeric Output:
+       R = [xx xy
+            yx yy]
+
+     Stucture Output:
+     R(BPM Plane, Corrector Plane) - 2x2 struct array
+     R(1,1).Data=xx;  % Kick x, look x
+     R(2,1).Data=yx;  % Kick x, look y
+     R(1,2).Data=xy;  % Kick y, look x
+     R(2,2).Data=yy;  % Kick y, look y
+           
+     R(Monitor, Actuator).Data - Response matrix
+                         .Monitor  - BPM data structure (starting orbit)
+                         .Monitor1 - BPM matrix (first  data point)
+                         .Monitor2 - BPM matrix (second data point)
+                         .Actuator - Corrector data structure
+                         .ActuatorDelta - Corrector kick vector
+                         .GeV - Electron beam energy
+                         .ModulationMethod - 'unipolar' or 'bipolar'
+                         .WaitFlag - Wait flag used when acquiring data
+                         .ExtraDelay - Extra time delay 
+                         .TimeStamp
+                         .CreatedBy
+                         .DCCT
+
+  2. FileName = File name (including directory) where the data was saved (if applicable)
+                (a machine configuration structure is saved in the data file as well)
+
+  NOTES
+  1. [] can be used on any input to obtain the default setting.
+     However, most inputs can be left out altogether to get the default.
+  2. For Mode = 'Model':
+     a. AT family names (or 'All') can be used and DeviceList is ignored
+     b. There is a lot of flexibility for getting response matrices, for instance,
+        R = measbpmresp('QF', 'QD', 'HCM', 'VCM', 'Model', 'Physics');
+        is the response matrix from the correctors to orbit at the sextupoles.
+        The units when using nonstandard families for BPMs is always 'physics', meter/radian.  
+  3. Cell inputs are not allowed.
+  4. BPM roll and crunch and corrector magnet roll errors are included only if they are 
+     in the AT model (field .GCR for BPMs and .Roll for correctors). 
+     BPM and corrector magnet gains are included in hardware units (not physics units). 
+  5. This function measures response matrices from 2 BPM families to 2 corrector families.  
+     If only one family is needed then use measrespmat.
+
+  EXAMPLES
+  1. Default:
+       R = measbpmresp;
+       is the same as,
+       R = measbpmresp(gethbpmfamily, getvbpmfamily, gethcmfamily, getvcmfamily, 'Online', 'Bipolar', 'Numeric', 'Archive');
+
+  2. Default using the model:
+       R = measbpmresp('Model');
+       is the same as,
+       R = measbpmresp(gethbpmfamily, getvbpmfamily, gethcmfamily, getvcmfamily, 'Model', 'Bipolar', 'Numeric', 'NoArchive', 'FixedPathLength', 'Linear');
+
+  3. Compare measured (or Default) and model BPM response
+     Rmeas  = getbpmresp;
+     Rmodel = measbpmresp('Model');
+     subplot(2,1,1);
+     surf(Rmeas);  title('Default BPM Response'); xlabel('BPM #'); ylabel('CM #'); zlabel('[mm/amp]');
+     subplot(2,1,2);
+     surf(Rmeas-Rmodel);  title('Default - Model BPM Response'); xlabel('BPM #'); ylabel('CM #'); zlabel('[mm/amp]');
+
+  See also <a href="getbpmresp.html" class="code" title="function [S, FileName] = getbpmresp(varargin)">getbpmresp</a>, <a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>, <a href="meastuneresp.html" class="code" title="function [Rmat, OutputFileName] = meastuneresp(varargin)">meastuneresp</a>, <a href="measchroresp.html" class="code" title="function [Rmat, OutputFileName] = measchroresp(varargin)">measchroresp</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>	GETMACHINECONFIG - Returns or saves to file the present storage ring setpoints and monitors</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li><li><a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>	GETVCMFAMILY - Returns the default vertical corrector family</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>	ISMEMBEROF - Returns turn if the membership information of a family (cell of strings)</li><li><a href="isstoragering.html" class="code" title="function Test = isstoragering">isstoragering</a>	ISSTORAGERING - Is this a storage ring?</li><li><a href="istransport.html" class="code" title="function Test = istransport">istransport</a>	ISTRANSPORT - Is this a transport line?</li><li><a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>	MEASRESPMAT - Measure a response matrix</li><li><a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>	PHYSICS2HW - Converts from 'Physics' units to 'Hardware' units</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="bpmresp2loco.html" class="code" title="function [R, Data, DataMM] = bpmresp2loco(R)">bpmresp2loco</a>	BPMRESP2LOCO - Convert a MML response matrix to LOCO units</li><li><a href="buildopsdatafiles.html" class="code" title="function buildopsdatafiles">buildopsdatafiles</a>	BUILDOPSDATAFILES - Builds the files for the OpsData directory from the model</li><li><a href="getbpmresp.html" class="code" title="function [S, FileName] = getbpmresp(varargin)">getbpmresp</a>	GETBPMRESP - Returns the BPM response matrix in the horizontal and vertical planes</li><li><a href="measlocodata.html" class="code" title="function measlocodata(varargin)">measlocodata</a>	MEASLOCODATA - Measures a set of LOCO data</li><li><a href="orbitcorrectionmethods.html" class="code" title="function [OCS, SmatNoWeights, S, U, V] = orbitcorrectionmethods(OCS, Smat, S, U, V)">orbitcorrectionmethods</a>	ORBITCORRECTIONMETHODS - Some the orbit correction methods used on light sources</li><li><a href="plotbpmresp.html" class="code" title="function plotbpmresp(varargin)">plotbpmresp</a>	PLOTBPMRESP - Plots the orbit response matrix in various ways</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Rmat, OutputFileName] = measbpmresp(varargin)</a>
+0002 <span class="comment">%MEASBPMRESP - Measures the BPM response matrix in the horizontal and vertical planes</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  For family name, device list inputs:</span>
+0005 <span class="comment">%  [R, FileName] = measbpmresp(BPMxFamily, BPMxList, BPMyFamily, BPMyList, HCMFamily, HCMList, VCMFamily, VCMList, HCMKicks, VCMKicks, ModulationMethod, WaitFlag, FileName, DirectoryName, ExtraDelay)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  For data structure inputs:</span>
+0008 <span class="comment">%  [R, FileName] = measbpmresp(BPMxStruct, BPMyStruct, HCMStruct, VCMStruct, HCMKicks, VCMKicks, ModulationMethod, WaitFlag, FileName, DirectoryName, ExtraDelay)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  INPUTS</span>
+0011 <span class="comment">%  1. BPMxFamily       - BPMx family name {Default: gethbpmfamily}</span>
+0012 <span class="comment">%     BPMxDeviceList   - BPMx device list {Default: all devices with good status}</span>
+0013 <span class="comment">%     or</span>
+0014 <span class="comment">%     BPMxStruct can replace BPMxFamily and BPMxList</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  2. BPMyFamily       - BPMy family name {Default: getvbpmfamily}</span>
+0017 <span class="comment">%     BPMyDeviceList   - BPMy device list {Default: all devices with good status}</span>
+0018 <span class="comment">%     or</span>
+0019 <span class="comment">%     BPMyStruct can replace BPMyFamily and BPMyList</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%  3. HCMFamily       - HCM family name {Default: gethcmfamily}</span>
+0022 <span class="comment">%     HCMDeviceList   - HCM device list {Default: all devices with good status}</span>
+0023 <span class="comment">%     or</span>
+0024 <span class="comment">%     HCMStruct can replace HCMFamily and HCMList</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  4. VCMFamily       - VCM family name {Default: getvcmfamily}</span>
+0027 <span class="comment">%     VCMDeviceList   - VCM device list {Default: all devices with good status}</span>
+0028 <span class="comment">%     or</span>
+0029 <span class="comment">%     VCMStruct can replace VCMFamily and VCMList</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  5. HCMKicks - Change in HCM correctors {Default: getfamilydata(HCMFamily,'Setpoint','DeltaRespMat',HCMDeviceList), then .05 mrad}</span>
+0032 <span class="comment">%  6. VCMKicks - Change in VCM correctors {Default: getfamilydata(VCMFamily,'Setpoint','DeltaRespMat',VCMDeviceList), then .05 mrad}</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">%  7. ModulationMethod - Method for changing the ActuatorFamily</span>
+0035 <span class="comment">%                       'bipolar' changes the ActuatorFamily by +/- ActuatorDelta/2 on each step {Default}</span>
+0036 <span class="comment">%                       'unipolar' changes the ActuatorFamily from 0 to ActuatorDelta on each step</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">%  8. WaitFlag - (see setpv for WaitFlag definitions) {Default: []}</span>
+0039 <span class="comment">%                WaitFlag = -5 will override gets to manual mode</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%  9. Optional input to change the default filename and directory</span>
+0042 <span class="comment">%     FileName - Filename for the response matrix data</span>
+0043 <span class="comment">%                (Empty prompts for a filename)</span>
+0044 <span class="comment">%     DirectoryName - Directory name to store the response matrix data file</span>
+0045 <span class="comment">%     Note: a. FileName can include the path if DirectoryName is not used</span>
+0046 <span class="comment">%           b. For model response matrices, FileName must exist for a file save</span>
+0047 <span class="comment">%           c. The 'Achive' flag is another way to input the filename</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">%  10. ExtraDelay - extra time delay [seconds] after a setpoint change</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">%  11. 'Struct'  - Output will be a response matrix structure {Default for     data structure inputs}</span>
+0052 <span class="comment">%      'Numeric' - Output will be a numeric matrix            {Default for non-data structure inputs}</span>
+0053 <span class="comment">%</span>
+0054 <span class="comment">%  12. Optional override of the units:</span>
+0055 <span class="comment">%      'Physics'  - Use physics  units</span>
+0056 <span class="comment">%      'Hardware' - Use hardware units</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">%  13. Optional override of the mode:</span>
+0059 <span class="comment">%      'Online'    - Set/Get data online</span>
+0060 <span class="comment">%      'Model'     - Set/Get data directly from AT (uses locoresponsematrix)</span>
+0061 <span class="comment">%      'Simulator' - Set/Get data on the simulated accelerator using AT (ie, same commands as 'Online')</span>
+0062 <span class="comment">%      'Manual'    - Set/Get data manually</span>
+0063 <span class="comment">%</span>
+0064 <span class="comment">%  14. 'Display'   - Prints status information to the command window {Default}</span>
+0065 <span class="comment">%      'NoDisplay' - Nothing is printed to the command window</span>
+0066 <span class="comment">%</span>
+0067 <span class="comment">%  15. 'NoArchive' - No file archive</span>
+0068 <span class="comment">%      'Archive'   - Save the response matrix data to \&lt;Directory.BPMResponse&gt;\&lt;BPMRespFile&gt;&lt;Date&gt;&lt;Time&gt;.mat</span>
+0069 <span class="comment">%                    To change the filename, included the filename after the 'Archive', '' to browse</span>
+0070 <span class="comment">%</span>
+0071 <span class="comment">%  16. 'MinimumBeamCurrent' - Minimum beam current before prompting for a refill</span>
+0072 <span class="comment">%                             The current (as returned by getdcct) must follow the flag.</span>
+0073 <span class="comment">%                             measbpmresp('MinimumBeamCurrent', 32.1)</span>
+0074 <span class="comment">%                             will pause at a beam current of 32.1 and prompt for a refill.</span>
+0075 <span class="comment">%</span>
+0076 <span class="comment">%  17. Optional inputs when computing model response matrices:</span>
+0077 <span class="comment">%      'FixedPathLength' or 'FixedMomentum' - hold the path length or momentum fixed  {Default: 'FixedPathLength'}</span>
+0078 <span class="comment">%      'Full' or 'Linear' - use full nonlinear model or linear approximation (faster) {Default: 'Linear'}</span>
+0079 <span class="comment">%      Note: The ModulationMethod input (7) is also used for the model calculation.</span>
+0080 <span class="comment">%</span>
+0081 <span class="comment">%  OUTPUTS</span>
+0082 <span class="comment">%  1. R = Orbit response matrix (delta(orbit)/delta(Kick))</span>
+0083 <span class="comment">%</span>
+0084 <span class="comment">%     Numeric Output:</span>
+0085 <span class="comment">%       R = [xx xy</span>
+0086 <span class="comment">%            yx yy]</span>
+0087 <span class="comment">%</span>
+0088 <span class="comment">%     Stucture Output:</span>
+0089 <span class="comment">%     R(BPM Plane, Corrector Plane) - 2x2 struct array</span>
+0090 <span class="comment">%     R(1,1).Data=xx;  % Kick x, look x</span>
+0091 <span class="comment">%     R(2,1).Data=yx;  % Kick x, look y</span>
+0092 <span class="comment">%     R(1,2).Data=xy;  % Kick y, look x</span>
+0093 <span class="comment">%     R(2,2).Data=yy;  % Kick y, look y</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">%     R(Monitor, Actuator).Data - Response matrix</span>
+0096 <span class="comment">%                         .Monitor  - BPM data structure (starting orbit)</span>
+0097 <span class="comment">%                         .Monitor1 - BPM matrix (first  data point)</span>
+0098 <span class="comment">%                         .Monitor2 - BPM matrix (second data point)</span>
+0099 <span class="comment">%                         .Actuator - Corrector data structure</span>
+0100 <span class="comment">%                         .ActuatorDelta - Corrector kick vector</span>
+0101 <span class="comment">%                         .GeV - Electron beam energy</span>
+0102 <span class="comment">%                         .ModulationMethod - 'unipolar' or 'bipolar'</span>
+0103 <span class="comment">%                         .WaitFlag - Wait flag used when acquiring data</span>
+0104 <span class="comment">%                         .ExtraDelay - Extra time delay</span>
+0105 <span class="comment">%                         .TimeStamp</span>
+0106 <span class="comment">%                         .CreatedBy</span>
+0107 <span class="comment">%                         .DCCT</span>
+0108 <span class="comment">%</span>
+0109 <span class="comment">%  2. FileName = File name (including directory) where the data was saved (if applicable)</span>
+0110 <span class="comment">%                (a machine configuration structure is saved in the data file as well)</span>
+0111 <span class="comment">%</span>
+0112 <span class="comment">%  NOTES</span>
+0113 <span class="comment">%  1. [] can be used on any input to obtain the default setting.</span>
+0114 <span class="comment">%     However, most inputs can be left out altogether to get the default.</span>
+0115 <span class="comment">%  2. For Mode = 'Model':</span>
+0116 <span class="comment">%     a. AT family names (or 'All') can be used and DeviceList is ignored</span>
+0117 <span class="comment">%     b. There is a lot of flexibility for getting response matrices, for instance,</span>
+0118 <span class="comment">%        R = measbpmresp('QF', 'QD', 'HCM', 'VCM', 'Model', 'Physics');</span>
+0119 <span class="comment">%        is the response matrix from the correctors to orbit at the sextupoles.</span>
+0120 <span class="comment">%        The units when using nonstandard families for BPMs is always 'physics', meter/radian.</span>
+0121 <span class="comment">%  3. Cell inputs are not allowed.</span>
+0122 <span class="comment">%  4. BPM roll and crunch and corrector magnet roll errors are included only if they are</span>
+0123 <span class="comment">%     in the AT model (field .GCR for BPMs and .Roll for correctors).</span>
+0124 <span class="comment">%     BPM and corrector magnet gains are included in hardware units (not physics units).</span>
+0125 <span class="comment">%  5. This function measures response matrices from 2 BPM families to 2 corrector families.</span>
+0126 <span class="comment">%     If only one family is needed then use measrespmat.</span>
+0127 <span class="comment">%</span>
+0128 <span class="comment">%  EXAMPLES</span>
+0129 <span class="comment">%  1. Default:</span>
+0130 <span class="comment">%       R = measbpmresp;</span>
+0131 <span class="comment">%       is the same as,</span>
+0132 <span class="comment">%       R = measbpmresp(gethbpmfamily, getvbpmfamily, gethcmfamily, getvcmfamily, 'Online', 'Bipolar', 'Numeric', 'Archive');</span>
+0133 <span class="comment">%</span>
+0134 <span class="comment">%  2. Default using the model:</span>
+0135 <span class="comment">%       R = measbpmresp('Model');</span>
+0136 <span class="comment">%       is the same as,</span>
+0137 <span class="comment">%       R = measbpmresp(gethbpmfamily, getvbpmfamily, gethcmfamily, getvcmfamily, 'Model', 'Bipolar', 'Numeric', 'NoArchive', 'FixedPathLength', 'Linear');</span>
+0138 <span class="comment">%</span>
+0139 <span class="comment">%  3. Compare measured (or Default) and model BPM response</span>
+0140 <span class="comment">%     Rmeas  = getbpmresp;</span>
+0141 <span class="comment">%     Rmodel = measbpmresp('Model');</span>
+0142 <span class="comment">%     subplot(2,1,1);</span>
+0143 <span class="comment">%     surf(Rmeas);  title('Default BPM Response'); xlabel('BPM #'); ylabel('CM #'); zlabel('[mm/amp]');</span>
+0144 <span class="comment">%     subplot(2,1,2);</span>
+0145 <span class="comment">%     surf(Rmeas-Rmodel);  title('Default - Model BPM Response'); xlabel('BPM #'); ylabel('CM #'); zlabel('[mm/amp]');</span>
+0146 <span class="comment">%</span>
+0147 <span class="comment">%  See also getbpmresp, measrespmat, meastuneresp, measchroresp</span>
+0148 
+0149 <span class="comment">%  Written by Greg Portmann</span>
+0150 
+0151 
+0152 <span class="comment">% Initialize defaults</span>
+0153 BPMxFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>; 
+0154 BPMxList = [];
+0155 
+0156 BPMyFamily = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;
+0157 BPMyList = [];
+0158 
+0159 HCMFamily = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0160 HCMList = [];
+0161 HCMKicks = [];
+0162 Default2HCMKick = .05e-3;  <span class="comment">% Radians, if getfamilydata(HCMFamily,'Setpoint','DeltaRespMat') is empty</span>
+0163 
+0164 VCMFamily = <a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>;
+0165 VCMList = [];
+0166 VCMKicks = [];
+0167 Default2VCMKick = .05e-3;  <span class="comment">% Radians, if getfamilydata(VCMFamily,'Setpoint','DeltaRespMat') is empty</span>
+0168 ModulationMethod = <span class="string">'bipolar'</span>;
+0169 
+0170 <span class="comment">% Map MML to LOCO naming</span>
+0171 <span class="keyword">if</span> strcmpi(ModulationMethod, <span class="string">'bipolar'</span>)
+0172     LOCORespFlags.ResponseMatrixMeasurement = <span class="string">'Bidirectional'</span>;   <span class="comment">% 'oneway'' or ''bidirectional'</span>
+0173 <span class="keyword">else</span>
+0174     LOCORespFlags.DispersionMeasurement     = <span class="string">'Bidirectional'</span>;
+0175 <span class="keyword">end</span>
+0176 <span class="keyword">if</span> <a href="isstoragering.html" class="code" title="function Test = isstoragering">isstoragering</a>
+0177     LOCORespFlags.ResponseMatrixCalculator  = <span class="string">'Linear'</span>;
+0178     LOCORespFlags.ClosedOrbitType           = <span class="string">'fixedpathlength'</span>;
+0179     LOCORespFlags.MachineType               = <span class="string">'StorageRing'</span>;
+0180 <span class="keyword">else</span>
+0181     <span class="comment">% Full is usually as fast as Linear for transport lines</span>
+0182     LOCORespFlags.ResponseMatrixCalculator  = <span class="string">'full'</span>;
+0183     LOCORespFlags.ClosedOrbitType           = <span class="string">'fixedmomentum'</span>;
+0184     LOCORespFlags.MachineType               = <span class="string">'Transport'</span>;
+0185 <span class="keyword">end</span>
+0186 
+0187 WaitFlag = -2;
+0188 ExtraDelay = 0; 
+0189 StructOutputFlag = 0;
+0190 NumericOutputFlag = 0;
+0191 DisplayFlag = -1;
+0192 ArchiveFlag = -1;
+0193 FileName = -1;
+0194 DirectoryName = <span class="string">''</span>;
+0195 ModeFlag = <span class="string">''</span>;  <span class="comment">% model, online, manual, or '' for default mode</span>
+0196 UnitsFlag = <span class="string">''</span>; <span class="comment">% hardware, physics, or '' for default units</span>
+0197 
+0198 InputFlags = {};
+0199 DCCTFlag = {};
+0200 <span class="keyword">for</span> i = length(varargin):-1:1
+0201     <span class="keyword">if</span> isstruct(varargin{i})
+0202         <span class="comment">% Ignor structures</span>
+0203     <span class="keyword">elseif</span> iscell(varargin{i})
+0204         <span class="comment">% Ignor cells</span>
+0205     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Struct'</span>)
+0206         StructOutputFlag = 1;
+0207         varargin(i) = [];
+0208     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Numeric'</span>)
+0209         StructOutputFlag = 0;
+0210         NumericOutputFlag = 1;
+0211         varargin(i) = [];
+0212     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Model'</span>)
+0213         ModeFlag = varargin{i};
+0214         InputFlags = [InputFlags varargin(i)];
+0215         varargin(i) = [];
+0216     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Simulator'</span>)
+0217         ModeFlag = varargin{i};
+0218         InputFlags = [InputFlags varargin(i)];
+0219         varargin(i) = [];
+0220     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0221         ModeFlag = varargin{i};
+0222         InputFlags = [InputFlags varargin(i)];
+0223         varargin(i) = [];
+0224     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0225         ModeFlag = varargin{i};
+0226         InputFlags = [InputFlags varargin(i)];
+0227         varargin(i) = [];
+0228     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Physics'</span>)
+0229         UnitsFlag = varargin{i};
+0230         InputFlags = [InputFlags varargin(i)];
+0231         varargin(i) = [];
+0232     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0233         UnitsFlag = varargin{i};
+0234         InputFlags = [InputFlags varargin(i)];
+0235         varargin(i) = [];
+0236     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Archive'</span>)
+0237         ArchiveFlag = 1;
+0238         <span class="keyword">if</span> length(varargin) &gt; i
+0239             <span class="comment">% Look for a filename as the next input</span>
+0240             <span class="keyword">if</span> ischar(varargin{i+1})
+0241                 FileName = varargin{i+1};
+0242                 varargin(i+1) = [];
+0243             <span class="keyword">end</span>
+0244         <span class="keyword">end</span>
+0245         varargin(i) = [];
+0246     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoArchive'</span>)
+0247         ArchiveFlag = 0;
+0248         varargin(i) = [];
+0249     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0250         DisplayFlag = 0;
+0251         InputFlags = [InputFlags varargin(i)];
+0252         varargin(i) = [];
+0253     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0254         DisplayFlag = 1;
+0255         InputFlags = [InputFlags varargin(i)];
+0256         varargin(i) = [];
+0257 
+0258     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'unipolar'</span>) || strcmpi(varargin{i},<span class="string">'oneway'</span>)
+0259         ModulationMethod = <span class="string">'unipolar'</span>;
+0260         LOCORespFlags.ResponseMatrixMeasurement = <span class="string">'oneway'</span>;
+0261         varargin(i) = [];
+0262     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'bipolar'</span>) || strcmpi(varargin{i},<span class="string">'bidirectional'</span>)
+0263         ModulationMethod = <span class="string">'bipolar'</span>;
+0264         LOCORespFlags.ResponseMatrixMeasurement = <span class="string">'bidirectional'</span>;
+0265         varargin(i) = [];
+0266 
+0267     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'FixedPathLength'</span>)
+0268         LOCORespFlags.ClosedOrbitType = <span class="string">'FixedPathLength'</span>;
+0269         varargin(i) = [];
+0270     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'FixedMomentum'</span>)
+0271         LOCORespFlags.ClosedOrbitType = <span class="string">'FixedMomentum'</span>;
+0272         varargin(i) = [];
+0273     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Linear'</span>)
+0274         LOCORespFlags.ResponseMatrixCalculator = <span class="string">'Linear'</span>;
+0275         varargin(i) = [];
+0276     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Full'</span>)
+0277         LOCORespFlags.ResponseMatrixCalculator = <span class="string">'Full'</span>;
+0278         varargin(i) = [];
+0279 
+0280     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'MinimumBeamCurrent'</span>)
+0281         DCCTFlag = [varargin(i) varargin(i+1)];
+0282         varargin(i+1) = [];
+0283         varargin(i)   = [];
+0284     <span class="keyword">end</span>
+0285 <span class="keyword">end</span>
+0286 
+0287 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0288 <span class="comment">% Parse Inputs %</span>
+0289 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0290 
+0291 <span class="comment">% Look for BPMx family info</span>
+0292 <span class="keyword">if</span> length(varargin) &gt;= 1
+0293     <span class="keyword">if</span> isstruct(varargin{1})
+0294         BPMxFamily = varargin{1}.FamilyName;
+0295         BPMxList = varargin{1}.DeviceList;
+0296 
+0297         <span class="comment">% For structure inputs, units are determined by the first input</span>
+0298         <span class="keyword">if</span> isempty(UnitsFlag)
+0299             UnitsFlag = varargin{1}.Units;
+0300         <span class="keyword">end</span>
+0301 
+0302         varargin(1) = [];
+0303         
+0304         <span class="comment">% Only change StructOutputFlag if 'Numeric' is not on the input line</span>
+0305         <span class="keyword">if</span> ~NumericOutputFlag
+0306             StructOutputFlag = 1;
+0307         <span class="keyword">end</span>
+0308     <span class="keyword">elseif</span> ischar(varargin{1})
+0309         BPMxFamily = varargin{1};
+0310         varargin(1) = [];
+0311         <span class="keyword">if</span> length(varargin) &gt;= 1
+0312             <span class="keyword">if</span> isnumeric(varargin{1})
+0313                 BPMxList = varargin{1};
+0314                 varargin(1) = [];
+0315             <span class="keyword">end</span>
+0316         <span class="keyword">end</span>
+0317     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0318         BPMxList = varargin{1};
+0319         varargin(1) = [];
+0320     <span class="keyword">end</span>
+0321 <span class="keyword">end</span>
+0322 <span class="keyword">if</span> isempty(BPMxList)
+0323     BPMxList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMxFamily, 1);
+0324 <span class="keyword">end</span>
+0325 
+0326 <span class="comment">% Look for BPMy family info</span>
+0327 <span class="keyword">if</span> length(varargin) &gt;= 1
+0328     <span class="keyword">if</span> isstruct(varargin{1})
+0329         BPMyFamily = varargin{1}.FamilyName;
+0330         BPMyList = varargin{1}.DeviceList;
+0331         varargin(1) = [];
+0332         <span class="keyword">if</span> ~NumericOutputFlag
+0333             StructOutputFlag = 1; <span class="comment">% Only change StructOutputFlag if 'Numeric' is not on the input line</span>
+0334         <span class="keyword">end</span>
+0335     <span class="keyword">elseif</span> ischar(varargin{1})
+0336         BPMyFamily = varargin{1};
+0337         varargin(1) = [];
+0338         <span class="keyword">if</span> length(varargin) &gt;= 1
+0339             <span class="keyword">if</span> isnumeric(varargin{1})
+0340                 BPMyList = varargin{1};
+0341                 varargin(1) = [];
+0342             <span class="keyword">end</span>
+0343         <span class="keyword">end</span>
+0344     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0345         BPMyList = varargin{1};
+0346         varargin(1) = [];
+0347     <span class="keyword">end</span>
+0348 <span class="keyword">end</span>
+0349 <span class="keyword">if</span> isempty(BPMyList)
+0350     BPMyList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMyFamily, 1);
+0351 <span class="keyword">end</span>
+0352 
+0353 <span class="comment">% Look for HCM family info</span>
+0354 <span class="keyword">if</span> length(varargin) &gt;= 1
+0355     <span class="keyword">if</span> isstruct(varargin{1})
+0356         HCMFamily = varargin{1}.FamilyName;
+0357         HCMList = varargin{1}.DeviceList;
+0358         varargin(1) = [];
+0359         <span class="keyword">if</span> ~NumericOutputFlag
+0360             StructOutputFlag = 1; <span class="comment">% Only change StructOutputFlag if 'Numeric' is not on the input line</span>
+0361         <span class="keyword">end</span>
+0362     <span class="keyword">elseif</span> ischar(varargin{1})
+0363         HCMFamily = varargin{1};
+0364         varargin(1) = [];
+0365         <span class="keyword">if</span> length(varargin) &gt;= 1
+0366             <span class="keyword">if</span> isnumeric(varargin{1})
+0367                 HCMList = varargin{1};
+0368                 varargin(1) = [];
+0369             <span class="keyword">end</span>
+0370         <span class="keyword">end</span>
+0371     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0372         HCMList = varargin{1};
+0373         varargin(1) = [];
+0374     <span class="keyword">end</span>
+0375 <span class="keyword">end</span>
+0376 <span class="keyword">if</span> isempty(HCMList)
+0377     HCMList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(HCMFamily, 1);
+0378 <span class="keyword">end</span>
+0379 
+0380 <span class="comment">% Look for VCM family info</span>
+0381 <span class="keyword">if</span> length(varargin) &gt;= 1
+0382     <span class="keyword">if</span> isstruct(varargin{1})
+0383         VCMFamily = varargin{1}.FamilyName;
+0384         VCMList = varargin{1}.DeviceList;
+0385         varargin(1) = [];
+0386         <span class="keyword">if</span> ~NumericOutputFlag
+0387             StructOutputFlag = 1; <span class="comment">% Only change StructOutputFlag if 'Numeric' is not on the input line</span>
+0388         <span class="keyword">end</span>
+0389     <span class="keyword">elseif</span> ischar(varargin{1})
+0390         VCMFamily = varargin{1};
+0391         varargin(1) = [];
+0392         <span class="keyword">if</span> length(varargin) &gt;= 1
+0393             <span class="keyword">if</span> isnumeric(varargin{1})
+0394                 VCMList = varargin{1};
+0395                 varargin(1) = [];
+0396             <span class="keyword">end</span>
+0397         <span class="keyword">end</span>
+0398     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0399         VCMList = varargin{1};
+0400         varargin(1) = [];
+0401     <span class="keyword">end</span>
+0402 <span class="keyword">end</span>
+0403 <span class="keyword">if</span> isempty(VCMList)
+0404     VCMList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(VCMFamily, 1);
+0405 <span class="keyword">end</span>
+0406 
+0407 <span class="comment">% Look for HCMKicks</span>
+0408 <span class="keyword">if</span> length(varargin) &gt;= 1
+0409     <span class="keyword">if</span> isempty(varargin{1})
+0410         <span class="comment">% Use default</span>
+0411         varargin(1) = [];
+0412     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0413         HCMKicks = varargin{1};
+0414         varargin(1) = [];
+0415     <span class="keyword">end</span>
+0416 <span class="keyword">end</span>
+0417 
+0418 <span class="comment">% Look for VCMKicks</span>
+0419 <span class="keyword">if</span> length(varargin) &gt;= 1
+0420     <span class="keyword">if</span> isempty(varargin{1})
+0421         <span class="comment">% Use default</span>
+0422         varargin(1) = [];
+0423     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0424         VCMKicks = varargin{1};
+0425         varargin(1) = [];
+0426     <span class="keyword">end</span>
+0427 <span class="keyword">end</span>
+0428 
+0429 <span class="comment">% ModulationMethod has already been searched for</span>
+0430 <span class="comment">% % Look for ModulationMethod</span>
+0431 <span class="comment">% if length(varargin) &gt;= 1</span>
+0432 <span class="comment">%     if isempty(varargin{1})</span>
+0433 <span class="comment">%         % Use default</span>
+0434 <span class="comment">%         varargin(1) = [];</span>
+0435 <span class="comment">%     end</span>
+0436 <span class="comment">%     if ischar(varargin{1})</span>
+0437 <span class="comment">%         ModulationMethod = varargin{1};</span>
+0438 <span class="comment">%         varargin(1) = [];</span>
+0439 <span class="comment">%     end</span>
+0440 <span class="comment">% end</span>
+0441 <span class="keyword">if</span> ~strcmpi(ModulationMethod, <span class="string">'unipolar'</span>) &amp;&amp; ~strcmpi(ModulationMethod, <span class="string">'bipolar'</span>)
+0442     error(<span class="string">'ModulationMethod must be ''unipolar'' or ''bipolar'''</span>);
+0443 <span class="keyword">end</span>
+0444 
+0445 
+0446 <span class="comment">% Look for WaitFlag</span>
+0447 <span class="keyword">if</span> length(varargin) &gt;= 1
+0448     <span class="keyword">if</span> isempty(varargin{1})
+0449         <span class="comment">% Use default</span>
+0450         varargin(1) = [];
+0451     <span class="keyword">end</span>
+0452     <span class="keyword">if</span> isnumeric(varargin{1})
+0453         WaitFlag = varargin{1};
+0454         varargin(1) = [];
+0455     <span class="keyword">end</span>
+0456 <span class="keyword">end</span>
+0457 
+0458 <span class="comment">% FileName and DirectoryName</span>
+0459 <span class="keyword">if</span> length(varargin) &gt;= 1
+0460     <span class="keyword">if</span> isempty(varargin{1})
+0461         <span class="comment">% Use default</span>
+0462         FileName = <span class="string">''</span>;
+0463         varargin(1) = [];
+0464     <span class="keyword">end</span>
+0465     <span class="keyword">if</span> ischar(varargin{1})
+0466         FileName = varargin{1};
+0467         varargin(1) = [];
+0468     <span class="keyword">end</span>
+0469 <span class="keyword">end</span>
+0470 <span class="keyword">if</span> length(varargin) &gt;= 1
+0471     <span class="keyword">if</span> isempty(varargin{1})
+0472         <span class="comment">% Use default</span>
+0473         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'BPMResponse'</span>);
+0474         FileName = [DirectoryName, FileName];
+0475         varargin(1) = [];
+0476     <span class="keyword">elseif</span> ischar(varargin{1})
+0477         DirectoryName = varargin{1};
+0478         <span class="keyword">if</span> strcmp(DirectoryName, filesep)
+0479             FileName = [DirectoryName, FileName];
+0480         <span class="keyword">else</span>
+0481             FileName = [DirectoryName, filesep, FileName];
+0482         <span class="keyword">end</span>
+0483         varargin(1) = [];
+0484     <span class="keyword">end</span>
+0485 <span class="keyword">end</span>
+0486 
+0487 <span class="comment">% Look for ExtraDelay</span>
+0488 <span class="keyword">if</span> length(varargin) &gt;= 1
+0489     <span class="keyword">if</span> isempty(varargin{1})
+0490         <span class="comment">% Use default</span>
+0491         varargin(1) = [];
+0492     <span class="keyword">end</span>
+0493     <span class="keyword">if</span> isnumeric(varargin{1})
+0494         ExtraDelay = varargin{1};
+0495         varargin(1) = [];
+0496     <span class="keyword">end</span>
+0497 <span class="keyword">end</span>
+0498 
+0499 <span class="comment">% Check units</span>
+0500 <span class="keyword">if</span> isempty(UnitsFlag)
+0501     <span class="keyword">if</span> strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMxFamily,<span class="string">'Monitor'</span>,<span class="string">'Units'</span>), <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMyFamily,<span class="string">'Monitor'</span>,<span class="string">'Units'</span>))
+0502         UnitsFlag = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMxFamily,<span class="string">'Monitor'</span>,<span class="string">'Units'</span>);
+0503     <span class="keyword">else</span>
+0504         error(<span class="string">'Mixed Units for orbits'</span>);
+0505     <span class="keyword">end</span>
+0506 <span class="keyword">end</span>
+0507 <span class="keyword">if</span> isempty(UnitsFlag)
+0508     error(<span class="string">'Unknown Units'</span>);
+0509 <span class="keyword">end</span>
+0510 
+0511 <span class="comment">% Check mode</span>
+0512 <span class="keyword">if</span> isempty(ModeFlag)
+0513     <span class="keyword">if</span> strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMxFamily,<span class="string">'Monitor'</span>,<span class="string">'Mode'</span>), <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMyFamily,<span class="string">'Monitor'</span>,<span class="string">'Mode'</span>))
+0514         <span class="comment">%ModeFlag = getfamilydata(BPMxFamily,'Monitor','Mode');</span>
+0515     <span class="keyword">else</span>
+0516         error(<span class="string">'Mixed Mode for orbits'</span>);
+0517     <span class="keyword">end</span>
+0518     <span class="keyword">if</span> strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(HCMFamily,<span class="string">'Monitor'</span>,<span class="string">'Mode'</span>), <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(VCMFamily,<span class="string">'Monitor'</span>,<span class="string">'Mode'</span>))
+0519         ModeFlag = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(HCMFamily,<span class="string">'Monitor'</span>,<span class="string">'Mode'</span>);
+0520     <span class="keyword">else</span>
+0521         error(<span class="string">'Mixed Mode for correctors'</span>);
+0522     <span class="keyword">end</span>
+0523 <span class="keyword">end</span>
+0524 <span class="keyword">if</span> isempty(ModeFlag)
+0525     error(<span class="string">'Unknown Mode'</span>);
+0526 <span class="keyword">end</span>
+0527 <span class="comment">% Input parsing complete</span>
+0528 
+0529 
+0530 <span class="comment">% Starting time</span>
+0531 TimeStart = gettime;
+0532 
+0533 
+0534 <span class="comment">% Change defaults for the model (note: simulator mode mimics online)</span>
+0535 <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'Model'</span>)
+0536     <span class="comment">% Only archive data if ArchiveFlag==1 or FileName~=[]</span>
+0537     <span class="keyword">if</span> ischar(FileName) || ArchiveFlag == 1
+0538         ArchiveFlag = 1;    
+0539     <span class="keyword">else</span>
+0540         ArchiveFlag = 0;            
+0541     <span class="keyword">end</span>
+0542     
+0543     <span class="comment">% Only display is it was turned on at the command line</span>
+0544     <span class="keyword">if</span> DisplayFlag == 1
+0545         <span class="comment">% Keep DisplayFlag = 1</span>
+0546     <span class="keyword">else</span>
+0547         DisplayFlag = 0;
+0548     <span class="keyword">end</span>
+0549 <span class="keyword">else</span>
+0550     <span class="comment">% Online or Simulator: Archive unless ArchiveFlag was forced to zero</span>
+0551     <span class="keyword">if</span> ArchiveFlag ~= 0
+0552         ArchiveFlag = 1;
+0553         <span class="keyword">if</span> FileName == -1
+0554             FileName = <span class="string">''</span>;
+0555         <span class="keyword">end</span>
+0556     <span class="keyword">end</span>    
+0557 <span class="keyword">end</span>
+0558 
+0559 <span class="comment">% % Print setup information</span>
+0560 <span class="comment">% if DisplayFlag</span>
+0561 <span class="comment">%     if ~strcmpi(ModeFlag,'Model')</span>
+0562 <span class="comment">%         fprintf('\n');</span>
+0563 <span class="comment">%         fprintf('   MEASBPMRESP measures the BPM response matrix for both HCM &amp; VCM corrector families.\n');</span>
+0564 <span class="comment">%         fprintf('   The storage ring lattice and hardware should be setup for accurate orbit measurements.\n');</span>
+0565 <span class="comment">%         fprintf('   Make sure the following information is correct:\n');</span>
+0566 <span class="comment">%         fprintf('   1.  Proper magnet lattice\n');</span>
+0567 <span class="comment">%         fprintf('   2.  Proper electron beam energy\n');</span>
+0568 <span class="comment">%         fprintf('   3.  Proper electron bunch pattern\n');</span>
+0569 <span class="comment">%         fprintf('   4.  BPMs are functioning properly (calibrated, sample rate, etc.)\n');</span>
+0570 <span class="comment">%         fprintf('   5.  Corrector magnets are working\n');</span>
+0571 <span class="comment">%         fprintf('   6.  The injection bump magnets off\n');</span>
+0572 <span class="comment">%         fprintf('   7.  Corrector Settle Time WaitFlag=%f, Extra BPM Delay=%f\n', WaitFlag, ExtraDelay);</span>
+0573 <span class="comment">%         fprintf('   9.  Modulation Method: %s\n', ModulationMethod);</span>
+0574 <span class="comment">%     end</span>
+0575 <span class="comment">% end</span>
+0576 
+0577 
+0578 <span class="keyword">if</span> ArchiveFlag
+0579     <span class="keyword">if</span> isempty(FileName)
+0580         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'BPMRespFile'</span>));
+0581         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'BPMResponse'</span>);
+0582         <span class="keyword">if</span> isempty(DirectoryName)
+0583             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'Response'</span>, filesep, <span class="string">'BPM'</span>, filesep];
+0584         <span class="keyword">else</span>
+0585             <span class="comment">% Make sure default directory exists</span>
+0586             DirStart = pwd;
+0587             [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0588             cd(DirStart);
+0589         <span class="keyword">end</span>
+0590         [FileName, DirectoryName] = uiputfile(<span class="string">'*.mat'</span>, <span class="string">'Select a BPM Response File (&quot;Save&quot; starts measurement)'</span>, [DirectoryName FileName]);
+0591         drawnow;
+0592         <span class="keyword">if</span> FileName == 0 
+0593             ArchiveFlag = 0;
+0594             disp(<span class="string">'   BPM response measurement canceled.'</span>);
+0595             Rmat = []; OutputFileName=<span class="string">''</span>;
+0596             <span class="keyword">return</span>
+0597         <span class="keyword">end</span>
+0598         FileName = [DirectoryName, FileName];
+0599     <span class="keyword">elseif</span> FileName == -1
+0600         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'BPMRespFile'</span>));
+0601         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'BPMResponse'</span>);
+0602         <span class="keyword">if</span> isempty(DirectoryName)
+0603             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'Response'</span>, filesep, <span class="string">'BPM'</span>, filesep];
+0604         <span class="keyword">end</span>
+0605         FileName = [DirectoryName, FileName];
+0606     <span class="keyword">end</span>
+0607     
+0608     <span class="comment">% Acquire initial data</span>
+0609     MachineConfig = <a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>(InputFlags{:}); 
+0610 <span class="keyword">end</span>
+0611 
+0612 
+0613 <span class="comment">% Get the response matrices</span>
+0614 <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'Model'</span>)
+0615     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0616     <span class="comment">% Model Response Matrix - Use LOCO Method %</span>
+0617     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0618 
+0619     <span class="comment">% Just to make sure the proper AT model is the currrent model, do a get on one of the correctors</span>
+0620     <span class="comment">% (This is needed because locoresponsematrix does not check the .AT.ATModel field)</span>
+0621     <span class="keyword">if</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(HCMFamily)
+0622         tmp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMList, <span class="string">'Model'</span>);
+0623     <span class="keyword">end</span>
+0624 
+0625 
+0626     <span class="comment">% % Mask bpms and correctors for status</span>
+0627     <span class="comment">% BPMxStatus = getfamilydata(BPMxFamily,'Status', BPMxList);</span>
+0628     <span class="comment">% BPMxGoodIndex = find(BPMxStatus);</span>
+0629     <span class="comment">% BPMxList = BPMxList(BPMxGoodIndex,:);</span>
+0630     <span class="comment">%</span>
+0631     <span class="comment">% BPMyStatus = getfamilydata(BPMyFamily,'Status', BPMyList);</span>
+0632     <span class="comment">% BPMyGoodIndex = find(BPMyStatus);</span>
+0633     <span class="comment">% BPMyList = BPMyList(BPMyGoodIndex,:);</span>
+0634     <span class="comment">%</span>
+0635     <span class="comment">% HCMStatus = getfamilydata(HCMFamily,'Status', HCMList);</span>
+0636     <span class="comment">% HCMGoodIndex = find(HCMStatus);</span>
+0637     <span class="comment">% HCMList = HCMList(HCMGoodIndex,:);</span>
+0638     <span class="comment">% HCMKicks = HCMKicks(HCMGoodIndex);</span>
+0639     <span class="comment">%</span>
+0640     <span class="comment">% VCMStatus = getfamilydata(VCMFamily,'Status', VCMList);</span>
+0641     <span class="comment">% VCMGoodIndex = find(VCMStatus);</span>
+0642     <span class="comment">% VCMList = VCMList(VCMGoodIndex,:);</span>
+0643     <span class="comment">% VCMKicks = VCMKicks(VCMGoodIndex);</span>
+0644     
+0645     <span class="comment">% Use AT (LOCO method)</span>
+0646     
+0647     <span class="comment">% 1. AT MODEL</span>
+0648     <span class="keyword">global</span> THERING
+0649     <span class="comment">%setcavity off;</span>
+0650     RINGData.Lattice = THERING;
+0651     iCavity = findcells(THERING, <span class="string">'Frequency'</span>);
+0652     <span class="keyword">if</span> isempty(iCavity)
+0653         <span class="keyword">if</span> <a href="isstoragering.html" class="code" title="function Test = isstoragering">isstoragering</a>
+0654             RINGData.CavityFrequency  = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Model'</span>, <span class="string">'Physics'</span>);
+0655             RINGData.CavityHarmNumber = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'HarmonicNumber'</span>);
+0656         <span class="keyword">else</span>
+0657             RINGData.CavityFrequency  = [];
+0658             RINGData.CavityHarmNumber = [];
+0659         <span class="keyword">end</span>
+0660     <span class="keyword">else</span>
+0661         RINGData.CavityFrequency  = THERING{iCavity(1)}.Frequency;
+0662         RINGData.CavityHarmNumber = THERING{iCavity(1)}.HarmNumber;
+0663     <span class="keyword">end</span>
+0664     
+0665     
+0666     <span class="comment">% 2. BPM STRUCTURE</span>
+0667     <span class="comment">% FamName and BPMIndex tells the findorbitrespm function which BPMs are needed in the response matrix</span>
+0668     <span class="comment">% HBPMIndex/VBPMIndex is the sub-index of BPMIndex which correspond to the measured response matrix</span>
+0669     <span class="keyword">if</span> strcmpi(BPMxFamily,<span class="string">'All'</span>) 
+0670         BPMxATIndex = 1:length(THERING);
+0671     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(BPMxFamily)
+0672         BPMxATIndex = family2atindex(BPMxFamily, BPMxList);
+0673     <span class="keyword">else</span>
+0674         BPMxATIndex = findcells(THERING, <span class="string">'FamName'</span>, BPMxFamily);
+0675     <span class="keyword">end</span>
+0676     <span class="keyword">if</span> isempty(BPMxATIndex)
+0677         error(sprintf(<span class="string">'BPMxFamily=%s could not be found in the AO or AT deck'</span>, BPMxFamily));
+0678     <span class="keyword">else</span>
+0679         BPMxATIndex = BPMxATIndex(:)';    <span class="comment">% Row vector</span>
+0680     <span class="keyword">end</span>
+0681     
+0682     <span class="keyword">if</span> strcmpi(BPMyFamily,<span class="string">'All'</span>) 
+0683         BPMyATIndex = 1:length(THERING);
+0684     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(BPMyFamily)
+0685         BPMyATIndex = family2atindex(BPMyFamily, BPMyList);
+0686     <span class="keyword">else</span>
+0687         BPMyATIndex = findcells(THERING, <span class="string">'FamName'</span>, BPMyFamily);
+0688     <span class="keyword">end</span>
+0689     <span class="keyword">if</span> isempty(BPMyATIndex)
+0690         error(sprintf(<span class="string">'BPMyFamily=%s could not be found in the AO or AT deck'</span>, BPMyFamily));
+0691     <span class="keyword">else</span>
+0692         BPMyATIndex = BPMyATIndex(:)';    <span class="comment">% Row vector</span>
+0693     <span class="keyword">end</span>
+0694     
+0695     BPMData.BPMIndex = unique([BPMxATIndex BPMyATIndex]);
+0696     BPMData.HBPMIndex = findrowindex(BPMxATIndex', BPMData.BPMIndex');  <span class="comment">% Only used after locoresponsematrix is called</span>
+0697     BPMData.VBPMIndex = findrowindex(BPMyATIndex', BPMData.BPMIndex');  <span class="comment">% Only used after locoresponsematrix is called</span>
+0698         
+0699     
+0700     <span class="comment">% 3. CORRECTOR MAGNET STRUCTURE</span>
+0701     <span class="comment">% FamName and HCMIndex/VCMIndex tells the findorbitrespm function which corrector magnets are in the response matrix</span>
+0702     <span class="comment">% CMData.HCMKicks = starting value for the horizontal kicks in milliradian</span>
+0703     <span class="comment">% CMData.VCMKicks = starting value for the vertical   kicks in milliradian</span>
+0704     <span class="comment">% CMData.HCMCoupling = starting value for the horizontal coupling (default: zeros)</span>
+0705     <span class="comment">% CMData.VCMCoupling = starting value for the vertical   coupling (default: zeros)</span>
+0706     <span class="comment">% Note:  The kick strength should match the measured response matrix as best as possible</span>
+0707     <span class="comment">% Note:  The kicks and Coupling are used all the time (fit or not!)</span>
+0708     
+0709     <span class="comment">% Note the different units between AT and LOCO</span>
+0710     <span class="keyword">if</span> strcmpi(HCMFamily,<span class="string">'All'</span>) 
+0711         ATIndex = 1:length(THERING);
+0712     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(HCMFamily)
+0713         ATIndex = family2atindex(HCMFamily, HCMList);
+0714     <span class="keyword">else</span>
+0715         ATIndex = findcells(THERING, <span class="string">'FamName'</span>, HCMFamily);
+0716     <span class="keyword">end</span>
+0717     <span class="keyword">if</span> isempty(ATIndex)
+0718         error(sprintf(<span class="string">'HCMFamily=%s could not be found in the middle layer or AT model'</span>, HCMFamily));
+0719     <span class="keyword">else</span>
+0720         ATIndex = ATIndex(:)';    <span class="comment">% Row vector</span>
+0721     <span class="keyword">end</span>
+0722     CMData.HCMIndex = ATIndex;
+0723     
+0724     <span class="keyword">if</span> strcmpi(VCMFamily,<span class="string">'All'</span>) 
+0725         ATIndex = 1:length(THERING);
+0726     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(VCMFamily)
+0727         ATIndex = family2atindex(VCMFamily, VCMList);
+0728     <span class="keyword">else</span>
+0729         ATIndex = findcells(THERING, <span class="string">'FamName'</span>, VCMFamily);
+0730     <span class="keyword">end</span>
+0731     <span class="keyword">if</span> isempty(ATIndex)
+0732         error(sprintf(<span class="string">'VCMFamily=%s could not be found in the middle layer or AT model'</span>, VCMFamily));
+0733     <span class="keyword">else</span>
+0734         ATIndex = ATIndex(:)';    <span class="comment">% Row vector</span>
+0735     <span class="keyword">end</span>
+0736     CMData.VCMIndex = ATIndex;
+0737     
+0738     <span class="comment">% Kicks must be in Physics units</span>
+0739     
+0740     <span class="comment">% Default kicks</span>
+0741     <span class="keyword">if</span> <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(HCMFamily,<span class="string">'COR'</span>)
+0742         <span class="keyword">if</span> isempty(HCMKicks)
+0743             HCMKicks = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(HCMFamily, <span class="string">'Setpoint'</span>, <span class="string">'DeltaRespMat'</span>, HCMList);
+0744             <span class="keyword">if</span> isempty(HCMKicks)
+0745                 CMData.HCMKicks = Default2HCMKick;
+0746             <span class="keyword">else</span>
+0747                 <span class="comment">%if strcmpi(getfamilydata(HCMFamily, 'Setpoint', 'Units'), 'Hardware')</span>
+0748                     HCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Hardware'</span>);
+0749                     CMData.HCMKicks = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp+HCMKicks, HCMList) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp, HCMList);
+0750                 <span class="comment">%else</span>
+0751                 <span class="comment">%    CMData.HCMKicks = HCMKicks;</span>
+0752                 <span class="comment">%end</span>
+0753             <span class="keyword">end</span>
+0754         <span class="keyword">else</span>
+0755             <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0756                 <span class="comment">% Change to AT units [radian]</span>
+0757                 HCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Hardware'</span>);
+0758                 CMData.HCMKicks = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp+HCMKicks, HCMList) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp, HCMList);
+0759             <span class="keyword">else</span>
+0760                 CMData.HCMKicks = HCMKicks;
+0761             <span class="keyword">end</span>
+0762         <span class="keyword">end</span>
+0763     <span class="keyword">else</span>
+0764         <span class="comment">% Not a corrector magnet location</span>
+0765         <span class="keyword">if</span> isempty(HCMKicks)
+0766             CMData.HCMKicks = Default2HCMKick; 
+0767         <span class="keyword">else</span>
+0768             <span class="comment">% The kick must be in physics units</span>
+0769             <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0770                 fprintf(<span class="string">'\n   You are using a non-corrector magnet actuator type and using hardware units.\n'</span>);
+0771                 fprintf(<span class="string">'   Unknown conversion method from hardware to physics.\n\n'</span>);
+0772                 fprintf(<span class="string">'   Change to a physics units input scheme.\n'</span>);
+0773                 error(<span class="string">'Hardware to physics conversion error'</span>);
+0774             <span class="keyword">else</span>
+0775                 CMData.HCMKicks = HCMKicks;    
+0776             <span class="keyword">end</span>
+0777         <span class="keyword">end</span>
+0778     <span class="keyword">end</span>
+0779     
+0780     <span class="keyword">if</span> <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(VCMFamily,<span class="string">'COR'</span>)
+0781         <span class="keyword">if</span> isempty(VCMKicks)
+0782             VCMKicks = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(VCMFamily, <span class="string">'Setpoint'</span>, <span class="string">'DeltaRespMat'</span>, VCMList);
+0783             <span class="keyword">if</span> isempty(VCMKicks)
+0784                 CMData.VCMKicks = Default2VCMKick;
+0785             <span class="keyword">else</span>
+0786                 <span class="comment">%if strcmpi(getfamilydata(VCMFamily, 'Setpoint', 'Units'), 'Hardware')</span>
+0787                     VCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Hardware'</span>);
+0788                     CMData.VCMKicks = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp+VCMKicks, VCMList) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp, VCMList);
+0789                 <span class="comment">%else</span>
+0790                 <span class="comment">%    CMData.VCMKicks = VCMKicks;</span>
+0791                 <span class="comment">%end</span>
+0792             <span class="keyword">end</span>
+0793         <span class="keyword">else</span>
+0794             <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0795                 <span class="comment">% Change to AT units [radian]</span>
+0796                 VCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Hardware'</span>);
+0797                 CMData.VCMKicks = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp+VCMKicks, VCMList) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp, VCMList);
+0798             <span class="keyword">else</span>
+0799                 CMData.VCMKicks = VCMKicks;
+0800             <span class="keyword">end</span>
+0801         <span class="keyword">end</span>
+0802     <span class="keyword">else</span>
+0803         <span class="comment">% Not a corrector magnet location</span>
+0804         <span class="keyword">if</span> isempty(VCMKicks)
+0805             CMData.VCMKicks = Default2VCMKick;
+0806         <span class="keyword">else</span>
+0807             <span class="comment">% The kick must be in physics units</span>
+0808             <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0809                 fprintf(<span class="string">'\n   You are using a non-corrector magnet actuator type and using hardware units.\n'</span>);
+0810                 fprintf(<span class="string">'   Unknown conversion method from hardware to physics!\n\n'</span>);
+0811                 fprintf(<span class="string">'   Change to a physics units input scheme.\n'</span>);
+0812                 error(<span class="string">'Hardware to physics conversion error'</span>);
+0813             <span class="keyword">else</span>
+0814                 CMData.VCMKicks = VCMKicks;    
+0815             <span class="keyword">end</span>
+0816         <span class="keyword">end</span>
+0817     <span class="keyword">end</span>
+0818     
+0819     CMData.HCMKicks = CMData.HCMKicks(:);
+0820     <span class="keyword">if</span> length(CMData.HCMKicks) == 1
+0821         CMData.HCMKicks = CMData.HCMKicks * ones(length(CMData.HCMIndex),1); 
+0822     <span class="keyword">end</span>
+0823     CMData.VCMKicks = CMData.VCMKicks(:);
+0824     <span class="keyword">if</span> length(CMData.VCMKicks) == 1
+0825         CMData.VCMKicks = CMData.VCMKicks * ones(length(CMData.VCMIndex),1); 
+0826     <span class="keyword">end</span>
+0827     
+0828     <span class="comment">% Corrector gain error have been taken into account by hw2physics</span>
+0829     <span class="comment">% If the model has corrector rolls, adjust the kicks now.</span>
+0830     
+0831     <span class="keyword">for</span> i = 1:length(CMData.HCMIndex)
+0832         <span class="keyword">if</span> isfield(THERING{CMData.HCMIndex(i)}, <span class="string">'Roll'</span>)            
+0833             Roll = THERING{CMData.HCMIndex(i)}.Roll;
+0834         <span class="keyword">else</span>
+0835             Roll = [0 0];  <span class="comment">% [Rollx Rolly]</span>
+0836         <span class="keyword">end</span>
+0837         HCMRoll(i,1) = Roll(1); 
+0838     <span class="keyword">end</span>
+0839     <span class="comment">%HCMRoll = getroll(HCMFamily, HCMList);</span>
+0840     
+0841     <span class="keyword">for</span> i = 1:length(CMData.VCMIndex)
+0842         <span class="keyword">if</span> isfield(THERING{CMData.VCMIndex(i)}, <span class="string">'Roll'</span>)            
+0843             Roll = THERING{CMData.VCMIndex(i)}.Roll;
+0844         <span class="keyword">else</span>
+0845             Roll = [0 0];  <span class="comment">% [Rollx Rolly]</span>
+0846         <span class="keyword">end</span>
+0847         VCMRoll(i,1) = Roll(2); 
+0848     <span class="keyword">end</span>
+0849     <span class="comment">%VCMRoll = getroll(VCMFamily, VCMList);</span>
+0850 
+0851     <span class="comment">% The kicks need to be adjusted for roll (model coordinates)</span>
+0852     HCMKicks = CMData.HCMKicks;
+0853     VCMKicks = CMData.VCMKicks;
+0854     CMData.HCMKicks = CMData.HCMKicks .* cos(HCMRoll);
+0855     CMData.VCMKicks = CMData.VCMKicks .* cos(VCMRoll);
+0856     
+0857     
+0858     <span class="comment">% Coupling term (convert from ML to LOCO coordinates)</span>
+0859     <span class="comment">% The ./cos term is needed because LOCO coupling is scaling the unrolled kick</span>
+0860     CMData.HCMCoupling =  sin(HCMRoll) ./ cos(HCMRoll);
+0861     CMData.VCMCoupling = -sin(VCMRoll) ./ cos(VCMRoll);
+0862     
+0863 
+0864     <span class="comment">% Generate a response matrix ('FixedPathLength' or 'FixedMomentum', 'Linear' or 'Full')</span>
+0865     <span class="comment">% Flags is empty then the locoresponsematrix defaults are used (which was fix path length, linear the last time I checked)</span>
+0866     R0 = locoresponsematrix(RINGData, BPMData, CMData, LOCORespFlags);
+0867 
+0868     
+0869     <span class="comment">% Coupling correction</span>
+0870     <span class="comment">% Convert the ML gain/rolls to LOCO gain/coupling</span>
+0871     <span class="comment">% for i = 1:length(BPMData.BPMIndex)</span>
+0872     <span class="comment">%     if isfield(THERING{BPMData.BPMIndex(i)}, 'GCR')</span>
+0873     <span class="comment">%         GCR = THERING{BPMData.BPMIndex(i)}.GCR;</span>
+0874     <span class="comment">%     else</span>
+0875     <span class="comment">%         GCR = [1 1 0 0];  % [Gx Gy Crunch Roll]</span>
+0876     <span class="comment">%     end</span>
+0877     <span class="comment">%</span>
+0878     <span class="comment">%     M = gcr2loco(GCR(1), GCR(2), GCR(3), GCR(4));</span>
+0879     <span class="comment">%     BPMxGainLOCO(i,1)     = M(1,1);</span>
+0880     <span class="comment">%     BPMxCouplingLOCO(i,1) = M(1,2);</span>
+0881     <span class="comment">%     BPMyGainLOCO(i,1)     = M(2,2);</span>
+0882     <span class="comment">%     BPMyCouplingLOCO(i,1) = M(2,1);</span>
+0883     <span class="comment">% end</span>
+0884     <span class="comment">%</span>
+0885     <span class="comment">%</span>
+0886     <span class="comment">% % Build a rotation matrix</span>
+0887     <span class="comment">% C = [diag(BPMxGainLOCO)      diag(BPMxCouplingLOCO)</span>
+0888     <span class="comment">%      diag(BPMyCouplingLOCO)  diag(BPMyGainLOCO)];</span>
+0889 
+0890     
+0891     <span class="comment">% BPM coupling correction (only roll, crunch correction, gain is done in physics2hw (via real2raw))</span>
+0892     <span class="comment">% Still in physics units, just rotate and crunch.</span>
+0893     NBPM = length(BPMData.BPMIndex);
+0894     <span class="keyword">for</span> i = 1:NBPM
+0895         <span class="keyword">if</span> isfield(THERING{BPMData.BPMIndex(i)}, <span class="string">'GCR'</span>)            
+0896             GCR = THERING{BPMData.BPMIndex(i)}.GCR;
+0897         <span class="keyword">else</span>
+0898             GCR = [1 1 0 0];  <span class="comment">% [Gx Gy Crunch Roll]</span>
+0899         <span class="keyword">end</span>
+0900         <span class="comment">%Gx = GCR(1);  % Not used</span>
+0901         <span class="comment">%Gy = GCR(2);  % Not used</span>
+0902         Crunch = GCR(3);
+0903         Roll = GCR(4);
+0904         
+0905         a(i,1) = ( Crunch * sin(Roll) + cos(Roll)) / sqrt(1 - Crunch^2);
+0906         b(i,1) = (-Crunch * cos(Roll) + sin(Roll)) / sqrt(1 - Crunch^2);
+0907         c(i,1) = (-Crunch * cos(Roll) - sin(Roll)) / sqrt(1 - Crunch^2);
+0908         d(i,1) = (-Crunch * sin(Roll) + cos(Roll)) / sqrt(1 - Crunch^2);
+0909 
+0910         <span class="comment">% Same as:</span>
+0911         <span class="comment">%%m = gcr2loco(GCR(1), GCR(2), GCR(3), GCR(4));</span>
+0912         <span class="comment">%m = gcr2loco(1, 1, GCR(3), GCR(4));</span>
+0913         <span class="comment">%a(i,1)= m(1,1);</span>
+0914         <span class="comment">%b(i,1)= m(1,2);</span>
+0915         <span class="comment">%c(i,1)= m(2,1);</span>
+0916         <span class="comment">%d(i,1)= m(2,2);</span>
+0917     <span class="keyword">end</span>
+0918   
+0919     <span class="comment">% Build a rotation matrix</span>
+0920     C = [diag(a)  diag(b)
+0921          diag(c)  diag(d)];
+0922 
+0923     <span class="comment">% Rotate &amp; crunch the AT model response matrix</span>
+0924     R0 = C * R0;
+0925     
+0926 
+0927     <span class="comment">% Split up R0 into an array</span>
+0928     Rmat(1,1).Data = R0(                         BPMData.HBPMIndex , 1:length(CMData.HCMIndex));
+0929     Rmat(2,1).Data = R0(length(BPMData.BPMIndex)+BPMData.VBPMIndex , 1:length(CMData.HCMIndex));
+0930     Rmat(1,2).Data = R0(                         BPMData.HBPMIndex , length(CMData.HCMIndex)+(1:length(CMData.VCMIndex)));
+0931     Rmat(2,2).Data = R0(length(BPMData.BPMIndex)+BPMData.VBPMIndex , length(CMData.HCMIndex)+(1:length(CMData.VCMIndex)));
+0932     
+0933     
+0934     <span class="comment">% Convert to meters/radian (don't use the rolled kick strength)</span>
+0935     <span class="keyword">for</span> i = 1:length(CMData.HCMKicks)
+0936         Rmat(1,1).Data(:,i) = Rmat(1,1).Data(:,i) / HCMKicks(i);
+0937         Rmat(2,1).Data(:,i) = Rmat(2,1).Data(:,i) / HCMKicks(i);
+0938     <span class="keyword">end</span>
+0939     
+0940     <span class="keyword">for</span> i = 1:length(CMData.VCMKicks)
+0941         Rmat(1,2).Data(:,i) = Rmat(1,2).Data(:,i) / VCMKicks(i);
+0942         Rmat(2,2).Data(:,i) = Rmat(2,2).Data(:,i) / VCMKicks(i);
+0943     <span class="keyword">end</span>
+0944     
+0945     
+0946     <span class="comment">% Build the rest of the response matrix structure in 'Physics' units</span>
+0947     
+0948     <span class="keyword">if</span> <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(BPMxFamily,<span class="string">'BPM'</span>) &amp;&amp; <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(BPMyFamily,<span class="string">'BPM'</span>)
+0949         <span class="comment">% getpvmodel is better because crunch and roll are included</span>
+0950         Xat = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxList, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0951         Yat = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyList, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0952     <span class="keyword">else</span>
+0953         <span class="comment">% The orbit does not have to be at the BPMs so use modeltwiss</span>
+0954         [Xat, Yat, Sx, Sy] = modeltwiss(<span class="string">'ClosedOrbit'</span>, BPMxFamily, BPMxList, BPMyFamily, BPMyList);
+0955     <span class="keyword">end</span>
+0956     X.Data = Xat(:);
+0957     Y.Data = Yat(:);
+0958     X.FamilyName = BPMxFamily;
+0959     Y.FamilyName = BPMyFamily;
+0960     X.Field = <span class="string">'Monitor'</span>;
+0961     Y.Field = <span class="string">'Monitor'</span>;
+0962     X.DeviceList = BPMxList;
+0963     Y.DeviceList = BPMyList;
+0964     X.Status = ones(length(Xat),1);
+0965     Y.Status = ones(length(Yat),1);
+0966     X.Mode = <span class="string">'Model'</span>;
+0967     Y.Mode = <span class="string">'Model'</span>;
+0968     X.t = 0;
+0969     Y.t = 0;
+0970     X.tout = 0;
+0971     Y.tout = 0;
+0972     X.TimeStamp = clock;
+0973     Y.TimeStamp = X.TimeStamp;
+0974     X.Units = <span class="string">'Physics'</span>;
+0975     Y.Units = <span class="string">'Physics'</span>;
+0976     X.UnitsString = <span class="string">'m'</span>;
+0977     Y.UnitsString = <span class="string">'m'</span>;
+0978     X.DataDescriptor = <span class="string">'Horizontal Orbit'</span>;
+0979     Y.DataDescriptor = <span class="string">'Vertical Orbit'</span>;
+0980     X.CreatedBy = <span class="string">'getpv'</span>;
+0981     Y.CreatedBy = <span class="string">'getpv'</span>;
+0982     
+0983     HCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMList, <span class="string">'Struct'</span>, <span class="string">'Model'</span>, <span class="string">'Physics'</span>);
+0984     VCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMList, <span class="string">'Struct'</span>, <span class="string">'Model'</span>, <span class="string">'Physics'</span>);
+0985     Rmat(1,1).Monitor = X;
+0986     Rmat(1,1).Actuator = HCMsp;
+0987     Rmat(1,2).Monitor = X;
+0988     Rmat(1,2).Actuator = VCMsp;
+0989     Rmat(2,1).Monitor = Y;
+0990     Rmat(2,1).Actuator = HCMsp;
+0991     Rmat(2,2).Monitor = Y;
+0992     Rmat(2,2).Actuator = VCMsp;
+0993     
+0994     Rmat(1,1).ActuatorDelta = HCMKicks;  <span class="comment">%CMData.HCMKicks;</span>
+0995     Rmat(2,1).ActuatorDelta = HCMKicks;  <span class="comment">%CMData.HCMKicks;</span>
+0996     Rmat(1,2).ActuatorDelta = VCMKicks;  <span class="comment">%CMData.VCMKicks;</span>
+0997     Rmat(2,2).ActuatorDelta = VCMKicks;  <span class="comment">%CMData.VCMKicks;</span>
+0998     
+0999     <span class="keyword">for</span> i = 1:2
+1000         <span class="keyword">for</span> j = 1:2
+1001             Rmat(i,j).GeV = getenergymodel;
+1002             Rmat(i,j).TimeStamp = X.TimeStamp;
+1003             Rmat(i,j).DCCT = [];
+1004             Rmat(i,j).ModulationMethod = ModulationMethod;
+1005             Rmat(i,j).WaitFlag = WaitFlag;
+1006             Rmat(i,j).ExtraDelay = ExtraDelay;
+1007             Rmat(i,j).Units = <span class="string">'Physics'</span>;
+1008             Rmat(i,j).UnitsString = [Rmat(1,1).Monitor.UnitsString, <span class="string">'/'</span>, Rmat(1,1).Actuator.UnitsString];
+1009             Rmat(i,j).DataDescriptor = <span class="string">'Response Matrix'</span>;
+1010             Rmat(i,j).CreatedBy = <span class="string">'measbpmresp'</span>;
+1011             Rmat(i,j).OperationalMode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OperationalMode'</span>);
+1012         <span class="keyword">end</span>
+1013     <span class="keyword">end</span>
+1014             
+1015     <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+1016         <span class="comment">% Change to hardware units [mm/amp]</span>
+1017         <span class="keyword">if</span> <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(BPMxFamily,<span class="string">'BPM'</span>) &amp;&amp; <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(BPMyFamily,<span class="string">'BPM'</span>) &amp;&amp; <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(HCMFamily,<span class="string">'COR'</span>) &amp;&amp; <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(VCMFamily,<span class="string">'COR'</span>)
+1018             Rmat = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(Rmat, getenergymodel);
+1019         <span class="keyword">else</span>
+1020             fprintf(<span class="string">'\n   You are asking for hardware units, but a nonstandard monitor and/or\n'</span>);
+1021             fprintf(<span class="string">'   actuator was used.  The response matrix will stay in physics units!\n\n'</span>);
+1022         <span class="keyword">end</span>
+1023     <span class="keyword">end</span>
+1024 
+1025 <span class="keyword">else</span>
+1026     
+1027     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1028     <span class="comment">% Online or Simulated Response Matrix %</span>
+1029     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1030     
+1031     <span class="comment">% Default kicks</span>
+1032     <span class="keyword">if</span> isempty(HCMKicks)
+1033         HCMKicks = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(HCMFamily, <span class="string">'Setpoint'</span>, <span class="string">'DeltaRespMat'</span>, HCMList);
+1034         KickUnits = <span class="string">'Hardware'</span>; <span class="comment">%getfamilydata(HCMFamily, 'Setpoint', 'Units');</span>
+1035         <span class="keyword">if</span> isempty(HCMKicks)
+1036             HCMKicks = Default2HCMKick;
+1037             KickUnits = <span class="string">'Physics'</span>;
+1038         <span class="keyword">end</span>
+1039         <span class="keyword">if</span> isempty(KickUnits)
+1040             error(<span class="string">'Units for the kick strength are unknown.  Try inputing units directly.'</span>);
+1041         <span class="keyword">end</span>
+1042         <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Physics'</span>) &amp;&amp; strcmpi(KickUnits, <span class="string">'Hardware'</span>) 
+1043             HCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Hardware'</span>);
+1044             HCMKicks = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp+HCMKicks, HCMList) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp, HCMList);
+1045         <span class="keyword">elseif</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>) &amp;&amp; strcmpi(KickUnits, <span class="string">'Physics'</span>) 
+1046             HCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Physics'</span>);
+1047             HCMKicks = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp+HCMKicks, HCMList) - <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(HCMFamily, <span class="string">'Setpoint'</span>, HCMsp, HCMList);
+1048         <span class="keyword">end</span>
+1049     <span class="keyword">end</span>
+1050     <span class="keyword">if</span> isempty(VCMKicks)
+1051         VCMKicks = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(VCMFamily, <span class="string">'Setpoint'</span>, <span class="string">'DeltaRespMat'</span>, VCMList);
+1052         KickUnits = <span class="string">'Hardware'</span>; <span class="comment">%getfamilydata(VCMFamily, 'Setpoint', 'Units');</span>
+1053         <span class="keyword">if</span> isempty(VCMKicks)
+1054             VCMKicks = Default2VCMKick;
+1055             KickUnits = <span class="string">'Physics'</span>;
+1056         <span class="keyword">end</span>
+1057         <span class="keyword">if</span> isempty(KickUnits)
+1058             error(<span class="string">'Units for the kick strength are unknown.  Try inputing units directly.'</span>);
+1059         <span class="keyword">end</span>
+1060         <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Physics'</span>) &amp;&amp; strcmpi(KickUnits, <span class="string">'Hardware'</span>) 
+1061             VCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Hardware'</span>);
+1062             VCMKicks = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp+VCMKicks, VCMList) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp, VCMList);
+1063         <span class="keyword">elseif</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>) &amp;&amp; strcmpi(KickUnits, <span class="string">'Physics'</span>) 
+1064             VCMsp = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMList, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Physics'</span>);
+1065             VCMKicks = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp+VCMKicks, VCMList) - <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(VCMFamily, <span class="string">'Setpoint'</span>, VCMsp, VCMList);
+1066         <span class="keyword">end</span>
+1067     <span class="keyword">end</span>
+1068     
+1069     <span class="comment">%% Query to begin measurement</span>
+1070     <span class="comment">%if DisplayFlag</span>
+1071     <span class="comment">%    tmp = questdlg('Begin response matrix measurement?','Response Matrix Measurement','Yes','No','No');</span>
+1072     <span class="comment">%    if strcmpi(tmp,'No')</span>
+1073     <span class="comment">%        fprintf('   Response matrix measurement aborted\n');</span>
+1074     <span class="comment">%        Rmat = [];</span>
+1075     <span class="comment">%        return</span>
+1076     <span class="comment">%    end</span>
+1077     <span class="comment">%end</span>
+1078     
+1079     <span class="comment">% Mask bpms and correctors for status</span>
+1080     BPMxStatus = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMxFamily, <span class="string">'Status'</span>, BPMxList);
+1081     BPMxGoodIndex = find(BPMxStatus);
+1082     BPMxList = BPMxList(BPMxGoodIndex,:);
+1083     
+1084     BPMyStatus = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMyFamily, <span class="string">'Status'</span>, BPMyList);
+1085     BPMyGoodIndex = find(BPMyStatus);
+1086     BPMyList = BPMyList(BPMyGoodIndex,:);
+1087     
+1088     HCMStatus = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(HCMFamily, <span class="string">'Status'</span>, HCMList);
+1089     HCMGoodIndex = find(HCMStatus);
+1090     HCMList = HCMList(HCMGoodIndex,:);
+1091     <span class="keyword">if</span> length(HCMKicks) == 1
+1092         HCMKicks = HCMKicks * ones(length(HCMGoodIndex),1);
+1093     <span class="keyword">else</span>
+1094         HCMKicks = HCMKicks(HCMGoodIndex);
+1095     <span class="keyword">end</span>
+1096 
+1097     VCMStatus = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(VCMFamily, <span class="string">'Status'</span>, VCMList);
+1098     VCMGoodIndex = find(VCMStatus);
+1099     VCMList = VCMList(VCMGoodIndex,:);
+1100     <span class="keyword">if</span> length(VCMKicks) == 1
+1101         VCMKicks = VCMKicks * ones(length(VCMGoodIndex),1);
+1102     <span class="keyword">else</span>
+1103         VCMKicks = VCMKicks(VCMGoodIndex);
+1104     <span class="keyword">end</span>
+1105     
+1106     <span class="comment">% Measure response matrix of all planes at once</span>
+1107     <span class="comment">% (One advantage of this is the limits of all planes get checked before the measurement starts)</span>
+1108     <span class="keyword">if</span> DisplayFlag
+1109         fprintf(<span class="string">'   Begin BPM response matrix measurement\n'</span>);
+1110     <span class="keyword">end</span>
+1111     
+1112     <span class="comment">%if strcmpi(getfamilydata('Machine'), 'ALS')</span>
+1113     <span class="comment">%    fprintf('   Using measrespmat_als (with orbit correction)\n');</span>
+1114     <span class="comment">%    Rcell = measrespmat_als({BPMxFamily,BPMyFamily}, {BPMxList,BPMyList}, {HCMFamily,VCMFamily}, {HCMList,VCMList}, {HCMKicks,VCMKicks}, 'Struct', ModulationMethod, WaitFlag, ExtraDelay, InputFlags{:}, DCCTFlag{:});</span>
+1115     <span class="comment">%else</span>
+1116         Rcell = <a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>({BPMxFamily,BPMyFamily}, {BPMxList,BPMyList}, {HCMFamily,VCMFamily}, {HCMList,VCMList}, {HCMKicks,VCMKicks}, <span class="string">'Struct'</span>, ModulationMethod, WaitFlag, ExtraDelay, InputFlags{:}, DCCTFlag{:});
+1117         <span class="comment">%BPMFamilies = findmemberof({'measbpmresp'},'Monitor');</span>
+1118         <span class="comment">%BPMDevLists = family2dev(BPMFamilies);</span>
+1119         <span class="comment">%Rcell = measrespmat(BPMFamilies, BPMDevLists, {HCMFamily,VCMFamily}, {HCMList,VCMList}, {HCMKicks,VCMKicks}, 'Struct', ModulationMethod, WaitFlag, ExtraDelay, InputFlags{:}, DCCTFlag{:});</span>
+1120     <span class="comment">%end</span>
+1121     <span class="keyword">if</span> DisplayFlag
+1122         fprintf(<span class="string">'   Measurement complete.\n\n'</span>);
+1123     <span class="keyword">end</span>
+1124 
+1125     <span class="comment">% Convert cell array to a struct array</span>
+1126     <span class="comment">% (We only did this because struct arrays were more familiar to people)</span>
+1127     <span class="comment">% Rmat(1,1) = Rcell{1,1};  % Kick x, look x</span>
+1128     <span class="comment">% Rmat(2,1) = Rcell{2,1};  % Kick x, look y</span>
+1129     <span class="comment">% Rmat(2,2) = Rcell{2,2};  % Kick y, look y</span>
+1130     <span class="comment">% Rmat(1,2) = Rcell{1,2};  % Kick y, look x</span>
+1131     <span class="keyword">for</span> i = 1:size(Rcell,1)
+1132         <span class="keyword">for</span> j = 1:size(Rcell,2)
+1133             <span class="keyword">if</span> <a href="istransport.html" class="code" title="function Test = istransport">istransport</a>
+1134                 <span class="comment">% For transport line zero the BPM noise for upstream BPMs</span>
+1135                 <span class="keyword">for</span> k = 1:size(Rcell{i,j}.Data,2)
+1136                     CMpos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(Rcell{i,j}.Actuator.FamilyName, Rcell{i,j}.Actuator.DeviceList(k,:));
+1137                     BPMpos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(Rcell{i,j}.Monitor);
+1138                     iUpStream = find(BPMpos &lt; CMpos);
+1139                     <span class="keyword">if</span> ~isempty(iUpStream)
+1140                         Rcell{i,j}.Data(iUpStream,k) = 0;
+1141                     <span class="keyword">end</span>
+1142                 <span class="keyword">end</span>
+1143             <span class="keyword">end</span>
+1144             Rmat(i,j) = Rcell{i,j};
+1145         <span class="keyword">end</span>
+1146     <span class="keyword">end</span>
+1147     
+1148     
+1149     <span class="comment">% % Horizontal corrector plane</span>
+1150     <span class="comment">% if DisplayFlag</span>
+1151     <span class="comment">%     fprintf('   Begin Horizontal plane measurement ...\n');</span>
+1152     <span class="comment">% end</span>
+1153     <span class="comment">% mat = measrespmat('Struct', {BPMxFamily, BPMyFamily}, {BPMxList, BPMyList}, HCMFamily, HCMList, HCMKicks, ModulationMethod, WaitFlag, ExtraDelay, InputFlags{:});</span>
+1154     <span class="comment">% if DisplayFlag</span>
+1155     <span class="comment">%     fprintf('   Horizontal plane complete.\n\n');</span>
+1156     <span class="comment">% end</span>
+1157     <span class="comment">%</span>
+1158     <span class="comment">% % Make a response matrix array</span>
+1159     <span class="comment">% Rmat(1,1) = mat{1};  % Kick x, look x</span>
+1160     <span class="comment">% Rmat(2,1) = mat{2};  % Kick x, look y</span>
+1161     <span class="comment">%</span>
+1162     <span class="comment">%</span>
+1163     <span class="comment">% % Vertical corrector plane</span>
+1164     <span class="comment">% if DisplayFlag</span>
+1165     <span class="comment">%     fprintf('   Begin Vertical plane measurement...\n');</span>
+1166     <span class="comment">% end</span>
+1167     <span class="comment">% mat = measrespmat('Struct', {BPMxFamily, BPMyFamily}, {BPMxList, BPMyList}, VCMFamily, VCMList, VCMKicks, ModulationMethod, WaitFlag, ExtraDelay, InputFlags{:});</span>
+1168     <span class="comment">% if DisplayFlag</span>
+1169     <span class="comment">%     fprintf('   Vertical plane complete.\n\n');</span>
+1170     <span class="comment">% end</span>
+1171     <span class="comment">%</span>
+1172     <span class="comment">% Rmat(2,2) = mat{2};  % Kick y, look y</span>
+1173     <span class="comment">% Rmat(1,2) = mat{1};  % Kick y, look x</span>
+1174 <span class="keyword">end</span>
+1175 
+1176 <span class="comment">% Save data in the proper directory</span>
+1177 <span class="keyword">if</span> ArchiveFlag || ischar(FileName)
+1178     [DirectoryName, FileName, Ext] = fileparts(FileName);
+1179     DirStart = pwd;
+1180     [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+1181     <span class="keyword">if</span> ErrorFlag
+1182         fprintf(<span class="string">'\n   There was a problem getting to the proper directory!\n\n'</span>);
+1183     <span class="keyword">end</span>
+1184     save(FileName, <span class="string">'Rmat'</span>,<span class="string">'MachineConfig'</span>);
+1185     cd(DirStart);
+1186     OutputFileName = [DirectoryName, FileName, <span class="string">'.mat'</span>];
+1187     
+1188     <span class="keyword">if</span> DisplayFlag
+1189         fprintf(<span class="string">'   BPM response matrix data structure ''Rmat'' saved to disk\n'</span>);
+1190         fprintf(<span class="string">'   Filename: %s\n'</span>, OutputFileName);
+1191         fprintf(<span class="string">'   The total response matrix measurement time was %.2f minutes.\n'</span>, (gettime-TimeStart)/60);
+1192     <span class="keyword">end</span>
+1193 <span class="keyword">else</span>
+1194     OutputFileName = <span class="string">''</span>;
+1195 <span class="keyword">end</span>
+1196 
+1197 
+1198 <span class="keyword">if</span> ~StructOutputFlag
+1199     <span class="comment">% Return a matrix</span>
+1200     <span class="comment">% Rmat = [Rmat(1,1).Data Rmat(1,2).Data;</span>
+1201     <span class="comment">%         Rmat(2,1).Data Rmat(2,2).Data];</span>
+1202     RmatData = [];
+1203     <span class="keyword">for</span> i = 1:size(Rmat,1)
+1204         Rrow = [];
+1205         <span class="keyword">for</span> j = 1:size(Rmat,2)
+1206             Rrow = [Rrow Rmat(i,j).Data];
+1207         <span class="keyword">end</span>
+1208         RmatData = [RmatData; Rrow];
+1209     <span class="keyword">end</span>
+1210     
+1211     Rmat = RmatData;
+1212 <span class="keyword">end</span>
+1213</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

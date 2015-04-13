@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of family2elem</title>
+  <meta name="keywords" content="family2elem">
+  <meta name="description" content="FAMILY2ELEM - Return the device list for a family">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; family2elem.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>family2elem
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>FAMILY2ELEM - Return the device list for a family</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function ElemList = family2elem(Family, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FAMILY2ELEM - Return the device list for a family
+  ElemList = family2elem(FamilyName, StatusFlag, PowerSupplyFlag)
+  ElemList = family2elem(FamilyName, Field, StatusFlag, PowerSupplyFlag)
+
+  INPUTS
+  1. Family - Family name (ex., 'BEND', 'QFA', 'SF', 'SD', 'HCM', 'VCM', etc.)
+              Data Structure (only the FamilyName field is used)
+              Accelerator Object (only the FamilyName field is used)
+              Cell Array
+  2. Field - Option field input only effects the PowerSupplyFlag
+  3. StatusFlag - 0 return all devices
+                  1 return only devices with good status {Default}
+
+  4. PowerSupplyFlag - 0 return all devices {Default}
+                       1 return only unique channel names (like, power supplies for a magnet)
+
+  OUTPUTS
+  1. ElemList - Element list corresponding to the Family
+                Empty if not found
+
+  See also <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>, <a href="family2common.html" class="code" title="function [CommonNames, ErrorFlag] = family2common(Family, DeviceList)">family2common</a>, <a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>, <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>, <a href="family2units.html" class="code" title="function [Units, UnitsString] = family2units(varargin)">family2units</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>	DEV2ELEM - Converts an element list to a device list</li><li><a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>	FAMILY2CHANNEL - Converts the family name to a channel name</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ElemList = family2elem(Family, varargin)</a>
+0002 <span class="comment">%FAMILY2ELEM - Return the device list for a family</span>
+0003 <span class="comment">%  ElemList = family2elem(FamilyName, StatusFlag, PowerSupplyFlag)</span>
+0004 <span class="comment">%  ElemList = family2elem(FamilyName, Field, StatusFlag, PowerSupplyFlag)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. Family - Family name (ex., 'BEND', 'QFA', 'SF', 'SD', 'HCM', 'VCM', etc.)</span>
+0008 <span class="comment">%              Data Structure (only the FamilyName field is used)</span>
+0009 <span class="comment">%              Accelerator Object (only the FamilyName field is used)</span>
+0010 <span class="comment">%              Cell Array</span>
+0011 <span class="comment">%  2. Field - Option field input only effects the PowerSupplyFlag</span>
+0012 <span class="comment">%  3. StatusFlag - 0 return all devices</span>
+0013 <span class="comment">%                  1 return only devices with good status {Default}</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  4. PowerSupplyFlag - 0 return all devices {Default}</span>
+0016 <span class="comment">%                       1 return only unique channel names (like, power supplies for a magnet)</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  OUTPUTS</span>
+0019 <span class="comment">%  1. ElemList - Element list corresponding to the Family</span>
+0020 <span class="comment">%                Empty if not found</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  See also family2dev, family2common, family2status, family2tol, family2units</span>
+0023 
+0024 <span class="comment">%  Written by Greg Portmann</span>
+0025 
+0026 
+0027 <span class="keyword">if</span> nargin == 0
+0028     error(<span class="string">'Must have at least one input.'</span>);
+0029 <span class="keyword">end</span>
+0030 
+0031 
+0032 <span class="comment">% Look for a field input</span>
+0033 Field = <span class="string">''</span>;
+0034 <span class="keyword">if</span> length(varargin) &gt;= 1
+0035     <span class="keyword">if</span> ischar(varargin{1})
+0036         Field = varargin{1};
+0037         varargin(1) = [];
+0038     <span class="keyword">end</span>
+0039 <span class="keyword">end</span>
+0040 
+0041 
+0042 <span class="comment">% StatusFlag</span>
+0043 <span class="keyword">if</span> length(varargin) &gt;= 1
+0044     StatusFlag = varargin{1};
+0045 <span class="keyword">else</span>
+0046     <span class="comment">% This choice changes the default behavior for the entire middle layer !!!!</span>
+0047     StatusFlag = 1;  <span class="comment">% Only return good status devices</span>
+0048 <span class="keyword">end</span>
+0049 
+0050 
+0051 <span class="comment">% PowerSupplyFlag</span>
+0052 <span class="keyword">if</span> length(varargin) &gt;= 2
+0053     PowerSupplyFlag = varargin{2};
+0054 <span class="keyword">else</span>
+0055     PowerSupplyFlag = 0; 
+0056 <span class="keyword">end</span>
+0057 
+0058 
+0059 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0060 <span class="comment">% Cell Array Inputs %</span>
+0061 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0062 <span class="keyword">if</span> iscell(Family)
+0063     <span class="keyword">for</span> i = 1:length(Family)
+0064         <span class="keyword">if</span> iscell(StatusFlag) &amp;&amp; iscell(PowerSupplyFlag)
+0065             ElemList{i} = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family{i}, StatusFlag{i}, PowerSupplyFlag{i});
+0066         <span class="keyword">elseif</span> iscell(StatusFlag)
+0067             ElemList{i} = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family{i}, StatusFlag{i}, PowerSupplyFlag);
+0068         <span class="keyword">elseif</span> iscell(PowerSupplyFlag)
+0069             ElemList{i} = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family{i}, StatusFlag, PowerSupplyFlag{i});
+0070         <span class="keyword">else</span>
+0071             ElemList{i} = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family{i}, StatusFlag, PowerSupplyFlag);
+0072         <span class="keyword">end</span>
+0073     <span class="keyword">end</span>
+0074     <span class="keyword">return</span>
+0075 <span class="keyword">end</span>
+0076 
+0077 
+0078 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0079 <span class="comment">% Family or data structure inputs beyond this point %</span>
+0080 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0081 <span class="keyword">if</span> isstruct(Family)
+0082     <span class="comment">% Structures can be an accelerator object or a data structure (as returned by getpv)</span>
+0083     <span class="keyword">if</span> isfield(Family, <span class="string">'FamilyName'</span>)
+0084         <span class="comment">% Data structure</span>
+0085         Family = Family.FamilyName;   
+0086     <span class="keyword">else</span>
+0087         error(<span class="string">'Family input of unknown type'</span>);
+0088     <span class="keyword">end</span>
+0089 <span class="keyword">end</span>
+0090 
+0091 
+0092 DeviceList = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'DeviceList'</span>);
+0093 <span class="keyword">if</span> isempty(DeviceList)
+0094     error(sprintf(<span class="string">'%s family not found'</span>, Family));
+0095 <span class="keyword">end</span>
+0096 
+0097 
+0098 <span class="keyword">if</span> StatusFlag
+0099     Status = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'Status'</span>, DeviceList);
+0100     <span class="keyword">if</span> isempty(Status)
+0101         fprintf(<span class="string">'   WARNING:  Status field not in the AO, hence ignored.\n'</span>);
+0102     <span class="keyword">else</span>
+0103         DeviceList = DeviceList(find(Status),:);
+0104     <span class="keyword">end</span>
+0105 <span class="keyword">end</span>
+0106 
+0107 
+0108 <span class="keyword">if</span> PowerSupplyFlag
+0109     <span class="comment">% There can be multiple channel names due to &quot;ganged&quot; power supplies</span>
+0110     <span class="keyword">if</span> isempty(Field)
+0111         ChannelNames0 = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(Family, DeviceList);
+0112     <span class="keyword">else</span>
+0113         ChannelNames0 = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(Family, Field, DeviceList);
+0114     <span class="keyword">end</span>
+0115     [ChannelNames, ii, jj] = unique(ChannelNames0, <span class="string">'rows'</span>);
+0116 
+0117     <span class="keyword">if</span> length(ii) ~= size(ChannelNames0,1)
+0118         <span class="comment">% Remove ' ' (' ' should always be the first row)</span>
+0119         <span class="keyword">if</span> isempty(deblank(ChannelNames(1,:)))
+0120             ii(1) = [];
+0121             jj(jj==1) = [];
+0122             jj = jj - 1;
+0123         <span class="keyword">end</span>
+0124 
+0125         ChannelNames = ChannelNames0(ii,:);
+0126 
+0127         <span class="comment">% Unique does a sort and keeps the last device.</span>
+0128         
+0129         <span class="comment">% Remove the sort</span>
+0130         jjtmp = jj;
+0131         <span class="keyword">for</span> i = 1:max(jj)
+0132             iDev(i) = jjtmp(1);
+0133             jjtmp(jjtmp==jjtmp(1)) = [];
+0134         <span class="keyword">end</span>
+0135         ChannelNames = ChannelNames(iDev,:);
+0136         
+0137         <span class="comment">% Find the first device with that name</span>
+0138         i = findrowindex(ChannelNames, ChannelNames0);
+0139         DeviceList = DeviceList(i,:);
+0140     <span class="keyword">else</span>
+0141         <span class="comment">% Remove ' ' (' ' should always be the first row)</span>
+0142         <span class="keyword">if</span> isempty(deblank(ChannelNames(1,:)))
+0143             iBlank = find(jj==1);
+0144             DeviceList(iBlank,:) = [];
+0145         <span class="keyword">end</span>
+0146     <span class="keyword">end</span>
+0147 <span class="keyword">end</span>
+0148 
+0149 
+0150 ElemList = <a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>(Family, DeviceList);
+0151</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

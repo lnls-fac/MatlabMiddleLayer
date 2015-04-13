@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of hdrload</title>
+  <meta name="keywords" content="hdrload">
+  <meta name="description" content="HDRLOAD Load data from an ASCII file containing a text header.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; hdrload.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>hdrload
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>HDRLOAD Load data from an ASCII file containing a text header.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [header, data] = hdrload(file) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> HDRLOAD Load data from an ASCII file containing a text header.
+     [header, data] = HDRLOAD('filename.ext') reads a data file
+     called 'filename.ext', which contains a text header.  There
+     is no default extension; any extensions must be explicitly
+     supplied.
+
+     The first output, HEADER, is the header information, 
+     returned as a text array.
+     The second output, DATA, is the data matrix.  This data 
+     matrix has the same dimensions as the data in the file, one
+     row per line of ASCII data in the file.  If the data is not
+     regularly spaced (i.e., each line of ASCII data does not 
+     contain the same number of points), the data is returned as
+     a column vector.
+
+     Limitations:  No line of the text header can begin with
+     a number.  Only one header and data set will be read,
+     and the header must come before the data.
+
+     See also LOAD, SAVE, SPCONVERT, FSCANF, FPRINTF, STR2MAT.
+     See also the IOFUN directory.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [header, data] = hdrload(file)</a>
+0002 
+0003 <span class="comment">% HDRLOAD Load data from an ASCII file containing a text header.</span>
+0004 <span class="comment">%     [header, data] = HDRLOAD('filename.ext') reads a data file</span>
+0005 <span class="comment">%     called 'filename.ext', which contains a text header.  There</span>
+0006 <span class="comment">%     is no default extension; any extensions must be explicitly</span>
+0007 <span class="comment">%     supplied.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%     The first output, HEADER, is the header information,</span>
+0010 <span class="comment">%     returned as a text array.</span>
+0011 <span class="comment">%     The second output, DATA, is the data matrix.  This data</span>
+0012 <span class="comment">%     matrix has the same dimensions as the data in the file, one</span>
+0013 <span class="comment">%     row per line of ASCII data in the file.  If the data is not</span>
+0014 <span class="comment">%     regularly spaced (i.e., each line of ASCII data does not</span>
+0015 <span class="comment">%     contain the same number of points), the data is returned as</span>
+0016 <span class="comment">%     a column vector.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%     Limitations:  No line of the text header can begin with</span>
+0019 <span class="comment">%     a number.  Only one header and data set will be read,</span>
+0020 <span class="comment">%     and the header must come before the data.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%     See also LOAD, SAVE, SPCONVERT, FSCANF, FPRINTF, STR2MAT.</span>
+0023 <span class="comment">%     See also the IOFUN directory.</span>
+0024 
+0025 <span class="comment">% check number and type of arguments</span>
+0026 <span class="keyword">if</span> nargin &lt; 1
+0027   error(<span class="string">'Function requires one input argument'</span>);
+0028 <span class="keyword">elseif</span> ~isstr(file)
+0029   error(<span class="string">'Input must be a string representing a filename'</span>);
+0030 <span class="keyword">end</span>
+0031 
+0032 <span class="comment">% Open the file.  If this returns a -1, we did not open the file</span>
+0033 <span class="comment">% successfully.</span>
+0034 fid = fopen(file);
+0035 <span class="keyword">if</span> fid==-1
+0036   error(<span class="string">'File not found or permission denied'</span>);
+0037   <span class="keyword">end</span>
+0038 
+0039 <span class="comment">% Initialize loop variables</span>
+0040 <span class="comment">% We store the number of lines in the header, and the maximum</span>
+0041 <span class="comment">% length of any one line in the header.  These are used later</span>
+0042 <span class="comment">% in assigning the 'header' output variable.</span>
+0043 no_lines = 0;
+0044 max_line = 0;
+0045 
+0046 <span class="comment">% We also store the number of columns in the data we read.  This</span>
+0047 <span class="comment">% way we can compute the size of the output based on the number</span>
+0048 <span class="comment">% of columns and the total number of data points.</span>
+0049 ncols = 0;
+0050 
+0051 <span class="comment">% Finally, we initialize the data to [].</span>
+0052 data = [];
+0053 
+0054 <span class="comment">% Start processing.</span>
+0055 line = fgetl(fid);
+0056 <span class="keyword">if</span> ~isstr(line)
+0057   disp(<span class="string">'Warning: file contains no header and no data'</span>)
+0058   <span class="keyword">end</span>;
+0059 [data, ncols, errmsg, nxtindex] = sscanf(line, <span class="string">'%f'</span>);
+0060 
+0061 <span class="comment">% One slight problem, pointed out by Peter vanderWal: If the</span>
+0062 <span class="comment">% first character of the line is 'e', then this will scan as</span>
+0063 <span class="comment">% 0.00e+00. We can trap this case specifically by using the</span>
+0064 <span class="comment">% 'next index' output: in the case of a stripped 'e' the next</span>
+0065 <span class="comment">% index is one, indicating zero characters read.  See the help</span>
+0066 <span class="comment">% entry for 'sscanf' for more information on this output</span>
+0067 <span class="comment">% parameter. We loop through the file one line at a time until</span>
+0068 <span class="comment">% we find some data.  After that point we stop checking for</span>
+0069 <span class="comment">% header information. This part of the program takes most of the</span>
+0070 <span class="comment">% processing time, because fgetl is relatively slow (compared to</span>
+0071 <span class="comment">% fscanf, which we will use later).</span>
+0072 <span class="keyword">while</span> isempty(data)|(nxtindex==1)
+0073   no_lines = no_lines+1;
+0074   max_line = max([max_line, length(line)]);
+0075   <span class="comment">% Create unique variable to hold this line of text information.</span>
+0076   <span class="comment">% Store the last-read line in this variable.</span>
+0077   eval([<span class="string">'line'</span>, num2str(no_lines), <span class="string">'=line;'</span>]);
+0078   line = fgetl(fid);
+0079   <span class="keyword">if</span> ~isstr(line)
+0080     disp(<span class="string">'Warning: file contains no data'</span>)
+0081     <span class="keyword">break</span>
+0082     <span class="keyword">end</span>;
+0083   [data, ncols, errmsg, nxtindex] = sscanf(line, <span class="string">'%f'</span>);
+0084   <span class="keyword">end</span> <span class="comment">% while</span>
+0085 
+0086 <span class="comment">% Now that we have read in the first line of data, we can skip</span>
+0087 <span class="comment">% the processing that stores header information, and just read</span>
+0088 <span class="comment">% in the rest of the data.</span>
+0089 data = [data; fscanf(fid, <span class="string">'%f'</span>)];
+0090 fclose(fid);
+0091 
+0092 <span class="comment">% Create header output from line information. The number of lines</span>
+0093 <span class="comment">% and the maximum line length are stored explicitly, and each</span>
+0094 <span class="comment">% line is stored in a unique variable using the 'eval' statement</span>
+0095 <span class="comment">% within the loop. Note that, if we knew a priori that the</span>
+0096 <span class="comment">% headers were 10 lines or less, we could use the STR2MAT</span>
+0097 <span class="comment">% function and save some work. First, initialize the header to an</span>
+0098 <span class="comment">% array of spaces.</span>
+0099 header = setstr(<span class="string">' '</span>*ones(no_lines, max_line));
+0100 <span class="keyword">for</span> i = 1:no_lines
+0101   varname = [<span class="string">'line'</span> num2str(i)];
+0102   <span class="comment">% Note that we only assign this line variable to a subset of</span>
+0103   <span class="comment">% this row of the header array.  We thus ensure that the matrix</span>
+0104   <span class="comment">% sizes in the assignment are equal.</span>
+0105   eval([<span class="string">'header(i, 1:length('</span> varname <span class="string">')) = '</span> varname <span class="string">';'</span>]);
+0106   <span class="keyword">end</span>
+0107 
+0108 <span class="comment">% Resize output data, based on the number of columns (as returned</span>
+0109 <span class="comment">% from the sscanf of the first line of data) and the total number</span>
+0110 <span class="comment">% of data elements. Since the data was read in row-wise, and</span>
+0111 <span class="comment">% MATLAB stores data in columnwise format, we have to reverse the</span>
+0112 <span class="comment">% size arguments and then transpose the data.  If we read in</span>
+0113 <span class="comment">% irregularly spaced data, then the division we are about to do</span>
+0114 <span class="comment">% will not work. Therefore, we will trap the error with an EVAL</span>
+0115 <span class="comment">% call; if the reshape fails, we will just return the data as is.</span>
+0116 eval(<span class="string">'data = reshape(data, ncols, length(data)/ncols)'';'</span>, <span class="string">''</span>);</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

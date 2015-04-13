@@ -1,0 +1,301 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of settune</title>
+  <meta name="keywords" content="settune">
+  <meta name="description" content="SETTUNE - Set the tune">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; settune.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>settune
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETTUNE - Set the tune</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [DelQuad, ActuatorFamily] = settune(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETTUNE - Set the tune
+  [DelQuad, QuadFamily] = settune(NuDesired, InteractiveFlag, TuneResponseMatrix);
+
+  INPUTS
+  1. NuDesired - Desired tune   [NuX; NuY] (2x1) {Default: golden tunes}
+  2. InteractiveFlag - 0    -&gt; No display information
+                       else -&gt; display tune information before setting magnets {Default}
+  3. TuneResponseMatrix - Tune response matrix {Default: gettuneresp}
+  4. ActuatorFamily -  Quadrupole to vary, ex {'Q7', 'Q9'} {Default: gettuneresp}
+  5. Optional override of the units:
+     'Physics'  - Use physics  units
+     'Hardware' - Use hardware units
+  6. Optional override of the mode:
+     'Online'    - Set/Get data online  
+     'Model'     - Set/Get data on the simulated accelerator using AT
+     'Simulator' - Set/Get data on the simulated accelerator using AT
+     'Manual'    - Set/Get data manually
+
+  OUTPUTS
+  1. DelQuad
+  2. QuadFamily - Families used (cell array)
+
+  Algorithm:  
+     SVD method
+     DelQuad = inv(TuneResponseMatrix) * DeltaTune
+     instead of 
+     DelQuad = inv(TuneResponseMatrix) * (Nu-gettune)
+              DelQuad = [Q7; Q9]
+
+  NOTES
+  1. If gettune only uses the fractional tune then NuDesired should only have fractional tunes.
+  2. The tune measurement system must be running correctly for this routine to work properly.
+
+  EXAMPLES
+  1. use 2 defaults family if specified in 'Tune Corrector'
+     settune([18.23 10.3]
+  2. use 10 families
+     Qfam = findmemberof('QUAD');
+     RTune = meastuneresp(Qfam, 'Model')
+     [DK Fam] = settune([18.12 10.3],1,RTune,Qfam,'Model')
+
+  See also <a href="steptune.html" class="code" title="function [DelQuad, ActuatorFamily] = steptune(varargin)">steptune</a>, <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>	FINDMEMBEROF - Finds all family members</li><li><a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>	GETGOLDEN - Returns the golden values for a family</li><li><a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>	GETTUNE - Returns the betatron tunes</li><li><a href="gettuneresp.html" class="code" title="function [TuneMatrix, FileName] = gettuneresp(varargin)">gettuneresp</a>	GETTUNERESP - Loads the tune response vector (or matrix) for multiple quadrupole families</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="steptune.html" class="code" title="function [DelQuad, ActuatorFamily] = steptune(varargin)">steptune</a>	STEPTUNE - Step the tune</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DelQuad, ActuatorFamily] = settune(varargin)</a>
+0002 <span class="comment">%SETTUNE - Set the tune</span>
+0003 <span class="comment">%  [DelQuad, QuadFamily] = settune(NuDesired, InteractiveFlag, TuneResponseMatrix);</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. NuDesired - Desired tune   [NuX; NuY] (2x1) {Default: golden tunes}</span>
+0007 <span class="comment">%  2. InteractiveFlag - 0    -&gt; No display information</span>
+0008 <span class="comment">%                       else -&gt; display tune information before setting magnets {Default}</span>
+0009 <span class="comment">%  3. TuneResponseMatrix - Tune response matrix {Default: gettuneresp}</span>
+0010 <span class="comment">%  4. ActuatorFamily -  Quadrupole to vary, ex {'Q7', 'Q9'} {Default: gettuneresp}</span>
+0011 <span class="comment">%  5. Optional override of the units:</span>
+0012 <span class="comment">%     'Physics'  - Use physics  units</span>
+0013 <span class="comment">%     'Hardware' - Use hardware units</span>
+0014 <span class="comment">%  6. Optional override of the mode:</span>
+0015 <span class="comment">%     'Online'    - Set/Get data online</span>
+0016 <span class="comment">%     'Model'     - Set/Get data on the simulated accelerator using AT</span>
+0017 <span class="comment">%     'Simulator' - Set/Get data on the simulated accelerator using AT</span>
+0018 <span class="comment">%     'Manual'    - Set/Get data manually</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  OUTPUTS</span>
+0021 <span class="comment">%  1. DelQuad</span>
+0022 <span class="comment">%  2. QuadFamily - Families used (cell array)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  Algorithm:</span>
+0025 <span class="comment">%     SVD method</span>
+0026 <span class="comment">%     DelQuad = inv(TuneResponseMatrix) * DeltaTune</span>
+0027 <span class="comment">%     instead of</span>
+0028 <span class="comment">%     DelQuad = inv(TuneResponseMatrix) * (Nu-gettune)</span>
+0029 <span class="comment">%              DelQuad = [Q7; Q9]</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  NOTES</span>
+0032 <span class="comment">%  1. If gettune only uses the fractional tune then NuDesired should only have fractional tunes.</span>
+0033 <span class="comment">%  2. The tune measurement system must be running correctly for this routine to work properly.</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%  EXAMPLES</span>
+0036 <span class="comment">%  1. use 2 defaults family if specified in 'Tune Corrector'</span>
+0037 <span class="comment">%     settune([18.23 10.3]</span>
+0038 <span class="comment">%  2. use 10 families</span>
+0039 <span class="comment">%     Qfam = findmemberof('QUAD');</span>
+0040 <span class="comment">%     RTune = meastuneresp(Qfam, 'Model')</span>
+0041 <span class="comment">%     [DK Fam] = settune([18.12 10.3],1,RTune,Qfam,'Model')</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%  See also steptune, gettune</span>
+0044 
+0045 <span class="comment">%  Written by Gregory J. Portmann</span>
+0046 <span class="comment">%  Modified by Laurent S. Nadolski</span>
+0047 <span class="comment">%    Adaptation for SOLEIL</span>
+0048 <span class="comment">%    Modification ALGO : use SVD as in steptune</span>
+0049 
+0050 <span class="comment">% Case of 2 families or more</span>
+0051 ActuatorFamily = <a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>(<span class="string">'Tune Corrector'</span>)';
+0052 <span class="keyword">if</span> isempty(ActuatorFamily) <span class="comment">% Default 2 families</span>
+0053     ActuatorFamily = {<span class="string">'QF'</span>,<span class="string">'QD'</span>};
+0054 <span class="keyword">end</span>
+0055 
+0056 <span class="comment">% Input parser</span>
+0057 UnitsFlag = {}; 
+0058 ModeFlag = {};
+0059 <span class="keyword">for</span> i = length(varargin):-1:1
+0060     <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0061         UnitsFlag = varargin(i);
+0062         varargin(i) = [];
+0063     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0064         UnitsFlag = varargin(i);
+0065         varargin(i) = [];
+0066     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0067         ModeFlag = varargin(i);
+0068         varargin(i) = [];
+0069     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0070         ModeFlag = varargin(i);
+0071         varargin(i) = [];
+0072     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0073         ModeFlag = varargin(i);
+0074         varargin(i) = [];
+0075     <span class="keyword">end</span>        
+0076 <span class="keyword">end</span>
+0077 
+0078 
+0079 <span class="keyword">if</span> length(varargin) &gt;= 1
+0080     Nu = varargin{1};
+0081 <span class="keyword">else</span>
+0082     Nu =[];
+0083 <span class="keyword">end</span>
+0084 
+0085 <span class="comment">% Golden values</span>
+0086 <span class="keyword">if</span> isempty(Nu)
+0087     Nu = <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>(<span class="string">'TUNE'</span>,[1 1;1 2]);
+0088 <span class="keyword">end</span>
+0089 
+0090 <span class="keyword">if</span> isempty(Nu)
+0091     error(<span class="string">'Tune must be an input or the golden tunes must be available.'</span>);
+0092 <span class="keyword">end</span>
+0093 Nu = Nu(:);
+0094 <span class="keyword">if</span> ~all(size(Nu) == [2 1])
+0095     error(<span class="string">'Nu must be a 2x1 vector.'</span>);
+0096 <span class="keyword">end</span>
+0097 
+0098 <span class="keyword">if</span> length(varargin) &gt;= 2
+0099     InteractiveFlag = varargin{2};
+0100 <span class="keyword">else</span>
+0101     InteractiveFlag = 1;
+0102 <span class="keyword">end</span>
+0103 
+0104 <span class="comment">% Get tune response matrix</span>
+0105 <span class="keyword">if</span> length(varargin) &gt;= 3
+0106     TuneResponseMatrix = varargin{3};
+0107 <span class="keyword">else</span>
+0108     TuneResponseMatrix = [];
+0109 <span class="keyword">end</span>
+0110 
+0111 <span class="comment">% Get ActuatorFamilies</span>
+0112 <span class="keyword">if</span> length(varargin) &gt;= 4
+0113     ActuatorFamily1 = varargin{4};
+0114 <span class="keyword">else</span>
+0115     ActuatorFamily1 = ActuatorFamily;
+0116 <span class="keyword">end</span>
+0117 
+0118 <span class="comment">% Interactive part</span>
+0119 <span class="keyword">if</span> InteractiveFlag
+0120     Flag = 1;
+0121     <span class="keyword">if</span> isempty(TuneResponseMatrix)
+0122         TuneResponseMatrix = <a href="gettuneresp.html" class="code" title="function [TuneMatrix, FileName] = gettuneresp(varargin)">gettuneresp</a>(UnitsFlag{:});
+0123     <span class="keyword">end</span>
+0124     <span class="keyword">if</span> isempty(TuneResponseMatrix)
+0125         error(<span class="string">'The tune response matrix must be an input or available in one of the default response matrix files.'</span>);
+0126     <span class="keyword">end</span>
+0127     <span class="keyword">while</span> Flag
+0128         TuneOld = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0129         fprintf(<span class="string">'\n'</span>);
+0130         fprintf(<span class="string">'  Present Tune:  Horizontal = %.4f   Vertical = %.4f\n'</span>, TuneOld(1), TuneOld(2));
+0131         fprintf(<span class="string">'     Goal Tune:  Horizontal = %.4f   Vertical = %.4f\n'</span>, Nu(1), Nu(2));
+0132 
+0133         DelNu = Nu - TuneOld;
+0134 
+0135         <span class="comment">% 1. SVD Tune Correction</span>
+0136         <span class="comment">% Decompose the tune response matrix:</span>
+0137         [U, S, V] = svd(TuneResponseMatrix, <span class="string">'econ'</span>);
+0138         <span class="comment">% TuneResponseMatrix = U*S*V'</span>
+0139         <span class="comment">%</span>
+0140         <span class="comment">% The V matrix columns are the singular vectors in the quadrupole magnet space</span>
+0141         <span class="comment">% The U matrix columns are the singular vectors in the TUNE space</span>
+0142         <span class="comment">% U'*U=I and V*V'=I</span>
+0143         <span class="comment">%</span>
+0144         <span class="comment">% TUNECoef is the projection onto the columns of TuneResponseMatrix*V(:,Ivec) (same space as spanned by U)</span>
+0145         <span class="comment">% Sometimes it's interesting to look at the size of these coefficients with singular value number.</span>
+0146         TUNECoef = diag(diag(S).^(-1)) * U' * DelNu;
+0147         <span class="comment">%</span>
+0148         <span class="comment">% Convert the vector TUNECoef back to coefficents of TuneResponseMatrix</span>
+0149         DelQuad = V * TUNECoef;
+0150 
+0151         <span class="comment">% 2. Square matrix solution</span>
+0152         <span class="comment">% DelQuad = inv(TuneResponseMatrix) * DelNu; %  DelQuad = [Q7; Q9];</span>
+0153 
+0154 
+0155         <span class="comment">% 3. Least squares solution</span>
+0156         <span class="comment">% DelQuad = inv(TuneResponseMatrix'*TuneResponseMatrix)*TuneResponseMatrix' * DeltaTune;</span>
+0157         <span class="comment">%</span>
+0158         <span class="comment">% see Matlab help for &quot;Matrices and Linear Algebra&quot; to see what this does</span>
+0159         <span class="comment">% If overdetermined, then &quot;\&quot; is least squares</span>
+0160         <span class="comment">%</span>
+0161         <span class="comment">% If underdetermined (like more than 2 quadrupole families), then only the</span>
+0162         <span class="comment">% columns with the 2 biggest norms will be keep.  The rest of the quadupole</span>
+0163         <span class="comment">% families with have zero effect.  Hence, constraints would have to be added for</span>
+0164         <span class="comment">% this method to work.</span>
+0165         <span class="comment">% DelQuad = TuneResponseMatrix \ DelNu;</span>
+0166 
+0167         <span class="keyword">for</span> k = 1:length(ActuatorFamily1)
+0168             [Units, UnitsString] = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(ActuatorFamily1{k});
+0169             <span class="keyword">if</span> k == 1
+0170                 fprintf(<span class="string">'   Quad Change:  Delta %3s = %+f %s\n'</span>, ActuatorFamily1{k}, DelQuad(k), UnitsString);
+0171             <span class="keyword">else</span>
+0172                 fprintf(<span class="string">'                 Delta %3s = %+f %s\n'</span>, ActuatorFamily1{k}, DelQuad(k), UnitsString);
+0173             <span class="keyword">end</span>
+0174         <span class="keyword">end</span>
+0175         fprintf(<span class="string">'\n'</span>)
+0176 
+0177         tmp = menu(<span class="string">'Choose an option?'</span>,<span class="string">'Step quadrupoles'</span>,<span class="string">'Remeasure Tunes'</span>,<span class="string">'Change goal tune'</span>,<span class="string">'Exit'</span>);
+0178         <span class="keyword">if</span> tmp == 1
+0179             Flag = 0;
+0180         <span class="keyword">elseif</span> tmp == 2
+0181             Flag = 1;
+0182         <span class="keyword">elseif</span> tmp == 3
+0183             Nu(1) = input(<span class="string">'  Input new horizontal tune = '</span>);
+0184             Nu(2) = input(<span class="string">'  Input new   vertical tune = '</span>);
+0185             <span class="comment">% Nu(1) = rem(Nu(1),1);</span>
+0186             <span class="comment">% Nu(2) = rem(Nu(2),1);</span>
+0187         <span class="keyword">else</span>
+0188             disp(<span class="string">'  Tunes not changed.'</span>);
+0189             <span class="keyword">return</span>
+0190         <span class="keyword">end</span>
+0191     <span class="keyword">end</span>
+0192 
+0193     disp(<span class="string">'  Changing quadrupoles...'</span>);
+0194 
+0195 <span class="keyword">else</span>
+0196     <span class="comment">% Non interactive part</span>
+0197     TuneOld = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0198 <span class="keyword">end</span>
+0199 
+0200 
+0201 <span class="comment">% Set the tune</span>
+0202 DeltaTune = Nu - TuneOld;
+0203 <span class="keyword">if</span> size(DeltaTune,1) ~= 2
+0204     error(<span class="string">'Input must be a 2x1 column vector.'</span>);
+0205 <span class="keyword">end</span>
+0206 
+0207 <span class="comment">% Step the tune</span>
+0208 [DelQuad, ActuatorFamily] = <a href="steptune.html" class="code" title="function [DelQuad, ActuatorFamily] = steptune(varargin)">steptune</a>(DeltaTune, TuneResponseMatrix, UnitsFlag{:}, ModeFlag{:});
+0209 
+0210 
+0211 <span class="keyword">if</span> InteractiveFlag
+0212    disp(<span class="string">'  Set tune complete.'</span>);
+0213 <span class="keyword">end</span>
+0214</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

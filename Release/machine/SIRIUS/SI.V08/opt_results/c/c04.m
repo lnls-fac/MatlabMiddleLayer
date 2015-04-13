@@ -1,0 +1,29 @@
+% firstRun_000493.m
+%  QUADRUPOLOS
+%  ===========
+qfa_strength	= 4.499894776193526;
+qda_strength	= -2.946085705858374;
+qdb2_strength	= -2.611498057719304;
+qfb_strength	= 4.468772755722889;
+qdb1_strength	= -3.599748613780032;
+qf1_strength	= 3.105844961037071;
+qf2_strength	= 4.091493751673809;
+qf3_strength	= 3.587318578485676;
+qf4_strength	= 3.708991851951457;
+ 
+%  SEXTUPOLOS
+%  ===========
+sda_strength	= -45.373459818561985;
+sfa_strength	= 26.035562312570525;
+sdb_strength	= -49.629913302154170;
+sfb_strength	= 66.68511547594630;
+sd1_strength	= -175.57648636755705;
+sf1_strength	= 197.91176148686675;
+sd2_strength	= -94.49149861926640;
+sd3_strength	= -124.17153878577945;
+sf2_strength	= 140.44621940019970;
+sd6_strength	= -133.52250249985290;
+sf4_strength	= 230.11412089192465;
+sd5_strength	= -121.14529210750815;
+sd4_strength	= -174.95529228130805;
+sf3_strength	= 214.84857712895970;

@@ -1,0 +1,4 @@
+- alterar scripts para otimizar AD usando familias do modo lowemit (não do hybrido)
+- para simplificar a analise do item anterior talvez otimizar sem mudar sintonia.
+- mudar sintonias usando algoritmo que conserva simetria da rede.
+- alterar sintonia antes de alterar sextupolos para não atrapalhar correção de cromaticidade.

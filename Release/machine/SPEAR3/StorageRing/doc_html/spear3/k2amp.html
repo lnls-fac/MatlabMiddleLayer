@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of k2amp</title>
+  <meta name="keywords" content="k2amp">
+  <meta name="description" content="K2AMP - Converts simulator values to amperes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; k2amp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>k2amp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>K2AMP - Converts simulator values to amperes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function Amps = k2amp(Family, Field, k, DeviceList, Energy, C, K2AmpScaleFactor) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">K2AMP - Converts simulator values to amperes
+  Amps = k2amp(Family, Field, k, DeviceList, Energy, Coefficients, K2AmpScaleFactor)
+       or
+  Amps = k2amp(Family, Field, k, DeviceList, Energy, MagnetCoreType, K2AmpScaleFactor)
+
+  Calculates the current [amperes] from the coefficients (or MagnetCoreType), &quot;K-value&quot;, energy, and linear scale factor
+
+  For dipole:      k = B / Brho
+  For quadrupole:  k = B'/ Brho
+  For sextupole:   k = B&quot;/ Brho / 2  (to be compatible with AT)
+
+  A Coefficients vector or a MagnetCoreType string (coefficient found from magnetcoefficents.m) can be used
+  k and Coefficients must have equal number of rows or one must only have one row 
+
+  Energy can be anything getenergy accepts, like 'Model' or 'Online'. 
+
+  The K2AmpScaleFactor linearly scales the output current:  Amps = K2AmpScaleFactor .* Amps
+
+  If energy is not an input or empty, then the energy is read from the accelerator data object (AD)
+  This can be used to account for linear calibration errors of the power supply and magnet
+
+  NOTES
+  1. If energy is not an input or empty, then the energy is obtained from getenergy.
+  2. Family and Field inputs are not used but there automatically part of the physics2hw call. 
+
+  Written by M. Yoon 4/8/03</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="magnetcoefficients.html" class="code" title="function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)">magnetcoefficients</a>	[C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="spear3init.html" class="code" title="function spear3init">spear3init</a>	Initialize parameters for SPEAR 3 control in MATLAB</li><li><a href="spear3init_ref.html" class="code" title="function spear3init">spear3init_ref</a>	Initialize parameters for SPEAR 3 control in MATLAB</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Amps = k2amp(Family, Field, k, DeviceList, Energy, C, K2AmpScaleFactor)</a>
+0002 <span class="comment">%K2AMP - Converts simulator values to amperes</span>
+0003 <span class="comment">%  Amps = k2amp(Family, Field, k, DeviceList, Energy, Coefficients, K2AmpScaleFactor)</span>
+0004 <span class="comment">%       or</span>
+0005 <span class="comment">%  Amps = k2amp(Family, Field, k, DeviceList, Energy, MagnetCoreType, K2AmpScaleFactor)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  Calculates the current [amperes] from the coefficients (or MagnetCoreType), &quot;K-value&quot;, energy, and linear scale factor</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%  For dipole:      k = B / Brho</span>
+0010 <span class="comment">%  For quadrupole:  k = B'/ Brho</span>
+0011 <span class="comment">%  For sextupole:   k = B&quot;/ Brho / 2  (to be compatible with AT)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  A Coefficients vector or a MagnetCoreType string (coefficient found from magnetcoefficents.m) can be used</span>
+0014 <span class="comment">%  k and Coefficients must have equal number of rows or one must only have one row</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  Energy can be anything getenergy accepts, like 'Model' or 'Online'.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  The K2AmpScaleFactor linearly scales the output current:  Amps = K2AmpScaleFactor .* Amps</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  If energy is not an input or empty, then the energy is read from the accelerator data object (AD)</span>
+0021 <span class="comment">%  This can be used to account for linear calibration errors of the power supply and magnet</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  NOTES</span>
+0024 <span class="comment">%  1. If energy is not an input or empty, then the energy is obtained from getenergy.</span>
+0025 <span class="comment">%  2. Family and Field inputs are not used but there automatically part of the physics2hw call.</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  Written by M. Yoon 4/8/03</span>
+0028 
+0029 
+0030 <span class="comment">% Note: skew quad family is distributed on two types of core</span>
+0031 <span class="comment">%       therefore might need to pass in device list</span>
+0032 <span class="comment">%       same could be true with quadshunt (current switched into many types of cores)</span>
+0033 
+0034 <span class="keyword">if</span> nargin &lt; 4
+0035     error(<span class="string">'At least 4 inputs required'</span>);
+0036 <span class="keyword">end</span>
+0037 
+0038 <span class="keyword">if</span> nargin &lt; 6
+0039     C = [];
+0040 <span class="keyword">end</span>
+0041 <span class="keyword">if</span> isempty(C)
+0042     <span class="comment">%[CC, Leff, MagnetName] = magnetcoefficients(Family);</span>
+0043     C = getfamilydata(Family, Field, <span class="string">'HW2PhysicsParams'</span>, DeviceList);
+0044     C = C{1};
+0045 <span class="keyword">end</span>
+0046 
+0047 <span class="keyword">if</span> nargin &lt; 5
+0048     Energy = [];
+0049 <span class="keyword">end</span>
+0050 <span class="keyword">if</span> isempty(Energy)
+0051     Energy = getenergy;
+0052 <span class="keyword">elseif</span> ischar(Energy)
+0053     Energy = getenergy(Energy);
+0054 <span class="keyword">end</span>
+0055 
+0056 
+0057 <span class="comment">% If k is a row vector make it a column vector</span>
+0058 k = k(:);
+0059 
+0060 
+0061 brho = getbrho(Energy);
+0062 
+0063 
+0064 <span class="comment">% Compute roots for the expansion:  0 = -BLeff + c0*I + c1*I^2 ...</span>
+0065 <span class="comment">% For dipole:      BLeff = B  * Leff</span>
+0066 <span class="comment">% For quadrupole:  BLeff = B' * Leff</span>
+0067 <span class="comment">% For sextupole:   BLeff = B&quot; * Leff</span>
+0068 
+0069 <span class="comment">%polynom = (C(8)+C(7)*Amps+C(6)*Amps^2+C(5)*Amps^3+C(4)*Amps^4+C(3)*Amps^5+C(2)*Amps^6+C(1)*Amps^7)</span>
+0070 <span class="comment">%polynom = (c0+c1*Amps+c2*Amps^2+c3*Amps^3+c4*Amps^4+c5*Amps^5+c6*Amps^6+c7*Amps^7)</span>
+0071 
+0072 <span class="keyword">if</span> isstr(C)
+0073     [C, Leff, MagnetName] = <a href="magnetcoefficients.html" class="code" title="function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)">magnetcoefficients</a>(C);
+0074 <span class="keyword">end</span>
+0075 
+0076 <span class="keyword">if</span> any(size(C,1) ~= length(k))
+0077     <span class="keyword">if</span> length(k) == 1
+0078         k = ones(size(C,1),1) * k;
+0079     <span class="keyword">elseif</span> size(C,1) == 1
+0080         <span class="comment">% Ok as is</span>
+0081         <span class="comment">%C = ones(size(k,1),1) * C;</span>
+0082     <span class="keyword">else</span>
+0083         error(<span class="string">'k and Coefficients must have equal number of rows or one must only have one row'</span>);
+0084     <span class="keyword">end</span>
+0085 <span class="keyword">end</span>
+0086 
+0087 <span class="keyword">for</span> j = 1:length(k)
+0088     
+0089     <span class="comment">% Solve for roots based on polynomial coefficient (coefficients already divided by Leff)</span>
+0090     <span class="comment">% p = [C(1) C(2) C(3) C(4) C(5) C(6) C(7) C(8) C(9)-k(j)*brho];</span>
+0091     
+0092     <span class="keyword">if</span> size(C,1) == 1
+0093         p = [C(1:end-1) C(end)-k(j)*brho]; 
+0094         r1inear = k(j)*brho/C(end-1);
+0095     <span class="keyword">else</span>
+0096         p = [C(j,1:end-1) C(j,end)-k(j)*brho]; 
+0097         r1inear = k(j)*brho/C(j,end-1);
+0098     <span class="keyword">end</span>
+0099     
+0100     r = roots(p);    
+0101         
+0102     <span class="comment">% Choose the closest solution to the linear one</span>
+0103     Amps(j,1) = inf;
+0104     <span class="keyword">for</span> i = 1:length(r)
+0105         <span class="keyword">if</span> isreal(r(i))
+0106             <span class="comment">%if r(i)&gt;0 &amp; abs(r(i)) &lt; Amps(j,1)  % Smallest, positive</span>
+0107             <span class="keyword">if</span> abs(r(i)-r1inear) &lt; abs(Amps(j,1)-r1inear)  <span class="comment">% Closest to linear solution</span>
+0108                 Amps(j,1) = r(i);
+0109             <span class="keyword">end</span>
+0110         <span class="keyword">end</span>
+0111     <span class="keyword">end</span>
+0112     
+0113     <span class="keyword">if</span> isinf(Amps(j,1))
+0114         error(sprintf(<span class="string">'Solution for k=%.3f not found (all roots are complex)'</span>, k(j)));
+0115     <span class="keyword">end</span>
+0116 <span class="keyword">end</span>
+0117 
+0118 
+0119 <span class="comment">% Scale solution if required</span>
+0120 <span class="keyword">if</span> nargin &gt;= 7
+0121     Amps = Amps .* K2AmpScaleFactor;
+0122 <span class="keyword">end</span>
+0123 
+0124 
+0125 
+0126 
+0127 
+0128 <span class="comment">% switch upper(deblank(MagnetName))</span>
+0129 <span class="comment">%</span>
+0130 <span class="comment">%     case 'BEND'</span>
+0131 <span class="comment">%         for i=1:8</span>
+0132 <span class="comment">%             if (imag(r(i))==0. &amp; real(r(i))&gt;0. &amp; real(r(i))&lt;900. &amp; real(r(i))&gt;100.)</span>
+0133 <span class="comment">%                 Amps(j,1) = r(i);</span>
+0134 <span class="comment">%             end</span>
+0135 <span class="comment">%         end</span>
+0136 <span class="comment">%</span>
+0137 <span class="comment">%     case 'QUAD'</span>
+0138 <span class="comment">%         for i=1:6</span>
+0139 <span class="comment">%             if (imag(r(i))==0. &amp; real(r(i))&gt;0. &amp; real(r(i))&lt;100. &amp; real(r(i))&gt;15.)</span>
+0140 <span class="comment">%                 Amps(j,1) = r(i);</span>
+0141 <span class="comment">%             end</span>
+0142 <span class="comment">%         end</span>
+0143 <span class="comment">%</span>
+0144 <span class="comment">%     case 'SEXT'</span>
+0145 <span class="comment">%         for i=1:6</span>
+0146 <span class="comment">%             if (imag(r(i))==0. &amp; real(r(i))&gt;0. &amp; real(r(i))&lt;100. &amp; real(r(i))&gt;15.)</span>
+0147 <span class="comment">%                 Amps(j,1) = r(i);</span>
+0148 <span class="comment">%             end</span>
+0149 <span class="comment">%         end</span>
+0150 <span class="comment">% end</span></pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

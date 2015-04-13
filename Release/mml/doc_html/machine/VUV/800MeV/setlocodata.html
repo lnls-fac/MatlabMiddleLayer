@@ -1,0 +1,346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setlocodata</title>
+  <meta name="keywords" content="setlocodata">
+  <meta name="description" content="SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">machine</a> &gt; <a href="#">VUV</a> &gt; <a href="index.html">800MeV</a> &gt; setlocodata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for machine\VUV\800MeV&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>setlocodata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function setlocodata(CommandInput, FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETLOCODATA - Applies the LOCO calibration data to both the middle layer &amp; the accelerator
+  setlocodata(CommandInput, FileName)
+
+  INPUTS
+  1. CommandInput 
+     'Nominal'    - Sets nominal gains (1) / rolls (0) to the model.
+     'Default'    - Transfer the default gains/roll setting to the Middle 
+                    Layer (Note: usually these come from a PhysData file, 
+                                 but not all accelerators use a PhysData file).
+     'SetGains'   - Set gains/coupling from a LOCO file.
+     'Symmetrize' - Symmetry correction of the lattice based on a LOCO file.
+     'CorrectCoupling' - Coupling correction of the lattice based on a LOCO file.
+     'SetModel'   - Set the model from a LOCO file.  But it only changes
+                    the part of the model that does not get corrected
+                    in 'Symmetrize' (also does a SetGains).
+     'LOCO2Model' - Set the model from a LOCO file (also does a SetGains).
+                    This sets all lattice machines fit in the LOCO run to the model.
+
+  NOTES
+  How one uses this function depends on how LOCO was setup.
+  1. Use setlocodata('Nominal') if no model calibration information is known.
+  2. The most typical situation is to apply:
+         setlocodata('Symmetrize') to the accelerator
+         setlocodata('SetModel')   to the middle layer (usually done in setoperationalmode)
+  3. If a LOCO run was done on the present lattice with no changes made to lattice
+     after LOCO run, then setting all the LOCO fits to the model makes sense.
+         setlocodata('LOCO2Model') 
+  4. This function is obviously very machine dependent.
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li><li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(OperationalMode)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function AO = getphysdatagains_local(AO)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setlocodata(CommandInput, FileName)</a>
+0002 <span class="comment">%SETLOCODATA - Applies the LOCO calibration data to both the middle layer &amp; the accelerator</span>
+0003 <span class="comment">%  setlocodata(CommandInput, FileName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. CommandInput</span>
+0007 <span class="comment">%     'Nominal'    - Sets nominal gains (1) / rolls (0) to the model.</span>
+0008 <span class="comment">%     'Default'    - Transfer the default gains/roll setting to the Middle</span>
+0009 <span class="comment">%                    Layer (Note: usually these come from a PhysData file,</span>
+0010 <span class="comment">%                                 but not all accelerators use a PhysData file).</span>
+0011 <span class="comment">%     'SetGains'   - Set gains/coupling from a LOCO file.</span>
+0012 <span class="comment">%     'Symmetrize' - Symmetry correction of the lattice based on a LOCO file.</span>
+0013 <span class="comment">%     'CorrectCoupling' - Coupling correction of the lattice based on a LOCO file.</span>
+0014 <span class="comment">%     'SetModel'   - Set the model from a LOCO file.  But it only changes</span>
+0015 <span class="comment">%                    the part of the model that does not get corrected</span>
+0016 <span class="comment">%                    in 'Symmetrize' (also does a SetGains).</span>
+0017 <span class="comment">%     'LOCO2Model' - Set the model from a LOCO file (also does a SetGains).</span>
+0018 <span class="comment">%                    This sets all lattice machines fit in the LOCO run to the model.</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  NOTES</span>
+0021 <span class="comment">%  How one uses this function depends on how LOCO was setup.</span>
+0022 <span class="comment">%  1. Use setlocodata('Nominal') if no model calibration information is known.</span>
+0023 <span class="comment">%  2. The most typical situation is to apply:</span>
+0024 <span class="comment">%         setlocodata('Symmetrize') to the accelerator</span>
+0025 <span class="comment">%         setlocodata('SetModel')   to the middle layer (usually done in setoperationalmode)</span>
+0026 <span class="comment">%  3. If a LOCO run was done on the present lattice with no changes made to lattice</span>
+0027 <span class="comment">%     after LOCO run, then setting all the LOCO fits to the model makes sense.</span>
+0028 <span class="comment">%         setlocodata('LOCO2Model')</span>
+0029 <span class="comment">%  4. This function is obviously very machine dependent.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  Written by Greg Portmann</span>
+0032 
+0033 
+0034 <span class="keyword">global</span> THERING
+0035 
+0036 <span class="keyword">if</span> nargin &lt; 1
+0037     <span class="comment">%CommandInput = 'Default';</span>
+0038     ModeCell = {<span class="string">'Nominal - Set Gain=1 &amp; Rolls=0 in the model'</span>, <span class="string">'Default - Default Gains &amp; Rolls'</span>, <span class="string">'SetGains - Set gains/rolls from a LOCO file'</span>,<span class="string">'Symmetrize - Symmetry correction of the lattice'</span>, <span class="string">'CorrectCoupling - Coupling correction of the lattice'</span>, <span class="string">'SetModel - Set the model from a LOCO file'</span>,<span class="string">'LOCO2Model - Set the model from a LOCO file (also does a SetGains)'</span>,<span class="string">'see &quot;help setlocodata&quot; for more details'</span>};
+0039     [ModeNumber, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'ALS'</span>,<span class="string">'PromptString'</span>, <span class="keyword">...</span>
+0040         <span class="string">'Select the proper LOCO set command:'</span>, <span class="keyword">...</span>
+0041         <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell);
+0042     <span class="keyword">if</span> OKFlag ~= 1
+0043         fprintf(<span class="string">'   setlocodata cancelled\n'</span>);
+0044         <span class="keyword">return</span>
+0045     <span class="keyword">end</span>
+0046     <span class="keyword">if</span> ModeNumber == 1
+0047         CommandInput = <span class="string">'Nominal'</span>;
+0048     <span class="keyword">elseif</span> ModeNumber == 2
+0049         CommandInput = <span class="string">'Default'</span>;
+0050     <span class="keyword">elseif</span> ModeNumber == 3
+0051         CommandInput = <span class="string">'SetGains'</span>;
+0052     <span class="keyword">elseif</span> ModeNumber == 4
+0053         CommandInput = <span class="string">'Symmetrize'</span>;
+0054     <span class="keyword">elseif</span> ModeNumber == 5
+0055         CommandInput = <span class="string">'CorrectCoupling'</span>;
+0056     <span class="keyword">elseif</span> ModeNumber == 6
+0057         CommandInput = <span class="string">'SetModel'</span>;
+0058     <span class="keyword">elseif</span> ModeNumber == 7
+0059         CommandInput = <span class="string">'LOCO2Model'</span>;
+0060     <span class="keyword">elseif</span> ModeNumber == 8
+0061         help <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>;
+0062         <span class="keyword">return</span>
+0063     <span class="keyword">end</span>
+0064 <span class="keyword">end</span>
+0065 
+0066 <span class="keyword">if</span> nargin &lt; 2
+0067     FileName = <span class="string">''</span>;
+0068 <span class="keyword">end</span>
+0069 
+0070 
+0071 
+0072 <span class="comment">% Device list</span>
+0073 BPMxDeviceList = family2dev(<span class="string">'BPMx'</span>);
+0074 BPMxDeviceListTotal = family2dev(<span class="string">'BPMx'</span>,0);
+0075 
+0076 BPMyDeviceList = family2dev(<span class="string">'BPMy'</span>);
+0077 BPMyDeviceListTotal = family2dev(<span class="string">'BPMy'</span>,0);
+0078 
+0079 HCMDeviceList = family2dev(<span class="string">'HCM'</span>);
+0080 HCMDeviceListTotal = family2dev(<span class="string">'HCM'</span>,0);
+0081 VCMDeviceList = family2dev(<span class="string">'VCM'</span>);
+0082 VCMDeviceListTotal = family2dev(<span class="string">'VCM'</span>,0);
+0083 
+0084 
+0085 
+0086 <span class="keyword">if</span> any(strcmpi(CommandInput, {<span class="string">'Defaults'</span>, <span class="string">'Default'</span>}))
+0087     fprintf(<span class="string">'   Using default BPM and corrector gains in %s.\n'</span>, getfamilydata(<span class="string">'OpsData'</span>,<span class="string">'PhysDataFile'</span>));
+0088 
+0089     <span class="comment">% To speed things up, put Gains/Rolls/etc in the AO</span>
+0090     AO = getao;
+0091     AO = <a href="#_sub1" class="code" title="subfunction AO = getphysdatagains_local(AO)">getphysdatagains_local</a>(AO);
+0092  
+0093 
+0094     <span class="comment">% Default behavior is what is in physdata.mat</span>
+0095     <span class="comment">% Set the roll, crunch to the AT model to be used by getpvmodel, setpvmodel, etc</span>
+0096     setatfield(<span class="string">'BPMx'</span>, <span class="string">'GCR'</span>, [AO.BPMx.Gain AO.BPMy.Gain AO.BPMx.Crunch AO.BPMx.Roll], BPMxDeviceListTotal);
+0097 
+0098     <span class="comment">% Set the gains to the AT model to be used by getpvmodel, setpvmodel, etc</span>
+0099     <span class="comment">% Make sure the Roll field is 1x2 even for single plane correctors</span>
+0100 
+0101     <span class="comment">% First set the cross planes to zero</span>
+0102     setatfield(<span class="string">'HCM'</span>, <span class="string">'Roll'</span>, 0*AO.HCM.Roll, HCMDeviceListTotal, 1, 2);
+0103     setatfield(<span class="string">'VCM'</span>, <span class="string">'Roll'</span>, 0*AO.VCM.Roll, VCMDeviceListTotal, 1, 1);
+0104 
+0105     <span class="comment">% Then set the roll field</span>
+0106     setatfield(<span class="string">'HCM'</span>, <span class="string">'Roll'</span>, AO.HCM.Roll, HCMDeviceListTotal, 1, 1);
+0107     setatfield(<span class="string">'VCM'</span>, <span class="string">'Roll'</span>, AO.VCM.Roll, VCMDeviceListTotal, 1, 2);
+0108 
+0109     setao(AO);
+0110 
+0111 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'Nominal'</span>))
+0112     fprintf(<span class="string">'   Using nominal BPM and corrector Gain=1 and Roll=0\n'</span>);
+0113 
+0114     <span class="comment">% To speed things up, put Gains/Rolls/etc in the AO</span>
+0115     AO = getao;
+0116 
+0117     <span class="comment">% Zero or one the gains and rolls</span>
+0118     AO.BPMx.Gain = ones(size(BPMxDeviceListTotal,1),1);
+0119     AO.BPMy.Gain = ones(size(BPMyDeviceListTotal,1),1);
+0120     AO.BPMx.Roll = zeros(size(BPMxDeviceListTotal,1),1);
+0121     AO.BPMy.Roll = zeros(size(BPMyDeviceListTotal,1),1);
+0122     AO.BPMx.Crunch = zeros(size(BPMxDeviceListTotal,1),1);
+0123     AO.BPMy.Crunch = zeros(size(BPMyDeviceListTotal,1),1);
+0124 
+0125     AO.HCM.Gain = ones(size(HCMDeviceListTotal,1),1);
+0126     AO.VCM.Gain = ones(size(VCMDeviceListTotal,1),1);
+0127     AO.HCM.Roll = zeros(size(HCMDeviceListTotal,1),1);
+0128     AO.VCM.Roll = zeros(size(VCMDeviceListTotal,1),1);
+0129 
+0130     
+0131     <span class="comment">% Set the roll, crunch to the AT model to be used by getpvmodel, setpvmodel, etc</span>
+0132     setatfield(<span class="string">'BPMx'</span>, <span class="string">'GCR'</span>, [AO.BPMx.Gain AO.BPMy.Gain AO.BPMx.Crunch AO.BPMx.Roll], BPMxDeviceListTotal);
+0133 
+0134     <span class="comment">% Set the gains to the AT model to be used by getpvmodel, setpvmodel, etc</span>
+0135     <span class="comment">% Make sure the Roll field is 1x2 even for single plane correctors</span>
+0136 
+0137     <span class="comment">% First set the cross planes to zero</span>
+0138     setatfield(<span class="string">'HCM'</span>, <span class="string">'Roll'</span>, 0*AO.HCM.Roll, HCMDeviceListTotal, 1, 2);
+0139     setatfield(<span class="string">'VCM'</span>, <span class="string">'Roll'</span>, 0*AO.VCM.Roll, VCMDeviceListTotal, 1, 1);
+0140 
+0141     <span class="comment">% Then set the roll field</span>
+0142     setatfield(<span class="string">'HCM'</span>, <span class="string">'Roll'</span>, AO.HCM.Roll, HCMDeviceListTotal, 1, 1);
+0143     setatfield(<span class="string">'VCM'</span>, <span class="string">'Roll'</span>, AO.VCM.Roll, VCMDeviceListTotal, 1, 2);
+0144 
+0145     setao(AO);
+0146 
+0147 
+0148 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'SetGains'</span>))
+0149 
+0150     error(<span class="string">'   Function not complete.  Look at the ALS setlocodata for an example.'</span>);
+0151 
+0152 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'SetModel'</span>))
+0153 
+0154     error(<span class="string">'   Function not complete.  Look at the ALS setlocodata for an example.'</span>);
+0155 
+0156 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'SetMachine'</span>))
+0157 
+0158     error(<span class="string">'   Function not complete.  Look at the ALS setlocodata for an example.'</span>);
+0159 
+0160 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'LOCO2Model'</span>))
+0161 
+0162     error(<span class="string">'   Function not complete.  Look at the ALS setlocodata for an example.'</span>);
+0163 
+0164 <span class="keyword">else</span>
+0165 
+0166     error(<span class="string">'   '</span>);
+0167 
+0168 <span class="keyword">end</span>
+0169 
+0170 
+0171 
+0172 <a name="_sub1" href="#_subfunctions" class="code">function AO = getphysdatagains_local(AO)</a>
+0173 
+0174 <span class="comment">% Device list</span>
+0175 BPMxDeviceList = family2dev(<span class="string">'BPMx'</span>);
+0176 BPMxDeviceListTotal = family2dev(<span class="string">'BPMx'</span>,0);
+0177 
+0178 BPMyDeviceList = family2dev(<span class="string">'BPMy'</span>);
+0179 BPMyDeviceListTotal = family2dev(<span class="string">'BPMy'</span>,0);
+0180 
+0181 HCMDeviceList = family2dev(<span class="string">'HCM'</span>);
+0182 HCMDeviceListTotal = family2dev(<span class="string">'HCM'</span>,0);
+0183 VCMDeviceList = family2dev(<span class="string">'VCM'</span>);
+0184 VCMDeviceListTotal = family2dev(<span class="string">'VCM'</span>,0);
+0185 
+0186 
+0187 <span class="comment">% Offsets - No conversion required</span>
+0188 <span class="comment">% AO.BPMx.Offset = getoffset('BPMx', BPMxDeviceListTotal);</span>
+0189 <span class="comment">% AO.BPMy.Offset = getoffset('BPMy', BPMyDeviceListTotal);</span>
+0190 <span class="keyword">try</span>
+0191     AO.BPMx.Offset = getphysdata(<span class="string">'BPMx'</span>, <span class="string">'Offset'</span>, BPMxDeviceListTotal);
+0192 <span class="keyword">catch</span>
+0193     AO.BPMx.Offset = zeros(size(BPMxDeviceListTotal,1),1);
+0194 <span class="keyword">end</span>
+0195 <span class="keyword">try</span>
+0196     AO.BPMy.Offset = getphysdata(<span class="string">'BPMy'</span>, <span class="string">'Offset'</span>, BPMyDeviceListTotal);
+0197 <span class="keyword">catch</span>
+0198     AO.BPMy.Offset = zeros(size(BPMyDeviceListTotal,1),1);
+0199 <span class="keyword">end</span>
+0200 
+0201 <span class="keyword">try</span>
+0202     AO.BPMx.Gain = getphysdata(<span class="string">'BPMx'</span>, <span class="string">'Gain'</span>, BPMxDeviceListTotal);
+0203 <span class="keyword">catch</span>
+0204     AO.BPMx.Gain = ones(size(BPMxDeviceListTotal,1),1);
+0205 <span class="keyword">end</span>
+0206 <span class="keyword">try</span>
+0207     AO.BPMy.Gain = getphysdata(<span class="string">'BPMy'</span>, <span class="string">'Gain'</span>, BPMyDeviceListTotal);
+0208 <span class="keyword">catch</span>
+0209     AO.BPMy.Gain = ones(size(BPMyDeviceListTotal,1),1);
+0210 <span class="keyword">end</span>
+0211 
+0212 <span class="keyword">try</span>
+0213     AO.BPMx.Roll = getphysdata(<span class="string">'BPMx'</span>, <span class="string">'Roll'</span>, BPMxDeviceListTotal);
+0214 <span class="keyword">catch</span>
+0215     AO.BPMx.Roll = zeros(size(BPMxDeviceListTotal,1),1);
+0216 <span class="keyword">end</span>
+0217 <span class="keyword">try</span>
+0218     AO.BPMy.Roll = getphysdata(<span class="string">'BPMy'</span>, <span class="string">'Roll'</span>, BPMyDeviceListTotal);
+0219 <span class="keyword">catch</span>
+0220     AO.BPMy.Roll = zeros(size(BPMyDeviceListTotal,1),1);
+0221 <span class="keyword">end</span>
+0222 
+0223 <span class="keyword">try</span>
+0224     AO.BPMx.Crunch = getphysdata(<span class="string">'BPMx'</span>, <span class="string">'Crunch'</span>, BPMxDeviceListTotal);
+0225 <span class="keyword">catch</span>
+0226     AO.BPMx.Crunch = zeros(size(BPMxDeviceListTotal,1),1);
+0227 <span class="keyword">end</span>
+0228 <span class="keyword">try</span>
+0229     AO.BPMy.Crunch = getphysdata(<span class="string">'BPMy'</span>, <span class="string">'Crunch'</span>, BPMyDeviceListTotal);
+0230 <span class="keyword">catch</span>
+0231     AO.BPMy.Crunch = zeros(size(BPMyDeviceListTotal,1),1);
+0232 <span class="keyword">end</span>
+0233 
+0234 
+0235 
+0236 <span class="comment">% Gains used by raw2real, real2raw, etc</span>
+0237 <span class="comment">% Set the gain/roll to the AO</span>
+0238 <span class="keyword">try</span>
+0239     AO.HCM.Gain = getphysdata(<span class="string">'HCM'</span>, <span class="string">'Gain'</span>, HCMDeviceListTotal);
+0240 <span class="keyword">catch</span>
+0241     AO.HCM.Gain = ones(size(HCMDeviceListTotal,1),1);
+0242 <span class="keyword">end</span>
+0243 <span class="keyword">try</span>
+0244     AO.HCM.Offset = getphysdata(<span class="string">'HCM'</span>, <span class="string">'Offset'</span>, HCMDeviceListTotal);
+0245 <span class="keyword">catch</span>
+0246     AO.HCM.Offset = zeros(size(HCMDeviceListTotal,1),1);
+0247 <span class="keyword">end</span>
+0248 <span class="keyword">try</span>
+0249     AO.HCM.Roll = getphysdata(<span class="string">'HCM'</span>, <span class="string">'Roll'</span>, HCMDeviceListTotal);
+0250 <span class="keyword">catch</span>
+0251     AO.HCM.Roll = zeros(size(HCMDeviceListTotal,1),1);
+0252 <span class="keyword">end</span>
+0253 
+0254 <span class="keyword">try</span>
+0255     AO.VCM.Gain = getphysdata(<span class="string">'VCM'</span>, <span class="string">'Gain'</span>, VCMDeviceListTotal);
+0256 <span class="keyword">catch</span>
+0257     AO.VCM.Gain = ones(size(VCMDeviceListTotal,1),1);
+0258 <span class="keyword">end</span>
+0259 <span class="keyword">try</span>
+0260     AO.VCM.Offset = getphysdata(<span class="string">'VCM'</span>, <span class="string">'Offset'</span>, VCMDeviceListTotal);
+0261 <span class="keyword">catch</span>
+0262     AO.VCM.Offset = zeros(size(VCMDeviceListTotal,1),1);
+0263 <span class="keyword">end</span>
+0264 <span class="keyword">try</span>
+0265     AO.VCM.Roll = getphysdata(<span class="string">'VCM'</span>, <span class="string">'Roll'</span>, VCMDeviceListTotal);
+0266 <span class="keyword">catch</span>
+0267     AO.VCM.Roll = zeros(size(VCMDeviceListTotal,1),1);
+0268 <span class="keyword">end</span>
+0269</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

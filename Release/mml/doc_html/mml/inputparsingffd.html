@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of inputparsingffd</title>
+  <meta name="keywords" content="inputparsingffd">
+  <meta name="description" content="INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; inputparsingffd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>inputparsingffd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList
+  [Family, Field, DeviceList, UnitsFlag, ModeFlag] = inputparsingffd(varargin);
+
+  OUTPUTS
+  1. Family
+  2. Field
+  3. DeviceList {Default: Entire family}
+                If DeviceList is a string, then a common name conversion is tried.
+  4. UnitsFlag - Units if the input was a data structure
+  5. ModeFlag - Mode if the input was a data structure
+
+  See also <a href="checkforcommonnames.html" class="code" title="function [Family, DeviceList] = checkforcommonnames(Family, DeviceList)">checkforcommonnames</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="checkforcommonnames.html" class="code" title="function [Family, DeviceList] = checkforcommonnames(Family, DeviceList)">checkforcommonnames</a>	CHECKFORCOMMONNAMES - Checks for common names in the Family or DeviceList input</li><li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>	FAMILY2DATASTRUCTURE</li><li><a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>	FAMILY2TOL - Return the (SP-AM) tolerance for a family</li><li><a href="getcrunch.html" class="code" title="function Data = getcrunch(varargin)">getcrunch</a>	GETCRUNCH- Returns the crunch values for a family (radians)</li><li><a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>	GETGAIN - Returns the gain for a family</li><li><a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>	GETGOLDEN - Returns the golden values for a family</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>	GETRAMPRATE - Returns the ramp rate for a family</li><li><a href="getroll.html" class="code" title="function Data = getroll(varargin)">getroll</a>	GETROLL - Returns the roll values for a family (radians)</li><li><a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>	GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</li><li><a href="maxpv.html" class="code" title="function [Data, ErrorFlag] = maxpv(varargin)">maxpv</a>	MAXPV - Maximum value of a process variable</li><li><a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>	MinPV - Maximum value of a process variable</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)</a>
+0002 <span class="comment">%INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList</span>
+0003 <span class="comment">%  [Family, Field, DeviceList, UnitsFlag, ModeFlag] = inputparsingffd(varargin);</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  OUTPUTS</span>
+0006 <span class="comment">%  1. Family</span>
+0007 <span class="comment">%  2. Field</span>
+0008 <span class="comment">%  3. DeviceList {Default: Entire family}</span>
+0009 <span class="comment">%                If DeviceList is a string, then a common name conversion is tried.</span>
+0010 <span class="comment">%  4. UnitsFlag - Units if the input was a data structure</span>
+0011 <span class="comment">%  5. ModeFlag - Mode if the input was a data structure</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  See also checkforcommonnames</span>
+0014 
+0015 <span class="comment">%  Written by Greg Portmann</span>
+0016 
+0017 
+0018 UnitsFlag = <span class="string">''</span>;
+0019 ModelFlag = <span class="string">''</span>;
+0020 
+0021 
+0022 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0023 <span class="comment">% Family, Data Structure, or AO Structure %</span>
+0024 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0025 <span class="keyword">if</span> isstruct(varargin{1})
+0026     <span class="keyword">if</span> isfield(varargin{1},<span class="string">'FamilyName'</span>) &amp;&amp; isfield(varargin{1},<span class="string">'Field'</span>)
+0027         <span class="comment">% Data structure inputs</span>
+0028         Family = varargin{1}.FamilyName;
+0029 
+0030         Field = varargin{1}.Field;
+0031         <span class="keyword">if</span> length(varargin) &gt;= 2
+0032             <span class="keyword">if</span> ischar(varargin{2})
+0033                 Field = varargin{2};
+0034                 varargin(2) = [];
+0035             <span class="keyword">end</span>
+0036         <span class="keyword">end</span>
+0037         <span class="keyword">if</span> length(varargin) &gt;= 2
+0038             DeviceList = varargin{2};
+0039         <span class="keyword">else</span>
+0040             DeviceList = varargin{1}.DeviceList;
+0041         <span class="keyword">end</span>
+0042 
+0043         <span class="keyword">if</span> isfield(varargin{1},<span class="string">'Units'</span>)
+0044             UnitsFlag = varargin{1}.Units;
+0045         <span class="keyword">end</span>
+0046         <span class="keyword">if</span> isfield(varargin{1},<span class="string">'Mode'</span>)
+0047             ModeFlag = varargin{1}.Mode;
+0048         <span class="keyword">end</span>
+0049 
+0050     <span class="keyword">else</span>
+0051 
+0052         <span class="comment">% AO Input</span>
+0053         Family = varargin{1}.FamilyName;
+0054 
+0055         Field = <span class="string">''</span>;
+0056         <span class="keyword">if</span> length(varargin) &gt;= 2
+0057             <span class="keyword">if</span> ischar(varargin{2})
+0058                 Field = varargin{2};
+0059                 varargin(2) = [];
+0060             <span class="keyword">end</span>
+0061         <span class="keyword">end</span>
+0062         <span class="keyword">if</span> length(varargin) &gt;= 2
+0063             DeviceList = varargin{2};
+0064         <span class="keyword">else</span>
+0065             DeviceList = varargin{1}.DeviceList;
+0066         <span class="keyword">end</span>
+0067         <span class="keyword">if</span> isempty(DeviceList)
+0068             DeviceList = varargin{1}.DeviceList;
+0069         <span class="keyword">end</span>
+0070     <span class="keyword">end</span>
+0071 
+0072 <span class="keyword">else</span>
+0073 
+0074     <span class="comment">% Family input</span>
+0075     Family = varargin{1};
+0076 
+0077     Field = <span class="string">''</span>;
+0078     <span class="keyword">if</span> length(varargin) &gt;= 2
+0079         <span class="keyword">if</span> ischar(varargin{2})
+0080             Field = varargin{2};
+0081             varargin(2) = [];
+0082         <span class="keyword">end</span>
+0083     <span class="keyword">end</span>
+0084     <span class="keyword">if</span> length(varargin) &gt;= 2
+0085         DeviceList = varargin{2};
+0086     <span class="keyword">else</span>
+0087         DeviceList = [];
+0088     <span class="keyword">end</span>
+0089 
+0090 <span class="keyword">end</span>
+0091 
+0092 
+0093 <span class="comment">% Default field</span>
+0094 <span class="comment">% if isempty(Field)</span>
+0095 <span class="comment">%     Field = 'Monitor';</span>
+0096 <span class="comment">% end</span>
+0097 
+0098 
+0099 <span class="comment">% Default device list</span>
+0100 <span class="keyword">if</span> isempty(DeviceList)
+0101     <span class="keyword">try</span>
+0102         DeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family);
+0103     <span class="keyword">catch</span>
+0104     <span class="keyword">end</span>
+0105 <span class="keyword">end</span>
+0106 
+0107 <span class="comment">% Convert element list to a device list</span>
+0108 <span class="keyword">if</span> (size(DeviceList,2) == 1) &amp;&amp; ~ischar(DeviceList)
+0109     DeviceList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(Family, DeviceList);
+0110 <span class="keyword">end</span>
+0111 
+0112 
+0113 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0114 <span class="comment">% Check DeviceList or Family is a common name list %</span>
+0115 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0116 [Family, DeviceList] = <a href="checkforcommonnames.html" class="code" title="function [Family, DeviceList] = checkforcommonnames(Family, DeviceList)">checkforcommonnames</a>(Family, DeviceList);
+0117 
+0118 
+0119 
+0120 
+0121</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

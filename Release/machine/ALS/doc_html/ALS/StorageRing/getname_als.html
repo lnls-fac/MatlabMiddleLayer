@@ -1,0 +1,1248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getname_als</title>
+  <meta name="keywords" content="getname_als">
+  <meta name="description" content="ChannelName = getname(Family, DeviceList, ChanTypeStr)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getname_als.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getname_als
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>ChannelName = getname(Family, DeviceList, ChanTypeStr)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function  [ChannelName, ErrorFlag] = getname_als(Family, DeviceList, ChanTypeFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> ChannelName = getname(Family, DeviceList, ChanTypeStr)
+
+   Inputs:  Family name
+            DeviceList ([Sector Device #] or [element #]) (default: whole family)
+            ChanTypeStr 0 -&gt; 'AM' channel type (default)
+                        1 -&gt; 'AC' channel type
+                        2 -&gt; 'BM' channel type
+                        3 -&gt; 'BC' channel type
+
+   Outputs: ChannelName = IOC channel name corresponding to the family and DeviceList
+            ErrorFlag = 0 if family name was found
+                       -1 if no family name was found, ChannelName = Family</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="alsinit.html" class="code" title="function alsinit(OperationalMode)">alsinit</a>	ALSINIT</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function  [ChannelName, ErrorFlag] = getname_als(Family, DeviceList, ChanTypeFlag)</a>
+0002 <span class="comment">% ChannelName = getname(Family, DeviceList, ChanTypeStr)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   Inputs:  Family name</span>
+0005 <span class="comment">%            DeviceList ([Sector Device #] or [element #]) (default: whole family)</span>
+0006 <span class="comment">%            ChanTypeStr 0 -&gt; 'AM' channel type (default)</span>
+0007 <span class="comment">%                        1 -&gt; 'AC' channel type</span>
+0008 <span class="comment">%                        2 -&gt; 'BM' channel type</span>
+0009 <span class="comment">%                        3 -&gt; 'BC' channel type</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%   Outputs: ChannelName = IOC channel name corresponding to the family and DeviceList</span>
+0012 <span class="comment">%            ErrorFlag = 0 if family name was found</span>
+0013 <span class="comment">%                       -1 if no family name was found, ChannelName = Family</span>
+0014 
+0015 ErrorFlag = 0;
+0016 
+0017 <span class="keyword">if</span> nargin == 0
+0018     error(<span class="string">'Must have at least one input (''Family'')!'</span>);
+0019 <span class="keyword">elseif</span> nargin == 1
+0020     DeviceList = getlist(Family);
+0021     ChanTypeFlag = 1;
+0022 <span class="keyword">elseif</span> nargin == 2
+0023     ChanTypeFlag = 1;
+0024 <span class="keyword">elseif</span> nargin &gt; 3
+0025     error(<span class="string">'GETNAME_ALS: maximum of 3 input arguments.'</span>);
+0026 <span class="keyword">end</span>
+0027 
+0028 
+0029 <span class="keyword">if</span> (ChanTypeFlag==0)
+0030     ChanTypeStr = <span class="string">'AM'</span>;    <span class="comment">% Analog Monitor (AM)</span>
+0031 <span class="keyword">elseif</span> (ChanTypeFlag==1)
+0032     ChanTypeStr = <span class="string">'AC'</span>;    <span class="comment">% Analog Control (AC)</span>
+0033 <span class="keyword">elseif</span> (ChanTypeFlag==2)
+0034     ChanTypeStr =<span class="string">'BM'</span>;    <span class="comment">% Boolean monitor (BM)</span>
+0035     EPICSChanTypeStr =<span class="string">'bi'</span>;
+0036 <span class="keyword">elseif</span> (ChanTypeFlag==3)
+0037     ChanTypeStr =<span class="string">'BC'</span>;    <span class="comment">% Boolean Control (BC)</span>
+0038     EPICSChanTypeStr =<span class="string">'bo'</span>;
+0039 <span class="keyword">else</span>
+0040     error(<span class="string">'Channel type unknown'</span>);
+0041 <span class="keyword">end</span>
+0042 
+0043 
+0044 <span class="keyword">if</span> isempty(DeviceList)
+0045     DeviceList = getlist(Family);
+0046 <span class="keyword">elseif</span> (size(DeviceList,2) == 1)
+0047     DeviceList = elem2dev(Family, DeviceList);
+0048 <span class="keyword">end</span>
+0049 
+0050 ChannelName = [];
+0051 
+0052 <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0053     SectorList = DeviceList(i,1);
+0054     DevList = DeviceList(i,2);
+0055     
+0056     <span class="comment">% First look for arc-BPM that have been modified with new Bergoz electronics</span>
+0057     <span class="keyword">if</span> strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; SectorList==1 &amp;&amp; DevList==2
+0058         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s02'</span>,  1, 2, ChanTypeStr);
+0059     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; SectorList==1 &amp;&amp; DevList==2
+0060         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s03'</span>,  1, 2, ChanTypeStr);
+0061         
+0062     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; SectorList==12 &amp;&amp; DevList==9
+0063         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s00'</span>,  1, 1, ChanTypeStr);
+0064     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; SectorList==12 &amp;&amp; DevList==9
+0065         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s01'</span>,  1, 1, ChanTypeStr);
+0066         
+0067     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; SectorList==2 &amp;&amp; DevList==9
+0068         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s00'</span>,  3, 1, ChanTypeStr);
+0069     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; SectorList==2 &amp;&amp; DevList==9
+0070         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s01'</span>,  3, 1, ChanTypeStr);
+0071     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; SectorList==3 &amp;&amp; DevList==2
+0072         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s02'</span>,  3, 2, ChanTypeStr);
+0073     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; SectorList==3 &amp;&amp; DevList==2
+0074         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s03'</span>,  3, 2, ChanTypeStr);
+0075         
+0076         <span class="comment">% Bergoz retrofit in center of arc</span>
+0077     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==5) <span class="comment">%&amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12)</span>
+0078         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dXT_%s00'</span>,  SectorList,  4, ChanTypeStr);
+0079     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==5) <span class="comment">%&amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12)</span>
+0080         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dYT_%s01'</span>,  SectorList,  4, ChanTypeStr);
+0081     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==6) <span class="comment">%&amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12)</span>
+0082         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dXT_%s02'</span>,  SectorList,  5, ChanTypeStr);
+0083     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==6) <span class="comment">%&amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12)</span>
+0084         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dYT_%s03'</span>,  SectorList,  5, ChanTypeStr);
+0085 
+0086         <span class="comment">% Bergoz retrofit in next to QFA magnets (2007-06-13), C. Steier, T. Scarvie</span>
+0087     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==4) 
+0088         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dXT_%s00'</span>,  SectorList,  3, ChanTypeStr);
+0089     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==4) 
+0090         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dYT_%s00'</span>,  SectorList,  3, ChanTypeStr);
+0091     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==7) 
+0092         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dXT_%s00'</span>,  SectorList,  6, ChanTypeStr);
+0093     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==7) 
+0094         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dYT_%s00'</span>,  SectorList,  6, ChanTypeStr);
+0095         
+0096     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; (DevList==2 || DevList==3 || DevList==4 || DevList==5 || DevList==6 || DevList==7 || DevList==8 || DevList==9)
+0097         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1d_X_%s00'</span>,  SectorList,  DevList-1, ChanTypeStr);
+0098     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; (DevList==2 || DevList==3 || DevList==4 || DevList==5 || DevList==6 || DevList==7 || DevList==8 || DevList==9)
+0099         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1d_Y_%s01'</span>,  SectorList,  DevList-1, ChanTypeStr);
+0100         
+0101     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==1)
+0102         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s02'</span>,  SectorList,  2, ChanTypeStr);
+0103     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==1)
+0104         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s03'</span>,  SectorList,  2, ChanTypeStr);
+0105     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==10)
+0106         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s00'</span>,  SectorList+1,  1, ChanTypeStr);
+0107     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==10)
+0108         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s01'</span>,  SectorList+1,  1, ChanTypeStr);
+0109         
+0110     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==11 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10))
+0111         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s00'</span>,  SectorList+1,  3, ChanTypeStr);
+0112     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==11 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10))
+0113         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s01'</span>,  SectorList+1,  3, ChanTypeStr);
+0114     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMx'</span>) &amp;&amp; DevList==12 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10))
+0115         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s02'</span>,  SectorList+1,  4, ChanTypeStr);
+0116     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMy'</span>) &amp;&amp; DevList==12 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10))
+0117         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s03'</span>,  SectorList+1,  4, ChanTypeStr);
+0118         
+0119         
+0120     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)) &amp;&amp; (DevList==2) &amp;&amp; (SectorList==1)
+0121         ChanName = sprintf(<span class="string">'SR%02dS___IBPM___AC00'</span>, SectorList);
+0122     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)) &amp;&amp; (DevList==9) &amp;&amp; (SectorList==2)
+0123         ChanName = sprintf(<span class="string">'SR%02dS___IBPM___AC00'</span>, SectorList);
+0124     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)) &amp;&amp; (DevList==2) &amp;&amp; (SectorList==3)
+0125         ChanName = sprintf(<span class="string">'SR%02dS___IBPM___AC00'</span>, SectorList);
+0126     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)) &amp;&amp; (DevList==9) &amp;&amp; (SectorList==12)
+0127         ChanName = sprintf(<span class="string">'SR%02dS___IBPM___AC00'</span>, SectorList);
+0128     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)) &amp;&amp; (DevList==2 || DevList==3 || DevList==8 || DevList==9)
+0129         ChanName =<span class="string">' '</span>;
+0130     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)) &amp;&amp; (DevList==1) &amp;&amp; (SectorList==1)
+0131         ChanName =<span class="string">' '</span>;
+0132     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)) &amp;&amp; (DevList==5 || DevList==6) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12)
+0133         ChanName = sprintf(<span class="string">'SR%02dC___BPM__T_AC00'</span>, SectorList);
+0134     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BPMxTimeConstant'</span>) || strcmp(Family,<span class="string">'BPMyTimeConstant'</span>)
+0135         ChanName = sprintf(<span class="string">'SR%02dS___IBPM___AC00'</span>, SectorList);
+0136         <span class="comment">% End of BPM family</span>
+0137         
+0138         <span class="comment">% Old style BPM</span>
+0139     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPM96x'</span>))
+0140         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1d_X_%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0141     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BPM96y'</span>))
+0142         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1d_Y_%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0143         
+0144         <span class="comment">% Old naming for IDBPMs</span>
+0145     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMx'</span>) &amp;&amp; DevList==1)
+0146         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0147     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMy'</span>) &amp;&amp; DevList==1)
+0148         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0149     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMx'</span>) &amp;&amp; DevList==2)
+0150         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s02'</span>,  SectorList,  DevList, ChanTypeStr);
+0151     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMy'</span>) &amp;&amp; DevList==2)
+0152         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s03'</span>,  SectorList,  DevList, ChanTypeStr);
+0153         
+0154     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMx'</span>) &amp;&amp; DevList==3 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0155         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0156     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMy'</span>) &amp;&amp; DevList==3 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0157         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0158     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMx'</span>) &amp;&amp; DevList==4 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0159         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dX_%s02'</span>,  SectorList,  DevList, ChanTypeStr);
+0160     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDBPMy'</span>) &amp;&amp; DevList==4 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0161         ChanName = sprintf(<span class="string">'SR%02dS___IBPM%1dY_%s03'</span>,  SectorList,  DevList, ChanTypeStr);
+0162         
+0163     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BBPMx'</span>) &amp;&amp; DevList==4) <span class="comment">% &amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12))</span>
+0164         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dXT_%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0165     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BBPMy'</span>) &amp;&amp; DevList==4) <span class="comment">% &amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12))</span>
+0166         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dYT_%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0167     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BBPMx'</span>) &amp;&amp; DevList==5) <span class="comment">% &amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12))</span>
+0168         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dXT_%s02'</span>,  SectorList,  DevList, ChanTypeStr);
+0169     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BBPMy'</span>) &amp;&amp; DevList==5) <span class="comment">% &amp;&amp; (SectorList==4 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12))</span>
+0170         ChanName = sprintf(<span class="string">'SR%02dC___BPM%1dYT_%s03'</span>,  SectorList,  DevList, ChanTypeStr);
+0171         
+0172     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==1)
+0173         ChanName = sprintf(<span class="string">'SR%02dC___HCM1___%s00'</span>,  SectorList, ChanTypeStr);
+0174     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0175         ChanName = sprintf(<span class="string">'SR%02dC___HCM1___BM01'</span>,  SectorList);
+0176     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0177         ChanName = sprintf(<span class="string">'SR%02dC___HCM1___BM02'</span>,  SectorList);
+0178     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0179         ChanName = sprintf(<span class="string">'SR%02dC___HCM1___BC16'</span>,  SectorList);
+0180     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0181         ChanName = sprintf(<span class="string">'SR%02dC___HCM1_R_BC17'</span>,  SectorList);
+0182     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==1   &amp;&amp; (ChanTypeFlag==1))
+0183         ChanName = sprintf(<span class="string">'SR%02dC___HCM1___AC10'</span>,  SectorList);
+0184     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==1)
+0185         ChanName = sprintf(<span class="string">'SR%02dC___HCM1___AC20'</span>,  SectorList);
+0186     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==1)
+0187         ChanName = sprintf(<span class="string">'SR%02dC___HCM1___AC30'</span>,  SectorList);
+0188     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtrim'</span>) &amp;&amp; DevList==1)
+0189         ChanName = sprintf(<span class="string">'SR%02dC___HCM1T__%s10'</span>,  SectorList, ChanTypeStr);
+0190     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMFF2'</span>) &amp;&amp; DevList==1 &amp;&amp; SectorList==11)
+0191         ChanName = sprintf(<span class="string">'SR%02dC___HCM1FF2AC00'</span>,  SectorList);
+0192         
+0193     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==2)
+0194         ChanName = sprintf(<span class="string">'SR%02dC___HCM2___%s01'</span>,  SectorList, ChanTypeStr);
+0195     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0196         ChanName = sprintf(<span class="string">'SR%02dC___HCM2___BM04'</span>,  SectorList);
+0197     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0198         ChanName = sprintf(<span class="string">'SR%02dC___HCM2___BM05'</span>,  SectorList);
+0199     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0200         ChanName = sprintf(<span class="string">'SR%02dC___HCM2___BC18'</span>,  SectorList);
+0201     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0202         ChanName = sprintf(<span class="string">'SR%02dC___HCM2_R_BC19'</span>,  SectorList);
+0203     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==2   &amp;&amp; (ChanTypeFlag==1))
+0204         ChanName = sprintf(<span class="string">'SR%02dC___HCM2___AC10'</span>,  SectorList);
+0205     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==2)
+0206         ChanName = sprintf(<span class="string">'SR%02dC___HCM2___AC20'</span>,  SectorList);
+0207     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==2)
+0208         ChanName = sprintf(<span class="string">'SR%02dC___HCM2___AC30'</span>,  SectorList);
+0209     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtrim'</span>) &amp;&amp; DevList==2)
+0210         ChanName = sprintf(<span class="string">'SR%02dC___HCM2T__%s10'</span>,  SectorList, ChanTypeStr);
+0211         
+0212         
+0213     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==3)
+0214         <span class="comment">%if SectorList==5</span>
+0215         <span class="comment">%    ChanName = sprintf('SR%02dC___SQSD1__%s00',  SectorList, ChanTypeStr);</span>
+0216         <span class="comment">%else</span>
+0217         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1__%s00'</span>,  SectorList, ChanTypeStr);
+0218         <span class="comment">%end</span>
+0219     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==3 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0220         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1__BM01'</span>,  SectorList);
+0221     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==3    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0222         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1__BM02'</span>,  SectorList);
+0223     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==3    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0224         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1__BC16'</span>,  SectorList);
+0225     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==3 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0226         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1R_BC17'</span>,  SectorList);
+0227         
+0228     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==3   &amp;&amp; (ChanTypeFlag==1)) &amp;&amp; any(SectorList==[1 2 3 4])
+0229         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1__AC10'</span>,  SectorList);
+0230     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==3) &amp;&amp; any(SectorList==[1 2 3 4])
+0231         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1__AC20'</span>,  SectorList);
+0232     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==3) &amp;&amp; any(SectorList==[1 2 3 4])
+0233         ChanName = sprintf(<span class="string">'SR%02dC___HCSD1__AC30'</span>,  SectorList);
+0234     <span class="comment">%elseif (strcmp(Family,'HCMtrim') &amp;&amp; DevList==3) &amp;&amp; any(SectorList==[1 2 3 4])</span>
+0235     <span class="comment">%    ChanName = sprintf('SR%02dC___HCSD1T_%s10',  SectorList, ChanTypeStr);</span>
+0236         
+0237     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==4)
+0238         <span class="comment">%if SectorList==7</span>
+0239         <span class="comment">%    ChanName = sprintf('SR%02dC___SQSF1__%s00',  SectorList, ChanTypeStr);</span>
+0240         <span class="comment">%else</span>
+0241         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1__%s02'</span>,  SectorList, ChanTypeStr);
+0242         <span class="comment">%end</span>
+0243     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==4 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0244         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1__BM07'</span>,  SectorList);
+0245     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==4    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0246         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1__BM08'</span>,  SectorList);
+0247     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==4    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0248         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1__BC20'</span>,  SectorList);
+0249     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==4 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0250         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1R_BC21'</span>,  SectorList);
+0251         
+0252     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==4   &amp;&amp; (ChanTypeFlag==1)) &amp;&amp; any(SectorList==[1 2 3 4])
+0253         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1__AC10'</span>,  SectorList);
+0254     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==4) &amp;&amp; any(SectorList==[1 2 3 4])
+0255         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1__AC20'</span>,  SectorList);
+0256     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==4) &amp;&amp; any(SectorList==[1 2 3 4])
+0257         ChanName = sprintf(<span class="string">'SR%02dC___HCSF1__AC30'</span>,  SectorList);
+0258     <span class="comment">%elseif (strcmp(Family,'HCMtrim') &amp;&amp; DevList==4) &amp;&amp; any(SectorList==[1 2 3 4])</span>
+0259     <span class="comment">%    ChanName = sprintf('SR%02dC___HCSF1T_%s10',  SectorList, ChanTypeStr);</span>
+0260 
+0261     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==5)
+0262         <span class="comment">%if (SectorList==5 &amp;&amp; ChanTypeFlag==0)</span>
+0263         <span class="comment">%    ChanName = sprintf('SR%02dC___SQSF2__AM01',  SectorList);</span>
+0264         <span class="comment">%elseif  (SectorList==5 &amp;&amp; ChanTypeFlag==1)</span>
+0265         <span class="comment">%    ChanName = sprintf('SR%02dC___SQSF2__AC00',  SectorList);</span>
+0266         <span class="comment">%else</span>
+0267         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2__%s03'</span>,  SectorList, ChanTypeStr);
+0268         <span class="comment">%end</span>
+0269     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==5 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0270         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2__BM10'</span>,  SectorList);
+0271     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==5    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0272         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2__BM11'</span>,  SectorList);
+0273     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==5    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0274         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2__BC22'</span>,  SectorList);
+0275     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==5 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0276         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2R_BC23'</span>,  SectorList);
+0277         
+0278     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==5   &amp;&amp; (ChanTypeFlag==1)) &amp;&amp; any(SectorList==[1 2 3 4])
+0279         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2__AC10'</span>,  SectorList);
+0280     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==5) &amp;&amp; any(SectorList==[1 2 3 4])
+0281         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2__AC20'</span>,  SectorList);
+0282     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==5) &amp;&amp; any(SectorList==[1 2 3 4])
+0283         ChanName = sprintf(<span class="string">'SR%02dC___HCSF2__AC30'</span>,  SectorList);
+0284     <span class="comment">%elseif (strcmp(Family,'HCMtrim') &amp;&amp; DevList==5) &amp;&amp; any(SectorList==[1 2 3 4])</span>
+0285     <span class="comment">%    ChanName = sprintf('SR%02dC___HCSF2T_%s10',  SectorList, ChanTypeStr);</span>
+0286 
+0287     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==6)
+0288         <span class="comment">%if (SectorList==5 &amp;&amp; ChanTypeFlag==0)</span>
+0289         <span class="comment">%    ChanName = sprintf('SR%02dC___SQSD2__AM01',  SectorList);</span>
+0290         <span class="comment">%elseif  (SectorList==5 &amp;&amp; ChanTypeFlag==1)</span>
+0291         <span class="comment">%    ChanName = sprintf('SR%02dC___SQSD2__AC00',  SectorList);</span>
+0292         <span class="comment">%else</span>
+0293         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2__%s01'</span>,  SectorList, ChanTypeStr);
+0294         <span class="comment">%end</span>
+0295     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==6 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0296         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2__BM04'</span>,  SectorList);
+0297     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==6    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0298         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2__BM05'</span>,  SectorList);
+0299     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==6    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0300         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2__BC18'</span>,  SectorList);
+0301     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==6 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0302         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2R_BC19'</span>,  SectorList);
+0303         
+0304     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==6   &amp;&amp; (ChanTypeFlag==1)) &amp;&amp; any(SectorList==[1 2 3 4])
+0305         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2__AC10'</span>,  SectorList);
+0306     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==6) &amp;&amp; any(SectorList==[1 2 3 4])
+0307         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2__AC20'</span>,  SectorList);
+0308     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==6) &amp;&amp; any(SectorList==[1 2 3 4])
+0309         ChanName = sprintf(<span class="string">'SR%02dC___HCSD2__AC30'</span>,  SectorList);
+0310     <span class="comment">%elseif (strcmp(Family,'HCMtrim') &amp;&amp; DevList==6) &amp;&amp; any(SectorList==[1 2 3 4])</span>
+0311     <span class="comment">%    ChanName = sprintf('SR%02dC___HCSD2T_%s10',  SectorList, ChanTypeStr);</span>
+0312 
+0313     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==7)
+0314         ChanName = sprintf(<span class="string">'SR%02dC___HCM3___%s02'</span>,  SectorList, ChanTypeStr);
+0315     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==7 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0316         ChanName = sprintf(<span class="string">'SR%02dC___HCM3___BM07'</span>,  SectorList);
+0317     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==7    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0318         ChanName = sprintf(<span class="string">'SR%02dC___HCM3___BM08'</span>,  SectorList);
+0319     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==7    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0320         ChanName = sprintf(<span class="string">'SR%02dC___HCM3___BC20'</span>,  SectorList);
+0321     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==7 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0322         ChanName = sprintf(<span class="string">'SR%02dC___HCM3_R_BC21'</span>,  SectorList);
+0323     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==7   &amp;&amp; (ChanTypeFlag==1))
+0324         ChanName = sprintf(<span class="string">'SR%02dC___HCM3___AC10'</span>,  SectorList);
+0325     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==7)
+0326         ChanName = sprintf(<span class="string">'SR%02dC___HCM3___AC20'</span>,  SectorList);
+0327     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==7)
+0328         ChanName = sprintf(<span class="string">'SR%02dC___HCM3___AC30'</span>,  SectorList);
+0329     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtrim'</span>) &amp;&amp; DevList==7)
+0330         ChanName = sprintf(<span class="string">'SR%02dC___HCM3T__%s10'</span>,  SectorList, ChanTypeStr);
+0331         
+0332     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==8)
+0333         ChanName = sprintf(<span class="string">'SR%02dC___HCM4___%s03'</span>,  SectorList, ChanTypeStr);
+0334     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==8 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0335         ChanName = sprintf(<span class="string">'SR%02dC___HCM4___BM10'</span>,  SectorList);
+0336     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==8    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0337         ChanName = sprintf(<span class="string">'SR%02dC___HCM4___BM11'</span>,  SectorList);
+0338     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==8    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0339         ChanName = sprintf(<span class="string">'SR%02dC___HCM4___BC22'</span>,  SectorList);
+0340     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMreset'</span>) &amp;&amp; DevList==8 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0341         ChanName = sprintf(<span class="string">'SR%02dC___HCM4_R_BC23'</span>,  SectorList);
+0342     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==8   &amp;&amp; (ChanTypeFlag==1))
+0343         ChanName = sprintf(<span class="string">'SR%02dC___HCM4___AC10'</span>,  SectorList);
+0344     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==8)
+0345         ChanName = sprintf(<span class="string">'SR%02dC___HCM4___AC20'</span>,  SectorList);
+0346     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==8)
+0347         ChanName = sprintf(<span class="string">'SR%02dC___HCM4___AC30'</span>,  SectorList);
+0348     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtrim'</span>) &amp;&amp; DevList==8)
+0349         ChanName = sprintf(<span class="string">'SR%02dC___HCM4T__%s10'</span>,  SectorList, ChanTypeStr);
+0350     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'HCMFF1'</span>) &amp;&amp; DevList==8 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10)
+0351         ChanName = sprintf(<span class="string">'SR%02dC___HCM4FF1AC00'</span>,  SectorList);
+0352         
+0353     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==10 &amp;&amp; SectorList==5 &amp;&amp; ChanTypeFlag==0)
+0354         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___%s01'</span>,  SectorList+1, ChanTypeStr);
+0355     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCM'</span>) &amp;&amp; DevList==10)
+0356         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___%s00'</span>,  SectorList+1, ChanTypeStr);
+0357     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMdac'</span>) &amp;&amp; DevList==10   &amp;&amp; (ChanTypeFlag==1))
+0358         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___AC10'</span>,  SectorList+1);
+0359     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMtimeconstant'</span>) &amp;&amp; DevList==10)
+0360         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___AC20'</span>,  SectorList+1);
+0361     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMramprate'</span>) &amp;&amp; DevList==10)
+0362         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___AC30'</span>,  SectorList+1);
+0363     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMready'</span>) &amp;&amp; DevList==10 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0364         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___BM19'</span>,  SectorList+1);
+0365     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==10    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0366         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___BM18'</span>,  SectorList+1);
+0367     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMon'</span>) &amp;&amp; DevList==10    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0368         ChanName = sprintf(<span class="string">'SR%02dU___HCM2___BC23'</span>,  SectorList+1);
+0369         <span class="comment">%elseif (strcmp(Family,'HCMtrim') &amp;&amp; DevList==10)</span>
+0370         <span class="comment">%    ChanName = sprintf('SR%02dU___HCM1T__%s10',  SectorList+1, ChanTypeStr);</span>
+0371     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMFF1'</span>) &amp;&amp; DevList==10 &amp;&amp; SectorList==10)
+0372         ChanName = sprintf(<span class="string">'SR%02dU___HCM2FF1AC00'</span>,  SectorList+1);
+0373     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMFF2'</span>) &amp;&amp; DevList==10 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10))
+0374         ChanName = sprintf(<span class="string">'SR%02dU___HCM2FF2AC00'</span>,  SectorList+1);
+0375         
+0376         
+0377     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==1)
+0378         ChanName = sprintf(<span class="string">'SR%02dC___VCM1___%s00'</span>,  SectorList, ChanTypeStr);
+0379     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMready'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0380         ChanName = sprintf(<span class="string">'SR%02dC___VCM1___BM01'</span>,  SectorList);
+0381     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0382         ChanName = sprintf(<span class="string">'SR%02dC___VCM1___BM02'</span>,  SectorList);
+0383     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0384         ChanName = sprintf(<span class="string">'SR%02dC___VCM1___BC16'</span>,  SectorList);
+0385     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMreset'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0386         ChanName = sprintf(<span class="string">'SR%02dC___VCM1_R_BC17'</span>,  SectorList);
+0387     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMdac'</span>) &amp;&amp; DevList==1   &amp;&amp; (ChanTypeFlag==1))
+0388         ChanName = sprintf(<span class="string">'SR%02dC___VCM1___AC10'</span>,  SectorList);
+0389     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtimeconstant'</span>) &amp;&amp; DevList==1)
+0390         ChanName = sprintf(<span class="string">'SR%02dC___VCM1___AC20'</span>,  SectorList);
+0391     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMramprate'</span>) &amp;&amp; DevList==1)
+0392         ChanName = sprintf(<span class="string">'SR%02dC___VCM1___AC30'</span>,  SectorList);
+0393     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtrim'</span>) &amp;&amp; DevList==1)
+0394         ChanName = sprintf(<span class="string">'SR%02dC___VCM1T__%s10'</span>,  SectorList, ChanTypeStr);
+0395     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMFF2'</span>) &amp;&amp; DevList==1 &amp;&amp; SectorList==11)
+0396         ChanName = sprintf(<span class="string">'SR%02dC___VCM1FF2AC00'</span>,  SectorList);
+0397         
+0398     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==2)
+0399         ChanName = sprintf(<span class="string">'SR%02dC___VCM2___%s01'</span>,  SectorList, ChanTypeStr);
+0400     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0401         ChanName = sprintf(<span class="string">'SR%02dC___VCM2___BM04'</span>,  SectorList);
+0402     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0403         ChanName = sprintf(<span class="string">'SR%02dC___VCM2___BM05'</span>,  SectorList);
+0404     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0405         ChanName = sprintf(<span class="string">'SR%02dC___VCM2___BC18'</span>,  SectorList);
+0406     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMreset'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0407         ChanName = sprintf(<span class="string">'SR%02dC___VCM2_R_BC19'</span>,  SectorList);
+0408     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMdac'</span>) &amp;&amp; DevList==2   &amp;&amp; (ChanTypeFlag==1))
+0409         ChanName = sprintf(<span class="string">'SR%02dC___VCM2___AC10'</span>,  SectorList);
+0410     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtimeconstant'</span>) &amp;&amp; DevList==2)
+0411         ChanName = sprintf(<span class="string">'SR%02dC___VCM2___AC20'</span>,  SectorList);
+0412     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMramprate'</span>) &amp;&amp; DevList==2)
+0413         ChanName = sprintf(<span class="string">'SR%02dC___VCM2___AC30'</span>,  SectorList);
+0414     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtrim'</span>) &amp;&amp; DevList==2)
+0415         ChanName = sprintf(<span class="string">'SR%02dC___VCM2T__%s10'</span>,  SectorList, ChanTypeStr);
+0416     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==3)
+0417         error(<span class="string">'No VCSD1 corrector magnet.'</span>);
+0418         
+0419     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==4)
+0420         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1__%s00'</span>,  SectorList, ChanTypeStr);
+0421     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMready'</span>) &amp;&amp; DevList==4 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0422         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1__BM01'</span>,  SectorList);
+0423     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==4    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0424         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1__BM02'</span>,  SectorList);
+0425     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==4    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0426         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1__BC16'</span>,  SectorList);
+0427     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMreset'</span>) &amp;&amp; DevList==4 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0428         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1R_BC17'</span>,  SectorList);
+0429         
+0430     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMdac'</span>) &amp;&amp; DevList==4   &amp;&amp; (ChanTypeFlag==1)) &amp;&amp; any(SectorList==[1 2 3 4])
+0431         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1__AC10'</span>,  SectorList);
+0432     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtimeconstant'</span>) &amp;&amp; DevList==4) &amp;&amp; any(SectorList==[1 2 3 4])
+0433         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1__AC20'</span>,  SectorList);
+0434     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMramprate'</span>) &amp;&amp; DevList==4) &amp;&amp; any(SectorList==[1 2 3 4])
+0435         ChanName = sprintf(<span class="string">'SR%02dC___VCSF1__AC30'</span>,  SectorList);
+0436     <span class="comment">%elseif (strcmp(Family,'VCMtrim') &amp;&amp; DevList==4) &amp;&amp; any(SectorList==[1 2 3 4])</span>
+0437     <span class="comment">%    ChanName = sprintf('SR%02dC___VCSF1T_%s10',  SectorList, ChanTypeStr);</span>
+0438 
+0439     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==5)
+0440         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2__%s01'</span>,  SectorList, ChanTypeStr);
+0441     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMready'</span>) &amp;&amp; DevList==5 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0442         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2__BM04'</span>,  SectorList);
+0443     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==5    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0444         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2__BM05'</span>,  SectorList);
+0445     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==5    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0446         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2__BC18'</span>,  SectorList);
+0447     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMreset'</span>) &amp;&amp; DevList==5 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0448         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2R_BC19'</span>,  SectorList);
+0449     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==6)
+0450         error(<span class="string">'No VCSD2 corrector magnet.'</span>);
+0451         
+0452     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMdac'</span>) &amp;&amp; DevList==5   &amp;&amp; (ChanTypeFlag==1)) &amp;&amp; any(SectorList==[1 2 3 4])
+0453         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2__AC10'</span>,  SectorList);
+0454     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtimeconstant'</span>) &amp;&amp; DevList==5) &amp;&amp; any(SectorList==[1 2 3 4])
+0455         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2__AC20'</span>,  SectorList);
+0456     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMramprate'</span>) &amp;&amp; DevList==5) &amp;&amp; any(SectorList==[1 2 3 4])
+0457         ChanName = sprintf(<span class="string">'SR%02dC___VCSF2__AC30'</span>,  SectorList);
+0458     <span class="comment">%elseif (strcmp(Family,'VCMtrim') &amp;&amp; DevList==5) &amp;&amp; any(SectorList==[1 2 3 4])</span>
+0459     <span class="comment">%    ChanName = sprintf('SR%02dC___VCSF2T_%s10',  SectorList, ChanTypeStr);</span>
+0460 
+0461         
+0462     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==7)
+0463         ChanName = sprintf(<span class="string">'SR%02dC___VCM3___%s02'</span>,  SectorList, ChanTypeStr);
+0464     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMready'</span>) &amp;&amp; DevList==7 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0465         ChanName = sprintf(<span class="string">'SR%02dC___VCM3___BM07'</span>,  SectorList);
+0466     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==7    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0467         ChanName = sprintf(<span class="string">'SR%02dC___VCM3___BM08'</span>,  SectorList);
+0468     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==7    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0469         ChanName = sprintf(<span class="string">'SR%02dC___VCM3___BC20'</span>,  SectorList);
+0470     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMreset'</span>) &amp;&amp; DevList==7 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0471         ChanName = sprintf(<span class="string">'SR%02dC___VCM3_R_BC21'</span>,  SectorList);
+0472     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMdac'</span>) &amp;&amp; DevList==7   &amp;&amp; (ChanTypeFlag==1))
+0473         ChanName = sprintf(<span class="string">'SR%02dC___VCM3___AC10'</span>,  SectorList);
+0474     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtimeconstant'</span>) &amp;&amp; DevList==7)
+0475         ChanName = sprintf(<span class="string">'SR%02dC___VCM3___AC20'</span>,  SectorList);
+0476     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMramprate'</span>) &amp;&amp; DevList==7)
+0477         ChanName = sprintf(<span class="string">'SR%02dC___VCM3___AC30'</span>,  SectorList);
+0478     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtrim'</span>) &amp;&amp; DevList==7)
+0479         ChanName = sprintf(<span class="string">'SR%02dC___VCM3T__%s10'</span>,  SectorList, ChanTypeStr);
+0480         
+0481     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==8)
+0482         ChanName = sprintf(<span class="string">'SR%02dC___VCM4___%s03'</span>,  SectorList, ChanTypeStr);
+0483     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMready'</span>) &amp;&amp; DevList==8 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0484         ChanName = sprintf(<span class="string">'SR%02dC___VCM4___BM10'</span>,  SectorList);
+0485     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==8    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0486         ChanName = sprintf(<span class="string">'SR%02dC___VCM4___BM11'</span>,  SectorList);
+0487     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==8    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0488         ChanName = sprintf(<span class="string">'SR%02dC___VCM4___BC22'</span>,  SectorList);
+0489     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMreset'</span>) &amp;&amp; DevList==8 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0490         ChanName = sprintf(<span class="string">'SR%02dC___VCM4_R_BC23'</span>,  SectorList);
+0491     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMdac'</span>) &amp;&amp; DevList==8   &amp;&amp; (ChanTypeFlag==1))
+0492         ChanName = sprintf(<span class="string">'SR%02dC___VCM4___AC10'</span>,  SectorList);
+0493     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtimeconstant'</span>) &amp;&amp; DevList==8)
+0494         ChanName = sprintf(<span class="string">'SR%02dC___VCM4___AC20'</span>,  SectorList);
+0495     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMramprate'</span>) &amp;&amp; DevList==8)
+0496         ChanName = sprintf(<span class="string">'SR%02dC___VCM4___AC30'</span>,  SectorList);
+0497     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtrim'</span>) &amp;&amp; DevList==8)
+0498         ChanName = sprintf(<span class="string">'SR%02dC___VCM4T__%s10'</span>,  SectorList, ChanTypeStr);
+0499     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMFF1'</span>) &amp;&amp; DevList==8 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10))
+0500         ChanName = sprintf(<span class="string">'SR%02dC___VCM4FF1AC00'</span>,  SectorList);
+0501         
+0502     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==10 &amp;&amp; SectorList==5 &amp;&amp; ChanTypeFlag==1)
+0503         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___%s00'</span>,  SectorList+1, ChanTypeStr);
+0504     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCM'</span>) &amp;&amp; DevList==10)
+0505         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___%s01'</span>,  SectorList+1, ChanTypeStr);
+0506     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMdac'</span>) &amp;&amp; DevList==10   &amp;&amp; (ChanTypeFlag==1))
+0507         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___AC10'</span>,  SectorList+1);
+0508     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMtimeconstant'</span>) &amp;&amp; DevList==10)
+0509         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___AC20'</span>,  SectorList+1);
+0510     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMramprate'</span>) &amp;&amp; DevList==10)
+0511         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___AC30'</span>,  SectorList+1);
+0512     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMready'</span>) &amp;&amp; DevList==10 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0513         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___BM17'</span>,  SectorList+1);
+0514     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==10    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0515         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___BM16'</span>,  SectorList+1);
+0516     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMon'</span>) &amp;&amp; DevList==10    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0517         ChanName = sprintf(<span class="string">'SR%02dU___VCM2___BC22'</span>,  SectorList+1);
+0518         <span class="comment">%elseif (strcmp(Family,'VCMtrim') &amp;&amp; DevList==10)</span>
+0519         <span class="comment">%    ChanName = sprintf('SR%02dU___VCM1T__%s10',  SectorList+1, ChanTypeStr);</span>
+0520     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMFF1'</span>) &amp;&amp; DevList==10 &amp;&amp; SectorList==10)
+0521         ChanName = sprintf(<span class="string">'SR%02dU___VCM2FF1AC00'</span>,  SectorList+1);
+0522     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMFF2'</span>) &amp;&amp; DevList==10 &amp;&amp; (SectorList==3 || SectorList==5 || SectorList==10))
+0523         ChanName = sprintf(<span class="string">'SR%02dU___VCM2FF2AC00'</span>,  SectorList+1);
+0524         
+0525         
+0526     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QF'</span>) &amp;&amp; DevList==1)
+0527         ChanName = sprintf(<span class="string">'SR%02dC___QF1____%s02'</span>,  SectorList, ChanTypeStr);
+0528     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFFF'</span>) &amp;&amp; DevList==1)
+0529         ChanName = sprintf(<span class="string">'SR%02dC___QF1FF__%s02'</span>,  SectorList, ChanTypeStr);
+0530     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFM'</span>) &amp;&amp; DevList==1)
+0531         ChanName = sprintf(<span class="string">'SR%02dC___QF1M___%s02'</span>,  SectorList, ChanTypeStr);
+0532     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFready'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0533         ChanName = sprintf(<span class="string">'SR%02dC___QF1____BM07'</span>,  SectorList);
+0534     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0535         ChanName = sprintf(<span class="string">'SR%02dC___QF1____BM08'</span>,  SectorList);
+0536     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0537         ChanName = sprintf(<span class="string">'SR%02dC___QF1____BC20'</span>,  SectorList);
+0538     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFreset'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0539         ChanName = sprintf(<span class="string">'SR%02dC___QF1__R_BC21'</span>,  SectorList);
+0540     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFdac'</span>) &amp;&amp; DevList==1   &amp;&amp; (ChanTypeFlag==1))
+0541         ChanName = sprintf(<span class="string">'SR%02dC___QF1____AC10'</span>,  SectorList);
+0542     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFtimeconstant'</span>) &amp;&amp; DevList==1)
+0543         ChanName = sprintf(<span class="string">'SR%02dC___QF1____AC20'</span>,  SectorList);
+0544     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFramprate'</span>) &amp;&amp; DevList==1)
+0545         ChanName = sprintf(<span class="string">'SR%02dC___QF1____AC30'</span>,  SectorList);
+0546         
+0547     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QF'</span>) &amp;&amp; DevList==2)
+0548         ChanName = sprintf(<span class="string">'SR%02dC___QF2____%s03'</span>,  SectorList, ChanTypeStr);
+0549     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFFF'</span>) &amp;&amp; DevList==2)
+0550         ChanName = sprintf(<span class="string">'SR%02dC___QF2FF__%s03'</span>,  SectorList, ChanTypeStr);
+0551     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFM'</span>) &amp;&amp; DevList==2)
+0552         ChanName = sprintf(<span class="string">'SR%02dC___QF2M___%s03'</span>,  SectorList, ChanTypeStr);
+0553     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0554         ChanName = sprintf(<span class="string">'SR%02dC___QF2____BM10'</span>,  SectorList);
+0555     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0556         ChanName = sprintf(<span class="string">'SR%02dC___QF2____BM11'</span>,  SectorList);
+0557     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0558         ChanName = sprintf(<span class="string">'SR%02dC___QF2____BC22'</span>,  SectorList);
+0559     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFreset'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0560         ChanName = sprintf(<span class="string">'SR%02dC___QF2__R_BC23'</span>,  SectorList);
+0561     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFdac'</span>) &amp;&amp; DevList==2   &amp;&amp; (ChanTypeFlag==1))
+0562         ChanName = sprintf(<span class="string">'SR%02dC___QF2____AC10'</span>,  SectorList);
+0563     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFtimeconstant'</span>) &amp;&amp; DevList==2)
+0564         ChanName = sprintf(<span class="string">'SR%02dC___QF2____AC20'</span>,  SectorList);
+0565     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFramprate'</span>) &amp;&amp; DevList==2)
+0566         ChanName = sprintf(<span class="string">'SR%02dC___QF2____AC30'</span>,  SectorList);
+0567         
+0568     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QD'</span>) &amp;&amp; DevList==1)
+0569         ChanName = sprintf(<span class="string">'SR%02dC___QD1____%s00'</span>,  SectorList, ChanTypeStr);
+0570     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDFF'</span>) &amp;&amp; DevList==1)
+0571         ChanName = sprintf(<span class="string">'SR%02dC___QD1FF__%s00'</span>,  SectorList, ChanTypeStr);
+0572     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDM'</span>) &amp;&amp; DevList==1)
+0573         ChanName = sprintf(<span class="string">'SR%02dC___QD1M___%s00'</span>,  SectorList, ChanTypeStr);
+0574     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDready'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0575         ChanName = sprintf(<span class="string">'SR%02dC___QD1____BM01'</span>,  SectorList);
+0576     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0577         ChanName = sprintf(<span class="string">'SR%02dC___QD1____BM02'</span>,  SectorList);
+0578     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDon'</span>) &amp;&amp; DevList==1    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0579         ChanName = sprintf(<span class="string">'SR%02dC___QD1____BC16'</span>,  SectorList);
+0580     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDreset'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0581         ChanName = sprintf(<span class="string">'SR%02dC___QD1__R_BC17'</span>,  SectorList);
+0582     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDdac'</span>) &amp;&amp; DevList==1   &amp;&amp; (ChanTypeFlag==1))
+0583         ChanName = sprintf(<span class="string">'SR%02dC___QD1____AC10'</span>,  SectorList);
+0584     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDtimeconstant'</span>) &amp;&amp; DevList==1)
+0585         ChanName = sprintf(<span class="string">'SR%02dC___QD1____AC20'</span>,  SectorList);
+0586     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDramprate'</span>) &amp;&amp; DevList==1)
+0587         ChanName = sprintf(<span class="string">'SR%02dC___QD1____AC30'</span>,  SectorList);
+0588         
+0589     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QD'</span>) &amp;&amp; DevList==2)
+0590         ChanName = sprintf(<span class="string">'SR%02dC___QD2____%s01'</span>,  SectorList, ChanTypeStr);
+0591     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDFF'</span>) &amp;&amp; DevList==2)
+0592         ChanName = sprintf(<span class="string">'SR%02dC___QD2FF__%s01'</span>,  SectorList, ChanTypeStr);
+0593     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDM'</span>) &amp;&amp; DevList==2)
+0594         ChanName = sprintf(<span class="string">'SR%02dC___QD2M___%s01'</span>,  SectorList, ChanTypeStr);
+0595     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0596         ChanName = sprintf(<span class="string">'SR%02dC___QD2____BM04'</span>,  SectorList);
+0597     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0598         ChanName = sprintf(<span class="string">'SR%02dC___QD2____BM05'</span>,  SectorList);
+0599     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDon'</span>) &amp;&amp; DevList==2    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0600         ChanName = sprintf(<span class="string">'SR%02dC___QD2____BC18'</span>,  SectorList);
+0601     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDreset'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0602         ChanName = sprintf(<span class="string">'SR%02dC___QD2__R_BC19'</span>,  SectorList);
+0603     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDdac'</span>) &amp;&amp; DevList==2   &amp;&amp; (ChanTypeFlag==1))
+0604         ChanName = sprintf(<span class="string">'SR%02dC___QD2____AC10'</span>,  SectorList);
+0605     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDtimeconstant'</span>) &amp;&amp; DevList==2)
+0606         ChanName = sprintf(<span class="string">'SR%02dC___QD2____AC20'</span>,  SectorList);
+0607     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDramprate'</span>) &amp;&amp; DevList==2)
+0608         ChanName = sprintf(<span class="string">'SR%02dC___QD2____AC30'</span>,  SectorList);
+0609         
+0610     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDA'</span>) &amp;&amp; DevList==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0611         ChanName = sprintf(<span class="string">'SR%02dC___QDA1___%s00'</span>,  SectorList, ChanTypeStr);
+0612     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; DevList==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0613         ChanName = sprintf(<span class="string">'SR%02dC___QDA1___BM10'</span>,  SectorList);
+0614     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAon'</span>)    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; DevList==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0615         ChanName = sprintf(<span class="string">'SR%02dC___QDA1___BM09'</span>,  SectorList);
+0616     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAon'</span>)    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; DevList==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0617         ChanName = sprintf(<span class="string">'SR%02dC___QDA1___BC15'</span>,  SectorList);
+0618     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; DevList==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0619         ChanName = sprintf(<span class="string">'SR%02dC___QDA1R__BC14'</span>,  SectorList);
+0620     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAtimeconstant'</span>) &amp;&amp; DevList==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0621         ChanName = sprintf(<span class="string">'SR%02dC___QDA1___AC02'</span>,  SectorList);
+0622     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAramprate'</span>) &amp;&amp; DevList==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0623         ChanName = sprintf(<span class="string">'SR%02dC___QDA1___AC03'</span>,  SectorList);
+0624     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDA'</span>) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0625         ChanName = sprintf(<span class="string">'SR%02dC___QDA2___%s00'</span>,  SectorList, ChanTypeStr);
+0626     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0627         ChanName = sprintf(<span class="string">'SR%02dC___QDA2___BM07'</span>,  SectorList);
+0628     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAon'</span>)    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0629         ChanName = sprintf(<span class="string">'SR%02dC___QDA2___BM06'</span>,  SectorList);
+0630     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAon'</span>)    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0631         ChanName = sprintf(<span class="string">'SR%02dC___QDA2___BC13'</span>,  SectorList);
+0632     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0633         ChanName = sprintf(<span class="string">'SR%02dC___QDA2R__BC12'</span>,  SectorList);
+0634     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAtimeconstant'</span>) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0635         ChanName = sprintf(<span class="string">'SR%02dC___QDA2___AC02'</span>,  SectorList);
+0636     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDAramprate'</span>) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0637         ChanName = sprintf(<span class="string">'SR%02dC___QDA2___AC03'</span>,  SectorList);
+0638     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QDA'</span>) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11))
+0639         error(<span class="string">'No QDA magnet in that sector.'</span>);
+0640         
+0641     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSF'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==0)
+0642         <span class="comment">%if SectorList == 7</span>
+0643         <span class="comment">%    ChanName = sprintf('SR%02dC___HCSF1__AM02',  SectorList);</span>
+0644         <span class="comment">%else</span>
+0645         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__AM00'</span>,  SectorList);
+0646         <span class="comment">%end</span>
+0647     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSF'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0648         <span class="comment">%if SectorList == 7</span>
+0649         <span class="comment">%    ChanName = sprintf('SR%02dC___HCSF1__AC02',  SectorList);</span>
+0650         <span class="comment">%else</span>
+0651         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__AC00'</span>,  SectorList);
+0652         <span class="comment">%end</span>
+0653     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFready'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0654         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__BM19'</span>,  SectorList);
+0655     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFon'</span>)    &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0656         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__BM18'</span>,  SectorList);
+0657     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFon'</span>)    &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0658         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__BC23'</span>,  SectorList);
+0659     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFdac'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0660         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__AC10'</span>,  SectorList);
+0661     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFtimeconstant'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0662         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__AC20'</span>,  SectorList);
+0663     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFramprate'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0664         ChanName = sprintf(<span class="string">'SR%02dC___SQSF1__AC30'</span>,  SectorList);
+0665     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSF'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==0)
+0666         <span class="comment">%if SectorList == 5</span>
+0667         <span class="comment">%ChanName = sprintf('SR%02dC___HCSF2__AM03',  SectorList);</span>
+0668         <span class="comment">%else</span>
+0669         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__AM01'</span>,  SectorList);
+0670         <span class="comment">%end</span>
+0671     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSF'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1)
+0672         <span class="comment">%if SectorList == 5</span>
+0673         <span class="comment">%    ChanName = sprintf('SR%02dC___HCSF2__AC03',  SectorList);</span>
+0674         <span class="comment">%else</span>
+0675         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__AC00'</span>,  SectorList);
+0676         <span class="comment">%end</span>
+0677     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0678         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__BM08'</span>,  SectorList);
+0679     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFon'</span>)    &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0680         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__BM09'</span>,  SectorList);
+0681     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFon'</span>)    &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0682         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__BC21'</span>,  SectorList);
+0683     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFdac'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1)
+0684         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__AC10'</span>,  SectorList);
+0685     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFtimeconstant'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1)
+0686         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__AC20'</span>,  SectorList);
+0687     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSFramprate'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1)
+0688         ChanName = sprintf(<span class="string">'SR%02dC___SQSF2__AC30'</span>,  SectorList);
+0689         
+0690     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSD'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==0)
+0691         <span class="comment">%if SectorList == 5</span>
+0692         <span class="comment">%    ChanName = sprintf('SR%02dC___HCSD1__AM00',  SectorList);</span>
+0693         <span class="comment">%else</span>
+0694         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__AM00'</span>,  SectorList);
+0695         <span class="comment">%end</span>
+0696     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSD'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0697         <span class="comment">%if SectorList == 5</span>
+0698         <span class="comment">%    ChanName = sprintf('SR%02dC___HCSD1__AC00',  SectorList);</span>
+0699         <span class="comment">%else</span>
+0700         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__AC00'</span>,  SectorList);
+0701         <span class="comment">%end</span>
+0702     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDready'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0703         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__BM17'</span>,  SectorList);
+0704     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDon'</span>)    &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0705         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__BM16'</span>,  SectorList);
+0706     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDon'</span>)    &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0707         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__BC22'</span>,  SectorList);
+0708     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDdac'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0709         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__AC10'</span>,  SectorList);
+0710     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDtimeconstant'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0711         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__AC20'</span>,  SectorList);
+0712     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDramprate'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+0713         ChanName = sprintf(<span class="string">'SR%02dC___SQSD1__AC30'</span>,  SectorList);
+0714         
+0715         <span class="comment">% SQSD2 for all sectors except SR01C</span>
+0716     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSD'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==0&amp;&amp; SectorList~=1)
+0717         <span class="comment">%if SectorList == 5</span>
+0718         <span class="comment">%    ChanName = sprintf('SR%02dC___HCSD2__AM01',  SectorList);</span>
+0719         <span class="comment">%else</span>
+0720         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__AM01'</span>,  SectorList);
+0721         <span class="comment">%end</span>
+0722     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSD'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1 &amp;&amp; SectorList~=1)
+0723         <span class="comment">%if SectorList == 5</span>
+0724         <span class="comment">%    ChanName = sprintf('SR%02dC___HCSD2__AC01',  SectorList);</span>
+0725         <span class="comment">%else</span>
+0726         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__AC00'</span>,  SectorList);
+0727         <span class="comment">%end</span>
+0728     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList~=1)
+0729         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__BM10'</span>,  SectorList);
+0730     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDon'</span>)    &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList~=1)
+0731         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__BM11'</span>,  SectorList);
+0732     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDon'</span>)    &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList~=1)
+0733         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__BC20'</span>,  SectorList);
+0734     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDdac'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1 &amp;&amp; SectorList~=1)
+0735         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__AC10'</span>,  SectorList);
+0736     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDtimeconstant'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1 &amp;&amp; SectorList~=1)
+0737         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__AC20'</span>,  SectorList);
+0738     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDramprate'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1 &amp;&amp; SectorList~=1)
+0739         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__AC30'</span>,  SectorList);
+0740         
+0741         <span class="comment">% ganged SR01C SQSD2</span>
+0742     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSD'</span>) &amp;&amp; DevList==2  &amp;&amp; SectorList==1)
+0743         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__%s02'</span>,  SectorList, ChanTypeStr);
+0744     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==1)
+0745         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__BM07'</span>,  SectorList);
+0746     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDon'</span>)    &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==1)
+0747         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__BM08'</span>,  SectorList);
+0748     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDon'</span>)    &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList==1)
+0749         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2__BC20'</span>,  SectorList);
+0750     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQSDreset'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList==1)
+0751         ChanName = sprintf(<span class="string">'SR%02dC___SQSD2R_BC21'</span>,  SectorList);
+0752         
+0753         
+0754     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SF'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==1))
+0755         ChanName = sprintf(<span class="string">'SR01C___SF_____%s00'</span>, ChanTypeStr);
+0756     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SFready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0757         ChanName = sprintf(<span class="string">'SR01C___SF_____BM17'</span>);
+0758     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SFon'</span>)    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0759         ChanName = sprintf(<span class="string">'SR01C___SF_____BM18'</span>);
+0760     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SFon'</span>)    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0761         ChanName = sprintf(<span class="string">'SR01C___SF_____BC22'</span>);
+0762     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SFdac'</span>))
+0763         ChanName = sprintf(<span class="string">'SR01C___SF_____AC10'</span>);
+0764     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SFtimeconstant'</span>))
+0765         ChanName = sprintf(<span class="string">'SR01C___SF_____AC20'</span>);
+0766     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SFramprate'</span>))
+0767         ChanName = sprintf(<span class="string">'SR01C___SF_____AC30'</span>);
+0768     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SFreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0769         ChanName = sprintf(<span class="string">'SR01C___SF___R_BC23'</span>);
+0770         
+0771         
+0772     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SD'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==1))
+0773         ChanName = sprintf(<span class="string">'SR01C___SD_____%s00'</span>, ChanTypeStr);
+0774     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SDready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0775         ChanName = sprintf(<span class="string">'SR01C___SD_____BM17'</span>);
+0776     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SDon'</span>)    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+0777         ChanName = sprintf(<span class="string">'SR01C___SD_____BM18'</span>);
+0778     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SDon'</span>)    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0779         ChanName = sprintf(<span class="string">'SR01C___SD_____BC22'</span>);
+0780     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SDdac'</span>))
+0781         ChanName = sprintf(<span class="string">'SR01C___SD_____AC10'</span>);
+0782     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SDtimeconstant'</span>))
+0783         ChanName = sprintf(<span class="string">'SR01C___SD_____AC20'</span>);
+0784     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SDramprate'</span>))
+0785         ChanName = sprintf(<span class="string">'SR01C___SD_____AC30'</span>);
+0786     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SDreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+0787         ChanName = sprintf(<span class="string">'SR01C___SD___R_BC23'</span>);
+0788         
+0789     <span class="keyword">elseif</span> findstr(Family,<span class="string">'QFA'</span>)
+0790         <span class="keyword">if</span> ~any([SectorList==4  SectorList==8  SectorList==12])
+0791             SectorList = 1;
+0792         <span class="keyword">end</span>
+0793         <span class="keyword">if</span> (strcmp(Family,<span class="string">'QFA'</span>) &amp;&amp; ChanTypeFlag==0)   <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==4 || SectorList==8 || SectorList==12))</span>
+0794             ChanName = sprintf(<span class="string">'SR%02dC___QFA____%s00'</span>,  SectorList, ChanTypeStr);
+0795         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFA'</span>) &amp;&amp; ChanTypeFlag==1) <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==4 || SectorList==8 || SectorList==12))</span>
+0796             ChanName = sprintf(<span class="string">'SR%02dC___QFA____%s00'</span>,  SectorList, ChanTypeStr);
+0797         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAtimeconstant'</span>)) <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==4 || SectorList==8 || SectorList==12))</span>
+0798             ChanName = sprintf(<span class="string">'SR%02dC___QFA____AC02'</span>,  SectorList);
+0799         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAramprate'</span>))  <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==4 || SectorList==8 || SectorList==12))</span>
+0800             ChanName = sprintf(<span class="string">'SR%02dC___QFA____AC03'</span>,  SectorList);
+0801         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0802             ChanName = sprintf(<span class="string">'SR%02dC___QFA____BM18'</span>,  SectorList);
+0803         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAon'</span>)    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0804             ChanName = sprintf(<span class="string">'SR%02dC___QFA____BM17'</span>,  SectorList);
+0805         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAon'</span>)    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0806             ChanName = sprintf(<span class="string">'SR%02dC___QFA____BC07'</span>,  SectorList);
+0807         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0808             ChanName = sprintf(<span class="string">'SR%02dC___QFA_R__BC06'</span>,  SectorList);
+0809         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==1)
+0810             ChanName = sprintf(<span class="string">'SR%02dC___QFA____BM02'</span>,  SectorList);
+0811         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAon'</span>)    &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==1)
+0812             ChanName = sprintf(<span class="string">'SR%02dC___QFA____BM04'</span>,  SectorList);
+0813         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAon'</span>)    &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList==1)
+0814             ChanName = sprintf(<span class="string">'SR%02dC___QFA____BC22'</span>,  SectorList);
+0815         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFAreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList==1)
+0816             ChanName = sprintf(<span class="string">'SR%02dC___QFA__R_BC23'</span>,  SectorList);
+0817         <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'QFA'</span>) &amp;&amp; (SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11))
+0818             error(<span class="string">'No QFA magnet in that sector.'</span>);
+0819         <span class="keyword">else</span>
+0820             ChanName = <span class="string">' '</span>;
+0821             ErrorFlag = -1;
+0822         <span class="keyword">end</span>
+0823         
+0824         <span class="comment">% Combine the BEND and Superbends</span>
+0825     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BEND'</span>) &amp;&amp; ChanTypeFlag==0 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0826         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__%s00'</span>,  SectorList, ChanTypeStr);
+0827     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BEND'</span>) &amp;&amp; ChanTypeFlag==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0828         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__%s00'</span>,  SectorList, ChanTypeStr);
+0829     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDtimeconstant'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0830         <span class="comment">%error('No BENDtimeconstant for the superbends')</span>
+0831         ChanName = <span class="string">' '</span>;
+0832     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDramprate'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0833         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__AC01'</span>,  SectorList);
+0834     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDdac'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0835         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__AM01'</span>,  SectorList);
+0836     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDlimit'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0837         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__AC02'</span>,  SectorList);
+0838     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0839         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__BM14'</span>,  SectorList);
+0840     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDon'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0841         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__BM15'</span>,  SectorList);
+0842     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDon'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0843         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__BC00'</span>,  SectorList);
+0844     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12) &amp;&amp; DevList==2)
+0845         ChanName = sprintf(<span class="string">'SR%02dC___BSC_PR_BC01'</span>,  SectorList);
+0846         
+0847     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BEND'</span>) &amp;&amp; ChanTypeFlag==0) <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==4 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0848         ChanName = sprintf(<span class="string">'SR01C___B______%s00'</span>, ChanTypeStr);
+0849     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BEND'</span>) &amp;&amp; ChanTypeFlag==1) <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0850         ChanName = sprintf(<span class="string">'SR01C___B______%s00'</span>, ChanTypeStr);
+0851     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDtimeconstant'</span>)) <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0852         ChanName = sprintf(<span class="string">'SR01C___B______AC02'</span>);
+0853     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDramprate'</span>)) <span class="comment">% &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0854         ChanName = sprintf(<span class="string">'SR01C___B______AC03'</span>);
+0855     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDready'</span>)) <span class="comment">% &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2)) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0856         ChanName = sprintf(<span class="string">'SR01C___B______BM18'</span>);
+0857     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDon'</span>)) <span class="comment">% &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2)) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0858         ChanName = sprintf(<span class="string">'SR01C___B______BM19'</span>);
+0859     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDon'</span>)) <span class="comment">% &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3)) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0860         ChanName = sprintf(<span class="string">'SR01C___B______BC23'</span>);
+0861     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BENDreset'</span>)) <span class="comment">% &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3)) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11)</span>
+0862         ChanName = sprintf(<span class="string">'SR01C___B____R_BC22'</span>);
+0863         
+0864     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSC'</span>) &amp;&amp; ChanTypeFlag==0 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0865         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__%s00'</span>,  SectorList, ChanTypeStr);
+0866     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSC'</span>) &amp;&amp; ChanTypeFlag==1 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0867         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__%s00'</span>,  SectorList, ChanTypeStr);
+0868     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSCramprate'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0869         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__AC01'</span>,  SectorList);
+0870     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSCdac'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0871         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__AM01'</span>,  SectorList);
+0872     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSClimit'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0873         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__AC02'</span>,  SectorList);
+0874     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSCready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0875         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__BM14'</span>,  SectorList);
+0876     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSCon'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0877         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__BM15'</span>,  SectorList);
+0878     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSCon'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0879         ChanName = sprintf(<span class="string">'SR%02dC___BSC_P__BC00'</span>,  SectorList);
+0880     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSCreset'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0881         ChanName = sprintf(<span class="string">'SR%02dC___BSC_PR_BC01'</span>,  SectorList);
+0882     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSC'</span>) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11))
+0883         error(<span class="string">'No BSC magnet in that sector.'</span>);
+0884         
+0885         <span class="comment">% BSC Hall Probes</span>
+0886     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BSChall'</span>) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0887         ChanName = sprintf(<span class="string">'SR%02dC___BSCHALLAM00'</span>,  SectorList);
+0888         
+0889         <span class="comment">% BSC Vertical Trim Correctors</span>
+0890     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSC'</span>) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0891         ChanName = sprintf(<span class="string">'SR%02dC___VCBSC1_%s00'</span>,  SectorList, ChanTypeStr);
+0892     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSCready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0893         ChanName = sprintf(<span class="string">'SR%02dC___VCBSC1_BM10'</span>,  SectorList);
+0894     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSCon'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0895         ChanName = sprintf(<span class="string">'SR%02dC___VCBSC1_BM09'</span>,  SectorList);
+0896     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSCon'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0897         ChanName = sprintf(<span class="string">'SR%02dC___VCBSC1_BC15'</span>,  SectorList);
+0898     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSCreset'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0899         ChanName = sprintf(<span class="string">'SR%02dC___VCBSC1RBC14'</span>,  SectorList);
+0900     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSCtimeconstant'</span>) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0901         ChanName = sprintf(<span class="string">'SR%02dC___VCBSC1_AC02'</span>,  SectorList);
+0902     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSCramprate'</span>) &amp;&amp; DevList==2 &amp;&amp; (SectorList==4 || SectorList==8 || SectorList==12))
+0903         ChanName = sprintf(<span class="string">'SR%02dC___VCBSC1_AC03'</span>,  SectorList);
+0904     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCBSC'</span>) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==6 || SectorList==7 || SectorList==9 || SectorList==10 || SectorList==11))
+0905         error(<span class="string">'No VCBSC magnet in that sector.'</span>);
+0906         
+0907     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANE'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==1) &amp;&amp; SectorList==4)
+0908         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0909     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANE'</span>) &amp;&amp; (DevList==1) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==1) &amp;&amp; SectorList==6)
+0910         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0911     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANE'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0) &amp;&amp; (SectorList==6))
+0912         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0913     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANE'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==1) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0914         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0915     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEready'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==4)
+0916         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BM04'</span>,  SectorList,  DevList);
+0917     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0918         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BM19'</span>,  SectorList,  DevList);
+0919     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEon'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==4)
+0920         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BM05'</span>,  SectorList,  DevList);
+0921     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEon'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==6)
+0922         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BM02'</span>,  SectorList,  DevList);
+0923     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEon'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0924         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BM18'</span>,  SectorList,  DevList);
+0925     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEon'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList==4)
+0926         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BC18'</span>,  SectorList,  DevList);
+0927     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEon'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList==6)
+0928         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BC16'</span>,  SectorList,  DevList);
+0929     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEon'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0930         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___BC23'</span>,  SectorList,  DevList);
+0931     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEdac'</span>) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0932         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___AC10'</span>,  SectorList,  DevList);
+0933     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEtimeconstant'</span>) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0934         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___AC20'</span>,  SectorList,  DevList);
+0935     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEramprate'</span>) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0936         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d___AC30'</span>,  SectorList,  DevList);
+0937     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEreset'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; ChanTypeFlag==3 &amp;&amp; SectorList==4)
+0938         ChanName = sprintf(<span class="string">'SR%02dU___HCM%1d_R_BC19'</span>,  SectorList,  DevList);
+0939         <span class="comment">% No reset channels for chicane magnet trim coils</span>
+0940         
+0941         <span class="comment">% Changed EPOS to RBV since sector 6 does not have a EPOS (GJP 2005-06-07)</span>
+0942     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEM'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==0 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0943         ChanName = sprintf(<span class="string">'SR%02dU___HCM2M1_AC00.RBV'</span>,  SectorList);
+0944     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEM'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==0 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0945         ChanName = sprintf(<span class="string">'SR%02dU___HCM2M2_AC01.RBV'</span>,  SectorList);
+0946     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEM'</span>) &amp;&amp; DevList==3 &amp;&amp; ChanTypeFlag==0 &amp;&amp; (SectorList==4 || SectorList==11))
+0947         ChanName = sprintf(<span class="string">'SR%02dU___HCM2M3_AC02.RBV'</span>,  SectorList);
+0948     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEM'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0949         ChanName = sprintf(<span class="string">'SR%02dU___HCM2M1_AC00'</span>,  SectorList);
+0950     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEM'</span>) &amp;&amp; DevList==2 &amp;&amp; ChanTypeFlag==1 &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0951         ChanName = sprintf(<span class="string">'SR%02dU___HCM2M2_AC01'</span>,  SectorList);
+0952     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'HCMCHICANEM'</span>) &amp;&amp; DevList==3 &amp;&amp; ChanTypeFlag==1 &amp;&amp; (SectorList==4 || SectorList==11))
+0953         ChanName = sprintf(<span class="string">'SR%02dU___HCM2M3_AC02'</span>,  SectorList);
+0954         
+0955     <span class="keyword">elseif</span> (strncmp(Family,<span class="string">'HCMCHICANE'</span>,10) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12))
+0956         error(<span class="string">'No CHICANE magnets in that sector.'</span>);
+0957         
+0958     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANE'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==1) &amp;&amp; (SectorList==4))
+0959         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0960     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANE'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0) &amp;&amp; (SectorList==6))
+0961         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0962     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANE'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1) &amp;&amp; (SectorList==6))
+0963         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___%s00'</span>,  SectorList,  DevList, ChanTypeStr);
+0964     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANE'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==1) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0965         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___%s01'</span>,  SectorList,  DevList, ChanTypeStr);
+0966     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEready'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==4)
+0967         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___BM01'</span>,  SectorList,  DevList);
+0968     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEready'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0969         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___BM17'</span>,  SectorList,  DevList);
+0970     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEon'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; SectorList==4)
+0971         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___BM02'</span>,  SectorList,  DevList);
+0972     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEon'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0973         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___BM16'</span>,  SectorList,  DevList);
+0974     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEon'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; SectorList==4)
+0975         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___BC16'</span>,  SectorList,  DevList);
+0976     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEon'</span>) &amp;&amp; DevList==2 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0977         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___BC22'</span>,  SectorList,  DevList);
+0978     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEdac'</span>) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0979         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___AC10'</span>,  SectorList,  DevList);
+0980     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEtimeconstant'</span>) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0981         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___AC20'</span>,  SectorList,  DevList);
+0982     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEramprate'</span>) &amp;&amp; (SectorList==4 || SectorList==6 || SectorList==11))
+0983         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d___AC30'</span>,  SectorList,  DevList);
+0984     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'VCMCHICANEreset'</span>) &amp;&amp; (DevList==1 || DevList==3) &amp;&amp; ChanTypeFlag==3 &amp;&amp; SectorList==4)
+0985         ChanName = sprintf(<span class="string">'SR%02dU___VCM%1d_R_BC17'</span>,  SectorList,  DevList);
+0986         <span class="comment">% No reset channels for chicane magnet trim coils</span>
+0987     <span class="keyword">elseif</span> (strncmp(Family,<span class="string">'VCMCHICANE'</span>,10) &amp;&amp; (SectorList==1 || SectorList==2 || SectorList==3 || SectorList==5 || SectorList==7 || SectorList==8 || SectorList==9 || SectorList==10 || SectorList==12))
+0988         error(<span class="string">'No CHICANE magnets in that sector.'</span>);
+0989         
+0990         <span class="comment">% Insertion devices</span>
+0991     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'ID'</span>))
+0992         <span class="keyword">if</span> (SectorList==5)
+0993             ChanName = sprintf(<span class="string">'SR%02dW___GDS1PS_%s00'</span>,    SectorList, ChanTypeStr);
+0994         <span class="keyword">elseif</span> (SectorList==4 || SectorList==11)
+0995             ChanName = sprintf(<span class="string">'SR%02dU___GDS%1dPS_%s00'</span>,  SectorList, DevList, ChanTypeStr);
+0996         <span class="keyword">else</span>
+0997             ChanName = sprintf(<span class="string">'SR%02dU___GDS1PS_%s00'</span>,    SectorList, ChanTypeStr);
+0998         <span class="keyword">end</span>
+0999     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDpos'</span>))
+1000         <span class="keyword">if</span> (SectorList==5)
+1001             ChanName = sprintf(<span class="string">'SR%02dW___GDS1PS_%s00'</span>,    SectorList, ChanTypeStr);
+1002         <span class="keyword">elseif</span> (SectorList==4 || SectorList==6 || SectorList==11)
+1003             ChanName = sprintf(<span class="string">'SR%02dU___GDS%1dPS_%s00'</span>,  SectorList, DevList, ChanTypeStr);
+1004         <span class="keyword">else</span>
+1005             ChanName = sprintf(<span class="string">'SR%02dU___GDS1PS_%s00'</span>,    SectorList, ChanTypeStr);
+1006         <span class="keyword">end</span>
+1007     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDvel'</span>))
+1008         <span class="keyword">if</span> (SectorList==5)
+1009             ChanName = sprintf(<span class="string">'SR%02dW___GDS1V__%s01'</span>,    SectorList, ChanTypeStr);
+1010         <span class="keyword">elseif</span> (SectorList==4 || SectorList==6 || SectorList==11)
+1011             ChanName = sprintf(<span class="string">'SR%02dU___GDS%1dV__%s01'</span>,  SectorList, DevList, ChanTypeStr);
+1012         <span class="keyword">else</span>
+1013             ChanName = sprintf(<span class="string">'SR%02dU___GDS1V__%s01'</span>,    SectorList, ChanTypeStr);
+1014         <span class="keyword">end</span>
+1015     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'IDrunflag'</span>))
+1016         <span class="keyword">if</span> (SectorList==5)
+1017             ChanName = sprintf(<span class="string">'SR%02dW___GDS1PS_BM00'</span>,    SectorList);
+1018         <span class="keyword">elseif</span> (SectorList==4 || SectorList==6 || SectorList==11)
+1019             ChanName = sprintf(<span class="string">'SR%02dU___GDS%1dPS_BM00'</span>,  SectorList, DevList);
+1020         <span class="keyword">else</span>
+1021             ChanName = sprintf(<span class="string">'SR%02dU___GDS1PS_BM00'</span>,    SectorList);
+1022         <span class="keyword">end</span>
+1023     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'MoveCount'</span>)
+1024         <span class="keyword">if</span> (SectorList==5)
+1025             ChanName = sprintf(<span class="string">'SR%02dW___GDS%1dE__AM02'</span>, SectorList, DevList);
+1026         <span class="keyword">else</span>
+1027             ChanName = sprintf(<span class="string">'SR%02dU___GDS%1dE__AM02'</span>, SectorList, DevList);
+1028         <span class="keyword">end</span>
+1029     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'UserGap'</span>)
+1030         <span class="keyword">if</span> SectorList==11
+1031             ChanName = sprintf(<span class="string">'sr%2du%1d:bl_input'</span>, SectorList, DevList);
+1032         <span class="keyword">else</span>
+1033             ChanName = sprintf(<span class="string">'cmm:ID%d_bl_input'</span>, SectorList);
+1034         <span class="keyword">end</span>
+1035     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUUserGap'</span>)
+1036         <span class="keyword">if</span> SectorList==4
+1037             ChanName = sprintf(<span class="string">'cmm:ID%d_bl_input'</span>, SectorList);
+1038         <span class="keyword">elseif</span> SectorList==11
+1039             ChanName = sprintf(<span class="string">'sr%2du%1d:bl_input'</span>, SectorList, DevList);
+1040         <span class="keyword">else</span>
+1041             ChanName = <span class="string">' '</span>;
+1042             ErrorFlag = -1;
+1043         <span class="keyword">end</span>
+1044     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUUserGapZ'</span>)
+1045         <span class="keyword">if</span> SectorList==4
+1046             ChanName = sprintf(<span class="string">'cmm:ID%d_bl_input_h'</span>, SectorList);
+1047         <span class="keyword">elseif</span> SectorList==11
+1048             ChanName = sprintf(<span class="string">'sr%2du%1d:bl_input_h'</span>, SectorList, DevList);
+1049         <span class="keyword">else</span>
+1050             ChanName = <span class="string">' '</span>;
+1051             ErrorFlag = -1;
+1052         <span class="keyword">end</span>
+1053         
+1054         <span class="comment">% Velocity Profile</span>
+1055     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'IDVelocityProfile'</span>) &amp;&amp; SectorList==5
+1056         ChanName = sprintf(<span class="string">'SR%02dW___GDS1E__BC02'</span>, SectorList);
+1057     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'IDVelocityProfile'</span>) &amp;&amp; SectorList==11
+1058         ChanName = sprintf(<span class="string">'SR%02dU___GDS%1dE__BC02'</span>, SectorList, DevList);
+1059     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'IDVelocityProfile'</span>)
+1060         ChanName = sprintf(<span class="string">'SR%02dU___GDS1E__BC02'</span>, SectorList);
+1061         
+1062         <span class="comment">% FFEnable</span>
+1063     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'FFEnable'</span>) &amp;&amp; SectorList==5
+1064         ChanName = sprintf(<span class="string">'sr%02dw:FFEnable:%s'</span>, SectorList, EPICSChanTypeStr);
+1065     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'FFEnable'</span>) &amp;&amp; SectorList==11
+1066         ChanName = sprintf(<span class="string">'sr%02du%1d:FFEnable:%s'</span>, SectorList, DevList, EPICSChanTypeStr);
+1067     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'FFEnable'</span>)
+1068         ChanName = sprintf(<span class="string">'sr%02du:FFEnable:%s'</span>, SectorList, EPICSChanTypeStr);
+1069         
+1070         <span class="comment">% GapEnable</span>
+1071     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'GapEnable'</span>) &amp;&amp; SectorList==5
+1072         ChanName = sprintf(<span class="string">'sr%02dw:GapEnable:%s'</span>, SectorList, EPICSChanTypeStr);
+1073     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'GapEnable'</span>) &amp;&amp; SectorList==11
+1074         ChanName = sprintf(<span class="string">'sr%02du%1d:GapEnable:%s'</span>, SectorList, DevList, EPICSChanTypeStr);
+1075     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'GapEnable'</span>)
+1076         ChanName = sprintf(<span class="string">'sr%02du:GapEnable:%s'</span>, SectorList, EPICSChanTypeStr);
+1077         
+1078     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'GapEnableBC'</span>) &amp;&amp; SectorList==11
+1079         ChanName = sprintf(<span class="string">'sr%02du%1d:opr_grant'</span>, SectorList, DevList);
+1080     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'GapEnableBC'</span>)
+1081         ChanName = sprintf(<span class="string">'cmm:ID%d_opr_grant'</span>, SectorList);
+1082         
+1083     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPU'</span>)
+1084         ChanName = sprintf(<span class="string">'SR%02dU___ODS%1dPS_%s00'</span>, SectorList, DevList, ChanTypeStr);
+1085     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUOffsetA'</span>)
+1086         ChanName = sprintf(<span class="string">'SR%02dU___ODA%1dPS_AM00'</span>, SectorList, DevList);
+1087     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUOffsetASP'</span>)
+1088         ChanName = sprintf(<span class="string">'SR%02dU___ODA%1dPS_AC02'</span>, SectorList, DevList);
+1089     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUOffsetB'</span>)
+1090         ChanName = sprintf(<span class="string">'SR%02dU___ODB%1dPS_AM01'</span>, SectorList, DevList);
+1091     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUOffsetBSP'</span>)
+1092         ChanName = sprintf(<span class="string">'SR%02dU___ODB%1dPS_AC03'</span>, SectorList, DevList);
+1093     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUvel'</span>)
+1094         ChanName = sprintf(<span class="string">'SR%02dU___ODS%1dV__AM01'</span>, SectorList, DevList);
+1095     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUrunflag'</span>)
+1096         ChanName = sprintf(<span class="string">'SR%02dU___ODS%1dE__AM02'</span>, SectorList, DevList);
+1097     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'EPUZMode'</span>)
+1098         ChanName = sprintf(<span class="string">'SR%02dU___ODS%1dM__DC01'</span>, SectorList, DevList);
+1099 
+1100     <span class="keyword">elseif</span> strncmp(Family,<span class="string">'SQEPU'</span>,5)
+1101         <span class="keyword">if</span> SectorList==4
+1102             <span class="keyword">if</span> (strcmp(Family,<span class="string">'SQEPU'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==0)
+1103                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____AM00'</span>,  SectorList);
+1104             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPU'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+1105                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____AC00'</span>,  SectorList);
+1106             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUready'</span>) &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+1107                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____BM15'</span>,  SectorList);
+1108             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUon'</span>)    &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+1109                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____BM14'</span>,  SectorList);
+1110             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUon'</span>)    &amp;&amp; DevList==1 &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+1111                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____BC21'</span>,  SectorList);
+1112             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUdac'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+1113                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____AC10'</span>,  SectorList);
+1114             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUtimeconstant'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+1115                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____AC20'</span>,  SectorList);
+1116             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUramprate'</span>) &amp;&amp; DevList==1 &amp;&amp; ChanTypeFlag==1)
+1117                 ChanName = sprintf(<span class="string">'SR%02dU___Q1_____AC30'</span>,  SectorList);
+1118             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPU'</span>) &amp;&amp; DevList==2)
+1119                 error(<span class="string">'No SR04 Q2 magnet yet.'</span>);
+1120             <span class="keyword">else</span>
+1121                 ChanName = <span class="string">' '</span>;
+1122                 ErrorFlag = -1;
+1123             <span class="keyword">end</span>
+1124         <span class="keyword">elseif</span> SectorList==11
+1125             <span class="keyword">if</span> (strcmp(Family,<span class="string">'SQEPU'</span>) &amp;&amp; ChanTypeFlag==0)
+1126                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____AM00'</span>,  SectorList, DevList);
+1127             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPU'</span>) &amp;&amp; ChanTypeFlag==1)
+1128                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____AC01'</span>,  SectorList, DevList);
+1129             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUready'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+1130                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____BM17'</span>,  SectorList, DevList);
+1131             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUon'</span>) &amp;&amp; (ChanTypeFlag==0 || ChanTypeFlag==2))
+1132                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____BM16'</span>,  SectorList, DevList);
+1133             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUon'</span>) &amp;&amp; (ChanTypeFlag==1 || ChanTypeFlag==3))
+1134                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____BC22'</span>,  SectorList, DevList);
+1135             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUdac'</span>) &amp;&amp; ChanTypeFlag==1)
+1136                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____AC10'</span>,  SectorList, DevList);
+1137             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUtimeconstant'</span>) &amp;&amp; ChanTypeFlag==1)
+1138                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____AC20'</span>,  SectorList, DevList);
+1139             <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'SQEPUramprate'</span>) &amp;&amp; ChanTypeFlag==1)
+1140                 ChanName = sprintf(<span class="string">'SR%02dU___Q%1d_____AC30'</span>,  SectorList, DevList);
+1141             <span class="keyword">else</span>
+1142                 ChanName = <span class="string">' '</span>;
+1143                 ErrorFlag = -1;
+1144             <span class="keyword">end</span>
+1145         <span class="keyword">else</span>
+1146             ChanName = <span class="string">' '</span>;
+1147             ErrorFlag = -1;
+1148         <span class="keyword">end</span>
+1149         
+1150     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'TOPSCRAPER'</span>) &amp;&amp; ChanTypeFlag==0)
+1151         <span class="keyword">if</span> SectorList==3
+1152             ChanName = sprintf(<span class="string">'SR03S___SCRAPT_AC01.EPOS'</span>);
+1153         <span class="keyword">else</span>
+1154             ChanName = sprintf(<span class="string">'SR%02dC___SCRAP%1dTAC01.RBV'</span>,  SectorList, DevList);
+1155         <span class="keyword">end</span>
+1156     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'TOPSCRAPER'</span>) &amp;&amp; ChanTypeFlag==1)
+1157         <span class="keyword">if</span> SectorList==3
+1158             ChanName = sprintf(<span class="string">'SR03S___SCRAPT_AC01.VAL'</span>);
+1159         <span class="keyword">else</span>
+1160             ChanName = sprintf(<span class="string">'SR%02dC___SCRAP%1dTAC01.VAL'</span>,  SectorList, DevList);
+1161         <span class="keyword">end</span>
+1162     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BOTTOMSCRAPER'</span>) &amp;&amp; ChanTypeFlag==0)
+1163         <span class="keyword">if</span> SectorList==3
+1164             ChanName = sprintf(<span class="string">'SR03S___SCRAPB_AC02.EPOS'</span>);
+1165         <span class="keyword">else</span>
+1166             ChanName = sprintf(<span class="string">'SR%02dC___SCRAP%1dBAC01.RBV'</span>,  SectorList, DevList);
+1167         <span class="keyword">end</span>
+1168     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'BOTTOMSCRAPER'</span>) &amp;&amp; ChanTypeFlag==1)
+1169         <span class="keyword">if</span> SectorList==3
+1170             ChanName = sprintf(<span class="string">'SR03S___SCRAPB_AC02.VAL'</span>);
+1171         <span class="keyword">else</span>
+1172             ChanName = sprintf(<span class="string">'SR%02dC___SCRAP%1dBAC01.VAL'</span>,  SectorList, DevList);
+1173         <span class="keyword">end</span>
+1174     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'INSIDESCRAPER'</span>) &amp;&amp; SectorList==3 &amp;&amp; ChanTypeFlag==0)
+1175         ChanName = sprintf(<span class="string">'SR03S___SCRAPH_AC00.EPOS'</span>);
+1176     <span class="keyword">elseif</span> (strcmp(Family,<span class="string">'INSIDESCRAPER'</span>) &amp;&amp; SectorList==3 &amp;&amp; ChanTypeFlag==1)
+1177         ChanName = sprintf(<span class="string">'SR03S___SCRAPH_AC00.VAL'</span>);
+1178     <span class="keyword">else</span>
+1179         ChanName = <span class="string">' '</span>;
+1180         ErrorFlag = -1;
+1181     <span class="keyword">end</span>
+1182     
+1183     <span class="comment">% Check for missing magnets</span>
+1184     <span class="keyword">if</span> ((strcmp(Family,<span class="string">'HCM'</span>) || strcmp(Family,<span class="string">'VCM'</span>)) &amp;&amp; SectorList==1 &amp;&amp; DevList==1)
+1185         error(<span class="string">'HCM1 &amp;&amp; VCM1 are missing from sector 1.'</span>);
+1186     <span class="keyword">elseif</span> ((strcmp(Family,<span class="string">'HCM'</span>) || strcmp(Family,<span class="string">'VCM'</span>)) &amp;&amp; SectorList==12 &amp;&amp; DevList==8)
+1187         error(<span class="string">'HCM4 &amp;&amp; VCM4 are missing from sector 12.'</span>);
+1188     <span class="keyword">end</span>
+1189     
+1190     ChannelName = strvcat(ChannelName, ChanName);
+1191 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,934 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of srramp_cas</title>
+  <meta name="keywords" content="srramp_cas">
+  <meta name="description" content="SRRAMP - Ramp the storage ring energy">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; srramp_cas.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>srramp_cas
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>SRRAMP - Ramp the storage ring energy</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function FailFlag = srramp(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SRRAMP - Ramp the storage ring energy
+  ErrorFlag = srramp(EnergyStop, NStepsPerGeV)
+
+  Ramp from the present energy to an energy between .75 and 2.0 GeV
+  The ramp files are determined in the alsvars file which take affect
+  when alsinit (or alsvars) is run.
+
+  EnergyStop   - Ramp to energy [GeV]
+                 For string inputs: 'Lower' or 'Injection'  -&gt; Ramp to lower hysteresis lattice
+                                    'Upper' or 'Production' -&gt; Ramp to upper hysteresis lattice
+  NStepsPerGeV - Number of steps per GeV {Default: 1500}
+  Input Flag   - 'NoSuperBend' don't ramp the superbend magnets
+
+  ErrorFlag - The only graceful error condition is on superbend temperature before the ramp starts
+
+  See also getenergy setenergy</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getsuperbendtemperatures.html" class="code" title="function [BSCcoiltemps, BSCcoilnames] = getsuperbendtemperatures">getsuperbendtemperatures</a>	GETSUPERBENDTEMPERATURES - Returns the super bend coil temperatures</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function FailFlag = CheckSuperBendTemperature(SBENDRampRate)</a></li><li><a href="#_sub2" class="code">function [SBENDRampRate, MinPeriod] = SetRampRateLimitsStart(LowerLattice, UpperLattice, GeVTable, NStepsPerGeV)</a></li><li><a href="#_sub3" class="code">function [SBENDRampRate, MinPeriod] = SetRampRateLimits(LowerLattice, UpperLattice, SBENDRampRate, MinPeriod, GeVTable, NStepsPerGeV)</a></li><li><a href="#_sub4" class="code">function Lattice = RemoveSomeFamilies(Lattice, SuperBendFlag)</a></li><li><a href="#_sub5" class="code">function Lattice  = RemoveSomeFields(Lattice)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function FailFlag = srramp(varargin)</a>
+0002 <span class="comment">%SRRAMP - Ramp the storage ring energy</span>
+0003 <span class="comment">%  ErrorFlag = srramp(EnergyStop, NStepsPerGeV)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Ramp from the present energy to an energy between .75 and 2.0 GeV</span>
+0006 <span class="comment">%  The ramp files are determined in the alsvars file which take affect</span>
+0007 <span class="comment">%  when alsinit (or alsvars) is run.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%  EnergyStop   - Ramp to energy [GeV]</span>
+0010 <span class="comment">%                 For string inputs: 'Lower' or 'Injection'  -&gt; Ramp to lower hysteresis lattice</span>
+0011 <span class="comment">%                                    'Upper' or 'Production' -&gt; Ramp to upper hysteresis lattice</span>
+0012 <span class="comment">%  NStepsPerGeV - Number of steps per GeV {Default: 1500}</span>
+0013 <span class="comment">%  Input Flag   - 'NoSuperBend' don't ramp the superbend magnets</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  ErrorFlag - The only graceful error condition is on superbend temperature before the ramp starts</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  See also getenergy setenergy</span>
+0018 
+0019 
+0020 <span class="comment">% 2001-11-26, T.Scarvie</span>
+0021 <span class="comment">% modified srramp so that it automatically halves the ramprate (down to 0.1A/s minimum)</span>
+0022 <span class="comment">%      if any of the superbend coil temps go above 4.65K</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% 2002-05-04, C. Steier</span>
+0025 <span class="comment">% trim DACs for correctors are set to 0 before ramping.</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% 2003-03-16, C. Steier</span>
+0028 <span class="comment">% Modified parameters for ramprate reduction to allow reasonable operation with failed</span>
+0029 <span class="comment">% cryocooler. Also programmed work-around for bug in BSC power supplies. If ramprate is</span>
+0030 <span class="comment">% set to 0.2 A/s the BSC power supply PLC ramps much slower than requested. Work around:</span>
+0031 <span class="comment">% Whenever the ramprate would be 0.2 A/s it is automatically reduced further to 0.15 A/s.</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% 2004-05-14, C. Steier</span>
+0034 <span class="comment">% Modified parameters for ramprate reduction. Previous parameters were slightly too</span>
+0035 <span class="comment">% cautious. Increased initial slow ramprate to 0.4 A/s and modified temperature</span>
+0036 <span class="comment">% thresholds (also added new cases). In addition the code now checks every 5 ramp</span>
+0037 <span class="comment">% steps whether temperatures are too high.</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">% 2005-11-13, G. Portmann</span>
+0040 <span class="comment">% Changed to use the new middle layer functionality</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">% 2007-09-17, C. Steier</span>
+0043 <span class="comment">% Attempt at a simplified version that mirrors more closely ramptable</span>
+0044 <span class="comment">% calculation in old Middle Layer to ease troubleshooting of two bunch</span>
+0045 <span class="comment">% ramping.</span>
+0046 
+0047 
+0048 <span class="comment">%%%%%%%%%%%%%%</span>
+0049 <span class="comment">% Initialize %</span>
+0050 <span class="comment">%%%%%%%%%%%%%%</span>
+0051 
+0052 
+0053 <span class="comment">% Input flags</span>
+0054 SET_BY_CHANNELNAME = 1;
+0055 FailFlag = 0;
+0056 SuperBendFlag = <span class="string">'Yes'</span>;
+0057 DisplayFlag = 1;
+0058 <span class="keyword">for</span> i = length(varargin):-1:1
+0059     <span class="keyword">if</span> isstruct(varargin{i})
+0060         <span class="comment">% Ignor structures</span>
+0061     <span class="keyword">elseif</span> iscell(varargin{i})
+0062         <span class="comment">% Ignor cells</span>
+0063     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0064         DisplayFlag = 1;
+0065         varargin(i) = [];
+0066     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0067         DisplayFlag = 0;
+0068         varargin(i) = [];
+0069     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'Super Bend'</span>, <span class="string">'SuperBend'</span>, <span class="string">'Super Bends'</span>, <span class="string">'SuperBends'</span>, <span class="string">'SB'</span>}))
+0070         SuperBendFlag = <span class="string">'Yes'</span>;
+0071         varargin(i) = [];
+0072     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'No Super Bend'</span>, <span class="string">'No SuperBend'</span>, <span class="string">'NoSuperBend'</span>, <span class="string">'No Super Bends'</span>, <span class="string">'No SuperBends'</span>, <span class="string">'NoSuperBends'</span>, <span class="string">'NoSB'</span>}))
+0073         SuperBendFlag = <span class="string">'No'</span>;
+0074         varargin(i) = [];
+0075     <span class="keyword">end</span>
+0076 <span class="keyword">end</span>
+0077 
+0078 
+0079 <span class="comment">% RampFlag = 0 -&gt;  Don't ramp</span>
+0080 <span class="comment">%            1 -&gt;  Linear ramp between production and injection lattices</span>
+0081 <span class="comment">%            2 -&gt;  Use the hysteresis tables</span>
+0082 OperationalMode = getfamilydata(<span class="string">'OperationalMode'</span>);
+0083 RFRampFlag = 0;         <span class="comment">% do not ramp RF</span>
+0084 HCMCHICANEMRampFlag = 0;    <span class="comment">% do not ramp chicane magnets</span>
+0085 HCMCHICANERampFlag  = 0;
+0086 SQRampFlag = 1;         <span class="comment">% linear ramp for skew quadrupoles</span>
+0087 <span class="keyword">if</span> strcmp(OperationalMode, <span class="string">'1.9 GeV, Two-Bunch'</span>)
+0088     QFQDRampFlag = 2;
+0089     SFSDRampFlag = 2;
+0090 <span class="keyword">elseif</span> strcmp(OperationalMode, <span class="string">'1.3 GeV'</span>)
+0091     QFQDRampFlag = 2;
+0092     SFSDRampFlag = 2;
+0093 <span class="keyword">else</span>
+0094     QFQDRampFlag = 2;
+0095     SFSDRampFlag = 2;
+0096 <span class="keyword">end</span>
+0097 
+0098 
+0099 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0100 <span class="comment">% Get the start and stop lattices             %</span>
+0101 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0102 load([getfamilydata(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>), <span class="string">'alsrampup.mat'</span>]);
+0103 UpperLattice = RampTable.UpperLattice.Setpoint;
+0104 LowerLattice = RampTable.LowerLattice.Setpoint;
+0105 GeVTable = RampTable.GeV;
+0106 
+0107 
+0108 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0109 <span class="comment">% Energies of importance %</span>
+0110 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0111 EnergyMode  = getfamilydata(<span class="string">'Energy'</span>);
+0112 EnergyStart = getenergy(<span class="string">'Present'</span>);  <span class="comment">% same as bend2gev (the hysteresis branch should already be set properly)</span>
+0113 EnergyUpper = max(RampTable.GeV);
+0114 EnergyLower = min(RampTable.GeV);
+0115 <span class="keyword">if</span> (abs(EnergyStart-EnergyUpper)&gt;1e-4) &amp;&amp; (abs(EnergyStart-EnergyLower)&gt;1e-4)
+0116     error(<span class="string">'Current Energy does not agree with energies of saved injection or lattice'</span>);
+0117 <span class="keyword">end</span>
+0118 
+0119 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0120 <span class="comment">% Tune response matrix %</span>
+0121 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0122 Mtune = gettuneresp({<span class="string">'QF'</span>,<span class="string">'QD'</span>}, {[],[]}, EnergyUpper);    <span class="comment">%[0.1944 -0.0286;-0.1182 0.1526];</span>
+0123 
+0124 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0125 <span class="comment">% Input checking %</span>
+0126 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0127 
+0128 <span class="comment">% Stop energy</span>
+0129 EnergyStop = [];
+0130 <span class="keyword">if</span> length(varargin) &gt;= 1
+0131     <span class="keyword">if</span> ischar(varargin{1})
+0132         <span class="keyword">if</span> any(strcmpi(varargin{1},{<span class="string">'Upper'</span>, <span class="string">'Production'</span>}))
+0133             EnergyStop = EnergyUpper;
+0134         <span class="keyword">elseif</span> any(strcmpi(varargin{1},{<span class="string">'Lower'</span>, <span class="string">'Injection'</span>}))
+0135             EnergyStop = EnergyLower;
+0136         <span class="keyword">else</span>
+0137             error(<span class="string">'Conversion for the string input for EnergyStop not known.'</span>);
+0138         <span class="keyword">end</span>
+0139     <span class="keyword">else</span>
+0140         EnergyStop = varargin{1};
+0141     <span class="keyword">end</span>
+0142 <span class="keyword">end</span>
+0143 <span class="keyword">if</span> isempty(EnergyStop)
+0144     <span class="keyword">if</span> EnergyStart &gt; 1.7
+0145         EnergyStop = EnergyLower;
+0146     <span class="keyword">else</span>
+0147         EnergyStop = EnergyUpper;
+0148     <span class="keyword">end</span>
+0149 <span class="keyword">end</span>
+0150 
+0151 <span class="keyword">if</span> EnergyStop&gt;EnergyStart
+0152     load([getfamilydata(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>), <span class="string">'alsrampup.mat'</span>]);
+0153     GeVTable = RampTable.GeV;
+0154 <span class="keyword">else</span>
+0155     load([getfamilydata(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>), <span class="string">'alsrampdn.mat'</span>]);
+0156     GeVTable = RampTable.GeV;
+0157 <span class="keyword">end</span>
+0158     
+0159 <span class="comment">% Number of steps per GeV</span>
+0160 NStepsPerGeV = [];
+0161 <span class="keyword">if</span> length(varargin) &gt;= 2
+0162     NStepsPerGeV = varargin{2};
+0163 <span class="keyword">end</span>
+0164 <span class="keyword">if</span> isempty(NStepsPerGeV)
+0165     NStepsPerGeV = 1500;
+0166 <span class="keyword">end</span>
+0167 
+0168 
+0169 <span class="comment">% Sanity check</span>
+0170 <span class="keyword">if</span> abs(EnergyStop-EnergyStart) &lt; 1e-6
+0171     fprintf(<span class="string">'   The storage ring is at the requested energy already.\n'</span>);
+0172     <span class="keyword">return</span>;
+0173 <span class="keyword">end</span>
+0174 
+0175 
+0176 <span class="keyword">if</span> QFQDRampFlag == 3
+0177     <span class="keyword">if</span> (EnergyStop&gt;EnergyStart)
+0178         <span class="keyword">try</span>
+0179             load([getfamilydata(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>), <span class="string">'rampup_tune_table.mat'</span>]);
+0180             disp(<span class="string">'   Loading measured tune tables for dynamic correction of ramping'</span>);
+0181         <span class="keyword">catch</span>
+0182             fprintf(<span class="string">'\n\n   Ramp up tune table not found (rampup_tune_table.mat).\n\n'</span>);
+0183             tune_meas_ramp.energy   = [EnergyStart EnergyStop];
+0184             tune_meas_ramp.tunefilt = [0.25 0.2;0.25 0.2];
+0185         <span class="keyword">end</span>
+0186         <span class="comment">%if strcmp(OperationalMode, '1.9 GeV, Inject at 1.23') || strcmp(SR_Mode, '1.9 GeV, Inject at 1.353')</span>
+0187         <span class="comment">%    load '/home/physdata/matlab/srdata/powersupplies/sr_ramp_tune_excursion/rampup_tune_table_4.mat'</span>
+0188         <span class="comment">%elseif strcmp(OperationalMode, '1.9 GeV, Two-Bunch')</span>
+0189         <span class="comment">%    load '/home/physdata/matlab/srdata/powersupplies/sr_ramp_tune_excursion/rampup_tune_table_5.mat' % middle of horizontal tune modifier raised by 0.01</span>
+0190         <span class="comment">%end</span>
+0191     <span class="keyword">else</span>
+0192         <span class="keyword">try</span>
+0193             load([getfamilydata(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>), <span class="string">'rampdown_tune_table.mat'</span>]);
+0194             disp(<span class="string">'   Loading measured tune tables for dynamic correction of ramping'</span>);
+0195         <span class="keyword">catch</span>
+0196             fprintf(<span class="string">'\n\n   Ramp up tune table not found (rampdown_tune_table.mat).\n\n'</span>);
+0197             tune_meas_ramp.energy   = [EnergyStart EnergyStop];
+0198             tune_meas_ramp.tunefilt = [0.25 0.2;0.25 0.2];
+0199         <span class="keyword">end</span>
+0200         <span class="comment">%if strcmp(OperationalMode, '1.9 GeV, Inject at 1.23') || strcmp(SR_Mode, '1.9 GeV, Inject at 1.353')</span>
+0201         <span class="comment">%    load '/home/physdata/matlab/srdata/powersupplies/sr_ramp_tune_excursion/rampdown_tune_table_2.mat'</span>
+0202         <span class="comment">%elseif strcmp(OperationalMode, '1.9 GeV, Two-Bunch')</span>
+0203         <span class="comment">%    load '/home/physdata/matlab/srdata/powersupplies/sr_ramp_tune_excursion/rampdown_tune_table_3.mat'</span>
+0204         <span class="comment">%end</span>
+0205     <span class="keyword">end</span>
+0206 <span class="keyword">else</span>
+0207     tune_meas_ramp.energy   = [EnergyStart EnergyStop];
+0208     tune_meas_ramp.tunefilt = [0.25 0.2;0.25 0.2];
+0209 <span class="keyword">end</span>
+0210 
+0211 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0212 <span class="comment">% Ramp vectors %</span>
+0213 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0214 NSteps = ceil(NStepsPerGeV * abs(EnergyStop-EnergyStart));
+0215 EVector = linspace(EnergyStart, EnergyStop, NSteps);
+0216 
+0217 
+0218 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0219 <span class="comment">% Get the starting lattice configuration &amp; convert to physics units %</span>
+0220 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0221 ConfigSetpointStart = getmachineconfig;
+0222 
+0223 BEND = ConfigSetpointStart.BEND.Setpoint;
+0224 QFA  = ConfigSetpointStart.QFA.Setpoint;
+0225 QDA  = ConfigSetpointStart.QDA.Setpoint;
+0226 QF   = ConfigSetpointStart.QF.Setpoint;
+0227 QD   = ConfigSetpointStart.QD.Setpoint;
+0228 SF   = ConfigSetpointStart.SF.Setpoint;
+0229 SD   = ConfigSetpointStart.SD.Setpoint;
+0230 SQSF = ConfigSetpointStart.SQSF.Setpoint;
+0231 SQSD = ConfigSetpointStart.SQSD.Setpoint;
+0232 HCM  = ConfigSetpointStart.HCM.Setpoint;
+0233 VCM  = ConfigSetpointStart.VCM.Setpoint;
+0234 <span class="comment">%VCBSC = ConfigSetpointStart.VCBSC.Setpoint;</span>
+0235 HCMCHICANE  = ConfigSetpointStart.HCMCHICANE.Setpoint;
+0236 HCMCHICANEM = ConfigSetpointStart.HCMCHICANEM.Setpoint;
+0237 
+0238 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0239 <span class="comment">% Final sets and checks before ramping %</span>
+0240 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0241 
+0242 
+0243 <span class="comment">% Reduce the device list to only power supplies</span>
+0244 DeviceListTable = HardwareTable.BEND.Setpoint.DeviceList;
+0245 i = findrowindex(DeviceListTable, BEND.DeviceList);
+0246 BEND.Data       = BEND.Data(i);
+0247 BEND.DeviceList = BEND.DeviceList(i,:);
+0248 BEND.Status     = BEND.Status(i);
+0249 
+0250 DeviceListTable = HardwareTable.QFA.Setpoint.DeviceList;
+0251 i = findrowindex(DeviceListTable, QFA.DeviceList);
+0252 QFA.Data       = QFA.Data(i);
+0253 QFA.DeviceList = QFA.DeviceList(i,:);
+0254 QFA.Status     = QFA.Status(i);
+0255 
+0256 DeviceListTable = HardwareTable.SF.Setpoint.DeviceList;
+0257 i = findrowindex(DeviceListTable, SF.DeviceList);
+0258 SF.Data       = SF.Data(i);
+0259 SF.DeviceList = SF.DeviceList(i,:);
+0260 SF.Status     = SF.Status(i);
+0261 
+0262 DeviceListTable = HardwareTable.SD.Setpoint.DeviceList;
+0263 i = findrowindex(DeviceListTable, SD.DeviceList);
+0264 SD.Data       = SD.Data(i);
+0265 SD.DeviceList = SD.DeviceList(i,:);
+0266 SD.Status     = SD.Status(i);
+0267 
+0268 
+0269 <span class="keyword">if</span> strcmpi(SuperBendFlag, <span class="string">'Yes'</span>)
+0270     <span class="comment">% Check superbend temperatures and set ramp rate limits</span>
+0271     [SBENDRampRate, MinPeriod] = <a href="#_sub2" class="code" title="subfunction [SBENDRampRate, MinPeriod] = SetRampRateLimitsStart(LowerLattice, UpperLattice, GeVTable, NStepsPerGeV)">SetRampRateLimitsStart</a>(LowerLattice, UpperLattice, GeVTable, NStepsPerGeV);
+0272     FailFlag = <a href="#_sub1" class="code" title="subfunction FailFlag = CheckSuperBendTemperature(SBENDRampRate)">CheckSuperBendTemperature</a>(SBENDRampRate);
+0273     <span class="keyword">if</span> FailFlag
+0274         <span class="keyword">return</span>;
+0275     <span class="keyword">end</span>    
+0276 <span class="keyword">else</span>
+0277     <span class="comment">% Remove the superbend from the ramp</span>
+0278     i = findrowindex([1 1], BEND.DeviceList);
+0279     BEND.Data       = BEND.Data(i);
+0280     BEND.DeviceList = BEND.DeviceList(i,:);
+0281     BEND.Status     = BEND.Status(i);
+0282 
+0283     MinPeriod = .1;
+0284 <span class="keyword">end</span>
+0285 
+0286 
+0287 <span class="comment">% Zero the orbit feedback channels (not sure this is the right thing to do?)</span>
+0288 setpv(<span class="string">'HCM'</span>, <span class="string">'Trim'</span>, 0, [], 0);
+0289 setpv(<span class="string">'VCM'</span>, <span class="string">'Trim'</span>, 0, [], 0);
+0290 
+0291 
+0292 <span class="comment">% Skew quadrupoles</span>
+0293 <span class="keyword">if</span> SQRampFlag == 0
+0294     <span class="keyword">if</span> EnergyStop &lt; EnergyStart
+0295         fprintf(<span class="string">'   Setting skew quadrupoles to the lower hysteresis lattice setpoint.\n'</span>);
+0296         setpv(LowerLattice.SQSD.Setpoint, 0);
+0297         setpv(LowerLattice.SQSF.Setpoint, 0);
+0298     <span class="keyword">end</span>
+0299 <span class="keyword">end</span>
+0300 
+0301 
+0302 <span class="comment">% Open the amplitude loops of the harmonic cavities to avoid problems while ramping (especially loss of longitudinal lock)</span>
+0303 fprintf(<span class="string">'   Opening amplitude loop on third harmonic cavities.\n'</span>);
+0304 <span class="keyword">try</span>
+0305     setpv(<span class="string">'SR02C___C1MLOP_BC00'</span>,0);
+0306     setpv(<span class="string">'SR02C___C2MLOP_BC00'</span>,0);
+0307     setpv(<span class="string">'SR02C___C3MLOP_BC00'</span>,0);
+0308 <span class="keyword">catch</span>
+0309     fprintf(<span class="string">'\n** There was a problem opening one of the THC loops!\n** Ramping will continue but please ensure that they are open manually.\n\n'</span>);
+0310     soundtada;
+0311 <span class="keyword">end</span>
+0312 
+0313 
+0314 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0315 <span class="comment">% Start the ramp %</span>
+0316 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0317 t00 = clock;
+0318 StopFlag = 0;
+0319 fprintf(<span class="string">'   Starting the ramp from %.4f GeV to %.4f GeV in %d steps\n'</span>, EnergyStart, EnergyStop, NSteps);
+0320 
+0321 
+0322 
+0323 <span class="keyword">if</span> SET_BY_CHANNELNAME
+0324     <span class="comment">% Using channel names is faster</span>
+0325     <span class="comment">%RF_CHANNELS   = family2channel('RF', 'Setpoint', [1 1]);</span>
+0326     BEND_CHANNELS = family2channel(<span class="string">'BEND'</span>, <span class="string">'Setpoint'</span>, BEND.DeviceList);
+0327     QFA_CHANNELS  = family2channel(<span class="string">'QFA'</span>, <span class="string">'Setpoint'</span>, QFA.DeviceList);
+0328     QDA_CHANNELS  = family2channel(<span class="string">'QDA'</span>, <span class="string">'Setpoint'</span>, QDA.DeviceList);
+0329     QF_CHANNELS   = family2channel(<span class="string">'QF'</span>, <span class="string">'Setpoint'</span>, QF.DeviceList);
+0330     QD_CHANNELS   = family2channel(<span class="string">'QD'</span>, <span class="string">'Setpoint'</span>, QD.DeviceList);
+0331     SF_CHANNELS   = family2channel(<span class="string">'SF'</span>, <span class="string">'Setpoint'</span>, SF.DeviceList);
+0332     SD_CHANNELS   = family2channel(<span class="string">'SD'</span>, <span class="string">'Setpoint'</span>, SD.DeviceList);
+0333     SQSF_CHANNELS = family2channel(<span class="string">'SQSF'</span>, <span class="string">'Setpoint'</span>, SQSF.DeviceList);
+0334     SQSD_CHANNELS = family2channel(<span class="string">'SQSD'</span>, <span class="string">'Setpoint'</span>, SQSD.DeviceList);
+0335     HCM_CHANNELS  = family2channel(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCM.DeviceList);
+0336     VCM_CHANNELS  = family2channel(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCM.DeviceList);
+0337     <span class="comment">%VCBSC_CHANNELS = family2channel('VCBSC', 'Setpoint', VCBSC.DeviceList);</span>
+0338     HCMCHICANE_CHANNELS  = family2channel(<span class="string">'HCMCHICANE'</span>, <span class="string">'Setpoint'</span>, HCMCHICANE.DeviceList);
+0339     HCMCHICANEM_CHANNELS = family2channel(<span class="string">'HCMCHICANEM'</span>, <span class="string">'Setpoint'</span>, HCMCHICANEM.DeviceList);
+0340 <span class="keyword">end</span>
+0341 
+0342 
+0343 <span class="keyword">for</span> i = 1:length(EVector)    
+0344     t0 = clock;
+0345 
+0346     <span class="comment">% Check superbend coil temps - if higher than Templimit, halve the ramprate</span>
+0347     <span class="keyword">if</span> strcmpi(SuperBendFlag, <span class="string">'Yes'</span>) &amp;&amp; (i==1 || rem((i-1),5)==0)
+0348         [SBENDRampRate, MinPeriod] = <a href="#_sub3" class="code" title="subfunction [SBENDRampRate, MinPeriod] = SetRampRateLimits(LowerLattice, UpperLattice, SBENDRampRate, MinPeriod, GeVTable, NStepsPerGeV)">SetRampRateLimits</a>(LowerLattice, UpperLattice, SBENDRampRate, MinPeriod, GeVTable, NStepsPerGeV);
+0349     <span class="keyword">end</span>
+0350 
+0351     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0352     <span class="comment">% Compute the setpoints for each magnet family %</span>
+0353     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0354 
+0355     <span class="comment">% Correctors</span>
+0356     <span class="comment">% Linear ramp between production and injection lattices</span>
+0357     HCM.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.HCM.Setpoint.Data UpperLattice.HCM.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0358     VCM.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.VCM.Setpoint.Data UpperLattice.VCM.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0359     <span class="comment">%VCBSC.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.VCBSC.Setpoint.Data UpperLattice.VCBSC.Setpoint.Data]', EVector(i), 'linear', 'extrap')';</span>
+0360 
+0361     
+0362     <span class="comment">% QF &amp; QD</span>
+0363     <span class="keyword">if</span> QFQDRampFlag == 1
+0364         <span class="comment">% Linear ramp between production and injection lattices</span>
+0365         QF.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.QF.Setpoint.Data UpperLattice.QF.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0366         QD.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.QD.Setpoint.Data UpperLattice.QD.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0367     <span class="keyword">elseif</span> (QFQDRampFlag ==2) || (QFQDRampFlag ==3)
+0368             <span class="comment">% Compute the magnets using the hysteresis tables</span>
+0369             QF.Data = interp1(RampTable.GeV, <span class="keyword">...</span>
+0370                 ((UpperLattice.QF.Setpoint.Data-LowerLattice.QF.Setpoint.Data)*RampTable.QF.Setpoint <span class="keyword">...</span>
+0371                 +LowerLattice.QF.Setpoint.Data*ones(size(RampTable.QF.Setpoint)))', EVector(i),<span class="string">'linear'</span>,<span class="string">'extrap'</span>);
+0372             QD.Data = interp1(RampTable.GeV, <span class="keyword">...</span>
+0373                 ((UpperLattice.QD.Setpoint.Data-LowerLattice.QD.Setpoint.Data)*RampTable.QD.Setpoint <span class="keyword">...</span>
+0374                 +LowerLattice.QD.Setpoint.Data*ones(size(RampTable.QD.Setpoint)))', EVector(i),<span class="string">'linear'</span>,<span class="string">'extrap'</span>);
+0375     <span class="keyword">else</span>
+0376         <span class="comment">% No change</span>
+0377         QF = ConfigSetpointStart.QF.Setpoint;
+0378         QD = ConfigSetpointStart.QD.Setpoint;
+0379     <span class="keyword">end</span>
+0380     
+0381     <span class="keyword">if</span> QFQDRampFlag==1 || QFQDRampFlag==2 || QFQDRampFlag==3 
+0382         <span class="comment">% Adjust ramp profile to separate the tunes during the ramp (modify ramp table with a quadratic function)</span>
+0383         <span class="keyword">if</span> EnergyStop &gt;= EnergyStart
+0384             dnu = [0.025; 0.010];
+0385         <span class="keyword">elseif</span> EnergyStop &lt; EnergyStart
+0386             dnu = [0.050; 0.020];
+0387         <span class="keyword">end</span>
+0388 
+0389         <span class="comment">% This only works for 1.522 to 1.9 ramping (ie, the .035 scale factor)</span>
+0390         <span class="comment">%QFQDcorr = inv(Mtune) * [</span>
+0391         <span class="comment">%    (-dnu(1)/0.035)*(EVector(i)-EnergyLower)*(EVector(i)-EnergyUpper)</span>
+0392         <span class="comment">%    (-dnu(2)/0.035)*(EVector(i)-EnergyLower)*(EVector(i)-EnergyUpper) ]</span>
+0393         
+0394         <span class="comment">% 1.32 to 1.9 GeV ramping</span>
+0395         <span class="comment">%QFQDcorr = inv(Mtune) * [</span>
+0396         <span class="comment">%    (-dnu(1)/0.109)*(EVector(i)-EnergyLower)*(EVector(i)-EnergyUpper)</span>
+0397         <span class="comment">%    (-dnu(2)/0.109)*(EVector(i)-EnergyLower)*(EVector(i)-EnergyUpper) ]</span>
+0398 
+0399         <span class="comment">% Normalized based on the delta energy change</span>
+0400         ScaleFactor = (EVector-EnergyLower).*(EVector-EnergyUpper);
+0401         ScaleFactor = ScaleFactor / max(max(abs(ScaleFactor)));
+0402         QFQDcorr = -1 * inv(Mtune) * EVector(i)/EnergyUpper * <span class="keyword">...</span>
+0403             (dnu * ScaleFactor(i) + interp1(tune_meas_ramp.energy,tune_meas_ramp.tunefilt,EVector(i),<span class="string">'linear'</span>,<span class="string">'extrap'</span>)' - [0.25;0.2]);
+0404 <span class="comment">%           (dnu * ScaleFactor(i)); this line used when trying to debug 2-bunch ramp tune problems - 8-19-07 - T.Scarvie</span>
+0405 
+0406         QF.Data = QF.Data + QFQDcorr(1);
+0407         QD.Data = QD.Data + QFQDcorr(2);
+0408     <span class="keyword">end</span>
+0409 
+0410     
+0411     <span class="comment">% Compute BEND, QFA &amp; QDA magnets using the hysteresis tables</span>
+0412     BEND.Data = HardwareTable.BEND.Setpoint.Data(:,i);
+0413 <span class="comment">%    BEND.Data(2) = HardwareTable.BEND.Setpoint.Data(2,1)+(gev2bsc_lowe(EVector(i),Branch)-gev2bsc_lowe(EVector(1),Branch))/(gev2bsc_lowe(EVector(end),Branch)-gev2bsc_lowe(EVector(1),Branch))*(HardwareTable.BEND.Setpoint.Data(2,end)-HardwareTable.BEND.Setpoint.Data(2,1));</span>
+0414 <span class="comment">%    BEND.Data(3) = HardwareTable.BEND.Setpoint.Data(3,1)+(gev2bsc_lowe(EVector(i),Branch)-gev2bsc_lowe(EVector(1),Branch))/(gev2bsc_lowe(EVector(end),Branch)-gev2bsc_lowe(EVector(1),Branch))*(HardwareTable.BEND.Setpoint.Data(3,end)-HardwareTable.BEND.Setpoint.Data(3,1));</span>
+0415 <span class="comment">%    BEND.Data(4) = HardwareTable.BEND.Setpoint.Data(4,1)+(gev2bsc_lowe(EVector(i),Branch)-gev2bsc_lowe(EVector(1),Branch))/(gev2bsc_lowe(EVector(end),Branch)-gev2bsc_lowe(EVector(1),Branch))*(HardwareTable.BEND.Setpoint.Data(4,end)-HardwareTable.BEND.Setpoint.Data(4,1));</span>
+0416     QFA.Data = HardwareTable.QFA.Setpoint.Data(:,i);
+0417     QDA.Data = HardwareTable.QDA.Setpoint.Data(:,i);
+0418     <span class="comment">%BEND = physics2hw(ConfigSetpointPhysics.BEND.Setpoint, EVector(i));</span>
+0419     <span class="comment">%QFA  = physics2hw(ConfigSetpointPhysics.QFA.Setpoint,  EVector(i));</span>
+0420     <span class="comment">%QDA  = physics2hw(ConfigSetpointPhysics.QDA.Setpoint,  EVector(i));</span>
+0421 
+0422     
+0423     <span class="comment">% SQSF &amp; SQSD</span>
+0424     <span class="keyword">if</span> SQRampFlag == 1
+0425         <span class="comment">% Linear ramp between production and injection lattices</span>
+0426         SQSF.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.SQSF.Setpoint.Data UpperLattice.SQSF.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0427         SQSD.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.SQSD.Setpoint.Data UpperLattice.SQSD.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0428     <span class="keyword">elseif</span> SQRampFlag ==2
+0429         <span class="comment">% Compute the magnets using the hysteresis tables</span>
+0430         SQSF.Data = HardwareTable.SQSF.Setpoint.Data(:,i);
+0431         SQSD.Data = HardwareTable.SQSD.Setpoint.Data(:,i);
+0432     <span class="keyword">else</span>
+0433         <span class="comment">% No change</span>
+0434         SQSF = ConfigSetpointStart.SQSF.Setpoint;
+0435         SQSD = ConfigSetpointStart.SQSD.Setpoint;
+0436     <span class="keyword">end</span>
+0437 
+0438     
+0439     <span class="comment">% SF &amp; SD</span>
+0440     <span class="keyword">if</span> SFSDRampFlag == 1
+0441         <span class="comment">% Linear ramp between production and injection lattices</span>
+0442         SF.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.SF.Setpoint.Data UpperLattice.SF.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0443         SD.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.SD.Setpoint.Data UpperLattice.SD.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0444     <span class="keyword">elseif</span> SFSDRampFlag ==2
+0445         <span class="comment">% Compute the magnets using the hysteresis tables</span>
+0446         <span class="keyword">if</span> strcmp(OperationalMode, <span class="string">'1.9 GeV, Two-Bunch'</span>)
+0447 <span class="comment">%             ScaleFactorS = (EVector-EnergyLower).*(EVector-EnergyUpper);</span>
+0448 <span class="comment">%             ScaleFactorS = (abs(ScaleFactorS) / max(max(abs(ScaleFactorS))));</span>
+0449 <span class="comment">%             SFSDcorr = 1.5 * EVector(i)/EnergyUpper * [14.1;8.8] * ScaleFactorS(i);</span>
+0450             SFSDcorr = [0;0];
+0451         <span class="keyword">else</span>
+0452             SFSDcorr = [0;0];
+0453         <span class="keyword">end</span>
+0454         SF.Data = HardwareTable.SF.Setpoint.Data(:,i)+SFSDcorr(1);
+0455         SD.Data = HardwareTable.SD.Setpoint.Data(:,i)+SFSDcorr(2);
+0456         <span class="comment">%SF = physics2hw(ConfigSetpointPhysics.SF.Setpoint, EVector(i));</span>
+0457         <span class="comment">%SD = physics2hw(ConfigSetpointPhysics.SD.Setpoint, EVector(i));</span>
+0458     <span class="keyword">else</span>
+0459         <span class="comment">% No change</span>
+0460         SF = ConfigSetpointStart.SF.Setpoint;
+0461         SD = ConfigSetpointStart.SD.Setpoint;
+0462     <span class="keyword">end</span>
+0463 
+0464 
+0465     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0466     <span class="comment">% Set all magnets without waiting for rampflag %</span>
+0467     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0468 
+0469     <span class="keyword">if</span> ~SET_BY_CHANNELNAME
+0470         <span class="comment">% BEND first if ramping down</span>
+0471         <span class="keyword">if</span> EnergyStop &lt; EnergyStart
+0472             <span class="comment">% Ramping down</span>
+0473             setpv(BEND, 0);
+0474         <span class="keyword">end</span>
+0475 
+0476         setpv(QF,  0);
+0477         setpv(QD,  0);
+0478         setpv(QFA, 0);
+0479         setpv(QDA, 0);
+0480         setpv(SF,  0);
+0481         setpv(SD,  0);
+0482         setpv(SQSF,0);
+0483         setpv(SQSD,0);
+0484 
+0485     <span class="keyword">else</span>
+0486 
+0487         <span class="comment">% BEND first if ramping down</span>
+0488         <span class="keyword">if</span> EnergyStop &lt; EnergyStart
+0489             <span class="comment">% Ramping down</span>
+0490             setpvonline(BEND_CHANNELS, BEND.Data);
+0491         <span class="keyword">end</span>
+0492 
+0493         setpvonline(  QF_CHANNELS, QF.Data);
+0494         setpvonline(  QD_CHANNELS, QD.Data);
+0495         setpvonline( QFA_CHANNELS, QFA.Data);
+0496         setpvonline( QDA_CHANNELS, QDA.Data);
+0497         setpvonline(  SF_CHANNELS, SF.Data);
+0498         setpvonline(  SD_CHANNELS, SD.Data);
+0499         setpvonline(SQSF_CHANNELS, SQSF.Data);
+0500         setpvonline(SQSD_CHANNELS, SQSD.Data);
+0501     <span class="keyword">end</span>
+0502     
+0503     <span class="comment">% Alternatively set HCM, VCM and chicanes to save CPU cycles</span>
+0504     <span class="keyword">if</span> rem(i,2) == 0 || i == length(EVector)
+0505         <span class="keyword">if</span> ~SET_BY_CHANNELNAME
+0506             setpv(HCM, 0);
+0507         <span class="keyword">else</span>
+0508             setpvonline(HCM_CHANNELS, HCM.Data);
+0509         <span class="keyword">end</span>
+0510         
+0511         <span class="keyword">if</span> HCMCHICANERampFlag == 1
+0512             <span class="comment">% Linear ramp between production and injection lattices</span>
+0513             HCMCHICANE.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.HCMCHICANE.Setpoint.Data UpperLattice.HCMCHICANE.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0514             setpv(HCMCHICANE, 0);
+0515         <span class="keyword">elseif</span> HCMCHICANERampFlag == 2
+0516             <span class="comment">% Compute the magnets using the hysteresis tables</span>
+0517             HCMCHICANE.Data = HardwareTable.HCMCHICANE.Setpoint.Data(:,i);
+0518             <span class="comment">%HCMCHICANE = physics2hw(ConfigSetpointPhysics.HCMCHICANE.Setpoint, EVector(i));</span>
+0519             setpv(HCMCHICANE, 0);
+0520         <span class="keyword">end</span>
+0521 
+0522         <span class="keyword">if</span> HCMCHICANEMRampFlag == 1
+0523             <span class="comment">% Linear ramp between production and injection lattices</span>
+0524             HCMCHICANEM.Data = interp1([EnergyLower EnergyUpper]', [LowerLattice.HCMCHICANEM.Setpoint.Data UpperLattice.HCMCHICANEM.Setpoint.Data]', EVector(i), <span class="string">'linear'</span>, <span class="string">'extrap'</span>)';
+0525             setpv(HCMCHICANEM, 0);
+0526         <span class="keyword">elseif</span> HCMCHICANEMRampFlag ==2
+0527             <span class="comment">% Compute the magnets using the hysteresis tables</span>
+0528             error(<span class="string">'Motor chicane hysteresis tables are not programmed yet!'</span>);
+0529             <span class="comment">%HCMCHICANEM.Data = HardwareTable.HCMCHICANEM.Setpoint.Data(:,i);</span>
+0530             <span class="comment">%%HCMCHICANEM = physics2hw(ConfigSetpointPhysics.HCMCHICANEM.Setpoint, EVector(i));</span>
+0531             <span class="comment">%setpv(HCMCHICANEM, 0);</span>
+0532         <span class="keyword">end</span>
+0533     <span class="keyword">end</span>
+0534     <span class="keyword">if</span> rem(i+1,2) == 0 || i == length(EVector)
+0535         <span class="keyword">if</span> ~SET_BY_CHANNELNAME
+0536             setpv(VCM, 0);
+0537             <span class="comment">%setpv(VCBSC, 0);</span>
+0538         <span class="keyword">else</span>
+0539             setpvonline(VCM_CHANNELS, VCM.Data);
+0540             <span class="comment">%setpvonline(VCBSC_CHANNELS, VCBSC.Data);</span>
+0541         <span class="keyword">end</span>
+0542     <span class="keyword">end</span>
+0543 
+0544     
+0545     <span class="comment">% Set the RF every 10th step</span>
+0546     <span class="keyword">if</span> RFRampFlag
+0547         <span class="keyword">if</span> rem(i,10) == 0 || i == length(EVector)
+0548             RFnew = interp1([EnergyLower; EnergyUpper], [LowerLattice.RF.Setpoint.Data; UpperLattice.RF.Setpoint.Data], EVector(i))';
+0549             <span class="keyword">if</span> isnan(RFnew)
+0550                 <span class="comment">% No change</span>
+0551                 RFnew = getpv(ConfigSetpoint.RF.Setpoint, <span class="string">'Numeric'</span>);
+0552             <span class="keyword">end</span>
+0553             setsp(<span class="string">'RF'</span>, RFnew);
+0554         <span class="keyword">end</span>
+0555     <span class="keyword">end</span>
+0556     
+0557     
+0558     <span class="comment">% BEND last if ramping up</span>
+0559     <span class="keyword">if</span> EnergyStop &gt;= EnergyStart
+0560         <span class="comment">% Ramping up</span>
+0561         <span class="keyword">if</span> ~SET_BY_CHANNELNAME
+0562             setpv(BEND, 0);
+0563         <span class="keyword">else</span>
+0564             setpvonline(BEND_CHANNELS, BEND.Data);
+0565         <span class="keyword">end</span>
+0566     <span class="keyword">end</span>
+0567 
+0568     
+0569     <span class="comment">% Delay for magnet ramping</span>
+0570     LoopPeriod = etime(clock,t0);
+0571     WaitTime = MinPeriod - LoopPeriod;
+0572     <span class="keyword">if</span> WaitTime &lt; .025
+0573         WaitTime = .025;  <span class="comment">% Minimum sleep after sets so that CA doesn't get too thrashed</span>
+0574     <span class="keyword">end</span>
+0575     pause(WaitTime);
+0576 
+0577 
+0578     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0579     <span class="comment">% Display some results %</span>
+0580     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0581     <span class="comment">%if rem(i,ceil(NSteps/100))==0  || i==length(EVector) || i==1</span>
+0582     <span class="comment">%    pause(2);</span>
+0583     <span class="comment">%    tunes = gettune;</span>
+0584     <span class="comment">%    fprintf('%6.4f %6.5f %6.5f %6.2f\n', EVector(i), tunes(1), tunes(2), getdcct);</span>
+0585     <span class="comment">%    % fprintf('%5.3f GeV, nu_x=%5.4f, nu_y=%5.4f\n', EVector(i), tunes(1), tunes(2));</span>
+0586     <span class="comment">%end</span>
+0587     <span class="keyword">if</span> rem(i,ceil(NSteps/25))==0  || i==length(EVector) || i==1  <span class="comment">% was 10 prints (GJP), changed for more 2-bunch diagnostic info</span>
+0588         <span class="keyword">if</span> length(BEND.Data) == 1
+0589             fprintf(<span class="string">'   %3d. %5.3f GeV,%6.1f mA, Time=%6.1f sec, BEND=%5.1f, QFA=%5.1f,%5.1f,%5.1f,%5.1f, SD=%5.1f, SF=%5.1f amps, T=%.3f sec\n'</span>, i, EVector(i), getdcct, etime(clock,t00), BEND.Data(1), QFA.Data(1), QFA.Data(2), QFA.Data(3), QFA.Data(4), SD.Data(1), SF.Data(1), LoopPeriod);
+0590         <span class="keyword">else</span>
+0591             fprintf(<span class="string">'   %3d. %5.3f GeV,%6.1f mA, Time=%6.1f sec, BEND=%5.1f, BSC=%5.1f, QFA=%5.1f,%5.1f,%5.1f,%5.1f, SD=%5.1f, SF=%5.1f amps, T=%.3f sec\n'</span>, i, EVector(i), getdcct, etime(clock,t00), BEND.Data(1), BEND.Data(2), QFA.Data(1), QFA.Data(2), QFA.Data(3), QFA.Data(4), SD.Data(1), SF.Data(1), LoopPeriod);
+0592         <span class="keyword">end</span>
+0593         pause(0);
+0594     <span class="keyword">end</span>
+0595 <span class="keyword">end</span>
+0596 
+0597 
+0598 <span class="comment">% Skew quadrupoles</span>
+0599 <span class="keyword">if</span> SQRampFlag == 0
+0600     <span class="keyword">if</span> EnergyStop &gt; EnergyStart
+0601         fprintf(<span class="string">'   Setting skew quadrupoles to the upper hysteresis lattice setpoint.\n'</span>);
+0602         setpv(UpperLattice.SQSD.Setpoint, 0);
+0603         setpv(UpperLattice.SQSF.Setpoint, 0);
+0604     <span class="keyword">end</span>
+0605 <span class="keyword">end</span>
+0606 
+0607 fprintf(<span class="string">'   Ramp from %.3f to %.3f GeV is complete.\n'</span>, EnergyStart, EnergyStop);
+0608 
+0609 
+0610 <span class="comment">% Set magnet time constants and ramp rates back to their old/non superbend values (fast cycling and ramping)</span>
+0611 setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>, 10.5, [1 1]);
+0612 setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>,  0.4, [4 2;8 2;12 2]);
+0613 setpv(<span class="string">'QFA'</span>,  <span class="string">'RampRate'</span>,  5.9);
+0614 setpv(<span class="string">'QDA'</span>,  <span class="string">'RampRate'</span>,  1.0);
+0615 setpv(<span class="string">'SF'</span>,   <span class="string">'RampRate'</span>,  4.3);
+0616 setpv(<span class="string">'SD'</span>,   <span class="string">'RampRate'</span>,  3.0);
+0617 setpv(<span class="string">'QF'</span>,   <span class="string">'RampRate'</span>,  1.0);
+0618 setpv(<span class="string">'QD'</span>,   <span class="string">'RampRate'</span>,  1.0);
+0619 
+0620 setpv(<span class="string">'BEND'</span>, <span class="string">'TimeConstant'</span>, 0);
+0621 setpv(<span class="string">'QFA'</span>,  <span class="string">'TimeConstant'</span>, 0);
+0622 setpv(<span class="string">'QDA'</span>,  <span class="string">'TimeConstant'</span>, 0);
+0623 setpv(<span class="string">'SF'</span>,   <span class="string">'TimeConstant'</span>, 0);
+0624 setpv(<span class="string">'SD'</span>,   <span class="string">'TimeConstant'</span>, 0);
+0625 setpv(<span class="string">'QF'</span>,   <span class="string">'TimeConstant'</span>, 0);
+0626 setpv(<span class="string">'QD'</span>,   <span class="string">'TimeConstant'</span>, 0);
+0627 
+0628 <span class="keyword">return</span>
+0629 
+0630 
+0631 
+0632 <span class="comment">%%%%%%%%%%%%%%%</span>
+0633 <span class="comment">% Subroutines %</span>
+0634 <span class="comment">%%%%%%%%%%%%%%%</span>
+0635 
+0636 
+0637 <a name="_sub1" href="#_subfunctions" class="code">function FailFlag = CheckSuperBendTemperature(SBENDRampRate)</a>
+0638 <span class="comment">% Check &amp; warning about superbend temperatures</span>
+0639 
+0640 FailFlag = 0;
+0641 
+0642 <span class="comment">% Superbend temperature limits</span>
+0643 <span class="keyword">if</span> SBENDRampRate &lt; .3
+0644     Templimit = 4.8;
+0645 <span class="keyword">elseif</span> SBENDRampRate &lt; .4
+0646     Templimit = 4.75;
+0647 <span class="keyword">elseif</span> SBENDRampRate &lt; .5
+0648     Templimit = 4.7;
+0649 <span class="keyword">elseif</span> SBENDRampRate &lt; .7
+0650     Templimit = 4.6;
+0651 <span class="keyword">else</span>
+0652     Templimit = 4.5;
+0653 <span class="keyword">end</span>
+0654 
+0655 [BSCcoiltemps, BSCcoilnames] = <a href="getsuperbendtemperatures.html" class="code" title="function [BSCcoiltemps, BSCcoilnames] = getsuperbendtemperatures">getsuperbendtemperatures</a>;
+0656 
+0657 <span class="keyword">if</span> any(BSCcoiltemps &gt; Templimit)
+0658     bscnum = find(BSCcoiltemps &gt; Templimit);
+0659     soundtada;
+0660     fprintf(<span class="string">'   The temperature of one of the superbend magnets is too high.\n'</span>);
+0661     <span class="keyword">for</span> i=1:length(bscnum)
+0662         fprintf(<span class="string">'   The Coil Temperature of %s is %.2f K.  It should be below %.2f K.\n'</span>, BSCcoilnames{bscnum(i)}, BSCcoiltemps(bscnum(i)), Templimit);
+0663     <span class="keyword">end</span>
+0664     fprintf(<span class="string">'   A reduced ramp rate will be used for the energy ramp.  However, if a temperature\n'</span>);
+0665     fprintf(<span class="string">'   warning persists, there may be a problem with one of the superbends!\n'</span>);
+0666     BSCTempFlag = questdlg(sprintf(<span class="string">'One of the BS Coil temperatures is %.2f K!\nIt should be below %.2f K\n\nAre you sure you want to continue with the ramp?'</span>, max(BSCcoiltemps), Templimit),<span class="string">'SR Ramp'</span>, <span class="string">'Yes'</span>, <span class="string">'No'</span>, <span class="string">'No'</span>);
+0667     <span class="keyword">if</span> strcmp(BSCTempFlag,<span class="string">'No'</span>)
+0668         fprintf(<span class="string">'\n   **************************\n'</span>);
+0669         fprintf(  <span class="string">'   **     Ramp  Aborted    **\n'</span>);
+0670         fprintf(  <span class="string">'   **************************\n\n'</span>);
+0671         FailFlag = 1;
+0672         <span class="keyword">return</span>
+0673     <span class="keyword">end</span>
+0674 <span class="keyword">end</span>
+0675 <span class="keyword">return</span>
+0676 
+0677 
+0678 
+0679 <a name="_sub2" href="#_subfunctions" class="code">function [SBENDRampRate, MinPeriod] = SetRampRateLimitsStart(LowerLattice, UpperLattice, GeVTable, NStepsPerGeV)</a>
+0680 
+0681 OperationalMode = getfamilydata(<span class="string">'OperationalMode'</span>);
+0682 
+0683 <span class="keyword">if</span> strcmp(OperationalMode, <span class="string">'1.9 GeV, Two-Bunch'</span>) 
+0684     maxSBramprate = 0.8;
+0685 <span class="keyword">else</span>
+0686     maxSBramprate = 0.8;
+0687 <span class="keyword">end</span>
+0688 
+0689 <span class="comment">% Initial superbend ramp rate limit is stored the middle layer</span>
+0690 SBENDRampRate = getfamilydata(<span class="string">'BSCRampRate'</span>);
+0691 <span class="keyword">if</span> isnan(SBENDRampRate) || isempty(SBENDRampRate)
+0692     SBENDRampRate = 0.4;
+0693 <span class="keyword">end</span>
+0694 <span class="keyword">if</span> SBENDRampRate &gt; maxSBramprate
+0695     SBENDRampRate = maxSBramprate;
+0696 <span class="keyword">elseif</span> SBENDRampRate &lt; 0.2
+0697     SBENDRampRate = 0.2;
+0698 <span class="keyword">end</span>
+0699 
+0700 
+0701 <span class="comment">% Base the ramp rate on the full injection to production lattice</span>
+0702 i = findrowindex([4 2], UpperLattice.BEND.Setpoint.DeviceList);
+0703 SBENDDelta = abs(UpperLattice.BEND.Setpoint.Data(i)-LowerLattice.BEND.Setpoint.Data(i));
+0704 
+0705 NSteps = ceil(NStepsPerGeV * abs(max(GeVTable)-min(GeVTable)));
+0706 
+0707 MinPeriod = SBENDDelta / (NSteps-1) / SBENDRampRate * 0.435 / 0.391;  <span class="comment">% ~.2</span>
+0708 fprintf(<span class="string">'   Superbend: RampRate = %g A/s   MinPeriod = %g seconds \n'</span>, SBENDRampRate, MinPeriod);
+0709 
+0710 
+0711 BENDDelta = abs(UpperLattice.BEND.Setpoint.Data(1) - LowerLattice.BEND.Setpoint.Data(1));
+0712 QFADelta  = abs(UpperLattice.QFA.Setpoint.Data     - LowerLattice.QFA.Setpoint.Data);
+0713 QDADelta  = abs(UpperLattice.QDA.Setpoint.Data     - LowerLattice.QDA.Setpoint.Data);
+0714 SFDelta   = abs(UpperLattice.SF.Setpoint.Data      - LowerLattice.SF.Setpoint.Data);
+0715 SDDelta   = abs(UpperLattice.SD.Setpoint.Data      - LowerLattice.SD.Setpoint.Data);
+0716 
+0717 BENDramprate = BENDDelta / (NSteps-1) / MinPeriod * 1.1;
+0718 QFAramprate  = QFADelta  / (NSteps-1) / MinPeriod * 1.1;
+0719 QDAramprate  = QDADelta  / (NSteps-1) / MinPeriod * 1.1;
+0720 SFramprate   = SFDelta   / (NSteps-1) / MinPeriod * 1.5;
+0721 SDramprate   = SDDelta   / (NSteps-1) / MinPeriod * 1.5;
+0722 
+0723 setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>, SBENDRampRate,  [4 2;8 2;12 2]);
+0724 setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>, BENDramprate, UpperLattice.BEND.Setpoint.DeviceList(1,:));
+0725 setpv(<span class="string">'QFA'</span>,  <span class="string">'RampRate'</span>, QFAramprate,  UpperLattice.QFA.Setpoint.DeviceList);
+0726 setpv(<span class="string">'QDA'</span>,  <span class="string">'RampRate'</span>, QDAramprate,  UpperLattice.QDA.Setpoint.DeviceList);
+0727 setpv(<span class="string">'SF'</span>,   <span class="string">'RampRate'</span>, SFramprate,   UpperLattice.SF.Setpoint.DeviceList);
+0728 setpv(<span class="string">'SD'</span>,   <span class="string">'RampRate'</span>, SDramprate,   UpperLattice.SD.Setpoint.DeviceList);
+0729 setpv(<span class="string">'QF'</span>,   <span class="string">'RampRate'</span>,  1.0);
+0730 setpv(<span class="string">'QD'</span>,   <span class="string">'RampRate'</span>,  1.0);
+0731 
+0732 setpv(<span class="string">'BEND'</span>, <span class="string">'TimeConstant'</span>, 0);
+0733 setpv(<span class="string">'QFA'</span>,  <span class="string">'TimeConstant'</span>, 0);
+0734 setpv(<span class="string">'QDA'</span>,  <span class="string">'TimeConstant'</span>, 0);
+0735 setpv(<span class="string">'SF'</span>,   <span class="string">'TimeConstant'</span>, 0);
+0736 setpv(<span class="string">'SD'</span>,   <span class="string">'TimeConstant'</span>, 0);
+0737 <span class="keyword">return</span>
+0738 
+0739 
+0740 
+0741 <a name="_sub3" href="#_subfunctions" class="code">function [SBENDRampRate, MinPeriod] = SetRampRateLimits(LowerLattice, UpperLattice, SBENDRampRate, MinPeriod, GeVTable, NStepsPerGeV)</a>
+0742 <span class="comment">% BSC temperature checking</span>
+0743 
+0744 <span class="comment">% two temperature ranges based on superbend setpoint</span>
+0745 <span class="comment">% I&lt;250A, add 0.2 to temp checks</span>
+0746 <span class="keyword">if</span> getpv(<span class="string">'BSC'</span>,<span class="string">'Setpoint'</span>,[4 2])&lt;250
+0747    <span class="keyword">if</span> SBENDRampRate &lt; .3
+0748       Templimit = 5.0;
+0749    <span class="keyword">elseif</span> SBENDRampRate &lt; .4
+0750       Templimit = 4.96;
+0751    <span class="keyword">elseif</span> SBENDRampRate &lt; .6
+0752       Templimit = 4.9;
+0753    <span class="keyword">else</span>
+0754       Templimit = 4.85;
+0755    <span class="keyword">end</span>
+0756 <span class="keyword">else</span>
+0757    <span class="keyword">if</span> SBENDRampRate &lt; .3
+0758       Templimit = 4.8;
+0759    <span class="keyword">elseif</span> SBENDRampRate &lt; .4
+0760       Templimit = 4.76;
+0761    <span class="keyword">elseif</span> SBENDRampRate &lt; .65
+0762       Templimit = 4.7;
+0763    <span class="keyword">else</span>
+0764       Templimit = 4.65;
+0765    <span class="keyword">end</span>
+0766 <span class="keyword">end</span>
+0767 
+0768 [BSCcoiltemps, BSCcoilnames] = <a href="getsuperbendtemperatures.html" class="code" title="function [BSCcoiltemps, BSCcoilnames] = getsuperbendtemperatures">getsuperbendtemperatures</a>;
+0769 
+0770 <span class="keyword">if</span> any(BSCcoiltemps &gt; Templimit)
+0771 
+0772     <span class="keyword">if</span> SBENDRampRate &gt; 0.5
+0773         SBENDRampRate = SBENDRampRate-0.2;
+0774     <span class="keyword">else</span>
+0775         SBENDRampRate = SBENDRampRate/2;
+0776     <span class="keyword">end</span>
+0777 
+0778     <span class="keyword">if</span> SBENDRampRate &lt; 0.1
+0779         SBENDRampRate = 0.1;
+0780     <span class="keyword">end</span>
+0781 
+0782     <span class="keyword">if</span> SBENDRampRate == 0.2 <span class="comment">%there is something magic about 0.2A/s that doesn't work well</span>
+0783         SBENDRampRate = 0.15;
+0784     <span class="keyword">end</span>
+0785     
+0786     fprintf(<span class="string">'\n   One of the superbend temperatures is too high (%f K).  Reducing the ramp speed to %.2f A/s for safety.\n'</span>, max(BSCcoiltemps), SBENDRampRate);
+0787 
+0788     <span class="comment">% Base the ramp rate on the full injection to production lattice</span>
+0789     i = findrowindex([4 2], UpperLattice.BEND.Setpoint.DeviceList);
+0790     SBENDDelta = abs(UpperLattice.BEND.Setpoint.Data(i)-LowerLattice.BEND.Setpoint.Data(i));
+0791 
+0792     NSteps = ceil(NStepsPerGeV * abs(max(GeVTable)-min(GeVTable)));
+0793     MinPeriod = SBENDDelta / (NSteps-1) / SBENDRampRate * 0.435 / 0.391;
+0794     fprintf(<span class="string">'   Superbend: RampRate = %g A/s   MinPeriod = %g seconds \n\n'</span>, SBENDRampRate, MinPeriod);
+0795     
+0796     BENDDelta = abs(UpperLattice.BEND.Setpoint.Data(1) - LowerLattice.BEND.Setpoint.Data(1));
+0797     QFADelta  = abs(UpperLattice.QFA.Setpoint.Data     - LowerLattice.QFA.Setpoint.Data);
+0798     QDADelta  = abs(UpperLattice.QDA.Setpoint.Data     - LowerLattice.QDA.Setpoint.Data);
+0799     SFDelta   = abs(UpperLattice.SF.Setpoint.Data      - LowerLattice.SF.Setpoint.Data);
+0800     SDDelta   = abs(UpperLattice.SD.Setpoint.Data      - LowerLattice.SD.Setpoint.Data);
+0801 
+0802     BENDramprate = BENDDelta / (NSteps-1) / MinPeriod * 1.1;
+0803     QFAramprate  = QFADelta  / (NSteps-1) / MinPeriod * 1.1;
+0804     QDAramprate  = QDADelta  / (NSteps-1) / MinPeriod * 1.1;
+0805     SFramprate   = SFDelta   / (NSteps-1) / MinPeriod * 1.5;
+0806     SDramprate   = SDDelta   / (NSteps-1) / MinPeriod * 1.5;
+0807 
+0808     setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>, SBENDRampRate,  [4 2;8 2;12 2]);
+0809     setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>, BENDramprate, UpperLattice.BEND.Setpoint.DeviceList(1,:));
+0810     setpv(<span class="string">'QFA'</span>,  <span class="string">'RampRate'</span>, QFAramprate,  UpperLattice.QFA.Setpoint.DeviceList);
+0811     setpv(<span class="string">'QDA'</span>,  <span class="string">'RampRate'</span>, QDAramprate,  UpperLattice.QDA.Setpoint.DeviceList);
+0812     setpv(<span class="string">'SF'</span>,   <span class="string">'RampRate'</span>, SFramprate,   UpperLattice.SF.Setpoint.DeviceList);
+0813     setpv(<span class="string">'SD'</span>,   <span class="string">'RampRate'</span>, SDramprate,   UpperLattice.SD.Setpoint.DeviceList);
+0814 <span class="keyword">end</span>
+0815 <span class="keyword">return</span>
+0816 
+0817 
+0818 
+0819 <a name="_sub4" href="#_subfunctions" class="code">function Lattice = RemoveSomeFamilies(Lattice, SuperBendFlag)</a>
+0820 <span class="keyword">if</span> nargin &lt; 2
+0821     SuperBendFlag = <span class="string">''</span>;
+0822 <span class="keyword">end</span>
+0823 <span class="keyword">if</span> isempty(SuperBendFlag)
+0824     SuperBendFlag = <span class="string">'Yes'</span>;
+0825 <span class="keyword">end</span>
+0826 
+0827 
+0828 <span class="comment">% Remove families</span>
+0829 RemoveFamilyNames = {<span class="string">'HCMCHICANEM'</span>,<span class="string">'VCMCHICANE'</span>,<span class="string">'SQEPU'</span>,<span class="string">'GeV'</span>,<span class="string">'DCCT'</span>,<span class="string">'RF'</span>};
+0830 j = find(isfield(Lattice, RemoveFamilyNames));
+0831 Lattice = rmfield(Lattice, RemoveFamilyNames(j));
+0832 
+0833 
+0834 <span class="comment">% Switch from a magnet device list to a power supply list</span>
+0835 i = findrowindex([1 1;4 2; 8 2; 12 2], Lattice.QFA.Setpoint.DeviceList);
+0836 Lattice.QFA.Setpoint.Data       = Lattice.QFA.Setpoint.Data(i);
+0837 Lattice.QFA.Setpoint.DeviceList = Lattice.QFA.Setpoint.DeviceList(i,:);
+0838 Lattice.QFA.Setpoint.Status     = Lattice.QFA.Setpoint.Status(i);
+0839 
+0840 Lattice.SF.Setpoint.Data       = Lattice.SF.Setpoint.Data(1);
+0841 Lattice.SF.Setpoint.DeviceList = Lattice.SF.Setpoint.DeviceList(1,:);
+0842 Lattice.SF.Setpoint.Status     = Lattice.SF.Setpoint.Status(i);
+0843 
+0844 Lattice.SD.Setpoint.Data       = Lattice.SD.Setpoint.Data(1);
+0845 Lattice.SD.Setpoint.DeviceList = Lattice.SD.Setpoint.DeviceList(1,:);
+0846 Lattice.SD.Setpoint.Status     = Lattice.SD.Setpoint.Status(i);
+0847 
+0848 <span class="comment">% Include the superbend magnets?</span>
+0849 <span class="keyword">if</span> ~strcmpi(SuperBendFlag, <span class="string">'Yes'</span>)
+0850     <span class="comment">% No superbends</span>
+0851     i = findrowindex([1 1], Lattice.BEND.Setpoint.DeviceList);
+0852 <span class="keyword">else</span>
+0853     <span class="comment">% Ramp the superbends</span>
+0854     i = findrowindex([1 1;4 2; 8 2; 12 2], Lattice.BEND.Setpoint.DeviceList);
+0855 <span class="keyword">end</span>
+0856 Lattice.BEND.Setpoint.Data       = Lattice.BEND.Setpoint.Data(i);
+0857 Lattice.BEND.Setpoint.DeviceList = Lattice.BEND.Setpoint.DeviceList(i,:);
+0858 Lattice.BEND.Setpoint.Status     = Lattice.BEND.Setpoint.Status(i);
+0859 <span class="keyword">return</span>
+0860 
+0861 
+0862 
+0863 <a name="_sub5" href="#_subfunctions" class="code">function Lattice  = RemoveSomeFields(Lattice)</a>
+0864 <span class="comment">% Remove fields</span>
+0865 RemoveFieldNames = {<span class="string">'RampRate'</span>,<span class="string">'TimeConstant'</span>,<span class="string">'DAC'</span>,<span class="string">'Trim'</span>,<span class="string">'FF1'</span>,<span class="string">'FF2'</span>};
+0866 Fields = fieldnames(Lattice);
+0867 <span class="keyword">for</span> i = 1:length(Fields)
+0868     j = isfield(Lattice.(Fields{i}), RemoveFieldNames);
+0869     Lattice.(Fields{i}) = rmfield(Lattice.(Fields{i}), RemoveFieldNames(j));
+0870 <span class="keyword">end</span>
+0871 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

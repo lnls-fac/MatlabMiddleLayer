@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getam_DVM</title>
+  <meta name="keywords" content="getam_DVM">
+  <meta name="description" content="[AM, tout, DataTime, ErrorFlag] = getam_DVM(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; getam_DVM.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getam_DVM
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[AM, tout, DataTime, ErrorFlag] = getam_DVM(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [AM, tout, DataTime, ErrorFlag] = getam_DVM(Family, Field, DeviceList, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [AM, tout, DataTime, ErrorFlag] = getam_DVM(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [AM, tout, DataTime, ErrorFlag] = getam_DVM(Family, Field, DeviceList, varargin)</a>
+0002 <span class="comment">% [AM, tout, DataTime, ErrorFlag] = getam_DVM(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)</span>
+0003 <span class="comment">%</span>
+0004 
+0005 
+0006 <span class="comment">%FileName = '/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_current/BEND_QF_QD.txt';</span>
+0007 
+0008 <span class="comment">%Directory = '/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_current/';</span>
+0009 Directory = <span class="string">'/home/als/physdata/matlab/srdata/powersupplies/BQFQD_ramping_20070618/'</span>;
+0010 
+0011 d = dir(Directory);
+0012 d(1:2) = [];
+0013 <span class="keyword">for</span> i = 1:length(d)
+0014     DataTime(i) = datenum(d(i).date);
+0015 <span class="keyword">end</span>
+0016 [tmp,i]=max(DataTime);
+0017 FileName = [Directory d(i).name];
+0018 
+0019 fprintf(<span class="string">'  Getting %s data from %s\n'</span>, Family, FileName);
+0020 
+0021 
+0022 
+0023 fid = fopen(FileName,<span class="string">'r'</span>);
+0024 <span class="keyword">if</span> fid == -1
+0025     fprintf(<span class="string">'   File open error.\n'</span>);
+0026     <span class="keyword">return</span>;
+0027 <span class="keyword">end</span>
+0028 f = fscanf(fid, <span class="string">'%f\n'</span>, 1);
+0029 N = fscanf(fid, <span class="string">'%f\n'</span>, 1);
+0030 Data = fscanf(fid, <span class="string">'%f %f %f'</span>, [3 inf]);
+0031 fclose(fid);
+0032 
+0033 Data = Data';
+0034 
+0035 <span class="comment">%QF   =  60 * Data(:,1);  %  60-&gt;New Quad, 48-&gt;Old Quad</span>
+0036 <span class="comment">%QD   =  60 * Data(:,2);  %  60-&gt;New Quad, 48-&gt;Old Quad</span>
+0037 <span class="comment">%BEND = 125 * Data(:,3);  % 125-&gt;New BEND, 80-&gt;Old BEND</span>
+0038 <span class="keyword">if</span> strcmpi(Family, <span class="string">'QF'</span>)
+0039     AM =  60 * Data(:,3);
+0040 <span class="keyword">elseif</span> strcmpi(Family, <span class="string">'QD'</span>)
+0041     AM =  60 * Data(:,2) * 10 / 2.14;
+0042 <span class="keyword">elseif</span> strcmpi(Family, <span class="string">'BEND'</span>)
+0043     AM = 125 * Data(:,1);
+0044 <span class="keyword">else</span>
+0045    error(<span class="string">'Unknown family'</span>);
+0046 <span class="keyword">end</span>
+0047 
+0048 AM = AM(:)';
+0049 
+0050 
+0051 tout = 0;
+0052 DataTime =  datenum(clock);
+0053 ErrorFlag = 0;
+0054</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

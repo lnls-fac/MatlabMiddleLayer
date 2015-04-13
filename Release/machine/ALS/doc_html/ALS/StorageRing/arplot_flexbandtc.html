@@ -1,0 +1,828 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of arplot_flexbandtc</title>
+  <meta name="keywords" content="arplot_flexbandtc">
+  <meta name="description" content="arplot_flexbandtc(Month1 String, Days1, Year1, Month2 String, Days2, Year2)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; arplot_flexbandtc.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>arplot_flexbandtc
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>arplot_flexbandtc(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function arplot_flexbandtc(monthStr, days, year1, month2Str, days2, year2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> arplot_flexbandtc(Month1 String, Days1, Year1, Month2 String, Days2, Year2)
+ 
+ Plots Beam Current and Flexband Thermocouple data.
+
+ Example:  arplot_flexbandtc('January',22:24, 1998);
+           plots data from 1/22, 1/23, and 1/24 in 1998</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arglobal.html" class="code" title="">arglobal</a>	Just used to make archived variables global</li><li><a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>	ARREAD - Loads one day of archived data into matlab global memory</li><li><a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>	ARSELECT - Return the archived data for a group on channel names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function arplot_flexbandtc(monthStr, days, year1, month2Str, days2, year2)</a>
+0002 <span class="comment">% arplot_flexbandtc(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Plots Beam Current and Flexband Thermocouple data.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Example:  arplot_flexbandtc('January',22:24, 1998);</span>
+0007 <span class="comment">%           plots data from 1/22, 1/23, and 1/24 in 1998</span>
+0008 
+0009 
+0010 <span class="comment">% Inputs</span>
+0011 <span class="keyword">if</span> nargin &lt; 2
+0012    error(<span class="string">'ARPLOTS:  You need at least two input arguments.'</span>);
+0013 <span class="keyword">elseif</span> nargin == 2
+0014    tmp = clock;
+0015    year1 = tmp(1);
+0016    monthStr2 = [];
+0017    days2 = [];
+0018    year2 = [];
+0019 <span class="keyword">elseif</span> nargin == 3
+0020    monthStr2 = [];
+0021    days2 = [];
+0022    year2 = [];
+0023 <span class="keyword">elseif</span> nargin == 4
+0024    error(<span class="string">'ARPLOTS:  You need 2, 3, 5, or 6 input arguments.'</span>);
+0025 <span class="keyword">elseif</span> nargin == 5
+0026    tmp = clock;
+0027    year2 = tmp(1);
+0028 <span class="keyword">elseif</span> nargin == 6
+0029 <span class="keyword">else</span>
+0030    error(<span class="string">'ARPLOTS:  Inputs incorrect.'</span>);
+0031 <span class="keyword">end</span>
+0032 
+0033 <span class="keyword">global</span> GLOBAL_SR_MODE_TITLE
+0034 
+0035 <span class="keyword">if</span> strcmp(GLOBAL_SR_MODE_TITLE, <span class="string">'1.9 GeV, Two Bunch'</span>)
+0036    dcctplotmax = 60;
+0037 <span class="keyword">else</span>
+0038    dcctplotmax = 400;
+0039 <span class="keyword">end</span>
+0040 
+0041 <a href="arglobal.html" class="code" title="">arglobal</a>
+0042 
+0043 
+0044 t=[];
+0045 dcct=[];
+0046 IDgap4=[];
+0047 IDgap5=[];
+0048 IDgap7=[];
+0049 IDgap8=[];
+0050 IDgap9=[];
+0051 IDgap10=[];
+0052 IDgap11=[];
+0053 IDgap12=[];
+0054 
+0055 SR01TC1 = []; SR01TC2 = []; SR01TC3 = []; SR01TC4 = []; SR01TC5 = []; SR01TC6 = [];
+0056 SR02TC1 = []; SR02TC2 = []; SR02TC3 = []; SR02TC4 = []; SR02TC5 = []; SR02TC6 = [];
+0057 SR03TC1 = []; SR03TC2 = []; SR03TC3 = []; SR03TC4 = []; SR03TC5 = []; SR03TC6 = [];
+0058 SR04TC1 = []; SR04TC2 = []; SR04TC3 = []; SR04TC4 = []; SR04TC5 = []; SR04TC6 = [];
+0059 SR05TC1 = []; SR05TC2 = []; SR05TC3 = []; SR05TC4 = []; SR05TC5 = []; SR05TC6 = [];
+0060 SR06TC1 = []; SR06TC2 = []; SR06TC3 = []; SR06TC4 = []; SR06TC5 = []; SR06TC6 = [];
+0061 SR07TC1 = []; SR07TC2 = []; SR07TC3 = []; SR07TC4 = []; SR07TC5 = []; SR07TC6 = [];
+0062 SR08TC1 = []; SR08TC2 = []; SR08TC3 = []; SR08TC4 = []; SR08TC5 = []; SR08TC6 = [];
+0063 SR09TC1 = []; SR09TC2 = []; SR09TC3 = []; SR09TC4 = []; SR09TC5 = []; SR09TC6 = [];
+0064 SR10TC1 = []; SR10TC2 = []; SR10TC3 = []; SR10TC4 = []; SR10TC5 = []; SR10TC6 = [];
+0065 SR11TC1 = []; SR11TC2 = []; SR11TC3 = []; SR11TC4 = []; SR11TC5 = []; SR11TC6 = [];
+0066 SR12TC1 = []; SR12TC2 = []; SR12TC3 = []; SR12TC4 = []; SR12TC5 = []; SR12TC6 = [];
+0067 
+0068 <span class="keyword">if</span> isempty(days2)
+0069    <span class="keyword">if</span> length(days) == [1]
+0070       month  = mon2num(monthStr);
+0071       NumDays = length(days);
+0072       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0073       EndDayStr =   [<span class="string">''</span>];
+0074       titleStr = [StartDayStr];
+0075    <span class="keyword">else</span>
+0076       month  = mon2num(monthStr);
+0077       NumDays = length(days);
+0078       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0079       EndDayStr =   [monthStr, <span class="string">' '</span>, num2str(days(length(days))),<span class="string">', '</span>, num2str(year1)];
+0080       titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0081    <span class="keyword">end</span>
+0082 <span class="keyword">else</span>
+0083    month  = mon2num(monthStr);
+0084    month2 = mon2num(month2Str);
+0085    NumDays = length(days) + length(days2);
+0086    StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0087    EndDayStr =   [month2Str, <span class="string">' '</span>, num2str(days2(length(days2))),<span class="string">', '</span>, num2str(year2)];
+0088    
+0089    titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0090 <span class="keyword">end</span>
+0091 
+0092 
+0093 StartDay = days(1);
+0094 EndDay = days(length(days));
+0095 N=0;
+0096 
+0097 <span class="keyword">for</span> day = days
+0098    day;
+0099    <span class="comment">%t0=clock;</span>
+0100    year1str = num2str(year1);
+0101    <span class="keyword">if</span> year1 &lt; 2000
+0102       year1str = year1str(3:4);
+0103       FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0104    <span class="keyword">else</span>
+0105       FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year1str, month, day);
+0106    <span class="keyword">end</span>
+0107    FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0108    <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName);
+0109    <span class="comment">%readtime = etime(clock, t0)</span>
+0110    
+0111    [y1, idcct] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___DCCTLP_AM01'</span>);
+0112    dcct = [dcct y1];
+0113    [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___GDS1PS_AM00'</span>);
+0114    [y2,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___GDS1PS_AM00'</span>);
+0115    [y3,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___GDS1PS_AM00'</span>);
+0116    [y4,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___GDS1PS_AM00'</span>);
+0117    [y5,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___GDS1PS_AM00'</span>);
+0118    IDgap5 =[IDgap5  y1];
+0119    IDgap7 =[IDgap7  y2];
+0120    IDgap8 =[IDgap8  y3];
+0121    IDgap9 =[IDgap9  y4];
+0122    IDgap12=[IDgap12 y5];
+0123 
+0124 <span class="keyword">if</span> 0
+0125     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO'</span>);
+0126    SR01TC = [SR01TC y1];
+0127    SR01TCname = ARChanNames(i,:);
+0128    [d,SR01TCdesc] = unix([<span class="string">'caget '</span> SR01TCname(1:19) <span class="string">'.DESC'</span>])
+0129    SR01TCdesc = SR01TCdesc(end-22:end)
+0130    
+0131    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO'</span>);
+0132    SR02TC = [SR02TC y1];
+0133    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO'</span>);
+0134    SR03TC = [SR03TC y1];
+0135    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO'</span>);
+0136    SR04TC = [SR04TC y1];
+0137    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO'</span>);
+0138    SR05TC = [SR05TC y1];
+0139    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO'</span>);
+0140    SR06TC = [SR06TC y1];
+0141    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO'</span>);
+0142    SR07TC = [SR07TC y1];
+0143    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO'</span>);
+0144    SR08TC = [SR08TC y1];
+0145    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO'</span>);
+0146    SR09TC = [SR09TC y1];
+0147    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO'</span>);
+0148    SR10TC = [SR10TC y1];
+0149    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO'</span>);
+0150    SR11TC = [SR11TC y1];
+0151    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO'</span>);
+0152    SR12TC = [SR12TC y1];
+0153 <span class="keyword">end</span>
+0154 
+0155    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM00'</span>);
+0156    SR01TC1 = [SR01TC1 y1]; 
+0157     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM01'</span>);
+0158    SR01TC2 = [SR01TC2 y1]; 
+0159    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM02'</span>);
+0160    SR01TC3 = [SR01TC3 y1]; 
+0161    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM03'</span>);
+0162    SR01TC4 = [SR01TC4 y1]; 
+0163    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM04'</span>);
+0164    SR01TC5 = [SR01TC5 y1]; 
+0165    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM05'</span>);
+0166    SR01TC6 = [SR01TC6 y1]; 
+0167    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM00'</span>);
+0168    SR02TC1 = [SR02TC1 y1]; 
+0169    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM01'</span>);
+0170    SR02TC2 = [SR02TC2 y1]; 
+0171    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM02'</span>);
+0172    SR02TC3 = [SR02TC3 y1]; 
+0173    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM03'</span>);
+0174    SR02TC4 = [SR02TC4 y1]; 
+0175    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM04'</span>);
+0176    SR02TC5 = [SR02TC5 y1]; 
+0177    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM05'</span>);
+0178    SR02TC6 = [SR02TC6 y1]; 
+0179    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM00'</span>);
+0180    SR03TC1 = [SR03TC1 y1]; 
+0181    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM01'</span>);
+0182    SR03TC2 = [SR03TC2 y1]; 
+0183    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM02'</span>);
+0184    SR03TC3 = [SR03TC3 y1]; 
+0185    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM03'</span>);
+0186    SR03TC4 = [SR03TC4 y1]; 
+0187    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM04'</span>);
+0188    SR03TC5 = [SR03TC5 y1]; 
+0189    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM05'</span>);
+0190    SR03TC6 = [SR03TC6 y1]; 
+0191    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM00'</span>);
+0192    SR04TC1 = [SR04TC1 y1]; 
+0193    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM01'</span>);
+0194    SR04TC2 = [SR04TC2 y1]; 
+0195    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM02'</span>);
+0196    SR04TC3 = [SR04TC3 y1]; 
+0197    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM03'</span>);
+0198    SR04TC4 = [SR04TC4 y1]; 
+0199    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM04'</span>);
+0200    SR04TC5 = [SR04TC5 y1]; 
+0201    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM05'</span>);
+0202    SR04TC6 = [SR04TC6 y1]; 
+0203    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM00'</span>);
+0204    SR05TC1 = [SR05TC1 y1]; 
+0205    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM01'</span>);
+0206    SR05TC2 = [SR05TC2 y1]; 
+0207    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM02'</span>);
+0208    SR05TC3 = [SR05TC3 y1]; 
+0209    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM03'</span>);
+0210    SR05TC4 = [SR05TC4 y1]; 
+0211    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM04'</span>);
+0212    SR05TC5 = [SR05TC5 y1]; 
+0213    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM05'</span>);
+0214    SR05TC6 = [SR05TC6 y1]; 
+0215    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM00'</span>);
+0216    SR06TC1 = [SR06TC1 y1]; 
+0217    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM01'</span>);
+0218    SR06TC2 = [SR06TC2 y1]; 
+0219    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM02'</span>);
+0220    SR06TC3 = [SR06TC3 y1]; 
+0221    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM03'</span>);
+0222    SR06TC4 = [SR06TC4 y1]; 
+0223    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM04'</span>);
+0224    SR06TC5 = [SR06TC5 y1]; 
+0225    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM05'</span>);
+0226    SR06TC6 = [SR06TC6 y1]; 
+0227    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM00'</span>);
+0228    SR07TC1 = [SR07TC1 y1]; 
+0229    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM01'</span>);
+0230    SR07TC2 = [SR07TC2 y1]; 
+0231    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM02'</span>);
+0232    SR07TC3 = [SR07TC3 y1]; 
+0233    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM03'</span>);
+0234    SR07TC4 = [SR07TC4 y1]; 
+0235    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM04'</span>);
+0236    SR07TC5 = [SR07TC5 y1]; 
+0237    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM05'</span>);
+0238    SR07TC6 = [SR07TC6 y1]; 
+0239    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM00'</span>);
+0240    SR08TC1 = [SR08TC1 y1]; 
+0241    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM01'</span>);
+0242    SR08TC2 = [SR08TC2 y1]; 
+0243    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM02'</span>);
+0244    SR08TC3 = [SR08TC3 y1]; 
+0245    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM03'</span>);
+0246    SR08TC4 = [SR08TC4 y1]; 
+0247    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM04'</span>);
+0248    SR08TC5 = [SR08TC5 y1]; 
+0249    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM05'</span>);
+0250    SR08TC6 = [SR08TC6 y1]; 
+0251    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM00'</span>);
+0252    SR09TC1 = [SR09TC1 y1]; 
+0253    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM01'</span>);
+0254    SR09TC2 = [SR09TC2 y1]; 
+0255    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM02'</span>);
+0256    SR09TC3 = [SR09TC3 y1]; 
+0257    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM03'</span>);
+0258    SR09TC4 = [SR09TC4 y1]; 
+0259    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM04'</span>);
+0260    SR09TC5 = [SR09TC5 y1]; 
+0261    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM05'</span>);
+0262    SR09TC6 = [SR09TC6 y1]; 
+0263    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM00'</span>);
+0264    SR10TC1 = [SR10TC1 y1]; 
+0265    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM01'</span>);
+0266    SR10TC2 = [SR10TC2 y1]; 
+0267    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM02'</span>);
+0268    SR10TC3 = [SR10TC3 y1]; 
+0269    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM03'</span>);
+0270    SR10TC4 = [SR10TC4 y1]; 
+0271    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM04'</span>);
+0272    SR10TC5 = [SR10TC5 y1]; 
+0273    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM05'</span>);
+0274    SR10TC6 = [SR10TC6 y1]; 
+0275    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM00'</span>);
+0276    SR11TC1 = [SR11TC1 y1]; 
+0277    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM01'</span>);
+0278    SR11TC2 = [SR11TC2 y1]; 
+0279    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM02'</span>);
+0280    SR11TC3 = [SR11TC3 y1]; 
+0281    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM03'</span>);
+0282    SR11TC4 = [SR11TC4 y1]; 
+0283    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM04'</span>);
+0284    SR11TC5 = [SR11TC5 y1]; 
+0285    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM05'</span>);
+0286    SR11TC6 = [SR11TC6 y1]; 
+0287    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM00'</span>);
+0288    SR12TC1 = [SR12TC1 y1]; 
+0289    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM01'</span>);
+0290    SR12TC2 = [SR12TC2 y1]; 
+0291    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM02'</span>);
+0292    SR12TC3 = [SR12TC3 y1]; 
+0293    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM03'</span>);
+0294    SR12TC4 = [SR12TC4 y1]; 
+0295    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM04'</span>);
+0296    SR12TC5 = [SR12TC5 y1]; 
+0297    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM05'</span>);
+0298    SR12TC6 = [SR12TC6 y1]; 
+0299    
+0300 <span class="comment">%   for j = 1:12</span>
+0301 <span class="comment">%      [y1, i] = arselect(sprintf('SR%02dC___IG2____AM00',j));</span>
+0302 <span class="comment">%      IG1(j,N+1:N+length(ARt))=y1;</span>
+0303 <span class="comment">%   end;</span>
+0304 
+0305    N = N + length(ARt);
+0306    
+0307    t    = [t  ARt+(day-StartDay)*24*60*60];
+0308    
+0309    disp(<span class="string">' '</span>);
+0310 <span class="keyword">end</span>
+0311 
+0312 
+0313 <span class="keyword">if</span> ~isempty(days2)
+0314    
+0315    StartDay = days2(1);
+0316    EndDay = days2(length(days2));
+0317    
+0318    <span class="keyword">for</span> day = days2
+0319       day;
+0320       <span class="comment">%t0=clock;</span>
+0321       year2str = num2str(year2);
+0322       <span class="keyword">if</span> year2 &lt; 2000
+0323          year2str = year2str(3:4);
+0324          FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month, day);
+0325       <span class="keyword">else</span>
+0326          FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year2str, month, day);
+0327       <span class="keyword">end</span>
+0328       FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month2, day);
+0329       <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName);
+0330       <span class="comment">%readtime = etime(clock, t0)</span>
+0331       
+0332         [y1, idcct] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___DCCTLP_AM01'</span>);
+0333         dcct = [dcct y1];
+0334         [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___GDS1PS_AM00'</span>);
+0335         [y2,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___GDS1PS_AM00'</span>);
+0336         [y3,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___GDS1PS_AM00'</span>);
+0337         [y4,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___GDS1PS_AM00'</span>);
+0338         [y5,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___GDS1PS_AM00'</span>);
+0339         IDgap5 =[IDgap5  y1];
+0340         IDgap7 =[IDgap7  y2];
+0341         IDgap8 =[IDgap8  y3];
+0342         IDgap9 =[IDgap9  y4];
+0343         IDgap12=[IDgap12 y5];
+0344         
+0345     <span class="keyword">if</span> 0
+0346         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO'</span>);
+0347         SR02TC = [SR02TC y1];
+0348         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO'</span>);
+0349         SR03TC = [SR03TC y1];
+0350         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO'</span>);
+0351         SR04TC = [SR04TC y1];
+0352         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO'</span>);
+0353         SR05TC = [SR05TC y1];
+0354         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO'</span>);
+0355         SR06TC = [SR06TC y1];
+0356         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO'</span>);
+0357         SR07TC = [SR07TC y1];
+0358         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO'</span>);
+0359         SR08TC = [SR08TC y1];
+0360         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO'</span>);
+0361         SR09TC = [SR09TC y1];
+0362         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO'</span>);
+0363         SR10TC = [SR10TC y1];
+0364         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO'</span>);
+0365         SR11TC = [SR11TC y1];
+0366         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO'</span>);
+0367         SR12TC = [SR12TC y1];
+0368     <span class="keyword">end</span>
+0369 
+0370         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM00'</span>);
+0371         SR01TC1 = [SR01TC1 y1]; 
+0372         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM01'</span>);
+0373         SR01TC2 = [SR01TC2 y1]; 
+0374         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM02'</span>);
+0375         SR01TC3 = [SR01TC3 y1]; 
+0376         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM03'</span>);
+0377         SR01TC4 = [SR01TC4 y1]; 
+0378         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM04'</span>);
+0379         SR01TC5 = [SR01TC5 y1]; 
+0380         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01W___TCWAGO_AM05'</span>);
+0381         SR01TC6 = [SR01TC6 y1]; 
+0382         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM00'</span>);
+0383         SR02TC1 = [SR02TC1 y1]; 
+0384         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM01'</span>);
+0385         SR02TC2 = [SR02TC2 y1]; 
+0386         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM02'</span>);
+0387         SR02TC3 = [SR02TC3 y1]; 
+0388         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM03'</span>);
+0389         SR02TC4 = [SR02TC4 y1]; 
+0390         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM04'</span>);
+0391         SR02TC5 = [SR02TC5 y1]; 
+0392         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02W___TCWAGO_AM05'</span>);
+0393         SR02TC6 = [SR02TC6 y1]; 
+0394         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM00'</span>);
+0395         SR03TC1 = [SR03TC1 y1]; 
+0396         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM01'</span>);
+0397         SR03TC2 = [SR03TC2 y1]; 
+0398         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM02'</span>);
+0399         SR03TC3 = [SR03TC3 y1]; 
+0400         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM03'</span>);
+0401         SR03TC4 = [SR03TC4 y1]; 
+0402         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM04'</span>);
+0403         SR03TC5 = [SR03TC5 y1]; 
+0404         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03W___TCWAGO_AM05'</span>);
+0405         SR03TC6 = [SR03TC6 y1]; 
+0406         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM00'</span>);
+0407         SR04TC1 = [SR04TC1 y1]; 
+0408         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM01'</span>);
+0409         SR04TC2 = [SR04TC2 y1]; 
+0410         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM02'</span>);
+0411         SR04TC3 = [SR04TC3 y1]; 
+0412         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM03'</span>);
+0413         SR04TC4 = [SR04TC4 y1]; 
+0414         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM04'</span>);
+0415         SR04TC5 = [SR04TC5 y1]; 
+0416         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04W___TCWAGO_AM05'</span>);
+0417         SR04TC6 = [SR04TC6 y1]; 
+0418         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM00'</span>);
+0419         SR05TC1 = [SR05TC1 y1]; 
+0420         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM01'</span>);
+0421         SR05TC2 = [SR05TC2 y1]; 
+0422         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM02'</span>);
+0423         SR05TC3 = [SR05TC3 y1]; 
+0424         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM03'</span>);
+0425         SR05TC4 = [SR05TC4 y1]; 
+0426         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM04'</span>);
+0427         SR05TC5 = [SR05TC5 y1]; 
+0428         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___TCWAGO_AM05'</span>);
+0429         SR05TC6 = [SR05TC6 y1]; 
+0430         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM00'</span>);
+0431         SR06TC1 = [SR06TC1 y1]; 
+0432         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM01'</span>);
+0433         SR06TC2 = [SR06TC2 y1]; 
+0434         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM02'</span>);
+0435         SR06TC3 = [SR06TC3 y1]; 
+0436         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM03'</span>);
+0437         SR06TC4 = [SR06TC4 y1]; 
+0438         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM04'</span>);
+0439         SR06TC5 = [SR06TC5 y1]; 
+0440         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06W___TCWAGO_AM05'</span>);
+0441         SR06TC6 = [SR06TC6 y1]; 
+0442         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM00'</span>);
+0443         SR07TC1 = [SR07TC1 y1]; 
+0444         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM01'</span>);
+0445         SR07TC2 = [SR07TC2 y1]; 
+0446         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM02'</span>);
+0447         SR07TC3 = [SR07TC3 y1]; 
+0448         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM03'</span>);
+0449         SR07TC4 = [SR07TC4 y1]; 
+0450         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM04'</span>);
+0451         SR07TC5 = [SR07TC5 y1]; 
+0452         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07W___TCWAGO_AM05'</span>);
+0453         SR07TC6 = [SR07TC6 y1]; 
+0454         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM00'</span>);
+0455         SR08TC1 = [SR08TC1 y1]; 
+0456         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM01'</span>);
+0457         SR08TC2 = [SR08TC2 y1]; 
+0458         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM02'</span>);
+0459         SR08TC3 = [SR08TC3 y1]; 
+0460         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM03'</span>);
+0461         SR08TC4 = [SR08TC4 y1]; 
+0462         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM04'</span>);
+0463         SR08TC5 = [SR08TC5 y1]; 
+0464         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08W___TCWAGO_AM05'</span>);
+0465         SR08TC6 = [SR08TC6 y1]; 
+0466         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM00'</span>);
+0467         SR09TC1 = [SR09TC1 y1]; 
+0468         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM01'</span>);
+0469         SR09TC2 = [SR09TC2 y1]; 
+0470         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM02'</span>);
+0471         SR09TC3 = [SR09TC3 y1]; 
+0472         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM03'</span>);
+0473         SR09TC4 = [SR09TC4 y1]; 
+0474         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM04'</span>);
+0475         SR09TC5 = [SR09TC5 y1]; 
+0476         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09W___TCWAGO_AM05'</span>);
+0477         SR09TC6 = [SR09TC6 y1]; 
+0478         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM00'</span>);
+0479         SR10TC1 = [SR10TC1 y1]; 
+0480         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM01'</span>);
+0481         SR10TC2 = [SR10TC2 y1]; 
+0482         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM02'</span>);
+0483         SR10TC3 = [SR10TC3 y1]; 
+0484         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM03'</span>);
+0485         SR10TC4 = [SR10TC4 y1]; 
+0486         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM04'</span>);
+0487         SR10TC5 = [SR10TC5 y1]; 
+0488         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10W___TCWAGO_AM05'</span>);
+0489         SR10TC6 = [SR10TC6 y1]; 
+0490         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM00'</span>);
+0491         SR11TC1 = [SR11TC1 y1]; 
+0492         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM01'</span>);
+0493         SR11TC2 = [SR11TC2 y1]; 
+0494         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM02'</span>);
+0495         SR11TC3 = [SR11TC3 y1]; 
+0496         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM03'</span>);
+0497         SR11TC4 = [SR11TC4 y1]; 
+0498         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM04'</span>);
+0499         SR11TC5 = [SR11TC5 y1]; 
+0500         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11W___TCWAGO_AM05'</span>);
+0501         SR11TC6 = [SR11TC6 y1]; 
+0502         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM00'</span>);
+0503         SR12TC1 = [SR12TC1 y1]; 
+0504         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM01'</span>);
+0505         SR12TC2 = [SR12TC2 y1]; 
+0506         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM02'</span>);
+0507         SR12TC3 = [SR12TC3 y1]; 
+0508         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM03'</span>);
+0509         SR12TC4 = [SR12TC4 y1]; 
+0510         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM04'</span>);
+0511         SR12TC5 = [SR12TC5 y1]; 
+0512         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12W___TCWAGO_AM05'</span>);
+0513         SR12TC6 = [SR12TC6 y1]; 
+0514 
+0515 <span class="comment">%     for j = 1:12</span>
+0516 <span class="comment">%        [y1, i] = arselect(sprintf('SR%02dC___IG2____AM00',j));</span>
+0517 <span class="comment">%        IG1(j,N+1:N+length(ARt))=y1;</span>
+0518 <span class="comment">%     end;</span>
+0519 
+0520       N = N + length(ARt);
+0521       
+0522       
+0523       t    = [t  ARt+(day-StartDay+(days(length(days))-days(1)+1))*24*60*60];
+0524       
+0525       disp(<span class="string">' '</span>);
+0526    <span class="keyword">end</span>
+0527 <span class="keyword">end</span>
+0528 
+0529 dcct = 100*dcct;
+0530 i = find(dcct &lt; 1.);
+0531 dcct(i) = NaN;
+0532 dlogdcct = diff(log(dcct));
+0533 lifetime = -diff(t/60/60)./(dlogdcct);
+0534 i = find(lifetime &lt; 0);
+0535 lifetime(i) = NaN;
+0536 
+0537 <span class="comment">% Hours or days for the x-axis?</span>
+0538 <span class="keyword">if</span> t(end)/60/60/24 &gt; 3
+0539    t = t/60/60/24;
+0540    xlabelstring = [<span class="string">'Date since '</span>, StartDayStr, <span class="string">' [Days]'</span>];
+0541    DayFlag = 1;
+0542 <span class="keyword">else</span>
+0543    t = t/60/60;
+0544    xlabelstring = [<span class="string">'Time since '</span>, StartDayStr, <span class="string">' [Hours]'</span>];
+0545    DayFlag = 0;
+0546 <span class="keyword">end</span>
+0547 Days = [days days2];
+0548 xmax = max(t);
+0549 
+0550 <span class="comment">% Channel descriptions - mine .DESC fields to get locations</span>
+0551 <span class="comment">%[d,SR01TC1full] = unix('scaget SR01W___TCWAGO_AM00.DESC');</span>
+0552 <span class="comment">%SR01TC1desc = SR01TC1full(end-22:end);</span>
+0553 <span class="comment">%</span>
+0554 <span class="comment">%SR01TC2desc = []; SR01TC3desc = []; SR01TC4desc = []; SR01TC5desc = []; SR01TC6desc = [];</span>
+0555 <span class="comment">%SR02TC1desc = []; SR02TC2desc = []; SR02TC3desc = []; SR02TC4desc = []; SR02TC5desc = []; SR02TC6desc = [];</span>
+0556 <span class="comment">%SR03TC1desc = []; SR03TC2desc = []; SR03TC3desc = []; SR03TC4desc = []; SR03TC5desc = []; SR03TC6desc = [];</span>
+0557 <span class="comment">%SR04TC1desc = []; SR04TC2desc = []; SR04TC3desc = []; SR04TC4desc = []; SR04TC5desc = []; SR04TC6desc = [];</span>
+0558 <span class="comment">%SR05TC1desc = []; SR05TC2desc = []; SR05TC3desc = []; SR05TC4desc = []; SR05TC5desc = []; SR05TC6desc = [];</span>
+0559 <span class="comment">%SR06TC1desc = []; SR06TC2desc = []; SR06TC3desc = []; SR06TC4desc = []; SR06TC5desc = []; SR06TC6desc = [];</span>
+0560 <span class="comment">%SR07TC1desc = []; SR07TC2desc = []; SR07TC3desc = []; SR07TC4desc = []; SR07TC5desc = []; SR07TC6desc = [];</span>
+0561 <span class="comment">%SR08TC1desc = []; SR08TC2desc = []; SR08TC3desc = []; SR08TC4desc = []; SR08TC5desc = []; SR08TC6desc = [];</span>
+0562 <span class="comment">%SR09TC1desc = []; SR09TC2desc = []; SR09TC3desc = []; SR09TC4desc = []; SR09TC5desc = []; SR09TC6desc = [];</span>
+0563 <span class="comment">%SR10TC1desc = []; SR10TC2desc = []; SR10TC3desc = []; SR10TC4desc = []; SR10TC5desc = []; SR10TC6desc = [];</span>
+0564 <span class="comment">%SR11TC1desc = []; SR11TC2desc = []; SR11TC3desc = []; SR11TC4desc = []; SR11TC5desc = []; SR11TC6desc = [];</span>
+0565 <span class="comment">%SR12TC1desc = []; SR12TC2desc = []; SR12TC3desc = []; SR12TC4desc = []; SR12TC5desc = []; SR12TC6desc = [];</span>
+0566 <span class="comment">%</span>
+0567 
+0568 n=1;
+0569 <span class="keyword">for</span> Sector = 1:12
+0570     <span class="keyword">for</span> j = 1:6
+0571        <span class="keyword">try</span>
+0572            [d,chanstr] = unix([<span class="string">'caget '</span>,sprintf(<span class="string">'SR%02dW___TCWAGO_AM%02d.DESC'</span>,Sector, j-1)]);
+0573            name{n} = chanstr(end-24:end-1); <span class="comment">% end-1 is used to get rid of carriage return</span>
+0574        <span class="keyword">catch</span>
+0575         name{n} = sprintf(<span class="string">'SR%02dW TCWAGO AM%02d'</span>,Sector,j-1);
+0576        <span class="keyword">end</span>
+0577     n=n+1;
+0578     <span class="keyword">end</span>
+0579 <span class="keyword">end</span>
+0580 
+0581 <span class="comment">% some of the TCs are on spots that don't fit the pattern (this as of 6-29-04)</span>
+0582 name{71} = <span class="string">'flex band 1-1 body'</span>;
+0583 name{2}  = <span class="string">'flex band 1-2 body'</span>;
+0584 name{16} = [name{16} <span class="string">' (not BPM FB)'</span>]; 
+0585 name{17} = [name{17} <span class="string">' (not BPM FB)'</span>];
+0586 name{18} = [name{18} <span class="string">' (not BPM FB)'</span>]; 
+0587 name{19} = [name{19} <span class="string">' (not BPM FB)'</span>]; 
+0588 name{20} = [name{20} <span class="string">' (not BPM FB)'</span>];
+0589 name{21} = [name{21} <span class="string">' (not BPM FB)'</span>]; 
+0590 name{61} = <span class="string">'flex band 11-2 bellows'</span>;
+0591 name{62} = <span class="string">'flex band 11-2 D-flange'</span>;
+0592 name{63} = <span class="string">'flex band 11-2 bellows (not BPM FB)'</span>;
+0593 
+0594 <span class="comment">%plot data</span>
+0595 <span class="comment">%first page</span>
+0596 figure
+0597 subplot(4,1,1);
+0598 plot(t, dcct);
+0599 grid on;
+0600 ylabel(<span class="string">'Beam Current [mAmps]'</span>);
+0601 axis([min(t) max(t) 0 dcctplotmax]);
+0602 title(titleStr);
+0603 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0604 
+0605 subplot(4,1,2);
+0606 plot(t, SR12TC4, t, SR12TC5, t, SR12TC6, t, SR01TC1, t, SR01TC2, t, SR01TC3);
+0607 grid on;
+0608 ylabel(<span class="string">'Temp [deg C]'</span>);
+0609 axis([min(t) max(t) 15 35])
+0610 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0611 legend(name{[70:72 1:3]},3);
+0612 
+0613 subplot(4,1,3);
+0614 plot(t, SR01TC4, t, SR01TC5, t, SR01TC6, t, SR02TC1, t, SR02TC2, t, SR02TC3);
+0615 grid on;
+0616 ylabel(<span class="string">'Temp [deg C]'</span>);
+0617 axis([min(t) max(t) 15 40])
+0618 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0619 legend(name{4:9},3);
+0620 
+0621 subplot(4,1,4);
+0622 plot(t, SR02TC4, t, SR02TC5, t, SR02TC6, t, SR03TC1, t, SR03TC2, t, SR03TC3);
+0623 grid on;
+0624 ylabel(<span class="string">'Temp [deg C]'</span>);
+0625 axis([min(t) max(t) 15 40])
+0626 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0627 xlabel(xlabelstring);
+0628 legend(name{10:15},3);
+0629 
+0630 orient landscape
+0631 
+0632 <span class="comment">% second page</span>
+0633 figure
+0634 subplot(4,1,1);
+0635 plot(t, dcct);
+0636 grid on;
+0637 ylabel(<span class="string">'Beam Current [mAmps]'</span>);
+0638 axis([min(t) max(t) 0 dcctplotmax]);
+0639 title(titleStr);
+0640 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0641 
+0642 subplot(4,1,2);
+0643 plot(t, SR03TC4, t, SR03TC5, t, SR03TC6, t, SR04TC1, t, SR04TC2, t, SR04TC3);
+0644 grid on;
+0645 ylabel(<span class="string">'Temp [deg C]'</span>);
+0646 axis([min(t) max(t) 15 35])
+0647 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0648 legend(name{16:21},3);
+0649 
+0650 subplot(4,1,3);
+0651 plot(t, SR04TC4, t, SR04TC5, t, SR04TC6, t, SR05TC1, t, SR05TC2, t, SR05TC3);
+0652 grid on;
+0653 ylabel(<span class="string">'Temp [deg C]'</span>);
+0654 axis([min(t) max(t) 15 35])
+0655 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0656 legend(name{22:27},3);
+0657 
+0658 subplot(4,1,4);
+0659 plot(t, SR05TC4, t, SR05TC5, t, SR05TC6, t, SR06TC1, t, SR06TC2, t, SR06TC3);
+0660 grid on;
+0661 ylabel(<span class="string">'Temp [deg C]'</span>);
+0662 axis([min(t) max(t) 15 35])
+0663 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0664 legend(name{28:33},3);
+0665 xlabel(xlabelstring);
+0666 
+0667 orient landscape
+0668 
+0669 <span class="comment">%third page</span>
+0670 figure
+0671 subplot(4,1,1);
+0672 plot(t, dcct);
+0673 grid on;
+0674 ylabel(<span class="string">'Beam Current [mAmps]'</span>);
+0675 axis([min(t) max(t) 0 dcctplotmax]);
+0676 title(titleStr);
+0677 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0678 
+0679 subplot(4,1,2);
+0680 plot(t, SR06TC4, t, SR06TC5, t, SR06TC6, t, SR07TC1, t, SR07TC2, t, SR07TC3);
+0681 grid on;
+0682 ylabel(<span class="string">'Temp [deg C]'</span>);
+0683 axis([min(t) max(t) 15 40])
+0684 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0685 legend(name{34:39},3);
+0686 
+0687 subplot(4,1,3);
+0688 plot(t, SR07TC4, t, SR07TC5, t, SR07TC6, t, SR08TC1, t, SR08TC2, t, SR08TC3);
+0689 grid on;
+0690 ylabel(<span class="string">'Temp [deg C]'</span>);
+0691 axis([min(t) max(t) 15 35])
+0692 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0693 legend(name{40:45},3);
+0694 
+0695 subplot(4,1,4);
+0696 plot(t, SR08TC4, t, SR08TC5, t, SR08TC6, t, SR09TC1, t, SR09TC2, t, SR09TC3);
+0697 grid on;
+0698 ylabel(<span class="string">'Temp [deg C]'</span>);
+0699 axis([min(t) max(t) 15 35])
+0700 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0701 legend(name{46:51},3);
+0702 xlabel(xlabelstring);
+0703 
+0704 orient landscape
+0705 
+0706 <span class="comment">%fourth page</span>
+0707 figure
+0708 subplot(4,1,1);
+0709 plot(t, dcct);
+0710 grid on;
+0711 ylabel(<span class="string">'Beam Current [mAmps]'</span>);
+0712 axis([min(t) max(t) 0 dcctplotmax]);
+0713 title(titleStr);
+0714 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0715 
+0716 subplot(4,1,2);
+0717 plot(t, SR09TC4, t, SR09TC5, t, SR09TC6, t, SR10TC1, t, SR10TC2, t, SR10TC3);
+0718 grid on;
+0719 ylabel(<span class="string">'Temp [deg C]'</span>);
+0720 axis([min(t) max(t) 15 35])
+0721 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0722 legend(name{52:57},3);
+0723 
+0724 subplot(4,1,3);
+0725 plot(t, SR10TC4, t, SR10TC5, t, SR10TC6, t, SR11TC1, t, SR11TC2, t, SR11TC3);
+0726 grid on;
+0727 ylabel(<span class="string">'Temp [deg C]'</span>);
+0728 axis([min(t) max(t) 15 40])
+0729 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0730 legend(name{58:63},3);
+0731 
+0732 subplot(4,1,4);
+0733 plot(t, SR11TC4, t, SR11TC5, t, SR11TC6, t, SR12TC1, t, SR12TC2, t, SR12TC3);
+0734 grid on;
+0735 ylabel(<span class="string">'Temp [deg C]'</span>);
+0736 axis([min(t) max(t) 15 35])
+0737 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0738 legend(name{64:69},3);
+0739 xlabel(xlabelstring);
+0740 
+0741 orient landscape
+0742 
+0743 
+0744 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0745 <a name="_sub1" href="#_subfunctions" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a>
+0746 <span class="keyword">if</span> DayFlag
+0747    <span class="keyword">if</span> size(Days,2) &gt; 1
+0748       Days = Days'; <span class="comment">% Make a column vector</span>
+0749    <span class="keyword">end</span>
+0750    
+0751    MaxDay = round(max(t));
+0752    set(gca,<span class="string">'XTick'</span>,[0:MaxDay]');
+0753    
+0754    <span class="keyword">if</span> length(Days) &lt; MaxDay-1
+0755       <span class="comment">% Days were skipped</span>
+0756       set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str([0:MaxDay-1]'+Days(1)),<span class="string">' '</span>));  
+0757    <span class="keyword">else</span>
+0758       <span class="comment">% All days plotted</span>
+0759       set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str(Days),<span class="string">' '</span>));  
+0760    <span class="keyword">end</span>
+0761    
+0762    XTickLabelString = get(gca,<span class="string">'XTickLabel'</span>);
+0763    <span class="keyword">if</span> MaxDay &lt; 20
+0764       <span class="comment">% ok</span>
+0765    <span class="keyword">elseif</span> MaxDay &lt; 40
+0766       set(gca,<span class="string">'XTick'</span>,[0:2:MaxDay]');       
+0767       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:2:MaxDay-1,:));       
+0768    <span class="keyword">elseif</span> MaxDay &lt; 63
+0769       set(gca,<span class="string">'XTick'</span>,[0:3:MaxDay]');       
+0770       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:3:MaxDay-1,:));       
+0771    <span class="keyword">elseif</span> MaxDay &lt; 80
+0772       set(gca,<span class="string">'XTick'</span>,[0:4:MaxDay]');       
+0773       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:4:MaxDay-1,:));       
+0774    <span class="keyword">end</span>
+0775 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

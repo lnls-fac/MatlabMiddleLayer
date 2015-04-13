@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sweepenergy</title>
+  <meta name="keywords" content="sweepenergy">
+  <meta name="description" content="SWEEPENERGY - Energy sweep of the storage ring">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; sweepenergy.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sweepenergy
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SWEEPENERGY - Energy sweep of the storage ring</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function sweepenergy(PercentChangeInEnergy) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SWEEPENERGY - Energy sweep of the storage ring
+  sweepenergy(PercentChangeInEnergy)
+  sweepenergy( .1: .2: 1.1)  ramps up   .1 to 1.1 percent in  .002 GeV steps
+  sweepenergy(-.1:-.2:-1.1)  ramps down .1 to 1.1 percent in -.002 GeV steps
+
+  This function starts at the present online lattice and 
+  leaves the lattice at the last energy step.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="field2cell.html" class="code" title="function OutputCell = field2cell(InputStruct)">field2cell</a>	FIELD2CELL - Converts a structure of MML data structures into a cell array</li><li><a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>	GETMACHINECONFIG - Returns or saves to file the present storage ring setpoints and monitors</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>	ISMEMBEROF - Returns turn if the membership information of a family (cell of strings)</li><li><a href="setmachineconfig.html" class="code" title="function [ConfigSetpoint, FileName] = setmachineconfig(varargin)">setmachineconfig</a>	SETMACHINECONFIG - Sets the storage ring setpoints from a file or configuration data structure</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function sweepenergy(PercentChangeInEnergy)</a>
+0002 <span class="comment">%SWEEPENERGY - Energy sweep of the storage ring</span>
+0003 <span class="comment">%  sweepenergy(PercentChangeInEnergy)</span>
+0004 <span class="comment">%  sweepenergy( .1: .2: 1.1)  ramps up   .1 to 1.1 percent in  .002 GeV steps</span>
+0005 <span class="comment">%  sweepenergy(-.1:-.2:-1.1)  ramps down .1 to 1.1 percent in -.002 GeV steps</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  This function starts at the present online lattice and</span>
+0008 <span class="comment">%  leaves the lattice at the last energy step.</span>
+0009 
+0010 <span class="comment">%  Written by Greg Portmann</span>
+0011 
+0012 
+0013 <span class="comment">% PercentChangeInEnergy = .1:.2:1.1;</span>
+0014 
+0015 
+0016 <span class="comment">% Get starting lattice</span>
+0017 SPstruct = <a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>;
+0018 SPcell = <a href="field2cell.html" class="code" title="function OutputCell = field2cell(InputStruct)">field2cell</a>(SPstruct);
+0019 
+0020 SP = SPcell;
+0021 
+0022 <span class="comment">% Set to simulator</span>
+0023 <a href="setmachineconfig.html" class="code" title="function [ConfigSetpoint, FileName] = setmachineconfig(varargin)">setmachineconfig</a>(SPstruct, <span class="string">'Simulator'</span>);
+0024 
+0025 Energy0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'BEND'</span>, [1 1], <span class="string">'Physics'</span>);
+0026 
+0027 <span class="keyword">for</span> i = 1:length(PercentChangeInEnergy)
+0028     NewEnergy = Energy0 * (1 + PercentChangeInEnergy(i)/100);
+0029 
+0030     <span class="comment">% Make the setpoint change w/o a WaitFlag</span>
+0031     <span class="keyword">for</span> k = 1:length(SPcell)
+0032         <span class="keyword">try</span>
+0033             <span class="keyword">if</span> <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(SPcell{k},<span class="string">'Magnet'</span>)
+0034                 SPcell{k}.Data = (1 + PercentChangeInEnergy(i)/100) * SP{k}.Data;
+0035                 <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(SPcell{k}, 0);
+0036             <span class="keyword">end</span>
+0037         <span class="keyword">catch</span>
+0038             fprintf(<span class="string">'   Trouble with setsp(%s), hence ignored (sweepenergy)\n'</span>, SPcell{k}.FamilyName);
+0039             <span class="comment">%lasterr</span>
+0040         <span class="keyword">end</span>
+0041     <span class="keyword">end</span>
+0042     
+0043     BEND = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'BEND'</span>, [1 1]);
+0044     fprintf(<span class="string">'   Changing energy to %f GeV (BEND=%f)\n'</span>, NewEnergy(1), BEND);
+0045     
+0046     <span class="comment">%     % Make the setpoint change with a WaitFlag</span>
+0047     <span class="comment">%     for k = 1:length(SPcell)</span>
+0048     <span class="comment">%         try</span>
+0049     <span class="comment">%             % Set with waiting</span>
+0050     <span class="comment">%             setpv(SPcell{k}, -1);</span>
+0051     <span class="comment">%         end</span>
+0052     <span class="comment">%     end</span>
+0053 
+0054     fprintf(<span class="string">'   Energy   change to %f GeV complete\n'</span>, NewEnergy(1));
+0055     fprintf(<span class="string">'   Hit return to continue (Ctrl-C to stop)\n\n'</span>);
+0056     pause
+0057 <span class="keyword">end</span>
+0058 
+0059 
+0060 
+0061 
+0062 
+0063 <span class="comment">% % Change the energy of the simulator</span>
+0064 <span class="comment">% setsp('BEND', NewEnergy(1), 'Physics', 'Simulator');</span>
+0065 <span class="comment">% BENDsim = getsp('BEND', [1 1], 'Simulator', 'Hardware');</span>
+0066 <span class="comment">%</span>
+0067 <span class="comment">% fprintf('   Changing energy to %f GeV (BEND=%f)\n', NewEnergy(1), BENDsim);</span>
+0068 <span class="comment">%</span>
+0069 <span class="comment">% % Get the simluator lattice at the new energy</span>
+0070 <span class="comment">% SP = getmachineconfig('Simulator');</span>
+0071 <span class="comment">%</span>
+0072 <span class="comment">% % Set to online accelerator</span>
+0073 <span class="comment">% setmachineconfig(SP, 'Online');</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

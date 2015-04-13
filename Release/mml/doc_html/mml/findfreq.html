@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of findfreq</title>
+  <meta name="keywords" content="findfreq">
+  <meta name="description" content="FINDFREQ - Finds the tunes via an FFT of turn-by-turn data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; findfreq.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>findfreq
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>FINDFREQ - Finds the tunes via an FFT of turn-by-turn data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [nux,nuy,ampx,ampy] = findfreq(fadx,fady) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FINDFREQ - Finds the tunes via an FFT of turn-by-turn data
+
+  [nux,nuy,ampx,ampy] = findfreq(fadx,fady)
+
+  This function calculates the tunes and the amplitude of the peak
+  for given transverse oscillation data (turn-by-turn) by
+  using an FFT with sine window and interpolation.
+
+  INPUTS
+  1. fadx - Horizontal turn-by-turn data (number of BPMs and number of turns is variable)
+  2. fady - Vertical   turn-by-turn data
+
+  OUTPUTS
+  1-2. nux, nuy   - the two transverse betatron tunes
+  3-4. ampx, ampy - the peak amplitudeS</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [nux,nuy,ampx,ampy] = findfreq(fadx,fady)</a>
+0002 <span class="comment">%FINDFREQ - Finds the tunes via an FFT of turn-by-turn data</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  [nux,nuy,ampx,ampy] = findfreq(fadx,fady)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  This function calculates the tunes and the amplitude of the peak</span>
+0007 <span class="comment">%  for given transverse oscillation data (turn-by-turn) by</span>
+0008 <span class="comment">%  using an FFT with sine window and interpolation.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  INPUTS</span>
+0011 <span class="comment">%  1. fadx - Horizontal turn-by-turn data (number of BPMs and number of turns is variable)</span>
+0012 <span class="comment">%  2. fady - Vertical   turn-by-turn data</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1-2. nux, nuy   - the two transverse betatron tunes</span>
+0016 <span class="comment">%  3-4. ampx, ampy - the peak amplitudeS</span>
+0017 
+0018 <span class="comment">%  Christoph Steier, July 1999</span>
+0019 <span class="comment">%  Modified by Laurent S. Nadolski, 2006</span>
+0020 
+0021 sfx = size(fadx);
+0022 sfy = size(fady);
+0023 
+0024 <span class="comment">% substract average value from the data</span>
+0025 mfadx = fadx - ones(sfx(1),1)*mean(fadx);
+0026 mfady = fady - ones(sfy(1),1)*mean(fady);
+0027 
+0028 <span class="comment">% compute fft amplitude for turn by turn data</span>
+0029 fftx = abs(fft(mfadx));
+0030 ffty = abs(fft(mfady));
+0031 
+0032 <span class="comment">% minx=int32(sfx(1)/20);</span>
+0033 <span class="comment">% miny=int32(sfy(1)/20);</span>
+0034 <span class="comment">% dminx=double(minx);</span>
+0035 <span class="comment">% dminy=double(miny);</span>
+0036 maxx = int32(sfx(1)/2);
+0037 maxy = int32(sfy(1)/2);
+0038 dmaxx = double(maxx);
+0039 dmaxy = double(maxy);
+0040 
+0041 <span class="comment">% look for maximum peak in data</span>
+0042 [dummy,indx] = max(fftx(1:dmaxx,:));
+0043 [dummy,indy] = max(ffty(1:dmaxy,:));
+0044 
+0045 dmaxx = indx + 5;
+0046 dminx = indx - 5;
+0047 dmaxy = indy + 5;
+0048 dminy = indy - 5;
+0049 
+0050 <span class="comment">% data with a sine window</span>
+0051 sfadx = mfadx.* (ones(sfx(2),1)*sin(pi*[0:1/(sfx(1)-1):1]))';
+0052 sfady = mfady.* (ones(sfy(2),1)*sin(pi*[0:1/(sfy(1)-1):1]))';
+0053 
+0054 <span class="comment">% fft of turn by turn data convoluted by a sine window</span>
+0055 fftx = abs(fft(sfadx));
+0056 ffty = abs(fft(sfady));
+0057 
+0058 
+0059 [dummy,indx] = max(fftx(dminx:dmaxx,:));
+0060 [dummy,indy] = max(ffty(dminy:dmaxy,:));
+0061 
+0062 indx = indx + dminx;
+0063 indy = indy + dminy;
+0064 
+0065 idx = [];
+0066 ampx = []; ampx2 = [];
+0067 
+0068 <span class="keyword">for</span> n = 1:sfx(2)
+0069 
+0070     <span class="keyword">if</span> indx(n) == 1
+0071         indx1=2; indx3=2;
+0072     <span class="keyword">elseif</span> indx(n) == (sfx(1)/2)
+0073         indx1=(sfx(1)/2-1); indx3=(sfx(1)/2-1);
+0074     <span class="keyword">else</span>
+0075         indx1=indx(n)-1; indx3=indx(n)+1;
+0076     <span class="keyword">end</span>
+0077 
+0078     <span class="keyword">if</span> (fftx(indx3,n)&gt;fftx(indx1,n))
+0079         ampx(n) = fftx(indx(n),n); ampx2(n) = fftx(indx3,n);
+0080         idx(n) = indx(n);
+0081     <span class="keyword">else</span>
+0082         ampx(n) = fftx(indx1,n); ampx2(n) = fftx(indx(n),n);
+0083         <span class="keyword">if</span> (indx(n) ~= 1)
+0084             idx(n) = indx1;
+0085         <span class="keyword">else</span>
+0086             idx(n) = 0;
+0087         <span class="keyword">end</span>
+0088     <span class="keyword">end</span>
+0089 <span class="keyword">end</span>
+0090 
+0091 nux = 1/(sfx(1)) * (idx-1 + (2*ampx2./(ampx+ampx2)) - 0.5);
+0092 
+0093 idy = [];
+0094 ampy = []; ampy2 = [];
+0095 
+0096 <span class="keyword">for</span> n = 1:(sfy(2))
+0097     <span class="keyword">if</span> indy(n) == 1
+0098         indy1=2; indy3=2;
+0099     <span class="keyword">elseif</span> indy(n) == (sfy(1)/2)
+0100         indy1=(sfy(1)/2-1); indy3=(sfy(1)/2-1);
+0101     <span class="keyword">else</span>
+0102         indy1=indy(n)-1; indy3=indy(n)+1;
+0103     <span class="keyword">end</span>
+0104 
+0105     <span class="keyword">if</span> (ffty(indy3,n)&gt;ffty(indy1,n))
+0106         ampy(n) = ffty(indy(n),n); ampy2(n) = ffty(indy3,n);
+0107         idy(n) = indy(n);
+0108     <span class="keyword">else</span>
+0109         ampy(n) = ffty(indy1,n); ampy2(n) = ffty(indy(n),n);
+0110         <span class="keyword">if</span> (indy(n) ~= 1)
+0111             idy(n) = indy1;
+0112         <span class="keyword">else</span>
+0113             idy(n) = 0;
+0114         <span class="keyword">end</span>
+0115     <span class="keyword">end</span>
+0116 <span class="keyword">end</span>
+0117 
+0118 nuy = 1/sfy(1) * (idy-1 + (2*ampy2./(ampy+ampy2)) - 0.5);
+0119 
+0120 ampx = 2 * diag(fftx(indx,:),0)' <span class="keyword">...</span>
+0121 ./( sin(pi*(indx-1+0.5-nux*sfx(1)))./(pi*(indx-1+0.5-nux*sfx(1))) + <span class="keyword">...</span>
+0122 sin(pi*(indx-1-0.5-nux*sfx(1)))./(pi*(indx-1-0.5-nux*sfx(1))));
+0123 ampy = 2 * diag(ffty(indy,:),0)' <span class="keyword">...</span>
+0124 ./( sin(pi*(indy-1+0.5-nuy*sfy(1)))./(pi*(indy-1+0.5-nuy*sfy(1))) + <span class="keyword">...</span>
+0125 sin(pi*(indy-1-0.5-nuy*sfy(1)))./(pi*(indy-1-0.5-nuy*sfy(1))));
+0126 
+0127 <span class="comment">% ampx = 2 * diag(fftx(indx,:),0)' ...</span>
+0128 <span class="comment">% ./( sinc(0.5+nux*1024) + sinc(-0.5+nux*1024));</span>
+0129 <span class="comment">% ampy = 2 * diag(ffty(indy,:),0)' ...</span>
+0130 <span class="comment">% ./( sinc(0.5+nuy*1024) + sinc(-0.5+nuy*1024));</span>
+0131 
+0132 <span class="comment">% nux = 1-nux;</span>
+0133 <span class="comment">% nuy = 1-nuy;</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

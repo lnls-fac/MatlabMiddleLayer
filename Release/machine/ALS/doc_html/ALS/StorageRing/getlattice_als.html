@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getlattice_als</title>
+  <meta name="keywords" content="getlattice_als">
+  <meta name="description" content="GETLATTICE_ALS - Get data from a StorageRingOpsData lattice file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getlattice_als.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getlattice_als
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GETLATTICE_ALS - Get data from a StorageRingOpsData lattice file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Setpoint, Monitor, FileName] = getlattice_als(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETLATTICE_ALS - Get data from a StorageRingOpsData lattice file
+  [ConfigSetpoint, ConfigMonitor, FileName] = getlattice_als(Field1, Field2, ...)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Setpoint, Monitor, FileName] = getlattice_als(varargin)</a>
+0002 <span class="comment">%GETLATTICE_ALS - Get data from a StorageRingOpsData lattice file</span>
+0003 <span class="comment">%  [ConfigSetpoint, ConfigMonitor, FileName] = getlattice_als(Field1, Field2, ...)</span>
+0004 <span class="comment">%</span>
+0005 
+0006 DirectoryName = getfamilydata(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0007 
+0008 FileName = menu(<span class="string">'Load which lattice?'</span>,<span class="string">'Production lattice'</span>,<span class="string">'Injection lattice'</span>,<span class="string">'Load from file'</span>,<span class="string">'Exit'</span>);
+0009 
+0010 <span class="comment">% if isstr(FileName)</span>
+0011 <span class="comment">%    DirName = [];</span>
+0012 
+0013 <span class="keyword">if</span> FileName == 1
+0014     fprintf(<span class="string">'  Loading production lattice.\n'</span>);
+0015     FileName = getfamilydata(<span class="string">'OpsData'</span>,<span class="string">'LatticeFile'</span>);
+0016 
+0017 <span class="keyword">elseif</span> FileName == 2
+0018     fprintf(<span class="string">'  Loading injection lattice.\n'</span>);
+0019     FileName = getfamilydata(<span class="string">'OpsData'</span>,<span class="string">'InjectionFile'</span>);
+0020 
+0021 <span class="keyword">elseif</span> FileName == 3
+0022     cd(DirectoryName);
+0023     pause(0.01)
+0024     [FileName, DirectoryName] = uigetfile(<span class="string">'*Config*.mat'</span>, <span class="string">'Select a configuration file'</span>);
+0025     <span class="keyword">if</span> FileName == 0
+0026         Setpoint = [];
+0027         Monitor = [];
+0028         <span class="keyword">return</span>
+0029     <span class="keyword">end</span>
+0030 
+0031 <span class="keyword">elseif</span> FileName == 4
+0032     Setpoint = [];
+0033     <span class="keyword">return</span>
+0034 <span class="keyword">else</span>
+0035     error(<span class="string">'FileName did not make sense.'</span>);
+0036 <span class="keyword">end</span>
+0037 
+0038 
+0039 load([DirectoryName FileName]);
+0040 FileName = [DirectoryName FileName];
+0041 
+0042 <span class="keyword">if</span> nargin == 0
+0043     Setpoint = ConfigSetpoint;
+0044 <span class="keyword">else</span>
+0045     <span class="keyword">for</span> i = 1:length(varargin)
+0046         <span class="keyword">if</span> isfield(ConfigSetpoint, varargin{i})
+0047             Setpoint.(varargin{i}) = ConfigSetpoint.(varargin{i});
+0048         <span class="keyword">end</span>
+0049     <span class="keyword">end</span>
+0050 <span class="keyword">end</span>
+0051 
+0052 <span class="keyword">if</span> nargout &gt;= 2
+0053     <span class="keyword">if</span> nargin == 0
+0054         Monitor = ConfigMonitor;
+0055     <span class="keyword">else</span>
+0056         <span class="keyword">for</span> i = 1:length(varargin)
+0057             <span class="keyword">if</span> isfield(ConfigMonitor, varargin{i})
+0058                 ConfigMonitor.(varargin{i}) = ConfigMonitor.(varargin{i});
+0059             <span class="keyword">end</span>
+0060         <span class="keyword">end</span>
+0061     <span class="keyword">end</span>
+0062 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

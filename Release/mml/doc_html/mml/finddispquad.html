@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of finddispquad</title>
+  <meta name="keywords" content="finddispquad">
+  <meta name="description" content="FINDDISPQUAD - Find the optimal setting for the dispersion correction quadrupole family">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; finddispquad.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>finddispquad
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>FINDDISPQUAD - Find the optimal setting for the dispersion correction quadrupole family</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function QuadSP = finddispquad </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FINDDISPQUAD - Find the optimal setting for the dispersion correction quadrupole family
+  QuadSP = finddispquad
+
+  This function is under development</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getdisp.html" class="code" title="function [Data, FileName] = getdisp(varargin)">getdisp</a>	GETDISP - Returns the dispersion for a BPM family (from file)</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>	GETX - Returns the horizontal orbit</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function QuadSP = finddispquad</a>
+0002 <span class="comment">%FINDDISPQUAD - Find the optimal setting for the dispersion correction quadrupole family</span>
+0003 <span class="comment">%  QuadSP = finddispquad</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  This function is under development</span>
+0006 
+0007 
+0008 disp(<span class="string">'This function is under construction (Greg Portmann).  '</span>);
+0009 <span class="keyword">return</span>
+0010 
+0011 QuadSP0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'QFA'</span>);
+0012 
+0013 <span class="comment">% Get Dispersion</span>
+0014 <span class="comment">%[Dx,Dy] = getdisp;</span>
+0015 
+0016 
+0017 i = 0; 
+0018 <span class="keyword">for</span> qfa=[0 .2 .4 .6 .8 1 1.2 1.4 1.6 1.8 2]
+0019   i = i+1;
+0020   QFAnew = QuadSP0+qfa
+0021   qfaam=<a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(<span class="string">'QFA'</span>, QFAnew);
+0022   sleep(2);
+0023   [Dx(:,i),Dy(:,i)]=<a href="getdisp.html" class="code" title="function [Data, FileName] = getdisp(varargin)">getdisp</a>;
+0024   x(:,i) = <a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>(1,BPMelem1278);
+0025   QFA(:,i) = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(<span class="string">'QFA'</span>);
+0026   save qfaout x QFA Dx Dy
+0027 <span class="keyword">end</span>
+0028 
+0029 
+0030 <span class="comment">% Set QFA back to starting point</span>
+0031 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(<span class="string">'QFA'</span>, QuadSP0);
+0032 
+0033 
+0034 <span class="comment">% Find LS fit to the line</span>
+0035 <span class="comment">%y=Dxmat;</span>
+0036 <span class="comment">%X = [ones(max(size()),1) QFA'];</span>
+0037 <span class="comment">%b = inv(X'*X)*X'*y;</span>
+0038 <span class="comment">%QuadSP = -b(1)/b(2);</span>
+0039 
+0040 <span class="comment">%QFA1 = linspace(QFA(1),QFA(max(size(QFA))),100);</span>
+0041 <span class="comment">%yfit = b(1) + b(2)*QFA1;</span>
+0042 
+0043 <span class="comment">%figure</span>
+0044 <span class="comment">%plot(QFA1,yfit, QFA,y,'o'); grid on</span>
+0045 <span class="comment">%xlabel('RF Frequency [MHz]');</span>
+0046 <span class="comment">%ylabel('Dot product of Dx and Hor. Orbit');</span>
+0047 
+0048 <span class="comment">%fprintf('\n\n                             Zero crossing of QFAF = %f [MHz]\n', rf0);</span>
+0049 
+0050 save qfadata
+0051 
+0052 figure;
+0053 plot(QFA,Dx(BPMelem1278,:)); grid on
+0054 xlabel(<span class="string">'QFA [Amps]'</span>);
+0055 ylabel(<span class="string">'Dispersion'</span>);
+0056</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getsp_ILCTrimQD</title>
+  <meta name="keywords" content="getsp_ILCTrimQD">
+  <meta name="description" content="[AM, tout, DataTime, ErrorFlag] = getsp_ILCTrimQD(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; getsp_ILCTrimQD.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getsp_ILCTrimQD
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[AM, tout, DataTime, ErrorFlag] = getsp_ILCTrimQD(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [AM, tout, DataTime, ErrorFlag] = getsp_ILCTrimQD(Family, Field, DeviceList, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [AM, tout, DataTime, ErrorFlag] = getsp_ILCTrimQD(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)
+
+ The following programs must be running:
+ y:\opstat\win\Hiroshi\release\BRQLinCor.exe
+ y:\opstat\win\Hiroshi\release\BRQLinCorServer.exe</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [AM, tout, DataTime, ErrorFlag] = getsp_ILCTrimQD(Family, Field, DeviceList, varargin)</a>
+0002 <span class="comment">% [AM, tout, DataTime, ErrorFlag] = getsp_ILCTrimQD(Family, Field, DeviceList, t, FreshDataFlag, TimeOutPeriod)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% The following programs must be running:</span>
+0005 <span class="comment">% y:\opstat\win\Hiroshi\release\BRQLinCor.exe</span>
+0006 <span class="comment">% y:\opstat\win\Hiroshi\release\BRQLinCorServer.exe</span>
+0007 <span class="comment">%</span>
+0008 
+0009 setpv(<span class="string">'HN:BR:QDRAQ'</span>, 0);
+0010 setpv(<span class="string">'HN:BR:QDRRQ'</span>, 0);
+0011 pause(.3);
+0012 setpv(<span class="string">'HN:BR:QDRRQ'</span>, 1);
+0013 <span class="comment">%pause(2);</span>
+0014 
+0015 tic
+0016 <span class="keyword">for</span> i = 1:100
+0017     <span class="comment">%fprintf('HN:BR:QDRAQ = %d, %f\n',getpv('HN:BR:QDRAQ'), toc);</span>
+0018     pause(.1);
+0019     <span class="keyword">if</span> getpv(<span class="string">'HN:BR:QDRAQ'</span>) == 1
+0020         <span class="keyword">break</span>;
+0021     <span class="keyword">end</span>
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="keyword">if</span> getpv(<span class="string">'HN:BR:QDRAQ'</span>) ~= 1
+0025     error(<span class="string">'HN:BR:QDRAQ is not 1'</span>);
+0026 <span class="keyword">end</span>
+0027 
+0028 <span class="keyword">for</span> i = 1:100
+0029     PVnames(i,:) = sprintf(<span class="string">'HN:BR:QD%02d'</span>, i-1);
+0030 <span class="keyword">end</span>
+0031 
+0032 [AM, tout, DataTime, ErrorFlag] = getpv(PVnames);
+0033 
+0034 setpv(<span class="string">'HN:BR:QDRAQ'</span>, 0);
+0035 setpv(<span class="string">'HN:BR:QDRRQ'</span>, 0);
+0036 
+0037 
+0038 <span class="comment">% Row vector</span>
+0039 AM = AM(:)';
+0040 DataTime = DataTime(:)';
+0041 
+0042 
+0043 <span class="comment">% Convert to amps</span>
+0044 AM = AM * (1.18 / 10);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

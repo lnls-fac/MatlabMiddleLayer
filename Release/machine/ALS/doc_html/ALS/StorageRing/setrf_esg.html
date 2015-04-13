@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setrf_esg</title>
+  <meta name="keywords" content="setrf_esg">
+  <meta name="description" content="RFam = setrf_esg(RFac, RampFlag);">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setrf_esg.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setrf_esg
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>RFam = setrf_esg(RFac, RampFlag);</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function RF = setrf_esg(rf, RampFlag); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> RFam = setrf_esg(RFac, RampFlag);
+
+  RFac = new RF frequency [MHz]
+  RFam = monitor value for the RF frequency (same as getrf) [MHz]
+  if RampFlag
+     Ramp the RF frequency slowing {default}
+  else
+     Set the RF frequency in one step
+
+  If RFac is a string (like, 'local')
+     RFac = reset  -&gt; turns on  polling (remote mode) then resets the systhesizer
+     RFac = remote -&gt; turns on  polling
+     RFac = local  -&gt; turns off polling
+
+  Note:  The RF must be connected to the variable synthesizer for this function to work</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function RF = setrf_esg(rf, RampFlag);</a>
+0002 <span class="comment">% RFam = setrf_esg(RFac, RampFlag);</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  RFac = new RF frequency [MHz]</span>
+0005 <span class="comment">%  RFam = monitor value for the RF frequency (same as getrf) [MHz]</span>
+0006 <span class="comment">%  if RampFlag</span>
+0007 <span class="comment">%     Ramp the RF frequency slowing {default}</span>
+0008 <span class="comment">%  else</span>
+0009 <span class="comment">%     Set the RF frequency in one step</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  If RFac is a string (like, 'local')</span>
+0012 <span class="comment">%     RFac = reset  -&gt; turns on  polling (remote mode) then resets the systhesizer</span>
+0013 <span class="comment">%     RFac = remote -&gt; turns on  polling</span>
+0014 <span class="comment">%     RFac = local  -&gt; turns off polling</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  Note:  The RF must be connected to the variable synthesizer for this function to work</span>
+0017 <span class="comment">%</span>
+0018 
+0019 SweepModeFlag = 0;
+0020 TolSP_AM = .00001;
+0021 
+0022 <span class="keyword">if</span> nargin &lt; 2
+0023    RampFlag = 1;
+0024 <span class="keyword">end</span>
+0025 
+0026 <span class="keyword">if</span> SweepModeFlag
+0027    <span class="comment">% Using sweep mode</span>
+0028    delMOperRF = 1/(-8.85009765625e-004);
+0029    
+0030    mo0 = getmo;
+0031    rf0 = getrf;
+0032    delMO = delMOperRF*(rf-rf0);
+0033    setmo(mo0+delMO);
+0034    
+0035    mo0 = getmo;
+0036    rf0 = getrf;
+0037    delMO = delMOperRF*(rf-rf0);
+0038    setmo(mo0+delMO);
+0039 <span class="keyword">else</span>
+0040    <span class="comment">% Using synthesizer</span>
+0041    MaxStep = .0005;     <span class="comment">% MHz</span>
+0042    
+0043    <span class="keyword">if</span> isstr(rf)
+0044       <span class="keyword">if</span> strcmp(<span class="string">'reset'</span>,lower(rf))
+0045          <span class="comment">% Reset synthesizer</span>
+0046          disp(<span class="string">'  Reset synthesizer (and set to remote mode)'</span>);
+0047          setsp(<span class="string">'SR03S___RFFREQ_BC01RF'</span>, 0); 
+0048          setsp(<span class="string">'SR03S___RFFREQ_BC00RF.PROC'</span>, 1); 
+0049       <span class="keyword">elseif</span> strcmp(<span class="string">'remote'</span>,lower(rf))
+0050          <span class="comment">% Set synthesizer to remote mode</span>
+0051          disp(<span class="string">'  Set synthesizer to remote (polling)'</span>);
+0052          setsp(<span class="string">'SR03S___RFFREQ_BC01RF'</span>, 0);
+0053          
+0054          <span class="comment">% Set present AC (in case it was set while in local)</span>
+0055          RFac = getam(<span class="string">'SR03S___RFFREQ_AC00RF'</span>);
+0056          setsp(<span class="string">'SR03S___RFFREQ_AC00RF'</span>, RFac);
+0057       <span class="keyword">elseif</span> strcmp(<span class="string">'local'</span>,lower(rf))
+0058          <span class="comment">% Set synthesizer to local mode</span>
+0059          disp(<span class="string">'  Set synthesizer to local (no polling)'</span>);
+0060          setsp(<span class="string">'SR03S___RFFREQ_BC01RF'</span>, 1); 
+0061       <span class="keyword">else</span>
+0062          fprintf(<span class="string">'  Unknown command: %s\n'</span>,rf);
+0063       <span class="keyword">end</span>
+0064    <span class="keyword">else</span>
+0065       RFac0   = getam(<span class="string">'SR03S___RFFREQ_AC00RF'</span>);
+0066       Nsteps = ceil(abs((RFac0-rf)/MaxStep));
+0067       
+0068       <span class="comment">% For large setpoint changes, varify RampFlag=1</span>
+0069       <span class="keyword">if</span> RampFlag==1 &amp; abs(RFac0-rf) &gt; .05
+0070          RampFlag = questdlg(str2mat(sprintf(<span class="string">'The RF change is %.5f MHz.'</span>,RFac0-rf),<span class="string">'How many steps do you want to make?'</span>),<span class="string">'RF Synthesizer?'</span>,<span class="string">'1 Step'</span>,sprintf(<span class="string">'%d Steps'</span>,Nsteps),<span class="string">'1 Step'</span>);
+0071          <span class="keyword">if</span> strcmp(RampFlag,<span class="string">'1 Step'</span>)
+0072             RampFlag = 0;
+0073          <span class="keyword">else</span>
+0074             RampFlag = 1;
+0075          <span class="keyword">end</span>
+0076       <span class="keyword">end</span>
+0077       
+0078       <span class="keyword">if</span> RampFlag
+0079          <span class="keyword">for</span> i = 1:Nsteps
+0080             setsp(<span class="string">'SR03S___RFFREQ_AC00RF'</span>, RFac0 + i*(rf-RFac0)/Nsteps);
+0081             sleep(.03);
+0082          <span class="keyword">end</span>
+0083          setsp(<span class="string">'SR03S___RFFREQ_AC00RF'</span>, rf); 
+0084       <span class="keyword">else</span>
+0085          setsp(<span class="string">'SR03S___RFFREQ_AC00RF'</span>, rf); 
+0086       <span class="keyword">end</span>
+0087    <span class="keyword">end</span>
+0088 <span class="keyword">end</span>
+0089 
+0090 sleep(1);
+0091 
+0092 <span class="keyword">if</span> ~isstr(rf)
+0093    <span class="keyword">if</span> nargout &gt; 0
+0094       RF = getrf;
+0095    <span class="keyword">end</span>
+0096    <span class="comment">%if RF-rf &gt; TolSP_AM</span>
+0097    <span class="comment">%  fprintf('  SETRF WARNING:  Setpoint (%f MHz) - Monitor (%f MHz) difference (%f MHz) is out-of-tolerance.\n', RF, rf, RF-rf);</span>
+0098    <span class="comment">%  fprintf('  Make sure the synthesizer is setup properly (try &quot;setrf reset&quot;, then &quot;setrf(%f)&quot;).\n', rf);</span>
+0099    <span class="comment">%end</span>
+0100 <span class="keyword">end</span>
+0101</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

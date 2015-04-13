@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of zoomfixticks</title>
+  <meta name="keywords" content="zoomfixticks">
+  <meta name="description" content="ZOOMFIXTICKS - Allows zoom to work on a figure whose AXES tick labels are manually set">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; zoomfixticks.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>zoomfixticks
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>ZOOMFIXTICKS - Allows zoom to work on a figure whose AXES tick labels are manually set</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function zoomfixticks(fig,method,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">ZOOMFIXTICKS - Allows zoom to work on a figure whose AXES tick labels are manually set
+   ZOOMFIXTICKS(FIG) operates on the figure with handle FIG.
+   ZOOMFIXTICKS(AX) operates on the figure with child AXES handle AX.
+   ZOOMFIXTICKS with no arguments operates on the current figure.
+
+   Note that when using this function, you will need to modify the FIXTICKS
+   subfunction to meet your application needs.  Alternatively, you can comment
+   out the function and supply it as an M-file function on the MATLAB path.  
+   If you supply your own, make sure that the M-file is named &quot;fixticks.m&quot;, and
+   it takes a single input argument, the handle to an AXES object.
+
+   Example:
+       hf = figure;
+       xdata = [0:.01:1];
+       ydata = 100000*sin(2*pi*5*xdata);
+       plot(xdata,ydata);
+       zoomfixticks(hf)
+
+   Greg Aloe (8-8-2002)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function init(fig)</a></li><li><a href="#_sub2" class="code">function zoomInCallback(hcbo,fig)</a></li><li><a href="#_sub3" class="code">function zoomOutCallback(hcbo,fig)</a></li><li><a href="#_sub4" class="code">function downFcn(fig)</a></li><li><a href="#_sub5" class="code">function fixticks(ax)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function zoomfixticks(fig,method,varargin)</a>
+0002 <span class="comment">%ZOOMFIXTICKS - Allows zoom to work on a figure whose AXES tick labels are manually set</span>
+0003 <span class="comment">%   ZOOMFIXTICKS(FIG) operates on the figure with handle FIG.</span>
+0004 <span class="comment">%   ZOOMFIXTICKS(AX) operates on the figure with child AXES handle AX.</span>
+0005 <span class="comment">%   ZOOMFIXTICKS with no arguments operates on the current figure.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%   Note that when using this function, you will need to modify the FIXTICKS</span>
+0008 <span class="comment">%   subfunction to meet your application needs.  Alternatively, you can comment</span>
+0009 <span class="comment">%   out the function and supply it as an M-file function on the MATLAB path.</span>
+0010 <span class="comment">%   If you supply your own, make sure that the M-file is named &quot;fixticks.m&quot;, and</span>
+0011 <span class="comment">%   it takes a single input argument, the handle to an AXES object.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   Example:</span>
+0014 <span class="comment">%       hf = figure;</span>
+0015 <span class="comment">%       xdata = [0:.01:1];</span>
+0016 <span class="comment">%       ydata = 100000*sin(2*pi*5*xdata);</span>
+0017 <span class="comment">%       plot(xdata,ydata);</span>
+0018 <span class="comment">%       zoomfixticks(hf)</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%   Greg Aloe (8-8-2002)</span>
+0021 
+0022 
+0023 <span class="comment">% Set up the figure if there are less than 2 arguments</span>
+0024 <span class="keyword">if</span> nargin &lt; 2
+0025     <span class="comment">% Make sure the input is a handle to an AXES or FIGURE</span>
+0026     <span class="keyword">if</span> nargin==0
+0027         <span class="comment">% If no arguments, assume the current figure</span>
+0028         fig = gcf;
+0029     <span class="keyword">elseif</span> ishandle(fig) &amp; ~strcmp(lower(get(fig,<span class="string">'type'</span>)),<span class="string">'figure'</span>)
+0030         <span class="comment">% If FIG is a handle, but not to a figure, assume it's an axes and get its parent</span>
+0031         fig = get(fig,<span class="string">'parent'</span>);
+0032     <span class="keyword">end</span>
+0033 
+0034     <span class="comment">% Error out if the input is not a handle, or not a handle to a figure or axes</span>
+0035     <span class="keyword">if</span> ~ishandle(fig) | (ishandle(fig) &amp; ~strcmp(lower(get(fig,<span class="string">'type'</span>)),<span class="string">'figure'</span>))
+0036         error(<span class="string">'Input argument must be a handle to an AXES or FIGURE object.'</span>)
+0037     <span class="keyword">end</span>
+0038     
+0039     <span class="comment">% Initialize the setup of the figure</span>
+0040     <a href="#_sub1" class="code" title="subfunction init(fig)">init</a>(fig)
+0041 <span class="keyword">else</span>
+0042     <span class="comment">% if 2 or more arguments, perform the desired operation</span>
+0043     feval(method,varargin{:})
+0044 <span class="keyword">end</span>
+0045     
+0046 
+0047 <span class="comment">%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+0048 <a name="_sub1" href="#_subfunctions" class="code">function init(fig)</a>
+0049 <span class="comment">% This function sets up the figure so that zooms will work even when the AXES</span>
+0050 <span class="comment">% ticklabels are set manually</span>
+0051  
+0052 <span class="comment">% Change the callback for the &quot;Zoom In&quot; toolbar button</span>
+0053 hin = findall(fig,<span class="string">'tag'</span>,<span class="string">'figToolZoomIn'</span>);
+0054 set(hin,<span class="string">'ClickedCallback'</span>,<span class="string">'zoomfixticks(gcbf,''zoomInCallback'',gcbo,gcbf)'</span>)
+0055 
+0056 <span class="comment">% Change the callback for the &quot;Zoom Out&quot; toolbar button</span>
+0057 hout = findall(fig,<span class="string">'tag'</span>,<span class="string">'figToolZoomOut'</span>);
+0058 set(hout,<span class="string">'ClickedCallback'</span>,<span class="string">'zoomfixticks(gcbf,''zoomOutCallback'',gcbo,gcbf)'</span>)
+0059 
+0060 <span class="comment">% Fix the ticks on initialization</span>
+0061 <a href="#_sub5" class="code" title="subfunction fixticks(ax)">fixticks</a>(gca(fig))
+0062 
+0063 <span class="comment">%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+0064 <a name="_sub2" href="#_subfunctions" class="code">function zoomInCallback(hcbo,fig)</a>
+0065 <span class="comment">% Callback for the &quot;Zoom In&quot; button</span>
+0066 
+0067 <span class="comment">% First call what is normally called during a zoom in</span>
+0068 putdowntext(<span class="string">'zoomin'</span>,hcbo)
+0069 
+0070 <span class="comment">% If the button is depressed, force WindowButtonDownFcn to call the DOWNFCN subfunction</span>
+0071 <span class="keyword">if</span> strcmp(get(hcbo,<span class="string">'state'</span>),<span class="string">'on'</span>)
+0072     set(fig,<span class="string">'WindowButtonDownFcn'</span>,<span class="string">'zoomfixticks(gcbf,''downFcn'',gcbf)'</span>)
+0073 <span class="keyword">end</span>
+0074 
+0075 
+0076 <span class="comment">%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+0077 <a name="_sub3" href="#_subfunctions" class="code">function zoomOutCallback(hcbo,fig)</a>
+0078 <span class="comment">% Callback for the &quot;Zoom Out&quot; button</span>
+0079 
+0080 <span class="comment">% First call what is normally called during a zoom out</span>
+0081 putdowntext(<span class="string">'zoomout'</span>,hcbo)
+0082 
+0083 <span class="comment">% If the button is depressed, force WindowButtonDownFcn to call the DOWNFCN subfunction</span>
+0084 <span class="keyword">if</span> strcmp(get(hcbo,<span class="string">'state'</span>),<span class="string">'on'</span>)
+0085     set(fig,<span class="string">'WindowButtonDownFcn'</span>,<span class="string">'zoomfixticks(gcbf,''downFcn'',gcbf)'</span>)
+0086 <span class="keyword">end</span>
+0087 
+0088 
+0089 <span class="comment">%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+0090 <a name="_sub4" href="#_subfunctions" class="code">function downFcn(fig)</a>
+0091 <span class="comment">% Since the button was pressed, tell the figure that we are starting a zoom</span>
+0092 zoom(fig,<span class="string">'down'</span>);
+0093 
+0094 <span class="comment">% After the zoom, fix the ticks</span>
+0095 <a href="#_sub5" class="code" title="subfunction fixticks(ax)">fixticks</a>(gca(fig))
+0096 
+0097 
+0098 <span class="comment">%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+0099 <a name="_sub5" href="#_subfunctions" class="code">function fixticks(ax)</a>
+0100 <span class="comment">% This function will perform the desired ticklabel fixing</span>
+0101 <span class="comment">% This is the function you will want to modify to meet your application needs</span>
+0102 <span class="comment">% Alternatively, you can comment out this function to call an M-file function</span>
+0103 <span class="comment">% in its place.</span>
+0104 
+0105 <span class="comment">% EXAMPLE:</span>
+0106 <span class="comment">% First update the axes so the ticks are as expected</span>
+0107 drawnow
+0108 <span class="comment">% Get the ticks</span>
+0109 tick=get(ax,<span class="string">'ytick'</span>);
+0110 <span class="comment">% Convert ticks to a string of the desired format</span>
+0111 tickstr=num2str(tick',7);
+0112 <span class="comment">% Reset the labels to the new format</span>
+0113 set(ax,<span class="string">'yticklabel'</span>,tickstr);</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

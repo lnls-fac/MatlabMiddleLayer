@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of family2channel</title>
+  <meta name="keywords" content="family2channel">
+  <meta name="description" content="FAMILY2CHANNEL - Converts the family name to a channel name">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; family2channel.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>family2channel
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>FAMILY2CHANNEL - Converts the family name to a channel name</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ChannelNames, ErrorFlag] = family2channel(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FAMILY2CHANNEL - Converts the family name to a channel name
+  ChannelName = family2channel(Family, Field, DeviceList)
+  ChannelName = family2channel(Family, DeviceList)
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Accelerator Object
+              or Cell Array of Families
+  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor'}
+  3. DeviceList - ([Sector Device #] or [element #]) {Default: whole family}
+
+  OUTPUTS
+  1. ChannelName - Channel name corresponding to the Family, Field, and DeviceList</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="checkforcommonnames.html" class="code" title="function [Family, DeviceList] = checkforcommonnames(Family, DeviceList)">checkforcommonnames</a>	CHECKFORCOMMONNAMES - Checks for common names in the Family or DeviceList input</li><li><a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>	COMMON2DEV - Converts a common name to a device list</li><li><a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>	FAMILY2CHANNEL - Converts the family name to a channel name</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>	FAMILY2CHANNEL - Converts the family name to a channel name</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="family2elem.html" class="code" title="function ElemList = family2elem(Family, varargin)">family2elem</a>	FAMILY2ELEM - Return the device list for a family</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="mmlviewer.html" class="code" title="function varargout = mmlviewer(varargin)">mmlviewer</a>	MMLVIEWER M-file for mmlviewer.fig</li><li><a href="plotfamily.html" class="code" title="function varargout = plotfamily(varargin)">plotfamily</a>	PLOTFAMILY - Plots by middle layer family name</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ChannelNames, ErrorFlag] = family2channel(varargin)</a>
+0002 <span class="comment">%FAMILY2CHANNEL - Converts the family name to a channel name</span>
+0003 <span class="comment">%  ChannelName = family2channel(Family, Field, DeviceList)</span>
+0004 <span class="comment">%  ChannelName = family2channel(Family, DeviceList)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. Family - Family Name</span>
+0008 <span class="comment">%              Data Structure</span>
+0009 <span class="comment">%              Accelerator Object</span>
+0010 <span class="comment">%              or Cell Array of Families</span>
+0011 <span class="comment">%  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor'}</span>
+0012 <span class="comment">%  3. DeviceList - ([Sector Device #] or [element #]) {Default: whole family}</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1. ChannelName - Channel name corresponding to the Family, Field, and DeviceList</span>
+0016 
+0017 <span class="comment">%  Written by Greg Portmann</span>
+0018 
+0019 
+0020 <span class="keyword">if</span> nargin == 0
+0021     error(<span class="string">'Must have at least one input (''Family'')!'</span>);
+0022 <span class="keyword">end</span>
+0023 
+0024 
+0025 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0026 <span class="comment">% Cell Array Inputs %</span>
+0027 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0028 <span class="keyword">if</span> iscell(varargin{1})
+0029     <span class="keyword">if</span> length(varargin) &gt;= 3 &amp;&amp; iscell(varargin{3})
+0030         <span class="keyword">if</span> length(varargin{1}) ~= length(varargin{3})
+0031             error(<span class="string">'Family and DeviceList must be the same size cell arrays.'</span>);
+0032         <span class="keyword">end</span>
+0033     <span class="keyword">end</span>
+0034     <span class="keyword">if</span> length(varargin) &gt;= 2 &amp;&amp; iscell(varargin{2})
+0035         <span class="keyword">if</span> length(varargin{1}) ~= length(varargin{2})
+0036             error(<span class="string">'If Field is a cell array, then must be the same size as Family.'</span>);
+0037         <span class="keyword">end</span>
+0038     <span class="keyword">end</span>
+0039     
+0040     
+0041     ErrorFlag = 0;
+0042     <span class="keyword">for</span> i = 1:length(varargin{1})
+0043         <span class="keyword">if</span> length(varargin) == 1
+0044             [ChannelNames{i}, ErrorTmp] = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(varargin{1}{i});
+0045         <span class="keyword">elseif</span> length(varargin) == 2
+0046             <span class="keyword">if</span> iscell(varargin{2})
+0047                 [ChannelNames{i}, ErrorTmp] = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(varargin{1}{i}, varargin{2}{i});
+0048             <span class="keyword">else</span>
+0049                 [ChannelNames{i}, ErrorTmp] = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(varargin{1}{i}, varargin{2});
+0050             <span class="keyword">end</span>
+0051         <span class="keyword">else</span>            
+0052             <span class="keyword">if</span> iscell(varargin{2})
+0053                 <span class="keyword">if</span> iscell(varargin{3})
+0054                     [ChannelNames{i}, ErrorTmp] = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i});
+0055                 <span class="keyword">else</span>
+0056                     [ChannelNames{i}, ErrorTmp] = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(varargin{1}{i}, varargin{2}{i}, varargin{3});
+0057                 <span class="keyword">end</span>
+0058             <span class="keyword">else</span>
+0059                 <span class="keyword">if</span> iscell(varargin{3})
+0060                     [ChannelNames{i}, ErrorTmp] = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(varargin{1}{i}, varargin{2}, varargin{3}{i});
+0061                 <span class="keyword">else</span>
+0062                     [ChannelNames{i}, ErrorTmp] = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(varargin{1}{i}, varargin{2}, varargin{3});
+0063                 <span class="keyword">end</span>
+0064             <span class="keyword">end</span>
+0065         <span class="keyword">end</span>
+0066         ErrorFlag = ErrorFlag | ErrorTmp;
+0067     <span class="keyword">end</span>
+0068     <span class="keyword">return</span>    
+0069 <span class="keyword">end</span>
+0070 
+0071 
+0072 
+0073 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0074 <span class="comment">% Family or data structure inputs beyond this point %</span>
+0075 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0076 <span class="keyword">if</span> isstruct(varargin{1})
+0077     <span class="keyword">if</span> isfield(varargin{1},<span class="string">'FamilyName'</span>) &amp;&amp; isfield(varargin{1},<span class="string">'Field'</span>)
+0078         <span class="comment">% Data structure inputs</span>
+0079         Family = varargin{1}.FamilyName;
+0080 
+0081         Field = varargin{1}.Field;
+0082         <span class="keyword">if</span> length(varargin) &gt;= 2
+0083             <span class="keyword">if</span> ischar(varargin{2})
+0084                 Field = varargin{2};
+0085                 varargin(2) = [];
+0086             <span class="keyword">end</span>
+0087         <span class="keyword">end</span>
+0088         <span class="keyword">if</span> length(varargin) &gt;= 2
+0089             DeviceList = varargin{2};
+0090         <span class="keyword">else</span>
+0091             DeviceList = varargin{1}.DeviceList;
+0092         <span class="keyword">end</span>
+0093     <span class="keyword">else</span>
+0094         <span class="comment">% AO input</span>
+0095         Family = varargin{1}.FamilyName;
+0096         Field = <span class="string">''</span>;
+0097         <span class="keyword">if</span> length(varargin) &gt;= 2
+0098             <span class="keyword">if</span> ischar(varargin{2})
+0099                 Field = varargin{2};
+0100                 varargin(2) = [];
+0101             <span class="keyword">end</span>
+0102         <span class="keyword">end</span>
+0103         <span class="keyword">if</span> length(varargin) &gt;= 2
+0104             DeviceList = varargin{2};
+0105         <span class="keyword">else</span>
+0106             DeviceList = varargin{1}.DeviceList;
+0107         <span class="keyword">end</span>
+0108         
+0109         <span class="keyword">if</span> isempty(Field)
+0110             Field = <span class="string">'Monitor'</span>;
+0111         <span class="keyword">end</span>
+0112         <span class="keyword">if</span> isempty(DeviceList)
+0113             DeviceList = varargin{1}.DeviceList;
+0114         <span class="keyword">end</span>
+0115         <span class="keyword">if</span> isempty(DeviceList)
+0116             DeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family);
+0117         <span class="keyword">end</span>
+0118 
+0119         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0120         <span class="comment">% CommonName Input:  Convert common names to a varargin{3} %</span>
+0121         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0122         <span class="keyword">if</span> ischar(DeviceList) &amp;&amp; ~isempty(DeviceList)
+0123             DeviceList = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(DeviceList, Family);
+0124             <span class="keyword">if</span> isempty(DeviceList)
+0125                 error(<span class="string">'DeviceList was a string but common names could not be found.'</span>);
+0126             <span class="keyword">end</span>
+0127         <span class="keyword">end</span>
+0128 
+0129         [i,iNotFound] = findrowindex(DeviceList, varargin{1}.DeviceList);
+0130         <span class="keyword">if</span> ~isempty(iNotFound)
+0131             error(<span class="string">'Device at found in the input structure'</span>);
+0132         <span class="keyword">end</span>
+0133         ChannelNames = varargin{1}.(Field).ChannelNames(i,:);
+0134         ErrorFlag = 0;
+0135 
+0136         <span class="keyword">return</span>;
+0137     <span class="keyword">end</span>
+0138 
+0139 <span class="keyword">else</span>
+0140     
+0141     <span class="comment">% Family input</span>
+0142     Family = varargin{1};
+0143     
+0144     Field = <span class="string">''</span>;
+0145     <span class="keyword">if</span> length(varargin) &gt;= 2
+0146         <span class="keyword">if</span> ischar(varargin{2})
+0147             Field = varargin{2};
+0148             varargin(2) = [];
+0149         <span class="keyword">end</span>
+0150     <span class="keyword">end</span>
+0151     <span class="keyword">if</span> length(varargin) &gt;= 2
+0152         DeviceList = varargin{2};
+0153     <span class="keyword">else</span>
+0154         DeviceList = [];
+0155     <span class="keyword">end</span>
+0156     
+0157 <span class="keyword">end</span>
+0158 
+0159 <span class="keyword">if</span> isempty(Field)
+0160     Field = <span class="string">'Monitor'</span>;
+0161 <span class="keyword">end</span>
+0162 <span class="keyword">if</span> isempty(DeviceList)
+0163     DeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family);
+0164 <span class="keyword">end</span>
+0165 
+0166 
+0167 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0168 <span class="comment">% Check DeviceList or Family is a common name list %</span>
+0169 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0170 [Family, DeviceList] = <a href="checkforcommonnames.html" class="code" title="function [Family, DeviceList] = checkforcommonnames(Family, DeviceList)">checkforcommonnames</a>(Family, DeviceList);
+0171 
+0172 
+0173 <span class="comment">%%%%%%%%%%%%</span>
+0174 <span class="comment">% Get data %</span>
+0175 <span class="comment">%%%%%%%%%%%%</span>
+0176 [ChannelNames, ErrorFlag] = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'ChannelNames'</span>, DeviceList);</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

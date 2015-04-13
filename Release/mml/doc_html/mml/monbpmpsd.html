@@ -1,0 +1,341 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of monbpmpsd</title>
+  <meta name="keywords" content="monbpmpsd">
+  <meta name="description" content="BPM_PSD - Computes the power spectral density of orbit data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; monbpmpsd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>monbpmpsd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>BPM_PSD - Computes the power spectral density of orbit data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Pdd, f, Drms, Pdd_int] = monbpmpsd(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BPM_PSD - Computes the power spectral density of orbit data
+  [Pdd, f, Drms, Pdd_int] = monbpmpsd(Data, DeviceList, LineColor)
+
+  INPUTS
+  1. Data
+  2. DeviceList
+  3. LineColor - {Default: 'b'}
+     If input 2 exists or no output exists, then data will be plotted to the screen
+
+  OUTPUTS
+  1. Pdd     - Displacement power spectrum  [(m)^2/Hz]
+  2. f       - Frequency vector [Hz]
+  3. Drms    - RMS deplacement [m]
+  4. Pdd_int - Integrated RMS deplacement squared [m^2]
+
+  NOTES
+  1. If the hanning function exists, then a hanning window will be used
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getdata.html" class="code" title="function [S, FileName] = getdata(varargin)">getdata</a>	GETDATA - Searches through a file (or group of files) for a data structure which matches the family name</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [Pdd, f] = calcpsd(data, Tsample)</a></li><li><a href="#_sub2" class="code">function PlotPSDLocal(f, Pdd, a, T1, m, LineColor)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Pdd, f, Drms, Pdd_int] = monbpmpsd(varargin)</a>
+0002 <span class="comment">%BPM_PSD - Computes the power spectral density of orbit data</span>
+0003 <span class="comment">%  [Pdd, f, Drms, Pdd_int] = monbpmpsd(Data, DeviceList, LineColor)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Data</span>
+0007 <span class="comment">%  2. DeviceList</span>
+0008 <span class="comment">%  3. LineColor - {Default: 'b'}</span>
+0009 <span class="comment">%     If input 2 exists or no output exists, then data will be plotted to the screen</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  OUTPUTS</span>
+0012 <span class="comment">%  1. Pdd     - Displacement power spectrum  [(m)^2/Hz]</span>
+0013 <span class="comment">%  2. f       - Frequency vector [Hz]</span>
+0014 <span class="comment">%  3. Drms    - RMS deplacement [m]</span>
+0015 <span class="comment">%  4. Pdd_int - Integrated RMS deplacement squared [m^2]</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  NOTES</span>
+0018 <span class="comment">%  1. If the hanning function exists, then a hanning window will be used</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  Written by Greg Portmann</span>
+0021 
+0022 
+0023 <span class="keyword">if</span> ~isempty(varargin)
+0024     FileName = varargin{1};
+0025     varargin(1) = [];
+0026 <span class="keyword">else</span>
+0027     FileName = [];
+0028 <span class="keyword">end</span>
+0029 
+0030 <span class="keyword">if</span> isstruct(FileName)
+0031     BPMx = FileName;
+0032     <span class="keyword">if</span> ~isempty(varargin)
+0033         BPMy = varargin{2};
+0034         varargin(1) = [];
+0035     <span class="keyword">else</span>
+0036         BPMy = BPMx;
+0037     <span class="keyword">end</span>
+0038     <span class="comment">% BPM response matrix cludge</span>
+0039     <span class="keyword">if</span> all(size(BPMx) == [2 2])
+0040         BPMx = BPMx(1,1);
+0041     <span class="keyword">end</span>
+0042 <span class="keyword">else</span>
+0043     DirFlag = 0;
+0044     <span class="keyword">if</span> isdir(FileName)
+0045         DirFlag = 1;
+0046     <span class="keyword">else</span>
+0047         <span class="keyword">if</span> length(FileName)&gt;=1
+0048             <span class="keyword">if</span> strcmp(FileName(end),filesep)
+0049                 DirFlag = 1;
+0050             <span class="keyword">end</span>
+0051         <span class="keyword">end</span>
+0052     <span class="keyword">end</span>
+0053     <span class="keyword">if</span> strcmp(FileName,<span class="string">'.'</span>) || isempty(FileName) || DirFlag
+0054         <span class="comment">% Data root</span>
+0055         <span class="keyword">if</span> strcmp(FileName,<span class="string">'.'</span>)
+0056             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a file to analyze'</span>);
+0057         <span class="keyword">elseif</span> DirFlag
+0058             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a file to analyze'</span>, FileName);
+0059         <span class="keyword">else</span>
+0060             DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>);
+0061             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a file to analyze'</span>, DirectoryName);
+0062         <span class="keyword">end</span>
+0063         <span class="keyword">if</span> FileName == 0
+0064             <span class="keyword">return</span>
+0065         <span class="keyword">end</span>
+0066         FileName = [DirectoryName FileName];
+0067     <span class="keyword">end</span>
+0068     
+0069     <span class="comment">% Get data from file</span>
+0070     <span class="keyword">try</span>
+0071         BPMxFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>;
+0072         BPMyFamily = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;
+0073         HBPM = <a href="getdata.html" class="code" title="function [S, FileName] = getdata(varargin)">getdata</a>(BPMxFamily, FileName, <span class="string">'Struct'</span>);
+0074         VBPM = <a href="getdata.html" class="code" title="function [S, FileName] = getdata(varargin)">getdata</a>(BPMyFamily, FileName, <span class="string">'Struct'</span>);
+0075     <span class="keyword">catch</span>
+0076         disp(<span class="string">'Not sure what type of file this is.'</span>);
+0077         <span class="keyword">return</span>
+0078     <span class="keyword">end</span>
+0079 <span class="keyword">end</span>
+0080 
+0081 <span class="keyword">if</span> ~isempty(varargin)
+0082     DeviceList = varargin{1};
+0083     varargin(1) = [];
+0084 <span class="keyword">else</span>
+0085     DeviceList = [];
+0086 <span class="keyword">end</span>
+0087 
+0088 <span class="keyword">if</span> ~isempty(varargin)
+0089     LineColor = varargin{1};
+0090 <span class="keyword">else</span>
+0091     LineColor = <span class="string">'b'</span>;
+0092 <span class="keyword">end</span>
+0093 
+0094 <span class="keyword">if</span> ~isempty(DeviceList)
+0095     i = findrowindex(DeviceList, HBPM.DeviceList);
+0096     HBPM.Data = HBPM.Data(i,:);
+0097     HBPM.DeviceList = HBPM.DeviceList(i,:);
+0098 
+0099     i = findrowindex(DeviceList, VBPM.DeviceList);
+0100     VBPM.Data = VBPM.Data(i,:);
+0101     VBPM.DeviceList = VBPM.DeviceList(i,:);
+0102 <span class="keyword">end</span>
+0103 
+0104 m = 3;
+0105 
+0106 <span class="keyword">if</span> rem(size(HBPM.Data,2), 2) == 1
+0107     HBPM.Data(:,end) = [];
+0108     VBPM.Data(:,end) = [];
+0109     HBPM.t(:,end) = [];
+0110     VBPM.t(:,end) = [];
+0111 <span class="keyword">end</span>
+0112 
+0113 N = size(HBPM.Data,2);
+0114 Tsample = mean(diff(HBPM.t));   <span class="comment">% seconds</span>
+0115 Fig1 = figure(1); <span class="comment">%gcf;</span>
+0116 clf reset
+0117 <span class="keyword">for</span> i = 1:size(HBPM.Data,1)
+0118     [Pxx(i,:), f] = <a href="#_sub1" class="code" title="subfunction [Pdd, f] = calcpsd(data, Tsample)">calcpsd</a>(HBPM.Data(i,:), Tsample);
+0119     <a href="#_sub2" class="code" title="subfunction PlotPSDLocal(f, Pdd, a, T1, m, LineColor)">PlotPSDLocal</a>(f, Pxx(i,:), HBPM.Data(i,:)/1000, Tsample, m, LineColor);
+0120 <span class="keyword">end</span>
+0121 
+0122 <span class="comment">% Plot the power spectrum</span>
+0123 figure(Fig1+1);
+0124 <span class="comment">%clf reset</span>
+0125 <span class="comment">%loglog(f, 1e12*mean(Pxx,1), LineColor);</span>
+0126 loglog(f(m+1:end), 1e12*mean(Pxx(:,m+1:end),1), LineColor);
+0127 grid on;
+0128 <span class="comment">%hold on</span>
+0129 <span class="keyword">if</span> size(Pxx,1) &gt; 1
+0130     title(sprintf(<span class="string">'BPM POWER SPECTRUM (%d points, %d Averages)'</span>, N, size(Pxx,1)));
+0131 <span class="keyword">else</span>
+0132     title(sprintf(<span class="string">'BPM POWER SPECTRUM (%d points)'</span>, N));
+0133 <span class="keyword">end</span>
+0134 xlabel(<span class="string">'Frequency [Hz]'</span>);
+0135 ylabel(<span class="string">'PSD [\mum^2/Hz]'</span>);
+0136 legend off;
+0137 <span class="comment">%axis([2 2000 1e-4 1]);</span>
+0138 axis tight
+0139 
+0140 
+0141 
+0142 <a name="_sub1" href="#_subfunctions" class="code">function [Pdd, f] = calcpsd(data, Tsample)</a>
+0143 N = length(data);
+0144 T  = Tsample*N;
+0145 T1 = Tsample;
+0146 f0 = 1/(N*T1);
+0147 f  = f0*(0:N/2)';
+0148 a  = data / 1000;  <span class="comment">% meters</span>
+0149 <span class="comment">%a = a-mean(a);</span>
+0150 <span class="comment">%a = detrend(a);</span>
+0151 
+0152 <span class="comment">% POWER SPECTRUM</span>
+0153 <span class="keyword">if</span> exist(<span class="string">'hanning'</span>,<span class="string">'file'</span>)
+0154     w = hanning(N);    <span class="comment">% hanning window</span>
+0155 <span class="keyword">else</span>
+0156     w = ones(N,1);    <span class="comment">% no window</span>
+0157 <span class="keyword">end</span>
+0158 w = w(:);
+0159 a = a(:);
+0160 a_w = a .* w;
+0161 A = fft(a_w);
+0162 Pdd = A.*conj(A)/N;
+0163 U = sum(w.^2)/N;              <span class="comment">% approximately .375 for hanning</span>
+0164 U2 = ((norm(w)/sum(w))^2);    <span class="comment">% used to normalize plots (p. 1-68, matlab DSP toolbox)</span>
+0165 Pdd=Pdd/U;
+0166 Pdd(N/2+2:N) = [];
+0167 Pdd(2:N/2+1) = 2*Pdd(2:N/2+1);
+0168 
+0169 
+0170 <span class="comment">% PSD using matlab functions (NOTE: matlab function detrend by default)</span>
+0171 <span class="comment">%PddS = spectrum(a,N,0,w,f0); PddS = 2*PddS(:,1); PddS(1)=PddS(1)/2;</span>
+0172 <span class="comment">%PddPSD=2*psd(a,N); PddPSD(1)=PddPSD(1)/2;</span>
+0173 
+0174 
+0175 <a name="_sub2" href="#_subfunctions" class="code">function PlotPSDLocal(f, Pdd, a, T1, m, LineColor)</a>
+0176 <span class="comment">% Output</span>
+0177 <span class="comment">%fprintf('\nRMS Displacement: %g meters   (Time series data, %d points, mean removed)\n', Drms_data, N);</span>
+0178 <span class="comment">%fprintf('RMS Displacement: %g meters   (PSD, Parseval''s Thm, first %d frequencies removed)\n', Drms, m);</span>
+0179 
+0180 N = length(a);
+0181 
+0182 <span class="comment">% Paa(0) is the DC term, and the first few data points are questionable in an FFT</span>
+0183 Pdd(1) = 0;   <span class="comment">% not sure if the DC term is correct</span>
+0184 Pdd1 = Pdd;
+0185 <span class="keyword">for</span> i=1:m
+0186     Pdd1(i) = 0;
+0187 <span class="keyword">end</span>
+0188 
+0189 <span class="comment">% Parseval's Thm</span>
+0190 Drms  = sqrt(sum(Pdd1)/N);
+0191 Pdd_int = cumsum(Pdd1)/N;
+0192 
+0193 <span class="comment">% Make PSD units meters^2/Hz</span>
+0194 Pdd = T1*Pdd;
+0195 
+0196 [LineColor, LineStyle, LineNumber] = nextline;
+0197 
+0198 <span class="comment">% Plot the power spectrum</span>
+0199 subplot(3,1,1);
+0200 <span class="comment">%loglog(f, 1e12*Pdd, LineColor);</span>
+0201 loglog(f(m+1:N/2),1e12*Pdd(m+1:N/2), <span class="string">'Color'</span>,LineColor, <span class="string">'LineStyle'</span>,LineStyle);
+0202 grid on;
+0203 hold on
+0204 title([<span class="string">'BPM POWER SPECTRUM ('</span>,num2str(N), <span class="string">' points)'</span>]);
+0205 xlabel(<span class="string">'Frequency [Hz]'</span>);
+0206 ylabel(<span class="string">'PSD [\mum^2/Hz]'</span>);
+0207 legend off;
+0208 <span class="comment">%  axis([2 2000 1e-4 1]);</span>
+0209 axis tight
+0210 
+0211 <span class="comment">% Position spectrum</span>
+0212 subplot(3,1,2);
+0213 loglog(f(m+1:N/2),1e12*Pdd_int(m+1:N/2), <span class="string">'Color'</span>,LineColor, <span class="string">'LineStyle'</span>,LineStyle);
+0214 grid on;
+0215 hold on
+0216 <span class="comment">%semilogx(f(m:N/2),sqrt(Pdd_int(m:N/2)), LineColor);</span>
+0217 <span class="comment">%title(['BPM INTEGRATED DISPLACEMENT POWER SPECTRUM (RMS=',num2str(1e6*Drms),' \mum)']);</span>
+0218 title(<span class="string">'INTEGRATED POWER SPECTRUM'</span>);
+0219 xlabel(<span class="string">'Frequency [Hz]'</span>);
+0220 ylabel(<span class="string">'[\mum^2]'</span>);
+0221 legend off;
+0222 <span class="comment">%   xaxis([2 2000]);</span>
+0223 axis tight
+0224 
+0225 
+0226 Drms_data = sqrt(sum((a-mean(a)).^2)/length((a-mean(a))));
+0227 
+0228 subplot(3,1,3);
+0229 plot(0:T1:T1*(N-1),1e6*detrend(a), <span class="string">'Color'</span>,LineColor, <span class="string">'LineStyle'</span>,LineStyle); 
+0230 grid on; 
+0231 hold on
+0232 <span class="comment">%title(['BPM DATA (mean removed) (RMS=',num2str(1e6*Drms_data),' \mum)']);</span>
+0233 title(<span class="string">'BPM Time Series Data (mean removed)'</span>);
+0234 xlabel(<span class="string">'Time [seconds]'</span>);
+0235 ylabel(<span class="string">'[\mum]'</span>);
+0236 legend off;
+0237 
+0238 <span class="comment">% drawnow;</span>
+0239 <span class="comment">% orient tall</span>
+0240 
+0241 
+0242 
+0243 <span class="comment">% % Plot the power spectrum</span>
+0244 <span class="comment">% %figure(3);</span>
+0245 <span class="comment">% subplot(3,1,1);</span>
+0246 <span class="comment">% loglog(f(3:N/2),Pdd(3:N/2),LineColor); grid on;</span>
+0247 <span class="comment">% title(['BPM POWER SPECTRUM (',num2str(N), ' points)']);</span>
+0248 <span class="comment">% xlabel('Frequency (Hz)');</span>
+0249 <span class="comment">% ylabel('[meters^2/Hz]');</span>
+0250 <span class="comment">% legend off;</span>
+0251 <span class="comment">% %aa=axis;</span>
+0252 <span class="comment">% %axis([1 100 aa(3) aa(4)]);</span>
+0253 <span class="comment">%</span>
+0254 <span class="comment">%</span>
+0255 <span class="comment">% % Position spectrum</span>
+0256 <span class="comment">% %figure(4);</span>
+0257 <span class="comment">% subplot(3,1,2);</span>
+0258 <span class="comment">% semilogx(f(m:N/2),Pdd_int(m:N/2), LineColor); grid on;</span>
+0259 <span class="comment">% %semilogx(f(m:N/2),sqrt(Pdd_int(m:N/2)), LineColor); grid on;</span>
+0260 <span class="comment">% title(['BPM INTEGRATED DISPLACEMENT POWER SPECTRUM (RMS=',num2str(Drms),' meters)']);</span>
+0261 <span class="comment">% xlabel('Frequency (Hz)');</span>
+0262 <span class="comment">% ylabel('Mean Square Displacement (meters)^2');</span>
+0263 <span class="comment">% legend off;</span>
+0264 <span class="comment">% %aa=axis;</span>
+0265 <span class="comment">% %axis([1 100 aa(3) aa(4)]);</span>
+0266 <span class="comment">%</span>
+0267 <span class="comment">% %figure(5);</span>
+0268 <span class="comment">% subplot(3,1,3);</span>
+0269 <span class="comment">% plot(0:T1:T1*(N-1),detrend(a),LineColor); grid on;</span>
+0270 <span class="comment">% title(['BPM DATA (mean removed) (RMS=',num2str(Drms_data),' meters)']);</span>
+0271 <span class="comment">% xlabel('Time (seconds)');</span>
+0272 <span class="comment">% ylabel('Displacement (meters)');</span>
+0273 <span class="comment">% legend off;</span>
+0274 <span class="comment">%</span>
+0275 <span class="comment">% orient tall</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

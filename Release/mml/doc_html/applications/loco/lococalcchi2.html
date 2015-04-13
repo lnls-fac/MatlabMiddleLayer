@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of lococalcchi2</title>
+  <meta name="keywords" content="lococalcchi2">
+  <meta name="description" content="LOCOCALCCHI2 - Calculate the contribution to chi^2 of each fit parameter in LOCO">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; lococalcchi2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>lococalcchi2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LOCOCALCCHI2 - Calculate the contribution to chi^2 of each fit parameter in LOCO</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function ChiSquare = lococalcchi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData, ConvertUnitsFlag, IterNumber) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOCOCALCCHI2 - Calculate the contribution to chi^2 of each fit parameter in LOCO
+  ChiSquare = lococalcchi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData, ConvertUnitsFlag, IterNumber)
+  ChiSquare = lococalcchi2(LOCOFileName, ConvertUnitsFlag, IterNumber)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>	LOCOMCF - Returns the momentum compaction factor</li><li><a href="locoresponsematrix.html" class="code" title="function RM = locoresponsematrix(RINGData, BPMData, CMData, varargin)">locoresponsematrix</a>	LOCORESPONSEMATRIX - Calculate the BPM response matrix and dispersion function</li><li><a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>	LOCOSETLATTICEPARAM - Set the AT lattice from the LOCO fit parameters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="loco.html" class="code" title="function [LocoModel, BPMData, CMData, FitParameters, LocoFlags, RINGData] = loco(LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">loco</a>	LOCO - Main routine for the LOCO algorithm</li><li><a href="lococalcdeltachi2.html" class="code" title="function [dChi2_FitParameter, dChi2_FitParameterGroup, dChi2_BPMGroup, dChi2_CMGroup, Chi2_Nominal] = lococalcdeltachi2(varargin)">lococalcdeltachi2</a>	LOCOCALCDeltaCHI2 - Calculate the contribution to chi2 of each fit parameter in LOCO</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ChiSquare = lococalcchi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData, ConvertUnitsFlag, IterNumber)</a>
+0002 <span class="comment">%LOCOCALCCHI2 - Calculate the contribution to chi^2 of each fit parameter in LOCO</span>
+0003 <span class="comment">%  ChiSquare = lococalcchi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData, ConvertUnitsFlag, IterNumber)</span>
+0004 <span class="comment">%  ChiSquare = lococalcchi2(LOCOFileName, ConvertUnitsFlag, IterNumber)</span>
+0005 
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. LOCOFileName - LOCO file name</span>
+0008 <span class="comment">%        or</span>
+0009 <span class="comment">%  1-7.  LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData</span>
+0010 <span class="comment">%  Optional Inputs:</span>
+0011 <span class="comment">%  a. ConvertUnitsFlag - True  convert to the LOCO units {Default}</span>
+0012 <span class="comment">%                        False don't convert (inputs have already been converted)</span>
+0013 <span class="comment">%  b. IterationNumber - LOCO iteration number (0,1, ...) {Default: last iteration}</span>
+0014 
+0015 
+0016 
+0017 IterNumber = [];
+0018 ChiSquare = [];
+0019 
+0020 <span class="keyword">if</span> nargin &lt; 8
+0021     ConvertUnitsFlag = 1;
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="comment">% Input #1 can be a LOCO file</span>
+0025 <span class="keyword">if</span> nargin==0
+0026     [FileName, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select A LOCO File'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0027     <span class="keyword">if</span> isequal(FileName,0) || isequal(PathName,0)
+0028         <span class="keyword">return</span>
+0029     <span class="keyword">end</span>
+0030     LOCOFileName= [PathName, FileName];
+0031     load(LOCOFileName);
+0032     
+0033 <span class="keyword">elseif</span> ischar(LocoModel) || isempty(LocoModel)
+0034     <span class="keyword">if</span> nargin &gt;= 2
+0035         ConvertUnitsFlag = LocoMeasData;
+0036     <span class="keyword">end</span>
+0037     <span class="keyword">if</span> nargin &gt;= 3
+0038         IterNumber = BPMData;
+0039     <span class="keyword">end</span>
+0040     <span class="keyword">if</span> isempty(LocoModel)
+0041         [FileName, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select A LOCO File'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0042         <span class="keyword">if</span> isequal(FileName,0) || isequal(PathName,0)
+0043             <span class="keyword">return</span>
+0044         <span class="keyword">end</span>
+0045         LOCOFileName= [PathName, FileName];
+0046         load(LOCOFileName);
+0047     <span class="keyword">elseif</span> LocoModel(1) == <span class="string">'.'</span>
+0048         [FileName, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select A LOCO File'</span>);
+0049         <span class="keyword">if</span> isequal(FileName,0) || isequal(PathName,0)
+0050             <span class="keyword">return</span>
+0051         <span class="keyword">end</span>
+0052         LOCOFileName= [PathName, FileName];
+0053         load(LOCOFileName);
+0054     <span class="keyword">else</span>
+0055         load(LocoModel);
+0056     <span class="keyword">end</span>
+0057 <span class="keyword">end</span>
+0058 
+0059 
+0060 <span class="keyword">if</span> isempty(IterNumber)
+0061     IterNumber = length(BPMData);
+0062 <span class="keyword">else</span>
+0063     IterNumber  = IterNumber + 1;
+0064 <span class="keyword">end</span>
+0065 
+0066 
+0067 <span class="comment">% Chi^2 of the last iteration?</span>
+0068 BPMData       = BPMData(IterNumber);
+0069 CMData        = CMData(IterNumber);
+0070 LocoModel     = LocoModel(IterNumber);
+0071 FitParameters = FitParameters(IterNumber);
+0072 LocoFlags     = LocoFlags(IterNumber);
+0073 
+0074     
+0075 <span class="comment">% Get the flags</span>
+0076 LocoParams = FitParameters.Params;
+0077 LocoValues = FitParameters.Values;
+0078 LocoDeltas = FitParameters.Deltas;
+0079 SVmethod             = LocoFlags.SVmethod;
+0080 AutoCorrectDeltaFlag = LocoFlags.AutoCorrectDelta;
+0081 CouplingFlag         = LocoFlags.Coupling;
+0082 <span class="comment">%NormalizeFlag        = LocoFlags.Normalization.Flag;</span>
+0083 OutlierFactor        = LocoFlags.OutlierFactor;
+0084 
+0085 
+0086 <span class="comment">% UNITS CONVERSIONS (to be combatible with tracking code)</span>
+0087 <span class="keyword">if</span> ConvertUnitsFlag
+0088     <span class="comment">% Convert corrector kicks used in the response matrix to radians</span>
+0089     CMData.HCMKicks = CMData.HCMKicks(:) / 1000;   <span class="comment">% milliradian to radians (column vector)</span>
+0090     CMData.VCMKicks = CMData.VCMKicks(:) / 1000;   <span class="comment">% milliradian to radians (column vector)</span>
+0091 
+0092     <span class="comment">% Convert the measured response matrix to meters</span>
+0093     LocoMeasData.M = LocoMeasData.M / 1000;
+0094 
+0095     <span class="comment">% Convert the BPMSTD to meters and make the same size as a response matrix</span>
+0096     LocoMeasData.BPMSTD = LocoMeasData.BPMSTD / 1000;    <span class="comment">% mm to meters</span>
+0097 
+0098     <span class="comment">% Convert orbit for &quot;dispersion&quot; in meters in column vector format</span>
+0099     LocoMeasData.Eta = LocoMeasData.Eta(:) / 1000;       <span class="comment">% mm to meters</span>
+0100 <span class="keyword">end</span>
+0101 <span class="comment">% END UNITS CONVERTSION</span>
+0102 
+0103 
+0104 Mstd = LocoMeasData.BPMSTD * ones(1,size(LocoMeasData.M,2));
+0105 
+0106 
+0107 <span class="comment">% Use the entire family of BPMs in the model response matrix, then index later (not much difference computationally)</span>
+0108 BPMIndexShortX = BPMData.HBPMIndex(BPMData.HBPMGoodDataIndex);
+0109 BPMIndexShortY = length(BPMData.BPMIndex)+BPMData.VBPMIndex(BPMData.VBPMGoodDataIndex);
+0110 BPMIndexShort = [BPMIndexShortX(:)' BPMIndexShortY(:)'];
+0111 NHBPM = length(BPMData.HBPMGoodDataIndex);
+0112 NVBPM = length(BPMData.VBPMGoodDataIndex);
+0113 NBPM  = NHBPM + NVBPM;
+0114 NHCM = length(CMData.HCMGoodDataIndex);
+0115 NVCM = length(CMData.VCMGoodDataIndex);
+0116 
+0117 
+0118 <span class="comment">% Remove unwanted data from the Mmeas and Mstd</span>
+0119 Mmeas = LocoMeasData.M([BPMData.HBPMGoodDataIndex length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex], [CMData.HCMGoodDataIndex length(CMData.HCMIndex)+CMData.VCMGoodDataIndex]); 
+0120 Mstd  =           Mstd([BPMData.HBPMGoodDataIndex length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex], [CMData.HCMGoodDataIndex length(CMData.HCMIndex)+CMData.VCMGoodDataIndex]); 
+0121 
+0122 <span class="comment">% If including dispersion then Mstd and Mmeas must include disperion term</span>
+0123 <span class="keyword">if</span> strcmpi((LocoFlags.Dispersion),<span class="string">'yes'</span>)
+0124     Xstd = LocoMeasData.BPMSTD(BPMData.HBPMGoodDataIndex);
+0125     Ystd = LocoMeasData.BPMSTD(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex);
+0126     
+0127     <span class="keyword">if</span> isempty(LocoMeasData.Eta)
+0128         error(<span class="string">'Measured dispersion (LocoMeasData.Eta) can not be empty when including dispersion'</span>);
+0129     <span class="keyword">end</span>
+0130     EtaX = LocoMeasData.Eta(BPMData.HBPMGoodDataIndex);
+0131     EtaY = LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex);
+0132     
+0133     LocoFlags.HorizontalDispersionWeight = abs(LocoFlags.HorizontalDispersionWeight);
+0134     LocoFlags.VerticalDispersionWeight   = abs(LocoFlags.VerticalDispersionWeight);
+0135 
+0136     <span class="comment">% Should remove the dispersion if both weights are zero</span>
+0137     <span class="keyword">if</span> LocoFlags.HorizontalDispersionWeight == 0
+0138         LocoFlags.HorizontalDispersionWeight = eps;
+0139     <span class="keyword">end</span>
+0140     <span class="keyword">if</span> LocoFlags.VerticalDispersionWeight == 0
+0141         LocoFlags.VerticalDispersionWeight = eps;
+0142     <span class="keyword">end</span>
+0143     
+0144     <span class="comment">% Weight the dispersion</span>
+0145     Mstd  = [Mstd  [Xstd/LocoFlags.HorizontalDispersionWeight; Ystd/LocoFlags.VerticalDispersionWeight]];
+0146     Mmeas = [Mmeas [EtaX; EtaY]];
+0147 <span class="keyword">end</span>
+0148 
+0149 
+0150 <span class="comment">% Convert to a column vector</span>
+0151 Mstd  = Mstd(:);
+0152 Mmeas = Mmeas(:);
+0153 
+0154 
+0155 <span class="comment">% Build the corrector magnet data structures to be used with locoresponsematrix</span>
+0156 CMDataRM.FamName = CMData.FamName;
+0157 CMDataRM.HCMIndex = CMData.HCMIndex(CMData.HCMGoodDataIndex);
+0158 CMDataRM.VCMIndex = CMData.VCMIndex(CMData.VCMGoodDataIndex);
+0159 CMDataRM.HCMKicks = CMData.HCMKicks(CMData.HCMGoodDataIndex);
+0160 CMDataRM.VCMKicks = CMData.VCMKicks(CMData.VCMGoodDataIndex);
+0161 CMDataRM.HCMCoupling = CMData.HCMCoupling(CMData.HCMGoodDataIndex);
+0162 CMDataRM.VCMCoupling = CMData.VCMCoupling(CMData.VCMGoodDataIndex);
+0163 CMDataRM.HCMEnergyShift = CMData.HCMEnergyShift(CMData.HCMGoodDataIndex);
+0164 CMDataRM.VCMEnergyShift = CMData.VCMEnergyShift(CMData.VCMGoodDataIndex);
+0165 
+0166 <span class="comment">% Compute the new model response matrix with dispersion for saving</span>
+0167 <span class="comment">%fprintf('   Computing final response matrix (after fit) (%s, %s) ... ', LocoFlags.ResponseMatrixCalculator, LocoFlags.ClosedOrbitType); tic</span>
+0168 CMDataRM.HCMKicks    = CMData.HCMKicks(CMData.HCMGoodDataIndex);
+0169 CMDataRM.VCMKicks    = CMData.VCMKicks(CMData.VCMGoodDataIndex);
+0170 CMDataRM.HCMCoupling = CMData.HCMCoupling(CMData.HCMGoodDataIndex);
+0171 CMDataRM.VCMCoupling = CMData.VCMCoupling(CMData.VCMGoodDataIndex);
+0172 warning off;
+0173 lastwarn(<span class="string">''</span>);
+0174 
+0175 <span class="comment">%modify RINGData</span>
+0176 LocoValues = LocoValues(:);      <span class="comment">% Force a column vector</span>
+0177 <span class="keyword">for</span> i = 1:length(LocoParams)
+0178     <span class="comment">% Compute the response matrix with the parameter change</span>
+0179     RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, LocoParams{i}, LocoValues(i));
+0180 <span class="keyword">end</span>
+0181 
+0182 <span class="keyword">if</span> isempty(FitParameters.DeltaRF)
+0183     Mmodel = <a href="locoresponsematrix.html" class="code" title="function RM = locoresponsematrix(RINGData, BPMData, CMData, varargin)">locoresponsematrix</a>(RINGData, BPMData, CMDataRM, LocoFlags);
+0184 <span class="keyword">else</span>
+0185     Mmodel = <a href="locoresponsematrix.html" class="code" title="function RM = locoresponsematrix(RINGData, BPMData, CMData, varargin)">locoresponsematrix</a>(RINGData, BPMData, CMDataRM, LocoFlags, <span class="string">'RF'</span>, FitParameters.DeltaRF);
+0186 <span class="keyword">end</span>
+0187 warning on;
+0188 <span class="comment">%fprintf('%f seconds. \n',toc);</span>
+0189 <span class="comment">% if ~isempty(lastwarn)</span>
+0190 <span class="comment">%     fprintf('\n   Warning computing the final response matrix:\n         %s\n', lastwarn);</span>
+0191 <span class="comment">%     fprintf(  '   Check the final values of the fits to make sure they are in a reasonable range for\n');</span>
+0192 <span class="comment">%     fprintf(  '   this accelerator.  Check the input data and/or reduce the number of singular values.\n\n');</span>
+0193 <span class="comment">% end</span>
+0194 
+0195 <span class="comment">% To remove the off-diagonal part of the A matrix find the index vector, iNoCoupling, of rows to keep</span>
+0196 <span class="keyword">if</span> strcmpi((CouplingFlag),<span class="string">'no'</span>)
+0197     CF = [ ones(NHBPM,NHCM) zeros(NHBPM,NVCM);
+0198           zeros(NVBPM,NHCM)  ones(NVBPM,NVCM)];
+0199 
+0200     <span class="comment">% Keep the dispersion</span>
+0201     <span class="keyword">if</span> strcmpi((LocoFlags.Dispersion),<span class="string">'yes'</span>)
+0202         <span class="comment">% Keep the horizontal and vertical part of the &quot;dispersion&quot; orbit</span>
+0203         CF = [CF [2*ones(NHBPM,1); 3*ones(NVBPM,1)]];    <span class="comment">% Make zeros to ignor dispersion</span>
+0204     <span class="keyword">end</span>
+0205         
+0206     CF = CF(:);
+0207     iNoCoupling = find(CF &gt; 0);               <span class="comment">% Rows of A to keep when ignoring coupling</span>
+0208     <span class="comment">%iHorizontalDispersion = find(CF == 2);   % Rows of A corresponding to horizontal dispersion</span>
+0209     <span class="comment">%iVerticalDispersion = find(CF == 3);     % Rows of A corresponding to vertical dispersion</span>
+0210     clear CF
+0211 <span class="keyword">else</span>
+0212     <span class="keyword">if</span> strcmpi((LocoFlags.Dispersion),<span class="string">'yes'</span>)
+0213         iNoCoupling = (1:(NVBPM+NHBPM)*(NHCM+NVCM+1))';
+0214     <span class="keyword">else</span>
+0215         iNoCoupling = (1:(NVBPM+NHBPM)*(NHCM+NVCM))';
+0216     <span class="keyword">end</span>
+0217 <span class="keyword">end</span>
+0218 
+0219 <span class="comment">% Rotate Mmodel and remove BPMs not in the measured response matrix</span>
+0220 C11 = ones(length(BPMData.BPMIndex),1);
+0221 C11(BPMData.HBPMIndex(BPMData.HBPMGoodDataIndex)) = BPMData.HBPMGain(BPMData.HBPMGoodDataIndex);
+0222 
+0223 C12 = zeros(length(BPMData.BPMIndex),1);
+0224 C12(BPMData.HBPMIndex(BPMData.HBPMGoodDataIndex)) = BPMData.HBPMCoupling(BPMData.HBPMGoodDataIndex);
+0225 
+0226 C21 = zeros(length(BPMData.BPMIndex),1);
+0227 C21(BPMData.VBPMIndex(BPMData.VBPMGoodDataIndex)) = BPMData.VBPMCoupling(BPMData.VBPMGoodDataIndex);
+0228 
+0229 C22 = ones(length(BPMData.BPMIndex),1);
+0230 C22(BPMData.VBPMIndex(BPMData.VBPMGoodDataIndex)) = BPMData.VBPMGain(BPMData.VBPMGoodDataIndex);
+0231 
+0232 C = [diag(C11) diag(C12)
+0233      diag(C21) diag(C22)];
+0234 clear C11 C12 C21 C22  
+0235 
+0236 Mmodel = C * Mmodel;
+0237 Mmodel = Mmodel(BPMIndexShort, :); 
+0238 
+0239 
+0240 <span class="comment">% Compute chi-squared based on new model</span>
+0241 Mmeas = LocoMeasData.M;
+0242 Mmeas = Mmeas([BPMData.HBPMGoodDataIndex length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex], [CMData.HCMGoodDataIndex length(CMData.HCMIndex)+CMData.VCMGoodDataIndex]); 
+0243 
+0244 Mstd = LocoMeasData.BPMSTD * ones(1,size(LocoMeasData.M,2));
+0245 Mstd = Mstd ([BPMData.HBPMGoodDataIndex length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex], [CMData.HCMGoodDataIndex length(CMData.HCMIndex)+CMData.VCMGoodDataIndex]); 
+0246 
+0247 Xstd = LocoMeasData.BPMSTD(BPMData.HBPMGoodDataIndex);
+0248 Ystd = LocoMeasData.BPMSTD(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex);
+0249 
+0250 
+0251 <span class="comment">% When using the fixed momentum response matrix calculator, the merit function becomes:</span>
+0252 <span class="comment">%              Merit = Mmeas_ij - Mmod_ij - Dp/p_j * eta_i</span>
+0253 <span class="comment">%              where eta_i is the measured eta (not the model eta)</span>
+0254 <span class="comment">% This is done by changing Mmodel to (Mmodel_ij + Dp/p_j * eta_i)</span>
+0255 <span class="comment">%if strcmpi((CMData.FitHCMEnergyShift),'yes') | strcmpi((CMData.FitVCMEnergyShift),'yes')</span>
+0256 <span class="keyword">if</span> strcmpi((LocoFlags.ClosedOrbitType), <span class="string">'fixedmomentum'</span>)
+0257     HCMEnergyShift = CMData.HCMEnergyShift(CMData.HCMGoodDataIndex);
+0258     VCMEnergyShift = CMData.VCMEnergyShift(CMData.VCMGoodDataIndex);
+0259     
+0260     <span class="keyword">if</span> ~exist(<span class="string">'AlphaMCF'</span>)
+0261         AlphaMCF = <a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>(RINGData);
+0262         EtaXmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(BPMData.HBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0263         EtaYmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0264     <span class="keyword">end</span>
+0265 
+0266     <span class="keyword">for</span> i = 1:length(HCMEnergyShift)
+0267         Mmodel(:,i) = Mmodel(:,i) + HCMEnergyShift(i) * [EtaXmcf; EtaYmcf];
+0268     <span class="keyword">end</span>
+0269     
+0270     <span class="keyword">for</span> i = 1:length(VCMEnergyShift)
+0271         Mmodel(:,NHCM+i) = Mmodel(:,NHCM+i) + VCMEnergyShift(i) * [EtaXmcf; EtaYmcf];
+0272     <span class="keyword">end</span>
+0273 <span class="keyword">end</span>
+0274 
+0275 Mstd  = Mstd(:);
+0276 Mmeas = Mmeas(:);
+0277 <span class="keyword">if</span> strcmpi((LocoFlags.Dispersion),<span class="string">'yes'</span>)  
+0278     EtaX = LocoMeasData.Eta(BPMData.HBPMGoodDataIndex);
+0279     EtaY = LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex);
+0280     
+0281     Mstd  = [Mstd;  [Xstd; Ystd]];
+0282     Mmeas = [Mmeas; [EtaX; EtaY]];
+0283 <span class="keyword">else</span>
+0284     <span class="keyword">if</span> ~isempty(FitParameters.DeltaRF)
+0285         Mmodel = Mmodel(:,1:end-1);
+0286     <span class="keyword">end</span>
+0287 <span class="keyword">end</span>
+0288 Mmodel = Mmodel(:);
+0289 
+0290 <span class="comment">% Combine the Mmodel outliers and the Eta outliers</span>
+0291 <span class="keyword">if</span> strcmpi((LocoFlags.Dispersion),<span class="string">'yes'</span>)
+0292     iOutliers = [LocoModel.OutlierIndex(:); LocoModel.EtaOutlierIndex(:) + ((NHBPM+NVBPM)*(NHCM+NVCM))];
+0293 <span class="keyword">else</span>
+0294     iOutliers = LocoModel.OutlierIndex(:);
+0295 <span class="keyword">end</span>
+0296 
+0297 <span class="comment">% Outliers are referenced to the coupled model</span>
+0298 <span class="comment">% Mark the outliers with NaN</span>
+0299 Mmeas(iOutliers)  = NaN; 
+0300 Mmodel(iOutliers) = NaN; 
+0301 Mstd(iOutliers)   = NaN;
+0302 
+0303 <span class="comment">% Remove coupling rows</span>
+0304 <span class="keyword">if</span> strcmpi((CouplingFlag),<span class="string">'no'</span>)
+0305     Mmodel = Mmodel(iNoCoupling); 
+0306     Mmeas = Mmeas(iNoCoupling); 
+0307     Mstd = Mstd(iNoCoupling); 
+0308 <span class="keyword">end</span>
+0309 
+0310 <span class="comment">% Remove the outliers</span>
+0311 Mmeas(find(isnan(Mmeas))) = []; 
+0312 Mmodel(find(isnan(Mmodel))) = []; 
+0313 Mstd(find(isnan(Mstd))) = [];
+0314 
+0315 
+0316 NumberOfFitParameters = 0; 
+0317 <span class="comment">%count the number of fit paramters</span>
+0318 <span class="comment">% Horizontal BPM gains</span>
+0319 <span class="keyword">if</span> strcmpi((BPMData.FitGains),<span class="string">'yes'</span>)
+0320     NumberOfFitParameters = NumberOfFitParameters + length(BPMData.HBPMGoodDataIndex);
+0321 <span class="keyword">end</span>
+0322 
+0323 <span class="comment">% Horizontal BPM coupling</span>
+0324 <span class="keyword">if</span> strcmpi((BPMData.FitCoupling),<span class="string">'yes'</span>)
+0325     NumberOfFitParameters = NumberOfFitParameters + length(BPMData.HBPMGoodDataIndex);
+0326 <span class="keyword">end</span>
+0327 
+0328 <span class="comment">% Vertical BPM coupling</span>
+0329 <span class="keyword">if</span> strcmpi((BPMData.FitCoupling),<span class="string">'yes'</span>)
+0330    NumberOfFitParameters = NumberOfFitParameters + length(BPMData.VBPMGoodDataIndex);
+0331 <span class="keyword">end</span>
+0332 
+0333 <span class="comment">% Vertical BPM gains</span>
+0334 <span class="keyword">if</span> strcmpi((BPMData.FitGains),<span class="string">'yes'</span>)
+0335     NumberOfFitParameters = NumberOfFitParameters + length(BPMData.VBPMGoodDataIndex);
+0336 <span class="keyword">end</span>
+0337 
+0338 <span class="comment">% Corrector magnet gains</span>
+0339 <span class="keyword">if</span> strcmpi((CMData.FitKicks),<span class="string">'yes'</span>)
+0340     NumberOfFitParameters = NumberOfFitParameters + length(CMData.HCMGoodDataIndex);
+0341 <span class="keyword">end</span>
+0342 
+0343 <span class="keyword">if</span> strcmpi((CMData.FitKicks),<span class="string">'yes'</span>)
+0344    NumberOfFitParameters = NumberOfFitParameters + length(CMData.VCMGoodDataIndex);
+0345 <span class="keyword">end</span>
+0346 
+0347 <span class="comment">% Corrector magnet coupling</span>
+0348 <span class="keyword">if</span> strcmpi((CMData.FitCoupling),<span class="string">'yes'</span>)    
+0349     NumberOfFitParameters = NumberOfFitParameters + length(CMData.HCMGoodDataIndex);
+0350 <span class="keyword">end</span>
+0351 
+0352 <span class="keyword">if</span> strcmpi((CMData.FitCoupling),<span class="string">'yes'</span>)    
+0353     NumberOfFitParameters = NumberOfFitParameters + length(CMData.VCMGoodDataIndex);
+0354 <span class="keyword">end</span>
+0355 
+0356 <span class="comment">% Corrector magnet energy shifts</span>
+0357 <span class="keyword">if</span> strcmpi((CMData.FitHCMEnergyShift),<span class="string">'yes'</span>)
+0358     NumberOfFitParameters = NumberOfFitParameters + length(CMData.HCMGoodDataIndex);
+0359 <span class="keyword">end</span>
+0360 <span class="keyword">if</span> strcmpi((CMData.FitVCMEnergyShift),<span class="string">'yes'</span>)
+0361     NumberOfFitParameters = NumberOfFitParameters + length(CMData.VCMGoodDataIndex);
+0362 <span class="keyword">end</span>
+0363 
+0364 <span class="comment">% RF Frequency parameter fit</span>
+0365 <span class="keyword">if</span> strcmpi((FitParameters.FitRFFrequency),<span class="string">'yes'</span>)
+0366     NumberOfFitParameters = NumberOfFitParameters + 1;
+0367 <span class="keyword">end</span>
+0368 
+0369 <span class="comment">% The rest of the parameter fits</span>
+0370 NumberOfFitParameters = NumberOfFitParameters + length(FitParameters.Values);
+0371 
+0372 
+0373 <span class="comment">%ChiSquare = sum(((Mmeas - Mmodel) ./ Mstd) .^ 2) / length(Mstd);</span>
+0374 ChiSquare = sum(((Mmeas - Mmodel) ./ Mstd) .^ 2) / (length(Mstd)-NumberOfFitParameters);   <span class="comment">% mean e'*e = sigma*(n-k)</span>
+0375 <span class="comment">% fprintf('   Chi-square/D.O.F. = %f (N=%d, K=%d) (computed from final response matrix)\n\n', ChiSquare, length(Mstd), NumberOfFitParameters);</span>
+0376 
+0377</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

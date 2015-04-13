@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of srcycle</title>
+  <meta name="keywords" content="srcycle">
+  <meta name="description" content="SRCYCLE - Standardize the storage ring magnets to the golden lattice">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; srcycle.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>srcycle
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SRCYCLE - Standardize the storage ring magnets to the golden lattice</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function srcycle(LatticeFile, DisplayFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SRCYCLE - Standardize the storage ring magnets to the golden lattice
+
+  INPUTS
+  1. LatticeFile - No input - cycle to the present lattice {Default}
+                  'Golden'  - cycle to the golden lattice
+                   LatticeFilename - cycle to the ConfigSetpoint in that file
+  2. 'Display' or 'NoDisplay' - to varify before standardizing and display results (or not)
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setdesired.html" class="code" title="function setdesired(Input1, FamilyName)">setdesired</a>	setdesired(Input, FamilyName)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function srcycle(LatticeFile, DisplayFlag)</a>
+0002 <span class="comment">%SRCYCLE - Standardize the storage ring magnets to the golden lattice</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  INPUTS</span>
+0005 <span class="comment">%  1. LatticeFile - No input - cycle to the present lattice {Default}</span>
+0006 <span class="comment">%                  'Golden'  - cycle to the golden lattice</span>
+0007 <span class="comment">%                   LatticeFilename - cycle to the ConfigSetpoint in that file</span>
+0008 <span class="comment">%  2. 'Display' or 'NoDisplay' - to varify before standardizing and display results (or not)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  Written by Greg Portmann</span>
+0011 
+0012 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0013 <span class="comment">% Input parsing and checking %</span>
+0014 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0015 FileName=<span class="string">'Setpoints'</span>;   <span class="comment">%default value</span>
+0016 DesiredFlag=0;          <span class="comment">%do not cycle to present Desired values</span>
+0017 <span class="keyword">if</span> nargin&gt;0 &amp; strcmpi(LatticeFile, <span class="string">'Desired'</span>)
+0018     DesiredFlag=1;   <span class="comment">%cycle to Desired values</span>
+0019     DisplayFlag = <span class="string">'Display'</span>;
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="keyword">if</span> ~DesiredFlag
+0023 LatticeFileDefault = <span class="string">'Present'</span>;  <span class="comment">% was 'Golden';</span>
+0024 <span class="keyword">if</span> nargin &lt; 1
+0025     LatticeFile = LatticeFileDefault;
+0026 <span class="keyword">end</span>
+0027 <span class="keyword">if</span> nargin &lt; 2
+0028     DisplayFlag = <span class="string">'Display'</span>;
+0029 <span class="keyword">end</span>
+0030 <span class="keyword">if</span> strcmpi(LatticeFile, <span class="string">'Display'</span>) | strcmpi(LatticeFile, <span class="string">'NoDisplay'</span>)
+0031     DisplayFlag = LatticeFile;
+0032     LatticeFile = LatticeFileDefault;
+0033 <span class="keyword">end</span>
+0034 
+0035 
+0036 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0037 <span class="comment">% Get the proper lattice %</span>
+0038 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0039 <span class="keyword">if</span> isempty(LatticeFile)
+0040     [FileName, DirectoryName, FilterIndex] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a Machine Configuration File for Standardization'</span>, getfamilydata(<span class="string">'Directory'</span>, <span class="string">'DataRoot'</span>));
+0041     <span class="keyword">if</span> FilterIndex == 0
+0042         <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0043             fprintf(<span class="string">'   Storage ring standardization cancelled\n'</span>);
+0044         <span class="keyword">end</span>        
+0045         <span class="keyword">return</span>
+0046     <span class="keyword">end</span>
+0047     <span class="keyword">try</span>
+0048         load([DirectoryName FileName]);
+0049         Lattice = ConfigSetpoint;
+0050     <span class="keyword">catch</span>
+0051         error(sprintf(<span class="string">'Problem getting data from machine configuration file\n%s'</span>,lasterr));
+0052     <span class="keyword">end</span>
+0053     <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0054         fprintf(<span class="string">'   Standardizing to the lattice file %s\n'</span>, [DirectoryName FileName]);
+0055     <span class="keyword">end</span>        
+0056 <span class="keyword">elseif</span> strcmpi(LatticeFile, <span class="string">'Present'</span>)
+0057     <span class="comment">% Present lattice</span>
+0058     Lattice = getmachineconfig;
+0059     <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0060         fprintf(<span class="string">'   Standardizing to the present lattice\n'</span>);
+0061     <span class="keyword">end</span>
+0062 <span class="keyword">elseif</span> strcmpi(LatticeFile, <span class="string">'Golden'</span>)
+0063     <span class="comment">% Golden lattice</span>
+0064     FileName = getfamilydata(<span class="string">'OpsData'</span>, <span class="string">'LatticeFile'</span>);
+0065     DirectoryName = getfamilydata(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0066     load([DirectoryName FileName]);
+0067     
+0068     Lattice = ConfigSetpoint;
+0069     <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0070         fprintf(<span class="string">'   Standardizing to the golden lattice %s\n'</span>, [DirectoryName FileName]);
+0071     <span class="keyword">end</span>
+0072 <span class="keyword">elseif</span> ischar(LatticeFile)
+0073     load(LatticeFile);
+0074     Lattice = ConfigSetpoint;
+0075     <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0076         fprintf(<span class="string">'   Standardizing to lattice file %s\n'</span>, LatticeFile);
+0077     <span class="keyword">end</span>
+0078 <span class="keyword">else</span>
+0079     error(<span class="string">'Not sure what lattice to cycle to!'</span>);    
+0080 <span class="keyword">end</span>
+0081     
+0082 <span class="keyword">end</span>  <span class="comment">%end ~DesiredFlag condition</span>
+0083 
+0084 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0085 <span class="comment">% Query to begin standardization %</span>
+0086 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0087 <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0088     tmp = questdlg(<span class="string">'Begin storage ring standardization?'</span>,<span class="string">'SRCYCLE'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0089     <span class="keyword">if</span> strcmpi(tmp,<span class="string">'No'</span>)
+0090         fprintf(<span class="string">'   Lattice standardization cancelled\n'</span>);
+0091         <span class="keyword">return</span>
+0092     <span class="keyword">end</span>
+0093 <span class="keyword">end</span>
+0094 
+0095 <span class="keyword">if</span> DesiredFlag    <span class="comment">%user wants to cycle to present Desired Values</span>
+0096   Lattice = getmachineconfig;   <span class="comment">%for correctors and kickers only</span>
+0097   FileName=<span class="string">'LATVALS'</span>;
+0098 <span class="keyword">end</span>
+0099 
+0100 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0101 <span class="comment">% Set the kickers first %</span>
+0102 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0103 <span class="comment">%Set Kicker values</span>
+0104 <span class="keyword">if</span> isfield(Lattice,<span class="string">'KickerAmp'</span>)
+0105     disp(  [<span class="string">'   Setting kicker setpoints to: '</span> FileName])
+0106     setsp(<span class="string">'KickerAmp'</span>,Lattice.KickerAmp.Setpoint.Data)
+0107 <span class="keyword">end</span>
+0108 
+0109 
+0110 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0111 <span class="comment">% Set the correctors second %</span>
+0112 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0113 <span class="comment">%NOTE: If standardizing to LATVALS, 'Lattice' is undefined for correctors</span>
+0114 FOFBState=getpv(<span class="string">'Fofb:ControlState'</span>);
+0115 setpv(<span class="string">'Fofb:ControlState'</span>,1);    <span class="comment">%0=failed, 1=off, 2=running</span>
+0116 NSteps = 5;
+0117 HCM0 = getsp(<span class="string">'HCM'</span>);
+0118 VCM0 = getsp(<span class="string">'VCM'</span>);
+0119 <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0120 disp(  [<span class="string">'   Setting corrector setpoints to: '</span> FileName])
+0121 disp(  [<span class="string">'   FOFB State: '</span> num2str(FOFBState) ])
+0122 <span class="keyword">end</span>
+0123 <span class="keyword">for</span> k = 1:NSteps
+0124     setsp(<span class="string">'HCM'</span>, HCM0 + k/NSteps * (Lattice.HCM.Setpoint.Data-HCM0), [], -1);
+0125     setsp(<span class="string">'VCM'</span>, VCM0 + k/NSteps * (Lattice.VCM.Setpoint.Data-VCM0), [], -1);
+0126     pause(0.1)
+0127 <span class="keyword">end</span>
+0128 
+0129 setpv(<span class="string">'Fofb:ControlState'</span>,FOFBState);    <span class="comment">%put FOFB flag back</span>
+0130 
+0131 disp(<span class="string">'   Finished with correctors'</span>)
+0132 
+0133 <span class="comment">%return   %%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</span>
+0134 
+0135 
+0136 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0137 <span class="comment">% Set the desired setpoints %</span>
+0138 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0139 <span class="keyword">if</span> ~DesiredFlag
+0140 <a href="setdesired.html" class="code" title="function setdesired(Input1, FamilyName)">setdesired</a>(Lattice);
+0141 <span class="keyword">end</span>  <span class="comment">%end ~DesireFlag condition</span>
+0142 
+0143 
+0144 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0145 <span class="comment">% Start the cycle %</span>
+0146 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0147 
+0148 <span class="comment">% BEND</span>
+0149 setpv(<span class="string">'MS1-BD:Standardize'</span>, 1);
+0150 
+0151 <span class="comment">% QF</span>
+0152 setpv(<span class="string">'PS:QFStandardizeSeq'</span>, 1);
+0153 
+0154 <span class="comment">% QD</span>
+0155 setpv(<span class="string">'PS:QDStandardizeSeq'</span>, 1);
+0156 
+0157 <span class="comment">% Sextupoles</span>
+0158 setpv(<span class="string">'PS:SextStandardizeSeq'</span>, 1);
+0159 
+0160 
+0161 <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0162     pause(2);
+0163     
+0164     <span class="comment">% PS:BTSStandardizeNum</span>
+0165     bend = getpv(<span class="string">'PS:StandardizeNum'</span>);
+0166     qf   = getpv(<span class="string">'PS:QFStandardizeNum'</span>);
+0167     qd   = getpv(<span class="string">'PS:QDStandardizeNum'</span>);
+0168     sext = getpv(<span class="string">'PS:SextStandardizeNum'</span>);
+0169     
+0170     fprintf(<span class="string">'   BEND     QFC      QF      QX      QY     QFZ      QF      QX      QY     QFZ     SF      SD     SFM     SDM\n'</span>);
+0171     <span class="keyword">while</span> bend | qf | qd | sext
+0172         bend = getpv(<span class="string">'PS:StandardizeNum'</span>);
+0173         qf   = getpv(<span class="string">'PS:QFStandardizeNum'</span>);
+0174         qd   = getpv(<span class="string">'PS:QDStandardizeNum'</span>);
+0175         sext = getpv(<span class="string">'PS:SextStandardizeNum'</span>);
+0176         pause(4.5);
+0177         
+0178         BEND = getam(<span class="string">'BEND'</span>);
+0179         QFC = getam(<span class="string">'QFC'</span>);
+0180         QF  = getam(<span class="string">'QF'</span>);
+0181         QFX = getam(<span class="string">'QFX'</span>);
+0182         QFY = getam(<span class="string">'QFY'</span>);
+0183         QFZ = getam(<span class="string">'QFZ'</span>);
+0184         QD  = getam(<span class="string">'QD'</span>);
+0185         QDX = getam(<span class="string">'QDX'</span>);
+0186         QDY = getam(<span class="string">'QDY'</span>);
+0187         QDZ = getam(<span class="string">'QDZ'</span>);
+0188         SF = getam(<span class="string">'SF'</span>);
+0189         SD = getam(<span class="string">'SD'</span>);
+0190         SFM = getam(<span class="string">'SFM'</span>);
+0191         SDM = getam(<span class="string">'SDM'</span>);
+0192         fprintf(<span class="string">' %7.1f %7.1f %7.1f %7.1f %7.1f %7.1f %7.1f %7.1f %7.1f %7.1f%7.1f %7.1f %7.1f %7.1f\r'</span>, BEND(1), QFC(1), QF(1), QFX(1), QFY(1), QFZ(1), QD(1), QDX(1), QDY(1), QDZ(1), SF(1), SD(1), SFM(1), SDM(1));
+0193     <span class="keyword">end</span>
+0194     fprintf(<span class="string">'\n'</span>);
+0195 <span class="keyword">end</span>
+0196 
+0197 
+0198 <span class="comment">% Make sure all the setpoints are there</span>
+0199 <span class="keyword">if</span> ~DesiredFlag
+0200 setmachineconfig(Lattice);
+0201 <span class="keyword">end</span>
+0202 
+0203 
+0204 <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0205     fprintf(<span class="string">'   Storage ring standardization complete\n'</span>);
+0206 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of hwinit</title>
+  <meta name="keywords" content="hwinit">
+  <meta name="description" content="HWINIT - Hardware initialization script for the BTS">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">LTB</a> &gt; hwinit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\LTB&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>hwinit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>HWINIT - Hardware initialization script for the BTS</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function hwinit(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">HWINIT - Hardware initialization script for the BTS</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="resetudferrors.html" class="code" title="function resetudferrors">resetudferrors</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function hwinit(varargin)</a>
+0002 <span class="comment">%HWINIT - Hardware initialization script for the BTS</span>
+0003 
+0004 
+0005 DisplayFlag = 1;
+0006 <span class="keyword">for</span> i = length(varargin):-1:1
+0007     <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0008         DisplayFlag = 1;
+0009         varargin(i) = [];
+0010     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0011         DisplayFlag = 0;
+0012         varargin(i) = [];
+0013     <span class="keyword">end</span>
+0014 <span class="keyword">end</span>
+0015 
+0016 
+0017 fprintf(<span class="string">'   Initializing BTS parameters (hwinit)\n'</span>)
+0018 
+0019 
+0020 
+0021 <span class="comment">% Set corrector magnets</span>
+0022 <span class="keyword">try</span>
+0023     fprintf(<span class="string">'   1. Setting BTS magnets HCM, VCM, Q, and BEND to a 10 Hz scan rate on the monitors ... '</span>);
+0024     setpv(family2channel(<span class="string">'HCM'</span>,  <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0025     setpv(family2channel(<span class="string">'VCM'</span>,  <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0026     setpv(family2channel(<span class="string">'Q'</span>,    <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0027     setpv(family2channel(<span class="string">'BEND'</span>, <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0028     fprintf(<span class="string">'Done\n'</span>);
+0029 <span class="keyword">catch</span>
+0030     fprintf(<span class="string">'\n   Error setting .SCAN field of BTS corrector magnets HCM and VCM.\n'</span>);
+0031 <span class="keyword">end</span>
+0032 
+0033 
+0034 <span class="comment">% Set BPMs</span>
+0035 <span class="keyword">try</span>
+0036     fprintf(<span class="string">'   2. Setting BTS BPMs to a 10 Hz scan rate ... '</span>);
+0037     setpv(family2channel(<span class="string">'BPMx'</span>),<span class="string">'SCAN'</span>, 9);
+0038     setpv(family2channel(<span class="string">'BPMy'</span>),<span class="string">'SCAN'</span>, 9);
+0039     fprintf(<span class="string">'Done\n'</span>);
+0040 <span class="keyword">catch</span>
+0041     fprintf(<span class="string">'\n   Error setting .SCAN field of BTS BPMs.\n'</span>);
+0042 <span class="keyword">end</span>
+0043 
+0044 
+0045 <span class="comment">% Set all UDF fields</span>
+0046 <span class="comment">% if islabca</span>
+0047 <span class="comment">%     fprintf('  14. UDF fields not set!!! \n');</span>
+0048 <span class="comment">%     fprintf('      sca or MCA must be used to set the .UDF field. \n');</span>
+0049 <span class="comment">%     fprintf('      &gt;&gt; setpathals sca\n');</span>
+0050 <span class="comment">%     fprintf('      to change.\n');</span>
+0051 <span class="comment">% else</span>
+0052     <span class="keyword">try</span>
+0053         fprintf(<span class="string">'   3. Setting the UDF fields for all families to 0 ... '</span>);
+0054         <a href="resetudferrors.html" class="code" title="function resetudferrors">resetudferrors</a>;
+0055         fprintf(<span class="string">'Done\n'</span>);
+0056     <span class="keyword">catch</span>
+0057         fprintf(<span class="string">'\n   Error setting the UDF for all families\n'</span>);
+0058     <span class="keyword">end</span>
+0059 <span class="comment">% end</span>
+0060 
+0061 
+0062 fprintf(<span class="string">'\n'</span>);
+0063 
+0064</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

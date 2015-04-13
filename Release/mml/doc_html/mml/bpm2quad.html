@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bpm2quad</title>
+  <meta name="keywords" content="bpm2quad">
+  <meta name="description" content="BPM2QUAD - Returns the nearest quadrupole to the specified BPM">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; bpm2quad.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>bpm2quad
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>BPM2QUAD - Returns the nearest quadrupole to the specified BPM</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [QUADFamilyOutput, QUADDevOutput, DeltaSpos, PhaseAdvanceX, PhaseAdvanceY] = bpm2quad(BPMFamily, BPMDev, LocationFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BPM2QUAD - Returns the nearest quadrupole to the specified BPM
+  [QUADFamily, QUADDeviceList, DeltaSpos, PhaseAdvanceX, PhaseAdvanceY] = bpm2quad(BPMFamily, BPMDeviceList, LocationFlag)
+
+  INPUTS
+  1. BPMFamily - BPM family (1 family only (row string))
+  2. BPMDeviceList - BPM device list
+  3. LocationFlag - Only search quadrupole positions that are 'UpStream' or 'DownStream' {Default for transport lines} 
+                    of the BPM.  Else no location preference is used {Default for rings}.
+
+  OUTPUTS
+  1. QUADFamily
+  2. QUADDeviceList
+  3. DeltaSpos - Distance from the BPM to the Quad  
+  4. PhaseAdvanceX - Horizontal phase advance from the BPM to the quadrupole (using the model) [radians]
+  5. PhaseAdvanceY - Vertical   phase advance from the BPM to the quadrupole (using the model) [radians]
+
+  Also see quad2bpm</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>	ISMEMBEROF - Returns turn if the membership information of a family (cell of strings)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="quadgetdata.html" class="code" title="function [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadgetdata(DirName, PlotFlag)">quadgetdata</a>	QUADGETDATA - Collect the date from a quadrupole center run.</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [QUADFamilyOutput, QUADDevOutput, DeltaSpos, PhaseAdvanceX, PhaseAdvanceY] = bpm2quad(BPMFamily, BPMDev, LocationFlag)</a>
+0002 <span class="comment">%BPM2QUAD - Returns the nearest quadrupole to the specified BPM</span>
+0003 <span class="comment">%  [QUADFamily, QUADDeviceList, DeltaSpos, PhaseAdvanceX, PhaseAdvanceY] = bpm2quad(BPMFamily, BPMDeviceList, LocationFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. BPMFamily - BPM family (1 family only (row string))</span>
+0007 <span class="comment">%  2. BPMDeviceList - BPM device list</span>
+0008 <span class="comment">%  3. LocationFlag - Only search quadrupole positions that are 'UpStream' or 'DownStream' {Default for transport lines}</span>
+0009 <span class="comment">%                    of the BPM.  Else no location preference is used {Default for rings}.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  OUTPUTS</span>
+0012 <span class="comment">%  1. QUADFamily</span>
+0013 <span class="comment">%  2. QUADDeviceList</span>
+0014 <span class="comment">%  3. DeltaSpos - Distance from the BPM to the Quad</span>
+0015 <span class="comment">%  4. PhaseAdvanceX - Horizontal phase advance from the BPM to the quadrupole (using the model) [radians]</span>
+0016 <span class="comment">%  5. PhaseAdvanceY - Vertical   phase advance from the BPM to the quadrupole (using the model) [radians]</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  Also see quad2bpm</span>
+0019 
+0020 <span class="comment">%  Written by Greg Portmann</span>
+0021 
+0022 
+0023 <span class="keyword">if</span> nargin &lt; 1
+0024     BPMFamily = [];
+0025 <span class="keyword">end</span>
+0026 <span class="keyword">if</span> isempty(BPMFamily)
+0027     BPMFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>;
+0028 <span class="keyword">end</span>
+0029 
+0030 <span class="keyword">if</span> nargin &lt; 2
+0031     BPMDev = [];
+0032 <span class="keyword">end</span>
+0033 <span class="keyword">if</span> isempty(BPMFamily)
+0034     BPMDev = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMFamily);
+0035     BPMDev = BPMDev(1,:);
+0036 <span class="keyword">end</span>
+0037 
+0038 <span class="keyword">if</span> nargin &lt; 3
+0039     LocationFlag = <span class="string">''</span>;
+0040 <span class="keyword">end</span>
+0041 <span class="keyword">if</span> isempty(LocationFlag)
+0042     <span class="keyword">if</span> any(strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'MachineType'</span>), {<span class="string">'Transport'</span>,<span class="string">'Transportline'</span>,<span class="string">'Linac'</span>}))
+0043         LocationFlag = <span class="string">'UpStream'</span>;
+0044     <span class="keyword">else</span>
+0045         LocationFlag = <span class="string">'Any'</span>;
+0046     <span class="keyword">end</span>
+0047 <span class="keyword">end</span>
+0048 
+0049 
+0050 <span class="comment">% Get all the quad families</span>
+0051 QUADFamilyList = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0052 [tmp, i] = <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(QUADFamilyList, <span class="string">'QUAD'</span>);
+0053 <span class="keyword">if</span> ~isempty(i)
+0054     QUADFamilyList = QUADFamilyList(i,:);
+0055 <span class="keyword">else</span>
+0056     QUADFamilyList = [<span class="string">'QF'</span>,<span class="string">'QD'</span>];
+0057 <span class="keyword">end</span>
+0058 
+0059 
+0060 <span class="comment">% Find the Quad next to the BPM</span>
+0061 QUADFamilyOutput = [];
+0062 <span class="keyword">for</span> k = 1:size(BPMDev,1)
+0063     BPMspos  = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(BPMFamily, BPMDev(k,:));
+0064 
+0065     <span class="keyword">if</span> nargout &gt;= 4
+0066         [PhiX,   PhiY]  = modeltwiss(<span class="string">'Phase'</span>, BPMFamily, BPMDev(k,:));
+0067     <span class="keyword">end</span>
+0068 
+0069     Del = inf;
+0070     <span class="keyword">for</span> j = 1:size(QUADFamilyList,1)
+0071         Family = deblank(QUADFamilyList(j,:));
+0072         QUADDevList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family);
+0073         QUADspos  = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(Family);
+0074 
+0075         <span class="keyword">if</span> strcmpi(LocationFlag, <span class="string">'DownStream'</span>)
+0076             i = find(abs(QUADspos-BPMspos)==min(abs(QUADspos-BPMspos)) &amp; BPMspos&lt;QUADspos);
+0077         <span class="keyword">elseif</span> strcmpi(LocationFlag, <span class="string">'UpStream'</span>)
+0078             i = find(abs(QUADspos-BPMspos)==min(abs(QUADspos-BPMspos)) &amp; BPMspos&gt;QUADspos);
+0079 
+0080         <span class="keyword">else</span>
+0081             i = find(abs(QUADspos-BPMspos)==min(abs(QUADspos-BPMspos)));
+0082         <span class="keyword">end</span>
+0083 
+0084         QUADDev{j} = QUADDevList(i,:);
+0085 
+0086         <span class="keyword">if</span> abs(QUADspos(i)-BPMspos) &lt; Del
+0087             QUADFamilyMin = Family;
+0088             QUADDevMin = QUADDev{j};        
+0089             Del = abs(QUADspos(i)-BPMspos);
+0090             DelwithSign = QUADspos(i)-BPMspos;
+0091         <span class="keyword">end</span>
+0092     <span class="keyword">end</span>
+0093     
+0094     QUADFamilyOutput = strvcat(QUADFamilyOutput, QUADFamilyMin);
+0095     QUADDevOutput(k,:) = QUADDevMin;        
+0096     DeltaSpos(k,1) = DelwithSign;
+0097 
+0098     
+0099     <span class="comment">% Get the phase advance between the BPM and Quad in the model</span>
+0100     <span class="keyword">if</span> nargout &gt;= 4
+0101         ATIndex = family2atindex(QUADFamilyOutput, QUADDevOutput(k,:));
+0102         [PhiQx,  PhiQy] = modeltwiss(<span class="string">'Phase'</span>, <span class="string">'All'</span>);
+0103         i = findrowindex(ATIndex(1), (1:length(PhiQx))');
+0104         PhiQx = (PhiQx(i) + PhiQx(i+1))/2;
+0105 
+0106         PhaseAdvanceX = PhiQx - PhiX;
+0107     <span class="keyword">end</span>
+0108     <span class="keyword">if</span> nargout &gt;= 5
+0109         PhiQy = (PhiQy(i) + PhiQy(i+1))/2;
+0110         PhaseAdvanceY = PhiQy - PhiY;
+0111     <span class="keyword">end</span>
+0112 <span class="keyword">end</span>
+0113</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

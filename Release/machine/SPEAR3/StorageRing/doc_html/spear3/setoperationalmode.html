@@ -1,0 +1,502 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setoperationalmode</title>
+  <meta name="keywords" content="setoperationalmode">
+  <meta name="description" content="setoperationalmode(ModeNumber)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; setoperationalmode.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setoperationalmode
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>setoperationalmode(ModeNumber)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function setoperationalmode(ModeNumber) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  setoperationalmode(ModeNumber)
+
+  This function is used to set the path and model for a particular operational mode.
+  NOTE: This function assumes that the AO has already setup with spear3init
+
+  INPUTS
+  ModeNumber = 1 CDR Optics - User mode
+               2 CDR Optics - Model
+               3 CDR Optics - IDs open
+               4 CDR Optics - Sextupoles off
+               5 CDR Optics - Eta leak
+               6 Low Beta (2 meter)
+               7 Double Waist - Nominal Configuration
+               8 Double Waist - Nominal Configuration/ID's Open
+               9 Double Waist - Low Alpha
+  
+  Written by Greg Portmann
+  updated by Jeff Corbett</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Puts the BPM and correctors gain in the middle layer AO</li><li><a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>	UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="spear3init.html" class="code" title="function spear3init">spear3init</a>	Initialize parameters for SPEAR 3 control in MATLAB</li><li><a href="spear3init_ref.html" class="code" title="function spear3init">spear3init_ref</a>	Initialize parameters for SPEAR 3 control in MATLAB</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function SetDirectoryPathLocal(MachineName, ModeName, OpsFileExtension);</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setoperationalmode(ModeNumber)</a>
+0002 <span class="comment">%  setoperationalmode(ModeNumber)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  This function is used to set the path and model for a particular operational mode.</span>
+0005 <span class="comment">%  NOTE: This function assumes that the AO has already setup with spear3init</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS</span>
+0008 <span class="comment">%  ModeNumber = 1 CDR Optics - User mode</span>
+0009 <span class="comment">%               2 CDR Optics - Model</span>
+0010 <span class="comment">%               3 CDR Optics - IDs open</span>
+0011 <span class="comment">%               4 CDR Optics - Sextupoles off</span>
+0012 <span class="comment">%               5 CDR Optics - Eta leak</span>
+0013 <span class="comment">%               6 Low Beta (2 meter)</span>
+0014 <span class="comment">%               7 Double Waist - Nominal Configuration</span>
+0015 <span class="comment">%               8 Double Waist - Nominal Configuration/ID's Open</span>
+0016 <span class="comment">%               9 Double Waist - Low Alpha</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  Written by Greg Portmann</span>
+0019 <span class="comment">%  updated by Jeff Corbett</span>
+0020 
+0021 
+0022 <span class="keyword">global</span> THERING
+0023 
+0024 
+0025 <span class="comment">% Check if the AO exists</span>
+0026 checkforao;
+0027 
+0028 
+0029 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0030 <span class="comment">% Accelerator Dependent Modes %</span>
+0031 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0032 <span class="keyword">if</span> nargin &lt; 1
+0033     ModeCell = {<span class="string">'User Mode'</span>, <span class="string">'Model'</span>, <span class="string">'IDs Open'</span>, <span class="string">'Sextupoles Off'</span>, <span class="string">'Eta Leak'</span>, <span class="string">'Low Beta'</span>,<span class="string">'Double Waist'</span>};
+0034     [ModeNumber, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'Spear'</span>,<span class="string">'PromptString'</span>,<span class="string">'Select the Operational Mode:'</span>, <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell);
+0035     <span class="keyword">if</span> OKFlag ~= 1
+0036         fprintf(<span class="string">'   Operational mode not changed\n'</span>);
+0037         <span class="keyword">return</span>
+0038     <span class="keyword">end</span>
+0039 <span class="keyword">end</span>
+0040 
+0041 
+0042 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0043 <span class="comment">% Accelerator Data %</span>
+0044 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0045 AD = getad;
+0046 AD.Machine = <span class="string">'SPEAR'</span>;
+0047 AD.Energy = 3.0;  <span class="comment">% GeV</span>
+0048 AD.InjectionEnergy = 3.0;  <span class="comment">% GeV</span>
+0049 AD.HarmonicNumber = 372;
+0050 
+0051 
+0052 
+0053 <span class="comment">% Defaults RF for disperion and chromaticity measurements (must be in Hardware units)</span>
+0054 AD.DeltaRFDisp = 1000e-6;
+0055 AD.DeltaRFChro = [-1000 -500 0 500 1000]*1e-6;
+0056 
+0057 
+0058 <span class="comment">% Tune processor delay: delay required to wait</span>
+0059 <span class="comment">% to have a fresh tune measurement after changing</span>
+0060 <span class="comment">% a variable like the RF frequency.</span>
+0061 AD.TuneDelay = 0.0;  
+0062 
+0063 
+0064 <span class="comment">% Golden TUNE is with the TUNE family (it could be in the AD)</span>
+0065 AO = getao;    
+0066 AO.TUNE.Monitor.Golden = [
+0067     0.1900
+0068     0.2300
+0069     NaN];
+0070 setao(AO);    
+0071 
+0072 
+0073 <span class="comment">% Golden chromaticity is in the AD (Physics units)</span>
+0074 AD.Chromaticity.Golden = [1; 1];   <span class="comment">% approx.  [-1.8;-1.8] in hardware units</span>
+0075 
+0076 
+0077 
+0078 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0079 <span class="comment">% Operational Modes %</span>
+0080 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0081 
+0082 <span class="comment">% Mode setup variables (mostly path and file names)</span>
+0083 <span class="comment">% AD.OperationalMode - String used in titles</span>
+0084 <span class="comment">% MachineName - string used to build directory structure off DataRoot</span>
+0085 <span class="comment">% ModeName - string used for mode directory name off DataRoot/MachineName</span>
+0086 <span class="comment">% OpsFileExtension - string add to default file names</span>
+0087 MachineName = <span class="string">'spear3'</span>;
+0088 
+0089 <span class="keyword">if</span> ModeNumber == 0
+0090     <span class="comment">% Development Lattice</span>
+0091     <span class="comment">% AT lattice</span>
+0092     DirectoryName = <span class="string">'R:\Controls\matlab\applications\lattices\'</span>;
+0093     [FileName, DirectoryName] = uigetfile(<span class="string">'*.m'</span>, <span class="string">'Select an AT Deck to load'</span>, DirectoryName);
+0094     AD.ATModel = FileName;
+0095     FileName = [DirectoryName FileName];
+0096     disp([<span class="string">'   AT Deck selected for development lattice: '</span> FileName])
+0097     run(FileName);
+0098     AD.OperationalMode = <span class="string">'Development Lattice'</span>;
+0099     ModeName = <span class="string">'Development'</span>;
+0100     OpsFileExtension = <span class="string">''</span>;
+0101     
+0102     switch2hw;
+0103 
+0104 <span class="keyword">elseif</span> ModeNumber == 1
+0105     <span class="comment">% User mode</span>
+0106     <span class="comment">% AT lattice</span>
+0107     sp3v82; 
+0108     AD.ATModel = <span class="string">'sp3v82'</span>;
+0109     AD.OperationalMode = <span class="string">'3.0 GeV, User Mode'</span>;
+0110     ModeName = <span class="string">'User'</span>;
+0111     OpsFileExtension = <span class="string">''</span>;
+0112     
+0113     switch2hw;
+0114     
+0115 <span class="keyword">elseif</span> ModeNumber == 2
+0116     <span class="comment">% Model</span>
+0117     sp3v81ft; 
+0118     AD.ATModel = <span class="string">'sp3v81ft'</span>;
+0119     AD.OperationalMode = <span class="string">'3.0 GeV, Model'</span>;
+0120     ModeName = <span class="string">'Model'</span>;
+0121     OpsFileExtension = <span class="string">'_Model'</span>;
+0122     
+0123     switch2hw;
+0124     
+0125 <span class="keyword">elseif</span> ModeNumber == 3
+0126     <span class="comment">% ID's open</span>
+0127     sp3v81ft; 
+0128     AD.ATModel = <span class="string">'sp3v81ft'</span>;
+0129     AD.OperationalMode = <span class="string">'3.0 GeV, ID''s Open'</span>;
+0130     ModeName = <span class="string">'IDsOpen'</span>;
+0131     OpsFileExtension = <span class="string">'_IDsOpen'</span>;
+0132     
+0133     switch2hw;
+0134     
+0135 <span class="keyword">elseif</span> ModeNumber == 4
+0136     <span class="comment">% Sextupoles Off</span>
+0137     sp3v81ft; 
+0138     AD.ATModel = <span class="string">'sp3v81ft'</span>;
+0139     AD.OperationalMode = <span class="string">'3.0 GeV, Sextupoles Off'</span>;
+0140     ModeName = <span class="string">'SextupolesOff'</span>;
+0141     OpsFileExtension = <span class="string">'_SextupolesOff'</span>;
+0142     
+0143     switch2hw;
+0144     
+0145 <span class="keyword">elseif</span> ModeNumber == 5
+0146     <span class="comment">% Eta Leak</span>
+0147     sp3v81ft; 
+0148     AD.ATModel = <span class="string">'sp3v81ft'</span>;
+0149     AD.OperationalMode = <span class="string">'3.0 GeV, Eta Leak'</span>;
+0150     ModeName = <span class="string">'EtaLeak'</span>;
+0151     OpsFileExtension = <span class="string">'_EtaLeak'</span>;
+0152        
+0153     switch2hw;
+0154     
+0155 <span class="keyword">elseif</span> ModeNumber == 6
+0156     <span class="comment">% Low Beta (2 meter)</span>
+0157     sp3v81ft; 
+0158     AD.ATModel = <span class="string">'sp3v81ft'</span>;
+0159     AD.OperationalMode = <span class="string">'3.0 GeV, Low Beta'</span>;
+0160     ModeName = [<span class="string">'LowBeta'</span>, filesep, <span class="string">'2meter'</span>];
+0161     OpsFileExtension = <span class="string">'_2meter'</span>;
+0162         
+0163     switch2hw;
+0164     
+0165 <span class="keyword">elseif</span> ModeNumber == 7
+0166     <span class="comment">% 2005 double waist test with no chicane</span>
+0167     sp3v81fdw; 
+0168     AD.ATModel = <span class="string">'sp3v81fdw'</span>;
+0169     AD.OperationalMode = <span class="string">'3.0 GeV, Double Waist, No Chicane'</span>;
+0170     ModeName = [<span class="string">'DoubleWaist05'</span>];
+0171     OpsFileExtension = <span class="string">''</span>;
+0172         
+0173     switch2hw;
+0174     
+0175 <span class="keyword">elseif</span> ModeNumber == 8
+0176     <span class="comment">% 2005 double waist test with no chicane and no IDs</span>
+0177     sp3v81fdw; 
+0178     AD.ATModel = <span class="string">'sp3v81fdw'</span>;
+0179     AD.OperationalMode = <span class="string">'3.0 GeV, Double Waist, No Chicane, No Ids'</span>;
+0180     ModeName = [<span class="string">'DoubleWaist05IDsOpen'</span>];
+0181     OpsFileExtension = <span class="string">''</span>;
+0182         
+0183     switch2hw;
+0184     
+0185 <span class="keyword">elseif</span> ModeNumber == 9
+0186     <span class="comment">% Low Alpha</span>
+0187     <span class="comment">% AT lattice</span>
+0188     sp3v81fdw; 
+0189     AD.ATModel = <span class="string">'sp3v81fdw'</span>;
+0190     AD.OperationalMode = <span class="string">'Low Alpha'</span>;
+0191     ModeName = <span class="string">'LowAlpha'</span>;
+0192     OpsFileExtension = <span class="string">''</span>;
+0193     
+0194     switch2hw;
+0195 
+0196     
+0197 <span class="keyword">elseif</span> ModeNumber == 999
+0198     <span class="comment">% Greg's mode</span>
+0199     AD.OperationalMode = <span class="string">'3.0 GeV, Greg Mode'</span>;
+0200     ModeName = <span class="string">'Greg'</span>;
+0201     OpsFileExtension = <span class="string">''</span>;
+0202     
+0203     <span class="comment">%     setfamilydata(1,'BPMx','Status',[14 4]);</span>
+0204     <span class="comment">%     setfamilydata(1,'BPMy','Status',[14 4]);</span>
+0205         
+0206     switch2hw;
+0207     
+0208 <span class="keyword">else</span>
+0209     error(<span class="string">'Operational mode unknown'</span>);
+0210 <span class="keyword">end</span>
+0211 
+0212 
+0213 <span class="comment">% Set the AD directory path</span>
+0214 setad(AD);
+0215 <a href="#_sub1" class="code" title="subfunction SetDirectoryPathLocal(MachineName, ModeName, OpsFileExtension);">SetDirectoryPathLocal</a>(MachineName, ModeName, OpsFileExtension);
+0216 AD = getad;
+0217     
+0218 
+0219 <span class="comment">% Updates the AT indices in the MiddleLayer with the present AT lattice</span>
+0220 <a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>;
+0221    
+0222 
+0223 <span class="comment">% Circumference</span>
+0224 AD.Circumference = findspos(THERING,length(THERING)+1);
+0225 <span class="comment">%AD.Circumference = 2.341440127200002e+002;</span>
+0226 
+0227 
+0228 <span class="comment">% Set the model energy</span>
+0229 setenergymodel(AD.Energy);
+0230 
+0231 
+0232 <span class="comment">% Cavity and radiation</span>
+0233 setcavity off;
+0234 setradiation off;   
+0235 
+0236 
+0237 <span class="comment">% Momentum compaction factor</span>
+0238 MCF = getmcf(<span class="string">'Model'</span>);
+0239 <span class="keyword">if</span> isnan(MCF)
+0240     AD.MCF = 0.001187;
+0241     fprintf(<span class="string">'   Model alpha calculation failed, middlelayer alpha set to  %f\n'</span>, AD.MCF);
+0242 <span class="keyword">else</span>
+0243     AD.MCF = MCF;
+0244     fprintf(<span class="string">'   Middlelayer alpha set to %f (determined by the initial AT model)\n'</span>, AD.MCF);
+0245 <span class="keyword">end</span>
+0246 setad(AD);
+0247 
+0248 
+0249 <span class="comment">% Final mode changes</span>
+0250 <span class="keyword">if</span> ModeNumber &lt; 100
+0251     <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>(<span class="string">'Defaults'</span>);
+0252     
+0253     <span class="comment">%% I put a LocoData.mat file in the same location as spear3physdata.mat</span>
+0254     <span class="comment">%% This file is a LOCO run with a good set of BPM and Corrector gains/coupling</span>
+0255     <span class="comment">%  LocoFileDirectory = getfamilydata('OpsData','PhysDataFile');</span>
+0256     <span class="comment">%  i = findstr(LocoFileDirectory, filesep);</span>
+0257     <span class="comment">%  setlocodata([LocoFileDirectory(1:i(end)),'LocoData']);</span>
+0258     <span class="comment">%  fprintf('   Loaded gains from LOCO file: %s\n', [LocoFileDirectory(1:i(end)),'LocoData.mat']);</span>
+0259     
+0260 <span class="keyword">elseif</span> ModeNumber == 999
+0261     <span class="comment">% Greg's mode</span>
+0262     <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>(<span class="string">'Nominal'</span>);
+0263     setfamilydata(0,<span class="string">'BPMx'</span>,<span class="string">'Offset'</span>);
+0264     setfamilydata(0,<span class="string">'BPMy'</span>,<span class="string">'Offset'</span>);
+0265     setfamilydata(0,<span class="string">'BPMx'</span>,<span class="string">'Golden'</span>);
+0266     setfamilydata(0,<span class="string">'BPMy'</span>,<span class="string">'Golden'</span>);
+0267     <span class="comment">%setsp('SQSF', 0, 'Simulator', 'Physics');</span>
+0268     <span class="comment">%setsp('SQSD', 0, 'Simulator', 'Physics');</span>
+0269     setsp(<span class="string">'HCM'</span>, 0, <span class="string">'Simulator'</span>, <span class="string">'Physics'</span>);
+0270     setsp(<span class="string">'VCM'</span>, 0, <span class="string">'Simulator'</span>, <span class="string">'Physics'</span>);
+0271     setfamilydata(0,<span class="string">'TuneDelay'</span>);
+0272 <span class="keyword">end</span>
+0273 
+0274 
+0275 fprintf(<span class="string">'   Middlelayer setup for operational mode: %s\n'</span>, AD.OperationalMode);
+0276 <span class="keyword">return</span>
+0277 
+0278 
+0279 
+0280 
+0281 <a name="_sub1" href="#_subfunctions" class="code">function SetDirectoryPathLocal(MachineName, ModeName, OpsFileExtension);</a>
+0282 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0283 <span class="comment">% Directories which define the data and opsdata tree %</span>
+0284 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0285 
+0286 AD = getad;
+0287 
+0288 <span class="comment">% First check for an environmental variable for the middle layer root directory</span>
+0289 MLROOT = <span class="string">''</span>;  <span class="comment">%getenv('MLROOT');</span>
+0290 <span class="keyword">if</span> isempty(MLROOT)
+0291     <span class="comment">% Base MLROOT on where getsp is located</span>
+0292     [MLROOT, FileName, ExtentionName] = fileparts(which(<span class="string">'getsp'</span>));
+0293     
+0294     <span class="comment">% Default location for Spear</span>
+0295     <span class="comment">%MLROOT = 'r:\controls\matlab\acceleratorcontrol\';</span>
+0296 <span class="keyword">end</span>
+0297 
+0298 i = findstr(MLROOT, filesep);
+0299 <span class="keyword">if</span> length(i) &gt; 0
+0300     MLROOT = MLROOT(1:i(end));
+0301 <span class="keyword">end</span>
+0302 
+0303 
+0304 <span class="comment">% MLROOT must end in a file separator</span>
+0305 <span class="keyword">if</span> ~strcmp(MLROOT(end), filesep)
+0306     MLROOT = [MLROOT, filesep];
+0307 <span class="keyword">end</span>
+0308 
+0309 
+0310 <span class="comment">% % DataRoot Location</span>
+0311 <span class="comment">% % This is a bit of a cluge to know if the user is on the Spear filer</span>
+0312 <span class="comment">% % If so, the location of DataRoot will be different from the middle layer default</span>
+0313 <span class="comment">% if ~isempty(findstr(lower(MLROOT),'y:\controls')) | ~isempty(findstr(lower(MLROOT),'r:\controls'))</span>
+0314 <span class="comment">%     % Use MLROOT and DataRoot on the Spear file system</span>
+0315 <span class="comment">%     i = findstr(MLROOT, filesep);</span>
+0316 <span class="comment">%     AD.Directory.DataRoot   = [MLROOT(1:i(end-1)), MachineName, 'data', filesep, ModeName, filesep];</span>
+0317 <span class="comment">%     AD.Directory.OpsData    = [MLROOT, MachineName, 'opsdata', filesep, ModeName, filesep];</span>
+0318 <span class="comment">%     AD.OpsData.PhysDataFile = [MLROOT, MachineName, 'opsdata', filesep, MachineName, 'physdata.mat'];</span>
+0319 <span class="comment">%</span>
+0320 <span class="comment">%     % If using the Spear filer, I'm assuming you want to be online</span>
+0321 <span class="comment">%     switch2online;</span>
+0322 <span class="comment">% else</span>
+0323 <span class="comment">%     % Base on normal middle layer directory structure</span>
+0324 <span class="comment">%     AD.Directory.DataRoot   = [MLROOT, 'machine', filesep, MachineName, 'data', filesep, ModeName, filesep];</span>
+0325 <span class="comment">%     AD.Directory.OpsData    = [MLROOT, 'machine', filesep, MachineName, 'opsdata', filesep, ModeName, filesep];</span>
+0326 <span class="comment">%     AD.OpsData.PhysDataFile = [MLROOT, 'machine', filesep, MachineName, 'opsdata', filesep, MachineName, 'physdata.mat'];</span>
+0327 <span class="comment">%     %if strcmp(computer,'PCWIN') == 1</span>
+0328 <span class="comment">%     %    AD.Directory.DataRoot = ['\\Als-filer\physdata\matlab2004\acceleratorcontrol\machine\', MachineName, filesep, ModeName, filesep];</span>
+0329 <span class="comment">%     %else</span>
+0330 <span class="comment">%     %    AD.Directory.DataRoot = ['/home/als/physdata/matlab2004/acceleratorcontrol/machine/', MachineName, 'data', filesep, ModeName, filesep];</span>
+0331 <span class="comment">%     %end</span>
+0332 <span class="comment">%</span>
+0333 <span class="comment">%     % If not using the Spear filer, I'm assuming you want to be simulating</span>
+0334 <span class="comment">%     switch2sim;</span>
+0335 <span class="comment">% end</span>
+0336 
+0337 <span class="comment">% DataRoot Location</span>
+0338 <span class="comment">% Base on normal middle layer directory structure</span>
+0339 AD.Directory.DataRoot = [MLROOT, <span class="string">'machine'</span>, filesep, MachineName, <span class="string">'data'</span>, filesep, ModeName, filesep];
+0340 AD.Directory.OpsData    = [MLROOT, <span class="string">'machine'</span>, filesep, MachineName, <span class="string">'opsdata'</span>, filesep, ModeName, filesep];
+0341 AD.OpsData.PhysDataFile = [MLROOT, <span class="string">'machine'</span>, filesep, MachineName, <span class="string">'opsdata'</span>, filesep, MachineName, <span class="string">'physdata.mat'</span>];
+0342 
+0343 <span class="comment">% This is a bit of a cluge to know if the user is on the ALS filer</span>
+0344 <span class="comment">% If so, the location of DataRoot will be different from the middle layer default</span>
+0345 <span class="keyword">if</span> ~isempty(findstr(lower(MLROOT),<span class="string">'y:\controls'</span>)) | ~isempty(findstr(lower(MLROOT),<span class="string">'r:\controls'</span>))
+0346     <span class="comment">% If using the ALS filer, I'm assuming you want to be online</span>
+0347     switch2online;
+0348 <span class="keyword">else</span>
+0349     <span class="comment">% If not using the Spear3 filer, I'm assuming you want to be simulating</span>
+0350     switch2sim;
+0351 <span class="keyword">end</span>
+0352 
+0353 
+0354 <span class="comment">%Data Archive Directories</span>
+0355 AD.Directory.BPMData        = [AD.Directory.DataRoot <span class="string">'BPM'</span>, filesep];
+0356 AD.Directory.ScraperData    = [AD.Directory.DataRoot <span class="string">'Scraper'</span>, filesep];
+0357 AD.Directory.TuneData       = [AD.Directory.DataRoot <span class="string">'Tune'</span>, filesep];
+0358 AD.Directory.ChroData       = [AD.Directory.DataRoot <span class="string">'Chromaticity'</span>, filesep];
+0359 AD.Directory.DispData       = [AD.Directory.DataRoot <span class="string">'Dispersion'</span>, filesep];
+0360 AD.Directory.ConfigData     = [AD.Directory.DataRoot <span class="string">'MachineConfig'</span>, filesep];
+0361 
+0362 <span class="comment">%Response Matrix Directories</span>
+0363 AD.Directory.BPMResponse    = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'BPM'</span>, filesep];
+0364 AD.Directory.TuneResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Tune'</span>, filesep];
+0365 AD.Directory.ChroResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Chromaticity'</span>, filesep];
+0366 AD.Directory.DispResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Dispersion'</span>, filesep];
+0367 AD.Directory.SkewResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Skew'</span>, filesep];
+0368 
+0369 <span class="comment">%Default Data File Prefix</span>
+0370 AD.Default.BPMArchiveFile   = <span class="string">'BPM'</span>;                <span class="comment">% File in AD.Directory.BPM               orbit data</span>
+0371 AD.Default.ScraperArchiveFile   = <span class="string">'Scraper'</span>;        <span class="comment">% File in AD.Directory.Scraper           scraper data</span>
+0372 AD.Default.TuneArchiveFile  = <span class="string">'Tune'</span>;               <span class="comment">% File in AD.Directory.Tune              tune data</span>
+0373 AD.Default.ChroArchiveFile  = <span class="string">'Chro'</span>;               <span class="comment">% File in AD.Directory.Chromaticity      chromaticity data</span>
+0374 AD.Default.DispArchiveFile  = <span class="string">'Disp'</span>;               <span class="comment">% File in AD.Directory.Dispersion        dispersion data</span>
+0375 AD.Default.CNFArchiveFile   = <span class="string">'CNF'</span>;                <span class="comment">% File in AD.Directory.CNF               configuration data</span>
+0376 
+0377 <span class="comment">%Default Response Matrix File Prefix</span>
+0378 AD.Default.BPMRespFile      = <span class="string">'BPMRespMat'</span>;         <span class="comment">% File in AD.Directory.BPMResponse       BPM response matrices</span>
+0379 AD.Default.TuneRespFile     = <span class="string">'TuneRespMat'</span>;        <span class="comment">% File in AD.Directory.TuneResponse      tune response matrices</span>
+0380 AD.Default.ChroRespFile     = <span class="string">'ChroRespMat'</span>;        <span class="comment">% File in AD.Directory.ChroResponse      chromaticity response matrices</span>
+0381 AD.Default.DispRespFile     = <span class="string">'DispRespMat'</span>;        <span class="comment">% File in AD.Directory.DispResponse      dispersion response matrices</span>
+0382 AD.Default.SkewRespFile     = <span class="string">'SkewRespMat'</span>;        <span class="comment">% File in AD.Directory.SkewResponse      skew quadrupole response matrices</span>
+0383 
+0384 <span class="comment">%Operational Files</span>
+0385 AD.OpsData.LatticeFile   = [<span class="string">'GoldenConfig'</span>,    OpsFileExtension];
+0386 AD.OpsData.InjectionFile = [<span class="string">'InjectionConfig'</span>, OpsFileExtension];
+0387 AD.OpsData.BPMSigmaFile  = [<span class="string">'GoldenBPMSigma'</span>,  OpsFileExtension];
+0388 AD.OpsData.DispFile      = [<span class="string">'GoldenDisp'</span>,      OpsFileExtension];
+0389 
+0390 <span class="comment">%Operational Response Files</span>
+0391 AD.OpsData.BPMRespFile  = [<span class="string">'GoldenBPMResp'</span>,  OpsFileExtension]; 
+0392 AD.OpsData.TuneRespFile = [<span class="string">'GoldenTuneResp'</span>, OpsFileExtension];
+0393 AD.OpsData.ChroRespFile = [<span class="string">'GoldenChroResp'</span>, OpsFileExtension];
+0394 AD.OpsData.DispRespFile = [<span class="string">'GoldenDispResp'</span>, OpsFileExtension];
+0395 AD.OpsData.SkewRespFile = [<span class="string">'GoldenSkewResp'</span>, OpsFileExtension];
+0396 AD.OpsData.RespFiles     = {<span class="keyword">...</span>
+0397         [AD.Directory.OpsData, AD.OpsData.BPMRespFile], <span class="keyword">...</span>
+0398         [AD.Directory.OpsData, AD.OpsData.TuneRespFile], <span class="keyword">...</span>
+0399         [AD.Directory.OpsData, AD.OpsData.ChroRespFile], <span class="keyword">...</span>
+0400         [AD.Directory.OpsData, AD.OpsData.DispRespFile], <span class="keyword">...</span>
+0401         [AD.Directory.OpsData, AD.OpsData.SkewRespFile]};
+0402 
+0403 
+0404 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0405 <span class="comment">% Spear only application parameters %</span>
+0406 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0407 AD.Directory.Lattice  = [MLROOT, <span class="string">'applications'</span>, filesep, <span class="string">'lattices'</span>, filesep, MachineName];
+0408 AD.Directory.Orbit    = [MLROOT, <span class="string">'applications'</span>, filesep, <span class="string">'orbit'</span>, filesep, MachineName];
+0409 AD.Directory.SOFB     = [MLROOT, <span class="string">'applications'</span>, filesep, <span class="string">'sofb'</span>, filesep, MachineName];
+0410 AD.Directory.BTS           = [AD.Directory.DataRoot <span class="string">'BTS'</span>, filesep];
+0411 AD.Directory.BumpData      = [AD.Directory.DataRoot <span class="string">'Bumps'</span>, filesep];
+0412 AD.Directory.InterlockData = [AD.Directory.DataRoot <span class="string">'Interlock'</span>, filesep];
+0413 
+0414 <span class="comment">% Add beamline files</span>
+0415 AD.Directory.BLData        = [AD.Directory.DataRoot <span class="string">'Beamline'</span>, filesep];
+0416 AD.Directory.BLResponse    = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Beamline'</span>, filesep];
+0417 AD.Default.BLArchiveFile = <span class="string">'BL'</span>;        <span class="comment">% file in AD.Directory.BL            beamline data</span>
+0418 AD.Default.BLRespFile = <span class="string">'BLRespMat'</span>;    <span class="comment">% file in AD.Directory.BLResponse    photon BPM response matrices</span>
+0419 AD.OpsData.BLRespFile = [<span class="string">'GoldenBLResp'</span>, OpsFileExtension];
+0420 AD.OpsData.RespFiles{end+1} = [AD.Directory.OpsData, AD.OpsData.BLRespFile];
+0421 
+0422 <span class="comment">% Skeleton Deck files</span>
+0423 AD.Deck.ATSkeleton_Group  = <span class="string">'sp3v81f_ATSkeleton_Group'</span>;   <span class="comment">%used to create deck with HW2OpticsDeck</span>
+0424 AD.Deck.ATSkeleton_All    = <span class="string">'sp3v81f_ATSkeleton_All'</span>;
+0425 AD.Deck.MADSkeleton_Group = <span class="string">'sp3v81f_MADSkeleton_Group'</span>;
+0426 AD.Deck.MADSkeleton_All   = <span class="string">'sp3v81f_MADSkeleton_All'</span>;
+0427 
+0428 <span class="comment">% Orbit Control and Feedback Files</span>
+0429 AD.Restore.GlobalFeedback   = <span class="string">'Restore.m'</span>;
+0430 AD.Restore.BeamlineFeedback = <span class="string">'Restore.m'</span>;
+0431 
+0432 <span class="comment">% Beam line corrector feed-forward 'CurrReference' file</span>
+0433 AD.setmachineconfigfile=<span class="string">'setmachineconfig_finis'</span>;
+0434 
+0435 <span class="comment">% Save AD</span>
+0436 setad(AD);
+0437</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

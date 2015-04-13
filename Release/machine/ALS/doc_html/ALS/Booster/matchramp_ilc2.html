@@ -1,0 +1,494 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of matchramp_ilc2</title>
+  <meta name="keywords" content="matchramp_ilc2">
+  <meta name="description" content="Check the power supply BW">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; matchramp_ilc2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>matchramp_ilc2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Check the power supply BW</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Check the power supply BW
+ Compensation TF should be applied on QF not QF/BEND
+ Test what the delay should be?  Sample rate or BW reasoning?
+ Test the tolerance to parameter uncertainty (TF high poles)
+ Timing should not independent of BEND setpoint!
+ Check the timing of a point in the middle of the sequence</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Check the power supply BW</span>
+0002 <span class="comment">% Compensation TF should be applied on QF not QF/BEND</span>
+0003 <span class="comment">% Test what the delay should be?  Sample rate or BW reasoning?</span>
+0004 <span class="comment">% Test the tolerance to parameter uncertainty (TF high poles)</span>
+0005 <span class="comment">% Timing should not independent of BEND setpoint!</span>
+0006 <span class="comment">% Check the timing of a point in the middle of the sequence</span>
+0007 
+0008 clear
+0009 
+0010 Fig1 = 7;
+0011 Fig2 = 8;
+0012 
+0013 FigN = 19;
+0014 
+0015 <span class="comment">% Power supply TF</span>
+0016 w = 2 * pi * 7.8;
+0017 sys = tf(1,[1/w 1]);
+0018 <span class="comment">%bode(H)</span>
+0019 
+0020 
+0021 
+0022 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0023 <span class="comment">% Compensation Transfer Function %</span>
+0024 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0025 
+0026 Gain = 1;
+0027 
+0028 <span class="comment">% The inverse system</span>
+0029 Fc = 2 * pi * 20;      <span class="comment">% High frequency poles for the compensation (avoid phase delay!!!)</span>
+0030 sysinv = tf([1/w 1], conv([1/Fc 1],[1/Fc 1]));
+0031 sysinv1 = sysinv;
+0032 
+0033 <span class="comment">% Add a pole (sample rate &amp; compensation)</span>
+0034 <span class="comment">%wc = 2 * pi * 10;</span>
+0035 <span class="comment">%sysinv = sysinv * tf(1, [1/wc 1]);</span>
+0036 
+0037 figure(20);
+0038 step(sysinv);
+0039 <span class="comment">%bode(sysinv1, sysinv);</span>
+0040 
+0041 
+0042 QF   = getpv(<span class="string">'QF'</span>,   <span class="string">'DVM'</span>); 
+0043 QD   = getpv(<span class="string">'QD'</span>,   <span class="string">'DVM'</span>);
+0044 BEND = getpv(<span class="string">'BEND'</span>, <span class="string">'DVM'</span>);
+0045 
+0046 QF = QF(:);
+0047 QD = QD(:);
+0048 BEND = BEND(:);
+0049 
+0050 
+0051 fs = 4000;
+0052 t = (0:(length(QF)-1)) / fs;
+0053 
+0054 
+0055 <span class="comment">% Filter the BEND but don't add phase delay</span>
+0056 BENDRaw = BEND;
+0057 [b,a] = fir1(10, .2);
+0058 BEND = filtfilt(b, a, BENDRaw);
+0059 
+0060 freqz(b,a,1024,<span class="string">'whole'</span>,4000);
+0061 
+0062 QFRaw = QF;
+0063 QF = filtfilt(b, a, QFRaw);
+0064 
+0065 QDRaw = QD;
+0066 QD = filtfilt(b, a, QDRaw);
+0067 
+0068 figure(FigN);
+0069 subplot(3,1,1);
+0070 plot(t, [BEND(:) BENDRaw(:)]);
+0071 subplot(3,1,2);
+0072 plot(t, [QF(:) QFRaw(:)]);
+0073 subplot(3,1,3);
+0074 plot(t, [QD(:) QDRaw(:)]);
+0075 
+0076 
+0077 <span class="comment">% Goal</span>
+0078 QFratio = QF./BEND; 
+0079 QDratio = QD./BEND; 
+0080 
+0081 
+0082 <span class="comment">% Error</span>
+0083 QFerr = BEND.*(.520-QFratio);
+0084 QDerr = BEND.*(.535-QDratio);
+0085 
+0086 
+0087 <span class="keyword">if</span> 1
+0088     TimeFlag = 1;
+0089     x = t;
+0090     xLabelString = <span class="string">'Time [Seconds]'</span>;
+0091 <span class="keyword">else</span>
+0092     TimeFlag = 0;
+0093     x = BEND;
+0094     xLabelString = <span class="string">'BEND Current [Amps]'</span>;
+0095 <span class="keyword">end</span>
+0096 
+0097 
+0098 B2 = 18;
+0099 B100 = 309;
+0100 dB = (B100-B2)/98;
+0101 
+0102 i2   = max(find(BEND &lt; B2));
+0103 i100 = max(find(BEND &lt; B100));
+0104 
+0105 <span class="comment">% 100 point bend table (last point gets dropped later)</span>
+0106 B = linspace(B2,B100+dB,100);
+0107 
+0108 
+0109 <span class="comment">% % Find the time step for the ILC linearity correction</span>
+0110 <span class="comment">% for i = 1:length(B)</span>
+0111 <span class="comment">%     Index(i) = max(find(BEND &lt; B(i)));</span>
+0112 <span class="comment">% end</span>
+0113 <span class="comment">% dIndex = median(diff(Index));</span>
+0114 <span class="comment">% Index = dIndex*(0:length(Index)-1)+Index(1);</span>
+0115 
+0116 
+0117 <span class="comment">% Base on time???</span>
+0118 [tmp, i2]   = max(find(t &lt; .0177));
+0119 [tmp, i100] = max(find(t &lt; .4135));
+0120 Index = linspace(i2,i100,100);
+0121 <span class="comment">%dIndex = Index(2)-Index(1);</span>
+0122 dIndex = round(median(diff(Index)));
+0123 Index = dIndex*(0:length(Index)-1)+Index(1);
+0124 
+0125 
+0126 <span class="comment">% Zero the error until the system can be controlled</span>
+0127 i = find(t &lt; t(Index(1)));
+0128 <span class="comment">%t_minus_1 = t(Index(1))-(t(Index(2))-t(Index(1)));</span>
+0129 <span class="comment">%i = find(t &lt; t_minus_1);</span>
+0130 <span class="comment">%i = find(t &lt; .0225-.004);</span>
+0131 <span class="comment">%i = find(t &lt; .0225);</span>
+0132 QFerr(i) = 0;
+0133 QDerr(i) = 0;
+0134 
+0135 
+0136 <span class="comment">% % Slowly zero the error after the top of the ramp</span>
+0137 <span class="comment">% i = find(t &gt; .85);</span>
+0138 <span class="comment">% QFerr(i) = linspace(QFerr(i(1)),0,length(i));</span>
+0139 <span class="comment">% QDerr(i) = linspace(QDerr(i(1)),0,length(i));</span>
+0140 
+0141 
+0142 <span class="comment">% Smooth the error signal without adding phase lag</span>
+0143 [b,a] = fir1(20, .02);
+0144 QFerrRaw = QFerr;
+0145 QFerr = filtfilt(b, a, QFerrRaw);
+0146 
+0147 QDerrRaw = QDerr;
+0148 QDerr = filtfilt(b, a, QDerrRaw);
+0149 
+0150 figure(FigN);
+0151 subplot(2,1,1);
+0152 plot(t, [QFerr(:) QFerrRaw(:)]);
+0153 subplot(2,1,2);
+0154 plot(t, [QDerr(:) QDerrRaw(:)]);
+0155 
+0156 
+0157 
+0158 <span class="comment">% Put the waveform to track through the inverse system</span>
+0159 [dQFcommand, tinv, xinv] = lsim(sysinv, QFerr, t);
+0160 [dQDcommand, tinv, xinv] = lsim(sysinv, QDerr, t);
+0161 
+0162 
+0163 <span class="keyword">if</span> 1
+0164 
+0165     [dQFcommandILC, tinv, xinv] = lsim(sysinv, QFerr(Index), t(Index));
+0166     [dQDcommandILC, tinv, xinv] = lsim(sysinv, QDerr(Index), t(Index));
+0167 
+0168     <span class="comment">% Slide the table 1 point (first point is zero)  ????</span>
+0169     dQFcommandILC(1) = [];
+0170     dQDcommandILC(1) = [];
+0171     Index(end) = [];
+0172 
+0173 
+0174     <span class="comment">%dQFcommandILC(end) = [];</span>
+0175     <span class="comment">%dQDcommandILC(end) = [];</span>
+0176     <span class="comment">%Index(end) = [];</span>
+0177 
+0178 <span class="keyword">elseif</span> 0
+0179     
+0180     <span class="comment">% Or be brain dead</span>
+0181     T = .0075;
+0182     NT = round(T/(t(2)-t(1)))
+0183     dQFcommandILC = QFerr(Index+NT);
+0184 
+0185     dQDcommandILC = QDerr(Index+NT);
+0186     
+0187 <span class="keyword">else</span>
+0188 
+0189     <span class="comment">% Low pass the command and resample but don't add phase delay</span>
+0190     <span class="comment">%[b,a] = butter(5,.2);</span>
+0191     <span class="comment">%[b,a] = butter(5,.08);</span>
+0192     [b,a] = fir1(50, .01);
+0193     dQFcommand1 = filtfilt(b, a, dQFcommand);
+0194     dQFcommandILC = dQFcommand1(Index);
+0195 
+0196     dQDcommand1 = filtfilt(b, a, dQDcommand);
+0197     dQDcommandILC = dQDcommand1(Index);
+0198 
+0199     figure(FigN);
+0200     subplot(2,1,1);
+0201     <span class="comment">%plot(t, [dQFcommand(:) dQFcommand1(:)], t(Index), dQFcommandILC,'.r', t,10*(QFratio-.520),'k');</span>
+0202     plot(t, [dQFcommand(:) dQFcommand1(:)], t(Index), dQFcommandILC,<span class="string">'.r'</span>, t,10*(QFratio-.520), <span class="string">'k'</span>, t,QFerr,<span class="string">'m'</span>, t,QFerrRaw,<span class="string">'m'</span>);
+0203 
+0204     subplot(2,1,2);
+0205     plot(t, [dQDcommand(:) dQDcommand1(:)], t(Index), dQDcommandILC,<span class="string">'.r'</span>, t,10*(QDratio-.535), <span class="string">'k'</span>, t,QDerr,<span class="string">'m'</span>);
+0206     xlabel(<span class="string">'Time [seconds]'</span>);
+0207 <span class="keyword">end</span>
+0208 
+0209 
+0210 <span class="comment">% Gain</span>
+0211 dQFcommandILC = Gain * dQFcommandILC;
+0212 dQDcommandILC = Gain * dQDcommandILC;
+0213 
+0214 
+0215 <span class="comment">% Simulate on 4096 point wave form</span>
+0216 dQFcommand = dQFcommand * 0;
+0217 dQDcommand = dQDcommand * 0;
+0218 <span class="keyword">for</span> i = 0:dIndex-1
+0219     dQFcommand(Index+i) = dQFcommandILC;
+0220     dQDcommand(Index+i) = dQDcommandILC;
+0221 <span class="keyword">end</span>
+0222 
+0223 
+0224 <span class="comment">% Simulate the result</span>
+0225 [dQFsim, t1, x1] = lsim(sys, dQFcommand, t);
+0226 [dQDsim, t1, x1] = lsim(sys, dQDcommand, t);
+0227 
+0228 
+0229 <span class="comment">% for i = 1:length(t_ILC)</span>
+0230 <span class="comment">%     j = max(find(t &lt; t_ILC(i)));</span>
+0231 <span class="comment">%     QFtable(i) = BEND(j) .* QFcommand(j);</span>
+0232 <span class="comment">%     QDtable(i) = BEND(j) .* QDcommand(j);</span>
+0233 <span class="comment">% end</span>
+0234 
+0235 
+0236 
+0237 figure(Fig1);
+0238 clf reset
+0239 subplot(4,1,1);
+0240 plot(x, [QF(:) QD(:) BEND(:)]);
+0241 legend(<span class="string">'QF'</span>, <span class="string">'QD'</span>, <span class="string">'BEND'</span>, <span class="string">'Location'</span>, <span class="string">'NorthWest'</span>);
+0242 axis tight;
+0243 
+0244 subplot(4,1,2);
+0245 plot(x, QFratio);
+0246 hold on;
+0247 plot(x(Index), QFratio(Index),<span class="string">'.'</span>);
+0248 plot([min(x) max(x)],[.520 .520],<span class="string">'r'</span>);
+0249 <span class="keyword">if</span> ~TimeFlag
+0250     plot([B2   B2],  [-10 10],<span class="string">'r'</span>);
+0251     plot([B100 B100],[-10 10],<span class="string">'r'</span>);
+0252 <span class="keyword">end</span>
+0253 hold off;
+0254 ylabel(<span class="string">'QF/BEND (Goal .520)'</span>);
+0255 axis tight;
+0256 yaxis([.45 .6]);
+0257 grid on;
+0258 
+0259 subplot(4,1,3);
+0260 plot(x,[(QFratio-.520) dQFcommand./BEND dQFsim./BEND (QFratio-.520)+dQFsim./BEND]);
+0261 ylabel(<span class="string">'QF/BEND Error'</span>);
+0262 <span class="comment">%legend('QF/BEND-.520', '\DeltaQFcommand', '\DeltaQFsim', 'QF/BEND-.520+\DeltaQFsim', 0);</span>
+0263 legend(<span class="string">'QF/BEND-.520'</span>, <span class="string">'\DeltaQFcommand/BEND'</span>, <span class="string">'\DeltaQFsim/BEND'</span>, <span class="string">'QF/BEND-.520+\DeltaQFsim/BEND'</span>, 0); <span class="comment">%'Location', 'SouthWest');</span>
+0264 axis tight;
+0265 <span class="comment">%yaxis([-.1 .1]);</span>
+0266 grid on;
+0267 
+0268 subplot(4,1,4);
+0269 plot(x, dQFcommand);
+0270 ylabel(<span class="string">'\DeltaQF [Amps]'</span>);
+0271 xlabel(xLabelString);
+0272 axis tight;
+0273 <span class="comment">%yaxis([-20 20]);</span>
+0274 grid on;
+0275 
+0276 <span class="keyword">if</span> TimeFlag
+0277     hold on;
+0278     plot(t(Index), dQFcommandILC, <span class="string">'sr'</span>, <span class="string">'MarkerSize'</span>,3);
+0279     hold off;
+0280 <span class="keyword">end</span>
+0281 
+0282 orient tall
+0283 
+0284 
+0285 
+0286 figure(Fig2);
+0287 clf reset
+0288 subplot(4,1,1);
+0289 plot(x, [QF(:) QD(:) BEND(:)]);
+0290 legend(<span class="string">'QF'</span>, <span class="string">'QD'</span>, <span class="string">'BEND'</span>, 0);
+0291 axis tight;
+0292 
+0293 subplot(4,1,2);
+0294 plot(x, QDratio);
+0295 hold on;
+0296 plot(x(Index), QDratio(Index),<span class="string">'.'</span>);
+0297 plot([min(x) max(x)],[.535 .535],<span class="string">'r'</span>);
+0298 <span class="keyword">if</span> ~TimeFlag
+0299     plot([B2   B2],  [-10 10],<span class="string">'r'</span>);
+0300     plot([B100 B100],[-10 10],<span class="string">'r'</span>);
+0301 <span class="keyword">end</span>
+0302 hold off;
+0303 ylabel(<span class="string">'QD/BEND (Goal .535)'</span>);
+0304 axis tight;
+0305 yaxis([.45 .6]);
+0306 grid on;
+0307 
+0308 
+0309 subplot(4,1,3);
+0310 plot(x,[(QDratio-.520) dQDcommand./BEND dQDsim./BEND (QDratio-.520)+dQDsim./BEND]);
+0311 ylabel(<span class="string">'QD/BEND Error'</span>);
+0312 <span class="comment">%legend('QD/BEND-.520', '\DeltaQDcommand', '\DeltaQDsim', 'QD/BEND-.520+\DeltaQDsim', 0);</span>
+0313 legend(<span class="string">'QD/BEND-.520'</span>, <span class="string">'\DeltaQDcommand/BEND'</span>, <span class="string">'\DeltaQDsim/BEND'</span>, <span class="string">'QD/BEND-.520+\DeltaQDsim/BEND'</span>, 0); <span class="comment">%'Location', 'SouthWest');</span>
+0314 axis tight;
+0315 <span class="comment">%yaxis([-.1 .1]);</span>
+0316 grid on;
+0317 
+0318 subplot(4,1,4);
+0319 plot(x, dQDcommand);
+0320 ylabel(<span class="string">'\DeltaQD [Amps]'</span>);
+0321 xlabel(xLabelString);
+0322 axis tight;
+0323 <span class="comment">%yaxis([-20 20]);</span>
+0324 grid on;
+0325 
+0326 <span class="keyword">if</span> TimeFlag
+0327     hold on;
+0328     plot(t(Index), dQDcommandILC, <span class="string">'sr'</span>, <span class="string">'MarkerSize'</span>,3);
+0329     hold off;
+0330 <span class="keyword">end</span>
+0331 
+0332 orient tall
+0333 
+0334 
+0335 
+0336 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0337 <span class="comment">% Set the ILC table %</span>
+0338 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0339 
+0340 QF_ILC = getpv(<span class="string">'QF'</span>, <span class="string">'ILCTrim'</span>);
+0341 QD_ILC = getpv(<span class="string">'QD'</span>, <span class="string">'ILCTrim'</span>);
+0342 
+0343 <span class="keyword">if</span> length(dQFcommandILC) == 100
+0344     QF_ILC = QF_ILC + dQFcommandILC';
+0345     QD_ILC = QD_ILC + dQDcommandILC';
+0346 <span class="keyword">else</span>
+0347     QF_ILC(2:100) = QF_ILC(2:100) + dQFcommandILC';
+0348     QD_ILC(2:100) = QD_ILC(2:100) + dQDcommandILC';
+0349 <span class="keyword">end</span>
+0350 
+0351 
+0352 tmp = questdlg(<span class="string">'Change the linearity correction?'</span>,<span class="string">'matchramp_ild'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0353 <span class="keyword">if</span> ~strcmpi(tmp,<span class="string">'Yes'</span>)
+0354     fprintf(<span class="string">'  No change made QF or QD linearity correction table.\n'</span>);
+0355     <span class="keyword">return</span>
+0356 <span class="keyword">else</span>
+0357     fprintf(<span class="string">'  QF &amp; QD linearity correction table updated.\n'</span>);
+0358     setpv(<span class="string">'QF'</span>, <span class="string">'ILCTrim'</span>, QF_ILC, [1 1]);
+0359     setpv(<span class="string">'QD'</span>, <span class="string">'ILCTrim'</span>, QD_ILC, [1 1]);
+0360 <span class="keyword">end</span>
+0361 
+0362 
+0363 
+0364 <span class="comment">%QFtable = [1.8 QFtable];</span>
+0365 <span class="comment">%QDtable = [1.8 QDtable];</span>
+0366 
+0367 
+0368 <span class="comment">% for i = 1:length(B)</span>
+0369 <span class="comment">%     j = max(find(BEND &lt; B(i)));</span>
+0370 <span class="comment">%     QFtable(i) = BEND(j) .* QFcommand(j);</span>
+0371 <span class="comment">%     QDtable(i) = BEND(j) .* QDcommand(j);</span>
+0372 <span class="comment">% end</span>
+0373 <span class="comment">%</span>
+0374 <span class="comment">% figure(Fig1);</span>
+0375 <span class="comment">% subplot(4,1,3);</span>
+0376 <span class="comment">% plot(x,[QFratio-.520 QFcommand QFsim QFratio-.535+QFsim]);</span>
+0377 <span class="comment">% ylabel('QF/BEND Error');</span>
+0378 <span class="comment">% legend('QF/BEND-.520', '\DeltaQFcommand', '\DeltaQFsim', 'QF/BEND-.535+\DeltaQFsim', 'Location', 'SouthWest');</span>
+0379 <span class="comment">% axis tight;</span>
+0380 <span class="comment">% yaxis([-.1 .1]);</span>
+0381 <span class="comment">%</span>
+0382 <span class="comment">% subplot(4,1,4);</span>
+0383 <span class="comment">% plot(x, BEND .* QFcommand);</span>
+0384 <span class="comment">% if ~TimeFlag</span>
+0385 <span class="comment">%     hold on;</span>
+0386 <span class="comment">%     plot(B, QFtable, 'sr', 'MarkerSize',3);</span>
+0387 <span class="comment">%     plot([B2   B2],  [-1000 1000],'r');</span>
+0388 <span class="comment">%     plot([B100 B100],[-1000 1000],'r');</span>
+0389 <span class="comment">%     hold off;</span>
+0390 <span class="comment">% end</span>
+0391 <span class="comment">% ylabel('\DeltaQF [Amps]');</span>
+0392 <span class="comment">% xlabel(xLabelString);</span>
+0393 <span class="comment">% axis tight;</span>
+0394 <span class="comment">% yaxis([-20 20]);</span>
+0395 <span class="comment">% grid on;</span>
+0396 <span class="comment">%</span>
+0397 <span class="comment">%</span>
+0398 <span class="comment">% figure(Fig2);</span>
+0399 <span class="comment">% subplot(4,1,3);</span>
+0400 <span class="comment">% %plot(x, [QDratio QDcommand QDsim QDratio+QDsim]);</span>
+0401 <span class="comment">% plot(x, [QDratio-.535 QDcommand QDsim QDratio-.535+QDsim]);</span>
+0402 <span class="comment">% ylabel('QD/BEND Error');</span>
+0403 <span class="comment">% legend('QD/BEND-.535', '\DeltaQDcommand', '\DeltaQDsim', 'QD/BEND-.535+\DeltaQDsim', 'Location', 'SouthWest');</span>
+0404 <span class="comment">% axis tight;</span>
+0405 <span class="comment">% yaxis([-.1 .1]);</span>
+0406 <span class="comment">%</span>
+0407 <span class="comment">% subplot(4,1,4);</span>
+0408 <span class="comment">% plot(x, BEND .* QDcommand);</span>
+0409 <span class="comment">% if ~TimeFlag</span>
+0410 <span class="comment">%     hold on;</span>
+0411 <span class="comment">%     plot(B, QDtable, 'sr', 'MarkerSize',3);</span>
+0412 <span class="comment">%     plot([B2   B2],  [-1000 1000],'r');</span>
+0413 <span class="comment">%     plot([B100 B100],[-1000 1000],'r');</span>
+0414 <span class="comment">%     hold off;</span>
+0415 <span class="comment">% end</span>
+0416 <span class="comment">% ylabel('\DeltaQD [Amps]');</span>
+0417 <span class="comment">% xlabel(xLabelString);</span>
+0418 <span class="comment">% axis tight;</span>
+0419 <span class="comment">% yaxis([-20 20]);</span>
+0420 <span class="comment">% grid on;</span>
+0421 
+0422 <span class="comment">% ysim = 0;</span>
+0423 <span class="comment">% clf</span>
+0424 <span class="comment">% for i = 1:10</span>
+0425 <span class="comment">%     Err = QFratio - ysim;</span>
+0426 <span class="comment">%     [yr, tr, xr] = lsim(sysr, Err, t);</span>
+0427 <span class="comment">%</span>
+0428 <span class="comment">%     unew = unew + yr;</span>
+0429 <span class="comment">%     [ysim, t1, x] = lsim(sys,unew,t);</span>
+0430 <span class="comment">%</span>
+0431 <span class="comment">%     plot(t,[unew(:) yr(:) ysim(:) QFratio(:)]);</span>
+0432 <span class="comment">%</span>
+0433 <span class="comment">%     legend('unew','yr','ysim','QFratio');</span>
+0434 <span class="comment">%</span>
+0435 <span class="comment">%     %[ysim, t1, x] = lsim(sys,unew,t);</span>
+0436 <span class="comment">%     %plot(t,[unew(:) ysim(:) QFratio(:)]);</span>
+0437 <span class="comment">%     %unew = unew + (QFratio-ysim(:)');</span>
+0438 <span class="comment">%</span>
+0439 <span class="comment">%     i; %pause;</span>
+0440 <span class="comment">% end</span>
+0441 
+0442 
+0443</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

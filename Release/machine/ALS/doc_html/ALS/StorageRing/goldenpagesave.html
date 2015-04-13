@@ -1,0 +1,451 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of goldenpagesave</title>
+  <meta name="keywords" content="goldenpagesave">
+  <meta name="description" content="This function generates and saves goldenpage files.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; goldenpagesave.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>goldenpagesave
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This function generates and saves goldenpage files.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function goldenpagesave(FileNameIn) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> This function generates and saves goldenpage files.
+ FileNameIn should have no extension
+ If FileNameIn is empty, data is saved to the 1_golden.txt file in the ALSDATA directory.
+ If FileNameIn is given, the data is saved to that file (.txt) in the ALSDATA directory.
+
+ Filenames and pulsed-magnet timing values are dificult to automatically update, so for now
+ these must be updated by editing /home/als/physbase/matlab/als/commands/goldenpagesave.m</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function goldenpagesave(FileNameIn)</a>
+0002 
+0003 <span class="comment">% This function generates and saves goldenpage files.</span>
+0004 <span class="comment">% FileNameIn should have no extension</span>
+0005 <span class="comment">% If FileNameIn is empty, data is saved to the 1_golden.txt file in the ALSDATA directory.</span>
+0006 <span class="comment">% If FileNameIn is given, the data is saved to that file (.txt) in the ALSDATA directory.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% Filenames and pulsed-magnet timing values are dificult to automatically update, so for now</span>
+0009 <span class="comment">% these must be updated by editing /home/als/physbase/matlab/als/commands/goldenpagesave.m</span>
+0010 
+0011 <span class="comment">% 2004-10-19  T. Scarvie</span>
+0012 <span class="comment">%     removed references to THC auxiliary tuners (they were replaced by HOM dampers 4-04)</span>
+0013 
+0014 <span class="keyword">global</span> GLOBAL_SR_GEV
+0015 <span class="keyword">global</span> GLOBAL_ALSDATA_DIRECTORY
+0016 <span class="keyword">global</span> GLOBAL_SR_MODE_TITLE
+0017 <span class="keyword">global</span> GLOBAL_SR_PRODUCTION_FILE
+0018 <span class="keyword">global</span> GLOBAL_SR_GOLDENPAGE_FILE
+0019 
+0020 
+0021 <span class="comment">% setup file names and directories</span>
+0022 <span class="keyword">if</span> nargin &lt; 1
+0023    <span class="comment">%FileNameIn = sprintf('%igolden',GLOBAL_SR_GEV*10);</span>
+0024    FileNameIn = sprintf(<span class="string">'%s'</span>, GLOBAL_SR_GOLDENPAGE_FILE);
+0025 <span class="keyword">end</span>
+0026 
+0027 <span class="keyword">if</span> isstr(FileNameIn)
+0028    <span class="comment">%FileNameHN = sprintf('%s.txt', FileNameIn);  originally to write .txt lattice files for Hiroshi</span>
+0029    txtflag = strcmp(FileNameIn(end-3:end), <span class="string">'.txt'</span>);
+0030    <span class="keyword">if</span> txtflag == 1
+0031        FileName = sprintf(<span class="string">'%s'</span>, FileNameIn);
+0032    <span class="keyword">else</span>
+0033        FileName = sprintf(<span class="string">'%s.txt'</span>, FileNameIn);
+0034    <span class="keyword">end</span>
+0035    <span class="comment">%DirName = '.';</span>
+0036    <span class="comment">%ReadmeStr = sprintf('Goldenpage values saved to %s.txt in .../alsdata/', FileNameIn);</span>
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="comment">%% choose whether to save all data or just FB data</span>
+0040 <span class="comment">%SaveDataFlag = menu(sprintf('%s\n\nSave which data?',GLOBAL_SR_MODE_TITLE),'All goldenpage values','Only feedback system values','Exit');</span>
+0041 <span class="comment">%if SaveDataFlag == 1</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%    %save all values</span>
+0044 <span class="comment">%    disp('Will save all values...');</span>
+0045 <span class="comment">%elseif SaveDataFlag == 2</span>
+0046 <span class="comment">%</span>
+0047 <span class="comment">%    %save only FB values</span>
+0048 <span class="comment">%    disp('Will save only FB values... (not implemented yet - all values will be saved)');</span>
+0049 <span class="comment">%end</span>
+0050 
+0051 
+0052 <span class="comment">% filenames</span>
+0053 <span class="comment">% edit these filenames to change on goldenpage</span>
+0054 ASLFileName = <span class="string">'GSR0309.MCH'</span>;
+0055 BTSFileName = <span class="string">'1_5GeV.BTS'</span>;
+0056 PulseMagnetFileName = <span class="string">'1_5GeV.PLS'</span>;
+0057 
+0058 
+0059 <span class="comment">% RF data</span>
+0060 C1TempFBonAC = getsp(<span class="string">'SR03S___C1TEMP_AC00'</span>);
+0061 C1TempFBonAM = getam(<span class="string">'SR03S___C1TEMP_AM00'</span>);
+0062 C2TempFBonAC = getsp(<span class="string">'SR03S___C2TEMP_AC00'</span>);
+0063 C2TempFBonAM = getam(<span class="string">'SR03S___C2TEMP_AM00'</span>);
+0064 C1TempFBoffAC = 43; <span class="comment">%edit this number to change on goldenpage</span>
+0065 C2TempFBoffAC = 45; <span class="comment">%edit this number to change on goldenpage</span>
+0066 
+0067 <span class="keyword">if</span> GLOBAL_SR_GEV == 1.9
+0068     Power = 120; <span class="comment">%edit this number to change on goldenpage</span>
+0069 <span class="keyword">elseif</span> GLOBAL_SR_GEV == 1.5
+0070     Power = 120; <span class="comment">%edit this number to change on goldenpage</span>
+0071 <span class="keyword">else</span>
+0072     Power = 120; <span class="comment">%edit this number to change on goldenpage</span>
+0073 <span class="keyword">end</span>
+0074 
+0075 
+0076 <span class="comment">% injection magnet data</span>
+0077 <span class="comment">% timing values: hand edit these numbers to change them on the goldenpage, because...</span>
+0078 <span class="comment">% these timing values don't change very often and require special dll call (due to &quot;gr&quot; structure in database)</span>
+0079 BRBump1 = getsp(<span class="string">'BR2_____BUMP1__AC00'</span>);
+0080 BRBump2 = getsp(<span class="string">'BR2_____BUMP2__AC01'</span>);
+0081 BRBump3 = getsp(<span class="string">'BR2_____BUMP3__AC00'</span>);
+0082 BR2SEN = getsp(<span class="string">'BR2_____SEN____AC00'</span>);
+0083 BR2SENTiming = 45250;
+0084 BR2SEK = getsp(<span class="string">'BR2_____SEK____AC01'</span>);
+0085 BR2SEKTiming = 0;
+0086 BR2KE = getsp(<span class="string">'BR2_____KE_____AC00'</span>);
+0087 BR2KETiming = 59650;
+0088 ExtFldTrigTiming = 237000;
+0089 BRBumpTrigTiming = 234650;
+0090 SRSEK = getsp(<span class="string">'SR01S___SEK____AC01'</span>);
+0091 SRSEKTiming = 0;
+0092 SRSEN = getsp(<span class="string">'SR01S___SEN____AC00'</span>);
+0093 SRSENTiming = 47250;
+0094 SRBUMP1 = getsp(<span class="string">'SR01S___BUMP1__AC00'</span>);
+0095 SRBUMP1Timing = 56700;
+0096 
+0097 
+0098 <span class="comment">% transverse feedback parametes</span>
+0099 X1Bias = getam(<span class="string">'tbds:x1bias:Ctrl'</span>);
+0100 X2Bias = getam(<span class="string">'tbds:x2bias:Ctrl'</span>);
+0101 Y1Bias = getam(<span class="string">'tbds:y1bias:Ctrl'</span>);
+0102 Y2Bias = getam(<span class="string">'tbds:y2bias:Ctrl'</span>);
+0103 XAtten = getam(<span class="string">'tbds:X:Atten:Parse.A'</span>);
+0104 YAtten = getam(<span class="string">'tbds:Y:Atten:Parse.A'</span>);
+0105 XDelay = getam(<span class="string">'tbds:cpdl_x_delay:Ctrl'</span>);
+0106 YDelay = getam(<span class="string">'tbds:cpdl_y_delay:Ctrl'</span>);
+0107 
+0108 
+0109 <span class="comment">% longitudinal feedback parameters</span>
+0110 FrontEndDelay = getam(<span class="string">'LFBFS1:PDL0:DELAY'</span>);
+0111 BackEndDelay = getam(<span class="string">'LFBFS1:PDL1:DELAY'</span>);
+0112 QPSKAtten = getam(<span class="string">'LFB0FS1:BE:QPSK_ATTEN'</span>);
+0113 FillPattern = scagetstring(<span class="string">'LFBFS1:DS:FILLPATTERN'</span>);
+0114 
+0115 SynchrotronFreq = getam(<span class="string">'LFBFS1:SYS:SYNCFREQ'</span>);
+0116 CalculatedSynchrotronFreq = 99999;
+0117 
+0118 RingShift = getam(<span class="string">'LFBFS1:DS:RINGSHIFT'</span>);
+0119 <span class="comment">%FilterPhase = 0;</span>
+0120 MinDSPTime = getam(<span class="string">'LFBFS1:DS:MINDSPTIME'</span>);
+0121 HoldBufferOffset = getam(<span class="string">'LFBFS1:DS:HBOFFSET'</span>);
+0122 ShiftGain = getam(<span class="string">'LFBFS1:DSP:SHIFTGAIN'</span>);
+0123 FEPhaseOffset = getam(<span class="string">'LFB0FS1:FE:PHASE_OFFSET'</span>);
+0124 FEPhaseShift = getam(<span class="string">'LFB0FS1:FE:PHASE_SHIFT'</span>);
+0125 FEGainSign = getam(<span class="string">'LFB0FS1:FE:GAIN_SIGN'</span>);
+0126     <span class="keyword">if</span> FEGainSign == 0
+0127         FEGainSign = <span class="string">'+'</span>;
+0128     <span class="keyword">elseif</span> FEGainSign == 1;
+0129         FEGainSign = <span class="string">'-'</span>;
+0130     <span class="keyword">else</span>
+0131         FEGainSign = <span class="string">'?'</span>;
+0132     <span class="keyword">end</span>
+0133     
+0134 <span class="comment">% Third Harmonic Cavity parameters</span>
+0135 THC1MainAC = getsp(<span class="string">'SR02C___C1MPOS_AC00'</span>);
+0136 THC1MainAM = getam(<span class="string">'SR02C___C1MPOS_AM00'</span>);
+0137 <span class="comment">%THC1AuxAC = getsp('SR02C___C1APOS_AC00');</span>
+0138 <span class="comment">%THC1AuxAM = getam('SR02C___C1APOS_AM00');</span>
+0139 THC2MainAC = getsp(<span class="string">'SR02C___C2MPOS_AC00'</span>);
+0140 THC2MainAM = getam(<span class="string">'SR02C___C2MPOS_AM00'</span>);
+0141 <span class="comment">%THC2AuxAC = getsp('SR02C___C2APOS_AC00');</span>
+0142 <span class="comment">%THC2AuxAM = getam('SR02C___C2APOS_AM00');</span>
+0143 THC3MainAC = getsp(<span class="string">'SR02C___C3MPOS_AC00'</span>);
+0144 THC3MainAM = getam(<span class="string">'SR02C___C3MPOS_AM00'</span>);
+0145 <span class="comment">%THC3AuxAC = getsp('SR02C___C3APOS_AC00');</span>
+0146 <span class="comment">%THC3AuxAM = getam('SR02C___C3APOS_AM00');</span>
+0147 beamcurrent = getdcct;
+0148 
+0149 <span class="comment">%% Go to the proper directory</span>
+0150 <span class="comment">%tmpdir = pwd;</span>
+0151 <span class="comment">%gotoalsdata;</span>
+0152 
+0153 
+0154 <span class="comment">%% Warn that goldenpage data will be overwritten</span>
+0155 <span class="comment">%if strcmp(computer,'PCWIN')==1</span>
+0156 <span class="comment">%   % PC</span>
+0157 <span class="comment">%   StartFlag = questdlg(str2mat(sprintf('File: %s',[FileName]),'Already exists on the matlab path.','','Do you want to save data to:',sprintf('File: %s%s',pwd,['\',FileName])),'GOLDENPAGESAVE','Yes','No','No');</span>
+0158 <span class="comment">%else</span>
+0159 <span class="comment">%   % Sun</span>
+0160 <span class="comment">%   StartFlag = questdlg(str2mat(sprintf('File: %s',[FileName]),'Already exists on the matlab path.','','Do you want to save data to:',sprintf('File: %s%s',pwd,['/',FileName])),'GOLDENPAGESAVE','Yes','No','No');</span>
+0161 <span class="comment">%end</span>
+0162 <span class="comment">%</span>
+0163 <span class="comment">%if strcmp(StartFlag,'Yes')</span>
+0164 <span class="comment">%   %disp(['  Writing over file: ',FileName,'.txt'])</span>
+0165 <span class="comment">%else</span>
+0166 <span class="comment">%   % Return to original directory</span>
+0167 <span class="comment">%   feval('cd', tmpdir);</span>
+0168 <span class="comment">%</span>
+0169 <span class="comment">%   disp('  Data not saved.');</span>
+0170 <span class="comment">%   return</span>
+0171 <span class="comment">%end</span>
+0172 
+0173 
+0174 <span class="comment">% Backup old goldenpage data to 1_golden.txt in .../alsdata/1._/goldenpage_backups/</span>
+0175 <span class="comment">% Record start directory</span>
+0176 DirStart = pwd;
+0177 
+0178 <span class="comment">% Get time and date</span>
+0179 tmp = clock;
+0180 year   = tmp(1);
+0181 month  = tmp(2);
+0182 day    = tmp(3);
+0183 hour   = tmp(4);
+0184 minute = tmp(5);
+0185 seconds= tmp(6);
+0186 
+0187 <span class="comment">% Change to /home/als/physbase/matlab/als/alsdata and create directory by date</span>
+0188 cd(<span class="string">'/home/als/physbase/matlab/als/alsdata'</span>);
+0189 <span class="keyword">if</span> GLOBAL_SR_GEV==1.3 | GLOBAL_SR_GEV==1.5 | GLOBAL_SR_GEV==1.9 
+0190    eval(sprintf(<span class="string">'cd %.1f'</span>, GLOBAL_SR_GEV));
+0191 <span class="keyword">else</span>
+0192    cd other
+0193 <span class="keyword">end</span>
+0194 
+0195 <span class="keyword">if</span> strcmp(GLOBAL_SR_GOLDENPAGE_FILE,<span class="string">'19tbfbgolden'</span>)
+0196    cd /home/als/physbase/matlab/als/alsdata/1.9TwoBunch
+0197 <span class="keyword">end</span>
+0198 BackupDir = pwd;
+0199 
+0200 DirByDate = sprintf(<span class="string">'%d-%02d-%02d'</span>, year, month, day);
+0201 eval(sprintf(<span class="string">'!mkdir goldenpage_backups/%s'</span>, DirByDate));
+0202 
+0203 <span class="comment">% cd to directory by date</span>
+0204 eval(sprintf(<span class="string">'cd goldenpage_backups/%s'</span>, DirByDate));
+0205 
+0206 <span class="comment">% Create directory by time</span>
+0207 DirByTime = sprintf(<span class="string">'%.0f-%02d-%.0f'</span>, hour, minute, seconds);
+0208 eval(sprintf(<span class="string">'!mkdir %s'</span>, DirByTime));
+0209 
+0210 <span class="comment">% cd to directory by time</span>
+0211 eval(sprintf(<span class="string">'cd %s'</span>, DirByTime));
+0212 
+0213 <span class="comment">%modestr = sprintf('%i',GLOBAL_SR_GEV*10);</span>
+0214 modestr = GLOBAL_SR_GOLDENPAGE_FILE;
+0215 
+0216 <span class="comment">% copy files</span>
+0217 eval(sprintf(<span class="string">'!cp /home/als/physbase/matlab/als/alsdata/%s.* .'</span>, modestr));
+0218 
+0219 <span class="comment">% Return to original directory</span>
+0220 eval([<span class="string">'cd '</span>, DirStart]);
+0221 
+0222 fprintf(<span class="string">'\n  Old %g GeV goldenpage file backed up to %s/goldenpage_backups/%s/%s\n'</span>, GLOBAL_SR_GEV, BackupDir, DirByDate, DirByTime);
+0223 
+0224 
+0225 
+0226 <span class="comment">% Write new goldenpage file</span>
+0227 tmpdir = pwd;
+0228 gotoalsdata;
+0229 
+0230 <span class="keyword">if</span> isunix
+0231    c = char(13);
+0232    
+0233    fid = fopen([FileName],<span class="string">'wt'</span>);
+0234    
+0235    fprintf(fid,<span class="string">'#%c\n'</span>, c);
+0236    fprintf(fid,<span class="string">'# %f GeV Storage Ring Operation%c\n'</span>, GLOBAL_SR_GEV, c);
+0237    fprintf(fid,<span class="string">'#%c\n'</span>, c);
+0238    fprintf(fid,<span class="string">'# This file created at %.0f:%02d on %d-%02d-%02d%c\n'</span>, hour, minute, year, month, day, c);
+0239    fprintf(fid,<span class="string">'%c\n'</span>, c);
+0240    
+0241    fprintf(fid,<span class="string">'ASLFileName %s%c\n'</span>, ASLFileName, c);
+0242    fprintf(fid,<span class="string">'BTSFileName %s%c\n'</span>, BTSFileName, c);
+0243    fprintf(fid,<span class="string">'PulseMagnetFileName %s%c\n'</span>, PulseMagnetFileName, c);
+0244    
+0245    fprintf(fid,<span class="string">'RFdata.C1TempFBoffAC %.1f%c\n'</span>, C1TempFBoffAC, c);
+0246    fprintf(fid,<span class="string">'RFdata.C2TempFBoffAC %.1f%c\n'</span>, C2TempFBoffAC, c);
+0247    fprintf(fid,<span class="string">'RFdata.C1TempFBonAC %.1f%c\n'</span>, C1TempFBonAC, c);
+0248    fprintf(fid,<span class="string">'RFdata.C1TempFBonAM %.2f%c\n'</span>, C1TempFBonAM, c);
+0249    fprintf(fid,<span class="string">'RFdata.C2TempFBonAC %.1f%c\n'</span>, C2TempFBonAC, c);
+0250    fprintf(fid,<span class="string">'RFdata.C2TempFBonAM %.2f%c\n'</span>, C2TempFBonAM, c);
+0251    fprintf(fid,<span class="string">'RFdata.Power %.0f%c\n'</span>, Power, c);
+0252    
+0253    fprintf(fid,<span class="string">'BUMPdata.BRBump1 %.1f%c\n'</span>, BRBump1, c);
+0254    fprintf(fid,<span class="string">'BUMPdata.BRBump2 %.1f%c\n'</span>, BRBump2, c);
+0255    fprintf(fid,<span class="string">'BUMPdata.BRBump3 %.1f%c\n'</span>, BRBump3, c);
+0256    fprintf(fid,<span class="string">'BUMPdata.BR2SEN %.1f%c\n'</span>, BR2SEN, c);
+0257    fprintf(fid,<span class="string">'BUMPdata.BR2SENTiming %.0f%c\n'</span>, BR2SENTiming, c);
+0258    fprintf(fid,<span class="string">'BUMPdata.BR2SEK %.1f%c\n'</span>, BR2SEK, c);
+0259    fprintf(fid,<span class="string">'BUMPdata.BR2SEKTiming %.0f%c\n'</span>, BR2SEKTiming, c);
+0260    fprintf(fid,<span class="string">'BUMPdata.BR2KE %.1f%c\n'</span>, BR2KE, c);
+0261    fprintf(fid,<span class="string">'BUMPdata.BR2KETiming %.0f%c\n'</span>, BR2KETiming, c);
+0262    fprintf(fid,<span class="string">'BUMPdata.ExtFldTrigTiming %.0f%c\n'</span>, ExtFldTrigTiming, c);
+0263    fprintf(fid,<span class="string">'BUMPdata.BRBumpTrigTiming %.0f%c\n'</span>, BRBumpTrigTiming, c);
+0264    fprintf(fid,<span class="string">'BUMPdata.SRSEK %.1f%c\n'</span>, SRSEK, c);
+0265    fprintf(fid,<span class="string">'BUMPdata.SRSEKTiming %.0f%c\n'</span>, SRSEKTiming, c);
+0266    fprintf(fid,<span class="string">'BUMPdata.SRSEN %.1f%c\n'</span>, SRSEN, c);
+0267    fprintf(fid,<span class="string">'BUMPdata.SRSENTiming %.0f%c\n'</span>, SRSENTiming, c);
+0268    fprintf(fid,<span class="string">'BUMPdata.SRBUMP1 %.1f%c\n'</span>, SRBUMP1, c);
+0269    fprintf(fid,<span class="string">'BUMPdata.SRBUMP1Timing %.0f%c\n'</span>, SRBUMP1Timing, c);
+0270    
+0271    fprintf(fid,<span class="string">'TFBdata.X1Bias %.2f%c\n'</span>, X1Bias, c);
+0272    fprintf(fid,<span class="string">'TFBdata.Y1Bias %.2f%c\n'</span>, Y1Bias, c);
+0273    fprintf(fid,<span class="string">'TFBdata.X2Bias %.2f%c\n'</span>, X2Bias, c);
+0274    fprintf(fid,<span class="string">'TFBdata.Y2Bias %.2f%c\n'</span>, Y2Bias, c);
+0275    fprintf(fid,<span class="string">'TFBdata.XAtten %.0f%c\n'</span>, XAtten, c);
+0276    fprintf(fid,<span class="string">'TFBdata.YAtten %.0f%c\n'</span>, YAtten, c);
+0277    fprintf(fid,<span class="string">'TFBdata.XDelay %.0f%c\n'</span>, XDelay, c);
+0278    fprintf(fid,<span class="string">'TFBdata.YDelay %.0f%c\n'</span>, YDelay, c);
+0279    
+0280    fprintf(fid,<span class="string">'LFBdata.FrontEndDelay %.0f%c\n'</span>, FrontEndDelay, c);
+0281    fprintf(fid,<span class="string">'LFBdata.FEPhaseOffset %.0f%c\n'</span>, FEPhaseOffset, c);
+0282    fprintf(fid,<span class="string">'LFBdata.FEPhaseShift %.0f%c\n'</span>, FEPhaseShift, c);
+0283    fprintf(fid,<span class="string">'LFBdata.FEGainSign %s%c\n'</span>, FEGainSign, c);
+0284    fprintf(fid,<span class="string">'LFBdata.BackEndDelay %.0f%c\n'</span>, BackEndDelay, c);
+0285    fprintf(fid,<span class="string">'LFBdata.QPSKAtten %.0f%c\n'</span>, QPSKAtten, c);
+0286    fprintf(fid,<span class="string">'LFBdata.FillPattern %s%c\n'</span>, FillPattern, c);
+0287    fprintf(fid,<span class="string">'LFBdata.SynchrotronFreq %.0f%c\n'</span>, SynchrotronFreq, c);
+0288    fprintf(fid,<span class="string">'LFBdata.CalculatedSynchrotronFreq %.0f%c\n'</span>, CalculatedSynchrotronFreq, c); 
+0289    fprintf(fid,<span class="string">'LFBdata.RingShift %.0f%c\n'</span>, RingShift, c);
+0290    fprintf(fid,<span class="string">'LFBdata.HoldBufferOffset %.0f%c\n'</span>, HoldBufferOffset, c);
+0291    fprintf(fid,<span class="string">'LFBdata.MinDSPTime %.0f%c\n'</span>, MinDSPTime, c);
+0292    fprintf(fid,<span class="string">'LFBdata.ShiftGain %.0f%c\n'</span>, ShiftGain, c);
+0293    <span class="comment">%fprintf(fid,'LFBdata.FilterPhase %.0f%c\n', FilterPhase, c);</span>
+0294    
+0295    fprintf(fid,<span class="string">'THCdata.THC1MainAC %.3f%c\n'</span>, THC1MainAC, c);
+0296    fprintf(fid,<span class="string">'THCdata.THC1MainAM %.3f%c\n'</span>, THC1MainAM, c);
+0297 <span class="comment">%  fprintf(fid,'THCdata.THC1AuxAC %.3f%c\n', THC1AuxAC, c);</span>
+0298 <span class="comment">%  fprintf(fid,'THCdata.THC1AuxAM %.3f%c\n', THC1AuxAM, c);</span>
+0299    fprintf(fid,<span class="string">'THCdata.THC2MainAC %.3f%c\n'</span>, THC2MainAC, c);
+0300    fprintf(fid,<span class="string">'THCdata.THC2MainAM %.3f%c\n'</span>, THC2MainAM, c);
+0301 <span class="comment">%  fprintf(fid,'THCdata.THC2AuxAC %.3f%c\n', THC2AuxAC, c);</span>
+0302 <span class="comment">%  fprintf(fid,'THCdata.THC2AuxAM %.3f%c\n', THC2AuxAM, c);</span>
+0303    fprintf(fid,<span class="string">'THCdata.THC3MainAC %.3f%c\n'</span>, THC3MainAC, c);
+0304    fprintf(fid,<span class="string">'THCdata.THC3MainAM %.3f%c\n'</span>, THC3MainAM, c);
+0305 <span class="comment">%  fprintf(fid,'THCdata.THC3AuxAC %.3f%c\n', THC3AuxAC, c);</span>
+0306 <span class="comment">%  fprintf(fid,'THCdata.THC3AuxAM %.3f%c\n', THC3AuxAM, c);</span>
+0307    fprintf(fid,<span class="string">'beamcurrent %.3f%c\n'</span>, beamcurrent, c);
+0308    
+0309    <span class="comment">%close file</span>
+0310    fclose(fid);
+0311    
+0312 <span class="keyword">else</span>
+0313    
+0314    fid = fopen([FileName],<span class="string">'wt'</span>);
+0315    
+0316    fprintf(fid,<span class="string">'#\n'</span>);
+0317    fprintf(fid,<span class="string">'# %f GeV Storage Ring Operation\n'</span>, GLOBAL_SR_GEV);
+0318    fprintf(fid,<span class="string">'#\n'</span>);
+0319    fprintf(fid,<span class="string">'# This file created at %.0f:%02d on %d-%02d-%02d\n'</span>, hour, minute, year, month, day);
+0320    fprintf(fid,<span class="string">'\n'</span>);
+0321    
+0322    fprintf(fid,<span class="string">'ASLFileName %s\n'</span>, ASLFileName);
+0323    fprintf(fid,<span class="string">'BTSFileName %s\n'</span>, BTSFileName);
+0324    fprintf(fid,<span class="string">'PulseMagnetFileName %s\n'</span>, PulseMagnetFileName);
+0325    
+0326    fprintf(fid,<span class="string">'RFdata.C1TempFBoffAC %.1f\n'</span>, C1TempFBoffAC);
+0327    fprintf(fid,<span class="string">'RFdata.C2TempFBoffAC %.1f\n'</span>, C2TempFBoffAC);
+0328    fprintf(fid,<span class="string">'RFdata.C1TempFBonAC %.1f\n'</span>, C1TempFBonAC);
+0329    fprintf(fid,<span class="string">'RFdata.C1TempFBonAM %.2f\n'</span>, C1TempFBonAM);
+0330    fprintf(fid,<span class="string">'RFdata.C2TempFBonAC %.1f\n'</span>, C2TempFBonAC);
+0331    fprintf(fid,<span class="string">'RFdata.C2TempFBonAM %.2f\n'</span>, C2TempFBonAM);
+0332    fprintf(fid,<span class="string">'RFdata.Power %.0f\n'</span>, Power);
+0333    
+0334    fprintf(fid,<span class="string">'BUMPdata.BRBump1 %.1f\n'</span>, BRBump1);
+0335    fprintf(fid,<span class="string">'BUMPdata.BRBump2 %.1f\n'</span>, BRBump2);
+0336    fprintf(fid,<span class="string">'BUMPdata.BRBump3 %.1f\n'</span>, BRBump3);
+0337    fprintf(fid,<span class="string">'BUMPdata.BR2SEN %.1f\n'</span>, BR2SEN);
+0338    fprintf(fid,<span class="string">'BUMPdata.BR2SENTiming %.0f\n'</span>, BR2SENTiming);
+0339    fprintf(fid,<span class="string">'BUMPdata.BR2SEK %.1f\n'</span>, BR2SEK);
+0340    fprintf(fid,<span class="string">'BUMPdata.BR2SEKTiming %.0f\n'</span>, BR2SEKTiming);
+0341    fprintf(fid,<span class="string">'BUMPdata.BR2KE %.1f\n'</span>, BR2KE);
+0342    fprintf(fid,<span class="string">'BUMPdata.BR2KETiming %.0f\n'</span>, BR2KETiming);
+0343    fprintf(fid,<span class="string">'BUMPdata.ExtFldTrigTiming %.0f\n'</span>, ExtFldTrigTiming);
+0344    fprintf(fid,<span class="string">'BUMPdata.BRBumpTrigTiming %.0f\n'</span>, BRBumpTrigTiming);
+0345    fprintf(fid,<span class="string">'BUMPdata.SRSEK %.1f\n'</span>, SRSEK);
+0346    fprintf(fid,<span class="string">'BUMPdata.SRSEKTiming %.0f\n'</span>, SRSEKTiming);
+0347    fprintf(fid,<span class="string">'BUMPdata.SRSEN %.1f\n'</span>, SRSEN);
+0348    fprintf(fid,<span class="string">'BUMPdata.SRSENTiming %.0f\n'</span>, SRSENTiming);
+0349    fprintf(fid,<span class="string">'BUMPdata.SRBUMP1 %.1f\n'</span>, SRBUMP1);
+0350    fprintf(fid,<span class="string">'BUMPdata.SRBUMP1Timing %.0f\n'</span>, SRBUMP1Timing);
+0351    
+0352    fprintf(fid,<span class="string">'TFBdata.X1Bias %.2f\n'</span>, X1Bias);
+0353    fprintf(fid,<span class="string">'TFBdata.Y1Bias %.2f\n'</span>, Y1Bias);
+0354    fprintf(fid,<span class="string">'TFBdata.X2Bias %.2f\n'</span>, X2Bias);
+0355    fprintf(fid,<span class="string">'TFBdata.Y2Bias %.2f\n'</span>, Y2Bias);
+0356    fprintf(fid,<span class="string">'TFBdata.XAtten %.0f\n'</span>, XAtten);
+0357    fprintf(fid,<span class="string">'TFBdata.YAtten %.0f\n'</span>, YAtten);
+0358    fprintf(fid,<span class="string">'TFBdata.XDelay %.0f\n'</span>, XDelay);
+0359    fprintf(fid,<span class="string">'TFBdata.YDelay %.0f\n'</span>, YDelay);
+0360    
+0361    fprintf(fid,<span class="string">'LFBdata.FrontEndDelay %.0f\n'</span>, FrontEndDelay);
+0362    fprintf(fid,<span class="string">'LFBdata.FEPhaseOffset %.0f\n'</span>, FEPhaseOffset);
+0363    fprintf(fid,<span class="string">'LFBdata.FEPhaseShift %.0f\n'</span>, FEPhaseShift);
+0364    fprintf(fid,<span class="string">'LFBdata.FEGainSign %s\n'</span>, FEGainSign);
+0365    fprintf(fid,<span class="string">'LFBdata.BackEndDelay %.0f\n'</span>, BackEndDelay);
+0366    fprintf(fid,<span class="string">'LFBdata.QPSKAtten %.0f\n'</span>, QPSKAtten);
+0367    fprintf(fid,<span class="string">'LFBdata.FillPattern %s\n'</span>, FillPattern);
+0368    fprintf(fid,<span class="string">'LFBdata.SynchrotronFreq %.0f\n'</span>, SynchrotronFreq);
+0369    fprintf(fid,<span class="string">'LFBdata.CalculatedSynchrotronFreq %.0f\n'</span>, CalculatedSynchrotronFreq); 
+0370    fprintf(fid,<span class="string">'LFBdata.RingShift %.0f\n'</span>, RingShift);
+0371    fprintf(fid,<span class="string">'LFBdata.HoldBufferOffset %.0f\n'</span>, HoldBufferOffset);
+0372    fprintf(fid,<span class="string">'LFBdata.MinDSPTime %.0f\n'</span>, MinDSPTime);
+0373    fprintf(fid,<span class="string">'LFBdata.ShiftGain %.0f\n'</span>, ShiftGain);
+0374    <span class="comment">%fprintf(fid,'LFBdata.FilterPhase %.0f\n', FilterPhase);</span>
+0375    
+0376    fprintf(fid,<span class="string">'THCdata.THC1MainAC %.3f\n'</span>, THC1MainAC);
+0377    fprintf(fid,<span class="string">'THCdata.THC1MainAM %.3f\n'</span>, THC1MainAM);
+0378 <span class="comment">%  fprintf(fid,'THCdata.THC1AuxAC %.3f\n', THC1AuxAC);</span>
+0379 <span class="comment">%  fprintf(fid,'THCdata.THC1AuxAM %.3f\n', THC1AuxAM);</span>
+0380    fprintf(fid,<span class="string">'THCdata.THC2MainAC %.3f\n'</span>, THC2MainAC);
+0381    fprintf(fid,<span class="string">'THCdata.THC2MainAM %.3f\n'</span>, THC2MainAM);
+0382 <span class="comment">%  fprintf(fid,'THCdata.THC2AuxAC %.3f\n', THC2AuxAC);</span>
+0383 <span class="comment">%  fprintf(fid,'THCdata.THC2AuxAM %.3f\n', THC2AuxAM);</span>
+0384    fprintf(fid,<span class="string">'THCdata.THC3MainAC %.3f\n'</span>, THC3MainAC);
+0385    fprintf(fid,<span class="string">'THCdata.THC3MainAM %.3f\n'</span>, THC3MainAM);
+0386 <span class="comment">%  fprintf(fid,'THCdata.THC3AuxAC %.3f\n', THC3AuxAC);</span>
+0387 <span class="comment">%  fprintf(fid,'THCdata.THC3AuxAM %.3f\n', THC3AuxAM);</span>
+0388    fprintf(fid,<span class="string">'beamcurrent %.3f\n'</span>, beamcurrent);
+0389    <span class="comment">%close file</span>
+0390    fclose(fid);
+0391    
+0392 <span class="keyword">end</span>
+0393 
+0394 <span class="comment">% Output</span>
+0395 fprintf(<span class="string">'\n  %.1f GeV goldenpage parameters saved to %s/%s.\n\n'</span>, GLOBAL_SR_GEV, pwd, FileName);
+0396 
+0397 
+0398 <span class="comment">% Return to original directory</span>
+0399 feval(<span class="string">'cd'</span>, tmpdir);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

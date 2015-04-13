@@ -1,0 +1,870 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getdates</title>
+  <meta name="keywords" content="getdates">
+  <meta name="description" content="'GETDATES' RETURNS THE DAYS BETWEEN TWO DATES USING THE GREGORIAN">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; getdates.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getdates
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>'GETDATES' RETURNS THE DAYS BETWEEN TWO DATES USING THE GREGORIAN</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [varargout] = getdates(startdate, enddate, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> 'GETDATES' RETURNS THE DAYS BETWEEN TWO DATES USING THE GREGORIAN 
+ CALENDAR SYSTEM AND CAN FILTER RESULTS BASED ON DAY AND DATE INCLUSION OR
+ EXCLUSION CRITERIA.
+
+ VARARGOUT = getdates(STARTDATE, ENDDATE, VARARGIN)
+
+ STARTDATE input may be a string of format 'YYYYMMDD' or a numeric scalar
+ of format YYYYMMDD.
+
+ ENDDATE input may be a string of format 'YYYYMMDD' or a numeric scalar of
+ format YYYYMMDD.
+
+ VARARGIN optional input may be used to specify output formats as well as
+ filtering criteria (see description below).
+
+ -------------------------------------------------------------------------
+ OUTPUTS MAY BE SPECIFIED IN ONE OF TWO WAYS:
+
+ 1.) OUTPUT SINGLE STRUCTURE (default)
+
+ [OUTPUT] = getdates(STARTDATE, ENDDATE, VARARGIN)
+
+ OUTPUT.dates -- 
+ Contains the dates from STARTDATE up to and including ENDDATE. Each entry
+ in this field may be in {'YYYYMMDD'} (cell string), 'YYYYMMDD' (character
+ array), or YYYYMMDD (numeric) format depending on the formatting
+ specified through VARARGIN optional input. If format is not specified,
+ the default for this field is numeric YYYYMMDD.
+ 
+ OUTPUT.days --
+ Contains the days for each date. Possible formats are cell string,
+ character array, or numeric depending on the formatting specified through
+ VARARGIN. If format is not specified, the default for this field is
+ numeric. (See VARARGIN description below.)
+
+ 2.) OUTPUT SEPARATE ARRAYS
+
+ [DATES, DAYS] = getdates(STARTDATE, ENDDATE, VARARGIN)
+ 
+ DATES will be a column array containing the dates from STARTDATE up to
+ and including ENDDATE. Each entry in DATES may be formatted {'YYYYMMDD'}
+ (cell string), 'YYYYMMDD' (character array), or YYYYMMDD (numeric array)
+ format depending on VARARGIN optional input. DATES may be ascending or
+ descending depending on the order that STARTDATE and ENDDATE are
+ specified. If format is not specified, the default is numeric YYYYMMDD.
+
+ DAYS will be a column array containing the days for each date. DAYS may
+ be a cell array of strings, a character array, or a numeric array,
+ depending on the formatting specified through VARARGIN. If format is not
+ specified, the default is numeric (see table below).
+
+ -------------------------------------------------------------------------
+ VARARGIN SETTINGS
+
+ Output formatting and day/date filtering criteria may be specified
+ through VARARGIN optional input. VARARGIN settings should be specified
+ using Property/Value pairs. Properties should always be specified as
+ strings. Values may be specified as strings, matrices, or cells depending
+ on the property being set.
+
+ -------------------------------------------------------------------------
+ 'DATEFORMAT' property determines the formatting for output dates. It may
+ be set to one of the following strings:
+
+ 'cellstring'  -- Output dates will be a cell array of strings with format
+                   {'YYYYMMDD'}.
+ 'char'        -- Output dates will be a character array with format
+                   ['YYYYMMDD'].
+ 'numeric'     -- Output dates will be a numeric array with format
+                   [YYYYMMDD] (default).
+
+ -------------------------------------------------------------------------
+ 'DAYFORMAT' property determines the formatting for output days. It may be
+ set to one of the following strings:
+
+ 'cellstring'  -- Output days will be returned as a cell array of strings
+                   {'mon'}
+                   {'tue'}
+                   {'wed'}
+                   {'thu'}
+                   {'fri'}
+                   {'sat'}
+                   {'sun'}
+
+ 'char'        -- Output days will be returned as a character array
+                   ['mon']
+                   ['tue']
+                   ['wed']
+                   ['thu']
+                   ['fri']
+                   ['sat']
+                   ['sun']
+
+ 'numeric'     -- Output days will be returned as a numeric array
+                   [1] = Mon
+                   [2] = Tue
+                   [3] = Wed
+                   [4] = Thu
+                   [5] = Fri
+                   [6] = Sat
+                   [7] = Sun
+                   (default)
+
+ -------------------------------------------------------------------------
+ 'INCLUDEDAYS' property may be used to specify which days will be returned
+ by the output, excluding all other dates which do not fall on the
+ specified day(s). This property must be set using a numeric vector.
+
+ Example:
+ If 'includedays' is set to [2 6 7], only the dates which fall on a
+ Tuesday, Saturday, and Sunday will be included in the output. All other
+ dates will be omitted. (Refer to numeric table in the 'DAYFORMAT'
+ property above.)
+
+ -------------------------------------------------------------------------
+ 'EXCLUDEDAYS' property may be used to specify which days will be excluded
+ from the output, returning all other dates which do not fall on the
+ specified day(s). This property must be set using a numeric vector.
+
+ Example:
+ If 'excludedays' is set to [4 6], all dates that fall on a Thursday or
+ Saturday will be excluded from the output. The output will only contain
+ dates that fall on the remaining days (Monday, Tuesday, Wednesday,
+ Friday, Sunday). (Refer to numeric table in the 'DAYFORMAT' property
+ above.)
+
+ -------------------------------------------------------------------------
+ NOTE: THE 'INCLUDEDAYS' AND 'EXCLUDEDAYS' PROPERTIES ARE MUTUALLY
+ EXCLUSIVE. IF USED, YOU MUST SPECIFY ONE *OR* THE OTHER, BUT NOT BOTH.
+ ATTEMPTING TO SET BOTH PROPERTIES AT THE SAME TIME WILL RESULT IN AN
+ ERROR.
+ 
+ -------------------------------------------------------------------------
+ 'BLACKOUTDATES' property may be used to specify which dates will be
+ excluded from the output. This property may be specified using a cell
+ array of strings of format {'YYYYMMDD'}, a character array of format
+ ['YYYYMMDD'], a numeric array of format [YYYYMMDD], or a numeric cell
+ array of format {YYYYMMDD}. Multiple &quot;blackout&quot; dates may be specified
+ and are applied IN ADDITION TO the 'INCLUDEDAYS' or 'EXCLUDEDAYS'
+ filters.
+
+ Example:
+ If 'blackoutdates' is set to: [20070821, 20080119, 20080229] -- after the
+ 'INCLUDEDAYS' or 'EXCLUDEDAYS' criteria have been applied, these dates,
+ if still present, will be purged from the output.
+
+ -------------------------------------------------------------------------
+ USAGE EXAMPLES:
+
+ 1.) Return a date/day structure from August 15, 2007 through February 6, 
+       2008 using default settings:
+
+       [mystruct] = getdates('20070815','20080206');
+
+ 2.) Return dates and days from August 15, 2007 through February 6, 2008 
+       that fall on a Monday through Friday:
+
+       [dates,days] = getdates(20070815,20080206,'includedays',[1:5]);
+
+ 3.) Return dates and days from August 15, 2007 through April 28, 2010,
+       excluding any days that fall on a Wednesday or Sunday:
+
+       [dates,days] = getdates('20070815',20100428,'excludedays',[3 7]);
+
+ 4.) Return dates and days from January 1, 2007 through January 6, 2008.
+       Display day names as characters. Exclude the following dates:
+       2007-05-20, 2007-11-04, 2008-01-01. Only include dates that fall on
+       a Tuesday, Thursday, Friday, and Sunday:
+
+       [dates,days] = getdates(20070101,'20080106','dayformat','char',...
+                       'blackoutdates',[20070520 20071104 20080101],...
+                       'includedays',[2 4 5 7]);
+
+                                                             Adrian Abordo
+                                                        Revised 2008-02-25</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="year.html" class="code" title="function y = year(d)">year</a>	Return the year, given a string date</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [dates] = spandates(startdate,enddate,varargin)</a></li><li><a href="#_sub2" class="code">function [days] = daysbetweendates(startdate,enddate)</a></li><li><a href="#_sub3" class="code">function [days] = daysbetweenyears(startyear,endyear)</a></li><li><a href="#_sub4" class="code">function [days] = dayswithinyear(inputdate)</a></li><li><a href="#_sub5" class="code">function [leap] = isleap(year)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [varargout] = getdates(startdate, enddate, varargin)</a>
+0002 
+0003 <span class="comment">% 'GETDATES' RETURNS THE DAYS BETWEEN TWO DATES USING THE GREGORIAN</span>
+0004 <span class="comment">% CALENDAR SYSTEM AND CAN FILTER RESULTS BASED ON DAY AND DATE INCLUSION OR</span>
+0005 <span class="comment">% EXCLUSION CRITERIA.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% VARARGOUT = getdates(STARTDATE, ENDDATE, VARARGIN)</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% STARTDATE input may be a string of format 'YYYYMMDD' or a numeric scalar</span>
+0010 <span class="comment">% of format YYYYMMDD.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% ENDDATE input may be a string of format 'YYYYMMDD' or a numeric scalar of</span>
+0013 <span class="comment">% format YYYYMMDD.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% VARARGIN optional input may be used to specify output formats as well as</span>
+0016 <span class="comment">% filtering criteria (see description below).</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% -------------------------------------------------------------------------</span>
+0019 <span class="comment">% OUTPUTS MAY BE SPECIFIED IN ONE OF TWO WAYS:</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% 1.) OUTPUT SINGLE STRUCTURE (default)</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% [OUTPUT] = getdates(STARTDATE, ENDDATE, VARARGIN)</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% OUTPUT.dates --</span>
+0026 <span class="comment">% Contains the dates from STARTDATE up to and including ENDDATE. Each entry</span>
+0027 <span class="comment">% in this field may be in {'YYYYMMDD'} (cell string), 'YYYYMMDD' (character</span>
+0028 <span class="comment">% array), or YYYYMMDD (numeric) format depending on the formatting</span>
+0029 <span class="comment">% specified through VARARGIN optional input. If format is not specified,</span>
+0030 <span class="comment">% the default for this field is numeric YYYYMMDD.</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% OUTPUT.days --</span>
+0033 <span class="comment">% Contains the days for each date. Possible formats are cell string,</span>
+0034 <span class="comment">% character array, or numeric depending on the formatting specified through</span>
+0035 <span class="comment">% VARARGIN. If format is not specified, the default for this field is</span>
+0036 <span class="comment">% numeric. (See VARARGIN description below.)</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">% 2.) OUTPUT SEPARATE ARRAYS</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">% [DATES, DAYS] = getdates(STARTDATE, ENDDATE, VARARGIN)</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">% DATES will be a column array containing the dates from STARTDATE up to</span>
+0043 <span class="comment">% and including ENDDATE. Each entry in DATES may be formatted {'YYYYMMDD'}</span>
+0044 <span class="comment">% (cell string), 'YYYYMMDD' (character array), or YYYYMMDD (numeric array)</span>
+0045 <span class="comment">% format depending on VARARGIN optional input. DATES may be ascending or</span>
+0046 <span class="comment">% descending depending on the order that STARTDATE and ENDDATE are</span>
+0047 <span class="comment">% specified. If format is not specified, the default is numeric YYYYMMDD.</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">% DAYS will be a column array containing the days for each date. DAYS may</span>
+0050 <span class="comment">% be a cell array of strings, a character array, or a numeric array,</span>
+0051 <span class="comment">% depending on the formatting specified through VARARGIN. If format is not</span>
+0052 <span class="comment">% specified, the default is numeric (see table below).</span>
+0053 <span class="comment">%</span>
+0054 <span class="comment">% -------------------------------------------------------------------------</span>
+0055 <span class="comment">% VARARGIN SETTINGS</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">% Output formatting and day/date filtering criteria may be specified</span>
+0058 <span class="comment">% through VARARGIN optional input. VARARGIN settings should be specified</span>
+0059 <span class="comment">% using Property/Value pairs. Properties should always be specified as</span>
+0060 <span class="comment">% strings. Values may be specified as strings, matrices, or cells depending</span>
+0061 <span class="comment">% on the property being set.</span>
+0062 <span class="comment">%</span>
+0063 <span class="comment">% -------------------------------------------------------------------------</span>
+0064 <span class="comment">% 'DATEFORMAT' property determines the formatting for output dates. It may</span>
+0065 <span class="comment">% be set to one of the following strings:</span>
+0066 <span class="comment">%</span>
+0067 <span class="comment">% 'cellstring'  -- Output dates will be a cell array of strings with format</span>
+0068 <span class="comment">%                   {'YYYYMMDD'}.</span>
+0069 <span class="comment">% 'char'        -- Output dates will be a character array with format</span>
+0070 <span class="comment">%                   ['YYYYMMDD'].</span>
+0071 <span class="comment">% 'numeric'     -- Output dates will be a numeric array with format</span>
+0072 <span class="comment">%                   [YYYYMMDD] (default).</span>
+0073 <span class="comment">%</span>
+0074 <span class="comment">% -------------------------------------------------------------------------</span>
+0075 <span class="comment">% 'DAYFORMAT' property determines the formatting for output days. It may be</span>
+0076 <span class="comment">% set to one of the following strings:</span>
+0077 <span class="comment">%</span>
+0078 <span class="comment">% 'cellstring'  -- Output days will be returned as a cell array of strings</span>
+0079 <span class="comment">%                   {'mon'}</span>
+0080 <span class="comment">%                   {'tue'}</span>
+0081 <span class="comment">%                   {'wed'}</span>
+0082 <span class="comment">%                   {'thu'}</span>
+0083 <span class="comment">%                   {'fri'}</span>
+0084 <span class="comment">%                   {'sat'}</span>
+0085 <span class="comment">%                   {'sun'}</span>
+0086 <span class="comment">%</span>
+0087 <span class="comment">% 'char'        -- Output days will be returned as a character array</span>
+0088 <span class="comment">%                   ['mon']</span>
+0089 <span class="comment">%                   ['tue']</span>
+0090 <span class="comment">%                   ['wed']</span>
+0091 <span class="comment">%                   ['thu']</span>
+0092 <span class="comment">%                   ['fri']</span>
+0093 <span class="comment">%                   ['sat']</span>
+0094 <span class="comment">%                   ['sun']</span>
+0095 <span class="comment">%</span>
+0096 <span class="comment">% 'numeric'     -- Output days will be returned as a numeric array</span>
+0097 <span class="comment">%                   [1] = Mon</span>
+0098 <span class="comment">%                   [2] = Tue</span>
+0099 <span class="comment">%                   [3] = Wed</span>
+0100 <span class="comment">%                   [4] = Thu</span>
+0101 <span class="comment">%                   [5] = Fri</span>
+0102 <span class="comment">%                   [6] = Sat</span>
+0103 <span class="comment">%                   [7] = Sun</span>
+0104 <span class="comment">%                   (default)</span>
+0105 <span class="comment">%</span>
+0106 <span class="comment">% -------------------------------------------------------------------------</span>
+0107 <span class="comment">% 'INCLUDEDAYS' property may be used to specify which days will be returned</span>
+0108 <span class="comment">% by the output, excluding all other dates which do not fall on the</span>
+0109 <span class="comment">% specified day(s). This property must be set using a numeric vector.</span>
+0110 <span class="comment">%</span>
+0111 <span class="comment">% Example:</span>
+0112 <span class="comment">% If 'includedays' is set to [2 6 7], only the dates which fall on a</span>
+0113 <span class="comment">% Tuesday, Saturday, and Sunday will be included in the output. All other</span>
+0114 <span class="comment">% dates will be omitted. (Refer to numeric table in the 'DAYFORMAT'</span>
+0115 <span class="comment">% property above.)</span>
+0116 <span class="comment">%</span>
+0117 <span class="comment">% -------------------------------------------------------------------------</span>
+0118 <span class="comment">% 'EXCLUDEDAYS' property may be used to specify which days will be excluded</span>
+0119 <span class="comment">% from the output, returning all other dates which do not fall on the</span>
+0120 <span class="comment">% specified day(s). This property must be set using a numeric vector.</span>
+0121 <span class="comment">%</span>
+0122 <span class="comment">% Example:</span>
+0123 <span class="comment">% If 'excludedays' is set to [4 6], all dates that fall on a Thursday or</span>
+0124 <span class="comment">% Saturday will be excluded from the output. The output will only contain</span>
+0125 <span class="comment">% dates that fall on the remaining days (Monday, Tuesday, Wednesday,</span>
+0126 <span class="comment">% Friday, Sunday). (Refer to numeric table in the 'DAYFORMAT' property</span>
+0127 <span class="comment">% above.)</span>
+0128 <span class="comment">%</span>
+0129 <span class="comment">% -------------------------------------------------------------------------</span>
+0130 <span class="comment">% NOTE: THE 'INCLUDEDAYS' AND 'EXCLUDEDAYS' PROPERTIES ARE MUTUALLY</span>
+0131 <span class="comment">% EXCLUSIVE. IF USED, YOU MUST SPECIFY ONE *OR* THE OTHER, BUT NOT BOTH.</span>
+0132 <span class="comment">% ATTEMPTING TO SET BOTH PROPERTIES AT THE SAME TIME WILL RESULT IN AN</span>
+0133 <span class="comment">% ERROR.</span>
+0134 <span class="comment">%</span>
+0135 <span class="comment">% -------------------------------------------------------------------------</span>
+0136 <span class="comment">% 'BLACKOUTDATES' property may be used to specify which dates will be</span>
+0137 <span class="comment">% excluded from the output. This property may be specified using a cell</span>
+0138 <span class="comment">% array of strings of format {'YYYYMMDD'}, a character array of format</span>
+0139 <span class="comment">% ['YYYYMMDD'], a numeric array of format [YYYYMMDD], or a numeric cell</span>
+0140 <span class="comment">% array of format {YYYYMMDD}. Multiple &quot;blackout&quot; dates may be specified</span>
+0141 <span class="comment">% and are applied IN ADDITION TO the 'INCLUDEDAYS' or 'EXCLUDEDAYS'</span>
+0142 <span class="comment">% filters.</span>
+0143 <span class="comment">%</span>
+0144 <span class="comment">% Example:</span>
+0145 <span class="comment">% If 'blackoutdates' is set to: [20070821, 20080119, 20080229] -- after the</span>
+0146 <span class="comment">% 'INCLUDEDAYS' or 'EXCLUDEDAYS' criteria have been applied, these dates,</span>
+0147 <span class="comment">% if still present, will be purged from the output.</span>
+0148 <span class="comment">%</span>
+0149 <span class="comment">% -------------------------------------------------------------------------</span>
+0150 <span class="comment">% USAGE EXAMPLES:</span>
+0151 <span class="comment">%</span>
+0152 <span class="comment">% 1.) Return a date/day structure from August 15, 2007 through February 6,</span>
+0153 <span class="comment">%       2008 using default settings:</span>
+0154 <span class="comment">%</span>
+0155 <span class="comment">%       [mystruct] = getdates('20070815','20080206');</span>
+0156 <span class="comment">%</span>
+0157 <span class="comment">% 2.) Return dates and days from August 15, 2007 through February 6, 2008</span>
+0158 <span class="comment">%       that fall on a Monday through Friday:</span>
+0159 <span class="comment">%</span>
+0160 <span class="comment">%       [dates,days] = getdates(20070815,20080206,'includedays',[1:5]);</span>
+0161 <span class="comment">%</span>
+0162 <span class="comment">% 3.) Return dates and days from August 15, 2007 through April 28, 2010,</span>
+0163 <span class="comment">%       excluding any days that fall on a Wednesday or Sunday:</span>
+0164 <span class="comment">%</span>
+0165 <span class="comment">%       [dates,days] = getdates('20070815',20100428,'excludedays',[3 7]);</span>
+0166 <span class="comment">%</span>
+0167 <span class="comment">% 4.) Return dates and days from January 1, 2007 through January 6, 2008.</span>
+0168 <span class="comment">%       Display day names as characters. Exclude the following dates:</span>
+0169 <span class="comment">%       2007-05-20, 2007-11-04, 2008-01-01. Only include dates that fall on</span>
+0170 <span class="comment">%       a Tuesday, Thursday, Friday, and Sunday:</span>
+0171 <span class="comment">%</span>
+0172 <span class="comment">%       [dates,days] = getdates(20070101,'20080106','dayformat','char',...</span>
+0173 <span class="comment">%                       'blackoutdates',[20070520 20071104 20080101],...</span>
+0174 <span class="comment">%                       'includedays',[2 4 5 7]);</span>
+0175 <span class="comment">%</span>
+0176 <span class="comment">%                                                             Adrian Abordo</span>
+0177 <span class="comment">%                                                        Revised 2008-02-25</span>
+0178 
+0179 <span class="comment">% -------------------------------------------------------------------------</span>
+0180 <span class="comment">% Begin core algorithm:</span>
+0181 <span class="keyword">if</span> ischar(startdate) == 1,
+0182     sy = str2double(startdate(1:4));
+0183     sm = str2double(startdate(5:6));
+0184     sd = str2double(startdate(7:8));
+0185     century = str2double(startdate(1:2));
+0186     <a href="year.html" class="code" title="function y = year(d)">year</a> = str2double(startdate(3:4));
+0187     startdate = str2double(startdate);
+0188 <span class="keyword">else</span>
+0189     startdate = num2str(startdate);
+0190     sy = str2double(startdate(1:4));
+0191     sm = str2double(startdate(5:6));
+0192     sd = str2double(startdate(7:8));
+0193     century = str2double(startdate(1:2));
+0194     <a href="year.html" class="code" title="function y = year(d)">year</a> = str2double(startdate(3:4));
+0195     startdate = str2double(startdate);
+0196 <span class="keyword">end</span>
+0197 <span class="keyword">if</span> ischar(enddate) == 1,
+0198     enddate = str2double(enddate);
+0199 <span class="keyword">end</span>
+0200 
+0201 <span class="keyword">switch</span> sm,
+0202     <span class="keyword">case</span> 1,
+0203         <span class="keyword">if</span> <a href="#_sub5" class="code" title="subfunction [leap] = isleap(year)">isleap</a>(sy) == 0,
+0204             mc = 0;
+0205         <span class="keyword">else</span>
+0206             mc = 6;
+0207         <span class="keyword">end</span>
+0208     <span class="keyword">case</span> 2,
+0209         <span class="keyword">if</span> <a href="#_sub5" class="code" title="subfunction [leap] = isleap(year)">isleap</a>(sy) == 0,
+0210             mc = 3;
+0211         <span class="keyword">else</span>
+0212             mc = 2;
+0213         <span class="keyword">end</span>
+0214     <span class="keyword">case</span> 3,
+0215         mc = 3;
+0216     <span class="keyword">case</span> 4,
+0217         mc = 6;
+0218     <span class="keyword">case</span> 5,
+0219         mc = 1;
+0220     <span class="keyword">case</span> 6,
+0221         mc = 4;
+0222     <span class="keyword">case</span> 7,
+0223         mc = 6;
+0224     <span class="keyword">case</span> 8,
+0225         mc = 2;
+0226     <span class="keyword">case</span> 9,
+0227         mc = 5;
+0228     <span class="keyword">case</span> 10,
+0229         mc = 0;
+0230     <span class="keyword">case</span> 11,
+0231         mc = 3;
+0232     <span class="keyword">case</span> 12,
+0233         mc = 5;
+0234 <span class="keyword">end</span>
+0235 c = (3 - mod(century,4)) * 2;
+0236 y = <a href="year.html" class="code" title="function y = year(d)">year</a> + floor(<a href="year.html" class="code" title="function y = year(d)">year</a>/4);
+0237 daysum = c + y + mc + sd;
+0238 sdcode = mod(daysum,7);
+0239 
+0240 dates = <a href="#_sub1" class="code" title="subfunction [dates] = spandates(startdate,enddate,varargin)">spandates</a>(startdate,enddate);
+0241 daycodes = ones(size(dates))*NaN;
+0242 <span class="keyword">for</span> k = 1:7,    
+0243     daycodes(k:7:end) = sdcode;
+0244     <span class="keyword">if</span> startdate &lt;= enddate,
+0245         <span class="keyword">if</span> sdcode &lt; 6,
+0246             sdcode = sdcode + 1;
+0247         <span class="keyword">else</span>
+0248             sdcode = 0;
+0249         <span class="keyword">end</span>
+0250     <span class="keyword">else</span>
+0251         <span class="keyword">if</span> sdcode &gt; 0,
+0252             sdcode = sdcode - 1;
+0253         <span class="keyword">else</span>
+0254             sdcode = 6;
+0255         <span class="keyword">end</span>        
+0256     <span class="keyword">end</span>
+0257 <span class="keyword">end</span>
+0258 daycodes(daycodes == 0) = 7;
+0259 <span class="comment">% End core algorithm</span>
+0260 <span class="comment">% -------------------------------------------------------------------------</span>
+0261 
+0262 dateformat = <span class="string">'numeric'</span>;
+0263 dayformat = <span class="string">'numeric'</span>;
+0264 <span class="keyword">if</span> isempty(varargin) == 0,        
+0265     varargin_property_names = cell(1,3);
+0266     varargin_property_values = cell(1,3);
+0267     matchindex = 0;
+0268     <span class="keyword">for</span> k = 1:length(varargin),
+0269         <span class="keyword">if</span> ischar(varargin{k}) == 1,
+0270             varargin{k} = lower(varargin{k});
+0271             <span class="comment">% Check for VARARGIN filtering criteria first</span>
+0272             I = strmatch(varargin{k},{<span class="string">'includedays'</span> <span class="string">'excludedays'</span><span class="keyword">...</span>
+0273                 <span class="string">'blackoutdates'</span>});
+0274             <span class="keyword">if</span> isempty(I) == 0,
+0275                 matchindex = matchindex + 1;
+0276                 varargin_property_names{matchindex} = varargin{k};
+0277                 varargin_property_values{matchindex} = varargin{k + 1};
+0278             <span class="keyword">end</span>
+0279             <span class="comment">% Check for VARARGIN formatting criteria next</span>
+0280             <span class="keyword">if</span> strcmp(varargin{k},<span class="string">'dateformat'</span>) == 1,
+0281                 dateformat = lower(varargin{k+1});
+0282             <span class="keyword">elseif</span> strcmp(varargin{k},<span class="string">'dayformat'</span>) == 1,
+0283                 dayformat = lower(varargin{k+1});
+0284             <span class="keyword">end</span>
+0285         <span class="keyword">end</span>
+0286     <span class="keyword">end</span>
+0287     varargin_property_names = {varargin_property_names{1:matchindex}};
+0288     varargin_property_values = {varargin_property_values{1:matchindex}};
+0289     
+0290     <span class="comment">% check for filtering conflicts</span>
+0291     I1 = strmatch(<span class="string">'includedays'</span>,varargin_property_names);
+0292     I2 = strmatch(<span class="string">'excludedays'</span>,varargin_property_names);
+0293     <span class="keyword">if</span> isempty(I1) == 0 &amp;&amp; isempty(I2) == 0,
+0294         error([<span class="string">'VARARGIN ''includedays'' and ''excludedays'' settings '</span><span class="keyword">...</span>
+0295             <span class="string">'cannot both be specified at the same time. Choose one or '</span><span class="keyword">...</span>
+0296             <span class="string">'the other.'</span>])
+0297     <span class="keyword">end</span>
+0298     
+0299     <span class="comment">% Remove blackoutdates first:</span>
+0300     I = strmatch(<span class="string">'blackoutdates'</span>,varargin_property_names);
+0301     <span class="keyword">if</span> isempty(I) == 0,
+0302         blackoutdates = varargin_property_values{I};
+0303         <span class="keyword">if</span> iscell(blackoutdates) == 1 &amp;&amp; iscellstr(blackoutdates) == 0,
+0304             blackoutdates = cell2mat(blackoutdates);
+0305         <span class="keyword">end</span>
+0306         <span class="keyword">if</span> iscellstr(blackoutdates) == 1,
+0307             blackoutdates = char(blackoutdates);
+0308         <span class="keyword">end</span>
+0309         <span class="keyword">if</span> ischar(blackoutdates) == 1,
+0310             blackoutdates = str2num(blackoutdates);
+0311         <span class="keyword">end</span>       
+0312         <span class="keyword">for</span> k = 1:length(blackoutdates),
+0313            dates(dates == blackoutdates(k)) = 0; 
+0314         <span class="keyword">end</span>
+0315         daycodes = daycodes(dates ~= 0);
+0316         dates = dates(dates ~= 0);
+0317     <span class="keyword">end</span>
+0318     
+0319     <span class="comment">% Satisfy includedays (if specified)</span>
+0320     I = strmatch(<span class="string">'includedays'</span>,varargin_property_names);
+0321     <span class="keyword">if</span> isempty(I) == 0,
+0322         includedays = varargin_property_values{I};
+0323         excludedays = setdiff(1:7,includedays);
+0324         <span class="keyword">for</span> k = 1:length(excludedays),
+0325            daycodes(daycodes == excludedays(k)) = 0;
+0326         <span class="keyword">end</span>
+0327         dates = dates(daycodes ~= 0);
+0328         daycodes = daycodes(daycodes ~= 0);
+0329     <span class="keyword">end</span>
+0330     
+0331     <span class="comment">% Satisfy excludedays (if specified)</span>
+0332     I = strmatch(<span class="string">'excludedays'</span>,varargin_property_names);
+0333     <span class="keyword">if</span> isempty(I) == 0,
+0334         excludedays = varargin_property_values{I};
+0335         <span class="keyword">for</span> k = 1:length(excludedays),
+0336            daycodes(daycodes == excludedays(k)) = 0;
+0337         <span class="keyword">end</span>
+0338         dates = dates(daycodes ~= 0);
+0339         daycodes = daycodes(daycodes ~= 0);
+0340     <span class="keyword">end</span>    
+0341 <span class="keyword">end</span>
+0342 
+0343 <span class="comment">% Assign day names (which may be needed later)</span>
+0344 daynames = zeros(length(dates),3);
+0345 mon = find(daycodes == 1);
+0346 tue = find(daycodes == 2);
+0347 wed = find(daycodes == 3);
+0348 thu = find(daycodes == 4);
+0349 fri = find(daycodes == 5);
+0350 sat = find(daycodes == 6);
+0351 sun = find(daycodes == 7);
+0352 daynames(mon,:) = repmat(<span class="string">'mon'</span>,length(mon),1);
+0353 daynames(tue,:) = repmat(<span class="string">'tue'</span>,length(tue),1);
+0354 daynames(wed,:) = repmat(<span class="string">'wed'</span>,length(wed),1);
+0355 daynames(thu,:) = repmat(<span class="string">'thu'</span>,length(thu),1);
+0356 daynames(fri,:) = repmat(<span class="string">'fri'</span>,length(fri),1);
+0357 daynames(sat,:) = repmat(<span class="string">'sat'</span>,length(sat),1);
+0358 daynames(sun,:) = repmat(<span class="string">'sun'</span>,length(sun),1);
+0359 daynames = char(daynames);
+0360 
+0361 <span class="keyword">if</span> nargout == 1 || nargout == 0,
+0362     <span class="comment">% pre-allocation</span>
+0363     outstruct(length(dates)).dates = NaN;
+0364     outstruct(length(dates)).days = NaN;
+0365     <span class="keyword">for</span> k = 1:length(dates),
+0366         <span class="keyword">switch</span> dateformat            
+0367             <span class="keyword">case</span> <span class="string">'cellstring'</span>
+0368                 outstruct(k).dates = cellstr(num2str(dates(k)));           
+0369             <span class="keyword">case</span> <span class="string">'char'</span>
+0370                 outstruct(k).dates = num2str(dates(k));
+0371             <span class="keyword">case</span> <span class="string">'numeric'</span>
+0372                 outstruct(k).dates = dates(k);
+0373             <span class="keyword">otherwise</span>
+0374                 error(<span class="string">'Invalid ''dateformat'' specified.'</span>)  
+0375         <span class="keyword">end</span>
+0376         <span class="keyword">switch</span> dayformat            
+0377             <span class="keyword">case</span> <span class="string">'cellstring'</span>
+0378                 outstruct(k).days = cellstr(daynames(k,:));           
+0379             <span class="keyword">case</span> <span class="string">'char'</span>
+0380                 outstruct(k).days = daynames(k,:);
+0381             <span class="keyword">case</span> <span class="string">'numeric'</span>
+0382                 outstruct(k).days = daycodes(k);
+0383             <span class="keyword">otherwise</span>
+0384                 error(<span class="string">'Invalid ''dayformat'' specified.'</span>)  
+0385         <span class="keyword">end</span>
+0386     <span class="keyword">end</span>
+0387     varargout = {outstruct};
+0388 <span class="keyword">elseif</span> nargout == 2,
+0389     <span class="keyword">switch</span> dateformat
+0390         <span class="keyword">case</span> <span class="string">'cellstring'</span>
+0391             dates = cellstr(num2str(dates));
+0392         <span class="keyword">case</span> <span class="string">'char'</span>
+0393             dates = num2str(dates);
+0394         <span class="keyword">case</span> <span class="string">'numeric'</span>
+0395             <span class="comment">% no need to do anything</span>
+0396         <span class="keyword">otherwise</span>
+0397             error(<span class="string">'Invalid ''dateformat'' specified.'</span>)
+0398     <span class="keyword">end</span>
+0399     varargout{1} = dates;
+0400     <span class="keyword">switch</span> dayformat
+0401         <span class="keyword">case</span> <span class="string">'cellstring'</span>
+0402             varargout{2} = cellstr(daynames);
+0403         <span class="keyword">case</span> <span class="string">'char'</span>
+0404             varargout{2} = daynames;
+0405         <span class="keyword">case</span> <span class="string">'numeric'</span>
+0406             varargout{2} = daycodes;
+0407         <span class="keyword">otherwise</span>
+0408             error(<span class="string">'Invalid ''dayformat'' specified.'</span>)
+0409     <span class="keyword">end</span>
+0410 <span class="keyword">elseif</span> nargout &gt; 2,
+0411     error(<span class="string">'Too many outputs specified.'</span>)
+0412 <span class="keyword">end</span>
+0413 
+0414 
+0415 <a name="_sub1" href="#_subfunctions" class="code">function [dates] = spandates(startdate,enddate,varargin)</a>
+0416 
+0417 <span class="comment">% 'SPANDATES' RETURNS THE CALENDAR DATES FROM STARTDATE TO ENDDATE.</span>
+0418 <span class="comment">%</span>
+0419 <span class="comment">% STARTDATE input may be a string of format 'YYYYMMDD' or a numeric scalar</span>
+0420 <span class="comment">% of format YYYYMMDD.</span>
+0421 <span class="comment">%</span>
+0422 <span class="comment">% ENDDATE input may be a string of format 'YYYYMMDD' or a numeric scalar</span>
+0423 <span class="comment">% of format YYYYMMDD.</span>
+0424 <span class="comment">%</span>
+0425 <span class="comment">% VARARGIN optional input may be used to specify the date format. If</span>
+0426 <span class="comment">% specified, it must be a string and may be one of three possible entries:</span>
+0427 <span class="comment">% 'cellstring' -- DATES output will be a vertical cell array of strings.</span>
+0428 <span class="comment">% 'char'       -- DATES output will be a vertical character array.</span>
+0429 <span class="comment">% 'numeric'    -- DATES output will be a vertical numeric vector (default).</span>
+0430 <span class="comment">%</span>
+0431 <span class="comment">% If VARARGIN is omitted, 'numeric' is assumed.</span>
+0432 <span class="comment">%</span>
+0433 <span class="comment">% DATES output will be a vertical array containing the dates from STARTDATE</span>
+0434 <span class="comment">% up to and including ENDDATE. Each entry in DATES will be formatted</span>
+0435 <span class="comment">% {'YYYYMMDD'}, 'YYYYMMDD', or YYYYMMDD depending on VARARGIN optional</span>
+0436 <span class="comment">% input. DATES will be a vertical array and may be ascending or descending</span>
+0437 <span class="comment">% depending on the order that STARTDATE and ENDDATE are specified.</span>
+0438 
+0439 <span class="keyword">if</span> ischar(startdate) == 1,
+0440     cy = str2double(startdate(1:4));
+0441     sm = str2double(startdate(5:6));
+0442     sd = str2double(startdate(7:8));
+0443     startdate = str2double(startdate);
+0444 <span class="keyword">else</span>
+0445     chardate = num2str(startdate);
+0446     cy = str2double(chardate(1:4));
+0447     sm = str2double(chardate(5:6));
+0448     sd = str2double(chardate(7:8));
+0449 <span class="keyword">end</span>
+0450 
+0451 <span class="keyword">if</span> ischar(enddate) == 1,
+0452     enddate = str2double(enddate);
+0453 <span class="keyword">end</span>
+0454 
+0455 <span class="keyword">if</span> enddate &lt; startdate,
+0456     dates = <a href="#_sub1" class="code" title="subfunction [dates] = spandates(startdate,enddate,varargin)">spandates</a>(enddate,startdate);
+0457     dates = flipud(dates);
+0458     <span class="keyword">return</span>    
+0459 <span class="keyword">end</span>
+0460       
+0461 numdays = <a href="#_sub2" class="code" title="subfunction [days] = daysbetweendates(startdate,enddate)">daysbetweendates</a>(startdate,enddate);
+0462 
+0463 <span class="comment">% pre-allocation</span>
+0464 dates = cell(numdays+1,1);
+0465 
+0466 k = 1;
+0467 <span class="keyword">while</span> true
+0468     <span class="keyword">if</span> <a href="#_sub5" class="code" title="subfunction [leap] = isleap(year)">isleap</a>(cy) == 0,
+0469         days_per_month = [31 28 31 30 31 30 31 31 30 31 30 31];
+0470     <span class="keyword">else</span>
+0471         days_per_month = [31 29 31 30 31 30 31 31 30 31 30 31];
+0472     <span class="keyword">end</span>   
+0473     <span class="keyword">for</span> cm = sm:12,        
+0474         <span class="keyword">for</span> cd = sd:days_per_month(cm),
+0475             dates{k} = [sprintf(<span class="string">'%04d'</span>,cy) sprintf(<span class="string">'%02d'</span>,cm)<span class="keyword">...</span>
+0476                 sprintf(<span class="string">'%02d'</span>,cd)];
+0477             <span class="keyword">if</span> str2double(dates{k}) &lt; enddate,
+0478                 k = k + 1;
+0479             <span class="keyword">else</span>
+0480                 <span class="keyword">if</span> isempty(varargin) == 0,
+0481                     dateformat = varargin{1};
+0482                     <span class="keyword">switch</span> lower(dateformat)
+0483                         <span class="keyword">case</span> <span class="string">'cellstring'</span>
+0484                             <span class="keyword">return</span>
+0485                         <span class="keyword">case</span> <span class="string">'char'</span>
+0486                             dates = char(dates);
+0487                             <span class="keyword">return</span>
+0488                         <span class="keyword">case</span> <span class="string">'numeric'</span>
+0489                             dates = char(dates);
+0490                             dates = str2num(dates);
+0491                             <span class="keyword">return</span>
+0492                         <span class="keyword">otherwise</span>
+0493                             error([<span class="string">'Invalid VARARGIN date format '</span><span class="keyword">...</span>
+0494                                 <span class="string">'specified.'</span>])
+0495                     <span class="keyword">end</span>
+0496                 <span class="keyword">else</span>
+0497                     dates = char(dates);
+0498                     dates = str2num(dates);
+0499                     <span class="keyword">return</span>
+0500                 <span class="keyword">end</span>
+0501             <span class="keyword">end</span>
+0502         <span class="keyword">end</span>
+0503         sd = 1;
+0504     <span class="keyword">end</span>    
+0505     sm = 1;
+0506     cy = cy + 1;
+0507 <span class="keyword">end</span>
+0508 
+0509 
+0510 <a name="_sub2" href="#_subfunctions" class="code">function [days] = daysbetweendates(startdate,enddate)</a>
+0511 
+0512 <span class="comment">% 'DAYSBETWEENDATES' CALCULATES THE NUMBER OF DAYS BETWEEN TWO DATES.</span>
+0513 <span class="comment">%</span>
+0514 <span class="comment">% 'STARTDATE' input may be a string of format 'YYYYMMDD' or a numeric</span>
+0515 <span class="comment">% scalar of format YYYYMMDD.</span>
+0516 <span class="comment">%</span>
+0517 <span class="comment">% 'ENDDATE' input may be a string of format 'YYYYMMDD' or a numeric</span>
+0518 <span class="comment">% scalar of format YYYYMMDD.</span>
+0519 <span class="comment">%</span>
+0520 <span class="comment">% DAYS output will be a numeric scalar specifying the number of days</span>
+0521 <span class="comment">% elapsed from STARTDATE 00:00 hour up to ENDDATE 00:00 hour.</span>
+0522 <span class="comment">%</span>
+0523 <span class="comment">% This function uses the Gregorian calendar system.</span>
+0524 
+0525 <span class="keyword">if</span> ischar(startdate) == 1,
+0526     sy = startdate(1:4);
+0527     startdate = str2double(startdate);
+0528 <span class="keyword">else</span>
+0529     chardate = num2str(startdate);
+0530     sy = chardate(1:4);   
+0531 <span class="keyword">end</span>
+0532 <span class="keyword">if</span> ischar(enddate) == 1,
+0533     ey = enddate(1:4);
+0534     enddate = str2double(enddate);   
+0535 <span class="keyword">else</span>
+0536     chardate = num2str(enddate);
+0537     ey = chardate(1:4);        
+0538 <span class="keyword">end</span>
+0539 <span class="keyword">if</span> enddate &lt; startdate,
+0540     days = <a href="#_sub2" class="code" title="subfunction [days] = daysbetweendates(startdate,enddate)">daysbetweendates</a>(enddate,startdate);
+0541     days = -days;
+0542     <span class="keyword">return</span>
+0543 <span class="keyword">end</span>
+0544 
+0545 days = <a href="#_sub3" class="code" title="subfunction [days] = daysbetweenyears(startyear,endyear)">daysbetweenyears</a>(sy,ey) + <a href="#_sub4" class="code" title="subfunction [days] = dayswithinyear(inputdate)">dayswithinyear</a>(enddate) - <span class="keyword">...</span>
+0546     <a href="#_sub4" class="code" title="subfunction [days] = dayswithinyear(inputdate)">dayswithinyear</a>(startdate);
+0547 
+0548 
+0549 <a name="_sub3" href="#_subfunctions" class="code">function [days] = daysbetweenyears(startyear,endyear)</a>
+0550 
+0551 <span class="comment">% 'DAYSBETWEENYEARS' CALCULATES THE NUMBER OF DAYS BETWEEN STARTYEAR AND</span>
+0552 <span class="comment">% ENDYEAR.</span>
+0553 <span class="comment">%</span>
+0554 <span class="comment">% STARTYEAR input must be a string or numeric scalar.</span>
+0555 <span class="comment">% ENDYEAR input must be a string or numeric scalar.</span>
+0556 <span class="comment">%</span>
+0557 <span class="comment">% DAYS output will be a scalar specifying the number of days elapsed from</span>
+0558 <span class="comment">% STARTYEAR January 1 00:00 hour to ENDYEAR January 1 00:00 hour.</span>
+0559 <span class="comment">%</span>
+0560 <span class="comment">% This function uses the Gregorian calendar system.</span>
+0561 
+0562 <span class="keyword">if</span> ischar(startyear) == 1,
+0563     startyear = str2double(startyear);
+0564 <span class="keyword">end</span>
+0565 
+0566 <span class="keyword">if</span> ischar(endyear) == 1,
+0567     endyear = str2double(endyear);
+0568 <span class="keyword">end</span>
+0569 
+0570 years = startyear:endyear-1;
+0571 
+0572 <span class="keyword">if</span> isempty(years) == 0,
+0573     leap = <a href="#_sub5" class="code" title="subfunction [leap] = isleap(year)">isleap</a>(years);
+0574     leap(leap == 0) = 365;
+0575     leap(leap == 1) = 366;
+0576     days = sum(leap);
+0577 <span class="keyword">else</span>
+0578     days = 0;
+0579 <span class="keyword">end</span>
+0580 
+0581 
+0582 <a name="_sub4" href="#_subfunctions" class="code">function [days] = dayswithinyear(inputdate)</a>
+0583 
+0584 <span class="comment">% 'DAYSWITHINYEAR' CALCULATES THE NUMBER OF DAYS ELAPSED FROM THE START OF</span>
+0585 <span class="comment">% THE INPUT YEAR UP TO THE SPECIFIED INPUT DATE.</span>
+0586 <span class="comment">%</span>
+0587 <span class="comment">% INPUTDATE may be a string of format 'YYYYMMDD' or a numeric scalar of</span>
+0588 <span class="comment">% format YYYYMMDD.</span>
+0589 <span class="comment">%</span>
+0590 <span class="comment">% DAYS output will be a scalar specifying the number of days elapsed from</span>
+0591 <span class="comment">% January 1 00:00 hour of the input year up to the start (00:00 hour) of</span>
+0592 <span class="comment">% the specified input date.</span>
+0593 <span class="comment">%</span>
+0594 <span class="comment">% This function uses the Gregorian calendar system.</span>
+0595 
+0596 <span class="keyword">if</span> ischar(inputdate) == 1,
+0597     y = str2double(inputdate(1:4));
+0598     m = str2double(inputdate(5:6));
+0599     d = str2double(inputdate(7:8));
+0600 <span class="keyword">else</span>
+0601     inputdate = num2str(inputdate);
+0602     days = <a href="#_sub4" class="code" title="subfunction [days] = dayswithinyear(inputdate)">dayswithinyear</a>(inputdate);
+0603     <span class="keyword">return</span>
+0604 <span class="keyword">end</span>
+0605 
+0606 <span class="keyword">if</span> <a href="#_sub5" class="code" title="subfunction [leap] = isleap(year)">isleap</a>(y) == 0,
+0607     days_per_month = [31 28 31 30 31 30 31 31 30 31 30 31];
+0608 <span class="keyword">else</span>
+0609     days_per_month = [31 29 31 30 31 30 31 31 30 31 30 31];
+0610 <span class="keyword">end</span>
+0611 
+0612 <span class="keyword">if</span> d &gt; days_per_month(m),
+0613     error(<span class="string">'Specified date exceeds number of days for specified month.'</span>)
+0614 <span class="keyword">end</span>
+0615 
+0616 days = sum(days_per_month(1:m-1)) + d - 1;
+0617 
+0618 
+0619 <a name="_sub5" href="#_subfunctions" class="code">function [leap] = isleap(year)</a>
+0620 
+0621 <span class="comment">% 'ISLEAP' FUNCTION DETERMINES WHETHER AN INPUT YEAR IS A LEAP YEAR.</span>
+0622 <span class="comment">%</span>
+0623 <span class="comment">% This function uses the Gregorian calendar system.</span>
+0624 <span class="comment">%</span>
+0625 <span class="comment">% YEAR input may be a string 'YYYY' or a number. It may also be a vector.</span>
+0626 <span class="comment">%</span>
+0627 <span class="comment">% LEAP output = 1 if YEAR is a leap year.</span>
+0628 <span class="comment">% LEAP output = 0 if YEAR is NOT a leap year.</span>
+0629 <span class="comment">%</span>
+0630 <span class="comment">% If YEAR is a vector, LEAP output will be a vector of the same shape, and</span>
+0631 <span class="comment">% LEAP(K) = 1 where YEAR(K) is a leap year, and LEAP(K) = 0 where YEAR(K)</span>
+0632 <span class="comment">% is NOT a leap year.</span>
+0633 
+0634 <span class="keyword">if</span> ischar(<a href="year.html" class="code" title="function y = year(d)">year</a>) == 1,
+0635     <a href="year.html" class="code" title="function y = year(d)">year</a> = str2num(<a href="year.html" class="code" title="function y = year(d)">year</a>);
+0636 <span class="keyword">end</span>
+0637 
+0638 leap = zeros(size(<a href="year.html" class="code" title="function y = year(d)">year</a>));
+0639 
+0640 mod4 = mod(<a href="year.html" class="code" title="function y = year(d)">year</a>,4);
+0641 mod100 = mod(<a href="year.html" class="code" title="function y = year(d)">year</a>,100);
+0642 mod400 = mod(<a href="year.html" class="code" title="function y = year(d)">year</a>,400);
+0643 mod4000 = mod(<a href="year.html" class="code" title="function y = year(d)">year</a>,4000);
+0644 
+0645 leap(mod4 == 0) = 1;
+0646 leap(mod100 == 0) = 0;
+0647 leap(mod400 == 0) = 1;
+0648 leap(mod4000 == 0) = 0;</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

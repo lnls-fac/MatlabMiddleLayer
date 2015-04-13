@@ -1,0 +1,856 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of arplot_sbm_tight</title>
+  <meta name="keywords" content="arplot_sbm_tight">
+  <meta name="description" content="arplot_sbm(Month1 String, Days1, Year1, Month2 String, Days2, Year2)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; arplot_sbm_tight.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>arplot_sbm_tight
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>arplot_sbm(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function arplot_sbm(monthStr, days, year1, month2Str, days2, year2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> arplot_sbm(Month1 String, Days1, Year1, Month2 String, Days2, Year2)
+ 
+ Plots archived data about all 3 Superbends.
+
+ Example:  arplot_sbm('January',22:24, 1998);
+           plots data from 1/22, 1/23, and 1 in 1998
+
+ C. Steier, August 2001</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arglobal.html" class="code" title="">arglobal</a>	Just used to make archived variables global</li><li><a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>	ARREAD - Loads one day of archived data into matlab global memory</li><li><a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>	ARSELECT - Return the archived data for a group on channel names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function arplot_sbm(monthStr, days, year1, month2Str, days2, year2)</a>
+0002 <span class="comment">% arplot_sbm(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Plots archived data about all 3 Superbends.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Example:  arplot_sbm('January',22:24, 1998);</span>
+0007 <span class="comment">%           plots data from 1/22, 1/23, and 1 in 1998</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% C. Steier, August 2001</span>
+0010 
+0011 <span class="comment">% 2002-08-15 T.Scarvie - Added cryo-liquid pressure plots</span>
+0012 
+0013 
+0014 FigNum = 28; <span class="comment">%figure;  % Must be next figure after arplot_sr (if publishing to the web)</span>
+0015 
+0016 
+0017 <span class="comment">% Inputs</span>
+0018 <span class="keyword">if</span> nargin &lt; 2
+0019    error(<span class="string">'ARPLOTS:  You need at least two input arguments.'</span>);
+0020 <span class="keyword">elseif</span> nargin == 2
+0021    tmp = clock;
+0022    year1 = tmp(1);
+0023    monthStr2 = [];
+0024    days2 = [];
+0025    year2 = [];
+0026 <span class="keyword">elseif</span> nargin == 3
+0027    monthStr2 = [];
+0028    days2 = [];
+0029    year2 = [];
+0030 <span class="keyword">elseif</span> nargin == 4
+0031    error(<span class="string">'ARPLOTS:  You need 2, 3, 5, or 6 input arguments.'</span>);
+0032 <span class="keyword">elseif</span> nargin == 5
+0033    tmp = clock;
+0034    year2 = tmp(1);
+0035 <span class="keyword">elseif</span> nargin == 6
+0036 <span class="keyword">else</span>
+0037    error(<span class="string">'ARPLOTS:  Inputs incorrect.'</span>);
+0038 <span class="keyword">end</span>
+0039 
+0040 
+0041 <a href="arglobal.html" class="code" title="">arglobal</a>
+0042 
+0043 
+0044 t=[];
+0045 
+0046 sbm1i = []; sbm1ln = []; sbm1lnp = []; sbm1lhe = []; sbm1lhep = []; sbm1hall =[]; sbm1cryovac =[];
+0047 sbm1t1 = []; sbm1t2 = []; sbm1t3 = []; sbm1t4 = [];
+0048 sbm1t5 = []; sbm1t6 = []; sbm1t7 = []; sbm1t8 = [];
+0049 
+0050 sbm3i = []; sbm3ln = []; sbm3lnp = []; sbm3lhe = []; sbm3lhep = []; sbm3hall =[]; sbm3cryovac =[];
+0051 sbm3t1 = []; sbm3t2 = []; sbm3t3 = []; sbm3t4 = [];
+0052 sbm3t5 = []; sbm3t6 = []; sbm3t7 = []; sbm3t8 = [];
+0053 
+0054 sbm4i = []; sbm4ln = []; sbm4lnp = []; sbm4lhe = []; sbm4lhep = []; sbm4hall =[]; sbm4cryovac =[];
+0055 sbm4t1 = []; sbm4t2 = []; sbm4t3 = []; sbm4t4 = [];
+0056 sbm4t5 = []; sbm4t6 = []; sbm4t7 = []; sbm4t8 = [];
+0057 
+0058 <span class="keyword">if</span> isempty(days2)
+0059    <span class="keyword">if</span> length(days) == [1]
+0060       month  = mon2num(monthStr);
+0061       NumDays = length(days);
+0062       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0063       EndDayStr =   [<span class="string">''</span>];
+0064       titleStr = [StartDayStr];
+0065    <span class="keyword">else</span>
+0066       month  = mon2num(monthStr);
+0067       NumDays = length(days);
+0068       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0069       EndDayStr =   [monthStr, <span class="string">' '</span>, num2str(days(length(days))),<span class="string">', '</span>, num2str(year1)];
+0070       titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0071    <span class="keyword">end</span>
+0072 <span class="keyword">else</span>
+0073    month  = mon2num(monthStr);
+0074    month2 = mon2num(month2Str);
+0075    NumDays = length(days) + length(days2);
+0076    StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0077    EndDayStr =   [month2Str, <span class="string">' '</span>, num2str(days2(length(days2))),<span class="string">', '</span>, num2str(year2)];
+0078    
+0079    titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0080 <span class="keyword">end</span>
+0081 
+0082 
+0083 StartDay = days(1);
+0084 EndDay = days(length(days));
+0085 N=0;
+0086 
+0087 <span class="keyword">for</span> day = days
+0088    day;
+0089    <span class="comment">%t0=clock;</span>
+0090    year1str = num2str(year1);
+0091    <span class="keyword">if</span> year1 &lt; 2000
+0092       year1str = year1str(3:4);
+0093       FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0094    <span class="keyword">else</span>
+0095       FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year1str, month, day);
+0096    <span class="keyword">end</span>
+0097    FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0098    <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName);
+0099    <span class="comment">%readtime = etime(clock, t0)</span>
+0100    
+0101    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_P__AM00'</span>);
+0102    sbm1i = [sbm1i y1];
+0103    
+0104    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCLVN2AM00'</span>);
+0105    sbm1ln = [sbm1ln y1];
+0106 
+0107    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_LN_AM00'</span>);
+0108    sbm1lnp = [sbm1lnp y1];
+0109 
+0110    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCLVHEAM00'</span>);
+0111    sbm1lhe = [sbm1lhe y1];
+0112 
+0113    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_LHEAM00'</span>);
+0114    sbm1lhep = [sbm1lhep y1];
+0115 
+0116    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCHALLAM00'</span>);
+0117    sbm1hall = [sbm1hall y1];
+0118 
+0119    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCIG1_AM00'</span>);
+0120    sbm1cryovac = [sbm1cryovac y1];
+0121 
+0122    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T1_AM00'</span>);
+0123    sbm1t1 = [sbm1t1 y1];
+0124 
+0125    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T2_AM01'</span>);
+0126    sbm1t2 = [sbm1t2 y1];
+0127 
+0128    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T3_AM02'</span>);
+0129    sbm1t3 = [sbm1t3 y1];
+0130 
+0131    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T4_AM03'</span>);
+0132    sbm1t4 = [sbm1t4 y1];
+0133 
+0134    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T5_AM04'</span>);
+0135    sbm1t5 = [sbm1t5 y1];
+0136 
+0137    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T6_AM05'</span>);
+0138    sbm1t6 = [sbm1t6 y1];
+0139 
+0140    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T7_AM06'</span>);
+0141    sbm1t7 = [sbm1t7 y1];
+0142 
+0143    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T8_AM07'</span>);
+0144    sbm1t8 = [sbm1t8 y1];
+0145 
+0146    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_P__AM00'</span>);
+0147    sbm3i = [sbm3i y1];
+0148    
+0149    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCLVN2AM00'</span>);
+0150    sbm3ln = [sbm3ln y1];
+0151 
+0152    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_LN_AM00'</span>);
+0153    sbm3lnp = [sbm3lnp y1];
+0154 
+0155    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCLVHEAM00'</span>);
+0156    sbm3lhe = [sbm3lhe y1];
+0157 
+0158    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_LHEAM00'</span>);
+0159    sbm3lhep = [sbm3lhep y1];
+0160 
+0161    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCHALLAM00'</span>);
+0162    sbm3hall = [sbm3hall y1];
+0163 
+0164    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCIG1_AM00'</span>);
+0165    sbm3cryovac = [sbm3cryovac y1];
+0166 
+0167    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T1_AM00'</span>);
+0168    sbm3t1 = [sbm3t1 y1];
+0169 
+0170    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T2_AM01'</span>);
+0171    sbm3t2 = [sbm3t2 y1];
+0172 
+0173    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T3_AM02'</span>);
+0174    sbm3t3 = [sbm3t3 y1];
+0175 
+0176    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T4_AM03'</span>);
+0177    sbm3t4 = [sbm3t4 y1];
+0178 
+0179    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T5_AM04'</span>);
+0180    sbm3t5 = [sbm3t5 y1];
+0181 
+0182    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T6_AM05'</span>);
+0183    sbm3t6 = [sbm3t6 y1];
+0184 
+0185    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T7_AM06'</span>);
+0186    sbm3t7 = [sbm3t7 y1];
+0187 
+0188    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T8_AM07'</span>);
+0189    sbm3t8 = [sbm3t8 y1];
+0190 
+0191    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_P__AM00'</span>);
+0192    sbm4i = [sbm4i y1];
+0193    
+0194    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCLVN2AM00'</span>);
+0195    sbm4ln = [sbm4ln y1];
+0196 
+0197    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_LN_AM00'</span>);
+0198    sbm4lnp = [sbm4lnp y1];
+0199 
+0200    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCLVHEAM00'</span>);
+0201    sbm4lhe = [sbm4lhe y1];
+0202 
+0203    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_LHEAM00'</span>);
+0204    sbm4lhep = [sbm4lhep y1];
+0205 
+0206    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCHALLAM00'</span>);
+0207    sbm4hall = [sbm4hall y1];
+0208 
+0209    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCIG1_AM00'</span>);
+0210    sbm4cryovac = [sbm4cryovac y1];
+0211 
+0212    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T1_AM00'</span>);
+0213    sbm4t1 = [sbm4t1 y1];
+0214 
+0215    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T2_AM01'</span>);
+0216    sbm4t2 = [sbm4t2 y1];
+0217 
+0218    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T3_AM02'</span>);
+0219    sbm4t3 = [sbm4t3 y1];
+0220 
+0221    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T4_AM03'</span>);
+0222    sbm4t4 = [sbm4t4 y1];
+0223 
+0224    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T5_AM04'</span>);
+0225    sbm4t5 = [sbm4t5 y1];
+0226 
+0227    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T6_AM05'</span>);
+0228    sbm4t6 = [sbm4t6 y1];
+0229 
+0230    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T7_AM06'</span>);
+0231    sbm4t7 = [sbm4t7 y1];
+0232 
+0233    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T8_AM07'</span>);
+0234    sbm4t8 = [sbm4t8 y1];
+0235    
+0236    t    = [t  ARt+(day-StartDay)*24*60*60];
+0237    
+0238    disp(<span class="string">' '</span>);
+0239 <span class="keyword">end</span>
+0240 
+0241 
+0242 <span class="keyword">if</span> ~isempty(days2)
+0243    
+0244     StartDay = days2(1);
+0245     EndDay = days2(length(days2));
+0246    
+0247    <span class="keyword">for</span> day = days2
+0248       
+0249       year2str = num2str(year2);
+0250       
+0251        <span class="keyword">if</span> year2 &lt; 2000
+0252               year2str = year2str(3:4);
+0253               FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month2, day);
+0254        <span class="keyword">else</span>
+0255               FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year2str, month2, day);
+0256          <span class="keyword">end</span>
+0257          
+0258          FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month2, day);
+0259                   
+0260        <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName);
+0261        <span class="comment">%readtime = etime(clock, t0)</span>
+0262    
+0263    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_P__AM00'</span>);
+0264    sbm1i = [sbm1i y1];
+0265    
+0266    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCLVN2AM00'</span>);
+0267    sbm1ln = [sbm1ln y1];
+0268 
+0269    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_LN_AM00'</span>);
+0270    sbm1lnp = [sbm1lnp y1];
+0271 
+0272    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCLVHEAM00'</span>);
+0273    sbm1lhe = [sbm1lhe y1];
+0274 
+0275    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_LHEAM00'</span>);
+0276    sbm1lhep = [sbm1lhep y1];
+0277 
+0278    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCHALLAM00'</span>);
+0279    sbm1hall = [sbm1hall y1];
+0280 
+0281    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSCIG1_AM00'</span>);
+0282    sbm1cryovac = [sbm1cryovac y1];
+0283 
+0284    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T1_AM00'</span>);
+0285    sbm1t1 = [sbm1t1 y1];
+0286 
+0287    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T2_AM01'</span>);
+0288    sbm1t2 = [sbm1t2 y1];
+0289 
+0290    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T3_AM02'</span>);
+0291    sbm1t3 = [sbm1t3 y1];
+0292 
+0293    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T4_AM03'</span>);
+0294    sbm1t4 = [sbm1t4 y1];
+0295 
+0296    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T5_AM04'</span>);
+0297    sbm1t5 = [sbm1t5 y1];
+0298 
+0299    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T6_AM05'</span>);
+0300    sbm1t6 = [sbm1t6 y1];
+0301 
+0302    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T7_AM06'</span>);
+0303    sbm1t7 = [sbm1t7 y1];
+0304 
+0305    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BSC_T8_AM07'</span>);
+0306    sbm1t8 = [sbm1t8 y1];
+0307 
+0308    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_P__AM00'</span>);
+0309    sbm3i = [sbm3i y1];
+0310    
+0311    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCLVN2AM00'</span>);
+0312    sbm3ln = [sbm3ln y1];
+0313 
+0314    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_LN_AM00'</span>);
+0315    sbm3lnp = [sbm3lnp y1];
+0316 
+0317    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCLVHEAM00'</span>);
+0318    sbm3lhe = [sbm3lhe y1];
+0319 
+0320    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_LHEAM00'</span>);
+0321    sbm3lhep = [sbm3lhep y1];
+0322 
+0323    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCHALLAM00'</span>);
+0324    sbm3hall = [sbm3hall y1];
+0325 
+0326    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSCIG1_AM00'</span>);
+0327    sbm3cryovac = [sbm3cryovac y1];
+0328 
+0329    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T1_AM00'</span>);
+0330    sbm3t1 = [sbm3t1 y1];
+0331 
+0332    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T2_AM01'</span>);
+0333    sbm3t2 = [sbm3t2 y1];
+0334 
+0335    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T3_AM02'</span>);
+0336    sbm3t3 = [sbm3t3 y1];
+0337 
+0338    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T4_AM03'</span>);
+0339    sbm3t4 = [sbm3t4 y1];
+0340 
+0341    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T5_AM04'</span>);
+0342    sbm3t5 = [sbm3t5 y1];
+0343 
+0344    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T6_AM05'</span>);
+0345    sbm3t6 = [sbm3t6 y1];
+0346 
+0347    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T7_AM06'</span>);
+0348    sbm3t7 = [sbm3t7 y1];
+0349 
+0350    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BSC_T8_AM07'</span>);
+0351    sbm3t8 = [sbm3t8 y1];
+0352 
+0353    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_P__AM00'</span>);
+0354    sbm4i = [sbm4i y1];
+0355    
+0356    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCLVN2AM00'</span>);
+0357    sbm4ln = [sbm4ln y1];
+0358 
+0359    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_LN_AM00'</span>);
+0360    sbm4lnp = [sbm4lnp y1];
+0361 
+0362    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCLVHEAM00'</span>);
+0363    sbm4lhe = [sbm4lhe y1];
+0364 
+0365    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_LHEAM00'</span>);
+0366    sbm4lhep = [sbm4lhep y1];
+0367 
+0368    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCHALLAM00'</span>);
+0369    sbm4hall = [sbm4hall y1];
+0370 
+0371    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSCIG1_AM00'</span>);
+0372    sbm4cryovac = [sbm4cryovac y1];
+0373 
+0374    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T1_AM00'</span>);
+0375    sbm4t1 = [sbm4t1 y1];
+0376 
+0377    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T2_AM01'</span>);
+0378    sbm4t2 = [sbm4t2 y1];
+0379 
+0380    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T3_AM02'</span>);
+0381    sbm4t3 = [sbm4t3 y1];
+0382 
+0383    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T4_AM03'</span>);
+0384    sbm4t4 = [sbm4t4 y1];
+0385 
+0386    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T5_AM04'</span>);
+0387    sbm4t5 = [sbm4t5 y1];
+0388 
+0389    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T6_AM05'</span>);
+0390    sbm4t6 = [sbm4t6 y1];
+0391 
+0392    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T7_AM06'</span>);
+0393    sbm4t7 = [sbm4t7 y1];
+0394 
+0395    [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BSC_T8_AM07'</span>);
+0396    sbm4t8 = [sbm4t8 y1];
+0397    
+0398     t = [t  ARt+(day-StartDay+(days(length(days))-days(1)+1))*24*60*60];
+0399    
+0400    disp(<span class="string">' '</span>);
+0401 
+0402    <span class="keyword">end</span>
+0403 <span class="keyword">end</span>
+0404 
+0405 
+0406 <span class="comment">% Hours or days for the x-axis?</span>
+0407 <span class="keyword">if</span> t(end)/60/60/24 &gt; 3
+0408    t = t/60/60/24;
+0409    xlabelstring = [<span class="string">'Date since '</span>, StartDayStr, <span class="string">' [Days]'</span>];
+0410    DayFlag = 1;
+0411 <span class="keyword">else</span>
+0412    t = t/60/60;
+0413    xlabelstring = [<span class="string">'Time since '</span>, StartDayStr, <span class="string">' [Hours]'</span>];
+0414    DayFlag = 0;
+0415 <span class="keyword">end</span>
+0416 Days = [days days2];
+0417 xmax = max(t);
+0418 
+0419 
+0420 
+0421 <span class="comment">% change data to NaN for plotting if archiver has stalled for more than 12minutes</span>
+0422 StalledArchFlag = [];
+0423 <span class="keyword">for</span> loop = 1:size(t,2)-1
+0424     StalledArchFlag(loop) = (t(loop+1)-t(loop)&gt;0.2);
+0425 <span class="keyword">end</span>
+0426 SANum = find(StalledArchFlag==1)+1;
+0427 sbm1i(SANum) = NaN; sbm1ln(SANum) = NaN; sbm1lnp(SANum) = NaN; sbm1lhe(SANum) = NaN; sbm1lhep(SANum) = NaN; sbm1hall(SANum) = NaN; sbm1cryovac(SANum) = NaN;
+0428 sbm1t1(SANum) = NaN; sbm1t2(SANum) = NaN; sbm1t3(SANum) = NaN; sbm1t4(SANum) = NaN;
+0429 sbm1t5(SANum) = NaN; sbm1t6(SANum) = NaN; sbm1t7(SANum) = NaN; sbm1t8(SANum) = NaN;
+0430 
+0431 sbm3i(SANum) = NaN; sbm3ln(SANum) = NaN; sbm3lnp(SANum) = NaN; sbm3lhe(SANum) = NaN; sbm3lhep(SANum) = NaN; sbm3hall(SANum) =NaN; sbm3cryovac(SANum) = NaN;
+0432 sbm3t1(SANum) = NaN; sbm3t2(SANum) = NaN; sbm3t3(SANum) = NaN; sbm3t4(SANum) = NaN;
+0433 sbm3t5(SANum) = NaN; sbm3t6(SANum) = NaN; sbm3t7(SANum) = NaN; sbm3t8(SANum) = NaN;
+0434 
+0435 sbm4i(SANum) = NaN; sbm4ln(SANum) = NaN; sbm4lnp(SANum) = NaN; sbm4lhe(SANum) = NaN; sbm4lhep(SANum) = NaN; sbm4hall(SANum) =NaN; sbm4cryovac(SANum) = NaN;
+0436 sbm4t1(SANum) = NaN; sbm4t2(SANum) = NaN; sbm4t3(SANum) = NaN; sbm4t4(SANum) = NaN;
+0437 sbm4t5(SANum) = NaN; sbm4t6(SANum) = NaN; sbm4t7(SANum) = NaN; sbm4t8(SANum) = NaN;
+0438 
+0439 
+0440 h = FigNum;
+0441 subfig(1,1,1, h);
+0442 <span class="comment">%%p = get(h, 'Position');</span>
+0443 <span class="comment">%FigurePosition = [p(1)-.4*p(3) p(2)-.95*p(4) p(3)+.4*p(3) p(4)+.95*p(4)];</span>
+0444 <span class="comment">%set(h, 'Position', FigurePosition);</span>
+0445 clf reset;
+0446 
+0447 subplot(6,1,1)
+0448 plot(t,sbm1i);
+0449 legend(<span class="string">'I power supply'</span>, 0);
+0450 ylabel(<span class="string">'I [A]'</span>);
+0451 grid;
+0452 axis([min(t) max(t) 0 320]);
+0453 title([<span class="string">'SBM2 (sector 4) Temperatures '</span>,titleStr]);
+0454 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0455 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0456 
+0457 subplot(6,1,2)
+0458 plot(t,sbm1ln,t,sbm1lhe);
+0459 legend(<span class="string">'LN level'</span>,<span class="string">'LHe level'</span>,0);
+0460 ylabel(<span class="string">'Liquid Level [cm]'</span>);
+0461 grid;
+0462 axis([min(t) max(t) 0 35]);
+0463 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0464 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0465 
+0466 subplot(6,1,3)
+0467 plot(t,sbm1lnp, <span class="string">'-'</span>, t,sbm1lhep, <span class="string">'--'</span>);
+0468 legend(<span class="string">'LN pressure'</span>,<span class="string">'LHe pressure'</span>,0);
+0469 ylabel({<span class="string">'Liquid'</span>,<span class="string">'Pressure [psi]'</span>});
+0470 grid;
+0471 <span class="comment">% axis([min(t) max(t) -15 8]);</span>
+0472 axis tight;
+0473 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0474 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0475 
+0476 subplot(6,1,4)
+0477 semilogy(t,sbm1cryovac);
+0478 legend(<span class="string">'cryo pressure'</span>,0);
+0479 ylabel({<span class="string">'Cryostat'</span>,<span class="string">'Pressure [Torr]'</span>});
+0480 grid;
+0481 axis tight
+0482 <span class="comment">%xaxis([min(t) max(t)])</span>
+0483 axis([min(t) max(t) 1e-8 1e-5]);
+0484 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0485 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0486 
+0487 subplot(6,1,5)
+0488 plot(t,sbm1t7,t,sbm1t2,t,sbm1t6,<span class="keyword">...</span>
+0489 t,sbm1t4,t,sbm1t8);
+0490 hh=legend(<span class="string">'stage 2'</span>,<span class="string">'upper coil'</span>,<span class="string">'lower coil'</span>,<span class="string">'yoke center 1'</span>,<span class="string">'yoke center 2'</span>);
+0491 set(hh, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, <span class="string">'position'</span>,[.895 .26 .1 .1]);
+0492 ylabel(<span class="string">'T [K]'</span>);
+0493 grid;
+0494 <span class="comment">% axis([min(t) max(t) 3.5 5.2]);</span>
+0495 axis tight;
+0496 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0497 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0498 
+0499 subplot(6,1,6)
+0500 plot(t,sbm1t3,t,sbm1t1,t,sbm1t5);
+0501 hh=legend(<span class="string">'stage 1'</span>,<span class="string">'upper HTS lead'</span>,<span class="string">'lower HTS lead'</span>);
+0502 <span class="comment">%set(hh, 'Units','Normalized', 'position',[.859 .17 .14 .05]);</span>
+0503 set(hh, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, <span class="string">'position'</span>,[.87 .025 .11 .05]);
+0504 ylabel(<span class="string">'T [K]'</span>);
+0505 grid;
+0506 <span class="comment">% axis([min(t) max(t) 40 80]);</span>
+0507 axis tight;
+0508 xlabel(xlabelstring);
+0509 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0510 yaxesposition(1.20);
+0511 orient tall
+0512 
+0513 
+0514 FigNum = FigNum + 1;
+0515 h = figure(FigNum);
+0516 subfig(1,1,1, h);
+0517 <span class="comment">%%p = get(h, 'Position');</span>
+0518 <span class="comment">%set(h, 'Position', FigurePosition);</span>
+0519 clf reset;
+0520 
+0521 subplot(6,1,1)
+0522 plot(t,sbm3i);
+0523 legend(<span class="string">'I power supply'</span>,0);
+0524 ylabel(<span class="string">'I [A]'</span>);
+0525 grid;
+0526 axis([min(t) max(t) 0 320]);
+0527 title([<span class="string">'SBM3 (sector 8) Temperatures '</span>,titleStr]);
+0528 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0529 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0530 
+0531 subplot(6,1,2)
+0532 plot(t,sbm3ln,t,sbm3lhe);
+0533 legend(<span class="string">'LN level'</span>,<span class="string">'LHe level'</span>,0);
+0534 ylabel(<span class="string">'Liquid Level [cm]'</span>);
+0535 grid;
+0536 axis([min(t) max(t) 0 35]);
+0537 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0538 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0539 
+0540 subplot(6,1,3)
+0541 plot(t,sbm3lnp, <span class="string">'-'</span>, t,sbm3lhep, <span class="string">'--'</span>);
+0542 legend(<span class="string">'LN pressure'</span>,<span class="string">'LHe pressure'</span>,0);
+0543 ylabel({<span class="string">'Liquid'</span>,<span class="string">'Pressure [psi]'</span>});
+0544 grid;
+0545 <span class="comment">% axis([min(t) max(t) -15 8]);</span>
+0546 axis tight;
+0547 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0548 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0549 
+0550 subplot(6,1,4)
+0551 semilogy(t,sbm3cryovac);
+0552 legend(<span class="string">'cryo pressure'</span>,0);
+0553 ylabel({<span class="string">'Cryostat'</span>,<span class="string">'Pressure [Torr]'</span>});
+0554 grid;
+0555 axis tight
+0556 <span class="comment">%xaxis([min(t) max(t)])</span>
+0557 axis([min(t) max(t) 1e-8 1e-5]);
+0558 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0559 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0560 
+0561 subplot(6,1,5)
+0562 plot(t,sbm3t7,t,sbm3t2,t,sbm3t6,<span class="keyword">...</span>
+0563 t,sbm3t4,t,sbm3t8);
+0564 hh=legend(<span class="string">'stage 2'</span>,<span class="string">'upper coil'</span>,<span class="string">'lower coil'</span>,<span class="string">'yoke center 1'</span>,<span class="string">'yoke center 2'</span>);
+0565 set(hh, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, <span class="string">'position'</span>,[.895 .26 .1 .1]);
+0566 ylabel(<span class="string">'T [K]'</span>);
+0567 grid;
+0568 <span class="comment">% axis([min(t) max(t) 3.5 5.2]);</span>
+0569 axis tight;
+0570 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0571 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0572 
+0573 subplot(6,1,6)
+0574 plot(t,sbm3t3,t,sbm3t1,t,sbm3t5);
+0575 hh=legend(<span class="string">'stage 1'</span>,<span class="string">'upper HTS lead'</span>,<span class="string">'lower HTS lead'</span>);
+0576 <span class="comment">%set(hh, 'Units','Normalized', 'position',[.859 .17 .14 .05]);</span>
+0577 set(hh, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, <span class="string">'position'</span>,[.87 .025 .11 .05]);
+0578 ylabel(<span class="string">'T [K]'</span>);
+0579 grid;
+0580 <span class="comment">%axis([min(t) max(t) 35 75]);</span>
+0581 axis tight;
+0582 
+0583 xlabel(xlabelstring);
+0584 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0585 yaxesposition(1.20);
+0586 orient tall
+0587 
+0588 
+0589 FigNum = FigNum + 1;
+0590 h = figure(FigNum);
+0591 subfig(1,1,1, h);
+0592 <span class="comment">%%p = get(h, 'Position');</span>
+0593 <span class="comment">%set(h, 'Position', FigurePosition);</span>
+0594 clf reset;
+0595 
+0596 subplot(6,1,1)
+0597 plot(t,sbm4i);
+0598 legend(<span class="string">'I power supply'</span>,0);
+0599 ylabel(<span class="string">'I [A]'</span>);
+0600 grid;
+0601 axis([min(t) max(t) 0 320]);
+0602 title([<span class="string">'SBM4 (sector 12) Temperatures '</span>,titleStr]);
+0603 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0604 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0605 
+0606 subplot(6,1,2)
+0607 plot(t,sbm4ln,t,sbm4lhe);
+0608 legend(<span class="string">'LN level'</span>,<span class="string">'LHe level'</span>,0);
+0609 ylabel(<span class="string">'Liquid Level [cm]'</span>);
+0610 grid;
+0611 axis([min(t) max(t) 0 35]);
+0612 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0613 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0614 
+0615 subplot(6,1,3)
+0616 plot(t,sbm4lnp, <span class="string">'-'</span>, t,sbm4lhep, <span class="string">'--'</span>);
+0617 legend(<span class="string">'LN pressure'</span>,<span class="string">'LHe pressure'</span>,0);
+0618 ylabel({<span class="string">'Liquid'</span>,<span class="string">'Pressure [psi]'</span>});
+0619 grid;
+0620 <span class="comment">% axis([min(t) max(t) -15 8]);</span>
+0621 axis tight;
+0622 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0623 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0624 
+0625 subplot(6,1,4)
+0626 semilogy(t,sbm4cryovac);
+0627 legend(<span class="string">'cryo pressure'</span>,0);
+0628 ylabel({<span class="string">'Cryostat'</span>,<span class="string">'Pressure [Torr]'</span>});
+0629 grid;
+0630 axis tight
+0631 <span class="comment">%xaxis([min(t) max(t)])</span>
+0632 axis([min(t) max(t) 1e-8 1e-5]);
+0633 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0634 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0635 
+0636 subplot(6,1,5)
+0637 plot(t,sbm4t7,t,sbm4t2,t,sbm4t6,<span class="keyword">...</span>
+0638 t,sbm4t4,t,sbm4t8);
+0639 hh=legend(<span class="string">'stage 2'</span>,<span class="string">'upper coil'</span>,<span class="string">'lower coil'</span>,<span class="string">'yoke center 1'</span>,<span class="string">'yoke center 2'</span>);
+0640 set(hh, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, <span class="string">'position'</span>,[.895 .26 .1 .1]);
+0641 ylabel(<span class="string">'T [K]'</span>);
+0642 grid;
+0643 <span class="comment">% axis([min(t) max(t) 3.5 5.2]);</span>
+0644 axis tight;
+0645 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0646 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0647 
+0648 subplot(6,1,6)
+0649 plot(t,sbm4t3,t,sbm4t1,t,sbm4t5);
+0650 hh=legend(<span class="string">'stage 1'</span>,<span class="string">'upper HTS lead'</span>,<span class="string">'lower HTS lead'</span>);
+0651 <span class="comment">%set(hh, 'Units','Normalized', 'position',[.859 .17 .14 .05]);</span>
+0652 set(hh, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>, <span class="string">'position'</span>,[.87 .025 .11 .05]);
+0653 ylabel(<span class="string">'T [K]'</span>);
+0654 grid;
+0655 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0656 <span class="comment">% axis([min(t) max(t) 40 80]);</span>
+0657 axis tight;
+0658 
+0659 xlabel(xlabelstring);
+0660 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0661 yaxesposition(1.20);
+0662 orient tall
+0663 
+0664 
+0665 
+0666 <span class="comment">% FigNum = FigNum + 1;</span>
+0667 <span class="comment">% h = figure(FigNum);</span>
+0668 <span class="comment">% subfig(1,1,1, h);</span>
+0669 <span class="comment">% %%p = get(h, 'Position');</span>
+0670 <span class="comment">% %set(h, 'Position', FigurePosition);</span>
+0671 <span class="comment">% clf reset;</span>
+0672 <span class="comment">%</span>
+0673 <span class="comment">% subplot(6,1,1)</span>
+0674 <span class="comment">% plot(t,sbm1hall);</span>
+0675 <span class="comment">% legend('Hall probe [T]');</span>
+0676 <span class="comment">% ylabel('B(SBM2) [T]');</span>
+0677 <span class="comment">% grid;</span>
+0678 <span class="comment">% axis([min(t) max(t) 4.865 4.875]);</span>
+0679 <span class="comment">% title(['SBM2, SBM3 and SBM4: Magnetic Field, ',titleStr]);</span>
+0680 <span class="comment">% %xlabel(xlabelstring);</span>
+0681 <span class="comment">% ChangeAxesLabel(t, Days, DayFlag);</span>
+0682 <span class="comment">%</span>
+0683 <span class="comment">% subplot(6,1,2)</span>
+0684 <span class="comment">% j = find(sbm1hall&gt;4.85);</span>
+0685 <span class="comment">% if ~isempty(j)</span>
+0686 <span class="comment">%    xmin=min(sbm1hall(j));</span>
+0687 <span class="comment">%    xmax=max(sbm1hall(j));</span>
+0688 <span class="comment">%    num=abs(xmax-xmin)/0.00011;</span>
+0689 <span class="comment">%    if num&lt;1</span>
+0690 <span class="comment">%       num=1;</span>
+0691 <span class="comment">%    end</span>
+0692 <span class="comment">%    [n,x] = hist(sbm1hall(j),num);</span>
+0693 <span class="comment">%    j2 = find(n&gt;3);</span>
+0694 <span class="comment">%    xstart=x(min(j2))-0.0002;</span>
+0695 <span class="comment">%    xstop=x(max(j2))+0.0002;</span>
+0696 <span class="comment">%    j3 = find((sbm1hall&gt;xstart)&amp;(sbm1hall&lt;xstop));</span>
+0697 <span class="comment">%    num=abs(xstop-xstart)/0.00011;</span>
+0698 <span class="comment">%    [n,x] = hist(sbm1hall(j3),num);</span>
+0699 <span class="comment">%    bar(x,n);</span>
+0700 <span class="comment">%    xlabel('B(SBM2) [T]');</span>
+0701 <span class="comment">%    ylabel('#');</span>
+0702 <span class="comment">%    grid;</span>
+0703 <span class="comment">% end</span>
+0704 <span class="comment">%</span>
+0705 <span class="comment">% subplot(6,1,3)</span>
+0706 <span class="comment">% plot(t,sbm3hall);</span>
+0707 <span class="comment">% legend('SBM3 Hall probe [T]');</span>
+0708 <span class="comment">% ylabel('B(SBM3) [T]');</span>
+0709 <span class="comment">% grid;</span>
+0710 <span class="comment">% axis([min(t) max(t) 4.905 4.915]);</span>
+0711 <span class="comment">% %xlabel(xlabelstring);</span>
+0712 <span class="comment">% ChangeAxesLabel(t, Days, DayFlag);</span>
+0713 <span class="comment">%</span>
+0714 <span class="comment">% subplot(6,1,4)</span>
+0715 <span class="comment">% j = find(sbm3hall&gt;4.85);</span>
+0716 <span class="comment">% if ~isempty(j)</span>
+0717 <span class="comment">%    xmin=min(sbm3hall(j));</span>
+0718 <span class="comment">%    xmax=max(sbm3hall(j));</span>
+0719 <span class="comment">%    num=abs(xmax-xmin)/0.00011;</span>
+0720 <span class="comment">%    if num&lt;1</span>
+0721 <span class="comment">%       num=1;</span>
+0722 <span class="comment">%    end</span>
+0723 <span class="comment">%    [n,x] = hist(sbm3hall(j),num);</span>
+0724 <span class="comment">%    j2 = find(n&gt;3);</span>
+0725 <span class="comment">%    xstart=x(min(j2))-0.0002;</span>
+0726 <span class="comment">%    xstop=x(max(j2))+0.0002;</span>
+0727 <span class="comment">%    j3 = find((sbm3hall&gt;xstart)&amp;(sbm3hall&lt;xstop));</span>
+0728 <span class="comment">%    num=abs(xstop-xstart)/0.00011;</span>
+0729 <span class="comment">%    [n,x] = hist(sbm3hall(j3),num);</span>
+0730 <span class="comment">%    bar(x,n);</span>
+0731 <span class="comment">%    xlabel('B(SBM3) [T]');</span>
+0732 <span class="comment">%    ylabel('#');</span>
+0733 <span class="comment">%    grid;</span>
+0734 <span class="comment">% end</span>
+0735 <span class="comment">%</span>
+0736 <span class="comment">% subplot(6,1,5)</span>
+0737 <span class="comment">% plot(t,sbm4hall);</span>
+0738 <span class="comment">% legend('SBM4 Hall probe [T]');</span>
+0739 <span class="comment">% ylabel('B(SBM4) [T]');</span>
+0740 <span class="comment">% grid;</span>
+0741 <span class="comment">% axis([min(t) max(t) 4.86 4.87]);</span>
+0742 <span class="comment">% %xlabel(xlabelstring);</span>
+0743 <span class="comment">% ChangeAxesLabel(t, Days, DayFlag);</span>
+0744 <span class="comment">%</span>
+0745 <span class="comment">% subplot(6,1,6)</span>
+0746 <span class="comment">% j = find(sbm4hall&gt;4.85);</span>
+0747 <span class="comment">% if ~isempty(j)</span>
+0748 <span class="comment">%    xmin=min(sbm4hall(j));</span>
+0749 <span class="comment">%    xmax=max(sbm4hall(j));</span>
+0750 <span class="comment">%    num=abs(xmax-xmin)/0.00011;</span>
+0751 <span class="comment">%    if num&lt;1</span>
+0752 <span class="comment">%       num=1;</span>
+0753 <span class="comment">%    end</span>
+0754 <span class="comment">%    [n,x] = hist(sbm4hall(j),num);</span>
+0755 <span class="comment">%    j2 = find(n&gt;3);</span>
+0756 <span class="comment">%    xstart=x(min(j2))-0.0002;</span>
+0757 <span class="comment">%    xstop=x(max(j2))+0.0002;</span>
+0758 <span class="comment">%    j3 = find((sbm4hall&gt;xstart)&amp;(sbm4hall&lt;xstop));</span>
+0759 <span class="comment">%    num=abs(xstop-xstart)/0.00011;</span>
+0760 <span class="comment">%    [n,x] = hist(sbm4hall(j3),num);</span>
+0761 <span class="comment">%    bar(x,n);</span>
+0762 <span class="comment">%    xlabel('B(SBM4) [T]');</span>
+0763 <span class="comment">%    ylabel('#');</span>
+0764 <span class="comment">%    grid;</span>
+0765 <span class="comment">% end</span>
+0766 <span class="comment">%</span>
+0767 <span class="comment">% orient tall;</span>
+0768 
+0769 
+0770 <a name="_sub1" href="#_subfunctions" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a>
+0771 <span class="keyword">if</span> DayFlag
+0772    <span class="keyword">if</span> size(Days,2) &gt; 1
+0773       Days = Days'; <span class="comment">% Make a column vector</span>
+0774    <span class="keyword">end</span>
+0775    
+0776    MaxDay = round(max(t));
+0777    set(gca,<span class="string">'XTick'</span>,[0:MaxDay]');
+0778    xaxis([0 MaxDay]);
+0779    
+0780    <span class="keyword">if</span> length(Days) &lt; MaxDay-1
+0781       <span class="comment">% Days were skipped</span>
+0782       set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str([0:MaxDay-1]'+Days(1)),<span class="string">' '</span>));  
+0783    <span class="keyword">else</span>
+0784       <span class="comment">% All days plotted</span>
+0785       set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str(Days),<span class="string">' '</span>));  
+0786    <span class="keyword">end</span>
+0787    
+0788    XTickLabelString = get(gca,<span class="string">'XTickLabel'</span>);
+0789    <span class="keyword">if</span> MaxDay &lt; 20
+0790       <span class="comment">% ok</span>
+0791    <span class="keyword">elseif</span> MaxDay &lt; 40
+0792       set(gca,<span class="string">'XTick'</span>,[0:2:MaxDay]');       
+0793       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:2:MaxDay-1,:));       
+0794    <span class="keyword">elseif</span> MaxDay &lt; 63
+0795       set(gca,<span class="string">'XTick'</span>,[0:3:MaxDay]');       
+0796       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:3:MaxDay-1,:));       
+0797    <span class="keyword">elseif</span> MaxDay &lt; 80
+0798       set(gca,<span class="string">'XTick'</span>,[0:4:MaxDay]');       
+0799       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:4:MaxDay-1,:));       
+0800    <span class="keyword">end</span>
+0801 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

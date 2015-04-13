@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of skewquadgains</title>
+  <meta name="keywords" content="skewquadgains">
+  <meta name="description" content="lococorrectcoupl_24">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; skewquadgains.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>skewquadgains
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>lococorrectcoupl_24</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> lococorrectcoupl_24
+
+ This routine reads the results of a LOCO analysis of the ALS lattice (83 fit parameters)
+ and calculates the skew quadrupole settings to correct the coupling. It allows to set
+ the results.
+
+ Christoph Steier, January 2003</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% lococorrectcoupl_24</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% This routine reads the results of a LOCO analysis of the ALS lattice (83 fit parameters)</span>
+0004 <span class="comment">% and calculates the skew quadrupole settings to correct the coupling. It allows to set</span>
+0005 <span class="comment">% the results.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Christoph Steier, January 2003</span>
+0008 
+0009 <span class="comment">% index of skew quadrupoles to be used</span>
+0010 
+0011 SQSFindex = [1 1; 2 1; 2 2; 3 1; 3 2; 5 1; 5 2; 6 1; 6 2; 7 1; 9 1; 11 1];
+0012 SQSDindex = [2 1; 2 2; 3 1; 3 2; 4 1; 5 1; 5 2; 6 1; 6 2; 8 1; 10 1; 12 1];
+0013 
+0014 
+0015 <span class="comment">% scaling factors [A/m^-2] (based on magnetic measurements of skew quadrupoles)</span>
+0016 <span class="comment">% SQSF are weaker because the higher sextupole strength causes pole</span>
+0017 <span class="comment">% saturation.</span>
+0018 
+0019 energy = getam(<span class="string">'cmm:sr_energy'</span>);
+0020 
+0021 <span class="keyword">if</span> energy&lt;0.7
+0022    error(<span class="string">'cannot read the storage ring energy! exiting ...'</span>);
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="keyword">if</span> energy &gt; 1.7
+0026    SQSFfac = 20.0/0.11*energy/1.894;
+0027 <span class="keyword">else</span>
+0028    SQSFfac = 13.0/0.11*energy/1.894;
+0029 <span class="keyword">end</span>
+0030 
+0031 SQSDfac = 13.0/0.11*energy/1.894;
+0032 
+0033 <span class="comment">% calculation routine ...</span>
+0034 
+0035 olddir = pwd;
+0036 
+0037 gotodata;
+0038 cd <span class="string">'smatrix/loco'</span>
+0039 
+0040 [locofilename,locofilepath] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'LOCO results: filename'</span>);
+0041 
+0042 <span class="keyword">if</span> isempty(locofilename) | (locofilename == 0)
+0043    error(<span class="string">'You have selected an invalid LOCO results filename'</span>);
+0044 <span class="keyword">end</span>
+0045 
+0046 cd(locofilepath);
+0047 
+0048 load(locofilename);
+0049 
+0050 cd(olddir);
+0051 
+0052 numiter = size(FitParameters,2);
+0053 
+0054 
+0055 <span class="keyword">if</span> length(FitParameters(numiter).Values)==83
+0056    
+0057    SQSFincr=FitParameters(numiter).Values(60:71)*SQSFfac;
+0058    SQSDincr=FitParameters(numiter).Values(72:83)*SQSDfac;
+0059    
+0060    
+0061    figure
+0062    
+0063    subplot(4,1,1)
+0064    bar(SQSFincr)
+0065    axis([0.5 12.5 -20 20])
+0066    grid on
+0067    
+0068    
+0069    subplot(4,1,2)
+0070    bar(SQSDincr)
+0071    axis([0.5 12.5 -20 20])
+0072    grid on
+0073    
+0074    <span class="comment">% Last chance to stop</span>
+0075    CorrFlag = questdlg(str2mat(<span class="string">'Do you want to set skew correction?'</span>),sprintf(<span class="string">'%.1f GeV Coupling Correction'</span>,energy),<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0076    <span class="keyword">if</span> strcmp(CorrFlag,<span class="string">'No'</span>)
+0077       disp(<span class="string">'  No correction made.'</span>);
+0078       SQSFnew = getsp(<span class="string">'SQSF'</span>,SQSFindex);
+0079       SQSDnew = getsp(<span class="string">'SQSD'</span>,SQSDindex);
+0080    <span class="keyword">elseif</span> strcmp(CorrFlag,<span class="string">'Yes'</span>)   
+0081       disp(<span class="string">'  Setting new skew quadrupole values (incremental).'</span>);
+0082       stepsp(<span class="string">'SQSF'</span>,SQSFincr,SQSFindex,0);
+0083       stepsp(<span class="string">'SQSD'</span>,SQSDincr,SQSDindex,0);
+0084       
+0085       pause(0.5);
+0086       
+0087       SQSFnew = getsp(<span class="string">'SQSF'</span>,SQSFindex);
+0088       SQSDnew = getsp(<span class="string">'SQSD'</span>,SQSDindex);
+0089       
+0090       setsp(<span class="string">'SQSF'</span>,SQSFnew,SQSFindex,2);
+0091       setsp(<span class="string">'SQSD'</span>,SQSDnew,SQSDindex,2);
+0092       disp(<span class="string">'  New skew quadrupole values have been set.'</span>);
+0093    <span class="keyword">else</span>
+0094       error(<span class="string">'  Unknown option.'</span>);      
+0095    <span class="keyword">end</span>
+0096    
+0097    subplot(4,1,3)
+0098    bar([SQSFnew-SQSFincr SQSFnew])
+0099    axis([0.5 12.5 -20 20])
+0100    grid on
+0101    
+0102    
+0103    subplot(4,1,4)
+0104    bar([SQSDnew-SQSDincr SQSDnew])
+0105    axis([0.5 12.5 -20 20])
+0106    grid on
+0107    
+0108    orient tall;
+0109    
+0110    <span class="keyword">if</span> strcmp(CorrFlag,<span class="string">'Yes'</span>)   
+0111       
+0112       <span class="comment">% Keep changes ?</span>
+0113       KeepFlag = questdlg(str2mat(<span class="string">'Do you want to keep the changes?'</span>),sprintf(<span class="string">'%.1f GeV Coupling Correction'</span>,energy),<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Yes'</span>);
+0114       <span class="keyword">if</span> strcmp(KeepFlag,<span class="string">'No'</span>)
+0115          disp(<span class="string">'  Backing out skew correction.'</span>);
+0116          stepsp(<span class="string">'SQSF'</span>,-SQSFincr,SQSFindex,0);
+0117          stepsp(<span class="string">'SQSD'</span>,-SQSDincr,SQSDindex,0);
+0118          
+0119          pause(0.5);
+0120          
+0121          SQSFnew = getsp(<span class="string">'SQSF'</span>,SQSFindex);
+0122          SQSDnew = getsp(<span class="string">'SQSD'</span>,SQSDindex);
+0123          
+0124          setsp(<span class="string">'SQSF'</span>,SQSFnew,SQSFindex,2);
+0125          setsp(<span class="string">'SQSD'</span>,SQSDnew,SQSDindex,2);
+0126          disp(<span class="string">'  Old skew quadrupole values have been restored.'</span>);      
+0127       <span class="keyword">elseif</span> strcmp(KeepFlag,<span class="string">'Yes'</span>)   
+0128          disp(<span class="string">'  Keeping new skew quadrupole values.'</span>);
+0129       <span class="keyword">else</span>
+0130          error(<span class="string">'  Unknown option.'</span>);      
+0131       <span class="keyword">end</span>
+0132       
+0133    <span class="keyword">end</span>
+0134    
+0135 <span class="keyword">else</span>
+0136    error(<span class="string">'LOCO file has wrong number of FitParameters!'</span>);
+0137    
+0138 <span class="keyword">end</span>
+0139</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

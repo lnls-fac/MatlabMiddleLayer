@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ALSUniverseExample1</title>
+  <meta name="keywords" content="ALSUniverseExample1">
+  <meta name="description" content="%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; ALSUniverseExample1.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>ALSUniverseExample1
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ ALS Universe Example - Dave's Low Alpha Lattice %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="alslat_loco_disp_nuy9_122bpms_splitdipole2.html" class="code" title="function varargout = alslat_loco_3sb_disp_nuy9_122bpms_splitdipole(varargin)">alslat_loco_disp_nuy9_122bpms_splitdipole2</a>	Lattice definition file</li><li><a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>	UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 
+0002 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0003 <span class="comment">% ALS Universe Example - Dave's Low Alpha Lattice %</span>
+0004 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0005 
+0006 <span class="comment">% Load Weishi's Data</span>
+0007 WeishiData = getuniverse;
+0008 
+0009 
+0010 <span class="comment">% Search on emittance</span>
+0011 i = find(WeishiData.Emittance &lt; 4.5e-9);  <span class="comment">% returns 26,725 lattices</span>
+0012 
+0013 
+0014 <span class="comment">% Add a search on low alpha</span>
+0015 j = find(WeishiData.Alpha0(i) == 0);      <span class="comment">% returns 44 lattices</span>
+0016 
+0017 
+0018 <span class="comment">% Add a search on BetaX &amp; BetaY</span>
+0019 k = find(WeishiData.BetaXB1(i(j)) &lt; 20 &amp; WeishiData.BetaYB1(i(j)) &lt; 30); 
+0020 
+0021 
+0022 
+0023 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0024 <span class="comment">% Load into the AT Model %</span>
+0025 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0026 
+0027 <span class="comment">% switch to simulate mode (or use 'Model' everywhere)</span>
+0028 switch2sim;
+0029 
+0030 <span class="comment">% Load an AT lattice without superbends</span>
+0031 <a href="alslat_loco_disp_nuy9_122bpms_splitdipole2.html" class="code" title="function varargout = alslat_loco_3sb_disp_nuy9_122bpms_splitdipole(varargin)">alslat_loco_disp_nuy9_122bpms_splitdipole2</a>;  <span class="comment">%als_short;</span>
+0032 <a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>;       <span class="comment">% This will throw some warnings because of the missing magnets - SB, QDA, etc.</span>
+0033 setradiation off;
+0034 setcavity off;
+0035 
+0036 iLatticeVector = i(j(k));
+0037 iLatticeVector = iLatticeVector(:)';
+0038 fprintf(<span class="string">'   %d lattices found\n'</span>, length(iLatticeVector));
+0039 
+0040 
+0041 <span class="comment">% The last one looks interesting  (466760 466769 466823 look good)</span>
+0042 <span class="comment">% Comment this line to look at all the solutions</span>
+0043 <span class="comment">%iLatticeVector = iLatticeVector(end);</span>
+0044 
+0045 
+0046 <span class="comment">% Inspect the remaining solutions manually</span>
+0047 h = figure;
+0048 <span class="keyword">for</span> iLattice = iLatticeVector
+0049 
+0050     <span class="comment">% Set quadrupoles</span>
+0051     setsp(<span class="string">'QF'</span>,  WeishiData.QF(iLattice),  <span class="string">'Physics'</span>);
+0052     setsp(<span class="string">'QD'</span>,  WeishiData.QD(iLattice),  <span class="string">'Physics'</span>);
+0053     setsp(<span class="string">'QFA'</span>, WeishiData.QFA(iLattice), <span class="string">'Physics'</span>);
+0054 
+0055 
+0056     <span class="comment">% Zero the sextupoles and skew quadrupoles</span>
+0057     setsp(<span class="string">'SF'</span>, 0, <span class="string">'Physics'</span>);
+0058     setsp(<span class="string">'SD'</span>, 0, <span class="string">'Physics'</span>);
+0059     setsp(<span class="string">'SQSF'</span>, 0, <span class="string">'Physics'</span>);
+0060     setsp(<span class="string">'SQSD'</span>, 0, <span class="string">'Physics'</span>);
+0061 
+0062     
+0063     figure(h);
+0064     plottwiss;
+0065     <span class="comment">%modeltwiss('Beta', 'DrawLattice');</span>
+0066 
+0067     <span class="comment">%figure(2);</span>
+0068     <span class="comment">%modeltwiss('Eta', 'DrawLattice');</span>
+0069 
+0070     
+0071     <span class="keyword">if</span> iLattice ~= iLatticeVector(end)
+0072         fprintf(<span class="string">'\n   This is lattice #%d\n   Hit &lt;return&gt; to continue.\n'</span>, iLattice);
+0073         pause;
+0074     <span class="keyword">end</span>
+0075 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of tunescan_EPUstraight</title>
+  <meta name="keywords" content="tunescan_EPUstraight">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; tunescan_EPUstraight.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>tunescan_EPUstraight
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>	[Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector {4}, ChanType)</li><li><a href="getid.html" class="code" title="function [Position, Velocity, RunFlag, UserGap] = getid(DeviceList, ChanType)">getid</a>	GETID - Get the insertion device position, velocity, run flag, and user requested gap</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 tune=[];offsetmeas=[];
+0002 epushift=<a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>([4 1;11 1;11 2]);
+0003 epugap=<a href="getid.html" class="code" title="function [Position, Velocity, RunFlag, UserGap] = getid(DeviceList, ChanType)">getid</a>([4 1;11 1;11 2]);
+0004 epumode = [scaget(<span class="string">'SR04U___ODS1M__DC00'</span>);scaget(<span class="string">'SR11U___ODS1M__DC00'</span>);scaget(<span class="string">'SR11U___ODS2M__DC00'</span>)];
+0005 
+0006 SectorIn = menu(str2mat(<span class="string">'EPU orbit bump test'</span>,<span class="string">'Feed forward must be off!'</span>,<span class="string">' '</span>,<span class="string">'Which insertion device?'</span>),<span class="string">'EPU 4.1'</span>,<span class="string">'EPU 11.1'</span>,<span class="string">'EPU 11.2'</span>,<span class="string">'Cancel'</span>);   
+0007 
+0008    <span class="keyword">if</span> SectorIn == 1
+0009       Sector = 4;
+0010    <span class="keyword">elseif</span> SectorIn == 2
+0011       Sector = 11;
+0012    <span class="keyword">elseif</span> SectorIn == 3
+0013       Sector = 11;
+0014    <span class="keyword">elseif</span> SectorIn == 4
+0015       disp(<span class="string">'  tunescan.  No changes to correctors or insertion device.'</span>);
+0016          <span class="keyword">return</span>
+0017    <span class="keyword">end</span>
+0018 
+0019 <span class="comment">% &quot;short&quot; bump</span>
+0020 CMIncrementList = [-3 -1 1 3];
+0021 NIter = 5;
+0022 
+0023 meastime = now;
+0024 
+0025 loop=1;
+0026 
+0027 x0 = getgolden(<span class="string">'BPMx'</span>,[Sector-1 10;Sector 1]);
+0028 
+0029 <span class="keyword">for</span> offset = -5.5:0.5:4.0
+0030     HCMsp0 = getsp(<span class="string">'HCM'</span>);
+0031     setorbitbump(<span class="string">'BPMx'</span>, [Sector-1 10;Sector 1], [offset; offset], <span class="string">'HCM'</span>, CMIncrementList, NIter);
+0032     offset
+0033     pause(10);
+0034     tune(:,loop)=gettune;
+0035     offsetmeas(:,loop)=getam(<span class="string">'BPMx'</span>,[Sector-1 10;Sector 1])-x0;
+0036     setsp(<span class="string">'HCM'</span>,HCMsp0,[],-2);
+0037     loop=loop+1;
+0038 <span class="keyword">end</span>
+0039 
+0040 filename=sprintf(<span class="string">'epu_orbitscan_tune_sector%d_%s.mat'</span>,Sector,datestr(now,30));
+0041 save(filename,<span class="string">'tune'</span>,<span class="string">'offsetmeas'</span>,<span class="string">'epushift'</span>,<span class="string">'epugap'</span>,<span class="string">'epumode'</span>,<span class="string">'x0'</span>);
+0042 
+0043 <span class="comment">%setorbitbump('BPMx', [Sector-1 10;Sector 1], [0;0], 'HCM', CMIncrementList, NIter);</span>
+0044 
+0045 
+0046 
+0047 
+0048</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

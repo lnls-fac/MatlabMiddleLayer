@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bl61bump</title>
+  <meta name="keywords" content="bl61bump">
+  <meta name="description" content="function bl61bump(offsetfac, anglefac)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; bl61bump.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>bl61bump
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function bl61bump(offsetfac, anglefac)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function bl61bump(offsetfac, anglefac) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> function bl61bump(offsetfac, anglefac)
+
+ This function generates a vertical offset and or angle bump at
+ BL 6.1 using 7 vertical correction magnets.
+
+ Christoph Steier, November 2004</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li><li><a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>	GETBPMLIST - Return a corrector magnet list based on key words and sector numbers</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function bl61bump(offsetfac, anglefac)</a>
+0002 <span class="comment">% function bl61bump(offsetfac, anglefac)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% This function generates a vertical offset and or angle bump at</span>
+0005 <span class="comment">% BL 6.1 using 7 vertical correction magnets.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Christoph Steier, November 2004</span>
+0008 
+0009 
+0010 <span class="comment">% Turn feedforward off</span>
+0011 <span class="comment">%setff([],0);</span>
+0012 
+0013 ModelFlag = strcmpi(getmode(<span class="string">'BPMy'</span>),<span class="string">'Simulator'</span>);
+0014 
+0015 HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>,<span class="string">'1 2 3 4 5 6 7 8'</span>);
+0016 VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>,<span class="string">'1 2 4 5 7 8'</span>);
+0017 
+0018 
+0019 <span class="comment">%load('/home/als/physbase/matlab/chris/commands/bl61bumps.mat');</span>
+0020 <span class="comment">%load('/home/als/physbase/matlab2004/users/portmann/bl6bumps/bl61bumps.mat');</span>
+0021 load([getfamilydata(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>), <span class="string">'bl61bumps.mat'</span>]);
+0022 
+0023 
+0024 BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'BPMx'</span>, <span class="string">'2 3 4 5 6 7 8 9'</span>);
+0025 BPMyList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'BPMy'</span>, <span class="string">'2 3 4 5 6 7 8 9'</span>);
+0026 
+0027 
+0028 x0 = getx(BPMxList);
+0029 <span class="comment">%x0real = raw2real('BPMx', 'Monitor', x0, BPMxList);</span>
+0030 
+0031 y0 = gety(BPMyList);
+0032 <span class="comment">%y0real = raw2real('BPMy', 'Monitor', y0, BPMyList);</span>
+0033 
+0034 xgolden = getgolden(<span class="string">'BPMx'</span>, BPMxList);
+0035 ygolden = getgolden(<span class="string">'BPMy'</span>, BPMyList);
+0036 
+0037 <span class="keyword">if</span> nargin &lt; 1
+0038     offsetfac = input(<span class="string">'   Offset factor (times 1 mm at 6.1) '</span>);
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="keyword">if</span> nargin &lt; 2
+0042     anglefac = input(<span class="string">'   Angle factor (times 0.1 mrad at 6.1) '</span>);
+0043 <span class="keyword">end</span>
+0044 
+0045 <span class="keyword">if</span> isnan(offsetfac) | isnan(anglefac)
+0046     error(<span class="string">'Input arguments are NaN'</span>);
+0047 <span class="keyword">end</span>
+0048 
+0049 
+0050 
+0051 f1 = 1; <span class="comment">%figure;</span>
+0052 f2 = 2; <span class="comment">%figure;</span>
+0053 
+0054 BPMs = getspos(<span class="string">'BPMx'</span>, BPMxList);
+0055 
+0056 
+0057 figure(f1);
+0058 clf reset
+0059 subplot(2,1,1);
+0060 plot(BPMs,x0-xgolden,<span class="string">'bx-'</span>);
+0061 hold on
+0062 subplot(2,1,2);
+0063 plot(BPMs,y0-ygolden,<span class="string">'bo-'</span>);
+0064 hold on
+0065 
+0066 figure(f2);
+0067 clf reset
+0068 subplot(2,1,1);
+0069 plot(BPMs,x0-x0,<span class="string">'bx-'</span>);
+0070 hold on
+0071 subplot(2,1,2);
+0072 plot(BPMs, offsetfac*orbit_offset(3,:)'*1e3+anglefac*orbit_angle(3,:)'*1e3,<span class="string">'bo-'</span>);
+0073 hold on
+0074 
+0075 <span class="keyword">if</span> ModelFlag
+0076     [xm0, ym0, Sx, Sy] = modeltwiss(<span class="string">'x'</span>);
+0077 <span class="keyword">end</span>
+0078 
+0079 ynew = y0+offsetfac*orbit_offset(3,:)'*1e3+anglefac*orbit_angle(3,:)'*1e3;
+0080 
+0081 <span class="comment">%ynewReal = y0+offsetfac*orbit_offset(3,:)'*1e3+anglefac*orbit_angle(3,:)'*1e3;</span>
+0082 <span class="comment">%ynewRaw = real2raw('BPMy', 'Monitor', ynewReal, BPMyList);</span>
+0083 
+0084 fprintf(<span class="string">'   Starting the orbit bump\n'</span>);
+0085 setbpm(<span class="string">'HCM'</span>, x0,   HCMList, BPMxList, <span class="keyword">...</span>
+0086        <span class="string">'VCM'</span>, ynew, corrlist, BPMyList, 4, 1.5e-3 );
+0087    
+0088 <span class="comment">% Raw may not be working because there is an offset???</span>
+0089 <span class="comment">%setbpm('HCM', x0,    HCMList, BPMxList, ...</span>
+0090 <span class="comment">%       'VCM', ynewRaw, corrlist, BPMyList, 4, 1.5e-3 );</span>
+0091 fprintf(<span class="string">'   Orbit bump complete.\n'</span>);
+0092 
+0093 <span class="keyword">if</span> ModelFlag
+0094     [xm1, ym1] = modeltwiss(<span class="string">'x'</span>);
+0095 <span class="keyword">end</span>
+0096 
+0097 x1 = getx(BPMxList);
+0098 <span class="comment">%x1 = raw2real('BPMx', 'Monitor', x1, BPMxList);</span>
+0099 
+0100 y1 = gety(BPMyList);
+0101 <span class="comment">%y1 = raw2real('BPMy', 'Monitor', y1, BPMyList);</span>
+0102 
+0103 
+0104 figure(f1);
+0105 subplot(2,1,1);
+0106 plot(BPMs, x1-xgolden, <span class="string">'rx-'</span>);
+0107 hold off
+0108 ylabel(<span class="string">'BPMx [mm]'</span>);
+0109 title(<span class="string">'BL 6.2 Orbit Bump: Different from the Golden Orbit'</span>);
+0110 legend(<span class="string">'Goal Orbit'</span>, <span class="string">'Final Orbit'</span>, 0);
+0111 subplot(2,1,2);
+0112 plot(BPMs, y1-ygolden, <span class="string">'ro-'</span>);
+0113 hold off
+0114 xlabel(<span class="string">'BPM Position [Meters]'</span>);
+0115 ylabel(<span class="string">'BPMy [mm]'</span>);
+0116 
+0117 figure(f2);
+0118 subplot(2,1,1);
+0119 plot(BPMs, x1-x0, <span class="string">'rx-'</span>);
+0120 <span class="keyword">if</span> ModelFlag
+0121     plot(Sx, 1e3*(xm1-xm0),<span class="string">'g'</span>);
+0122 <span class="keyword">end</span>
+0123 hold off
+0124 
+0125 legend(<span class="string">'Goal Orbit'</span>, <span class="string">'Final Orbit'</span>, 0);
+0126 ylabel(<span class="string">'\DeltaBPMx [mm]'</span>);
+0127 title(<span class="string">'BL 6.2 Orbit Bump'</span>);
+0128 
+0129 subplot(2,1,2);
+0130 plot(BPMs, y1-y0, <span class="string">'ro-'</span>);
+0131 
+0132 <span class="keyword">if</span> ModelFlag
+0133     plot(Sy, 1e3*(ym1-ym0),<span class="string">'g'</span>);
+0134 <span class="keyword">end</span>
+0135 hold off
+0136 
+0137 xlabel(<span class="string">'BPM Position [Meters]'</span>);
+0138 ylabel(<span class="string">'\DeltaBPMy [mm]'</span>);
+0139 
+0140 addlabel(0, 0, <span class="string">'BPM gains have been taken into account.'</span>);
+0141 addlabel(1, 0, datestr(clock,0));
+0142</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

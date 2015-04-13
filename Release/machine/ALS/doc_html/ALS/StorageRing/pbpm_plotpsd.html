@@ -1,0 +1,453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of pbpm_plotpsd</title>
+  <meta name="keywords" content="pbpm_plotpsd">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; pbpm_plotpsd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>pbpm_plotpsd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function plotpbpmpsd(FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function plotpbpmpsd(FileName)</a>
+0002 
+0003 <span class="keyword">if</span> nargin == 0
+0004    <span class="comment">%uiload;</span>
+0005    [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a pBPM File'</span>);
+0006    FileName = [DirectoryName, FileName];
+0007 <span class="keyword">end</span>
+0008     
+0009 load(FileName);
+0010 
+0011 <span class="keyword">if</span> ~exist(<span class="string">'d1'</span>,<span class="string">'var'</span>)
+0012     <span class="keyword">return</span>;
+0013 <span class="keyword">end</span>
+0014 
+0015 
+0016 NaaAvg = size(d1,2);
+0017 
+0018 PaaAvg = 0;
+0019 Paa1Avg = 0;
+0020 Paa2Avg = 0;
+0021 Paa3Avg = 0;
+0022 Paa4Avg = 0;
+0023 Paa5Avg = 0;
+0024 Paa6Avg = 0;
+0025 
+0026 
+0027 <span class="keyword">for</span> i = 1:NaaAvg    
+0028     
+0029     <span class="comment">% Vertical position</span>
+0030     y1(:,i) = (d1(:,i) - d3(:,i)) ./ (d1(:,i) + d3(:,i));
+0031     y2(:,i) = (d2(:,i) - d4(:,i)) ./ (d2(:,i) + d4(:,i));
+0032     
+0033     
+0034     <span class="comment">% Calibrated position</span>
+0035     <span class="comment">%Gain = 1;</span>
+0036     <span class="comment">%Gain3 = .978 ./ (mean(y2(:,i)) - mean(y1(:,i)));</span>
+0037     <span class="comment">%Gain2 = .978 ./ mean(y2(:,i) - y1(:,i));</span>
+0038     Gain = .978 ./ (y2(:,i) - y1(:,i));
+0039     
+0040     <span class="comment">%y(:,i) = Gain .* y1(:,i);</span>
+0041     y(:,i) = mean(Gain) .* y1(:,i);
+0042 
+0043     y1(:,i) = mean(Gain) .* y1(:,i);
+0044     y2(:,i) = mean(Gain) .* y2(:,i);
+0045 
+0046     a  = y(:,i);   <span class="comment">% Calibrated</span>
+0047     a1 = d1(:,i);  <span class="comment">% Channel #1</span>
+0048     a2 = d2(:,i);  <span class="comment">% Channel #2</span>
+0049     a3 = d3(:,i);  <span class="comment">% Channel #3</span>
+0050     a4 = d4(:,i);  <span class="comment">% Channel #4</span>
+0051     a5 = y1(:,i);  <span class="comment">% Inside</span>
+0052     a6 = y2(:,i);  <span class="comment">% Outside</span>
+0053     
+0054     
+0055     <span class="comment">%a = a-mean(a);</span>
+0056     a = detrend(a);
+0057     a1 = detrend(a1);
+0058     a2 = detrend(a2);
+0059     a3 = detrend(a3);
+0060     a4 = detrend(a4);
+0061     a5 = detrend(a5);
+0062     a6 = detrend(a6);
+0063 
+0064 
+0065     <span class="comment">% POWER SPECTRUM</span>
+0066     T1 = 1/Fs;
+0067     T  = T1 * N;
+0068 
+0069     f0 = 1 / (N*T1);
+0070     f  = f0 * (0:N/2)';
+0071     
+0072     <span class="keyword">if</span> exist(<span class="string">'hanning'</span>) == 0
+0073         w = ones(N,1);               <span class="comment">% no window</span>
+0074     <span class="keyword">else</span>
+0075         w = hanning(N);              <span class="comment">% hanning window</span>
+0076     <span class="keyword">end</span>
+0077     U = sum(w.^2)/N;              <span class="comment">% approximately .375 for hanning</span>
+0078     <span class="comment">%U2 = ((norm(w)/sum(w))^2);   % used to normalize plots (p. 1-68, matlab DSP toolbox)</span>
+0079     
+0080     a_w = a .* w;
+0081     A = fft(a_w);
+0082     Paa = A.*conj(A)/N;
+0083     Paa = Paa/U;
+0084     Paa(N/2+2:N) = [];
+0085     Paa(2:N/2+1) = 2*Paa(2:N/2+1);
+0086 
+0087     a_w = a1 .* w;
+0088     A = fft(a_w);
+0089     Paa1 = A.*conj(A)/N;
+0090     Paa1 = Paa1 / U;
+0091     Paa1(N/2+2:N) = [];
+0092     Paa1(2:N/2+1) = 2*Paa1(2:N/2+1);
+0093     
+0094     a_w = a2 .* w;
+0095     A = fft(a_w);
+0096     Paa2 = A.*conj(A)/N;
+0097     Paa2 = Paa2/U;
+0098     Paa2(N/2+2:N) = [];
+0099     Paa2(2:N/2+1) = 2*Paa2(2:N/2+1);
+0100 
+0101     a_w = a3 .* w;
+0102     A = fft(a_w);
+0103     Paa3 = A.*conj(A)/N;
+0104     Paa3 = Paa3/U;
+0105     Paa3(N/2+2:N) = [];
+0106     Paa3(2:N/2+1) = 2*Paa3(2:N/2+1);
+0107 
+0108     a_w = a4 .* w;
+0109     A = fft(a_w);
+0110     Paa4 = A.*conj(A)/N;
+0111     Paa4 = Paa4/U;
+0112     Paa4(N/2+2:N) = [];
+0113     Paa4(2:N/2+1) = 2*Paa4(2:N/2+1);
+0114 
+0115     a_w = a5 .* w;
+0116     A = fft(a_w);
+0117     Paa5 = A.*conj(A)/N;
+0118     Paa5 = Paa5/U;
+0119     Paa5(N/2+2:N) = [];
+0120     Paa5(2:N/2+1) = 2*Paa5(2:N/2+1);
+0121 
+0122     a_w = a6 .* w;
+0123     A = fft(a_w);
+0124     Paa6 = A.*conj(A)/N;
+0125     Paa6 = Paa6/U;
+0126     Paa6(N/2+2:N) = [];
+0127     Paa6(2:N/2+1) = 2*Paa6(2:N/2+1);
+0128 
+0129     <span class="comment">% PSD using matlab functions (NOTE: matlab function detrend by default)</span>
+0130     <span class="comment">% PaaS = spectrum(a,N,0,w,f0);</span>
+0131     <span class="comment">% PaaS = 2*PaaS(:,1);</span>
+0132     <span class="comment">% PaaS(1)=PaaS(1)/2;</span>
+0133     <span class="comment">% PaaPSD=2*psd(a,N);</span>
+0134     <span class="comment">% PddPSD(1)=PddPSD(1)/2;</span>
+0135 
+0136     
+0137     <span class="comment">%Pdd(1) = 0;   % not sure if the DC term is correct</span>
+0138     <span class="comment">%Pdd1 = Pdd;</span>
+0139     <span class="comment">%m = 3;        % not sure if the first couple terms are good</span>
+0140     <span class="comment">%for i=1:m</span>
+0141     <span class="comment">%   Pdd(i) = 0;</span>
+0142     <span class="comment">%end</span>
+0143 
+0144 
+0145     RMS_data = sqrt(sum((a-mean(a)).^2)/length((a-mean(a))));
+0146     RMS_data1 = sqrt(sum((a1-mean(a1)).^2)/length((a1-mean(a1))));
+0147     RMS_data2 = sqrt(sum((a2-mean(a2)).^2)/length((a2-mean(a2))));
+0148     RMS_data3 = sqrt(sum((a3-mean(a3)).^2)/length((a3-mean(a3))));
+0149     RMS_data4 = sqrt(sum((a4-mean(a4)).^2)/length((a4-mean(a4))));
+0150     RMS_data5 = sqrt(sum((a5-mean(a5)).^2)/length((a5-mean(a5))));
+0151     RMS_data6 = sqrt(sum((a6-mean(a6)).^2)/length((a6-mean(a6))));
+0152 
+0153     
+0154     Paa_int = cumsum(Paa)/N;
+0155     <span class="comment">%Paa_int = cumsum(Paa(end:-1:1))/N;</span>
+0156     <span class="comment">%Paa_int = Paa_int(length(Paa_int):-1:1);</span>
+0157     Paa1_int = cumsum(Paa1)/N;
+0158     Paa2_int = cumsum(Paa2)/N;
+0159     Paa3_int = cumsum(Paa3)/N;
+0160     Paa4_int = cumsum(Paa4)/N;
+0161     Paa5_int = cumsum(Paa5)/N;
+0162     Paa6_int = cumsum(Paa6)/N;
+0163 
+0164     
+0165     fprintf(<span class="string">'\n   RMS Displacement: %g mm (Calibrated) (Time series data)\n'</span>, RMS_data);
+0166     fprintf(  <span class="string">'   RMS Displacement: %g mm (Calibrated) (PSD, Parseval''s Thm)\n\n'</span>, sqrt(Paa_int(end)));
+0167 
+0168     fprintf(<span class="string">'\n   RMS Displacement: %g mm (Channel #1) (Time series data)\n'</span>, RMS_data1);
+0169     fprintf(  <span class="string">'   RMS Displacement: %g mm (Channel #1) (PSD, Parseval''s Thm)\n\n'</span>, sqrt(Paa1_int(end)));
+0170 
+0171     fprintf(<span class="string">'\n   RMS Displacement: %g mm (Channel #2) (Time series data)\n'</span>, RMS_data2);
+0172     fprintf(  <span class="string">'   RMS Displacement: %g mm (Channel #2) (PSD, Parseval''s Thm)\n\n'</span>, sqrt(Paa2_int(end)));
+0173 
+0174     fprintf(<span class="string">'\n   RMS Displacement: %g mm (Channel #3) (Time series data)\n'</span>, RMS_data3);
+0175     fprintf(  <span class="string">'   RMS Displacement: %g mm (Channel #3) (PSD, Parseval''s Thm)\n\n'</span>, sqrt(Paa3_int(end)));
+0176 
+0177     fprintf(<span class="string">'\n   RMS Displacement: %g mm (Channel #4) (Time series data)\n'</span>, RMS_data4);
+0178     fprintf(  <span class="string">'   RMS Displacement: %g mm (Channel #4) (PSD, Parseval''s Thm)\n\n'</span>, sqrt(Paa4_int(end)));
+0179 
+0180     fprintf(<span class="string">'\n   RMS Displacement: %g mm (Inside) (Time series data)\n'</span>, RMS_data5);
+0181     fprintf(  <span class="string">'   RMS Displacement: %g mm (Inside) (PSD, Parseval''s Thm)\n\n'</span>, sqrt(Paa5_int(end)));
+0182 
+0183     fprintf(<span class="string">'\n   RMS Displacement: %g mm (Outside) (Time series data)\n'</span>, RMS_data6);
+0184     fprintf(  <span class="string">'   RMS Displacement: %g mm (Outside) (PSD, Parseval''s Thm)\n\n'</span>, sqrt(Paa6_int(end)));
+0185 
+0186 
+0187     PaaAvg = PaaAvg + Paa/NaaAvg;
+0188     Paa1Avg = Paa1Avg + Paa1/NaaAvg;
+0189     Paa2Avg = Paa2Avg + Paa2/NaaAvg;
+0190     Paa3Avg = Paa3Avg + Paa3/NaaAvg;
+0191     Paa4Avg = Paa4Avg + Paa4/NaaAvg;
+0192     Paa5Avg = Paa5Avg + Paa5/NaaAvg;
+0193     Paa6Avg = Paa6Avg + Paa6/NaaAvg;
+0194 <span class="keyword">end</span>
+0195 
+0196 fprintf(<span class="string">'\n   %d Averaged Power Spectrums\n'</span>, NaaAvg);
+0197 
+0198 Paa = PaaAvg;
+0199 Paa_int = cumsum(Paa)/N;
+0200 <span class="comment">%Paa_int = cumsum(Paa(end:-1:1))/N;</span>
+0201 <span class="comment">%Paa_int = Paa_int(length(Paa_int):-1:1);</span>
+0202 fprintf(<span class="string">'   RMS Displacement: %g mm (Calibrated) (PSD, Parseval''s Thm)\n'</span>, sqrt(Paa_int(end)));
+0203 
+0204 Paa1 = Paa1Avg;
+0205 Paa1_int = cumsum(Paa1)/N;
+0206 fprintf(<span class="string">'   RMS Displacement: %g mm (Channel #1) (PSD, Parseval''s Thm)\n'</span>, sqrt(Paa1_int(end)));
+0207 
+0208 Paa2 = Paa2Avg;
+0209 Paa2_int = cumsum(Paa2)/N;
+0210 fprintf(<span class="string">'   RMS Displacement: %g mm (Channel #2) (PSD, Parseval''s Thm)\n'</span>, sqrt(Paa2_int(end)));
+0211 
+0212 Paa3 = Paa3Avg;
+0213 Paa3_int = cumsum(Paa3)/N;
+0214 fprintf(<span class="string">'   RMS Displacement: %g mm (Channel #3) (PSD, Parseval''s Thm)\n'</span>, sqrt(Paa3_int(end)));
+0215 
+0216 Paa4 = Paa4Avg;
+0217 Paa4_int = cumsum(Paa4)/N;
+0218 fprintf(<span class="string">'   RMS Displacement: %g mm (Channel #4) (PSD, Parseval''s Thm)\n'</span>, sqrt(Paa4_int(end)));
+0219 
+0220 Paa5 = Paa5Avg;
+0221 Paa5_int = cumsum(Paa5)/N;
+0222 fprintf(<span class="string">'   RMS Displacement: %g mm (Inside) (PSD, Parseval''s Thm)\n'</span>, sqrt(Paa5_int(end)));
+0223 
+0224 Paa6 = Paa6Avg;
+0225 Paa6_int = cumsum(Paa6)/N;
+0226 fprintf(<span class="string">'   RMS Displacement: %g mm (Outside) (PSD, Parseval''s Thm)\n'</span>, sqrt(Paa6_int(end)));
+0227 
+0228 
+0229 
+0230 davg  = mean(mean(y));
+0231 d1avg = mean(mean(d1));
+0232 d2avg = mean(mean(d2));
+0233 d3avg = mean(mean(d3));
+0234 d4avg = mean(mean(d4));
+0235 d5avg = mean(mean(y1));
+0236 d6avg = mean(mean(y2));
+0237 
+0238 
+0239 
+0240 <span class="comment">% Plotting T1*Paa makes the PSD the same units as on the HP Control System Analyzer</span>
+0241 <span class="comment">% Ie, you can integrate it visually and get mm^2</span>
+0242 
+0243 <span class="comment">% subplot(3,1,1);</span>
+0244 <span class="comment">% plot((1:4096)/Fs, y1(:,1));</span>
+0245 
+0246 
+0247 figure(1);
+0248 clf reset
+0249 
+0250 subplot(2,1,1);
+0251 loglog(f, 1000*1000*T1*[Paa5 Paa6]);
+0252 xlabel(<span class="string">'Frequency [Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0253 ylabel(<span class="string">'[\mum{^2}/Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0254 title(<span class="string">'Photon BPM 7.2 Power Spectral Density'</span>, <span class="string">'FontSize'</span>,12);
+0255 legend(<span class="string">'Inside Blades'</span>, <span class="string">'Outside Blades'</span>, <span class="string">'Location'</span>,<span class="string">'NorthWest'</span>);
+0256 axis tight
+0257 grid on
+0258 
+0259 a = axis;
+0260 <span class="keyword">if</span> a(3) &lt; 1e-3
+0261     a(3) = 1e-3;
+0262     axis(a);
+0263 <span class="keyword">end</span>
+0264 
+0265 subplot(2,1,2);
+0266 semilogx(f, 1000*1000*[Paa5_int Paa6_int]);
+0267 xlabel(<span class="string">'Frequency [Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0268 ylabel(<span class="string">'[\mum {^2}]'</span>, <span class="string">'FontSize'</span>,12);
+0269 title(sprintf(<span class="string">'\\fontsize{12}Cumulative  \\fontsize{16}\\int \\fontsize{12}PSD df     (RMS=%.2g \\mum (Inside)  %.2g \\mum (Outside))'</span>, 1000*sqrt(Paa5_int(end)),1000*sqrt(Paa6_int(end))));
+0270 legend(<span class="string">'Inside Blades'</span>, <span class="string">'Outside Blades'</span>, <span class="string">'Location'</span>,<span class="string">'NorthWest'</span>);
+0271 axis tight
+0272 grid on
+0273 
+0274 addlabel(1,0,sprintf(<span class="string">'%.1f mA  %s'</span>, DCCT, datestr(TimeClock,0)));
+0275 addlabel(0,0,sprintf(<span class="string">'Avg Blade Voltage: Top Inside = %.2f  Top Outside = %.2f  Bottom Inside = %.2f  Bottom Outside = %.2f  (Average Gain = %.2f)'</span>, d1avg, d2avg, d3avg, d4avg, mean(Gain)));
+0276 <span class="comment">%addlabel(0,0,sprintf('Avg Blade Voltage: Top Inside = %.2f   Bottom Inside = %.2f', d1avg, d3avg));</span>
+0277 <span class="comment">%addlabel(0,0,sprintf('Avg Blade Voltage: Top Outside = %.2f   Bottom Outside = %.2f', d2avg, d3avg));</span>
+0278 orient tall
+0279 
+0280 
+0281 
+0282 figure(2);
+0283 clf reset
+0284 
+0285 subplot(2,1,1);
+0286 loglog(f, 1000*1000*T1*[Paa1 Paa2 Paa3 Paa4]);
+0287 xlabel(<span class="string">'Frequency [Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0288 ylabel(<span class="string">'[Volts{^2}/Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0289 title(<span class="string">'Photon BPM 7.2 Power Spectral Density for Each Blade'</span>, <span class="string">'FontSize'</span>,12);
+0290 axis tight
+0291 grid on
+0292 
+0293 a = axis;
+0294 <span class="keyword">if</span> a(3) &lt; 1e-5
+0295     a(3) = 1e-5;
+0296     axis(a);
+0297 <span class="keyword">end</span>
+0298 
+0299 subplot(2,1,2);
+0300 semilogx(f, [Paa1_int Paa2_int Paa3_int Paa4_int]);
+0301 xlabel(<span class="string">'Frequency [Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0302 ylabel(<span class="string">'[Volts {^2}]'</span>, <span class="string">'FontSize'</span>,12);
+0303 title(sprintf(<span class="string">'\\fontsize{12}Cumulative  \\fontsize{16}\\int \\fontsize{12}PSD df  (RMS: Top Inside=%.2g  Top Outside=%.2g  Bottom Inside=%.2g  Bottom Outside=%.2g Volts)'</span>, sqrt(Paa1_int(end)), sqrt(Paa2_int(end)), sqrt(Paa3_int(end)), sqrt(Paa4_int(end)) ));
+0304 legend(<span class="string">'Top Inside'</span>,<span class="string">'Top Outside'</span>,<span class="string">'Bottom Inside'</span>,<span class="string">'Bottom Outside'</span>, <span class="string">'Location'</span>,<span class="string">'NorthWest'</span>); 
+0305 axis tight
+0306 grid on
+0307 
+0308 addlabel(1,0,sprintf(<span class="string">'%.1f mA  %s'</span>, DCCT, datestr(TimeClock,0)));
+0309 addlabel(0,0,sprintf(<span class="string">'Avg Blade Voltage: Top Inside = %.2f  Top Outside = %.2f  Bottom Inside = %.2f  Bottom Outside = %.2f'</span>, d1avg, d2avg, d3avg, d4avg));
+0310 orient tall
+0311 
+0312 
+0313 
+0314 figure(3);
+0315 clf reset
+0316 
+0317 subplot(2,1,1);
+0318 loglog(f, 1000*1000*T1*[Paa]);
+0319 xlabel(<span class="string">'Frequency [Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0320 ylabel(<span class="string">'[\mum{^2}/Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0321 title(<span class="string">'Photon BPM 7.2 Power Spectral Density'</span>, <span class="string">'FontSize'</span>,12);
+0322 axis tight
+0323 grid on
+0324 
+0325 a = axis;
+0326 <span class="keyword">if</span> a(3) &lt; 1e-3
+0327     a(3) = 1e-3;
+0328     axis(a);
+0329 <span class="keyword">end</span>
+0330 
+0331 subplot(2,1,2);
+0332 semilogx(f, 1000*1000*[Paa_int]);
+0333 xlabel(<span class="string">'Frequency [Hz]'</span>, <span class="string">'FontSize'</span>,12);
+0334 ylabel(<span class="string">'[\mum {^2}]'</span>, <span class="string">'FontSize'</span>,12);
+0335 title(sprintf(<span class="string">'\\fontsize{12}Cumulative  \\fontsize{16}\\int \\fontsize{12}PSD df   (RMS=%.2g \\mum)'</span>, 1000*sqrt(Paa_int(end))));
+0336 axis tight
+0337 grid on
+0338 
+0339 addlabel(1,0,sprintf(<span class="string">'%.1f mA  %s'</span>, DCCT, datestr(TimeClock,0)));
+0340 addlabel(0,0,sprintf(<span class="string">'Avg Blade Voltage: Top Inside = %.2f  Top Outside = %.2f  Bottom Inside = %.2f  Bottom Outside = %.2f  (Average Gain = %.2f)'</span>, d1avg, d2avg, d3avg, d4avg, mean(Gain)));
+0341 orient tall
+0342 
+0343 
+0344 
+0345 <span class="comment">% figure(4);</span>
+0346 <span class="comment">% %clf reset</span>
+0347 <span class="comment">%</span>
+0348 <span class="comment">% LineColor = 'k'; %nxtcolor;</span>
+0349 <span class="comment">%</span>
+0350 <span class="comment">% subplot(2,1,1);</span>
+0351 <span class="comment">% loglog(f, 1000*1000*T1*[Paa2], LineColor);</span>
+0352 <span class="comment">% xlabel('Frequency [Hz]', 'FontSize',12);</span>
+0353 <span class="comment">% ylabel('Top Outside [Volts{^2}/Hz]', 'FontSize',12);</span>
+0354 <span class="comment">% title('Photon BPM 7.2 Power Spectral Density', 'FontSize',12);</span>
+0355 <span class="comment">% axis tight</span>
+0356 <span class="comment">% grid on</span>
+0357 <span class="comment">%</span>
+0358 <span class="comment">% a = axis;</span>
+0359 <span class="comment">% if a(3) &lt; 1e-5</span>
+0360 <span class="comment">%     a(3) = 1e-5;</span>
+0361 <span class="comment">%     axis(a);</span>
+0362 <span class="comment">% end</span>
+0363 <span class="comment">%</span>
+0364 <span class="comment">% subplot(2,1,2);</span>
+0365 <span class="comment">% semilogx(f, [Paa2_int], LineColor);</span>
+0366 <span class="comment">% xlabel('Frequency [Hz]', 'FontSize',12);</span>
+0367 <span class="comment">% ylabel('Top Outside [Volts {^2}]', 'FontSize',12);</span>
+0368 <span class="comment">% title(sprintf('\\fontsize{12}Cumulative  \\fontsize{16}\\int \\fontsize{12}PSD df)'));</span>
+0369 <span class="comment">% %legend('Top Inside','Top Outside','Bottom Inside','Bottom Outside', 'Location','NorthWest');</span>
+0370 <span class="comment">% axis tight</span>
+0371 <span class="comment">% grid on</span>
+0372 <span class="comment">%</span>
+0373 <span class="comment">% %addlabel(1,0,sprintf('%.1f mA  %s', DCCT, datestr(TimeClock,0)));</span>
+0374 <span class="comment">% %addlabel(0,0,sprintf('Avg Blade Voltage: Top Inside = %.2f  Top Outside = %.2f  Bottom Inside = %.2f  Bottom Outside = %.2f', d1avg, d2avg, d3avg, d4avg));</span>
+0375 <span class="comment">% orient tall</span>
+0376 
+0377 
+0378 
+0379 
+0380 <span class="comment">% subplot(2,1,1);</span>
+0381 <span class="comment">% loglog(f, 1000*1000*T1*Paa);</span>
+0382 <span class="comment">% xlabel('Frequency [Hz]', 'FontSize',12);</span>
+0383 <span class="comment">% ylabel('[\mum{^2}/Hz]', 'FontSize',12);</span>
+0384 <span class="comment">% axis tight</span>
+0385 <span class="comment">% grid on</span>
+0386 <span class="comment">% title('Photon BPM 7.2  Power Spectral Density (Inside Blades)', 'FontSize',12);</span>
+0387 <span class="comment">%</span>
+0388 <span class="comment">% a = axis;</span>
+0389 <span class="comment">% if a(3) &lt; 1e-3</span>
+0390 <span class="comment">%     a(3) = 1e-3;</span>
+0391 <span class="comment">%     axis(a);</span>
+0392 <span class="comment">% end</span>
+0393 <span class="comment">%</span>
+0394 <span class="comment">% subplot(2,1,2);</span>
+0395 <span class="comment">% semilogx(f, 1000*1000*Paa_int);</span>
+0396 <span class="comment">% xlabel('Frequency [Hz]', 'FontSize',12);</span>
+0397 <span class="comment">% ylabel('[\mum {^2}]', 'FontSize',12);</span>
+0398 <span class="comment">% title(sprintf('\\fontsize{12}Cumulative  \\fontsize{16}\\int \\fontsize{12}PSD df   (RMS=%.2g \\mum)', 1000*sqrt(Paa_int(end))));</span>
+0399 <span class="comment">% axis tight</span>
+0400 <span class="comment">% grid on</span>
+0401 <span class="comment">%</span>
+0402 <span class="comment">% addlabel(1,0,sprintf('%.1f mA  %s', DCCT, datestr(TimeClock,0)));</span>
+0403 <span class="comment">%</span>
+0404 <span class="comment">%</span>
+0405 <span class="comment">% %addlabel(0,0,sprintf('Avg Blade Voltage: Top Inside = %.2f   Top Outside = %.2f   Bottom Inside = %.2f   Bottom Outside = %.2f', d1avg, d2avg, d3avg, d4avg));</span>
+0406 <span class="comment">% addlabel(0,0,sprintf('Avg Blade Voltage: Top Inside = %.2f   Bottom Inside = %.2f', d1avg, d3avg));</span>
+0407 <span class="comment">% %addlabel(0,0,sprintf('Avg Blade Voltage: Top Outside = %.2f   Bottom Outside = %.2f', d2avg, d3avg));</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

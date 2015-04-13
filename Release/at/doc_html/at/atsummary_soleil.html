@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of atsummary_soleil</title>
+  <meta name="keywords" content="atsummary_soleil">
+  <meta name="description" content="ATSUMMARY will print out the paramters of the lattice currently loaded">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">at</a> &gt; atsummary_soleil.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for at&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>atsummary_soleil
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>ATSUMMARY will print out the paramters of the lattice currently loaded</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function sum = atsummary </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> ATSUMMARY will print out the paramters of the lattice currently loaded
+ in AT. The parameters that come after the Synchrotron Integrals are
+ parameters that depend on the Integrals themselves. The equations to
+ calculate them were taken from [1].
+
+ [1] Alexander Wu Chao and Maury Tigner, Handbook of Accelerator Physics
+ and Engineering (World Scientific, Singapore, 1998), pp. 183-187. (or
+ 187-190 in ed. 2)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function sum = atsummary</a>
+0002 <span class="comment">% ATSUMMARY will print out the paramters of the lattice currently loaded</span>
+0003 <span class="comment">% in AT. The parameters that come after the Synchrotron Integrals are</span>
+0004 <span class="comment">% parameters that depend on the Integrals themselves. The equations to</span>
+0005 <span class="comment">% calculate them were taken from [1].</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% [1] Alexander Wu Chao and Maury Tigner, Handbook of Accelerator Physics</span>
+0008 <span class="comment">% and Engineering (World Scientific, Singapore, 1998), pp. 183-187. (or</span>
+0009 <span class="comment">% 187-190 in ed. 2)</span>
+0010 
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  Written by Eugene Tan</span>
+0013 <span class="comment">%  Revised by Laurent S. Nadolski</span>
+0014 
+0015 
+0016 <span class="keyword">global</span> THERING GLOBVAL 
+0017 
+0018 <span class="comment">% if exist('sum','var')</span>
+0019 <span class="comment">%     clear global sum;</span>
+0020 <span class="comment">%     global sum;</span>
+0021 <span class="comment">% end</span>
+0022 
+0023 <span class="comment">% Structure to store info</span>
+0024 sum.e0 = GLOBVAL.E0*1e-9;
+0025 sum.circumference = findspos(THERING, length(THERING)+1);
+0026 sum.revTime = sum.circumference / 2.99792458e8;
+0027 sum.revFreq = 2.99792458e8 / sum.circumference;
+0028 sum.gamma = sum.e0 / 0.51099906e-3;
+0029 sum.beta = sqrt(1 - 1/sum.gamma);
+0030 [TD sum.tunes sum.chromaticity] = twissring(THERING, 0, 1:length(THERING)+1, <span class="string">'chrom'</span>, 1e-8);
+0031 sum.compactionFactor = mcf(THERING);
+0032 
+0033 <span class="comment">% For calculating the synchrotron integrals</span>
+0034 temp  = cat(2,TD.Dispersion);
+0035 D_x   = temp(1,:)';
+0036 D_x_  = temp(2,:)';
+0037 beta  = cat(1, TD.beta);
+0038 alpha = cat(1, TD.alpha);
+0039 gamma = (1 + alpha.^2) ./ beta;
+0040 circ  = TD(length(THERING)+1).SPos;
+0041 
+0042 <span class="comment">% Synchrotron integral calculation</span>
+0043 sum.integrals = [0.0 0.0 0.0 0.0 0.0 0.0];
+0044 
+0045 <span class="keyword">for</span> i = 1:length(THERING),
+0046     <span class="keyword">if</span> isfield(THERING{i}, <span class="string">'BendingAngle'</span>) &amp;&amp; isfield(THERING{i}, <span class="string">'EntranceAngle'</span>)
+0047         rho = THERING{i}.Length/THERING{i}.BendingAngle;
+0048         dispersion = 0.5*(D_x(i)+D_x(i+1));
+0049         sum.integrals(1) = sum.integrals(1) + dispersion*THERING{i}.Length/rho;
+0050         sum.integrals(2) = sum.integrals(2) + THERING{i}.Length/(rho^2);
+0051         sum.integrals(3) = sum.integrals(3) + THERING{i}.Length/(rho^3);
+0052         <span class="comment">% For general wedge magnets</span>
+0053         sum.integrals(4) = sum.integrals(4) + <span class="keyword">...</span>
+0054             D_x(i)*tan(THERING{i}.EntranceAngle)/rho^2 + <span class="keyword">...</span>
+0055             (1 + 2*rho^2*THERING{i}.PolynomB(2))*(D_x(i)+D_x(i+1))*THERING{i}.Length/(2*rho^3) + <span class="keyword">...</span>
+0056             D_x(i+1)*tan(THERING{i}.ExitAngle)/rho^2;
+0057         <span class="comment">%         sum.integrals(4) = sum.integrals(4) + 2*0.5*(D_x(i)+D_x(i+1))*THERING{i}.Length/rho^3;</span>
+0058         H1 = beta(i,1)*D_x_(i)*D_x_(i)+2*alpha(i)*D_x(i)*D_x_(i)+gamma(i)*D_x(i)*D_x(i);
+0059         H0 = beta(i+1,1)*D_x_(i+1)*D_x_(i+1)+2*alpha(i+1)*D_x(i+1)*D_x_(i+1)+gamma(i+1)*D_x(i+1)*D_x(i+1);
+0060         sum.integrals(5) = sum.integrals(5) + THERING{i}.Length*(H1+H0)*0.5/(rho^3);
+0061         <span class="comment">%         if H1+H0 &lt; 0</span>
+0062         <span class="comment">%             fprintf('%f %i %s\n', H1+H0, i, THERING{i}.FamName)</span>
+0063         <span class="comment">%         end</span>
+0064         sum.integrals(6) = sum.integrals(6) + <span class="keyword">...</span>
+0065             THERING{i}.PolynomB(2)^2*dispersion^2*THERING{i}.Length;
+0066     <span class="keyword">end</span>
+0067 <span class="keyword">end</span>
+0068 
+0069 <span class="comment">% Damping numbers</span>
+0070 <span class="comment">% Use Robinson's Theorem</span>
+0071 sum.damping(1) = 1 - sum.integrals(4)/sum.integrals(2);
+0072 sum.damping(2) = 1;
+0073 sum.damping(3) = 2 + sum.integrals(4)/sum.integrals(2);
+0074 
+0075 sum.radiation = 8.846e-5*sum.e0.^4*sum.integrals(2)/(2*pi);
+0076 sum.naturalEnergySpread = sqrt(3.8319e-13*sum.gamma.^2*sum.integrals(3)/(2*sum.integrals(2) + sum.integrals(4)));
+0077 sum.naturalEmittance = 3.8319e-13*(sum.e0*1e3/0.510999).^2*sum.integrals(5)/(sum.damping(1)*sum.integrals(2));
+0078 
+0079 <span class="comment">% Damping times</span>
+0080 sum.radiationDamping(1) = 1/(2113.1*sum.e0.^3*sum.integrals(2)*sum.damping(1)/circ);
+0081 sum.radiationDamping(2) = 1/(2113.1*sum.e0.^3*sum.integrals(2)*sum.damping(2)/circ);
+0082 sum.radiationDamping(3) = 1/(2113.1*sum.e0.^3*sum.integrals(2)*sum.damping(3)/circ);
+0083 
+0084 <span class="comment">% Slip factor</span>
+0085 sum.etac = sum.gamma^(-2) - sum.compactionFactor;
+0086 
+0087 cavind = findcells(THERING,<span class="string">'HarmNumber'</span>);
+0088 <span class="keyword">if</span> ~isempty(cavind)
+0089     freq = THERING{cavind}.Frequency;
+0090     v_cav = THERING{cavind}.Voltage;
+0091 <span class="keyword">else</span>
+0092     <span class="comment">% Default</span>
+0093     freq = 352.202e6;
+0094     v_cav = 3e6;
+0095 <span class="keyword">end</span>
+0096 sum.harmon = sum.circumference/(2.99792458e8/freq); <span class="comment">% Assuming 499.654MHz RF</span>
+0097 sum.overvoltage = v_cav/(sum.radiation*1e9); <span class="comment">% Assuming 3e6 volt cavities.</span>
+0098 <span class="comment">% Assuming the harmon and overvoltage above.</span>
+0099 <span class="comment">% references:  H. Winick, &quot;Synchrotron Radiation Sources: A Primer&quot;,</span>
+0100 <span class="comment">% World Scientific Publishing, Singapore, pp92-95. (1995)</span>
+0101 <span class="comment">% Wiedemann, pp290,350. Chao, pp189.</span>
+0102 sum.syncphase = pi - asin(1/sum.overvoltage);
+0103 sum.energyacceptance = sqrt(v_cav*sin(sum.syncphase)*2*(sqrt(sum.overvoltage^2-1) - acos(1/sum.overvoltage))/(pi*sum.harmon*abs(sum.etac)*sum.e0*1e9));
+0104 sum.synctune = sqrt((sum.etac*sum.harmon*v_cav*cos(sum.syncphase))/(2*pi*sum.e0*1e9));
+0105 sum.bunchlength = sum.beta*299792458*abs(sum.etac)*sum.naturalEnergySpread/(sum.synctune*sum.revFreq*2*pi);
+0106 
+0107 fprintf(<span class="string">'\n'</span>);
+0108 fprintf(<span class="string">'   ******** Summary for ''%s'' ********\n'</span>, GLOBVAL.LatticeFile);
+0109 fprintf(<span class="string">'   Energy: \t\t\t%4.5f [GeV]\n'</span>, sum.e0);
+0110 fprintf(<span class="string">'   Gamma: \t\t\t%4.5f \n'</span>, sum.gamma);
+0111 fprintf(<span class="string">'   Circumference: \t\t%4.5f [m]\n'</span>, sum.circumference);
+0112 fprintf(<span class="string">'   Revolution time: \t\t%4.5f [ns] (%4.5f [MHz]) \n'</span>, sum.revTime*1e9,sum.revFreq*1e-6);
+0113 fprintf(<span class="string">'   Betatron tune H: \t\t%4.5f (%4.5f [kHz])\n'</span>, sum.tunes(1),sum.tunes(1)/sum.revTime*1e-3);
+0114 fprintf(<span class="string">'                 V: \t\t%4.5f (%4.5f [kHz])\n'</span>, sum.tunes(2),sum.tunes(2)/sum.revTime*1e-3);
+0115 fprintf(<span class="string">'   Momentum Compaction Factor: \t%4.5f\n'</span>, sum.compactionFactor);
+0116 fprintf(<span class="string">'   Chromaticity H: \t\t%+4.5f\n'</span>, sum.chromaticity(1));
+0117 fprintf(<span class="string">'                V: \t\t%+4.5f\n'</span>, sum.chromaticity(2));
+0118 fprintf(<span class="string">'   Synchrotron Integral 1: \t%4.5f [m]\n'</span>, sum.integrals(1));
+0119 fprintf(<span class="string">'                        2: \t%4.5f [m^-1]\n'</span>, sum.integrals(2));
+0120 fprintf(<span class="string">'                        3: \t%4.5f [m^-2]\n'</span>, sum.integrals(3));
+0121 fprintf(<span class="string">'                        4: \t%4.5f [m^-1]\n'</span>, sum.integrals(4));
+0122 fprintf(<span class="string">'                        5: \t%4.5f [m^-1]\n'</span>, sum.integrals(5));
+0123 fprintf(<span class="string">'                        6: \t%4.5f [m^-1]\n'</span>, sum.integrals(6));
+0124 fprintf(<span class="string">'   Damping Partition H: \t%4.5f\n'</span>, sum.damping(1));
+0125 fprintf(<span class="string">'                     V: \t%4.5f\n'</span>, sum.damping(2));
+0126 fprintf(<span class="string">'                     E: \t%4.5f\n'</span>, sum.damping(3));
+0127 fprintf(<span class="string">'   Radiation Loss: \t\t%4.5f [keV]\n'</span>, sum.radiation*1e6);
+0128 fprintf(<span class="string">'   Natural Energy Spread: \t%4.5e\n'</span>, sum.naturalEnergySpread);
+0129 fprintf(<span class="string">'   Natural Emittance: \t\t%4.5e [mrad]\n'</span>, sum.naturalEmittance);
+0130 fprintf(<span class="string">'   Radiation Damping H: \t%4.5f [ms]\n'</span>, sum.radiationDamping(1)*1e3);
+0131 fprintf(<span class="string">'                     V: \t%4.5f [ms]\n'</span>, sum.radiationDamping(2)*1e3);
+0132 fprintf(<span class="string">'                     E: \t%4.5f [ms]\n'</span>, sum.radiationDamping(3)*1e3);
+0133 fprintf(<span class="string">'   Slip factor : \t%4.5f\n'</span>, sum.etac);
+0134 fprintf(<span class="string">'\n'</span>);
+0135 fprintf(<span class="string">'   Assuming cavities Voltage: %4.5f [kV]\n'</span>, v_cav/1e3);
+0136 fprintf(<span class="string">'                   Frequency: %4.5f [MHz]\n'</span>, freq/1e6);
+0137 fprintf(<span class="string">'             Harmonic Number: %4.5f\n'</span>, sum.harmon);
+0138 fprintf(<span class="string">'   Overvoltage factor: %4.5f\n'</span>, sum.overvoltage);
+0139 fprintf(<span class="string">'   Synchronous Phase:  %4.5f [rad] (%4.5f [deg])\n'</span>, sum.syncphase, sum.syncphase*180/pi);
+0140 fprintf(<span class="string">'   Linear Energy Acceptance:  %4.5f %%\n'</span>, sum.energyacceptance*100);
+0141 fprintf(<span class="string">'   Synchrotron Tune:   %4.5f (%4.5f kHz or %4.2f turns) \n'</span>, sum.synctune, sum.synctune/sum.revTime*1e-3, 1/sum.synctune);
+0142 fprintf(<span class="string">'   Bunch Length:       %4.5f [mm]\n'</span>, sum.bunchlength*1e3);</pre></div>
+<hr><address>Generated on Sun 27-Aug-2006 19:55:47 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

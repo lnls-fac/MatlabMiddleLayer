@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bend2gev</title>
+  <meta name="keywords" content="bend2gev">
+  <meta name="description" content="BEND2GEV - Compute the energy based on the ramp tables">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; bend2gev.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>bend2gev
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>BEND2GEV - Compute the energy based on the ramp tables</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function GeV = bend2gev(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BEND2GEV - Compute the energy based on the ramp tables
+ GeV = bend2gev(Family, Field, Amps, DeviceList, BranchFlag)
+
+  INPUTS
+  1. Bend - Bend magnet family {Optional}
+  2. Field - Field {Optional}
+  3. Amps - Bend magnet current
+  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}
+  5. BranchFlag - 1 -&gt; Lower branch
+                  2 -&gt; Upper branch {Default}
+                  Not working at Spear yet, since there isn't any magnet measurements on hysteresis
+
+  OUTPUTS
+  1. GeV - Electron beam energy [GeV]
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function GeV = bend2gev(varargin)</a>
+0002 <span class="comment">%BEND2GEV - Compute the energy based on the ramp tables</span>
+0003 <span class="comment">% GeV = bend2gev(Family, Field, Amps, DeviceList, BranchFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Bend - Bend magnet family {Optional}</span>
+0007 <span class="comment">%  2. Field - Field {Optional}</span>
+0008 <span class="comment">%  3. Amps - Bend magnet current</span>
+0009 <span class="comment">%  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}</span>
+0010 <span class="comment">%  5. BranchFlag - 1 -&gt; Lower branch</span>
+0011 <span class="comment">%                  2 -&gt; Upper branch {Default}</span>
+0012 <span class="comment">%                  Not working at Spear yet, since there isn't any magnet measurements on hysteresis</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1. GeV - Electron beam energy [GeV]</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  Written by Greg Portmann</span>
+0018 
+0019 <span class="comment">% Default</span>
+0020 Family = <span class="string">''</span>;
+0021 Field = <span class="string">''</span>;
+0022 Amps = [];
+0023 DeviceList = [];
+0024 BranchFlag = [];
+0025 
+0026 ModeFlag = <span class="string">''</span>;  <span class="comment">% model, online, manual</span>
+0027 UnitsFlag = <span class="string">''</span>; <span class="comment">% hardware, physics</span>
+0028 <span class="keyword">for</span> i = length(varargin):-1:1
+0029     <span class="keyword">if</span> isstruct(varargin{i})
+0030         <span class="comment">% Ignor structures</span>
+0031     <span class="keyword">elseif</span> iscell(varargin{i})
+0032         <span class="comment">% Ignor cells</span>
+0033     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0034         varargin(i) = [];
+0035     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0036         varargin(i) = [];
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0038         UnitsFlag = <span class="string">'Physics'</span>;
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0041         UnitsFlag = <span class="string">'Hardware'</span>;
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>)
+0044         ModeFlag = varargin{i};
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0047         ModeFlag = varargin{i};
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0050         ModeFlag = varargin{i};
+0051         varargin(i) = [];
+0052     <span class="keyword">end</span>        
+0053 <span class="keyword">end</span>
+0054 
+0055 
+0056 <span class="keyword">if</span> length(varargin) &gt;= 1
+0057     <span class="keyword">if</span> ischar(varargin{1})
+0058         Family = varargin{1};
+0059         varargin(1) = [];
+0060     <span class="keyword">else</span>
+0061         Amps = varargin{1};
+0062         varargin(1) = [];
+0063         <span class="keyword">if</span> length(varargin) &gt;= 1
+0064             DeviceList = varargin{1};
+0065             varargin(1) = [];
+0066         <span class="keyword">end</span>
+0067         <span class="keyword">if</span> length(varargin) &gt;= 1
+0068             BranchFlag = varargin{1};
+0069             varargin(1:end) = [];
+0070         <span class="keyword">end</span>
+0071     <span class="keyword">end</span>
+0072 <span class="keyword">end</span>
+0073 <span class="keyword">if</span> length(varargin) &gt;= 1 &amp; ischar(varargin{1})
+0074     Field = varargin{1};
+0075     varargin(1) = [];
+0076 <span class="keyword">end</span>
+0077 <span class="keyword">if</span> length(varargin) &gt;= 1
+0078     Amps = varargin{1};
+0079     varargin(1) = [];
+0080 <span class="keyword">end</span>
+0081 <span class="keyword">if</span> length(varargin) &gt;= 1
+0082     DeviceList = varargin{1};
+0083     varargin(1) = [];
+0084 <span class="keyword">end</span>
+0085 <span class="keyword">if</span> length(varargin) &gt;= 1
+0086     BranchFlag = varargin{1};
+0087     varargin(1) = [];
+0088 <span class="keyword">end</span>
+0089 
+0090 
+0091 <span class="keyword">if</span> isempty(Family)
+0092     Family = <span class="string">'BEND'</span>;
+0093 <span class="keyword">end</span>
+0094 <span class="keyword">if</span> isempty(ModeFlag)
+0095     ModeFlag = getmode(Family);
+0096 <span class="keyword">end</span>
+0097 
+0098 <span class="keyword">if</span> isempty(Field)
+0099     Field = <span class="string">'Setpoint'</span>;
+0100 <span class="keyword">end</span>
+0101 <span class="keyword">if</span> isempty(DeviceList)
+0102     DeviceList = family2dev(Family);
+0103     <span class="keyword">if</span> all(size(Amps)==[1 1]) | isempty(Amps)
+0104         DeviceList = DeviceList(1,:);
+0105     <span class="keyword">end</span>
+0106 <span class="keyword">end</span>
+0107 <span class="keyword">if</span> isempty(BranchFlag)
+0108     <span class="comment">% Default is upper branch</span>
+0109     BranchFlag = 2;
+0110 <span class="keyword">end</span>
+0111 <span class="keyword">if</span> isempty(Amps)
+0112     <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'simulator'</span>) | strcmpi(ModeFlag,<span class="string">'model'</span>)
+0113         <span class="comment">% The model energy is used only if Amps is empty</span>
+0114         <span class="comment">% Otherwise &quot;Maximum recursion limit&quot;</span>
+0115         GeV = getenergymodel;
+0116         <span class="keyword">return</span>;
+0117         
+0118         <span class="comment">%GeVmodel = getenergymodel;</span>
+0119         <span class="comment">%kmodel = getpvmodel(Family, Field, DeviceList, 'Physics');</span>
+0120         <span class="comment">%Amps = k2amp(Family, Field, kmodel, DeviceList, [], 1, GeVmodel);</span>
+0121     <span class="keyword">else</span> 
+0122         Amps = getpv(Family, Field, [1 1], <span class="string">'Hardware'</span>, ModeFlag);
+0123         UnitsFlag = <span class="string">'UnitsFlag'</span>;
+0124     <span class="keyword">end</span>
+0125 <span class="keyword">end</span>
+0126 
+0127 <span class="comment">% End of input checking</span>
+0128 <span class="comment">% Machine dependent stuff below</span>
+0129 
+0130 
+0131 <span class="comment">% Amps should be in hardware units</span>
+0132 <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0133     Amps = physics2hw(Family, <span class="string">'Setpoint'</span>, Amps, DeviceList);
+0134 <span class="keyword">end</span>
+0135 
+0136 
+0137 DeviceListTotal = family2dev(Family, 0);
+0138 
+0139 <span class="keyword">for</span> ii = 1:size(DeviceList,1)
+0140     <span class="keyword">if</span> length(Amps) == 1
+0141         BEND = Amps;    
+0142     <span class="keyword">else</span>
+0143         BEND = Amps(ii);    
+0144     <span class="keyword">end</span>
+0145 
+0146     <span class="comment">% Convert to energy</span>
+0147     
+0148     <span class="comment">% C coefficients have been scaled to convert between AT units and hardware units and also includes a DC term:</span>
+0149     <span class="comment">% c8 * I^8+ c7 * I^7+ c6 * I^6 + c5 * I^5 + c4 * I^4 + c3 * I^3 + c2 * I^2+c1*I + c0 = B or B' or B&quot;</span>
+0150     <span class="comment">% C = [c8 c7 c6 c5 c4 c3 c2 c1 c0]</span>
+0151     <span class="comment">%[C1, Leff, MagnetType, A] = magnetcoefficients('BEND');</span>
+0152     
+0153     C = getfamilydata(Family, Field, <span class="string">'HW2PhysicsParams'</span>, DeviceList(ii,:));
+0154     C = C{1};
+0155     
+0156     B = C(8)*BEND + C(7)*BEND.^2 + C(6)*BEND.^3 + C(5)*BEND.^4 + C(4)*BEND.^5 + C(3)*BEND.^6 + C(2)*BEND.^7 + C(1)*BEND.^8;
+0157     <span class="comment">% k(i,1) = polyval(C, Amps(i)) / brho;</span>
+0158     
+0159     <span class="comment">% k is fixed to be -0.31537858</span>
+0160     k = -0.31537858;
+0161     
+0162     <span class="comment">% Convert to BEND angle</span>
+0163     <span class="comment">%K2BendingAngle = 2.54842790129284;</span>
+0164     <span class="keyword">if</span> any(DeviceList(ii,1) == [1 9 10 18])
+0165         K2BendingAngle = 2.54842790129284 * -0.43947079695140;   <span class="comment">% BendAngle / K</span>
+0166     <span class="keyword">else</span>
+0167         K2BendingAngle = 2.54842790129284 * -0.58596106939159;  <span class="comment">% BendAngle / K</span>
+0168     <span class="keyword">end</span>
+0169     <span class="comment">%K2BendingAngle = -0.43947079695140;   % BendAngle / K</span>
+0170     k = K2BendingAngle * k;
+0171     
+0172     
+0173     boverbprime = 0.392348;
+0174     bprime = B / boverbprime;
+0175     brho = bprime / k;
+0176     
+0177     <span class="comment">% now return energy in GeV</span>
+0178     gev1 = brho / 3.33620907461447;
+0179     
+0180     
+0181     <span class="keyword">if</span> size(Amps,2) == 1
+0182         GeV(ii,1) = gev1;
+0183     <span class="keyword">else</span>
+0184         GeV(1,ii) = gev1;
+0185     <span class="keyword">end</span>
+0186 
+0187 <span class="keyword">end</span>
+0188 
+0189 
+0190 <span class="comment">% cur = BEND;</span>
+0191 <span class="comment">% % Convert to energy</span>
+0192 <span class="comment">%</span>
+0193 <span class="comment">% a7= 0.0137956;</span>
+0194 <span class="comment">% a6=-0.0625519;</span>
+0195 <span class="comment">% a5= 0.1156769;</span>
+0196 <span class="comment">% a4=-0.1141570;</span>
+0197 <span class="comment">% a3= 0.0652128;</span>
+0198 <span class="comment">% a2=-0.0216472;</span>
+0199 <span class="comment">% a1= 0.0038866;</span>
+0200 <span class="comment">% a0= 0.0028901;</span>
+0201 <span class="comment">%</span>
+0202 <span class="comment">% i0=700.;</span>
+0203 <span class="comment">% c7=a7/(i0^7);</span>
+0204 <span class="comment">% c6=a6/(i0^6);</span>
+0205 <span class="comment">% c5=a5/(i0^5);</span>
+0206 <span class="comment">% c4=a4/(i0^4);</span>
+0207 <span class="comment">% c3=a3/(i0^3);</span>
+0208 <span class="comment">% c2=a2/(i0^2);</span>
+0209 <span class="comment">% c1=a1/i0;</span>
+0210 <span class="comment">% c0=a0;</span>
+0211 <span class="comment">% leff=1.5048;</span>
+0212 <span class="comment">%</span>
+0213 <span class="comment">%</span>
+0214 <span class="comment">% % kl = (cur/brho)*(c0+c1*cur+c2*cur^2+c3*cur^3+c4*cur^4+c5*cur^5+c6*cur^6+c7*cur^7);</span>
+0215 <span class="comment">% % k  = kl/Leff;</span>
+0216 <span class="comment">% % k is fixed to be -0.31537858</span>
+0217 <span class="comment">% k = -0.31537858;</span>
+0218 <span class="comment">%</span>
+0219 <span class="comment">% BLeff = cur.*(c0+c1*cur+c2*cur.^2+c3*cur.^3+c4*cur.^4+c5*cur.^5+c6*cur.^6+c7*cur.^7);</span>
+0220 <span class="comment">% field = BLeff / Leff;</span>
+0221 <span class="comment">%</span>
+0222 <span class="comment">% boverbprime = 0.392348;</span>
+0223 <span class="comment">% bprime = field / boverbprime;</span>
+0224 <span class="comment">% brho = bprime / k;</span>
+0225 <span class="comment">%</span>
+0226 <span class="comment">% % now return energy in GeV</span>
+0227 <span class="comment">% GeV = brho / 3.33620907461447;</span>
+0228 
+0229 
+0230</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

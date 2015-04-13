@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of steprf</title>
+  <meta name="keywords" content="steprf">
+  <meta name="description" content="STEPRF - Increment change in the RF frequency">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; steprf.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>steprf
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>STEPRF - Increment change in the RF frequency</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function steprf(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">STEPRF - Increment change in the RF frequency
+  steprf(DelRF, WaitFlag)
+
+  INPUTS
+  1. DelRF = Change in RF frequenc
+  2. WaitFlag = 0    -&gt; return immediately {SLAC default}
+                &gt; 0  -&gt; wait until ramping is done then adds an extra delay equal to WaitFlag 
+                = -1 -&gt; wait until ramping is done
+                = -2 -&gt; wait until ramping is done then adds an extra delay for fresh data 
+                        from the BPMs  {ALS default}
+                = -3 -&gt; wait until ramping is done then adds an extra delay for fresh data 
+                        from the tune measurement system
+                = -4 -&gt; wait until ramping is done then wait for a carriage return
+  3. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+     The actual physics or hardware strings can also be used.  
+     For example, if the physics and hardware modes corresponds 
+     to Hz and MHz then strings 'Hz' or 'MHz' can be used to specify units.
+  4. 'Online' - Set data online (optional override of the mode)
+     'Model'  - Set data on the model (optional override of the mode)
+     'Manual' - Set data manually (optional override of the mode)
+
+  setrf converts a string input to a number, hence, setrf 476.3 is the same as setrf(476.3)
+
+  EXAMPES
+  1. setrf(10000, 'Hz')  or  setrf 1000 Hz  =&gt; changes the RF frequency 10000 Hz
+  2. setrf(.01, 'MHz')   or  setrf .01 MHz  =&gt; changes the RF frequency 10000 Hz
+
+  NOTES
+  1. 'Hardware', 'Physics', 'MHz', 'Hz', 'Numeric', and 'Struct' are not case sensitive</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>	SETRF - Sets the RF frequency</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findrf.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = findrf(varargin)">findrf</a>	FINDRF - Finds the RF frequency that minimizes the energy change due</li><li><a href="findrf1.html" class="code" title="function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName)">findrf1</a>	FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion</li><li><a href="rmdisp.html" class="code" title="function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)">rmdisp</a>	RMDISP - Removes the portion of the orbit that correlates with the dispersion</li><li><a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>	SETORBIT - Orbit correction function</li><li><a href="setorbitbumpgui.html" class="code" title="function varargout = setorbitbumpgui(varargin)">setorbitbumpgui</a>	SETORBITBUMPGUI M-file for setorbitbumpgui.fig</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function steprf(varargin)</a>
+0002 <span class="comment">%STEPRF - Increment change in the RF frequency</span>
+0003 <span class="comment">%  steprf(DelRF, WaitFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. DelRF = Change in RF frequenc</span>
+0007 <span class="comment">%  2. WaitFlag = 0    -&gt; return immediately {SLAC default}</span>
+0008 <span class="comment">%                &gt; 0  -&gt; wait until ramping is done then adds an extra delay equal to WaitFlag</span>
+0009 <span class="comment">%                = -1 -&gt; wait until ramping is done</span>
+0010 <span class="comment">%                = -2 -&gt; wait until ramping is done then adds an extra delay for fresh data</span>
+0011 <span class="comment">%                        from the BPMs  {ALS default}</span>
+0012 <span class="comment">%                = -3 -&gt; wait until ramping is done then adds an extra delay for fresh data</span>
+0013 <span class="comment">%                        from the tune measurement system</span>
+0014 <span class="comment">%                = -4 -&gt; wait until ramping is done then wait for a carriage return</span>
+0015 <span class="comment">%  3. 'Physics'  - Use physics  units (optional override of units)</span>
+0016 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0017 <span class="comment">%     The actual physics or hardware strings can also be used.</span>
+0018 <span class="comment">%     For example, if the physics and hardware modes corresponds</span>
+0019 <span class="comment">%     to Hz and MHz then strings 'Hz' or 'MHz' can be used to specify units.</span>
+0020 <span class="comment">%  4. 'Online' - Set data online (optional override of the mode)</span>
+0021 <span class="comment">%     'Model'  - Set data on the model (optional override of the mode)</span>
+0022 <span class="comment">%     'Manual' - Set data manually (optional override of the mode)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  setrf converts a string input to a number, hence, setrf 476.3 is the same as setrf(476.3)</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  EXAMPES</span>
+0027 <span class="comment">%  1. setrf(10000, 'Hz')  or  setrf 1000 Hz  =&gt; changes the RF frequency 10000 Hz</span>
+0028 <span class="comment">%  2. setrf(.01, 'MHz')   or  setrf .01 MHz  =&gt; changes the RF frequency 10000 Hz</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  NOTES</span>
+0031 <span class="comment">%  1. 'Hardware', 'Physics', 'MHz', 'Hz', 'Numeric', and 'Struct' are not case sensitive</span>
+0032 
+0033 <span class="comment">%  Written by Greg Portmann</span>
+0034 
+0035 
+0036 <span class="keyword">if</span> nargin &lt; 1
+0037     error(<span class="string">'No RF frequency input'</span>);
+0038 <span class="keyword">end</span>
+0039 
+0040 varargin{end+1} = <span class="string">'Incremental'</span>;
+0041 
+0042 <a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>(varargin{:});
+0043</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

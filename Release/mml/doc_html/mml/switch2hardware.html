@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of switch2hardware</title>
+  <meta name="keywords" content="switch2hardware">
+  <meta name="description" content="SWITCH2HARDWARE - Switch family to hardware units">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; switch2hardware.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>switch2hardware
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SWITCH2HARDWARE - Switch family to hardware units</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function ErrorFlag = switch2hardware(Family) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SWITCH2HARDWARE - Switch family to hardware units
+   ErrorFlag = switch2hardware(Family)
+
+  INPUTS 
+  1. Family - Family name string  {Default: All families}
+              Matrix of family name strings
+              Cell array of family name strings
+
+  OUTPUTS
+  1. ErrorFlag - Number of errors that occurred
+
+   See also <a href="switch2physics.html" class="code" title="function ErrorFlag = switch2physics(Family)">switch2physics</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li><li><a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>	SETFAMILYDATA - Sets data associated with accelerator control</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="switch2hw.html" class="code" title="function ErrorFlag = switch2hw(varargin)">switch2hw</a>	SWITCH2HW - Switch a family to hardware units</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ErrorFlag = switch2hardware(Family)</a>
+0002 <span class="comment">%SWITCH2HARDWARE - Switch family to hardware units</span>
+0003 <span class="comment">%   ErrorFlag = switch2hardware(Family)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Family - Family name string  {Default: All families}</span>
+0007 <span class="comment">%              Matrix of family name strings</span>
+0008 <span class="comment">%              Cell array of family name strings</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  OUTPUTS</span>
+0011 <span class="comment">%  1. ErrorFlag - Number of errors that occurred</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   See also switch2physics</span>
+0014 
+0015 <span class="comment">%   Written by Greg Portmann</span>
+0016 
+0017 
+0018 ErrorFlag = 0;
+0019 
+0020 <span class="keyword">if</span> nargin == 0
+0021     Family = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0022 <span class="keyword">end</span>
+0023 <span class="keyword">if</span> isempty(Family)
+0024     Family = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0025 <span class="keyword">end</span>
+0026 
+0027 
+0028 <span class="keyword">if</span> ischar(Family)
+0029     <span class="keyword">for</span> i = 1:size(Family,1)
+0030         FamilyNameCell(i) = {deblank(Family(i,:))};
+0031     <span class="keyword">end</span>
+0032 <span class="keyword">elseif</span> iscell(Family)
+0033     FamilyNameCell = Family;
+0034 <span class="keyword">else</span>
+0035     error(<span class="string">'Familyname input must be empty, a string matrix, or a cell array of strings'</span>);
+0036 <span class="keyword">end</span>
+0037 
+0038 
+0039 <span class="keyword">for</span> i = 1:length(FamilyNameCell)
+0040     AOFamily = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(FamilyNameCell{i});
+0041     <span class="keyword">try</span>
+0042         AllFields = fieldnames(AOFamily);
+0043         <span class="keyword">for</span> j = 1:length(AllFields)
+0044             <span class="keyword">if</span> isfield(AOFamily.(AllFields{j}),<span class="string">'Units'</span>)
+0045                 <a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>(<span class="string">'Hardware'</span>, AOFamily.FamilyName, AllFields{j}, <span class="string">'Units'</span>);
+0046             <span class="keyword">end</span>
+0047         <span class="keyword">end</span>
+0048     <span class="keyword">catch</span>
+0049         ErrorFlag = ErrorFlag + 1;
+0050         fprintf(<span class="string">'   Error switching %s family to hardware units, hence ignored (switch2hardware)\n'</span>, FamilyNameCell{i});        
+0051     <span class="keyword">end</span>
+0052 <span class="keyword">end</span>
+0053 
+0054 
+0055 <span class="keyword">if</span> ~ErrorFlag
+0056     <span class="keyword">if</span> length(FamilyNameCell) == 1
+0057         fprintf(<span class="string">'   Switched %s family to hardware units (%s)\n'</span>, FamilyNameCell{1}, datestr(clock,0));
+0058     <span class="keyword">else</span>
+0059         fprintf(<span class="string">'   Switched %d families to hardware units (%s)\n'</span>, length(FamilyNameCell)-ErrorFlag, datestr(clock,0));
+0060     <span class="keyword">end</span>
+0061 <span class="keyword">end</span>
+0062</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

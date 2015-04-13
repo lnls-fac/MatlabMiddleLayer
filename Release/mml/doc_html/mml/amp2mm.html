@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of amp2mm</title>
+  <meta name="keywords" content="amp2mm">
+  <meta name="description" content="AMPS2MM - Returns the maximum millimeter orbit change per change in corrector">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; amp2mm.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>amp2mm
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>AMPS2MM - Returns the maximum millimeter orbit change per change in corrector</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function mm = amp2mm(CMfamily, Amps, CMDevList, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">AMPS2MM - Returns the maximum millimeter orbit change per change in corrector
+  mm = amps2mm(CMFamily, Amps, CMDevList, varargin)
+
+  INPUTS
+  1. CMFamily - Corrector magnet family name (ex. 'HCM', 'VCM')
+  2. Amps - Change in corrector magnet strength
+  3. CMDevList - Corrector magnet device list
+  4. varargin - Inputs sent to getrespmat function call
+
+  OUTPUTS
+  1. mm - Maximum change in orbit produces by a change in
+          corrector strength of Amps.
+
+  NOTES
+  1. mm and Amps happen to be the hardware units for the ALS.  This function 
+     actually works in whatever the hardware units are for the middlelayer.
+
+  ALGORITHM
+  Based on the response matrix, mm = R * Amps, the maximum change in the
+  orbit due to a corrector change can be found.
+
+  See also <a href="mm2amp.html" class="code" title="function Amps = mm2amp(CMfamily, mm, CMDevList, varargin)">mm2amp</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>	GETRESPMAT - Get response matrix data from a file</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="cm2mm.html" class="code" title="function mm = cm2mm(varargin)">cm2mm</a>	CM2MM - (Just an alias to amp2mm)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function mm = amp2mm(CMfamily, Amps, CMDevList, varargin)</a>
+0002 <span class="comment">%AMPS2MM - Returns the maximum millimeter orbit change per change in corrector</span>
+0003 <span class="comment">%  mm = amps2mm(CMFamily, Amps, CMDevList, varargin)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. CMFamily - Corrector magnet family name (ex. 'HCM', 'VCM')</span>
+0007 <span class="comment">%  2. Amps - Change in corrector magnet strength</span>
+0008 <span class="comment">%  3. CMDevList - Corrector magnet device list</span>
+0009 <span class="comment">%  4. varargin - Inputs sent to getrespmat function call</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  OUTPUTS</span>
+0012 <span class="comment">%  1. mm - Maximum change in orbit produces by a change in</span>
+0013 <span class="comment">%          corrector strength of Amps.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  NOTES</span>
+0016 <span class="comment">%  1. mm and Amps happen to be the hardware units for the ALS.  This function</span>
+0017 <span class="comment">%     actually works in whatever the hardware units are for the middlelayer.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  ALGORITHM</span>
+0020 <span class="comment">%  Based on the response matrix, mm = R * Amps, the maximum change in the</span>
+0021 <span class="comment">%  orbit due to a corrector change can be found.</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  See also mm2amp</span>
+0024 
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="comment">% Input checking</span>
+0029 <span class="keyword">if</span> nargin &lt; 2
+0030     error(<span class="string">'Must have at least two inputs (Family &amp; Amps)'</span>);
+0031 <span class="keyword">end</span>
+0032 <span class="keyword">if</span> nargin &lt; 3
+0033     CMDevList = [];
+0034 <span class="keyword">end</span>
+0035 <span class="keyword">if</span> isempty(CMDevList)
+0036     CMDevList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(CMfamily);
+0037 <span class="keyword">end</span>
+0038 <span class="keyword">if</span> (size(CMDevList,1) == 1)
+0039     CMDevList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(CMfamily, CMDevList);
+0040 <span class="keyword">end</span>
+0041 
+0042 
+0043 <span class="comment">% Response matrix</span>
+0044 <span class="keyword">if</span> ~isempty(findstr(upper(CMfamily),<span class="string">'H'</span>)) || ~isempty(findstr(upper(CMfamily),<span class="string">'X'</span>))
+0045     Smat = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(<a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>, [], CMfamily, CMDevList, varargin{:});
+0046 <span class="keyword">elseif</span> ~isempty(findstr(upper(CMfamily),<span class="string">'V'</span>)) || ~isempty(findstr(upper(CMfamily),<span class="string">'Y'</span>))
+0047     Smat = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(<a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>, [], CMfamily, CMDevList, varargin{:});
+0048 <span class="keyword">else</span>
+0049     error(<span class="string">'Not sure if corrector family is horizontal or vertical.'</span>);
+0050 <span class="keyword">end</span>
+0051 
+0052 
+0053 <span class="keyword">if</span> isempty(Amps)
+0054     error(<span class="string">'Amps is empty'</span>);
+0055 <span class="keyword">elseif</span> all(size(Amps) == [1 1])
+0056     Amps = Amps * ones(size(CMDevList,1),1);
+0057 <span class="keyword">elseif</span> size(Amps,1) == size(CMDevList,1)
+0058     <span class="comment">% input OK</span>
+0059 <span class="keyword">else</span>
+0060     error(<span class="string">'Rows of Amps must be equal to the rows of CMDevList or a scalar!'</span>);
+0061 <span class="keyword">end</span>
+0062 
+0063 
+0064 <span class="comment">% Check for missing correctors</span>
+0065 [iFound, iNotFound] = findrowindex(CMDevList, <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(CMfamily,0));
+0066 <span class="keyword">if</span> ~isempty(iNotFound)
+0067     error(<span class="string">'   Not all correctors found.\n'</span>);
+0068 <span class="keyword">end</span>
+0069 
+0070 
+0071 <span class="comment">% Main</span>
+0072 <span class="keyword">for</span> j = 1:size(Amps,2)
+0073     <span class="keyword">for</span> i = 1:size(CMDevList,1)
+0074         mm(i,j) = Amps(i,j) * max(Smat(:,i));
+0075     <span class="keyword">end</span>
+0076 <span class="keyword">end</span>
+0077</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

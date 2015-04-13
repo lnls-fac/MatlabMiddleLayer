@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of arplot_sr_report</title>
+  <meta name="keywords" content="arplot_sr_report">
+  <meta name="description" content="ARPLOT_SR_REPORT - Publish archiver plots from arplot_sr & arplot_sbm to a web page">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; arplot_sr_report.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>arplot_sr_report
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>ARPLOT_SR_REPORT - Publish archiver plots from arplot_sr & arplot_sbm to a web page</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [FileName, DirectoryName] = arplot_sr_report(DirectoryName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">ARPLOT_SR_REPORT - Publish archiver plots from arplot_sr &amp; arplot_sbm to a web page
+
+  DIRECTIONS
+  1. run arplot_sr
+  2. run arplot_sbm
+  3. make sure the plots are scaled properly
+  4. run arplot_sr_report
+
+  See also <a href="arplot.html" class="code" title="function [yout, ivecout] = arplot(ChanName, LineType);">arplot</a>, <a href="arplot_sr.html" class="code" title="function arplot_sr(monthStr, days, year1, month2Str, days2, year2)">arplot_sr</a>, <a href="arplot_sbm.html" class="code" title="function arplot_sbm(monthStr, days, year1, month2Str, days2, year2)">arplot_sbm</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [FileName, DirectoryName] = arplot_sr_report(DirectoryName)</a>
+0002 <span class="comment">%ARPLOT_SR_REPORT - Publish archiver plots from arplot_sr &amp; arplot_sbm to a web page</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  DIRECTIONS</span>
+0005 <span class="comment">%  1. run arplot_sr</span>
+0006 <span class="comment">%  2. run arplot_sbm</span>
+0007 <span class="comment">%  3. make sure the plots are scaled properly</span>
+0008 <span class="comment">%  4. run arplot_sr_report</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  See also arplot, arplot_sr, arplot_sbm</span>
+0011  
+0012 <span class="comment">%  Written by Greg Portmann</span>
+0013 
+0014 
+0015 <span class="keyword">if</span> max(get(0,<span class="string">'Children'</span>)) &lt; 20
+0016     error(<span class="string">'No superbend figures.  Run arplot_sbm to generate them.'</span>);
+0017 <span class="keyword">end</span>
+0018 
+0019 
+0020 DirectoryDate = getappdata(1, <span class="string">'ArchiveDate'</span>);
+0021 
+0022 ButtonName = questdlg(<span class="string">'Do to want to publish this report to the ALS website?'</span>,<span class="string">'ARPLOT_SR_REPORT'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'Cancel'</span>,<span class="string">'Yes'</span>);
+0023 drawnow;
+0024 <span class="keyword">switch</span> ButtonName,
+0025     <span class="keyword">case</span> <span class="string">'Yes'</span>
+0026         PresentDirectory = pwd;
+0027         <span class="keyword">if</span> ispc
+0028             DirectoryName = [<span class="string">'\\Cgsrv\alswebdata\portmann\archiver\'</span>, DirectoryDate];
+0029         <span class="keyword">else</span>
+0030             DirectoryName = [<span class="string">'/home/als2/www/htdoc/dynamic_pages/incoming/portmann/archiver/'</span>, DirectoryDate];
+0031         <span class="keyword">end</span>
+0032         
+0033         gotodirectory(DirectoryName);
+0034         cd(PresentDirectory);
+0035 
+0036     <span class="keyword">case</span> <span class="string">'No'</span>
+0037         <span class="keyword">if</span> nargin == 0
+0038             <span class="comment">% Get directory path to write HTML file</span>
+0039             <span class="comment">% DirectoryName = getfamilydata('Directory', 'DataRoot');</span>
+0040             <span class="comment">% i = findstr(DirectoryName, filesep);</span>
+0041             <span class="comment">% DirectoryName = DirectoryName(1:i(end-1))</span>
+0042             <span class="comment">% DirectoryName = [DirectoryName, 'HTML', filesep];</span>
+0043             <span class="comment">% DirectoryName = uigetdir(DirectoryName, 'Select a directory to put the HTLM output');</span>
+0044             
+0045             <span class="comment">%[DirectoryName, FileName, ExtentionName] = fileparts(which('getsp'));</span>
+0046             <span class="comment">%i = findstr(DirectoryName, filesep);</span>
+0047             <span class="comment">%if isempty(i)</span>
+0048             <span class="comment">%    error('Directory not found');</span>
+0049             <span class="comment">%else</span>
+0050             <span class="comment">%    DirectoryName = [DirectoryName(1:i(end)), 'users', filesep, 'html', filesep, 'Archiver', filesep];</span>
+0051             <span class="comment">%    DirectoryName = uigetdir(DirectoryName, 'Select a directory to put the arplot HTLM output');</span>
+0052             <span class="comment">%    if DirectoryName == 0</span>
+0053             <span class="comment">%        return;</span>
+0054             <span class="comment">%    end</span>
+0055             <span class="comment">%end</span>
+0056             
+0057             DirectoryName = uigetdir([pwd, filesep], <span class="string">'Select a directory to put the arplot HTLM output'</span>);
+0058             <span class="keyword">if</span> DirectoryName == 0
+0059                 <span class="keyword">return</span>;
+0060             <span class="keyword">end</span>
+0061         <span class="keyword">end</span>
+0062         
+0063     <span class="keyword">otherwise</span>
+0064         <span class="keyword">return</span>;
+0065 
+0066 <span class="keyword">end</span>
+0067 
+0068 
+0069 saveas(figure(1), <span class="string">'ARPlot_Fig1'</span>, <span class="string">'fig'</span>);
+0070 saveas(figure(2), <span class="string">'ARPlot_Fig2'</span>, <span class="string">'fig'</span>);
+0071 saveas(figure(3), <span class="string">'ARPlot_Fig3'</span>, <span class="string">'fig'</span>);
+0072 saveas(figure(4), <span class="string">'ARPlot_Fig4'</span>, <span class="string">'fig'</span>);
+0073 saveas(figure(5), <span class="string">'ARPlot_Fig5'</span>, <span class="string">'fig'</span>);
+0074 saveas(figure(6), <span class="string">'ARPlot_Fig6'</span>, <span class="string">'fig'</span>);
+0075 saveas(figure(7), <span class="string">'ARPlot_Fig7'</span>, <span class="string">'fig'</span>);
+0076 saveas(figure(8), <span class="string">'ARPlot_Fig8'</span>, <span class="string">'fig'</span>);
+0077 saveas(figure(9), <span class="string">'ARPlot_Fig9'</span>, <span class="string">'fig'</span>);
+0078 saveas(figure(10), <span class="string">'ARPlot_Fig10'</span>, <span class="string">'fig'</span>);
+0079 saveas(figure(11), <span class="string">'ARPlot_Fig11'</span>, <span class="string">'fig'</span>);
+0080 saveas(figure(12), <span class="string">'ARPlot_Fig12'</span>, <span class="string">'fig'</span>);
+0081 saveas(figure(13), <span class="string">'ARPlot_Fig13'</span>, <span class="string">'fig'</span>);
+0082 saveas(figure(14), <span class="string">'ARPlot_Fig14'</span>, <span class="string">'fig'</span>);
+0083 saveas(figure(15), <span class="string">'ARPlot_Fig15'</span>, <span class="string">'fig'</span>);
+0084 saveas(figure(16), <span class="string">'ARPlot_Fig16'</span>, <span class="string">'fig'</span>);
+0085 saveas(figure(17), <span class="string">'ARPlot_Fig17'</span>, <span class="string">'fig'</span>);
+0086 saveas(figure(18), <span class="string">'ARPlot_Fig18'</span>, <span class="string">'fig'</span>);
+0087 saveas(figure(19), <span class="string">'ARPlot_Fig19'</span>, <span class="string">'fig'</span>);
+0088 saveas(figure(20), <span class="string">'ARPlot_Fig20'</span>, <span class="string">'fig'</span>);
+0089 
+0090 options.format = <span class="string">'html'</span>;
+0091 options.outputDir = DirectoryName;
+0092 options.showCode = false;
+0093 
+0094 FileName = publish(<span class="string">'arplot_sr_html'</span>, options);
+0095 
+0096 
+0097 delete(<span class="string">'ARPlot_Fig1.fig'</span>);
+0098 delete(<span class="string">'ARPlot_Fig2.fig'</span>);
+0099 delete(<span class="string">'ARPlot_Fig3.fig'</span>);
+0100 delete(<span class="string">'ARPlot_Fig4.fig'</span>);
+0101 delete(<span class="string">'ARPlot_Fig5.fig'</span>);
+0102 delete(<span class="string">'ARPlot_Fig6.fig'</span>);
+0103 delete(<span class="string">'ARPlot_Fig7.fig'</span>);
+0104 delete(<span class="string">'ARPlot_Fig8.fig'</span>);
+0105 delete(<span class="string">'ARPlot_Fig9.fig'</span>);
+0106 delete(<span class="string">'ARPlot_Fig10.fig'</span>);
+0107 delete(<span class="string">'ARPlot_Fig11.fig'</span>);
+0108 delete(<span class="string">'ARPlot_Fig12.fig'</span>);
+0109 delete(<span class="string">'ARPlot_Fig13.fig'</span>);
+0110 delete(<span class="string">'ARPlot_Fig14.fig'</span>);
+0111 delete(<span class="string">'ARPlot_Fig15.fig'</span>);
+0112 delete(<span class="string">'ARPlot_Fig16.fig'</span>);
+0113 delete(<span class="string">'ARPlot_Fig17.fig'</span>);
+0114 delete(<span class="string">'ARPlot_Fig18.fig'</span>);
+0115 delete(<span class="string">'ARPlot_Fig19.fig'</span>);
+0116 delete(<span class="string">'ARPlot_Fig20.fig'</span>);
+0117 
+0118 
+0119 <span class="comment">% Open website</span>
+0120 web(FileName);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

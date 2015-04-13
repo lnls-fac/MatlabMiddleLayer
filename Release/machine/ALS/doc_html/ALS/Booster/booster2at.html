@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of booster2at</title>
+  <meta name="keywords" content="booster2at">
+  <meta name="description" content="BOOSTER2AT - Converts control system values to simulator values">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; booster2at.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>booster2at
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BOOSTER2AT - Converts control system values to simulator values</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [k, B] = booster2at(Family, Field, Value, DeviceList, Energy, BranchFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BOOSTER2AT - Converts control system values to simulator values
+  [K, B] = booster2at(Family, Field, Value, DeviceList, Energy, BranchFlag)
+
+  INPUTS
+  1. Family - Family name
+  2. Field - Sub-field (like 'Setpoint')
+  3. Value - Controls system values
+  4. DeviceList - Device list (Value and DeviceList must have the same number of rows)
+  5. Energy - Energy in GeV {Default: getenergy}
+              If Energy is a vector, each output column will correspond to that energy.
+              Energy can be anything getenergy accepts, like 'Model' or 'Online'.
+              (Note: If Energy is a vector, then Value can only have 1 column)
+  6. BranchFlag - 1 -&gt; Lower branch
+                  2 -&gt; Upper branch
+
+  OUTPUTS
+  1. K and B - K-value and field in AT convention
+     For dipole:      K = B / Brho
+     For quadrupole:  K = B'/ Brho
+     For sextupole:   K = B&quot;/ Brho / 2
+
+  See also at2bts
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="boosterinit.html" class="code" title="function boosterinit(OperationalMode)">boosterinit</a>	BOOSTERINIT - Initialization function of the ALS booster</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [k, B] = booster2at(Family, Field, Value, DeviceList, Energy, BranchFlag)</a>
+0002 <span class="comment">%BOOSTER2AT - Converts control system values to simulator values</span>
+0003 <span class="comment">%  [K, B] = booster2at(Family, Field, Value, DeviceList, Energy, BranchFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Family - Family name</span>
+0007 <span class="comment">%  2. Field - Sub-field (like 'Setpoint')</span>
+0008 <span class="comment">%  3. Value - Controls system values</span>
+0009 <span class="comment">%  4. DeviceList - Device list (Value and DeviceList must have the same number of rows)</span>
+0010 <span class="comment">%  5. Energy - Energy in GeV {Default: getenergy}</span>
+0011 <span class="comment">%              If Energy is a vector, each output column will correspond to that energy.</span>
+0012 <span class="comment">%              Energy can be anything getenergy accepts, like 'Model' or 'Online'.</span>
+0013 <span class="comment">%              (Note: If Energy is a vector, then Value can only have 1 column)</span>
+0014 <span class="comment">%  6. BranchFlag - 1 -&gt; Lower branch</span>
+0015 <span class="comment">%                  2 -&gt; Upper branch</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  OUTPUTS</span>
+0018 <span class="comment">%  1. K and B - K-value and field in AT convention</span>
+0019 <span class="comment">%     For dipole:      K = B / Brho</span>
+0020 <span class="comment">%     For quadrupole:  K = B'/ Brho</span>
+0021 <span class="comment">%     For sextupole:   K = B&quot;/ Brho / 2</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  See also at2bts</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="keyword">if</span> nargin &lt; 3
+0029     error(<span class="string">'At least 3 input required'</span>);
+0030 <span class="keyword">end</span>
+0031 
+0032 <span class="keyword">if</span> isempty(Field)
+0033     Field = <span class="string">'Setpoint'</span>;
+0034 <span class="keyword">end</span>
+0035 
+0036 <span class="keyword">if</span> nargin &lt; 4
+0037     DeviceList = [];
+0038 <span class="keyword">end</span>
+0039 <span class="keyword">if</span> isempty(DeviceList)
+0040     DeviceList = family2dev(Family);
+0041 <span class="keyword">end</span>
+0042 
+0043 <span class="keyword">if</span> nargin &lt; 5
+0044     Energy = [];
+0045 <span class="keyword">end</span>
+0046 <span class="keyword">if</span> isempty(Energy)
+0047     Energy = getenergy;
+0048 <span class="keyword">elseif</span> ischar(Energy)
+0049     Energy = getenergy(Energy);
+0050 <span class="keyword">end</span>
+0051 
+0052 
+0053 <span class="comment">% Hysteresis branch</span>
+0054 <span class="keyword">if</span> nargin &lt; 6
+0055     BranchFlag = [];
+0056 <span class="keyword">else</span>
+0057     <span class="keyword">if</span> char(BranchFlag)
+0058         <span class="keyword">if</span> strcmpi(BranchFlag, <span class="string">'Lower'</span>)
+0059             <span class="comment">% Lower branch</span>
+0060             BranchFlag = 1;
+0061         <span class="keyword">elseif</span> strcmpi(BranchFlag, <span class="string">'Upper'</span>)
+0062             <span class="comment">% Upper branch</span>
+0063             BranchFlag = 2;
+0064         <span class="keyword">end</span>
+0065     <span class="keyword">end</span>
+0066 <span class="keyword">end</span>
+0067 <span class="keyword">if</span> isempty(BranchFlag)
+0068     <span class="keyword">if</span> strcmpi(getfamilydata(<span class="string">'HysteresisBranch'</span>),<span class="string">'Lower'</span>)
+0069         <span class="comment">% Lower branch</span>
+0070         BranchFlag = 1;
+0071     <span class="keyword">else</span>
+0072         <span class="comment">% Upper branch (default)</span>
+0073         BranchFlag = 2;
+0074     <span class="keyword">end</span>
+0075 <span class="keyword">end</span>
+0076 
+0077 
+0078 <span class="keyword">if</span> size(Value,1) == 1 &amp; length(DeviceList) &gt; 1
+0079     Value = ones(size(DeviceList,1),1) * Value;
+0080 <span class="keyword">elseif</span> size(Value,1) ~= size(DeviceList,1)
+0081     error(<span class="string">'Rows in Value must equal rows in DeviceList or be a scalar'</span>);
+0082 <span class="keyword">end</span>
+0083 
+0084 
+0085 <span class="keyword">if</span> all(isnan(Value))
+0086     k = Value;
+0087     B = Value;
+0088     <span class="keyword">return</span>
+0089 <span class="keyword">end</span>
+0090 
+0091 
+0092 <span class="comment">% Force Energy and Value to have the same number of columns</span>
+0093 <span class="keyword">if</span> all(size(Energy) &gt; 1)
+0094     error(<span class="string">'Energy can only be a scalar or vector'</span>);
+0095 <span class="keyword">end</span>
+0096 Energy = Energy(:)';
+0097 
+0098 <span class="keyword">if</span> length(Energy) &gt; 1
+0099     <span class="keyword">if</span> size(Value,2) == size(Energy,2)
+0100         <span class="comment">% OK</span>
+0101     <span class="keyword">elseif</span> size(Value,2) &gt; 1
+0102         error(<span class="string">'If Energy is a vector, then Value can only have 1 column.'</span>);
+0103     <span class="keyword">else</span>
+0104         <span class="comment">% Value has one column, expand to the size of Energy</span>
+0105         Value = Value * ones(1,size(Energy,2));
+0106     <span class="keyword">end</span>
+0107 <span class="keyword">else</span>
+0108     Energy = Energy * ones(1,size(Value,2));
+0109 <span class="keyword">end</span>
+0110 
+0111 
+0112 
+0113 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0114 <span class="comment">% Corrector Magnets %</span>
+0115 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0116 <span class="comment">% Conversions factors</span>
+0117 <span class="comment">% HCM:   BLeff  = K_hcm * I  (Tesla-meters)</span>
+0118 <span class="comment">% VCM:   BLeff  = K_vcm * I  (Tesla-meters)</span>
+0119 <span class="comment">% Radian = BLeff / Brho</span>
+0120 <span class="keyword">if</span> strcmpi(Family, <span class="string">'HCM'</span>)
+0121     C = 1; <span class="comment">%8.5/1000;  % Radian/kGaussMeter</span>
+0122     k = C * Value;
+0123     <span class="keyword">if</span> nargout &gt;= 2
+0124         B = NaN;
+0125     <span class="keyword">end</span>
+0126     <span class="keyword">return</span>
+0127 <span class="keyword">end</span>
+0128 
+0129 <span class="keyword">if</span> strcmpi(Family, <span class="string">'VCM'</span>)
+0130     C = 1; <span class="comment">%8.5/1000;  % Radian/kGaussMeter</span>
+0131     k = C * Value;
+0132     <span class="keyword">if</span> nargout &gt;= 2
+0133         B = NaN;
+0134     <span class="keyword">end</span>
+0135     <span class="keyword">return</span>
+0136 <span class="keyword">end</span>
+0137 
+0138 
+0139 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0140 <span class="comment">% Setpoint and Monitor fields %</span>
+0141 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0142 <span class="comment">%if any(strcmpi(Field, {'Setpoint','Monitor'}))</span>
+0143 <span class="comment">%    error('sps2at conversion needs to be programmed for %s.%s\n', Family, Field);</span>
+0144 <span class="comment">%    return</span>
+0145 <span class="comment">%end</span>
+0146 
+0147 
+0148 <span class="comment">% If you made it to here, I don't know how to convert it</span>
+0149 k = Value;
+0150 B = Value;
+0151 <span class="keyword">return</span>
+0152</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

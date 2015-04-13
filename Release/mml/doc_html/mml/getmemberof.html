@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getmemberof</title>
+  <meta name="keywords" content="getmemberof">
+  <meta name="description" content="GETMEMBEROF - Returns the membership information of a family (cell of strings)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; getmemberof.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getmemberof
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETMEMBEROF - Returns the membership information of a family (cell of strings)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function  MemberOfCell = getmemberof(FamilyName, Field) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETMEMBEROF - Returns the membership information of a family (cell of strings)
+  MemberOfCell = getmemberof(FamilyName)
+  MemberOfCell = getmemberof(FamilyName, Field)
+
+  If FamilyName is a matrix, then a column of cells is returned.
+  If the family was not found, then {[]} is returned
+  An optional Field input can be used to only look through subfields.
+
+  NOTES
+  1. If no input, then the all families will be returned
+     MemberOfCell = getmemberof;
+  2. If no output, then the MemberOf strings will be printed to the screen
+
+  See also <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>, <a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>, <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>, <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>	ISMEMBEROF - Returns turn if the membership information of a family (cell of strings)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function  MemberOfCell = getmemberof(FamilyName, Field)</a>
+0002 <span class="comment">%GETMEMBEROF - Returns the membership information of a family (cell of strings)</span>
+0003 <span class="comment">%  MemberOfCell = getmemberof(FamilyName)</span>
+0004 <span class="comment">%  MemberOfCell = getmemberof(FamilyName, Field)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  If FamilyName is a matrix, then a column of cells is returned.</span>
+0007 <span class="comment">%  If the family was not found, then {[]} is returned</span>
+0008 <span class="comment">%  An optional Field input can be used to only look through subfields.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  NOTES</span>
+0011 <span class="comment">%  1. If no input, then the all families will be returned</span>
+0012 <span class="comment">%     MemberOfCell = getmemberof;</span>
+0013 <span class="comment">%  2. If no output, then the MemberOf strings will be printed to the screen</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  See also ismemberof, findmemberof, isfamily, getfamilylist</span>
+0016 
+0017 <span class="comment">%  Written by Greg Portmann</span>
+0018 
+0019 
+0020 <span class="keyword">if</span> nargin &lt; 1
+0021     FamilyName = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0022 <span class="keyword">end</span>
+0023 
+0024 
+0025 MemberOfCell = {};
+0026 <span class="keyword">for</span> i = 1:size(FamilyName,1)
+0027     Family = deblank(FamilyName(i,:));
+0028     <span class="keyword">if</span> nargin &gt;= 2
+0029         <span class="keyword">if</span> size(Field,1) == 1
+0030             a = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, deblank(Field), <span class="string">'MemberOf'</span>);
+0031         <span class="keyword">else</span>
+0032             a = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, deblank(Field(i,:)), <span class="string">'MemberOf'</span>);
+0033         <span class="keyword">end</span>
+0034     <span class="keyword">else</span>
+0035         a = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'MemberOf'</span>);
+0036     <span class="keyword">end</span>
+0037     MemberOfCell{i,1} = a(:)';
+0038 <span class="keyword">end</span>
+0039 
+0040 
+0041 <span class="keyword">if</span> nargout == 0
+0042     <span class="comment">% Print to the screen</span>
+0043     <span class="keyword">if</span> nargin == 1
+0044         fprintf(<span class="string">'   #  Family:    Memberships \n'</span>);
+0045     <span class="keyword">else</span>
+0046         fprintf(<span class="string">'   #  Family.Field:    Memberships \n'</span>);
+0047     <span class="keyword">end</span>
+0048     <span class="keyword">for</span> i = 1:size(MemberOfCell,1)
+0049         <span class="keyword">if</span> nargin == 1
+0050             fprintf(<span class="string">'  %2d. %s:'</span>, i, deblank(FamilyName(i,:)));
+0051         <span class="keyword">else</span>
+0052             <span class="keyword">if</span> size(Field,1) == 1
+0053                 fprintf(<span class="string">'  %2d. %s.%s:'</span>, i, deblank(FamilyName(i,:)), deblank(Field));
+0054             <span class="keyword">else</span>
+0055                 fprintf(<span class="string">'  %2d. %s.%s:'</span>, i, deblank(FamilyName(i,:)), deblank(Field(i,:)));
+0056             <span class="keyword">end</span>
+0057         <span class="keyword">end</span>
+0058         Members = MemberOfCell{i};
+0059         <span class="keyword">for</span> j = 1:length(Members)
+0060             fprintf(<span class="string">'  &quot;%s&quot;'</span>, Members{j});
+0061         <span class="keyword">end</span>
+0062         fprintf(<span class="string">' \n'</span>);
+0063     <span class="keyword">end</span>
+0064 <span class="keyword">else</span>
+0065     <span class="comment">% For one family, returns a cell array, not cell array of cell arrays</span>
+0066     <span class="keyword">if</span> length(MemberOfCell) == 1
+0067         MemberOfCell = MemberOfCell{1};
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

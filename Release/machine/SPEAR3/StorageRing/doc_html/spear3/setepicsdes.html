@@ -1,0 +1,308 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setepicsdes</title>
+  <meta name="keywords" content="setepicsdes">
+  <meta name="description" content="SETGOLDEN - Sets the golden values for a family to the Des channel (EPICS)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; setepicsdes.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setepicsdes
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETGOLDEN - Sets the golden values for a family to the Des channel (EPICS)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Data, ErrorFlag] = setepicsdes(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETGOLDEN - Sets the golden values for a family to the Des channel (EPICS)
+  [Golden, ErrorFlag] = setepicsdes(Family, Field, GoldenValues, DeviceList)
+  [Golden, ErrorFlag] = setepicsdes(Family, GoldenValues, DeviceList)
+  [Golden, ErrorFlag] = setepicsdes(Family, GoldenValues)
+  [Golden, ErrorFlag] = setepicsdes(Family)
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Accelerator Object
+  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {'Monitor'}
+  3. GoldenValues - Desired values {Default: getgolden}
+  4. DeviceList ([Sector Device #] or [element #]) {Default: whole family}
+  5. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+
+  OUTPUTS
+  1. GoldenValues - The actual values set
+  2. ErrorFlag
+ 
+  NOTES
+  1. If Family is a cell array, then DeviceList and Field can also be a cell arrays
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>	SETGOLDEN - Sets the golden values for a family to the Des channel (EPICS)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>	SETGOLDEN - Sets the golden values for a family to the Des channel (EPICS)</li><li><a href="srinit.html" class="code" title="function srinit(DisplayFlag)">srinit</a>	</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Data, ErrorFlag] = setepicsdes(varargin)</a>
+0002 <span class="comment">%SETGOLDEN - Sets the golden values for a family to the Des channel (EPICS)</span>
+0003 <span class="comment">%  [Golden, ErrorFlag] = setepicsdes(Family, Field, GoldenValues, DeviceList)</span>
+0004 <span class="comment">%  [Golden, ErrorFlag] = setepicsdes(Family, GoldenValues, DeviceList)</span>
+0005 <span class="comment">%  [Golden, ErrorFlag] = setepicsdes(Family, GoldenValues)</span>
+0006 <span class="comment">%  [Golden, ErrorFlag] = setepicsdes(Family)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  INPUTS</span>
+0009 <span class="comment">%  1. Family - Family Name</span>
+0010 <span class="comment">%              Data Structure</span>
+0011 <span class="comment">%              Accelerator Object</span>
+0012 <span class="comment">%  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {'Monitor'}</span>
+0013 <span class="comment">%  3. GoldenValues - Desired values {Default: getgolden}</span>
+0014 <span class="comment">%  4. DeviceList ([Sector Device #] or [element #]) {Default: whole family}</span>
+0015 <span class="comment">%  5. 'Physics'  - Use physics  units (optional override of units)</span>
+0016 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  OUTPUTS</span>
+0019 <span class="comment">%  1. GoldenValues - The actual values set</span>
+0020 <span class="comment">%  2. ErrorFlag</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  NOTES</span>
+0023 <span class="comment">%  1. If Family is a cell array, then DeviceList and Field can also be a cell arrays</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0029 <span class="comment">% Input parsing %</span>
+0030 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0031 UnitsFlag = {};
+0032 <span class="keyword">for</span> i = length(varargin):-1:1
+0033     <span class="keyword">if</span> isstruct(varargin{i})
+0034         <span class="comment">% Ignor structures</span>
+0035     <span class="keyword">elseif</span> iscell(varargin{i})
+0036         <span class="comment">% Ignor cells</span>
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0038         <span class="comment">% Remove and ignor</span>
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0041         <span class="comment">% Remove and ignor</span>
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>) | strcmpi(varargin{i},<span class="string">'Online'</span>) | strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0044         <span class="comment">% Remove and ignor</span>
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0047         UnitsFlag = {<span class="string">'Physics'</span>};
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0050         UnitsFlag = {<span class="string">'Hardware'</span>};
+0051         varargin(i) = [];
+0052     <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 
+0055 <span class="keyword">if</span> length(varargin) == 0
+0056     error(<span class="string">'Must have at least a family name input'</span>);
+0057 <span class="keyword">else</span>
+0058     Family = varargin{1};
+0059     <span class="keyword">if</span> length(varargin) &gt;= 2
+0060         Field = varargin{2};
+0061     <span class="keyword">end</span>
+0062     <span class="keyword">if</span> length(varargin) &gt;= 3
+0063         GoldenValues = varargin{3};
+0064     <span class="keyword">end</span>
+0065     <span class="keyword">if</span> length(varargin) &gt;= 4
+0066         DeviceList = varargin{4};
+0067     <span class="keyword">end</span>
+0068 <span class="keyword">end</span>
+0069 
+0070 
+0071 <span class="comment">%%%%%%%%%%%%%%</span>
+0072 <span class="comment">% Cell input %</span>
+0073 <span class="comment">%%%%%%%%%%%%%%</span>
+0074 <span class="keyword">if</span> iscell(Family)
+0075     <span class="keyword">for</span> i = 1:length(Family)
+0076         <span class="keyword">if</span> length(varargin) &lt; 2
+0077             [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, UnitsFlag{:});
+0078         <span class="keyword">elseif</span> length(varargin) &lt; 3
+0079             <span class="keyword">if</span> iscell(Field)
+0080                 [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field{i}, UnitsFlag{:});
+0081             <span class="keyword">else</span>
+0082                 [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field, UnitsFlag{:});
+0083             <span class="keyword">end</span>
+0084         <span class="keyword">elseif</span> length(varargin) &lt; 4
+0085             <span class="keyword">if</span> iscell(Field)
+0086                 <span class="keyword">if</span> iscell(GoldenValues)
+0087                     [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field{i}, GoldenValues{i}, UnitsFlag{:});
+0088                 <span class="keyword">else</span>
+0089                     [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field{i}, GoldenValues, UnitsFlag{:});
+0090                 <span class="keyword">end</span>
+0091             <span class="keyword">else</span>
+0092                 <span class="keyword">if</span> iscell(GoldenValues)
+0093                     [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field, GoldenValues{i}, UnitsFlag{:});
+0094                 <span class="keyword">else</span>
+0095                     [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field, GoldenValues, UnitsFlag{:});
+0096                 <span class="keyword">end</span>
+0097             <span class="keyword">end</span>
+0098         <span class="keyword">else</span>
+0099             <span class="keyword">if</span> iscell(Field)
+0100                 <span class="keyword">if</span> iscell(GoldenValues)
+0101                     <span class="keyword">if</span> iscell(DeviceList)
+0102                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field{i}, GoldenValues{i}, DeviceList{i}, UnitsFlag{:});
+0103                     <span class="keyword">else</span>
+0104                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field{i}, GoldenValues{i}, DeviceList, UnitsFlag{:});
+0105                     <span class="keyword">end</span>
+0106                 <span class="keyword">else</span>
+0107                     <span class="keyword">if</span> iscell(DeviceList)
+0108                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field{i}, GoldenValues, DeviceList{i}, UnitsFlag{:});
+0109                     <span class="keyword">else</span>
+0110                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field{i}, GoldenValues, DeviceList, UnitsFlag{:});
+0111                     <span class="keyword">end</span>
+0112                 <span class="keyword">end</span>
+0113             <span class="keyword">else</span>
+0114                 <span class="keyword">if</span> iscell(GoldenValues)
+0115                     <span class="keyword">if</span> iscell(DeviceList)
+0116                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field, GoldenValues{i}, DeviceList{i}, UnitsFlag{:});
+0117                     <span class="keyword">else</span>
+0118                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field, GoldenValues{i}, DeviceList, UnitsFlag{:});
+0119                     <span class="keyword">end</span>
+0120                 <span class="keyword">else</span>
+0121                     <span class="keyword">if</span> iscell(DeviceList)
+0122                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field, GoldenValues, DeviceList{i}, UnitsFlag{:});
+0123                     <span class="keyword">else</span>
+0124                         [Data{i}, ErrorFlag{i}] = <a href="setepicsdes.html" class="code" title="function [Data, ErrorFlag] = setepicsdes(varargin)">setepicsdes</a>(Family{i}, Field, GoldenValues, DeviceList, UnitsFlag{:});
+0125                     <span class="keyword">end</span>
+0126                 <span class="keyword">end</span>
+0127             <span class="keyword">end</span>
+0128         <span class="keyword">end</span>
+0129     <span class="keyword">end</span>
+0130     <span class="keyword">return</span>
+0131 <span class="keyword">end</span>
+0132 
+0133 
+0134 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0135 <span class="comment">% Family or data structure inputs beyond this point %</span>
+0136 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0137 <span class="keyword">if</span> isstruct(Family)
+0138     <span class="comment">% Data structure inputs</span>
+0139     <span class="keyword">if</span> length(varargin) &lt; 2
+0140         <span class="keyword">if</span> isfield(Family,<span class="string">'Field'</span>)
+0141             Field = Family.Field;
+0142         <span class="keyword">else</span>
+0143             Field = <span class="string">''</span>;
+0144         <span class="keyword">end</span>
+0145     <span class="keyword">end</span>
+0146     <span class="keyword">if</span> length(varargin) &lt; 3 
+0147         <span class="keyword">if</span> isfield(Family,<span class="string">'Data'</span>)
+0148             GoldenValues = Family.Data;
+0149         <span class="keyword">else</span>
+0150             error(<span class="string">'GoldenValues input required (or a .Data field must exist for data structure inputs)'</span>);
+0151         <span class="keyword">end</span>
+0152     <span class="keyword">end</span>
+0153     <span class="keyword">if</span> length(varargin) &lt; 4
+0154         <span class="keyword">if</span> isfield(Family,<span class="string">'DeviceList'</span>)
+0155             DeviceList = Family.DeviceList;
+0156         <span class="keyword">else</span>
+0157             DeviceList = [];
+0158         <span class="keyword">end</span>
+0159     <span class="keyword">end</span>
+0160     <span class="keyword">if</span> isempty(UnitsFlag)
+0161         <span class="keyword">if</span> isfield(Family,<span class="string">'Units'</span>)
+0162             UnitsFlag{1} = Family.Units; 
+0163         <span class="keyword">end</span>
+0164     <span class="keyword">end</span>
+0165     <span class="keyword">if</span> isfield(Family,<span class="string">'FamilyName'</span>)
+0166         Family = Family.FamilyName;
+0167     <span class="keyword">else</span>
+0168         error(<span class="string">'For data structure inputs FamilyName field must exist'</span>)
+0169     <span class="keyword">end</span>
+0170 <span class="keyword">else</span>
+0171     <span class="comment">% Family string input</span>
+0172     <span class="keyword">if</span> length(varargin) &lt; 2
+0173         Field = <span class="string">''</span>;
+0174     <span class="keyword">end</span>
+0175     <span class="keyword">if</span> length(varargin) &lt; 3
+0176         GoldenValues = [];
+0177     <span class="keyword">end</span>
+0178     <span class="keyword">if</span> length(varargin) &lt; 4
+0179         DeviceList = [];
+0180     <span class="keyword">end</span>
+0181 <span class="keyword">end</span>
+0182 
+0183 <span class="keyword">if</span> isempty(GoldenValues)
+0184     GoldenValues = getgolden(Family, Field, DeviceList, <span class="string">'numeric'</span>, UnitsFlag{:});
+0185 <span class="keyword">end</span>
+0186 
+0187 <span class="keyword">if</span> isnumeric(Field)
+0188     DeviceList = GoldenValues;
+0189     GoldenValues = Field;
+0190     Field = <span class="string">''</span>;
+0191 <span class="keyword">end</span>
+0192 <span class="keyword">if</span> isempty(Field)
+0193     <span class="keyword">if</span> ismemberof(Family,<span class="string">'BPM'</span>)
+0194         <span class="comment">% Spear 3 only</span>
+0195         <span class="keyword">if</span> strcmpi(getfamilydata(<span class="string">'Machine'</span>), <span class="string">'SPEAR'</span>) | strcmpi(getfamilydata(<span class="string">'Machine'</span>), <span class="string">'SPEAR3'</span>)
+0196             <span class="keyword">if</span> strcmpi(Family,<span class="string">'BPMx'</span>)
+0197                 Field = <span class="string">'UDes'</span>;
+0198             <span class="keyword">elseif</span> strcmpi(Family,<span class="string">'BPMy'</span>)
+0199                 Field = <span class="string">'VDes'</span>;
+0200             <span class="keyword">else</span>
+0201                 Field = <span class="string">'Monitor'</span>;
+0202             <span class="keyword">end</span>
+0203         <span class="keyword">else</span>
+0204             error(<span class="string">'User setorbit to set a golden value for a BPM family'</span>);
+0205         <span class="keyword">end</span>
+0206     <span class="keyword">else</span>
+0207         Field = <span class="string">'Setpoint'</span>;
+0208     <span class="keyword">end</span>
+0209 <span class="keyword">end</span>
+0210 
+0211 <span class="keyword">if</span> isempty(DeviceList)
+0212     DeviceList = family2dev(Family);
+0213 <span class="keyword">end</span>
+0214 <span class="keyword">if</span> (size(DeviceList,2) == 1) 
+0215     DeviceList = elem2dev(Family, DeviceList);
+0216 <span class="keyword">end</span>
+0217 
+0218 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0219 <span class="comment">% CommonName Input:  Convert common names to a DeviceList %</span>
+0220 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0221 <span class="keyword">if</span> isstr(DeviceList)
+0222     DeviceList = common2dev(DeviceList, Family);
+0223     <span class="keyword">if</span> isempty(DeviceList)
+0224         error(<span class="string">'DeviceList was a string but common names could not be found.'</span>);
+0225     <span class="keyword">end</span>
+0226 <span class="keyword">end</span>
+0227 
+0228 
+0229 <span class="keyword">if</span> isempty(GoldenValues)
+0230     error(<span class="string">'No golden values found'</span>);
+0231 <span class="keyword">end</span>
+0232 
+0233 
+0234 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0235 <span class="comment">% Make the setpoint change %</span>
+0236 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0237 ErrorFlag = setpv(Family, Field, GoldenValues, UnitsFlag{:});
+0238 
+0239</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

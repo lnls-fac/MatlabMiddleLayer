@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setpvonline</title>
+  <meta name="keywords" content="setpvonline">
+  <meta name="description" content="SETPVONLINE - Sets the online value">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">mml</a> &gt; <a href="#">links</a> &gt; <a href="index.html">labca</a> &gt; setpvonline.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml\links\labca&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>setpvonline
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>SETPVONLINE - Sets the online value</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function ErrorFlag = setpvonline(ChannelNames, NewSP, DataType, NoWaitFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETPVONLINE - Sets the online value
+  ErrorFlag = setpvonline(ChannelNames, NewSP, DataType, NoWaitFlag)
+
+  Note: labca handles all EPICS data types.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ErrorFlag = setpvonline(ChannelNames, NewSP, DataType, NoWaitFlag)</a>
+0002 <span class="comment">%SETPVONLINE - Sets the online value</span>
+0003 <span class="comment">%  ErrorFlag = setpvonline(ChannelNames, NewSP, DataType, NoWaitFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Note: labca handles all EPICS data types.</span>
+0006 
+0007 
+0008 <span class="comment">%  Written by Greg Portmann</span>
+0009 
+0010 
+0011 ErrorFlag = 0;
+0012 
+0013 <span class="keyword">if</span> nargin &lt; 2
+0014     error(<span class="string">'Must have at least two inputs'</span>);
+0015 <span class="keyword">end</span>
+0016 <span class="keyword">if</span> nargin &lt; 3
+0017     DataType = <span class="string">''</span>;
+0018 <span class="keyword">end</span>
+0019 <span class="keyword">if</span> isempty(DataType)
+0020     <span class="keyword">if</span> ischar(NewSP)
+0021         DataType = <span class="string">'char'</span>;
+0022     <span class="keyword">else</span>
+0023         DataType = <span class="string">'double'</span>;
+0024     <span class="keyword">end</span>
+0025 <span class="keyword">elseif</span> ischar(DataType)
+0026     <span class="keyword">if</span> any(strcmpi(DataType, {<span class="string">'string'</span>,<span class="string">'char'</span>}))
+0027         <span class="comment">% Convert string to char</span>
+0028         DataType = <span class="string">'char'</span>;
+0029     <span class="keyword">end</span>
+0030 <span class="keyword">end</span>
+0031 
+0032 <span class="keyword">if</span> nargin &lt; 4
+0033     NoWaitFlag = 0;
+0034 <span class="keyword">end</span>
+0035 
+0036 
+0037 <span class="keyword">if</span> iscell(ChannelNames)
+0038 
+0039     <span class="comment">% Put data</span>
+0040     lcaPut(ChannelNames, NewSP, DataType);
+0041 
+0042     <span class="comment">% Not so good, but it's faster</span>
+0043     <span class="comment">%lcaPutNoWait(ChannelNames, NewSP, DataType);</span>
+0044 
+0045 <span class="keyword">else</span>
+0046 
+0047     <span class="comment">% Vectorized put</span>
+0048 
+0049     <span class="comment">% There can be multiple channel names due to &quot;ganged&quot; power supplies</span>
+0050     [ChannelNames, i] = unique(ChannelNames, <span class="string">'rows'</span>);
+0051 
+0052     <span class="comment">% if size(ChannelNames,1) == size(NewSP,1)</span>
+0053     <span class="comment">%     % ChannelNames equals the number of power supplies</span>
+0054     <span class="comment">% else</span>
+0055     NewSP = NewSP(i,:);
+0056     <span class="comment">% end</span>
+0057 
+0058 
+0059     <span class="comment">%if size(ChannelNames,1) ~= size(NewSP,1)</span>
+0060     <span class="comment">%    error('Size of NewSP must be equal to the DeviceList, a scalar, or the number of unique channelnames in the family');</span>
+0061     <span class="comment">%end</span>
+0062 
+0063 
+0064     <span class="comment">% Remove ' ' and fill with NaN latter (' ' should always be the first row)</span>
+0065     <span class="keyword">if</span> isempty(deblank(ChannelNames(1,:)))
+0066         ChannelNames(1,:) = [];
+0067         NewSP(1,:) = [];
+0068     <span class="keyword">end</span>
+0069 
+0070     <span class="keyword">if</span> ~isempty(ChannelNames)
+0071 
+0072         <span class="comment">% Build the cell array and look for blanks</span>
+0073         ChanNameCell = deblank(mat2cell(ChannelNames, ones(1,size(ChannelNames,1)),size(ChannelNames,2)));
+0074 
+0075         <span class="comment">%ChanNameCell = cell(size(ChannelNames,1),1);</span>
+0076         <span class="comment">%for k = size(ChannelNames,1):-1:1</span>
+0077         <span class="comment">%    ChanName = deblank(ChannelNames(k,:));</span>
+0078         <span class="comment">%    if isempty(ChanName)</span>
+0079         <span class="comment">%        NewSP(k,:) = [];</span>
+0080         <span class="comment">%        ChanNameCell(k) = [];</span>
+0081         <span class="comment">%    else</span>
+0082         <span class="comment">%        ChanNameCell{k} = ChanName;</span>
+0083         <span class="comment">%    end</span>
+0084         <span class="comment">%end</span>
+0085 
+0086         <span class="comment">% Put data</span>
+0087         <span class="keyword">if</span> NoWaitFlag
+0088             <span class="comment">% Not so good, but it's faster &amp; does not error as much</span>
+0089             <span class="comment">% It's also needed for certain triggers</span>
+0090             lcaPutNoWait(ChanNameCell, NewSP, DataType);
+0091         <span class="keyword">else</span>
+0092             lcaPut(ChanNameCell, NewSP, DataType);
+0093         <span class="keyword">end</span>
+0094     <span class="keyword">end</span>
+0095 <span class="keyword">end</span>
+0096</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

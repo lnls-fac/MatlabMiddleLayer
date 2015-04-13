@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setorbit1</title>
+  <meta name="keywords" content="setorbit1">
+  <meta name="description" content="SETORBIT1 - Correct the orbit using all the SVD (1 plane)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setorbit1.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setorbit1
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETORBIT1 - Correct the orbit using all the SVD (1 plane)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function setorbit1(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETORBIT1 - Correct the orbit using all the SVD (1 plane)
+  setorbit1(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)
+
+  For 1 BPM, if CMDevList is empty, the most effective corrector will be used.
+
+  EXAMPLE
+  1. setorbit1(getgolden('BPMx',[8 2]), 'BPMx', [8 2]);</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>	GETRESPMAT - Get response matrix data from a file</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="maxsp.html" class="code" title="function [Data, ErrorFlag] = maxsp(varargin)">maxsp</a>	MAXSP - Maximum value of the setpoint</li><li><a href="minsp.html" class="code" title="function [Data, ErrorFlag] = minsp(varargin)">minsp</a>	MINSP - Minimum value of the setpoint</li><li><a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>	STEPSP - Step the setpoint for family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setorbit1(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)</a>
+0002 <span class="comment">%SETORBIT1 - Correct the orbit using all the SVD (1 plane)</span>
+0003 <span class="comment">%  setorbit1(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  For 1 BPM, if CMDevList is empty, the most effective corrector will be used.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  EXAMPLE</span>
+0008 <span class="comment">%  1. setorbit1(getgolden('BPMx',[8 2]), 'BPMx', [8 2]);</span>
+0009 
+0010 <span class="comment">%  Written by Greg Portmann</span>
+0011 
+0012 WaitFlag = -2;
+0013 
+0014 <span class="keyword">if</span> nargin &lt; 4
+0015     <span class="keyword">if</span> strcmpi(BPMFamily, <span class="string">'BPMx'</span>)
+0016         CMFamily= <span class="string">'HCM'</span>;
+0017     <span class="keyword">elseif</span> strcmpi(BPMFamily, <span class="string">'BPMy'</span>)
+0018         CMFamily= <span class="string">'VCM'</span>;
+0019     <span class="keyword">else</span>
+0020         error(<span class="string">'Corrector magnet family not specified.'</span>);
+0021     <span class="keyword">end</span>
+0022 <span class="keyword">end</span>
+0023 <span class="keyword">if</span> nargin &lt; 5
+0024     <span class="keyword">if</span> size(BPMDevList,1) == 1
+0025         <span class="comment">% Pick the corrector based on most effective corrector in the response matrix</span>
+0026         R = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(BPMFamily, BPMDevList, CMFamily, [], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0027         [MaxValue, j] = max(abs(R.Data));
+0028         CMDevList = R.Actuator.DeviceList(j,:);
+0029     <span class="keyword">else</span>
+0030         error(<span class="string">'Corrector magnet device list not specified.'</span>);
+0031     <span class="keyword">end</span>
+0032 <span class="keyword">end</span>
+0033 
+0034 <span class="keyword">if</span> nargin &lt; 6
+0035     Iter = 3;
+0036 <span class="keyword">end</span>
+0037 
+0038 
+0039 s = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(BPMFamily, BPMDevList, CMFamily, CMDevList);
+0040 <span class="keyword">if</span> any(any(isnan(s)))
+0041     error(<span class="string">'Response matrix has a NaN'</span>)
+0042 <span class="keyword">end</span>
+0043 <span class="keyword">for</span> i = 1:Iter
+0044     x = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMFamily, BPMDevList) - GoalOrbit;
+0045 
+0046     <span class="comment">% Check limits</span>
+0047     MinSP = <a href="minsp.html" class="code" title="function [Data, ErrorFlag] = minsp(varargin)">minsp</a>(CMFamily, CMDevList);
+0048     MaxSP = <a href="maxsp.html" class="code" title="function [Data, ErrorFlag] = maxsp(varargin)">maxsp</a>(CMFamily, CMDevList);
+0049     <span class="keyword">if</span> any(<a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(CMFamily,CMDevList)-(x/s) &gt; MaxSP-5)
+0050         fprintf(<span class="string">'   Orbit not corrected because a maximum power supply limit would have been exceeded!'</span>);
+0051         <span class="keyword">return</span>;
+0052     <span class="keyword">end</span>
+0053     <span class="keyword">if</span> any(<a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(CMFamily,CMDevList)-(x/s) &lt; MinSP+5)
+0054         fprintf(<span class="string">'   Orbit not corrected because a minimum power supply limit would have been exceeded!'</span>);
+0055         <span class="keyword">return</span>;
+0056     <span class="keyword">end</span>
+0057 
+0058     <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily, -x/s, CMDevList, WaitFlag);
+0059 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

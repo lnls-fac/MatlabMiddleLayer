@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotmemberof</title>
+  <meta name="keywords" content="plotmemberof">
+  <meta name="description" content="PLOTMEMBEROF - Plots the setpoint and monitor for all members in a "MemberOf" group">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; plotmemberof.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plotmemberof
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>PLOTMEMBEROF - Plots the setpoint and monitor for all members in a "MemberOf" group</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [h_axes, h] = plotmemberof(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTMEMBEROF - Plots the setpoint and monitor for all members in a &quot;MemberOf&quot; group
+  [h_axes, h_line] = plotmemberof(MemberOfField)
+
+  INPUTS
+  1. MemberOfField - MemberOf name (string)
+  2. Units flag overrides
+     'Physics'  - Use physics  units
+     'Hardware' - Use hardware unitS
+  3. Lattice flag overrides
+     'Production' - Get data from the production lattice 
+     'Injection'  - get data from the injection lattice 
+     'Online' - Get data online 
+     'Model'  - get data on the model
+
+  See also <a href="plotquad.html" class="code" title="function plotquad">plotquad</a>, <a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>, <a href="getmemberof.html" class="code" title="function  MemberOfCell = getmemberof(FamilyName, Field)">getmemberof</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>	FINDMEMBEROF - Finds all family members</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getinjectionlattice.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getinjectionlattice(varargin)">getinjectionlattice</a>	GETINJECTIONLATTICE - Get data from the injection lattice file</li><li><a href="getproductionlattice.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getproductionlattice(varargin)">getproductionlattice</a>	GETPRODUCTIONLATTICE - Get data from the production (golden) lattice file</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>	PHYSICS2HW - Converts from 'Physics' units to 'Hardware' units</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="plotquad.html" class="code" title="function plotquad">plotquad</a>	PLOTQUAD - Plots the setpoint and monitor for all the quadrupole families (MemberOf 'QUAD')</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [h_axes, h] = plotmemberof(varargin)</a>
+0002 <span class="comment">%PLOTMEMBEROF - Plots the setpoint and monitor for all members in a &quot;MemberOf&quot; group</span>
+0003 <span class="comment">%  [h_axes, h_line] = plotmemberof(MemberOfField)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. MemberOfField - MemberOf name (string)</span>
+0007 <span class="comment">%  2. Units flag overrides</span>
+0008 <span class="comment">%     'Physics'  - Use physics  units</span>
+0009 <span class="comment">%     'Hardware' - Use hardware unitS</span>
+0010 <span class="comment">%  3. Lattice flag overrides</span>
+0011 <span class="comment">%     'Production' - Get data from the production lattice</span>
+0012 <span class="comment">%     'Injection'  - get data from the injection lattice</span>
+0013 <span class="comment">%     'Online' - Get data online</span>
+0014 <span class="comment">%     'Model'  - get data on the model</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  See also plotquad, findmemberof, getmemberof</span>
+0017 
+0018 <span class="comment">%  Written by Greg Portmann</span>
+0019 
+0020 
+0021 <span class="comment">% Look for keywords on the input line</span>
+0022 ModeFlag = {};
+0023 UnitsFlags = {};
+0024 LatticeFlag = <span class="string">''</span>;
+0025 
+0026 <span class="keyword">for</span> i = length(varargin):-1:1
+0027     <span class="keyword">if</span> isstruct(varargin{i})
+0028         <span class="comment">% Ignor structures</span>
+0029     <span class="keyword">elseif</span> iscell(varargin{i})
+0030         <span class="comment">% Ignor cells</span>
+0031     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0032         <span class="comment">% Remove</span>
+0033         varargin(i) = [];
+0034     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0035         <span class="comment">% Remove</span>
+0036         varargin(i) = [];
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Simulator'</span>) || strcmpi(varargin{i},<span class="string">'Model'</span>)
+0038         ModeFlag = {<span class="string">'Model'</span>};
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0041         ModeFlag = {<span class="string">'Online'</span>};
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Production'</span>)
+0044         LatticeFlag = <span class="string">'Production'</span>;
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Injection'</span>)
+0047         LatticeFlag = <span class="string">'Injection'</span>;
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Physics'</span>)
+0050         UnitsFlags = {<span class="string">'Physics'</span>};
+0051         varargin(i) = [];
+0052     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0053         UnitsFlags = {<span class="string">'Hardware'</span>};
+0054         varargin(i) = [];
+0055     <span class="keyword">end</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 
+0059 <span class="keyword">if</span> isempty(varargin)
+0060     MemberOfField = <span class="string">''</span>;
+0061 <span class="keyword">else</span>
+0062     MemberOfField = varargin{1};
+0063 <span class="keyword">end</span>
+0064 <span class="keyword">if</span> isempty(MemberOfField)
+0065     <span class="comment">% Just some typical fields</span>
+0066     MemberOfFieldCell = {<span class="string">'BPM'</span>,<span class="string">'COR'</span>,<span class="string">'QUAD'</span>,<span class="string">'SEXT'</span>,<span class="string">'Tune Corrector'</span>,<span class="string">'Chromaticity Corrector'</span>};
+0067     [ButtonName, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'PLOTMEMBEROF'</span>,<span class="string">'PromptString'</span>,{<span class="string">'These are typical MemberOf fields.'</span>,<span class="string">' '</span>, <span class="string">'Selection one:'</span>}, <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, MemberOfFieldCell, <span class="string">'ListSize'</span>, [350 100], <span class="string">'InitialValue'</span>, 2);
+0068     drawnow;
+0069     MemberOfField = MemberOfFieldCell{ButtonName};
+0070     <span class="comment">%error('1 input required');</span>
+0071 <span class="keyword">end</span>
+0072 
+0073 
+0074 FamilyNames = <a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>(MemberOfField);
+0075 
+0076 N = length(FamilyNames);
+0077 
+0078 WidthScaleFactor = .75;
+0079 
+0080 clf reset
+0081 <span class="keyword">for</span> i = 1:N
+0082     
+0083     h_axes(i,1) = subplot(N,1,i);
+0084         
+0085     <span class="keyword">if</span> isempty(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(FamilyNames{i}, <span class="string">'Setpoint'</span>))
+0086         NoSetpointFlag = 1;
+0087     <span class="keyword">else</span>
+0088         NoSetpointFlag = 0;
+0089     <span class="keyword">end</span>
+0090 
+0091     <span class="keyword">if</span> strcmpi(LatticeFlag,<span class="string">'Production'</span>)
+0092         [SP, AM] = <a href="getproductionlattice.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getproductionlattice(varargin)">getproductionlattice</a>(FamilyNames{i}, UnitsFlags{:});
+0093         SP = SP.Setpoint;
+0094         AM = AM.Monitor;
+0095         <span class="keyword">if</span> ~isempty(UnitsFlags) &amp;&amp; strcmpi(UnitsFlags{1},<span class="string">'Physics'</span>)
+0096             SP = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(SP);
+0097             AM = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(AM);
+0098         <span class="keyword">elseif</span> ~isempty(UnitsFlags) &amp;&amp; strcmpi(UnitsFlags{1},<span class="string">'Hardware'</span>)
+0099             SP = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(SP);
+0100             AM = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(AM);
+0101         <span class="keyword">end</span>
+0102     <span class="keyword">elseif</span> strcmpi(LatticeFlag,<span class="string">'Injection'</span>)
+0103         [SP, AM] = <a href="getinjectionlattice.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getinjectionlattice(varargin)">getinjectionlattice</a>(FamilyNames{i}, UnitsFlags{:});
+0104         SP = SP.Setpoint;
+0105         AM = AM.Monitor;
+0106         <span class="keyword">if</span> ~isempty(UnitsFlags) &amp;&amp; strcmpi(UnitsFlags{1},<span class="string">'Physics'</span>)
+0107             SP = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(SP);
+0108             AM = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(AM);
+0109         <span class="keyword">elseif</span> ~isempty(UnitsFlags) &amp;&amp; strcmpi(UnitsFlags{1},<span class="string">'Hardware'</span>)
+0110             SP = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(SP);
+0111             AM = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(AM);
+0112         <span class="keyword">end</span>
+0113     <span class="keyword">else</span>
+0114         AM = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(FamilyNames{i}, <span class="string">'Struct'</span>, ModeFlag{:}, UnitsFlags{:});
+0115     <span class="keyword">end</span>
+0116 
+0117     <span class="keyword">if</span> ~NoSetpointFlag
+0118         <span class="keyword">if</span> ~(strcmpi(LatticeFlag,<span class="string">'Production'</span>) || strcmpi(LatticeFlag,<span class="string">'Injection'</span>))
+0119             SP = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(FamilyNames{i}, <span class="string">'Struct'</span>, ModeFlag{:}, UnitsFlags{:});
+0120         <span class="keyword">end</span>
+0121 
+0122         h(i,2) = bar(h_axes(i), 1:length(SP.Data), SP.Data, WidthScaleFactor);
+0123         set(h(i,2),<span class="string">'FaceColor'</span>,[0 0 .5]);
+0124         set(h(i,2),<span class="string">'EdgeColor'</span>,[0 0 .5]);
+0125 
+0126         hold(h_axes(i), <span class="string">'on'</span>);
+0127         h(i,1) = bar(h_axes(i), 1:length(AM.Data), AM.Data, WidthScaleFactor/3);
+0128         hold(h_axes(i), <span class="string">'off'</span>);
+0129 
+0130         set(h(i,1),<span class="string">'FaceColor'</span>,[0 .5 0]);
+0131         set(h(i,1),<span class="string">'EdgeColor'</span>,[0 .5 0]);
+0132     <span class="keyword">else</span>
+0133         h(i,1) = bar(h_axes(i), 1:length(AM.Data), AM.Data, WidthScaleFactor);
+0134         set(h(i,1),<span class="string">'FaceColor'</span>,[0 0 .5]);
+0135         set(h(i,1),<span class="string">'EdgeColor'</span>,[0 0 .5]);
+0136         SP = AM;
+0137     <span class="keyword">end</span>
+0138     
+0139     <span class="comment">%bar(1:length(AM.Data), [AM.Data SP.Data], 1, 'grouped');</span>
+0140         
+0141     ylabel(sprintf(<span class="string">'%s [%s]'</span>, FamilyNames{i}, AM.UnitsString));
+0142 
+0143     <span class="keyword">if</span> i == 1
+0144         <span class="keyword">if</span> strcmpi(LatticeFlag,<span class="string">'Production'</span>)
+0145             title(h_axes(i), sprintf(<span class="string">'%s - Production Lattice'</span>, MemberOfField));
+0146         <span class="keyword">elseif</span> strcmpi(LatticeFlag,<span class="string">'Injection'</span>)
+0147             title(h_axes(i), sprintf(<span class="string">'%s - Injection Lattice'</span>, MemberOfField));
+0148         <span class="keyword">else</span>
+0149             title(h_axes(i), sprintf(<span class="string">'%s'</span>, MemberOfField));
+0150         <span class="keyword">end</span>
+0151     <span class="keyword">end</span>
+0152            
+0153     
+0154     <span class="comment">% Change the scale</span>
+0155     axis tight;
+0156 
+0157     ScaleFactor = .95;
+0158 
+0159     MaxY = max([AM.Data(:); SP.Data(:)]);
+0160     MinY = min([AM.Data(:); SP.Data(:)]);
+0161 
+0162     <span class="keyword">if</span> isnan(MinY) || isnan(MaxY)
+0163         axis(h_axis, <span class="string">'auto'</span>);
+0164         set(h_axis, <span class="string">'XLim'</span>, a(1:2));
+0165     <span class="keyword">else</span>
+0166         <span class="comment">% Add a buffer</span>
+0167         Delta = MaxY - MinY;
+0168         <span class="keyword">if</span> Delta == 0
+0169             Delta = 1e-12; <span class="comment">%eps;</span>
+0170         <span class="keyword">end</span>
+0171         MaxY = MaxY + (1-ScaleFactor) * Delta;
+0172         MinY = MinY - (1-ScaleFactor) * Delta;
+0173         <span class="comment">%end</span>
+0174         set(h_axes(i), <span class="string">'YLim'</span>, [MinY MaxY]);
+0175     <span class="keyword">end</span>
+0176 <span class="keyword">end</span>
+0177 
+0178 
+0179 <span class="keyword">if</span> ~NoSetpointFlag
+0180     <span class="comment">%addlabel(0,0,'   Blue=Monitor   GRN=Setpoint');</span>
+0181     h = addlabel(0,0,<span class="string">'   Monitor'</span>);
+0182     set(h, <span class="string">'Color'</span>, [0 .5 0]);
+0183     h = addlabel(0,.025,<span class="string">'   Setpoint'</span>);
+0184     set(h, <span class="string">'Color'</span>, [0 0 .5]);
+0185 <span class="keyword">end</span>
+0186 addlabel(1,0);
+0187 
+0188 
+0189 <span class="comment">% Don't echo to the screen if no output exits (I think it's cleaner)</span>
+0190 <span class="keyword">if</span> nargout == 0
+0191     clear h_axes h
+0192 <span class="keyword">end</span>
+0193</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

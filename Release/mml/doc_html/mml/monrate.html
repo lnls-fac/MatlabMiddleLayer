@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of monrate</title>
+  <meta name="keywords" content="monrate">
+  <meta name="description" content="MONRATE - Calculates the control system data rate of a noisy channel">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; monrate.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>monrate
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MONRATE - Calculates the control system data rate of a noisy channel</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [AvgRate, N] = monrate(family, DeviceList, T); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MONRATE - Calculates the control system data rate of a noisy channel
+  [AvgRate, N] = monrate(Family, DeviceList, T)
+
+  INPUTS
+  1. Family - Family name ('BPMx', 'HCM', etc.) 
+  2. DeviceList - Device list or element list [column vector] {Default: entire family}
+  3. T - Time interval to check sampling rate [seconds]  {Default: 2 seconds}
+
+  OUTPUTS
+  1. AvgRate - Average sample rate over T seconds periods
+  2. N - Number of observed transitions
+
+  NOTES
+  1. This method only works on noisy channels!</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>	GETLIST - Returns Device List for a Family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [AvgRate, N] = monrate(family, DeviceList, T);</a>
+0002 <span class="comment">%MONRATE - Calculates the control system data rate of a noisy channel</span>
+0003 <span class="comment">%  [AvgRate, N] = monrate(Family, DeviceList, T)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Family - Family name ('BPMx', 'HCM', etc.)</span>
+0007 <span class="comment">%  2. DeviceList - Device list or element list [column vector] {Default: entire family}</span>
+0008 <span class="comment">%  3. T - Time interval to check sampling rate [seconds]  {Default: 2 seconds}</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  OUTPUTS</span>
+0011 <span class="comment">%  1. AvgRate - Average sample rate over T seconds periods</span>
+0012 <span class="comment">%  2. N - Number of observed transitions</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  NOTES</span>
+0015 <span class="comment">%  1. This method only works on noisy channels!</span>
+0016 
+0017 <span class="comment">%  Written by Greg Portmann</span>
+0018 
+0019 DisplayFlag = 0;
+0020 OneAtATimeFlag = 0;
+0021 
+0022 <span class="keyword">if</span> nargin == 0,
+0023     error(<span class="string">'Need atleast one input: family'</span>);
+0024 <span class="keyword">end</span> 
+0025 
+0026 <span class="keyword">if</span> nargin &lt; 2
+0027     DeviceList = [];
+0028 <span class="keyword">end</span>
+0029 <span class="keyword">if</span> isempty(DeviceList)
+0030     DeviceList = <a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>(family);
+0031 <span class="keyword">end</span>
+0032 
+0033 <span class="keyword">if</span> (size(DeviceList,2) == 1) 
+0034     DeviceList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(family, DeviceList);
+0035 <span class="keyword">end</span>                  
+0036 
+0037 <span class="keyword">if</span> nargin &lt;= 2
+0038     T = 2;
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="keyword">if</span> OneAtATimeFlag
+0042     DelT = .005;
+0043 <span class="keyword">else</span>
+0044     <span class="keyword">if</span> size(DeviceList,1) &gt; 50
+0045         DelT = .03;
+0046     <span class="keyword">else</span>
+0047         DelT = .02;
+0048     <span class="keyword">end</span>
+0049 <span class="keyword">end</span>
+0050 <span class="keyword">if</span> length(T) == 1
+0051     tin = 0:DelT:T;
+0052 <span class="keyword">else</span>
+0053     tin = T;
+0054 <span class="keyword">end</span>
+0055 
+0056 
+0057 disp([<span class="string">'   Checking the data rate for channel or family: '</span>, family]); 
+0058 disp([<span class="string">'   Collection data for '</span>,num2str(tin(end)),<span class="string">' seconds at a sample rate of '</span>,num2str(1/mean(diff(tin))),<span class="string">' Hertz.'</span>]); 
+0059 pause(0);
+0060 disp([<span class="string">'   Channels must be noisy for this method to work.'</span>]);
+0061 <span class="keyword">if</span> OneAtATimeFlag
+0062     
+0063     <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0064         <span class="comment">% Collect data</span>
+0065         [a, t] = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(family, DeviceList(i,:), tin);
+0066         
+0067         adiff = abs(diff(a));
+0068         I = find(adiff &gt; 0);
+0069         
+0070         <span class="keyword">if</span> size(I,2) &lt; 3
+0071             disp(<span class="string">' '</span>); 
+0072             disp(<span class="string">'   WARNING: Less than 3 update.  Increase time span or channel not noisy enough.'</span>); 
+0073             disp(<span class="string">' '</span>);
+0074         <span class="keyword">end</span>
+0075         
+0076         <span class="keyword">if</span> isempty(I)
+0077             N(i,1) = 0;
+0078             AvgRate(i,1) = 0;
+0079         <span class="keyword">else</span>
+0080             t = t(I);
+0081             tdiff = diff(t);
+0082             
+0083             N(i,1) = size(I,2)-1;
+0084             AvgRate(i,1) = 1/mean(tdiff);
+0085         <span class="keyword">end</span>
+0086         
+0087         Dev=<a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(family,elem(i));
+0088         fprintf(<span class="string">'   %s(%2d,%2d), Sample Rate=%5.2f Hz,  Number of Samples=%d, Number of New Data Points=%d\n'</span>, family, Dev(1), Dev(2), AvgRate(i,1), length(t),N(i,1));
+0089     <span class="keyword">end</span>
+0090 <span class="keyword">else</span>
+0091     <span class="comment">% Collect data using EPICs</span>
+0092     <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(family, DeviceList);  <span class="comment">% just to connect to channels</span>
+0093     [a, t, DataTime] = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(family, DeviceList, tin);
+0094     
+0095     <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0096         adiff = abs(diff(a(i,:)));
+0097         I = find(adiff&gt;0);
+0098         
+0099         <span class="keyword">if</span> size(I,2) &lt; 3
+0100             fprintf(<span class="string">'\n    WARNING: %s(%d,%d) updated %d times in %.2f seconds.  Increase time span or channel is not noisy enough.\n\n'</span>, family, DeviceList(i,:), size(I,2), tin(end)); 
+0101         <span class="keyword">end</span>
+0102         
+0103         <span class="keyword">if</span> isempty(I)
+0104             N(i,1) = 0;
+0105             AvgRate(i,1) = 0;
+0106         <span class="keyword">else</span>
+0107             t1 = t(I);
+0108             tdiff = diff(t1);
+0109             
+0110             N(i,1) = size(I,2)-1;
+0111             AvgRate(i,1) = 1/mean(tdiff);
+0112         <span class="keyword">end</span>
+0113         
+0114         Dev = DeviceList(i,:);
+0115         <span class="keyword">if</span> DisplayFlag
+0116             fprintf(<span class="string">'   %s(%2d,%2d), Sample Rate=%5.2f Hz,  Number of Samples=%d, Number of New Data Points=%d\n'</span>, family, Dev, AvgRate(i,1), length(t), N(i,1));
+0117         <span class="keyword">end</span>
+0118     <span class="keyword">end</span>
+0119 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

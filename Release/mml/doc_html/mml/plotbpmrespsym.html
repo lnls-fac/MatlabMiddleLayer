@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotbpmrespsym</title>
+  <meta name="keywords" content="plotbpmrespsym">
+  <meta name="description" content="PLOTBPMRESPSYM - Looks for symmetry of the orbit response matrix">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; plotbpmrespsym.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plotbpmrespsym
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>PLOTBPMRESPSYM - Looks for symmetry of the orbit response matrix</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function plotbpmrespsym(R) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTBPMRESPSYM - Looks for symmetry of the orbit response matrix
+  plotbpmrespsym(R)
+  plotbpmrespsym(FileName)
+
+  NOTES
+  1. This function is only informative if the lattice is
+     symmetric by sector.
+  2. This function only works if the corrector and BPM 
+     placement is symmetric in each sector.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getbpmresp.html" class="code" title="function [S, FileName] = getbpmresp(varargin)">getbpmresp</a>	GETBPMRESP - Returns the BPM response matrix in the horizontal and vertical planes</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function plotbpmrespsym(R)</a>
+0002 <span class="comment">%PLOTBPMRESPSYM - Looks for symmetry of the orbit response matrix</span>
+0003 <span class="comment">%  plotbpmrespsym(R)</span>
+0004 <span class="comment">%  plotbpmrespsym(FileName)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  NOTES</span>
+0007 <span class="comment">%  1. This function is only informative if the lattice is</span>
+0008 <span class="comment">%     symmetric by sector.</span>
+0009 <span class="comment">%  2. This function only works if the corrector and BPM</span>
+0010 <span class="comment">%     placement is symmetric in each sector.</span>
+0011 
+0012 <span class="comment">%  Written by Greg Portmann</span>
+0013 
+0014 
+0015 <span class="keyword">if</span> nargin == 0
+0016     R = <a href="getbpmresp.html" class="code" title="function [S, FileName] = getbpmresp(varargin)">getbpmresp</a>(<span class="string">'Struct'</span>);
+0017 <span class="keyword">end</span>
+0018 <span class="keyword">if</span> isempty(R)
+0019     R = <a href="getbpmresp.html" class="code" title="function [S, FileName] = getbpmresp(varargin)">getbpmresp</a>(<span class="string">''</span>,<span class="string">'Struct'</span>);
+0020 <span class="keyword">end</span>
+0021 <span class="keyword">if</span> isempty(R)
+0022     <span class="keyword">return</span>;
+0023 <span class="keyword">end</span>
+0024 
+0025 
+0026 <span class="comment">% Use physics units for scaling</span>
+0027 R = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(R);
+0028 
+0029 
+0030 FontSize = 10;
+0031 Buffer = .01;
+0032 HeightBuffer = .08;
+0033 
+0034 
+0035 Sx = R(1,1).Data;
+0036 Sy = R(2,2).Data;
+0037 
+0038 NSectors = R(1,1).Monitor.DeviceList(<span class="keyword">end</span>,1);
+0039 NBPMxperSector = max(R(1,1).Monitor.DeviceList(:,2));
+0040 NBPMyperSector = max(R(2,2).Monitor.DeviceList(:,2));
+0041 
+0042 NBPMx = size(Sx,1);
+0043 NBPMy = size(Sy,1);
+0044 
+0045 NHCMperSector = max(R(1,1).Actuator.DeviceList(:,2));
+0046 NVCMperSector = max(R(2,2).Actuator.DeviceList(:,2));
+0047 
+0048 <span class="comment">%NHCMperSector = size(Sx,2) / NSectors;</span>
+0049 <span class="comment">%NVCMperSector = size(Sy,2) / NSectors;</span>
+0050 
+0051 Circumference = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0052 
+0053 BPMxs = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(R(1,1).Monitor.FamilyName, R(1,1).Monitor.DeviceList);
+0054 BPMxs = BPMxs(:);
+0055 BPMys = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(R(2,2).Monitor.FamilyName, R(2,2).Monitor.DeviceList);
+0056 BPMys = BPMys(:);
+0057 
+0058 BPMxDev = R(1,1).Monitor.DeviceList;
+0059 BPMyDev = R(2,2).Monitor.DeviceList;
+0060 <span class="comment">% BPMxelem = dev2elem(R(1,1).Monitor.FamilyName, R(1,1).Monitor.DeviceList);</span>
+0061 <span class="comment">% BPMyelem = dev2elem(R(2,2).Monitor.FamilyName, R(2,2).Monitor.DeviceList);</span>
+0062 
+0063 <span class="comment">% BPMxGain = getgain(R(1,1).Monitor.FamilyName, R(1,1).Monitor.DeviceList);</span>
+0064 <span class="comment">% BPMyGain = getgain(R(2,2).Monitor.FamilyName, R(2,2).Monitor.DeviceList);</span>
+0065 
+0066 HCMDev = R(1,1).Actuator.DeviceList;
+0067 VCMDev = R(2,2).Actuator.DeviceList;
+0068 <span class="comment">% HCMelem = dev2elem('HCM', R(1,1).Actuator.DeviceList);</span>
+0069 <span class="comment">% VCMelem = dev2elem('VCM', R(2,2).Actuator.DeviceList);</span>
+0070 
+0071 <span class="comment">% % Hardware units to mradian</span>
+0072 <span class="comment">% %HCMGain = getgain('HCM', R(1,1).Actuator.DeviceList);</span>
+0073 <span class="comment">% HCMGain = 1 ./ (hw2physics('HCM', 'Setpoint', R(1,1).ActuatorDelta, HCMDev) ./ R(1,1).ActuatorDelta) / 1000;</span>
+0074 <span class="comment">%</span>
+0075 <span class="comment">% %VCMGain = getgain('VCM', R(2,2).Actuator.DeviceList);</span>
+0076 <span class="comment">% VCMGain = 1 ./ (hw2physics('VCM', 'Setpoint', R(2,2).ActuatorDelta, VCMDev) ./ R(2,2).ActuatorDelta) / 1000;</span>
+0077 
+0078 XUnitsString = R(1,1).UnitsString;
+0079 XUnitsString(findstr(XUnitsString,<span class="string">'('</span>)) = [];
+0080 XUnitsString(findstr(XUnitsString,<span class="string">')'</span>)) = [];
+0081 YUnitsString = R(2,2).UnitsString;
+0082 YUnitsString(findstr(YUnitsString,<span class="string">'('</span>)) = [];
+0083 YUnitsString(findstr(YUnitsString,<span class="string">')'</span>)) = [];
+0084 
+0085 
+0086 L = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0087 
+0088 
+0089 
+0090 <span class="comment">%%%%%%%%%%%%%%</span>
+0091 <span class="comment">% Horizontal %</span>
+0092 <span class="comment">%%%%%%%%%%%%%%</span>
+0093 
+0094 <span class="comment">% % Scale response matrix by the BPM gains</span>
+0095 <span class="comment">% for i = 1:size(Sx,2)</span>
+0096 <span class="comment">%    Sx(:,i) = Sx(:,i) .* BPMxGain(:);</span>
+0097 <span class="comment">% end</span>
+0098 <span class="comment">%</span>
+0099 <span class="comment">% % Scale response matrix by the HCM gains</span>
+0100 <span class="comment">% for i = 1:size(Sx,1)</span>
+0101 <span class="comment">%    Sx(i,:) = Sx(i,:) .* HCMGain(:)';</span>
+0102 <span class="comment">%    %Sx(i,:) = Sx(i,:) ./ hw2physics('HCM', 'Setpoint', 1, HCMDev)'/1000;</span>
+0103 <span class="comment">%    %Sx(i,:) = Sx(i,:) / (1000*amps2rad('HCM',1,i));</span>
+0104 <span class="comment">% end</span>
+0105 
+0106 
+0107 figure;
+0108 clf reset
+0109 set(gcf,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[.0+Buffer .27+Buffer .5-2*Buffer .72-2*Buffer-HeightBuffer]);
+0110 <span class="keyword">for</span> Mag = 1:NHCMperSector    
+0111     S = [];
+0112     P = [];
+0113     <span class="keyword">for</span> i = 1:NSectors
+0114         j = findrowindex([i Mag], HCMDev);
+0115         <span class="keyword">if</span> ~isempty(j)
+0116             k = min(find(BPMxDev(:,1)==i));
+0117             S = [S [Sx(k:<span class="keyword">end</span>, j); Sx(1:k-1, j)]]; 
+0118             P = [P [BPMxs(k:end); BPMxs(1:k-1)+L]-BPMxs(k)+BPMxs(1)]; 
+0119         <span class="keyword">end</span>
+0120     <span class="keyword">end</span>
+0121     
+0122     subplot(NHCMperSector, 1, Mag);
+0123     <span class="keyword">if</span> isempty(S)
+0124         plot(BPMxs, NaN*ones(size(BPMxs)));        
+0125     <span class="keyword">else</span>
+0126         plot(P, S);
+0127     <span class="keyword">end</span>
+0128     ylabel(sprintf(<span class="string">'Mag #%d'</span>, Mag), <span class="string">'FontSize'</span>, FontSize);
+0129 <span class="keyword">end</span>
+0130 
+0131 subplot(NHCMperSector,1,1);
+0132 title(sprintf(<span class="string">'Horizontal Corrector Magnet Response (%s)'</span>, XUnitsString), <span class="string">'FontSize'</span>, FontSize);
+0133 
+0134 subplot(NHCMperSector,1,NHCMperSector);
+0135 xlabel(<span class="string">'BPM Position [meters]'</span>, <span class="string">'FontSize'</span>, FontSize);
+0136 <span class="keyword">if</span> isfield(R(1,1), <span class="string">'TimeStamp'</span>)
+0137     addlabel(1,0,sprintf(<span class="string">'%s'</span>, datestr(R(1,1).TimeStamp)));
+0138 <span class="keyword">end</span>
+0139 orient tall
+0140 
+0141 
+0142 <span class="comment">%%%%%%%%%%%%</span>
+0143 <span class="comment">% Vertical %</span>
+0144 <span class="comment">%%%%%%%%%%%%</span>
+0145 
+0146 <span class="comment">% % Scale response matrix by the BPM gains</span>
+0147 <span class="comment">% for i = 1:size(Sy,2)</span>
+0148 <span class="comment">%    Sy(:,i) = Sy(:,i) .* BPMyGain(:);</span>
+0149 <span class="comment">% end</span>
+0150 <span class="comment">%</span>
+0151 <span class="comment">% % Scale response matrix by the VCM gains</span>
+0152 <span class="comment">% for i = 1:size(Sy,1)</span>
+0153 <span class="comment">%    Sy(i,:) = Sy(i,:) .* VCMGain(:)';</span>
+0154 <span class="comment">%    %Sy(i,:) = Sy(i,:) / (1000*amps2rad('VCM',1,i));</span>
+0155 <span class="comment">% end</span>
+0156 
+0157 figure(gcf+1);
+0158 clf reset
+0159 set(gcf,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[.5+Buffer .27+Buffer .5-2*Buffer .72-2*Buffer-HeightBuffer]);
+0160 
+0161 <span class="keyword">for</span> Mag = 1:NVCMperSector     
+0162     S = [];
+0163     P = [];
+0164     <span class="keyword">for</span> i = 1:NSectors
+0165         j = findrowindex([i Mag], VCMDev);
+0166         <span class="keyword">if</span> ~isempty(j)
+0167             k = min(find(BPMyDev(:,1)==i));
+0168             S = [S [Sy(k:<span class="keyword">end</span>, j); Sy(1:k-1, j)]]; 
+0169             P = [P [BPMys(k:end); BPMys(1:k-1)+L]-BPMys(k)+BPMys(1)]; 
+0170         <span class="keyword">end</span>
+0171     <span class="keyword">end</span>
+0172   
+0173     subplot(NVCMperSector, 1, Mag);
+0174     <span class="keyword">if</span> isempty(S)
+0175         plot(BPMys, NaN*ones(size(BPMys)));        
+0176     <span class="keyword">else</span>
+0177         plot(P, S);
+0178     <span class="keyword">end</span>
+0179     ylabel(sprintf(<span class="string">'Mag #%d'</span>, Mag), <span class="string">'FontSize'</span>, FontSize);
+0180 <span class="keyword">end</span>
+0181 
+0182 subplot(NVCMperSector,1,1);
+0183 title(sprintf(<span class="string">'Vertical Corrector Magnet Response (%s)'</span>, XUnitsString), <span class="string">'FontSize'</span>, FontSize);
+0184 
+0185 subplot(NVCMperSector,1,NVCMperSector);
+0186 xlabel(<span class="string">'BPM Position [meters]'</span>, <span class="string">'FontSize'</span>, FontSize);
+0187 <span class="keyword">if</span> isfield(R(1,1), <span class="string">'TimeStamp'</span>)
+0188     addlabel(1,0,sprintf(<span class="string">'%s'</span>, datestr(R(1,1).TimeStamp)));
+0189 <span class="keyword">end</span>
+0190 orient tall
+0191 
+0192</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

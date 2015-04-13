@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of family2tol</title>
+  <meta name="keywords" content="family2tol">
+  <meta name="description" content="FAMILY2TOL - Return the (SP-AM) tolerance for a family">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; family2tol.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>family2tol
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>FAMILY2TOL - Return the (SP-AM) tolerance for a family</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Data, ErrorFlag] = family2tol(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FAMILY2TOL - Return the (SP-AM) tolerance for a family
+  [Tol, ErrorFlag] = family2tol(Family, Field, DeviceList)
+  [Tol, ErrorFlag] = family2tol(Family, DeviceList)
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Accelerator Object
+  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Setpoint'}
+  3. DeviceList ([Sector Device #] or [element #]) {Default: Entire family}
+  4. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+  5. 'Numeric' - Numeric output {Default}
+     'Struct'  - Data structure output
+
+  OUTPUTS
+  1. Tol = Tolerance field corresponding to the Family, Field, and DeviceList
+ 
+  NOTES
+  1. If Family is a cell array, then DeviceList and Field can also be a cell arrays</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>	FAMILY2DATASTRUCTURE</li><li><a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>	FAMILY2TOL - Return the (SP-AM) tolerance for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>	INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>	FAMILY2TOL - Return the (SP-AM) tolerance for a family</li><li><a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>	GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</li><li><a href="gettol.html" class="code" title="function [S, Error] = gettol(varargin)">gettol</a>	GETTOL - Returns the tolerance between the setpoint and monitor</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Data, ErrorFlag] = family2tol(varargin)</a>
+0002 <span class="comment">%FAMILY2TOL - Return the (SP-AM) tolerance for a family</span>
+0003 <span class="comment">%  [Tol, ErrorFlag] = family2tol(Family, Field, DeviceList)</span>
+0004 <span class="comment">%  [Tol, ErrorFlag] = family2tol(Family, DeviceList)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. Family - Family Name</span>
+0008 <span class="comment">%              Data Structure</span>
+0009 <span class="comment">%              Accelerator Object</span>
+0010 <span class="comment">%  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Setpoint'}</span>
+0011 <span class="comment">%  3. DeviceList ([Sector Device #] or [element #]) {Default: Entire family}</span>
+0012 <span class="comment">%  4. 'Physics'  - Use physics  units (optional override of units)</span>
+0013 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0014 <span class="comment">%  5. 'Numeric' - Numeric output {Default}</span>
+0015 <span class="comment">%     'Struct'  - Data structure output</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  OUTPUTS</span>
+0018 <span class="comment">%  1. Tol = Tolerance field corresponding to the Family, Field, and DeviceList</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  NOTES</span>
+0021 <span class="comment">%  1. If Family is a cell array, then DeviceList and Field can also be a cell arrays</span>
+0022 
+0023 <span class="comment">%  Written by Greg Portmann</span>
+0024 
+0025 
+0026 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0027 <span class="comment">% Input Parsing %</span>
+0028 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0029 UnitsFlagCell = {};
+0030 StructOutputFlag = 0;
+0031 <span class="keyword">for</span> i = length(varargin):-1:1
+0032     <span class="keyword">if</span> isstruct(varargin{i})
+0033         <span class="comment">% Ignor structures</span>
+0034     <span class="keyword">elseif</span> iscell(varargin{i})
+0035         <span class="comment">% Ignor cells</span>
+0036     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0037         StructOutputFlag = 1;
+0038         varargin(i) = [];
+0039     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0040         StructOutputFlag = 0;
+0041         varargin(i) = [];
+0042     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>) || strcmpi(varargin{i},<span class="string">'Online'</span>) || strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0043         <span class="comment">% Remove and ignor</span>
+0044         varargin(i) = [];
+0045     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0046         UnitsFlagCell = {<span class="string">'Physics'</span>};
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0049         UnitsFlagCell = {<span class="string">'Hardware'</span>};
+0050         varargin(i) = [];
+0051     <span class="keyword">end</span>
+0052 <span class="keyword">end</span>
+0053 
+0054 <span class="keyword">if</span> isempty(varargin)
+0055     error(<span class="string">'Must have at least a family name input'</span>);
+0056 <span class="keyword">end</span>
+0057 
+0058 
+0059 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0060 <span class="comment">% Cell Array Inputs %</span>
+0061 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0062 <span class="keyword">if</span> iscell(varargin{1})
+0063     <span class="keyword">for</span> i = 1:length(varargin{1})
+0064         <span class="keyword">if</span> length(varargin) &lt; 2
+0065             [Data{i}, ErrorFlag{i}] = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(varargin{1}{i}, UnitsFlagCell{:});
+0066         <span class="keyword">elseif</span> length(varargin) &lt; 3
+0067             <span class="keyword">if</span> iscell(varargin{2})
+0068                 [Data{i}, ErrorFlag{i}] = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(varargin{1}{i}, varargin{2}{i}, UnitsFlagCell{:});
+0069             <span class="keyword">else</span>
+0070                 [Data{i}, ErrorFlag{i}] = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(varargin{1}{i}, varargin{2}, UnitsFlagCell{:});
+0071             <span class="keyword">end</span>
+0072         <span class="keyword">else</span>
+0073             <span class="keyword">if</span> iscell(varargin{2})
+0074                 <span class="keyword">if</span> iscell(varargin{3})
+0075                     [Data{i}, ErrorFlag{i}] = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i}, UnitsFlagCell{:});
+0076                 <span class="keyword">else</span>
+0077                     [Data{i}, ErrorFlag{i}] = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}, UnitsFlagCell{:});
+0078                 <span class="keyword">end</span>
+0079             <span class="keyword">else</span>
+0080                 <span class="keyword">if</span> iscell(varargin{3})
+0081                     [Data{i}, ErrorFlag{i}] = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(varargin{1}{i}, varargin{2}, varargin{3}{i}, UnitsFlagCell{:});
+0082                 <span class="keyword">else</span>
+0083                     [Data{i}, ErrorFlag{i}] = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(varargin{1}{i}, varargin{2}, varargin{3}, UnitsFlagCell{:});
+0084                 <span class="keyword">end</span>
+0085             <span class="keyword">end</span>
+0086         <span class="keyword">end</span>
+0087     <span class="keyword">end</span>
+0088     <span class="keyword">return</span>
+0089 <span class="keyword">end</span>
+0090 
+0091 
+0092 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0093 <span class="comment">% Parse Family, Field, DeviceList %</span>
+0094 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0095 [Family, Field, DeviceList, UnitsFlag] = <a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>(varargin{:});
+0096 
+0097 
+0098 <span class="comment">% Units flag</span>
+0099 <span class="keyword">if</span> isempty(UnitsFlagCell)
+0100     <span class="comment">% For structure inputs, use the units in the structure (from inputparsingffd)</span>
+0101     <span class="comment">% Else, get the default family value</span>
+0102     <span class="keyword">if</span> isempty(UnitsFlag)
+0103         UnitsFlag = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(Family);
+0104     <span class="keyword">end</span>
+0105 <span class="keyword">else</span>
+0106     <span class="comment">% Input override has priority</span>
+0107     UnitsFlag = UnitsFlagCell{1};
+0108 <span class="keyword">end</span>
+0109 
+0110 
+0111 <span class="comment">% Default field is Setpoint</span>
+0112 <span class="keyword">if</span> isempty(Field)
+0113     Field = <span class="string">'Setpoint'</span>;
+0114 <span class="keyword">end</span>
+0115 
+0116 
+0117 <span class="comment">%%%%%%%%%%%%</span>
+0118 <span class="comment">% Get data %</span>
+0119 <span class="comment">%%%%%%%%%%%%</span>
+0120 [Data, ErrorFlag] = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'Tolerance'</span>, DeviceList);
+0121 
+0122 
+0123 
+0124 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0125 <span class="comment">% Change to physics units if requested %</span>
+0126 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0127 <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0128     Data = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(Family, Field, Data, DeviceList);
+0129 <span class="keyword">end</span>
+0130 
+0131 
+0132 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0133 <span class="comment">% Return a data structure if requested %</span>
+0134 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0135 <span class="keyword">if</span> StructOutputFlag
+0136     DataNumeric = Data;
+0137     <span class="keyword">if</span> isempty(UnitsFlag)
+0138         Data = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(Family, Field, DeviceList);
+0139     <span class="keyword">else</span>
+0140         Data = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(Family, Field, DeviceList, UnitsFlag);
+0141     <span class="keyword">end</span>
+0142     Data.Data = DataNumeric;
+0143     Data.DataDescriptor = sprintf(<span class="string">'%s.%s Tolerance'</span>, Family, Field);
+0144     Data.CreatedBy = <span class="string">'family2tol'</span>;
+0145 <span class="keyword">end</span>
+0146</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

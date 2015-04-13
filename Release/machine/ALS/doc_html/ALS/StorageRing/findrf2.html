@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of findrf2</title>
+  <meta name="keywords" content="findrf2">
+  <meta name="description" content="[DeltaRF, RF] = findrf2">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; findrf2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>findrf2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[DeltaRF, RF] = findrf2</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [DeltaRF, RF] = findrf2 </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  [DeltaRF, RF] = findrf2
+
+  This function uses analcm to find and set the RF frequency
+  to minimize the mean of arc-section horiztonal correctors
+
+  Also see findrf, rmdisp, plotcm</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="bend2gev.html" class="code" title="function GeV = bend2gev(varargin)">bend2gev</a>	BEND2GEV - Compute the energy based on the ramp tables</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DeltaRF, RF] = findrf2</a>
+0002 <span class="comment">%  [DeltaRF, RF] = findrf2</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  This function uses analcm to find and set the RF frequency</span>
+0005 <span class="comment">%  to minimize the mean of arc-section horiztonal correctors</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  Also see findrf, rmdisp, plotcm</span>
+0008 
+0009 
+0010 RFold = getsp(<span class="string">'RF'</span>);
+0011 <span class="comment">%fprintf('  The current RF frequency is %.4f MHz.', RFold);</span>
+0012 
+0013 
+0014 [DeltaRF, EnergyChange, meanHCM3456] = analcm;
+0015 
+0016 
+0017 <span class="keyword">if</span> 1
+0018 
+0019     Const19 = 0.0012;
+0020     Const15 = 0.0015;
+0021 
+0022     GeV = <a href="bend2gev.html" class="code" title="function GeV = bend2gev(varargin)">bend2gev</a>;
+0023     <span class="keyword">if</span> GeV == getenergy(<span class="string">'Production'</span>)
+0024         RFnew = RFold + (Const19*meanHCM3456);
+0025     <span class="keyword">elseif</span> GeV == getenergy(<span class="string">'Injection'</span>)
+0026         RFnew = RFold + (Const15*meanHCM3456);
+0027     <span class="keyword">else</span>
+0028         fprintf(<span class="string">'  There is no conversion factor for this energy. Please set the frequency manually.'</span>);
+0029     <span class="keyword">end</span>
+0030 
+0031     DeltaRF = Const19*meanHCM3456;
+0032 
+0033 <span class="keyword">else</span>
+0034 
+0035     <span class="comment">% Half the energy change seems to be a good RF change</span>
+0036     DeltaRF = DeltaRF/2;
+0037     RFnew = RFold + DeltaRF;
+0038 
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="comment">%fprintf('  The new RF frequency will be %.4f MHz. ', RFnew);</span>
+0042 
+0043 changeRFbutton = questdlg(sprintf(<span class="string">'The current RF freq. is %.6f MHz\nThe new RF freq. will be %.6f MHz\nDo you wish to change it?'</span>, RFold, RFnew), <span class="string">'Change RF Frequency?'</span>, <span class="string">'Yes'</span>, <span class="string">'No'</span>, <span class="string">'No'</span>);
+0044 
+0045 <span class="keyword">switch</span> changeRFbutton
+0046     <span class="keyword">case</span> <span class="string">'Yes'</span>
+0047         setsp(<span class="string">'RF'</span>,RFnew);
+0048         pause(1);
+0049         RF = getsp(<span class="string">'RF'</span>);
+0050         fprintf(<span class="string">'   The RF frequency has been changed. The new RF frequency is %.6f MHz.\n'</span>, RF);
+0051     <span class="keyword">case</span> <span class="string">'No'</span>
+0052         RF = getsp(<span class="string">'RF'</span>);
+0053         fprintf(<span class="string">'   The RF frequency has not been changed. The RF frequency is %.6f MHz.\n'</span>, RF);
+0054 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

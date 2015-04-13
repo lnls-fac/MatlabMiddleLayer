@@ -1,0 +1,255 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ffdeltasp</title>
+  <meta name="keywords" content="ffdeltasp">
+  <meta name="description" content="[DelHCM, DelVCM, DelQF, DelQD] = ffdeltasp(Sector, Gap, LongitudinalGap, GeV)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; ffdeltasp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>ffdeltasp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[DelHCM, DelVCM, DelQF, DelQD] = ffdeltasp(Sector, Gap, LongitudinalGap, GeV)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [DelHCM, DelVCM, DelQF, DelQD] = ffdeltasp(Sector, Gap, LongitudinalGap, GeV) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [DelHCM, DelVCM, DelQF, DelQD] = ffdeltasp(Sector, Gap, LongitudinalGap, GeV)
+
+ Inputs:
+   Sector (column vector)
+   Gap and LongitudinalGap must have the same number of columns
+   Sector, Gap, and LongitudinalGap must have the same number of rows
+
+ Defaults:
+   if 0 or 1 inputs, then Gap=getid and LongitudinalGap=getepu
+   if 2 inputs, then LongitudinalGap = zeros(size(Gap))
+
+ Outputs
+   Each column corresponds to the sum of all the sectors
+   DelHCM, DelVCM, DelQF, DelQD are sized to the full family size
+   Note:  if Sector has more than one element then HCM, VCM, QF, QD and their
+          associated lists correspond to only the last element.  It does not make
+          sense to sum corrections from different sectors.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="ffdeltaquad.html" class="code" title="function [DelQF, DelQD] = ffdeltaquad(Sector, Gap, GeV)">ffdeltaquad</a>	Sector</li><li><a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>	[Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector {4}, ChanType)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arplot_ff.html" class="code" title="function arplot_ff(Sector,t1,t2);">arplot_ff</a>	function arplot_ff(Sector, StartTime [Hours], EndTime [Hours]);</li><li><a href="checksrmags.html" class="code" title="function NumErrors = checksrmags(LatticeFileName)">checksrmags</a>	CHECKSRMAGS - Check SR power supplies against a lattice file</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DelHCM, DelVCM, DelQF, DelQD] = ffdeltasp(Sector, Gap, LongitudinalGap, GeV)</a>
+0002 <span class="comment">% [DelHCM, DelVCM, DelQF, DelQD] = ffdeltasp(Sector, Gap, LongitudinalGap, GeV)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Inputs:</span>
+0005 <span class="comment">%   Sector (column vector)</span>
+0006 <span class="comment">%   Gap and LongitudinalGap must have the same number of columns</span>
+0007 <span class="comment">%   Sector, Gap, and LongitudinalGap must have the same number of rows</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% Defaults:</span>
+0010 <span class="comment">%   if 0 or 1 inputs, then Gap=getid and LongitudinalGap=getepu</span>
+0011 <span class="comment">%   if 2 inputs, then LongitudinalGap = zeros(size(Gap))</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% Outputs</span>
+0014 <span class="comment">%   Each column corresponds to the sum of all the sectors</span>
+0015 <span class="comment">%   DelHCM, DelVCM, DelQF, DelQD are sized to the full family size</span>
+0016 <span class="comment">%   Note:  if Sector has more than one element then HCM, VCM, QF, QD and their</span>
+0017 <span class="comment">%          associated lists correspond to only the last element.  It does not make</span>
+0018 <span class="comment">%          sense to sum corrections from different sectors.</span>
+0019 
+0020 <span class="comment">% Revision History:</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% 2003-02-25, Christoph Steier</span>
+0023 <span class="comment">%        Added quadrupole feed forward for EPU in sector 11 and longitudinal dipole feed forward</span>
+0024 <span class="comment">% 2005-12-21, Greg Portmann</span>
+0025 <span class="comment">%        Changed for new middle layer.  Copies srcontrol5 for tune correction.</span>
+0026 
+0027 
+0028 HCMelem = dev2elem(<span class="string">'HCM'</span>, family2dev(<span class="string">'HCM'</span>));
+0029 VCMelem = dev2elem(<span class="string">'VCM'</span>, family2dev(<span class="string">'VCM'</span>));
+0030 
+0031 
+0032 <span class="keyword">if</span> nargin &lt; 1
+0033     Sector = [];
+0034 <span class="keyword">end</span>
+0035 <span class="keyword">if</span> isempty(Sector)
+0036     Sector = family2dev(<span class="string">'ID'</span>);
+0037 <span class="keyword">end</span>
+0038 <span class="keyword">if</span> nargin &lt; 2
+0039     Gap = [];
+0040 <span class="keyword">end</span>
+0041 <span class="keyword">if</span> isempty(Gap)
+0042     Gap = getsp(<span class="string">'ID'</span>, Sector);
+0043 <span class="keyword">end</span>
+0044 <span class="keyword">if</span> nargin &lt; 3
+0045     LongitudinalGap = [];
+0046 <span class="keyword">end</span>
+0047 <span class="keyword">if</span> isempty(LongitudinalGap)
+0048     LongitudinalGap = <a href="getepu.html" class="code" title="function [Offset, OffsetA, OffsetB, Velocity, RunFlag, UserGap] = getepu(Sector, ChanType)">getepu</a>(Sector);
+0049 <span class="keyword">end</span>
+0050 <span class="keyword">if</span> nargin &lt; 4
+0051     GeV = [];
+0052 <span class="keyword">end</span>
+0053 <span class="keyword">if</span> isempty(GeV)
+0054     GeV = getenergy(<span class="string">'Production'</span>);  <span class="comment">% was getenergy, changed by GJP 2/13/2007</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 
+0058 <span class="keyword">if</span> size(Sector,2) == 1
+0059     Sector = elem2dev(<span class="string">'ID'</span>, Sector);
+0060 <span class="keyword">end</span>
+0061 <span class="keyword">if</span> size(Sector,1) ~= size(Gap,1)
+0062     error(<span class="string">'Rows of Sector &amp; Gap must equal.'</span>);
+0063 <span class="keyword">end</span>
+0064 <span class="keyword">if</span> any(size(Gap) ~= size(LongitudinalGap))
+0065     error(<span class="string">'Sector and LongitudinalGap must be the same size'</span>);
+0066 <span class="keyword">end</span>
+0067 
+0068 
+0069 
+0070 <span class="comment">% Initialize</span>
+0071 HCMDeviceList = family2dev(<span class="string">'HCM'</span>);
+0072 VCMDeviceList = family2dev(<span class="string">'VCM'</span>);
+0073 DelHCM = zeros(size(HCMDeviceList,1), size(Gap,2));
+0074 DelVCM = zeros(size(VCMDeviceList,1), size(Gap,2));
+0075 HCM    = zeros( 4, size(Gap,2));
+0076 VCM    = zeros( 4, size(Gap,2));
+0077 
+0078 
+0079 <span class="keyword">for</span> i = 1:size(Sector,1);
+0080     <span class="keyword">if</span> any(Sector(i,1) == [4 6 11])
+0081         <span class="keyword">if</span> Sector(i,2) == 1
+0082             HCMlist1 = [
+0083                 Sector(i,1)-1  8;
+0084                 Sector(i,1)-1 10;
+0085                 Sector(i,1)-1  2;  <span class="comment">% ???</span>
+0086                 Sector(i,1)    7]; <span class="comment">% ???</span>
+0087 
+0088             VCMlist1 = [
+0089                 Sector(i,1)-1  8;
+0090                 Sector(i,1)-1 10;
+0091                 Sector(i,1)-1  2;  <span class="comment">% ???</span>
+0092                 Sector(i,1)    7]; <span class="comment">% ???</span>
+0093         <span class="keyword">else</span>
+0094             HCMlist1 = [
+0095                 Sector(i,1)-1 10;
+0096                 Sector(i,1)    1;
+0097                 Sector(i,1)-1  2;  <span class="comment">% ???</span>
+0098                 Sector(i,1)    7]; <span class="comment">% ???</span>
+0099 
+0100             VCMlist1 = [
+0101                 Sector(i,1)-1 10;
+0102                 Sector(i,1)    1;
+0103                 Sector(i,1)-1  2;  <span class="comment">% ???</span>
+0104                 Sector(i,1)    7]; <span class="comment">% ???</span>
+0105         <span class="keyword">end</span>
+0106     <span class="keyword">else</span>
+0107         HCMlist1 = [
+0108             Sector(i,1)-1 8;
+0109             Sector(i,1)   1;
+0110             Sector(i,1)-1 2;
+0111             Sector(i,1)   7];
+0112 
+0113         VCMlist1 = [
+0114             Sector(i,1)-1 8;
+0115             Sector(i,1)   1;
+0116             Sector(i,1)-1 2;
+0117             Sector(i,1)   7];
+0118     <span class="keyword">end</span>
+0119 
+0120     iHCM = findrowindex(HCMlist1, HCMDeviceList);
+0121     iVCM = findrowindex(VCMlist1, VCMDeviceList);
+0122 
+0123 
+0124     <span class="comment">% Read the vertical FF table</span>
+0125     [tableHCM, tableVCM, tableQ] = fftable(Sector(i,1), GeV);
+0126     <span class="keyword">if</span> (Sector(i) == 4) | (Sector(i) == 11)
+0127         [GapsLongitudinal, Gaps, HCMtable1, HCMtable2, VCMtable1, VCMtable2] = fftableepu(Sector(i,1), GeV);
+0128         <span class="comment">%[GapsLongitudinal, Gaps, HCMtable1, HCMtable2, VCMtable1, VCMtable2] = fftableepu;</span>
+0129     <span class="keyword">end</span>
+0130 
+0131     <span class="keyword">for</span> j = 1:size(Gap,2)
+0132         <span class="comment">% just to make table1 work without errors</span>
+0133         tmpgap = Gap(i,j);
+0134         <span class="keyword">if</span> tmpgap &gt;= tableHCM(1,1)
+0135             tmpgap = tableHCM(1,1);
+0136         <span class="keyword">end</span>
+0137         <span class="keyword">if</span> tmpgap &lt;= tableHCM(size(tableHCM,1),1)
+0138             tmpgap = tableHCM(size(tableHCM,1),1);
+0139         <span class="keyword">end</span>
+0140 
+0141         HCM(1:2,j) = [
+0142             interp1(tableHCM(:,1), tableHCM(:,2), tmpgap);
+0143             interp1(tableHCM(:,1), tableHCM(:,3), tmpgap)];
+0144 
+0145         VCM(1:2,j) = [
+0146             interp1(tableVCM(:,1), tableVCM(:,2), tmpgap);
+0147             interp1(tableVCM(:,1), tableVCM(:,3), tmpgap)];
+0148 
+0149 
+0150         <span class="comment">% Read the longitudinal FF table</span>
+0151         <span class="keyword">if</span> (Sector(i) == 4) | (Sector(i) == 11)
+0152             <span class="comment">% just to make table1 work without errors</span>
+0153             tmpgap = Gap(i,j);
+0154             <span class="keyword">if</span> tmpgap &gt;= Gaps(1)
+0155                 tmpgap = Gaps(1);
+0156             <span class="keyword">end</span>
+0157             <span class="keyword">if</span> tmpgap &lt;= Gaps(end)
+0158                 tmpgap = Gaps(end);
+0159             <span class="keyword">end</span>
+0160 
+0161             tmpLongitudinalGap = LongitudinalGap(i,j);
+0162             <span class="keyword">if</span> tmpLongitudinalGap &lt; GapsLongitudinal(1)
+0163                 tmpLongitudinalGap = GapsLongitudinal(1);
+0164             <span class="keyword">end</span>
+0165             <span class="keyword">if</span> tmpLongitudinalGap &gt; GapsLongitudinal(end)
+0166                 tmpLongitudinalGap = GapsLongitudinal(end);
+0167             <span class="keyword">end</span>
+0168 
+0169             hcm1 = interp2(GapsLongitudinal, Gaps, HCMtable1, tmpLongitudinalGap, tmpgap);
+0170             hcm2 = interp2(GapsLongitudinal, Gaps, HCMtable2, tmpLongitudinalGap, tmpgap);
+0171             vcm1 = interp2(GapsLongitudinal, Gaps, VCMtable1, tmpLongitudinalGap, tmpgap);
+0172             vcm2 = interp2(GapsLongitudinal, Gaps, VCMtable2, tmpLongitudinalGap, tmpgap);
+0173 
+0174             HCM(:,j) = HCM(:,j) + [hcm1;hcm2;0;0];
+0175             VCM(:,j) = VCM(:,j) + [vcm1;vcm2;0;0];
+0176         <span class="keyword">end</span>
+0177 
+0178         DelHCM(iHCM,j) = DelHCM(iHCM,j) + HCM(:,j);
+0179         DelVCM(iVCM,j) = DelVCM(iVCM,j) + VCM(:,j);
+0180     <span class="keyword">end</span>
+0181 <span class="keyword">end</span>
+0182 
+0183 
+0184 
+0185 <span class="comment">% Tune feed forward</span>
+0186 <span class="keyword">if</span> nargout &gt;= 3
+0187     [DelQF, DelQD] = <a href="ffdeltaquad.html" class="code" title="function [DelQF, DelQD] = ffdeltaquad(Sector, Gap, GeV)">ffdeltaquad</a>(Sector, Gap, GeV);
+0188 <span class="keyword">end</span>
+0189 
+0190 
+0191 
+0192 
+0193</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

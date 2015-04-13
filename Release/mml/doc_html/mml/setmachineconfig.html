@@ -1,0 +1,404 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setmachineconfig</title>
+  <meta name="keywords" content="setmachineconfig">
+  <meta name="description" content="SETMACHINECONFIG - Sets the storage ring setpoints from a file or configuration data structure">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setmachineconfig.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setmachineconfig
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETMACHINECONFIG - Sets the storage ring setpoints from a file or configuration data structure</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ConfigSetpoint, FileName] = setmachineconfig(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETMACHINECONFIG - Sets the storage ring setpoints from a file or configuration data structure
+  [ConfigSetpoint, FileName] = setmachineconfig(FamilyName, FileName, WaitFlag, ExtraInputs ...)
+  [ConfigSetpoint, FileName] = setmachineconfig(FileName, WaitFlag, ExtraInputs ...)
+  [ConfigSetpoint, FileName] = setmachineconfig(ConfigSetpoint, WaitFlag, ExtraInputs ...)
+  
+  INPUTS
+  1. FamilyName - Name of family/families to set (string, string matrix, cell array of families)
+                  {Default: all families (as returned by getfamilylist)}
+  2. FileName - File name to get setpoint data (if necessary, include full path)
+                'Production' or 'Golden' will get the lattice from the &quot;golden lattice&quot; which stored in &lt;OpsData.LatticeFile&gt;
+                'Injection' will get the injection lattice stored in &lt;OpsData.InjectionFile&gt;
+                {Default: browse for the desired file}
+       or
+     ConfigSetpoint - A configuration structure as returned by getmachineconfig can also be used.
+  3. WaitFlag - {optional} (see getpv for details)
+  4. ExtraInputs - 'Display' - Dialog box prompting for what to set
+                   Extra inputs get passed to setpv (like 'Online', 'Simulator')
+                   See &gt;&gt; help setpv for more details
+
+  OUTPUTS
+  1. ConfigSetpoint - structure of setpoint structures
+                      each field being a family 
+  2. FileName - filename where the data came from (if the data came from a file)
+
+  NOTES
+  1. Since some accelerators need to do non-standard things after setting a configuration,
+     setmachineconfig looks for the existence of getfamilydata('setmachineconfigfile').  
+     If not empty, the result is sent to feval.
+
+  EXAMPLES  
+  1.  To browse for a configuration to set:
+      &gt;&gt; setmachineconfig; 
+
+  2.  To set to golden configuration:
+      &gt;&gt; setmachineconfig('Golden'); 
+      &gt;&gt; setmachineconfig('Golden','Display');  % To interactively change what is set
+
+  3.  To only restore the HCM and VCM corrector families from the golden lattice:
+      &gt;&gt; setmachineconfig('HCM', 'Golden'); 
+                or
+      &gt;&gt; setmachineconfig({'HCM','VCM'}, 'Golden'); 
+
+  See also <a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="golden2sim.html" class="code" title="function golden2sim(ZeroCMFlag)">golden2sim</a>	GOLDEN2SIM - loads online machine configuration to AT configuration</li><li><a href="loadmachineconfig.html" class="code" title="function loadmachineconfig(Flag)">loadmachineconfig</a>	LOADMACHINECONFIG - Sets the storage ring setpoints and monitors from a file</li><li><a href="machine2sim.html" class="code" title="function machine2sim(ZeroCMFlag)">machine2sim</a>	MACHINE2SIM - loads online machine configuration to AT configuration</li><li><a href="sim2machine.html" class="code" title="function sim2machine">sim2machine</a>	SIM2MACHINE - Sets the AT configuration to the online machine</li><li><a href="sweepenergy.html" class="code" title="function sweepenergy(PercentChangeInEnergy)">sweepenergy</a>	SWEEPENERGY - Energy sweep of the storage ring</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ConfigSetpoint, FileName] = setmachineconfig(varargin)</a>
+0002 <span class="comment">%SETMACHINECONFIG - Sets the storage ring setpoints from a file or configuration data structure</span>
+0003 <span class="comment">%  [ConfigSetpoint, FileName] = setmachineconfig(FamilyName, FileName, WaitFlag, ExtraInputs ...)</span>
+0004 <span class="comment">%  [ConfigSetpoint, FileName] = setmachineconfig(FileName, WaitFlag, ExtraInputs ...)</span>
+0005 <span class="comment">%  [ConfigSetpoint, FileName] = setmachineconfig(ConfigSetpoint, WaitFlag, ExtraInputs ...)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS</span>
+0008 <span class="comment">%  1. FamilyName - Name of family/families to set (string, string matrix, cell array of families)</span>
+0009 <span class="comment">%                  {Default: all families (as returned by getfamilylist)}</span>
+0010 <span class="comment">%  2. FileName - File name to get setpoint data (if necessary, include full path)</span>
+0011 <span class="comment">%                'Production' or 'Golden' will get the lattice from the &quot;golden lattice&quot; which stored in &lt;OpsData.LatticeFile&gt;</span>
+0012 <span class="comment">%                'Injection' will get the injection lattice stored in &lt;OpsData.InjectionFile&gt;</span>
+0013 <span class="comment">%                {Default: browse for the desired file}</span>
+0014 <span class="comment">%       or</span>
+0015 <span class="comment">%     ConfigSetpoint - A configuration structure as returned by getmachineconfig can also be used.</span>
+0016 <span class="comment">%  3. WaitFlag - {optional} (see getpv for details)</span>
+0017 <span class="comment">%  4. ExtraInputs - 'Display' - Dialog box prompting for what to set</span>
+0018 <span class="comment">%                   Extra inputs get passed to setpv (like 'Online', 'Simulator')</span>
+0019 <span class="comment">%                   See &gt;&gt; help setpv for more details</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%  OUTPUTS</span>
+0022 <span class="comment">%  1. ConfigSetpoint - structure of setpoint structures</span>
+0023 <span class="comment">%                      each field being a family</span>
+0024 <span class="comment">%  2. FileName - filename where the data came from (if the data came from a file)</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  NOTES</span>
+0027 <span class="comment">%  1. Since some accelerators need to do non-standard things after setting a configuration,</span>
+0028 <span class="comment">%     setmachineconfig looks for the existence of getfamilydata('setmachineconfigfile').</span>
+0029 <span class="comment">%     If not empty, the result is sent to feval.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  EXAMPLES</span>
+0032 <span class="comment">%  1.  To browse for a configuration to set:</span>
+0033 <span class="comment">%      &gt;&gt; setmachineconfig;</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%  2.  To set to golden configuration:</span>
+0036 <span class="comment">%      &gt;&gt; setmachineconfig('Golden');</span>
+0037 <span class="comment">%      &gt;&gt; setmachineconfig('Golden','Display');  % To interactively change what is set</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">%  3.  To only restore the HCM and VCM corrector families from the golden lattice:</span>
+0040 <span class="comment">%      &gt;&gt; setmachineconfig('HCM', 'Golden');</span>
+0041 <span class="comment">%                or</span>
+0042 <span class="comment">%      &gt;&gt; setmachineconfig({'HCM','VCM'}, 'Golden');</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">%  See also getmachineconfig</span>
+0045 
+0046 <span class="comment">%  Written by Greg Portmann</span>
+0047 
+0048 
+0049 WaitFlag = -1;
+0050 FamilyName = [];
+0051 FileName = <span class="string">''</span>;
+0052 DisplayFlag = 0;
+0053 ConfigSetpoint = [];
+0054 
+0055 
+0056 <span class="comment">% Look for keywords on the input line</span>
+0057 InputFlags = {};
+0058 <span class="keyword">for</span> i = length(varargin):-1:1
+0059     <span class="keyword">if</span> isstruct(varargin{i})
+0060         <span class="comment">% Ignor structures</span>
+0061     <span class="keyword">elseif</span> iscell(varargin{i})
+0062         <span class="comment">% Ignor cells</span>
+0063     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0064         <span class="comment">% Remove</span>
+0065         varargin(i) = [];
+0066     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0067         <span class="comment">% Remove</span>
+0068         varargin(i) = [];
+0069     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0070         DisplayFlag = 1;
+0071         varargin(i) = [];
+0072     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0073         DisplayFlag = 0;
+0074         varargin(i) = [];
+0075     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0076         InputFlags = [InputFlags varargin(i)];
+0077         varargin(i) = [];
+0078     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0079         InputFlags = [InputFlags varargin(i)];
+0080         varargin(i) = [];
+0081     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0082         InputFlags = [InputFlags varargin(i)];
+0083         varargin(i) = [];
+0084     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0085         InputFlags = [InputFlags varargin(i)];
+0086         varargin(i) = [];
+0087     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0088         InputFlags = [InputFlags varargin(i)];
+0089         varargin(i) = [];
+0090     <span class="keyword">end</span>
+0091 <span class="keyword">end</span>
+0092 
+0093 <span class="keyword">if</span> length(varargin) &gt;= 1
+0094     <span class="keyword">if</span> iscell(varargin{1})
+0095         FamilyName = varargin{1};
+0096         varargin(1) = [];
+0097     <span class="keyword">elseif</span> size(varargin{1},1) &gt; 1 &amp;&amp; ischar(varargin{1})
+0098         FamilyName = varargin{1};
+0099         varargin(1) = [];
+0100     <span class="keyword">elseif</span> isstruct(varargin{1})
+0101         ConfigSetpoint = varargin{1};
+0102         varargin(1) = [];
+0103     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(varargin{1})
+0104         FamilyName = varargin{1};
+0105         varargin(1) = [];
+0106     <span class="keyword">elseif</span> ischar(varargin{1})
+0107         FileName = varargin{1};
+0108         varargin(1) = [];
+0109     <span class="keyword">end</span>
+0110 <span class="keyword">end</span>
+0111 <span class="keyword">if</span> length(varargin) &gt;= 1
+0112     <span class="keyword">if</span> iscell(varargin{1})
+0113         FamilyName = varargin{1};
+0114         varargin(1) = [];
+0115     <span class="keyword">elseif</span> size(varargin{1},1) &gt; 1 &amp;&amp; ischar(varargin{1})
+0116         FamilyName = varargin{1};
+0117         varargin(1) = [];
+0118     <span class="keyword">elseif</span> isstruct(varargin{1})
+0119         ConfigSetpoint = varargin{1};
+0120         varargin(1) = [];
+0121     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(varargin{1})
+0122         FamilyName = varargin{1};
+0123         varargin(1) = [];
+0124     <span class="keyword">elseif</span> ischar(varargin{1})
+0125         FileName = varargin{1};
+0126         varargin(1) = [];
+0127     <span class="keyword">end</span>
+0128 <span class="keyword">end</span>
+0129 
+0130 
+0131 <span class="comment">% WaitFlag</span>
+0132 <span class="keyword">if</span> length(varargin) &gt;= 1
+0133     <span class="keyword">if</span> isnumeric(varargin{1})
+0134         WaitFlag = varargin{1};
+0135         varargin(1) = [];
+0136     <span class="keyword">end</span>
+0137 <span class="keyword">end</span>
+0138 
+0139 
+0140 <span class="comment">% Get config structure</span>
+0141 <span class="keyword">if</span> isempty(ConfigSetpoint)
+0142     AskStartQuestion = 1;
+0143     <span class="keyword">try</span>
+0144         <span class="keyword">if</span> isempty(FileName)
+0145             <span class="comment">% Default file</span>
+0146             <span class="comment">%FileName = getfamilydata('Default', 'CNFArchiveFile');</span>
+0147             <span class="comment">% Spear has an operator cluge on where to save default files</span>
+0148             <span class="keyword">if</span> any(strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Machine'</span>),{<span class="string">'spear3'</span>,<span class="string">'spear'</span>}))
+0149                 DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'GoldenConfigFiles'</span>);
+0150             <span class="keyword">else</span>
+0151                 DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'ConfigData'</span>);
+0152             <span class="keyword">end</span>
+0153             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a configuration file to load'</span>, DirectoryName);
+0154             <span class="keyword">if</span> FileName == 0
+0155                 fprintf(<span class="string">'   No change to lattice (setmachineconfig)\n'</span>);
+0156                 <span class="keyword">return</span>
+0157             <span class="keyword">end</span>
+0158             load([DirectoryName FileName]);
+0159             FileName = [DirectoryName FileName];
+0160             AskStartQuestion = 0;
+0161         
+0162         <span class="keyword">elseif</span> strcmpi(FileName,<span class="string">'.'</span>)
+0163             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a configuration file to load'</span>);
+0164             <span class="keyword">if</span> FileName == 0
+0165                 fprintf(<span class="string">'   No change to lattice (setmachineconfig)\n'</span>);
+0166                 <span class="keyword">return</span>
+0167             <span class="keyword">end</span>
+0168             load([DirectoryName FileName]);
+0169             FileName = [DirectoryName FileName];
+0170             AskStartQuestion = 0;
+0171 
+0172         <span class="keyword">elseif</span> any(strcmpi(FileName, {<span class="string">'Golden'</span>,<span class="string">'Production'</span>}))
+0173             <span class="comment">% Get the production file name (full path)</span>
+0174             <span class="comment">% AD.OpsData.LatticeFile could have the full path else default to AD.Directory.OpsData</span>
+0175             FileName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OpsData'</span>,<span class="string">'LatticeFile'</span>);
+0176             [DirectoryName, FileName, Ext, VerNumber] = fileparts(FileName);
+0177             <span class="keyword">if</span> isempty(DirectoryName)
+0178                 DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0179             <span class="keyword">end</span>
+0180             FileName = fullfile(DirectoryName,[FileName, <span class="string">'.mat'</span>]);
+0181             load(FileName);
+0182 
+0183         <span class="keyword">elseif</span> strcmpi(FileName, <span class="string">'Injection'</span>)
+0184             <span class="comment">% Get the injection file name (full path)</span>
+0185             <span class="comment">% AD.OpsData.InjectionFile could have the full path else default to AD.Directory.OpsData</span>
+0186             FileName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OpsData'</span>,<span class="string">'InjectionFile'</span>);
+0187             [DirectoryName, FileName, Ext, VerNumber] = fileparts(FileName);
+0188             <span class="keyword">if</span> isempty(DirectoryName)
+0189                 DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0190             <span class="keyword">end</span>
+0191             FileName = fullfile(DirectoryName,[FileName, <span class="string">'.mat'</span>]);
+0192             load(FileName);
+0193             
+0194         <span class="keyword">else</span>
+0195             <span class="comment">% Input file name</span>
+0196             load(FileName);
+0197         <span class="keyword">end</span>
+0198     <span class="keyword">catch</span>
+0199         fprintf(<span class="string">'%s\n'</span>, lasterr)
+0200         fprintf(<span class="string">'No change made to lattice (setmachineconfig)\n'</span>);
+0201         <span class="keyword">return</span>
+0202     <span class="keyword">end</span>
+0203 
+0204     <span class="comment">% Query to begin measurement</span>
+0205     <span class="keyword">if</span> DisplayFlag &amp;&amp; ~isempty(FileName) &amp;&amp; AskStartQuestion
+0206         tmp = questdlg(sprintf(<span class="string">'Change the lattice to %s?'</span>, FileName),<span class="string">'setmachineconfig'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0207         <span class="keyword">if</span> ~strcmpi(tmp,<span class="string">'Yes'</span>)
+0208             fprintf(<span class="string">'  No change made to lattice (setmachineconfig)\n'</span>);
+0209             <span class="keyword">return</span>
+0210         <span class="keyword">end</span>
+0211     <span class="keyword">end</span>
+0212 <span class="keyword">end</span>
+0213 
+0214 
+0215 <span class="keyword">if</span> isempty(FamilyName)
+0216     FieldNameCell = fieldnames(ConfigSetpoint);
+0217 <span class="keyword">elseif</span> iscell(FamilyName)
+0218     FieldNameCell = FamilyName;
+0219 <span class="keyword">elseif</span> size(FamilyName,1) &gt; 1
+0220     <span class="keyword">for</span> i = 1:size(FamilyName,1)
+0221         FieldNameCell{i} = FamilyName(i,:);
+0222     <span class="keyword">end</span>
+0223 <span class="keyword">else</span>
+0224     FieldNameCell = {FamilyName};
+0225 <span class="keyword">end</span>
+0226 
+0227 
+0228 <span class="comment">% Build the cell array</span>
+0229 j = 0;
+0230 NameList = <span class="string">''</span>;
+0231 <span class="keyword">for</span> i = 1:length(FieldNameCell)
+0232     FieldNameCell{i} = deblank(FieldNameCell{i});
+0233     <span class="keyword">if</span> isfield(ConfigSetpoint, FieldNameCell{i})
+0234         <span class="keyword">if</span> isfield(ConfigSetpoint.(FieldNameCell{i}),<span class="string">'Data'</span>) &amp;&amp; isfield(ConfigSetpoint.(FieldNameCell{i}),<span class="string">'FamilyName'</span>)
+0235             j = j + 1;
+0236             SPcell{j} = ConfigSetpoint.(FieldNameCell{i});
+0237             NameList = strvcat(NameList, sprintf(<span class="string">'%s'</span>,FieldNameCell{i}));
+0238         <span class="keyword">else</span>
+0239             <span class="comment">% Find all the subfields that are data structures</span>
+0240             SubFieldNameCell = fieldnames(ConfigSetpoint.(FieldNameCell{i}));
+0241             <span class="keyword">for</span> ii = 1:length(SubFieldNameCell)
+0242                 <span class="keyword">if</span> isfield(ConfigSetpoint.(FieldNameCell{i}).(SubFieldNameCell{ii}),<span class="string">'Data'</span>) &amp;&amp; isfield(ConfigSetpoint.(FieldNameCell{i}).(SubFieldNameCell{ii}),<span class="string">'FamilyName'</span>)
+0243                     j = j + 1;
+0244                     SPcell{j} = ConfigSetpoint.(FieldNameCell{i}).(SubFieldNameCell{ii});
+0245                     NameList = strvcat(NameList, sprintf(<span class="string">'%s.%s'</span>,FieldNameCell{i}, SubFieldNameCell{ii}));
+0246                 <span class="keyword">end</span>
+0247             <span class="keyword">end</span>
+0248         <span class="keyword">end</span>
+0249     <span class="keyword">else</span>
+0250         fprintf(<span class="string">'   %s field does not exist for family, hence ignored (setmachineconfig)\n'</span>, deblank(FieldNameCell{i}));
+0251     <span class="keyword">end</span>
+0252 <span class="keyword">end</span>
+0253 
+0254 
+0255 <span class="keyword">if</span> DisplayFlag
+0256     [NameList, i] = editlist(NameList,<span class="string">''</span>,ones(size(NameList,1),1));
+0257     SPcell = SPcell(i);
+0258 <span class="keyword">end</span>
+0259 
+0260 
+0261 <span class="comment">% Make the setpoint change w/o a WaitFlag</span>
+0262 <span class="keyword">for</span> k = 1:length(SPcell)
+0263     <span class="keyword">try</span>
+0264         <span class="keyword">if</span> DisplayFlag 
+0265             Time = clock;
+0266             <span class="comment">%fprintf('   Setting family %s (%s %d:%d:%.2f)\n', SPcell{k}.FamilyName, datestr(clock,1), Time(4), Time(5), Time(6));</span>
+0267             fprintf(<span class="string">'   %s %d:%d:%.2f Setting family %s.%s\n'</span>, datestr(clock,1), Time(4), Time(5), Time(6), SPcell{k}.FamilyName, SPcell{k}.Field);
+0268             drawnow;
+0269         <span class="keyword">end</span>
+0270         <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(SPcell{k}, 0, InputFlags{:});
+0271     <span class="keyword">catch</span>
+0272         fprintf(<span class="string">'%s\n'</span>, lasterr)
+0273         fprintf(<span class="string">'Trouble with setpv(''%s'',''%s''), hence ignored (setmachineconfig)\n'</span>, SPcell{k}.FamilyName, SPcell{k}.Field);
+0274     <span class="keyword">end</span>
+0275 <span class="keyword">end</span>
+0276 
+0277 
+0278 <span class="comment">% Make the setpoint change with a WaitFlag</span>
+0279 <span class="keyword">if</span> WaitFlag ~= 0 
+0280     <span class="keyword">try</span>
+0281         <span class="keyword">if</span> DisplayFlag 
+0282             fprintf(<span class="string">'   Waiting for Setpoint-Monitor to be within tolerance\n'</span>);
+0283             drawnow;
+0284         <span class="keyword">end</span>
+0285         <span class="keyword">for</span> k = 1:length(SPcell)
+0286             <span class="keyword">try</span>
+0287                 <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(SPcell{k}, WaitFlag, InputFlags{:});
+0288             <span class="keyword">catch</span>
+0289             <span class="keyword">end</span>
+0290         <span class="keyword">end</span>
+0291         <span class="keyword">if</span> DisplayFlag 
+0292             Time = clock;
+0293             fprintf(<span class="string">'   %s %d:%d:%.2f Lattice change complete (setmachineconfig)\n\n'</span>, datestr(clock,1), Time(4), Time(5), Time(6));
+0294             drawnow;
+0295         <span class="keyword">end</span>
+0296     <span class="keyword">catch</span>
+0297         fprintf(<span class="string">'%s\n'</span>, lasterr)
+0298         fprintf(<span class="string">'Error occurred waiting for Setpoint-Monitor comparison.\n'</span>);
+0299         fprintf(<span class="string">'Lattice is in an unknown state! (setmachineconfig)\n\n'</span>);
+0300     <span class="keyword">end</span>
+0301 <span class="keyword">end</span>
+0302 
+0303 
+0304 
+0305 <span class="comment">% Special function call for further updates</span>
+0306 <span class="comment">% Note that the eval allows one to run it has a script (for better or worse).</span>
+0307 ExtraSetFunction = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'setmachineconfigfunction'</span>);
+0308 
+0309 <span class="keyword">if</span> ~isempty(ExtraSetFunction)
+0310     <span class="keyword">try</span>
+0311         feval(ExtraSetFunction);
+0312     <span class="keyword">catch</span>
+0313         fprintf(<span class="string">'\n%s\n'</span>, lasterr);
+0314         fprintf(<span class="string">'   Warning: %s did not complete without error in setmachineconfig.'</span>, ExtraSetFunction);
+0315     <span class="keyword">end</span>
+0316 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

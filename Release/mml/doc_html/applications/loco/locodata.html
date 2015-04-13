@@ -1,0 +1,701 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of locodata</title>
+  <meta name="keywords" content="locodata">
+  <meta name="description" content="LOCODATA - Extracts data from a LOCO file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; locodata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>locodata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LOCODATA - Extracts data from a LOCO file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function varargout = locodata(FileName, IterationNumber, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOCODATA - Extracts data from a LOCO file
+ Data = locodata(FileName, IterationNumber, DataType, Source)
+ [Data1, Data2, ... ] = locodata(FileName, IterationNumber, DataType1, Source1, DataType2, Source2, ...)
+
+ or FileName can be replaced with the cell: {BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData}
+
+ IterationNumber = 0,1,2, ...
+
+ DataType:  'RINGData'
+            'ATModel' or 'THERING'  = the AT lattice cell array (typically called THERING)
+            'RF'                    = RF frequency in the model        'Meas' or 'Model'
+            'DeltaRF'               = Change in RF for dispersion measurement
+            'FitDeltaRF'            = Fit change in RF for dispersion measurement
+            'HarmonicNumber'        = Harmonic number in the model
+
+            'ResponseMatrix'        = Response matrix [mm]             'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'
+            'ResponseMatrixXX'      = Response matrix (HCM to HBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'
+            'ResponseMatrixXY'      = Response matrix (VCM to HBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'
+            'ResponseMatrixYX'      = Response matrix (HCM to VBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'
+            'ResponseMatrixYY'      = Response matrix (VCM to VBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'
+
+            'Eta'                   = Dispersion function              'Meas' or 'Model'
+            'EtaX'                  = Dispersion function (horizontal) 'Meas' or 'Model'
+            'EtaY'                  = Dispersion function (vertical)   'Meas' or 'Model'
+
+            'BPMstd'                = Measured BPM errors
+            'HBPMstd'               = Measured BPM errors (horizontal)
+            'VBPMstd'               = Measured BPM errors (vertical)
+
+            'HBPMgain'
+            'HBPMgainstd'
+            'VBPMgain'
+            'VBPMgainstd'
+
+            'HBPMcoupling'
+            'HBPMcouplingstd'
+            'VBPMcoupling'
+            'VBPMcouplingstd'
+
+            'HCMkick'
+            'HCMkickstd'
+            'VCMkick'
+            'VCMkickstd'
+
+            'HCMcoupling'
+            'HCMcouplingstd'
+            'VCMcoupling'
+            'VCMcouplingstd'
+
+            'HCMenergyshift'
+            'HCMenergyshiftstd'
+            'VCMenergyshift'
+            'VCMenergyshiftstd'
+
+            'FitValues'
+            'FitValuesstd'
+            'FitValuesDeltas'
+            'FitDeltaRF'
+            'FitDeltaRFstd'
+
+            'ChiSquare'             = Chi squared for the fit
+            'ErrorDistribution'     = (Measured - Model) response matrix error / standard deviation of the BPMs 
+            'OutlierIndex'          = Index of outliers for the response matrix part of the merit function 
+            'OutlierMatrix'         = Matrix of size(response matrix) with outliers marked with ones 
+            'EtaOutlierIndex'       = Index of the outliers for the dispersion part of the merit function
+
+            'Tune'                  = Tune vector
+            'Beta'                  = Beta at all BPMs  [Position, HBeta, VBeta]
+            'HBeta'                 = Beta at horizontal BPMs
+            'VBeta'                 = Beta at vertical   BPMs
+
+ Source = extra arguments, like 'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift' (not always required) (default: 'Meas')
+          Note: for multiple outputs, the source field must exist even if it is not used.
+
+ Note 1: DataType and Source are not case sensitive
+ Note 2: Each call to locodata requires a file load so it is best to all data will one call
+
+ Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="locodata.html" class="code" title="function varargout = locodata(FileName, IterationNumber, varargin)">locodata</a>	LOCODATA - Extracts data from a LOCO file</li><li><a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>	LOCOMCF - Returns the momentum compaction factor</li><li><a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>	LOCOSETLATTICEPARAM - Set the AT lattice from the LOCO fit parameters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="locodata.html" class="code" title="function varargout = locodata(FileName, IterationNumber, varargin)">locodata</a>	LOCODATA - Extracts data from a LOCO file</li><li><a href="locogui.html" class="code" title="function varargout = locogui(varargin)">locogui</a>	LOCOGUI - Graphical interface for running the LOCO algorithm</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = locodata(FileName, IterationNumber, varargin)</a>
+0002 <span class="comment">%LOCODATA - Extracts data from a LOCO file</span>
+0003 <span class="comment">% Data = locodata(FileName, IterationNumber, DataType, Source)</span>
+0004 <span class="comment">% [Data1, Data2, ... ] = locodata(FileName, IterationNumber, DataType1, Source1, DataType2, Source2, ...)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% or FileName can be replaced with the cell: {BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData}</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% IterationNumber = 0,1,2, ...</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% DataType:  'RINGData'</span>
+0011 <span class="comment">%            'ATModel' or 'THERING'  = the AT lattice cell array (typically called THERING)</span>
+0012 <span class="comment">%            'RF'                    = RF frequency in the model        'Meas' or 'Model'</span>
+0013 <span class="comment">%            'DeltaRF'               = Change in RF for dispersion measurement</span>
+0014 <span class="comment">%            'FitDeltaRF'            = Fit change in RF for dispersion measurement</span>
+0015 <span class="comment">%            'HarmonicNumber'        = Harmonic number in the model</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%            'ResponseMatrix'        = Response matrix [mm]             'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'</span>
+0018 <span class="comment">%            'ResponseMatrixXX'      = Response matrix (HCM to HBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'</span>
+0019 <span class="comment">%            'ResponseMatrixXY'      = Response matrix (VCM to HBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'</span>
+0020 <span class="comment">%            'ResponseMatrixYX'      = Response matrix (HCM to VBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'</span>
+0021 <span class="comment">%            'ResponseMatrixYY'      = Response matrix (VCM to VBPM)    'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift'</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%            'Eta'                   = Dispersion function              'Meas' or 'Model'</span>
+0024 <span class="comment">%            'EtaX'                  = Dispersion function (horizontal) 'Meas' or 'Model'</span>
+0025 <span class="comment">%            'EtaY'                  = Dispersion function (vertical)   'Meas' or 'Model'</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%            'BPMstd'                = Measured BPM errors</span>
+0028 <span class="comment">%            'HBPMstd'               = Measured BPM errors (horizontal)</span>
+0029 <span class="comment">%            'VBPMstd'               = Measured BPM errors (vertical)</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%            'HBPMgain'</span>
+0032 <span class="comment">%            'HBPMgainstd'</span>
+0033 <span class="comment">%            'VBPMgain'</span>
+0034 <span class="comment">%            'VBPMgainstd'</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">%            'HBPMcoupling'</span>
+0037 <span class="comment">%            'HBPMcouplingstd'</span>
+0038 <span class="comment">%            'VBPMcoupling'</span>
+0039 <span class="comment">%            'VBPMcouplingstd'</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%            'HCMkick'</span>
+0042 <span class="comment">%            'HCMkickstd'</span>
+0043 <span class="comment">%            'VCMkick'</span>
+0044 <span class="comment">%            'VCMkickstd'</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">%            'HCMcoupling'</span>
+0047 <span class="comment">%            'HCMcouplingstd'</span>
+0048 <span class="comment">%            'VCMcoupling'</span>
+0049 <span class="comment">%            'VCMcouplingstd'</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">%            'HCMenergyshift'</span>
+0052 <span class="comment">%            'HCMenergyshiftstd'</span>
+0053 <span class="comment">%            'VCMenergyshift'</span>
+0054 <span class="comment">%            'VCMenergyshiftstd'</span>
+0055 <span class="comment">%</span>
+0056 <span class="comment">%            'FitValues'</span>
+0057 <span class="comment">%            'FitValuesstd'</span>
+0058 <span class="comment">%            'FitValuesDeltas'</span>
+0059 <span class="comment">%            'FitDeltaRF'</span>
+0060 <span class="comment">%            'FitDeltaRFstd'</span>
+0061 <span class="comment">%</span>
+0062 <span class="comment">%            'ChiSquare'             = Chi squared for the fit</span>
+0063 <span class="comment">%            'ErrorDistribution'     = (Measured - Model) response matrix error / standard deviation of the BPMs</span>
+0064 <span class="comment">%            'OutlierIndex'          = Index of outliers for the response matrix part of the merit function</span>
+0065 <span class="comment">%            'OutlierMatrix'         = Matrix of size(response matrix) with outliers marked with ones</span>
+0066 <span class="comment">%            'EtaOutlierIndex'       = Index of the outliers for the dispersion part of the merit function</span>
+0067 <span class="comment">%</span>
+0068 <span class="comment">%            'Tune'                  = Tune vector</span>
+0069 <span class="comment">%            'Beta'                  = Beta at all BPMs  [Position, HBeta, VBeta]</span>
+0070 <span class="comment">%            'HBeta'                 = Beta at horizontal BPMs</span>
+0071 <span class="comment">%            'VBeta'                 = Beta at vertical   BPMs</span>
+0072 <span class="comment">%</span>
+0073 <span class="comment">% Source = extra arguments, like 'Meas', 'Model', 'Model+EnergyShift', or 'Meas-EnergyShift' (not always required) (default: 'Meas')</span>
+0074 <span class="comment">%          Note: for multiple outputs, the source field must exist even if it is not used.</span>
+0075 <span class="comment">%</span>
+0076 <span class="comment">% Note 1: DataType and Source are not case sensitive</span>
+0077 <span class="comment">% Note 2: Each call to locodata requires a file load so it is best to all data will one call</span>
+0078 <span class="comment">%</span>
+0079 <span class="comment">% Written by Greg Portmann</span>
+0080 
+0081 
+0082 <span class="keyword">if</span> nargin &lt; 3
+0083     error(<span class="string">'Requires at least 3 inputs (see help locodata).'</span>);
+0084 <span class="keyword">end</span>
+0085 
+0086 <span class="keyword">if</span> isempty(FileName)
+0087     <span class="keyword">return</span>
+0088 <span class="keyword">end</span>
+0089 <span class="keyword">if</span> iscell(FileName)
+0090     BPMData       = FileName{1};
+0091     CMData        = FileName{2};
+0092     LocoMeasData  = FileName{3};
+0093     LocoModel     = FileName{4};
+0094     FitParameters = FileName{5};
+0095     LocoFlags     = FileName{6};
+0096     RINGData      = FileName{7};
+0097 <span class="keyword">elseif</span> ischar(FileName)    
+0098     <span class="keyword">try</span>
+0099         load(FileName);
+0100     <span class="keyword">catch</span>
+0101         fprintf(<span class="string">'   File does not exist or is not a *.mat file type.\n'</span>);
+0102         <span class="keyword">for</span> i = 1:nargout
+0103             varargout{i} = [];
+0104         <span class="keyword">end</span>
+0105         <span class="keyword">return</span>
+0106     <span class="keyword">end</span>
+0107 <span class="keyword">else</span>
+0108     error(<span class="string">'Input problem'</span>);
+0109 <span class="keyword">end</span>
+0110 
+0111 
+0112 <span class="comment">% Find the right iteration</span>
+0113 <span class="keyword">if</span> length(BPMData) &gt; 1
+0114     IterationNumber = IterationNumber + 1;
+0115     <span class="keyword">if</span> IterationNumber &gt; length(BPMData)
+0116         error(<span class="string">'IterationNumber great than the number of iterations'</span>);
+0117     <span class="keyword">end</span>
+0118     BPMData = BPMData(IterationNumber);
+0119     CMData = CMData(IterationNumber);
+0120     LocoModel = LocoModel(IterationNumber);
+0121     LocoFlags = LocoFlags(IterationNumber);
+0122     FitParameters = FitParameters(IterationNumber);
+0123 <span class="keyword">end</span>
+0124 
+0125 
+0126 NHBPM = length(BPMData.HBPMGoodDataIndex);
+0127 NVBPM = length(BPMData.VBPMGoodDataIndex);
+0128 NBPM  = NHBPM + NVBPM;
+0129 NHCM = length(CMData.HCMGoodDataIndex);
+0130 NVCM = length(CMData.VCMGoodDataIndex);
+0131 
+0132 <span class="keyword">for</span> i = 1:ceil(length(varargin)/2)
+0133     
+0134     DataType = lower(varargin{2*i-1});
+0135     <span class="keyword">if</span> length(varargin) &gt;= 2*i
+0136         Source = lower(varargin{2*i});
+0137     <span class="keyword">else</span>
+0138         Source = <span class="string">'meas'</span>;
+0139     <span class="keyword">end</span>
+0140     
+0141     <span class="keyword">switch</span> DataType
+0142         
+0143         <span class="keyword">case</span> <span class="string">'ringdata'</span>
+0144             <span class="comment">% Set the lattice model</span>
+0145             <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0146                 RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0147             <span class="keyword">end</span>
+0148             Data = RINGData;
+0149             
+0150         <span class="keyword">case</span> {<span class="string">'atmodel'</span>,<span class="string">'thering'</span>}
+0151             <span class="comment">% Set the lattice model</span>
+0152             <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0153                 RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0154             <span class="keyword">end</span>
+0155             Data = RINGData.Lattice;
+0156             
+0157         <span class="keyword">case</span> {<span class="string">'atmodelglobal'</span>}
+0158             <span class="comment">% Set the lattice model</span>
+0159             <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0160                 RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0161             <span class="keyword">end</span>
+0162             <span class="keyword">global</span> THERING
+0163             THERING = RINGData.Lattice;
+0164 
+0165             <span class="comment">% To be compatible with the middle layer look for a updateatindex function</span>
+0166             <span class="keyword">if</span> exist(<span class="string">'updateatindex'</span>) == 2 &amp;&amp; ~isempty(getappdata(0, <span class="string">'AcceleratorObjects'</span>))
+0167                 fprintf(<span class="string">'   Running updateatindex to sync the middlelayer with THERING\n'</span>);
+0168                 fprintf(<span class="string">'   The middlelayer energy might need to be set with setenergymodel(GeV).\n'</span>);
+0169                 updateatindex;
+0170             <span class="keyword">end</span>
+0171 
+0172             <span class="keyword">if</span> ceil(length(varargin)/2) == 1
+0173                 <span class="keyword">return</span>
+0174             <span class="keyword">else</span>
+0175                 Data =[];
+0176             <span class="keyword">end</span>      
+0177                         
+0178         <span class="keyword">case</span> <span class="string">'rf'</span>
+0179             <span class="keyword">if</span> strcmpi(Source, <span class="string">'meas'</span>)
+0180                 Data = LocoMeasData.RF;
+0181             <span class="keyword">elseif</span> strcmpi(Source, <span class="string">'model'</span>)
+0182                 Data = RINGData.CavityFrequency;
+0183             <span class="keyword">else</span>
+0184                 fprintf(<span class="string">'   DataType=RF, Source is unknown\n'</span>);
+0185                 Data = [];
+0186             <span class="keyword">end</span>
+0187             
+0188         <span class="keyword">case</span> <span class="string">'deltarf'</span>
+0189             Data = LocoMeasData.DeltaRF;
+0190             
+0191         <span class="keyword">case</span> <span class="string">'harmonicnumber'</span>
+0192             Data = RINGData.CavityHarmNumber;
+0193 
+0194         <span class="keyword">case</span> {<span class="string">'responsematrix'</span>,<span class="string">'responsematrixxx'</span>,<span class="string">'responsematrixxy'</span>,<span class="string">'responsematrixyx'</span>,<span class="string">'responsematrixyy'</span>,<span class="string">'responsematrixperkick'</span>,<span class="string">'responsematrixxxperkick'</span>,<span class="string">'responsematrixxyperkick'</span>,<span class="string">'responsematrixyxperkick'</span>,<span class="string">'responsematrixyyperkick'</span>}
+0195             
+0196             <span class="keyword">if</span> any(strcmpi(Source, {<span class="string">'meas'</span>,<span class="string">'meas-energyshift'</span>}))
+0197                 <span class="comment">%if strcmp(lower(LocoFlags.ClosedOrbitType), 'fixedmomentum')</span>
+0198                 <span class="comment">%    Source = 'meas+energyshift';</span>
+0199                 <span class="comment">%else</span>
+0200                 <span class="comment">%    Source = 'meas';</span>
+0201                 <span class="comment">%end</span>
+0202                 
+0203                 <span class="comment">% Measured response matrix</span>
+0204                 M = LocoMeasData.M([BPMData.HBPMGoodDataIndex length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex], [CMData.HCMGoodDataIndex length(CMData.HCMIndex)+CMData.VCMGoodDataIndex]); 
+0205                 
+0206                 <span class="comment">% Divide by the corrector current [mm/Amps]</span>
+0207                 <span class="comment">%for iBPM = 1:size(M,1)</span>
+0208                 <span class="comment">%    M(iBPM,:) = M(iBPM,:) ./ LocoMeasData.DeltaAmps(:)';</span>
+0209                 <span class="comment">%end</span>
+0210 
+0211                 <span class="comment">% Convert to mm/milliradian or meter/radian</span>
+0212                 <span class="keyword">if</span> findstr(DataType,<span class="string">'perkick'</span>)
+0213                     <span class="comment">% Divide by the magnitude of the kick</span>
+0214                     <span class="comment">%TotalKick = CMData.HCMKicks;</span>
+0215                     TotalKick = sign(CMData.HCMKicks) .* sqrt(CMData.HCMKicks.^2 + (CMData.HCMKicks.*CMData.HCMCoupling).^2);                   
+0216                     <span class="keyword">for</span> iloop = 1:length(CMData.HCMKicks)
+0217                         M(:,iloop) = M(:,iloop) / TotalKick(iloop);
+0218                     <span class="keyword">end</span>
+0219 
+0220                     <span class="comment">%TotalKick = CMData.VCMKicks;</span>
+0221                     TotalKick = sign(CMData.VCMKicks) .* sqrt(CMData.VCMKicks.^2 + (CMData.VCMKicks.*CMData.VCMCoupling).^2);
+0222                     <span class="keyword">for</span> iloop = 1:length(CMData.VCMKicks)
+0223                         M(:,length(CMData.HCMKicks)+iloop) = M(:,length(CMData.HCMKicks)+iloop) / TotalKick(iloop);
+0224                     <span class="keyword">end</span>
+0225                 <span class="keyword">end</span>
+0226                 
+0227                 <span class="keyword">if</span> strcmpi(Source, <span class="string">'meas-energyshift'</span>)
+0228                     <span class="comment">% Change measured by subtracting dispersion proportional to the energy shifts</span>
+0229                     HCMEnergyShift = CMData.HCMEnergyShift(CMData.HCMGoodDataIndex);
+0230                     VCMEnergyShift = CMData.VCMEnergyShift(CMData.VCMGoodDataIndex);
+0231                     
+0232                     <span class="comment">% Set the lattice model</span>
+0233                     <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0234                         RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0235                     <span class="keyword">end</span>
+0236                     
+0237                     AlphaMCF = <a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>(RINGData);
+0238                     EtaXmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(BPMData.HBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0239                     EtaYmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0240                     
+0241                     <span class="keyword">for</span> j = 1:length(HCMEnergyShift)
+0242                         M(:,j) = M(:,j) - HCMEnergyShift(j) * [EtaXmcf; EtaYmcf];
+0243                     <span class="keyword">end</span>
+0244                     
+0245                     <span class="keyword">for</span> j = 1:length(VCMEnergyShift)
+0246                         M(:,NHCM+j) = M(:,NHCM+j) - VCMEnergyShift(j) * [EtaXmcf; EtaYmcf];
+0247                     <span class="keyword">end</span>
+0248                 <span class="keyword">end</span>
+0249             <span class="keyword">else</span>
+0250                 <span class="comment">% Model response matrix</span>
+0251                 
+0252                 <span class="comment">%if strcmp(lower(LocoFlags.ClosedOrbitType), 'fixedmomentum')</span>
+0253                 <span class="comment">%    Source = 'meas-energyshift';</span>
+0254                 <span class="comment">%else</span>
+0255                 <span class="comment">%    Source = 'meas';</span>
+0256                 <span class="comment">%end</span>
+0257                 
+0258                 <span class="keyword">if</span> isempty(LocoModel.M)
+0259                     fprintf(<span class="string">'   No model response matrix available.\n'</span>);
+0260                     Data = [];
+0261                 <span class="keyword">end</span>
+0262                 
+0263                 M = LocoModel.M;
+0264                 
+0265                 
+0266                 <span class="comment">% Divide by the corrector current [mm/Amps]</span>
+0267                 <span class="comment">%if strcmpi(varargin{end},'mm/Amp')</span>
+0268                 <span class="comment">%    for iBPM = 1:size(M,1)</span>
+0269                 <span class="comment">%        M(iBPM,:) = M(iBPM,:) ./ LocoMeasData.DeltaAmps(:)';</span>
+0270                 <span class="comment">%    end</span>
+0271                 <span class="comment">%end</span>
+0272 
+0273                 <span class="comment">% Convert to mm/milliradian or meter/radian</span>
+0274                 <span class="keyword">if</span> findstr(DataType,<span class="string">'perkick'</span>)
+0275                     <span class="comment">% Divide by the magnitude of the kick</span>
+0276                     <span class="comment">%TotalKick = CMData.HCMKicks;</span>
+0277                     TotalKick = sign(CMData.HCMKicks) .* sqrt(CMData.HCMKicks.^2 + (CMData.HCMKicks.*CMData.HCMCoupling).^2);
+0278                     <span class="keyword">for</span> iloop = 1:length(CMData.HCMKicks)
+0279                         M(:,iloop) = M(:,iloop) / TotalKick(iloop);
+0280                     <span class="keyword">end</span>
+0281 
+0282                     <span class="comment">%TotalKick = CMData.VCMKicks;</span>
+0283                     TotalKick = sign(CMData.VCMKicks) .* sqrt(CMData.VCMKicks.^2 + (CMData.VCMKicks.*CMData.VCMCoupling).^2);
+0284                     <span class="keyword">for</span> iloop = 1:length(CMData.VCMKicks)
+0285                         M(:,length(CMData.HCMKicks)+iloop) = M(:,length(CMData.HCMKicks)+iloop) / TotalKick(iloop);
+0286                     <span class="keyword">end</span>
+0287                 <span class="keyword">end</span>
+0288                 
+0289                 <span class="keyword">if</span> strcmpi(Source, <span class="string">'model+energyshift'</span>)
+0290                     <span class="comment">% Change model by adding dispersion proportional to the energy shifts</span>
+0291                     HCMEnergyShift = CMData.HCMEnergyShift(CMData.HCMGoodDataIndex);
+0292                     VCMEnergyShift = CMData.VCMEnergyShift(CMData.VCMGoodDataIndex);
+0293                     
+0294                     <span class="comment">% Set the lattice model</span>
+0295                     <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0296                         RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0297                     <span class="keyword">end</span>
+0298 
+0299                     AlphaMCF = <a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>(RINGData);
+0300                     EtaXmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(BPMData.HBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0301                     EtaYmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0302                     
+0303                     <span class="keyword">for</span> j = 1:length(HCMEnergyShift)
+0304                         M(:,j) = M(:,j) + HCMEnergyShift(j) * [EtaXmcf; EtaYmcf];
+0305                     <span class="keyword">end</span>
+0306                     
+0307                     <span class="keyword">for</span> j = 1:length(VCMEnergyShift)
+0308                         M(:,NHCM+j) = M(:,NHCM+j) + VCMEnergyShift(j) * [EtaXmcf; EtaYmcf];
+0309                     <span class="keyword">end</span>
+0310                 <span class="keyword">end</span>
+0311             <span class="keyword">end</span>
+0312             
+0313             <span class="keyword">if</span> any(strcmpi(DataType, {<span class="string">'responsematrixxx'</span>, <span class="string">'responsematrixxxperkick'</span>}))
+0314                 Data = M([1:NHBPM], [1:NHCM]); 
+0315             <span class="keyword">elseif</span> any(strcmpi(DataType, {<span class="string">'responsematrixxy'</span>,<span class="string">'responsematrixxyperkick'</span>}))
+0316                 Data = M([1:NHBPM], [NHCM+(1:NVCM)]); 
+0317             <span class="keyword">elseif</span> any(strcmpi(DataType, {<span class="string">'responsematrixyx'</span>,<span class="string">'responsematrixyxperkick'</span>}))
+0318                 Data = M([NHBPM+(1:NVBPM)], [1:NHCM]); 
+0319             <span class="keyword">elseif</span> any(strcmpi(DataType, {<span class="string">'responsematrixyy'</span>,<span class="string">'responsematrixyyperkick'</span>}))
+0320                 Data = M([NHBPM+(1:NVBPM)], [NHCM+(1:NVCM)]); 
+0321             <span class="keyword">else</span>
+0322                 Data = M;
+0323             <span class="keyword">end</span>
+0324 
+0325         <span class="keyword">case</span> <span class="string">'outlierindex'</span>        
+0326             Data = LocoModel.OutlierIndex;
+0327             
+0328         <span class="keyword">case</span> <span class="string">'outliermatrix'</span>        
+0329             <span class="comment">% Mark the outliers with ones</span>
+0330             Data = zeros(NHBPM+NVBPM, NHCM+NVCM);
+0331             Data = Data(:);
+0332             Data(LocoModel.OutlierIndex) = 1;        
+0333             Data = reshape(Data, NHBPM+NVBPM, NHCM+NVCM);
+0334             
+0335         <span class="keyword">case</span> <span class="string">'hbpmgain'</span>
+0336             Data = BPMData.HBPMGain(BPMData.HBPMGoodDataIndex);
+0337         <span class="keyword">case</span> <span class="string">'vbpmgain'</span>
+0338             Data = BPMData.VBPMGain(BPMData.VBPMGoodDataIndex);
+0339 
+0340         <span class="keyword">case</span> <span class="string">'hbpmgainstd'</span>
+0341             Data = BPMData.HBPMGainSTD(BPMData.HBPMGoodDataIndex);
+0342         <span class="keyword">case</span> <span class="string">'vbpmgainstd'</span>
+0343             Data = BPMData.VBPMGainSTD(BPMData.VBPMGoodDataIndex);
+0344             
+0345         <span class="keyword">case</span> <span class="string">'hbpmcoupling'</span>
+0346             Data = BPMData.HBPMCoupling(BPMData.HBPMGoodDataIndex);
+0347         <span class="keyword">case</span> <span class="string">'vbpmcoupling'</span>
+0348             Data = BPMData.VBPMCoupling(BPMData.VBPMGoodDataIndex);
+0349             
+0350         <span class="keyword">case</span> <span class="string">'hbpmcouplingstd'</span>
+0351             Data = BPMData.HBPMCouplingSTD(BPMData.HBPMGoodDataIndex);
+0352         <span class="keyword">case</span> <span class="string">'vbpmcouplingstd'</span>
+0353             Data = BPMData.VBPMCouplingSTD(BPMData.VBPMGoodDataIndex);
+0354             
+0355         <span class="keyword">case</span> <span class="string">'bpmstd'</span>
+0356             Data = LocoMeasData.BPMSTD([BPMData.HBPMGoodDataIndex length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex]);
+0357             
+0358         <span class="keyword">case</span> <span class="string">'hbpmstd'</span>
+0359             Data = LocoMeasData.BPMSTD(BPMData.HBPMGoodDataIndex);
+0360             
+0361         <span class="keyword">case</span> <span class="string">'vbpmstd'</span>
+0362             Data = LocoMeasData.BPMSTD(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex);
+0363             
+0364         <span class="keyword">case</span> <span class="string">'hcmkick'</span>
+0365             Data = CMData.HCMKicks(CMData.HCMGoodDataIndex);
+0366         <span class="keyword">case</span> <span class="string">'vcmkick'</span>
+0367             Data = CMData.VCMKicks(CMData.VCMGoodDataIndex);
+0368             
+0369         <span class="keyword">case</span> <span class="string">'hcmkickstd'</span>
+0370             Data = CMData.HCMKicksSTD(CMData.HCMGoodDataIndex);
+0371         <span class="keyword">case</span> <span class="string">'vcmkickstd'</span>
+0372             Data = CMData.VCMKicksSTD(CMData.VCMGoodDataIndex);
+0373             
+0374         <span class="keyword">case</span> <span class="string">'hcmcoupling'</span>
+0375             Data = CMData.HCMCoupling(CMData.HCMGoodDataIndex);
+0376         <span class="keyword">case</span> <span class="string">'vcmcoupling'</span>
+0377             Data = CMData.VCMCoupling(CMData.VCMGoodDataIndex);
+0378             
+0379         <span class="keyword">case</span> <span class="string">'hcmcouplingstd'</span>
+0380             Data = CMData.HCMCouplingSTD(CMData.HCMGoodDataIndex);
+0381         <span class="keyword">case</span> <span class="string">'vcmcouplingstd'</span>
+0382             Data = CMData.VCMCouplingSTD(CMData.VCMGoodDataIndex);
+0383             
+0384         <span class="keyword">case</span> <span class="string">'hcmenergyshift'</span>
+0385             Data = CMData.HCMEnergyShift(CMData.HCMGoodDataIndex);
+0386         <span class="keyword">case</span> <span class="string">'vcmenergyshift'</span>
+0387             Data = CMData.VCMEnergyShift(CMData.VCMGoodDataIndex);
+0388 
+0389         <span class="keyword">case</span> <span class="string">'hcmenergyshiftstd'</span>
+0390             Data = CMData.HCMEnergyShiftSTD(CMData.HCMGoodDataIndex);
+0391         <span class="keyword">case</span> <span class="string">'vcmenergyshiftstd'</span>
+0392             Data = CMData.VCMEnergyShiftSTD(CMData.VCMGoodDataIndex);
+0393 
+0394         <span class="keyword">case</span> <span class="string">'fitvalues'</span>
+0395             Data = FitParameters.Values;
+0396         <span class="keyword">case</span> <span class="string">'fitvaluesstd'</span>
+0397             Data = FitParameters.ValuesSTD;
+0398         <span class="keyword">case</span> <span class="string">'fitvaluesdeltas'</span>
+0399             Data = FitParameters.Deltas;
+0400         <span class="keyword">case</span> <span class="string">'fitdeltarf'</span>
+0401             Data = FitParameters.DeltaRF;
+0402         <span class="keyword">case</span> <span class="string">'fitdeltarfstd'</span>
+0403             Data = FitParameters.DeltaRFSTD;
+0404             
+0405         <span class="keyword">case</span> <span class="string">'eta'</span>
+0406             <span class="keyword">if</span> strcmpi(Source, <span class="string">'meas'</span>)
+0407                 Data = LocoMeasData.Eta([BPMData.HBPMGoodDataIndex length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex]);
+0408             <span class="keyword">else</span>
+0409                 Data = LocoModel.Eta;                 
+0410             <span class="keyword">end</span>
+0411             
+0412         <span class="keyword">case</span> <span class="string">'etax'</span>
+0413             <span class="keyword">if</span> strcmpi(Source, <span class="string">'meas'</span>)
+0414                 Data = LocoMeasData.Eta(BPMData.HBPMGoodDataIndex);
+0415             <span class="keyword">else</span>
+0416                 Data = LocoModel.Eta(1:NHBPM);                 
+0417             <span class="keyword">end</span>
+0418             
+0419         <span class="keyword">case</span> <span class="string">'etay'</span>
+0420             <span class="keyword">if</span> strcmpi(Source, <span class="string">'meas'</span>)
+0421                 Data = LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex);
+0422             <span class="keyword">else</span>
+0423                 Data = LocoModel.Eta(NHBPM+(1:NVBPM));                 
+0424             <span class="keyword">end</span>
+0425             
+0426         <span class="keyword">case</span> <span class="string">'etaoutlierindex'</span>
+0427             Data = LocoModel.EtaOutlierIndex;
+0428             
+0429         <span class="keyword">case</span> <span class="string">'chisquare'</span>
+0430             Data = LocoModel.ChiSquare;
+0431             
+0432         <span class="keyword">case</span> <span class="string">'errordistribution'</span>
+0433             
+0434             [Mmeas, Mmodel, EtaMeas, EtaModel, BPMstd]  = <a href="locodata.html" class="code" title="function varargout = locodata(FileName, IterationNumber, varargin)">locodata</a>(FileName, IterationNumber-1, <span class="string">'responsematrix'</span>,<span class="string">'Meas'</span>, <span class="string">'responsematrix'</span>,<span class="string">'Model'</span>, <span class="string">'Eta'</span>,<span class="string">'Meas'</span>, <span class="string">'Eta'</span>,<span class="string">'Model'</span>, <span class="string">'BPMstd'</span>,<span class="string">'Meas'</span>);            
+0435             Mstd = BPMstd * ones(1,size(Mmodel,2));
+0436             
+0437             <span class="comment">% Change Mmodel by the energy shifts</span>
+0438             <span class="keyword">if</span> strcmpi(LocoFlags.ClosedOrbitType, <span class="string">'fixedmomentum'</span>)
+0439                 HCMEnergyShift = CMData.HCMEnergyShift(CMData.HCMGoodDataIndex);
+0440                 VCMEnergyShift = CMData.VCMEnergyShift(CMData.VCMGoodDataIndex);
+0441                 
+0442                 <span class="comment">% Set the lattice model</span>
+0443                 <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0444                     RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0445                 <span class="keyword">end</span>
+0446 
+0447                 AlphaMCF = <a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>(RINGData);
+0448                 EtaXmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(BPMData.HBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0449                 EtaYmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0450                 
+0451                 <span class="keyword">for</span> j = 1:length(HCMEnergyShift)
+0452                     Mmodel(:,j) = Mmodel(:,j) + HCMEnergyShift(j) * [EtaXmcf; EtaYmcf];
+0453                 <span class="keyword">end</span>
+0454                 
+0455                 <span class="keyword">for</span> j = 1:length(VCMEnergyShift)
+0456                     Mmodel(:,NHCM+j) = Mmodel(:,NHCM+j) + VCMEnergyShift(j) * [EtaXmcf; EtaYmcf];
+0457                 <span class="keyword">end</span>
+0458             <span class="keyword">end</span>
+0459             
+0460             <span class="comment">% Remove coupling rows</span>
+0461             <span class="keyword">if</span> strcmpi(LocoFlags.Coupling,<span class="string">'no'</span>)
+0462                 MmodelXX = Mmodel(1:NHBPM,1:NHCM);
+0463                 MmodelYY = Mmodel(NHBPM+1:NHBPM+NVBPM,NHCM+1:NHCM+NVCM);
+0464                 Mmodel = [MmodelXX(:); MmodelYY(:)];
+0465             
+0466                 MmeasXX = Mmeas(1:NHBPM,1:NHCM);
+0467                 MmeasYY = Mmeas(NHBPM+1:NHBPM+NVBPM,NHCM+1:NHCM+NVCM);
+0468                 Mmeas = [MmeasXX(:); MmeasYY(:)];
+0469 
+0470                 MstdXX = Mstd(1:NHBPM,1:NHCM);
+0471                 MstdYY = Mstd(NHBPM+1:NHBPM+NVBPM,NHCM+1:NHCM+NVCM);
+0472                 Mstd = [MstdXX(:); MstdYY(:)];                    
+0473                 
+0474                 <span class="comment">% Change the outlier index to no coupling</span>
+0475                 tmp = zeros(NHBPM+NVBPM, NHCM+NVCM);
+0476                 tmp = tmp(:);
+0477                 tmp(LocoModel.OutlierIndex) = 1;        
+0478                 tmp = reshape(tmp, NHBPM+NVBPM, NHCM+NVCM);
+0479                 tmpXX = tmp(1:NHBPM,1:NHCM);
+0480                 tmpYY = tmp(NHBPM+1:NHBPM+NVBPM, NHCM+1:NHCM+NVCM);
+0481                 tmp = [tmpXX(:); tmpYY(:)];
+0482                 iOutliers = find(tmp == 1);
+0483                 
+0484                 Mmeas(iOutliers) = []; 
+0485                 Mmodel(iOutliers) = []; 
+0486                 Mstd(iOutliers) = [];
+0487             <span class="keyword">else</span>
+0488                 Mmodel = Mmodel(:);
+0489                 Mmeas = Mmeas(:);
+0490                 Mstd = Mstd(:);
+0491                 
+0492                 <span class="comment">% Outliers</span>
+0493                 iOutliers = LocoModel.OutlierIndex;
+0494                 Mmeas(iOutliers) = []; 
+0495                 Mmodel(iOutliers) = []; 
+0496                 Mstd(iOutliers) = [];
+0497             <span class="keyword">end</span>
+0498             
+0499             
+0500             <span class="comment">% Include dispersion</span>
+0501             <span class="keyword">if</span> strcmpi(LocoFlags.Dispersion,<span class="string">'yes'</span>)
+0502                 iOutliers = LocoModel.EtaOutlierIndex;
+0503                 EtaModel(iOutliers) = []; 
+0504                 EtaMeas(iOutliers) = []; 
+0505                 BPMstd(iOutliers) = [];
+0506                 
+0507                 Mmodel = [Mmodel; EtaModel];
+0508                 Mmeas = [Mmeas; EtaMeas];
+0509                 Mstd = [Mstd; BPMstd];
+0510             <span class="keyword">end</span>
+0511             
+0512             <span class="comment">%Data =   Mmeas - Mmodel;</span>
+0513             Data =  (Mmeas - Mmodel) ./ Mstd;
+0514             <span class="comment">%Data = ((Mmeas - Mmodel) ./ Mstd) .^ 2;</span>
+0515             
+0516             <span class="comment">%ChiSquare = sum(((Mmeas - Mmodel) ./ Mstd) .^ 2) / length(Mstd)</span>
+0517             <span class="comment">%ChiSquare = sum(((Mmeas - Mmodel) ./ Mstd) .^ 2) / (length(Mstd)-NumberOfFitParameters)</span>
+0518             
+0519         <span class="keyword">case</span> <span class="string">'beta'</span>
+0520             <span class="comment">% Set the lattice model</span>
+0521             <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0522                 RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0523             <span class="keyword">end</span>
+0524             
+0525             Index = 1:length(RINGData.Lattice);
+0526             <span class="comment">%Index = BPMData.BPMIndex;</span>
+0527             [TD, Tune] = twissring(RINGData.Lattice, 0, Index);
+0528             BETA = cat(1,TD.beta);
+0529             Spos = cat(1,TD.SPos);
+0530             Data = [BETA(:,1) BETA(:,2) Spos(:)];
+0531             
+0532         <span class="keyword">case</span> <span class="string">'hbeta'</span>
+0533             <span class="comment">% Set the lattice model</span>
+0534             <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0535                 RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0536             <span class="keyword">end</span>
+0537             
+0538             Index = 1:length(RINGData.Lattice);
+0539             <span class="comment">%Index = BPMData.BPMIndex;</span>
+0540             <span class="comment">%Index = BPMData.BPMIndex(BPMData.HBPMIndex);</span>
+0541             <span class="comment">%Index = BPMData.BPMIndex(BPMData.HBPMIndex(BPMData.HBPMGoodDataIndex));</span>
+0542             [TD, Tune] = twissring(RINGData.Lattice,0,Index);
+0543             BETA = cat(1,TD.beta);
+0544             <span class="comment">%Sx  = cat(1,TD.SPos);</span>
+0545             Data = BETA(:,1);
+0546             
+0547         <span class="keyword">case</span> <span class="string">'vbeta'</span>
+0548             <span class="comment">% Set the lattice model</span>
+0549             <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0550                 RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0551             <span class="keyword">end</span>
+0552             
+0553             Index = 1:length(RINGData.Lattice);
+0554             <span class="comment">%Index = BPMData.BPMIndex(BPMData.VBPMIndex);</span>
+0555             <span class="comment">%Index = BPMData.BPMIndex(BPMData.VBPMIndex(BPMData.VBPMGoodDataIndex));</span>
+0556             [TD, Tune] = twissring(RINGData.Lattice, 0, Index);
+0557             BETA = cat(1,TD.beta);
+0558             <span class="comment">%Sy  = cat(1,TD.SPos);</span>
+0559             Data = BETA(:,2);
+0560             
+0561         <span class="keyword">case</span> <span class="string">'tune'</span>
+0562             <span class="comment">% Set the lattice model</span>
+0563             <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0564                 RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0565             <span class="keyword">end</span>
+0566             
+0567             [TD, Tune] = twissring(RINGData.Lattice, 0, 1:length(RINGData.Lattice));
+0568             <span class="comment">%[LD, Tune] = linopt(RINGData.Lattice, 0);</span>
+0569             Data = Tune(:);
+0570             
+0571         <span class="keyword">otherwise</span>
+0572             fprintf(<span class="string">'   DataType unknown\n'</span>);
+0573             Data = [];
+0574     <span class="keyword">end</span>
+0575     
+0576     varargout{i} = Data;
+0577 <span class="keyword">end</span>
+0578</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

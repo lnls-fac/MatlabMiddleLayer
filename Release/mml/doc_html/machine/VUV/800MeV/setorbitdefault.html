@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setorbitdefault</title>
+  <meta name="keywords" content="setorbitdefault">
+  <meta name="description" content="SETORBITDEFAULT - Calls setorbit with the default parameters for the VUV ring">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">machine</a> &gt; <a href="#">VUV</a> &gt; <a href="index.html">800MeV</a> &gt; setorbitdefault.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for machine\VUV\800MeV&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>setorbitdefault
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>SETORBITDEFAULT - Calls setorbit with the default parameters for the VUV ring</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function setorbitdefault(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETORBITDEFAULT - Calls setorbit with the default parameters for the VUV ring
+  setorbitdefault(Evectors, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setorbitdefault(varargin)</a>
+0002 <span class="comment">%SETORBITDEFAULT - Calls setorbit with the default parameters for the VUV ring</span>
+0003 <span class="comment">%  setorbitdefault(Evectors, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</span>
+0004 
+0005 
+0006 <span class="comment">% Defaults</span>
+0007 PlaneFlag = 0;   <span class="comment">% Both planes</span>
+0008 ItersDefault = 1;
+0009 EvectorsDefault = 5e-3;
+0010 RemoveBPMDeviceList = [];   
+0011 RemoveHCMDeviceList = [];   
+0012 RemoveVCMDeviceList = [];   
+0013 DisplayFlag = <span class="string">'NoDisplay'</span>;
+0014 
+0015 
+0016 <span class="comment">% Input parsing</span>
+0017 Evectors = [];
+0018 Iters = [];
+0019 <span class="keyword">for</span> i = length(varargin):-1:1
+0020     <span class="keyword">if</span> isstruct(varargin{i})
+0021         <span class="comment">% Just remove</span>
+0022         varargin(i) = [];
+0023     <span class="keyword">elseif</span> iscell(varargin{i})
+0024         <span class="comment">% Just remove</span>
+0025         varargin(i) = [];
+0026     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0027         <span class="comment">% Just remove</span>
+0028         varargin(i) = [];
+0029     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0030         <span class="comment">% Just remove</span>
+0031         varargin(i) = [];
+0032     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0033         DisplayFlag = <span class="string">'Display'</span>;
+0034         varargin(i) = [];
+0035     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0036         DisplayFlag = <span class="string">'NoDisplay'</span>;
+0037         varargin(i) = [];
+0038     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'x'</span>,<span class="string">'Horizontal'</span>}))
+0039         PlaneFlag = 1;
+0040         varargin(i) = [];
+0041     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'y'</span>,<span class="string">'Vertical'</span>}))
+0042         PlaneFlag = 2;
+0043         varargin(i) = [];
+0044     <span class="keyword">end</span>
+0045 <span class="keyword">end</span>
+0046 
+0047 
+0048 <span class="keyword">if</span> length(varargin) &gt;= 1
+0049     <span class="keyword">if</span> isnumeric(varargin{1})
+0050         Evectors = varargin{1};
+0051         varargin(i) = [];
+0052     <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 <span class="keyword">if</span> isempty(Evectors)
+0055     <span class="keyword">if</span> PlaneFlag == 0
+0056         Evectors = EvectorsDefault;
+0057     <span class="keyword">elseif</span> PlaneFlag == 1
+0058         Evectors = EvectorsDefault;
+0059     <span class="keyword">elseif</span> PlaneFlag == 2
+0060         Evectors = EvectorsDefault;
+0061     <span class="keyword">end</span>
+0062 <span class="keyword">end</span>
+0063 
+0064 <span class="keyword">if</span> length(varargin) &gt;= 1
+0065     <span class="keyword">if</span> isnumeric(varargin{1})
+0066         Iters = varargin{1};
+0067         varargin(i) = [];
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">end</span>
+0070 <span class="keyword">if</span> isempty(Iters)
+0071     Iters = ItersDefault;
+0072 <span class="keyword">end</span>
+0073 
+0074 <span class="keyword">if</span> length(varargin) &gt;= 1
+0075     <span class="keyword">if</span> isnumeric(varargin{1})
+0076         RemoveBPMDeviceList = varargin{1};
+0077         varargin(i) = [];
+0078     <span class="keyword">end</span>
+0079 <span class="keyword">end</span>
+0080 
+0081 
+0082 
+0083 <span class="keyword">if</span> PlaneFlag == 0
+0084     <span class="comment">% Both planes</span>
+0085     <span class="comment">% Get BPM and CM structures</span>
+0086     CM  = {getsp(<span class="string">'HCM'</span>,<span class="string">'struct'</span>),getsp(<span class="string">'VCM'</span>,<span class="string">'struct'</span>)};
+0087     BPM = {getx(<span class="string">'struct'</span>), gety(<span class="string">'struct'</span>)};
+0088       
+0089     <span class="comment">% Remove devices</span>
+0090     <span class="comment">% HCM</span>
+0091     i = findrowindex(RemoveHCMDeviceList, CM{1}.DeviceList); 
+0092     CM{1}.DeviceList(i,:) = [];
+0093     CM{1}.Data(i,:) = [];
+0094     CM{1}.Status(i,:) = [];
+0095 
+0096     <span class="comment">% VCM</span>
+0097     i = findrowindex(RemoveVCMDeviceList, CM{2}.DeviceList); 
+0098     CM{2}.DeviceList(i,:) = [];
+0099     CM{2}.Data(i,:) = [];
+0100     CM{2}.Status(i,:) = [];
+0101 
+0102     <span class="comment">% BPMx and BPMy</span>
+0103     i = findrowindex(RemoveBPMDeviceList, BPM{1}.DeviceList); 
+0104     BPM{1}.DeviceList(i,:) = [];
+0105     BPM{1}.Data(i,:) = [];
+0106     BPM{1}.Status(i,:) = [];
+0107     
+0108     i = findrowindex(RemoveBPMDeviceList, BPM{2}.DeviceList); 
+0109     BPM{2}.DeviceList(i,:) = [];
+0110     BPM{2}.Data(i,:) = [];
+0111     BPM{2}.Status(i,:) = [];
+0112     
+0113     
+0114     <span class="comment">% Corrector orbit</span>
+0115     setorbit(<span class="string">'Golden'</span>, BPM, CM, Iters, Evectors, DisplayFlag, varargin{:});
+0116 
+0117 <span class="keyword">elseif</span> PlaneFlag == 1
+0118     <span class="comment">% Horizontal only</span>
+0119     
+0120     <span class="comment">% Get BPM and CM structures</span>
+0121     CM  = getsp(<span class="string">'HCM'</span>,<span class="string">'struct'</span>);
+0122     BPM = getx(<span class="string">'struct'</span>);
+0123     
+0124     <span class="comment">% Remove devices</span>
+0125     <span class="comment">% HCM</span>
+0126     i = findrowindex(RemoveHCMDeviceList, CM.DeviceList); 
+0127     CM.DeviceList(i,:) = [];
+0128     CM.Data(i,:) = [];
+0129     CM.Status(i,:) = [];
+0130 
+0131     <span class="comment">% BPMx</span>
+0132     i = findrowindex(RemoveBPMDeviceList, BPM.DeviceList); 
+0133     BPM.DeviceList(i,:) = [];
+0134     BPM.Data(i,:) = [];
+0135     BPM.Status(i,:) = [];    
+0136     
+0137     <span class="comment">% Corrector orbit</span>
+0138     setorbit(<span class="string">'Golden'</span>, BPM, CM, Iters, Evectors, DisplayFlag, varargin{:});
+0139     
+0140 <span class="keyword">elseif</span> PlaneFlag == 2
+0141     <span class="comment">% Vertical only</span>
+0142    
+0143     <span class="comment">% Get BPM and CM structures</span>
+0144     CM  = getsp(<span class="string">'VCM'</span>,<span class="string">'struct'</span>);
+0145     BPM = gety(<span class="string">'struct'</span>);
+0146         
+0147     <span class="comment">% Remove devices</span>
+0148     <span class="comment">% VCM</span>
+0149     i = findrowindex(RemoveVCMDeviceList, CM.DeviceList); 
+0150     CM.DeviceList(i,:) = [];
+0151     CM.Data(i,:) = [];
+0152     CM.Status(i,:) = [];
+0153     
+0154     <span class="comment">% BPMy</span>
+0155     i = findrowindex(RemoveBPMDeviceList, BPM.DeviceList); 
+0156     BPM.DeviceList(i,:) = [];
+0157     BPM.Data(i,:) = [];
+0158     BPM.Status(i,:) = [];    
+0159     
+0160     <span class="comment">% Corrector orbit</span>
+0161     setorbit(<span class="string">'Golden'</span>, BPM, CM, Iters, Evectors, DisplayFlag, varargin{:});
+0162 <span class="keyword">end</span>
+0163</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

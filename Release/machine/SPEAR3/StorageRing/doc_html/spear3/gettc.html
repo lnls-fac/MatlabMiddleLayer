@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gettc</title>
+  <meta name="keywords" content="gettc">
+  <meta name="description" content="GETTC - Gets the storage ring thermocouples">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; gettc.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>gettc
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETTC - Gets the storage ring thermocouples</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function tc = gettc(Sector, ChannelNumber, TRP) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETTC - Gets the storage ring thermocouples
+
+  For 1-Dim (typically middle layer output) 
+  TC = gettc(DeviceList, TRP)
+
+  For 2-Dim 
+  TC = gettc(Sector, ChannelNumber, TRP)  
+
+  TRP 2 and 4 only exist for sector 3 and 14</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function tc = gettc(Sector, ChannelNumber, TRP)</a>
+0002 <span class="comment">%GETTC - Gets the storage ring thermocouples</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  For 1-Dim (typically middle layer output)</span>
+0005 <span class="comment">%  TC = gettc(DeviceList, TRP)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  For 2-Dim</span>
+0008 <span class="comment">%  TC = gettc(Sector, ChannelNumber, TRP)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  TRP 2 and 4 only exist for sector 3 and 14</span>
+0011 
+0012 
+0013 <span class="keyword">if</span> nargin &lt; 1
+0014     Sector = [];
+0015 <span class="keyword">end</span>
+0016 <span class="keyword">if</span> nargin &lt; 2
+0017     ChannelNumber = [];
+0018 <span class="keyword">end</span>
+0019 <span class="keyword">if</span> nargin &lt; 3
+0020     TRP = [];
+0021 <span class="keyword">end</span>
+0022 
+0023 <span class="keyword">if</span> size(Sector,2) == 2
+0024     <span class="keyword">if</span> nargin &lt; 2
+0025         TRP = [];
+0026     <span class="keyword">else</span>
+0027         TRP = ChannelNumber;
+0028     <span class="keyword">end</span>
+0029 <span class="keyword">end</span>
+0030 
+0031 <span class="keyword">if</span> isempty(Sector)
+0032     Sector = 1:18;
+0033 <span class="keyword">end</span>
+0034 <span class="keyword">if</span> isempty(ChannelNumber)
+0035     ChannelNumber = 1:15;
+0036 <span class="keyword">end</span>
+0037 <span class="keyword">if</span> isempty(TRP)
+0038     TRP = 1;
+0039 <span class="keyword">end</span>
+0040 
+0041 
+0042 <span class="comment">% if length(Sector) == 1</span>
+0043 <span class="comment">%     Sector = Sector * ones(size(ChannelNumber));</span>
+0044 <span class="comment">% end</span>
+0045 <span class="comment">% if length(TRP) == 1</span>
+0046 <span class="comment">%     TRP = TRP * ones(size(ChannelNumber));</span>
+0047 <span class="comment">% end</span>
+0048 
+0049 <span class="keyword">if</span> size(Sector,2) == 2
+0050     ChanName = [];
+0051     <span class="keyword">for</span> j = 1:size(Sector,1)
+0052         ChanName = strvcat(ChanName,sprintf(<span class="string">'spr:TG%02dR%dC%d/AM1'</span>, Sector(j,1), TRP(1), Sector(j,2)));
+0053     <span class="keyword">end</span>
+0054     tc = getpv(ChanName);
+0055 <span class="keyword">else</span>
+0056     <span class="keyword">for</span> i = 1:length(ChannelNumber)
+0057         ChanName = [];
+0058         <span class="keyword">for</span> j = 1:length(Sector)
+0059             ChanName = strvcat(ChanName,sprintf(<span class="string">'spr:TG%02dR%dC%d/AM1'</span>, Sector(j), TRP(1), ChannelNumber(i)));
+0060         <span class="keyword">end</span>
+0061         tc(:,i) = getpv(ChanName);
+0062     <span class="keyword">end</span>
+0063 <span class="keyword">end</span>
+0064 
+0065 
+0066 [i,j] = find(tc &lt; 0); 
+0067 tc(i,j) = NaN;</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

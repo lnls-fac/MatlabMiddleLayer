@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcdispersionwave</title>
+  <meta name="keywords" content="calcdispersionwave">
+  <meta name="description" content="CALCDISPERSIONWAVE - Calculates the dispersion wave and bump">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; calcdispersionwave.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>calcdispersionwave
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>CALCDISPERSIONWAVE - Calculates the dispersion wave and bump</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = calcdispersionwave(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">CALCDISPERSIONWAVE - Calculates the dispersion wave and bump
+  [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = calcdispersionwave(Factor_Wave, Factor_Bump, LatticeFlag)
+
+  INPUTS
+  1. Factor_Wave - Scale factor on the dispersion wave
+  2. Factor_Bump - Scale factor on the dispersion bump
+                   Presently, bumps can only be added to the 'Distributed Dispersion' lattice
+  3. LatticeFlag - Lattice flag for the dispersion wave
+                   'Distributed Dispersion' - 6 cm horizontal dispersion in the straights
+                   'Zero Dispersion' - Zero horizontal dispersion in the straights
+  4. 'Hardware' {Default} or 'Physics' units
+  NOTE: it does not matter where the string inputs (3 &amp; 4) appear in the input order.
+
+  OUTPUTS
+  1. Total - Combined dispersion wave &amp; bump
+  2. Wave  - Dispersion wave
+  3. Bump  - Dispersion bump
+  NOTE: All outputs are structure arrays: (1)-SQSF, (2)-SQSD</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = calcdispersionwave(varargin)</a>
+0002 <span class="comment">%CALCDISPERSIONWAVE - Calculates the dispersion wave and bump</span>
+0003 <span class="comment">%  [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = calcdispersionwave(Factor_Wave, Factor_Bump, LatticeFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Factor_Wave - Scale factor on the dispersion wave</span>
+0007 <span class="comment">%  2. Factor_Bump - Scale factor on the dispersion bump</span>
+0008 <span class="comment">%                   Presently, bumps can only be added to the 'Distributed Dispersion' lattice</span>
+0009 <span class="comment">%  3. LatticeFlag - Lattice flag for the dispersion wave</span>
+0010 <span class="comment">%                   'Distributed Dispersion' - 6 cm horizontal dispersion in the straights</span>
+0011 <span class="comment">%                   'Zero Dispersion' - Zero horizontal dispersion in the straights</span>
+0012 <span class="comment">%  4. 'Hardware' {Default} or 'Physics' units</span>
+0013 <span class="comment">%  NOTE: it does not matter where the string inputs (3 &amp; 4) appear in the input order.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  OUTPUTS</span>
+0016 <span class="comment">%  1. Total - Combined dispersion wave &amp; bump</span>
+0017 <span class="comment">%  2. Wave  - Dispersion wave</span>
+0018 <span class="comment">%  3. Bump  - Dispersion bump</span>
+0019 <span class="comment">%  NOTE: All outputs are structure arrays: (1)-SQSF, (2)-SQSD</span>
+0020 <span class="comment">%</span>
+0021 
+0022 
+0023 <span class="comment">% Input checking</span>
+0024 LatticeFlag = <span class="string">''</span>; Total=[]; Wave=[]; Bump=[]; LatticeFlag=[]; Factor_Wave=[]; Factor_Bump=[];
+0025 NumericOutputFlag = 0;  <span class="comment">% Not implemented yet</span>
+0026 UnitsFlag = <span class="string">'Hardware'</span>;
+0027 <span class="keyword">for</span> i = length(varargin):-1:1
+0028     <span class="keyword">if</span> isstruct(varargin{i})
+0029         <span class="comment">% Ignor structures</span>
+0030     <span class="keyword">elseif</span> iscell(varargin{i})
+0031         <span class="comment">% Ignor cells</span>
+0032     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0033         <span class="comment">% Ignor flag</span>
+0034         varargin(i) = [];
+0035     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0036         NumericOutputFlag = 1;
+0037         varargin(i) = [];
+0038     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>) || strcmpi(varargin{i},<span class="string">'Online'</span>) || strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0039         <span class="comment">% Remove and ignor</span>
+0040         varargin(i) = [];
+0041     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0042         UnitsFlag = <span class="string">'Physics'</span>;
+0043         varargin(i) = [];
+0044     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0045         UnitsFlag = <span class="string">'Hardware'</span>;
+0046         varargin(i) = [];
+0047     <span class="keyword">elseif</span> ischar(varargin{i})
+0048         <span class="comment">% Lattice flag input</span>
+0049         LatticeFlag = varargin{i};
+0050         varargin(i) = [];
+0051     <span class="keyword">end</span>
+0052 <span class="keyword">end</span>
+0053 
+0054 
+0055 <span class="keyword">if</span> isempty(LatticeFlag)
+0056     LatticeFlag =  questdlg({<span class="keyword">...</span>
+0057         <span class="string">'The vertical dispersion wave depends on the lattice:'</span>, <span class="keyword">...</span>
+0058         <span class="string">'1. Distributed  Dispersion (6 cm horizontal in straights)'</span>, <span class="keyword">...</span>
+0059         <span class="string">'    (Typically the production lattice)'</span>, <span class="keyword">...</span>
+0060         <span class="string">'2. Zero Dispersion (horizontal in straights)'</span>, <span class="keyword">...</span>
+0061         <span class="string">'    (Typically the injection lattice)'</span>, <span class="keyword">...</span>
+0062         <span class="string">' '</span>, <span class="keyword">...</span>
+0063         <span class="string">'Which Lattice?'</span>}, <span class="keyword">...</span>
+0064         sprintf(<span class="string">'Mode: %s'</span>,getfamilydata(<span class="string">'OperationalMode'</span>)), <span class="keyword">...</span>
+0065         <span class="string">'Distributed Dispersion'</span>,<span class="string">'Zero Dispersion'</span>,<span class="string">'Distributed Dispersion'</span>);
+0066 <span class="keyword">end</span>
+0067 
+0068 
+0069 <span class="keyword">if</span> length(varargin) &gt;= 1
+0070     Factor_Wave = varargin{1};
+0071 <span class="keyword">else</span>
+0072     prompt={<span class="string">'Enter the scale factor for global eta_y wave'</span>};
+0073     def={<span class="string">'0.8'</span>};
+0074     dlgTitle=<span class="string">'Selection whether to correct to small emittance, or user settings'</span>;
+0075     lineNo=1;
+0076     answernum=inputdlg(prompt,dlgTitle,lineNo,def);
+0077     <span class="keyword">if</span> ~isempty(answernum)
+0078         Factor_Wave = str2double(answernum{1});
+0079     <span class="keyword">else</span>
+0080         disp(<span class="string">'   calcdispersionwave cancelled'</span>);
+0081         <span class="keyword">return</span>;
+0082     <span class="keyword">end</span>
+0083 <span class="keyword">end</span>
+0084 
+0085 
+0086 <span class="keyword">if</span> strcmpi(LatticeFlag,<span class="string">'Distributed Dispersion'</span>)
+0087     <span class="keyword">if</span> length(varargin) &gt;= 2
+0088         Factor_Bump = varargin{2};
+0089     <span class="keyword">else</span>
+0090         prompt={<span class="string">'Enter the factor for local eta_y bump'</span>};
+0091         def={<span class="string">'1.0'</span>};
+0092         dlgTitle=<span class="string">'Selection of dispersion bump size'</span>;
+0093         lineNo=1;
+0094         answernum = inputdlg(prompt,dlgTitle,lineNo,def);
+0095         <span class="keyword">if</span> ~isempty(answernum)
+0096             Factor_Bump = str2double(answernum{1});
+0097         <span class="keyword">else</span>
+0098             disp(<span class="string">'   calcdispersionwave cancelled'</span>);
+0099             <span class="keyword">return</span>;
+0100         <span class="keyword">end</span>
+0101     <span class="keyword">end</span>
+0102 <span class="keyword">else</span>
+0103     <span class="keyword">if</span> ~isempty(Factor_Bump) || Factor_Bump ~= 0
+0104         fprintf(<span class="string">'  Dispersion bump will be ignored for Zero Dispersion lattice.\n'</span>);
+0105     <span class="keyword">end</span>
+0106     Factor_Bump = 0;
+0107 <span class="keyword">end</span>
+0108 
+0109 
+0110 <span class="comment">% Create data structure arrays</span>
+0111 Wave    = family2datastruct(<span class="string">'SQSF'</span>, <span class="string">'Setpoint'</span>, <span class="string">'Physics'</span>);
+0112 Wave(2) = family2datastruct(<span class="string">'SQSD'</span>, <span class="string">'Setpoint'</span>, <span class="string">'Physics'</span>);
+0113 Bump = Wave; 
+0114 
+0115 
+0116 
+0117 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0118 <span class="comment">% Local Dispersion Bump %</span>
+0119 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0120 
+0121 <span class="comment">% Theoretical k values [m^-2] for the skews by Walter Wittmer</span>
+0122 List = [5 1; 5 2; 6 1; 6 2; 7 1; 7 2];
+0123 DispersionBump_K_SQSF = [
+0124     -0.36984004      <span class="comment">% [5 1]</span>
+0125     -0.22817710      <span class="comment">% [5 2]</span>
+0126     -0.25978570      <span class="comment">% [6 1]</span>
+0127     -0.10999989      <span class="comment">% [6 2]</span>
+0128     -0.05744313      <span class="comment">% [7 1]</span>
+0129     -0.09800899];    <span class="comment">% [7 2]</span>
+0130 [i, j] = findrowindex(List, Wave(1).DeviceList);
+0131 <span class="keyword">if</span> ~isempty(j)
+0132     error(<span class="string">'SQSF is in the disperion bump that is not in the present lattice'</span>);
+0133 <span class="keyword">else</span>
+0134     Bump(1).Data = zeros(length(Bump(1).Data),1);
+0135     Bump(1).Data(i) = DispersionBump_K_SQSF;
+0136 <span class="keyword">end</span>
+0137 
+0138 DispersionBump_K_SQSD = [
+0139      0.22515577      <span class="comment">% [5 1]</span>
+0140     -0.03016227      <span class="comment">% [5 2]</span>
+0141     -0.03330246      <span class="comment">% [6 1]</span>
+0142      0.03189800];    <span class="comment">% [6 2]</span>
+0143 List = [5 1; 5 2; 6 1; 6 2;];
+0144 [i, j] = findrowindex(List, Wave(2).DeviceList);
+0145 <span class="keyword">if</span> ~isempty(j)
+0146     error(<span class="string">'SQSD is in the disperion bump that is not in the present lattice'</span>);
+0147 <span class="keyword">else</span>
+0148     Bump(2).Data = zeros(length(Bump(2).Data),1);
+0149     Bump(2).Data(i) = DispersionBump_K_SQSD;
+0150 <span class="keyword">end</span>
+0151 
+0152  
+0153 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0154 <span class="comment">% Local Dispersion Wave %</span>
+0155 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0156 
+0157 <span class="comment">% Theoretical k values [m^-2] for the skews as determined with a fit using the accelerator toolbox</span>
+0158 <span class="keyword">if</span> strcmpi(LatticeFlag,<span class="string">'Distributed Dispersion'</span>)
+0159     disp(<span class="string">'   Distributed Dispersion'</span>)  <span class="comment">% 6 cm</span>
+0160     Wave(1).Data = [ 
+0161         0.01049061974609; 0.01140933697991;-0.04030875696656; <span class="keyword">...</span>
+0162         0.00000000000000; 0.00000000000000;-0.05502813334686; <span class="keyword">...</span>
+0163         0.01542076460695;-0.01619516668507; 0.00789235914796; <span class="keyword">...</span>
+0164         0.00131257163789; 0.00103749322207;];
+0165     Wave(2).Data = [
+0166         -0.03848844279225;-0.01638239892977;-0.01260762847070; <span class="keyword">...</span>
+0167         -0.01719182683414; 0.00000000000000; 0.00000000000000; <span class="keyword">...</span>
+0168         -0.00012424401083;-0.00830469993127;-0.00037523106600; <span class="keyword">...</span>
+0169         -0.03827790708473;-0.02139034673185;-0.01107856244175; <span class="keyword">...</span>
+0170         +0.02111710213345];
+0171 <span class="keyword">elseif</span> strcmpi(LatticeFlag,<span class="string">'Zero Dispersion'</span>)
+0172     disp(<span class="string">'   Zero Dispersion'</span>);
+0173     Wave(1).Data = [ 
+0174         0.01157297379474;0.01119306834886;-0.03365503399306; <span class="keyword">...</span>
+0175        -0.00000000000000;0.00000000000000;-0.04751476955472; <span class="keyword">...</span>
+0176         0.01514092010687;-0.01597486848438;0.01029755374564; <span class="keyword">...</span>
+0177         0.00138907222726;0.00107982276350;];
+0178     Wave(2).Data = [
+0179         -0.03612300082450;-0.01532848704077;-0.01198859969586; <span class="keyword">...</span>
+0180         -0.01717691979496;-0.00000000000000;-0.00000000000000; <span class="keyword">...</span>
+0181         -0.00012471625950;-0.00945953402402;-0.00032774806922; <span class="keyword">...</span>
+0182         -0.03708187010264;-0.02488363394460;-0.01066978009210; <span class="keyword">...</span>
+0183         +0.01884052079746];
+0184 <span class="keyword">else</span>
+0185     error(<span class="string">'Lattice for the dispersion wave unknown (Flag=%s)'</span>, LatticeFlag);
+0186 <span class="keyword">end</span>
+0187 
+0188 
+0189 Total = Wave;  <span class="comment">% Just for fields</span>
+0190 
+0191 <span class="keyword">for</span> i = 1:2
+0192     Wave(i).Data = -1 * Factor_Wave * Wave(i).Data;
+0193     Bump(i).Data = -1 * Factor_Bump * Bump(i).Data;
+0194     Total(i).Data = Wave(i).Data + Bump(i).Data;
+0195 <span class="keyword">end</span>
+0196 
+0197 
+0198 <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0199     Wave = physics2hw(Wave);
+0200     Bump = physics2hw(Bump);
+0201     Total = physics2hw(Total);
+0202 <span class="keyword">end</span>
+0203 
+0204 
+0205</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

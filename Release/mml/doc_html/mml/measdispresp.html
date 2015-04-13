@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measdispresp</title>
+  <meta name="keywords" content="measdispresp">
+  <meta name="description" content="MEASDISPRESP - Measures Amman TERMs in response matrix">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measdispresp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measdispresp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASDISPRESP - Measures Amman TERMs in response matrix</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [D] = measdispresp(CMfamily, CMlist); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  MEASDISPRESP - Measures Amman TERMs in response matrix
+  Dmat = measdispresp(CMfamily, CMlist);
+ 
+  INPUTS
+  1. CMfamily - Magnet corrector family
+  2. CMlist - List of magnet corrector
+
+  OUTPUTS
+  1. D Energy part of the bpm response matrix
+
+  Seems to measure Amman TERMs in response matrix</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getbpm.html" class="code" title="function [BPM1, BPM2, FileName]=getbpm(varargin)">getbpm</a>	GETBPM - Returns the horizontal and vertical orbit</li><li><a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li><li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>	GETVCMFAMILY - Returns the default vertical corrector family</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [D] = measdispresp(CMfamily, CMlist);</a>
+0002 <span class="comment">%  MEASDISPRESP - Measures Amman TERMs in response matrix</span>
+0003 <span class="comment">%  Dmat = measdispresp(CMfamily, CMlist);</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. CMfamily - Magnet corrector family</span>
+0007 <span class="comment">%  2. CMlist - List of magnet corrector</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%  OUTPUTS</span>
+0010 <span class="comment">%  1. D Energy part of the bpm response matrix</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  Seems to measure Amman TERMs in response matrix</span>
+0013 
+0014 <span class="comment">%  Written by Jeff Corbett</span>
+0015 <span class="comment">%  Modified by Laurent S. Nadolski</span>
+0016 
+0017 
+0018 <span class="comment">% Initialize</span>
+0019 MMmax = 6;      <span class="comment">% to set corrector strength magnitude</span>
+0020 Navg=6;
+0021 DeltaMO = 1;
+0022 Delay1 = 2;
+0023 Delay2 = 2;
+0024 
+0025 <span class="keyword">if</span> CMfamily == <a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>
+0026     Dim = 2;
+0027 <span class="keyword">elseif</span> CMfamily == <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>
+0028     Dim = 1;
+0029 <span class="keyword">else</span>
+0030     error(<span class="string">'Dim set problem'</span>);
+0031 <span class="keyword">end</span>
+0032 
+0033 
+0034 <span class="comment">% Save corrector magnet starting points</span>
+0035 CM0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(CMfamily, CMlist);
+0036 MO0 = getmo;
+0037 DCCT0 = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>;
+0038 
+0039 <span class="keyword">for</span> i=1:max(size(CMlist,1))
+0040     fprintf(<span class="string">'%s Sector %d Magnet #%d\n'</span>,CMfamily, CMlist(i,1), CMlist(i,2)); drawnow;
+0041     
+0042     <span class="comment">% Get change in amps</span>
+0043     DeltaAmps = mm2amps(CMfamily, MMmax, CMlist(i,:))
+0044         
+0045     <span class="comment">% plus CM</span>
+0046     CMam=<a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(CMfamily, CM0(i)+DeltaAmps, CMlist(i,:));
+0047     setmo(MO0+DeltaMO);
+0048     sleep(Delay1);
+0049     BPMp = <a href="getbpm.html" class="code" title="function [BPM1, BPM2, FileName]=getbpm(varargin)">getbpm</a>(Dim, Navg);
+0050     RFp= <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>;
+0051     
+0052     setmo(MO0-DeltaMO);
+0053     sleep(Delay2);
+0054     BPMm = <a href="getbpm.html" class="code" title="function [BPM1, BPM2, FileName]=getbpm(varargin)">getbpm</a>(Dim, Navg);
+0055     RFm= <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>;
+0056     
+0057     Dp = (BPMp-BPMm)/(RFp-RFm);
+0058         
+0059     <span class="comment">% minus CM</span>
+0060     CMam=<a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(CMfamily, CM0(i)-DeltaAmps, CMlist(i,:));
+0061     setmo(MO0+DeltaMO);
+0062     sleep(Delay1);
+0063     BPMp = <a href="getbpm.html" class="code" title="function [BPM1, BPM2, FileName]=getbpm(varargin)">getbpm</a>(Dim, Navg);
+0064     RFp= <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>;
+0065     
+0066     setmo(MO0-DeltaMO);
+0067     sleep(Delay2);
+0068     BPMm = <a href="getbpm.html" class="code" title="function [BPM1, BPM2, FileName]=getbpm(varargin)">getbpm</a>(Dim, Navg);
+0069     RFm= <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>;
+0070     
+0071     Dm = (BPMp-BPMm)/(RFp-RFm);
+0072    
+0073     <span class="comment">% Reset corrector magnet and MO</span>
+0074     CMam=<a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(CMfamily, CM0(i), CMlist(i,:));
+0075     setmo(MO0);
+0076      
+0077     D(:,i) = (Dp-Dm)/(2*DeltaAmps);
+0078     
+0079     <span class="keyword">if</span> (abs(DCCT0-<a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>) &gt; 10)
+0080         disp(<span class="string">'Beam current dropped 10 milliamps.'</span>);
+0081         disp(<span class="string">'Refill then hit return.'</span>); pause;
+0082         DCCT0 = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>;
+0083     <span class="keyword">end</span>;
+0084 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

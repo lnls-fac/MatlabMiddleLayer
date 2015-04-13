@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setbts</title>
+  <meta name="keywords" content="setbts">
+  <meta name="description" content="SETBTS - Ramps the BTS magnets in steps to avoid overshoots and trips">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">LTB</a> &gt; setbts.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\LTB&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setbts
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>SETBTS - Ramps the BTS magnets in steps to avoid overshoots and trips</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function ErrorFlag = setbts(Family, Field, NewSP, DeviceList, WaitFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETBTS - Ramps the BTS magnets in steps to avoid overshoots and trips
+  ErrorFlag = setbts(Family, Field, NewSP, DeviceList, MaxStep, WaitFlag)
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ErrorFlag = setbts(Family, Field, NewSP, DeviceList, WaitFlag) </a>
+0002 <span class="comment">%SETBTS - Ramps the BTS magnets in steps to avoid overshoots and trips</span>
+0003 <span class="comment">%  ErrorFlag = setbts(Family, Field, NewSP, DeviceList, MaxStep, WaitFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Written by Greg Portmann</span>
+0006 
+0007 
+0008 ErrorFlag = 0;
+0009 
+0010 
+0011 <span class="keyword">if</span> nargin &lt; 1
+0012     Family = <span class="string">'BEND'</span>;
+0013 <span class="keyword">end</span>
+0014 <span class="keyword">if</span> nargin &lt; 2
+0015     Field = <span class="string">'Setpoint'</span>;
+0016 <span class="keyword">end</span>
+0017 <span class="keyword">if</span> nargin &lt; 3
+0018     NewSP = [];
+0019 <span class="keyword">end</span>
+0020 <span class="keyword">if</span> nargin &lt; 4
+0021     DeviceList = [];
+0022 <span class="keyword">end</span>
+0023 
+0024 
+0025 <span class="comment">% If not input, get the setpoints from the production lattice</span>
+0026 <span class="keyword">if</span> isempty(NewSP)
+0027     SP = getproductionlattice;
+0028     NewSP = SP.(Family).(<span class="string">'Setpoint'</span>).Data;
+0029     <span class="keyword">if</span> isempty(DeviceList)
+0030         DeviceList = SP.(Family).Setpoint.DeviceList;
+0031     <span class="keyword">else</span>
+0032         i = findrowindex(DeviceList ,SP.(Family).Setpoint.DeviceList);
+0033         NewSP = NewSP(i,:);
+0034     <span class="keyword">end</span>
+0035 <span class="keyword">end</span>
+0036 
+0037 
+0038 <span class="keyword">switch</span> Family
+0039     <span class="keyword">case</span> <span class="string">'BEND'</span>
+0040         MaxStep = 25;  <span class="comment">% Amps</span>
+0041     <span class="keyword">otherwise</span>
+0042         MaxStep = 25;  <span class="comment">% Amps</span>
+0043 <span class="keyword">end</span>
+0044 
+0045 
+0046 SP0 = getpv(Family, Field, DeviceList);
+0047 
+0048 <span class="keyword">if</span> ~all((NewSP - SP0) == 0)
+0049 
+0050     N = max(ceil(abs(NewSP-SP0) / MaxStep));
+0051 
+0052     <span class="comment">% Use the AO for the BEND without the special function</span>
+0053     [tmp, AO] = isfamily(Family);
+0054     AO.Setpoint = rmfield(AO.Setpoint, <span class="string">'SpecialFunctionSet'</span>);
+0055 
+0056     Delta = (NewSP - SP0) / N;
+0057 
+0058     <span class="keyword">if</span> N &gt; 1
+0059         <span class="keyword">if</span> WaitFlag == 0
+0060             fprintf(<span class="string">'   Warning: WaitFlag==0 gets ignored if the change in current is greater than %.1f amps.\n'</span>, MaxStep);
+0061             WaitFlag == -1;
+0062         <span class="keyword">end</span>
+0063         
+0064         SPtmp = SP0;
+0065         <span class="keyword">for</span> i = 1:N
+0066             SPtmp = SPtmp + Delta;
+0067             ErrorFlag = setpv(AO, Field, SPtmp, DeviceList, -1);
+0068         <span class="keyword">end</span>
+0069     <span class="keyword">end</span>
+0070 
+0071     ErrorFlag = setpv(AO, Field, NewSP, DeviceList, WaitFlag);
+0072 <span class="keyword">end</span>
+0073</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setlocooutput</title>
+  <meta name="keywords" content="setlocooutput">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; setlocooutput.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setlocooutput
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function setlocooutput(FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Puts the BPM and correctors gain in the middle layer AO</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setlocooutput(FileName)</a>
+0002 
+0003 <span class="keyword">if</span> nargin == 0
+0004     [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>);
+0005     <span class="keyword">if</span> FileName == 0
+0006         fprintf(<span class="string">'   setlocooutput canceled\n'</span>);
+0007         <span class="keyword">return</span>
+0008     <span class="keyword">end</span>
+0009     FileName = [DirectoryName FileName];
+0010 <span class="keyword">end</span>
+0011 
+0012 load(FileName);  
+0013 le = length(FitParameters);
+0014 
+0015 QFscale(1:6) = FitParameters(1).Values(1)/FitParameters(le).Values(1);
+0016 QFscale(7:28) = FitParameters(1).Values(2:23)./FitParameters(le).Values(2:23);
+0017 QDscale(1:6) = FitParameters(1).Values(24)/FitParameters(le).Values(24);
+0018 QDscale(7:28) = FitParameters(1).Values(25:46)./FitParameters(le).Values(25:46);
+0019 QFCscale = FitParameters(1).Values(47)/FitParameters(le).Values(47);
+0020 QDXscale = FitParameters(1).Values(48)/FitParameters(le).Values(48);
+0021 QFXscale = FitParameters(1).Values(49)/FitParameters(le).Values(49);
+0022 QDYscale = FitParameters(1).Values(50)/FitParameters(le).Values(50);
+0023 QFYscale = FitParameters(1).Values(51)/FitParameters(le).Values(51);
+0024 QDZscale = FitParameters(1).Values(52)/FitParameters(le).Values(52);
+0025 QFZscale = FitParameters(1).Values(53)/FitParameters(le).Values(53);
+0026 
+0027 
+0028 <span class="comment">% According the Jacky's fit (Q:\Groups\Accel\Controls\matlab\machine\spear3data\Loco\2004-01-07\Jacky)</span>
+0029 <span class="comment">% K/I = 0.00245246 1/(m^2*A)</span>
+0030 SkewQuad = FitParameters(le).Values(54:end);
+0031 SkewQuadnew = SkewQuad / 0.00245246;
+0032 <span class="comment">% dialog box to apply?</span>
+0033 <span class="comment">%stepsp('SkewQuad', SkewQuadnew);   % Should this be -SkewQuadnew???</span>
+0034 
+0035 
+0036 
+0037 QFnew  = QFscale'.*getsp(<span class="string">'QF'</span>);
+0038 QDnew  = QDscale'.*getsp(<span class="string">'QD'</span>);
+0039 QFCnew = QFCscale*getsp(<span class="string">'QFC'</span>);
+0040 QDXnew = QDXscale*getsp(<span class="string">'QDX'</span>);
+0041 QFXnew = QFXscale*getsp(<span class="string">'QFX'</span>);
+0042 QDYnew = QDYscale*getsp(<span class="string">'QDY'</span>);
+0043 QFYnew = QFYscale*getsp(<span class="string">'QFY'</span>);
+0044 QDZnew = QDZscale*getsp(<span class="string">'QDZ'</span>);
+0045 QFZnew = QFZscale*getsp(<span class="string">'QFZ'</span>);
+0046 
+0047 
+0048 setsp(<span class="string">'QF'</span>, QFnew);
+0049 setsp(<span class="string">'QD'</span>, QDnew);
+0050 setsp(<span class="string">'QFC'</span>, QFCnew);
+0051 
+0052 setsp(<span class="string">'QFX'</span>, QFXnew);
+0053 setsp(<span class="string">'QFY'</span>, QFYnew);
+0054 setsp(<span class="string">'QFZ'</span>, QFZnew);
+0055 
+0056 setsp(<span class="string">'QDX'</span>, QDXnew);
+0057 setsp(<span class="string">'QDY'</span>, QDYnew);
+0058 setsp(<span class="string">'QDZ'</span>, QDZnew);
+0059</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

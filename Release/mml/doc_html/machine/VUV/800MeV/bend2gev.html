@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bend2gev</title>
+  <meta name="keywords" content="bend2gev">
+  <meta name="description" content="BEND2GEV - Compute the energy based on the ramp tables">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">machine</a> &gt; <a href="#">VUV</a> &gt; <a href="index.html">800MeV</a> &gt; bend2gev.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for machine\VUV\800MeV&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>bend2gev
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>BEND2GEV - Compute the energy based on the ramp tables</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function GeV = bend2gev(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BEND2GEV - Compute the energy based on the ramp tables
+ GeV = bend2gev(Family, Field, Amps, DeviceList, BranchFlag)
+
+  INPUTS
+  1. Bend - Bend magnet family {Optional}
+  2. Field - Field {Optional}
+  3. Amps - Bend magnet current
+  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}
+  5. BranchFlag - 1 -&gt; Lower branch
+                  2 -&gt; Upper branch {Default}
+
+  OUTPUTS
+  1. GeV - Electron beam energy [GeV]
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function GeV = bend2gev(varargin)</a>
+0002 <span class="comment">%BEND2GEV - Compute the energy based on the ramp tables</span>
+0003 <span class="comment">% GeV = bend2gev(Family, Field, Amps, DeviceList, BranchFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Bend - Bend magnet family {Optional}</span>
+0007 <span class="comment">%  2. Field - Field {Optional}</span>
+0008 <span class="comment">%  3. Amps - Bend magnet current</span>
+0009 <span class="comment">%  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}</span>
+0010 <span class="comment">%  5. BranchFlag - 1 -&gt; Lower branch</span>
+0011 <span class="comment">%                  2 -&gt; Upper branch {Default}</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  OUTPUTS</span>
+0014 <span class="comment">%  1. GeV - Electron beam energy [GeV]</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  Written by Greg Portmann</span>
+0017 
+0018 
+0019 <span class="comment">% Default</span>
+0020 Family = <span class="string">''</span>;
+0021 Field = <span class="string">''</span>;
+0022 Amps = [];
+0023 DeviceList = [];
+0024 BranchFlag = [];
+0025 
+0026 GeV = getfamilydata(<span class="string">'Energy'</span>);
+0027 <span class="keyword">return</span>
+0028 
+0029 
+0030 
+0031 
+0032 
+0033 
+0034 ModeFlag = <span class="string">''</span>;  <span class="comment">% model, online, manual</span>
+0035 UnitsFlag = <span class="string">''</span>; <span class="comment">% hardware, physics</span>
+0036 <span class="keyword">for</span> i = length(varargin):-1:1
+0037     <span class="keyword">if</span> isstruct(varargin{i})
+0038         <span class="comment">% Ignor structures</span>
+0039     <span class="keyword">elseif</span> iscell(varargin{i})
+0040         <span class="comment">% Ignor cells</span>
+0041     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0044         varargin(i) = [];
+0045     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0046         UnitsFlag = <span class="string">'Physics'</span>;
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0049         UnitsFlag = varargin{i};
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>)
+0052         ModeFlag = varargin{i};
+0053         varargin(i) = [];
+0054     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0055         ModeFlag = varargin{i};
+0056         varargin(i) = [];
+0057     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0058         ModeFlag = varargin{i};
+0059         varargin(i) = [];
+0060     <span class="keyword">end</span>        
+0061 <span class="keyword">end</span>
+0062 
+0063 
+0064 <span class="keyword">if</span> length(varargin) &gt;= 1
+0065     <span class="keyword">if</span> ischar(varargin{1})
+0066         Family = varargin{1};
+0067         varargin(1) = [];
+0068     <span class="keyword">else</span>
+0069         Amps = varargin{1};
+0070         varargin(1) = [];
+0071         <span class="keyword">if</span> length(varargin) &gt;= 1
+0072             DeviceList = varargin{1};
+0073             varargin(1) = [];
+0074         <span class="keyword">end</span>
+0075         <span class="keyword">if</span> length(varargin) &gt;= 1
+0076             BranchFlag = varargin{1};
+0077             varargin(1:end) = [];
+0078         <span class="keyword">end</span>
+0079     <span class="keyword">end</span>
+0080 <span class="keyword">end</span>
+0081 <span class="keyword">if</span> length(varargin) &gt;= 1 &amp; ischar(varargin{1})
+0082     Field = varargin{1};
+0083     varargin(1) = [];
+0084 <span class="keyword">end</span>
+0085 <span class="keyword">if</span> length(varargin) &gt;= 1
+0086     Amps = varargin{1};
+0087     varargin(1) = [];
+0088 <span class="keyword">end</span>
+0089 <span class="keyword">if</span> length(varargin) &gt;= 1
+0090     DeviceList = varargin{1};
+0091     varargin(1) = [];
+0092 <span class="keyword">end</span>
+0093 <span class="keyword">if</span> length(varargin) &gt;= 1
+0094     BranchFlag = varargin{1};
+0095     varargin(1) = [];
+0096 <span class="keyword">end</span>
+0097 
+0098 
+0099 <span class="keyword">if</span> isempty(Family)
+0100     Family = <span class="string">'BEND'</span>;
+0101 <span class="keyword">end</span>
+0102 <span class="keyword">if</span> isempty(ModeFlag)
+0103     ModeFlag = getmode(Family);
+0104 <span class="keyword">end</span>
+0105 
+0106 <span class="keyword">if</span> isempty(Field)
+0107     Field = <span class="string">'Setpoint'</span>;
+0108 <span class="keyword">end</span>
+0109 <span class="keyword">if</span> isempty(DeviceList)
+0110     DeviceList = family2dev(Family);
+0111     <span class="keyword">if</span> all(size(Amps)==[1 1]) | isempty(Amps)
+0112         DeviceList = DeviceList(1,:);
+0113     <span class="keyword">end</span>
+0114 <span class="keyword">end</span>
+0115 <span class="keyword">if</span> isempty(BranchFlag)
+0116     <span class="comment">% Default is upper branch</span>
+0117     BranchFlag = 2;
+0118 <span class="keyword">end</span>
+0119 <span class="keyword">if</span> isempty(Amps)
+0120     <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'simulator'</span>) | strcmpi(ModeFlag,<span class="string">'model'</span>)
+0121         GeVmodel = getenergymodel;
+0122         k = getpvmodel(Family, Field, DeviceList, <span class="string">'Physics'</span>);
+0123         Amps = k2amp(Family, Field, k, DeviceList, GeVmodel, BranchFlag);
+0124     <span class="keyword">else</span> 
+0125         Amps = getpv(Family, Field, [1 1], <span class="string">'Hardware'</span>, ModeFlag);
+0126     <span class="keyword">end</span>
+0127 <span class="keyword">end</span>
+0128 
+0129 <span class="keyword">if</span> size(Amps,1) == 1 &amp; size(DeviceList,1) &gt; 1
+0130     Amps = ones(size(DeviceList,1),1) * Amps;
+0131 <span class="keyword">end</span>
+0132 
+0133 <span class="comment">% End of input checking</span>
+0134 <span class="comment">% Machine dependant stuff below</span>
+0135 
+0136</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

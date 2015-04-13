@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of topoff_readtrackingfile</title>
+  <meta name="keywords" content="topoff_readtrackingfile">
+  <meta name="description" content="TOPOFF_READTRACKINGFILE - Read Hiroshi's top-off tracking files">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; topoff_readtrackingfile.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>topoff_readtrackingfile
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>TOPOFF_READTRACKINGFILE - Read Hiroshi's top-off tracking files</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Data, FileNameBase] = topoff_readtrackingfile(FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">TOPOFF_READTRACKINGFILE - Read Hiroshi's top-off tracking files
+  [Data, FileName] = topoff_readtrackingfile(FileName)
+
+  INPUTS
+  1. FileName - Tracking file name (extension not necessary)
+
+  OUTPUTS
+  1. Data - Structure of data and parameters
+
+  See also <a href="topoff_plottrackingfile.html" class="code" title="function [Data, FileNameBase] = topoff_plottrackingfile(varargin)">topoff_plottrackingfile</a>, <a href="topoff_apertures.html" class="code" title="function BL = topoff_apertures(BLNumber, ExtremeRay, LineColor, LineWidth, DimFlag)">topoff_apertures</a>, <a href="topoff_fieldprofiles.html" class="code" title="function [x, f, Families] = topoff_fieldprofiles(Family)">topoff_fieldprofiles</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="topoff_plottrackingfile.html" class="code" title="function [Data, FileNameBase] = topoff_plottrackingfile(varargin)">topoff_plottrackingfile</a>	TOPOFF_PLOTTRACKINGFILE - Plot Hiroshi's top-off tracking files</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Data, FileNameBase] = topoff_readtrackingfile(FileName)</a>
+0002 <span class="comment">%TOPOFF_READTRACKINGFILE - Read Hiroshi's top-off tracking files</span>
+0003 <span class="comment">%  [Data, FileName] = topoff_readtrackingfile(FileName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. FileName - Tracking file name (extension not necessary)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  OUTPUTS</span>
+0009 <span class="comment">%  1. Data - Structure of data and parameters</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  See also topoff_plottrackingfile, topoff_apertures, topoff_fieldprofiles</span>
+0012 
+0013 
+0014 <span class="keyword">if</span> nargin == 0 || isempty(FileName)
+0015     [FileName, PathName] = uigetfile(<span class="string">'*.csv'</span>, <span class="string">'Tracking file ...'</span>);
+0016     <span class="keyword">if</span> ~ischar(FileName)
+0017         Data =[]; 
+0018         FileNameBase = [];
+0019         <span class="keyword">return</span>
+0020     <span class="keyword">end</span>
+0021     FileName = [PathName, FileName];
+0022 <span class="keyword">end</span>
+0023 
+0024 [PathName, FileName, ext] = fileparts(FileName);
+0025 FileNameBase = [PathName, filesep, FileName];
+0026 
+0027 <span class="comment">% Get the phase space info</span>
+0028 [fid, errmsg]  = fopen([FileNameBase, <span class="string">'.iphs'</span>],<span class="string">'r'</span>);
+0029 <span class="keyword">if</span> fid==-1
+0030     error(<span class="string">'Could not open file'</span>);
+0031 <span class="keyword">end</span>
+0032 
+0033 LINE1 = fgetl(fid);
+0034 LINE2 = fgetl(fid);
+0035 
+0036 LINE = fgetl(fid);
+0037 i = findstr(LINE,<span class="string">'|'</span>);
+0038 Data.x0     = str2double(LINE(i(2)+1:i(3)-1));
+0039 Data.xMin   = str2double(LINE(i(3)+1:i(4)-1));
+0040 Data.xMax   = str2double(LINE(i(4)+1:i(5)-1));
+0041 Data.xDelta = str2double(LINE(i(5)+1:end));
+0042 Data.xSteps = length(Data.xMin:Data.xDelta:Data.xMax);
+0043 
+0044 LINE = fgetl(fid);
+0045 i = findstr(LINE,<span class="string">'|'</span>);
+0046 Data.Px0     = str2double(LINE(i(2)+1:i(3)-1));
+0047 Data.PxMin   = str2double(LINE(i(3)+1:i(4)-1));
+0048 Data.PxMax   = str2double(LINE(i(4)+1:i(5)-1));
+0049 Data.PxDelta = str2double(LINE(i(5)+1:end));
+0050 Data.PxSteps = length(Data.PxMin:Data.PxDelta:Data.PxMax);
+0051 
+0052 LINE = fgetl(fid);
+0053 i = findstr(LINE,<span class="string">'|'</span>);
+0054 Data.dPx0     = str2double(LINE(i(2)+1:i(3)-1));
+0055 Data.dPxMin   = str2double(LINE(i(3)+1:i(4)-1));
+0056 Data.dPxMax   = str2double(LINE(i(4)+1:i(5)-1));
+0057 Data.dPxDelta = str2double(LINE(i(5)+1:end));
+0058 Data.dPxSteps = length(Data.dPxMin:Data.dPxDelta:Data.dPxMax);
+0059 
+0060 fclose(fid);
+0061 
+0062 Data.x = (Data.xMin:Data.xDelta:Data.xMax)';
+0063 Data.Px = (Data.PxMin:Data.PxDelta:Data.PxMax)';
+0064 
+0065 
+0066 <span class="comment">% Get the tracking data</span>
+0067 <span class="keyword">if</span> exist([FileNameBase, <span class="string">'.csv'</span>],<span class="string">'file'</span>)
+0068     <span class="comment">% Raw tracking data</span>
+0069     CSVFlag = 1;
+0070     [fid, errmsg]  = fopen([FileNameBase, <span class="string">'.csv'</span>],<span class="string">'r'</span>);
+0071     <span class="keyword">if</span> fid==-1
+0072         error(<span class="string">'Could not open file'</span>);
+0073     <span class="keyword">end</span>
+0074     Data.Data = load([FileNameBase, <span class="string">'.csv'</span>], <span class="string">'ascii'</span>);
+0075     Data.Data(Data.Data(:,3)==10000000000,3) = NaN;
+0076 <span class="keyword">else</span>
+0077     <span class="comment">% Bitmap data</span>
+0078     CSVFlag = 0;
+0079     [fid, errmsg]  = fopen([FileNameBase, <span class="string">'.dat'</span>],<span class="string">'r'</span>);
+0080     <span class="keyword">if</span> fid==-1
+0081         error(<span class="string">'Could not open file'</span>);
+0082     <span class="keyword">end</span>
+0083 
+0084     LINE1 = fgetl(fid);
+0085     LINE2 = fgetl(fid);
+0086     <span class="comment">%LINE3 = fgetl(fid);</span>
+0087     Tmp = fscanf(fid,<span class="string">'%d,%d,%f,%f,%f'</span>,[1 5]);
+0088     M = Tmp(1);
+0089     N = Tmp(2);
+0090 
+0091     Tmp = fscanf(fid,<span class="string">'%d,%d,%f,%f,%f'</span>);
+0092     Data.Data = reshape(Tmp',5,length(Tmp)/5)';
+0093     <span class="comment">% i = 0;</span>
+0094     <span class="comment">% while 1</span>
+0095     <span class="comment">%     Tmp = fscanf(fid,'%d,%d,%f,%f,%f',[1 5]);</span>
+0096     <span class="comment">%     if length(Tmp) ~= 5</span>
+0097     <span class="comment">%         break</span>
+0098     <span class="comment">%     else</span>
+0099     <span class="comment">%         i = i + 1;</span>
+0100     <span class="comment">%         Data.Data(i,:) = Tmp;</span>
+0101     <span class="comment">%     end</span>
+0102     <span class="comment">% end</span>
+0103     fclose(fid);
+0104 
+0105     Data.Data = Data.Data(:,[4 5 3]);
+0106 
+0107     <span class="comment">% d = NaN * ones(max(Data.Data(:,1)), max(Data.Data(:,2)));</span>
+0108     <span class="comment">% for i = 1:size(Data.Data,1)</span>
+0109     <span class="comment">%     d(Data.Data(i,1),Data.Data(i,2)) = Data.Data(i,3);</span>
+0110     <span class="comment">% end</span>
+0111 
+0112     <span class="comment">% Start distance at the launch point</span>
+0113     <span class="comment">%Data.Data(:,3) = Data.Data(:,3) - 8.6;</span>
+0114 
+0115     <span class="comment">% Bad data</span>
+0116     <span class="comment">%Data.Data(find(Data.Data(:,1)==0),1) = 0.34;</span>
+0117     <span class="comment">%Data.Data(find(Data.Data(:,2)==0),2) = 0.3;</span>
+0118 <span class="keyword">end</span>
+0119 
+0120 <span class="keyword">if</span> (Data.xSteps*Data.PxSteps) == size(Data.Data,1)
+0121     d = diff(Data.Data(:,1));
+0122     i = find(d ~=0);
+0123     i = i(1);
+0124 
+0125     <span class="comment">%Data.X = reshape(Data.Data(:,1),i,size(Data.Data,1)/i);</span>
+0126     <span class="comment">%Data.Y = reshape(Data.Data(:,2),i,size(Data.Data,1)/i);</span>
+0127     Data.Z = reshape(Data.Data(:,3),i,size(Data.Data,1)/i);
+0128 
+0129     <span class="comment">% Change Z to be from low to high</span>
+0130     <span class="keyword">if</span> ~CSVFlag
+0131         <span class="comment">%Data.Y = Data.Y(end:-1:1);</span>
+0132         Data.Z = Data.Z(end:-1:1,:);
+0133     <span class="keyword">end</span>
+0134 <span class="keyword">else</span>
+0135     [XI,YI] = meshgrid(Data.x, Data.Px);
+0136     [XI,YI,Data.Z] = griddata(Data.Data(:,1), Data.Data(:,2), Data.Data(:,3), XI, YI, <span class="string">'linear'</span>);
+0137 
+0138     <span class="comment">% Remove rows or columns that are all NaN</span>
+0139     <span class="keyword">for</span> i = size(Data.Z,2):-1:1
+0140         <span class="keyword">if</span> all(isnan(Data.Z(:,i)))
+0141             Data.Z(:,i) = [];
+0142             Data.x(i) = [];
+0143             <span class="comment">%Data.xSteps = Data.xSteps - 1;</span>
+0144         <span class="keyword">end</span>
+0145     <span class="keyword">end</span>
+0146     <span class="keyword">for</span> i = size(Data.Z,1):-1:1
+0147         <span class="keyword">if</span> all(isnan(Data.Z(i,:)))
+0148             Data.Z(i,:) = [];
+0149             Data.Px(i) = [];
+0150             <span class="comment">%Data.PxSteps = Data.PxSteps - 1;</span>
+0151         <span class="keyword">end</span>
+0152     <span class="keyword">end</span>
+0153 <span class="keyword">end</span>
+0154 
+0155 
+0156 Data = rmfield(Data, <span class="string">'Data'</span>);
+0157</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

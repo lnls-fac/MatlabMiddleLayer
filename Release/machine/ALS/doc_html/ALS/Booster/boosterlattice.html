@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of boosterlattice</title>
+  <meta name="keywords" content="boosterlattice">
+  <meta name="description" content="BOOSTERLATTICE - Booster lattice definition function">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; boosterlattice.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>boosterlattice
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BOOSTERLATTICE - Booster lattice definition function</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function varargout = boosterlattice(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BOOSTERLATTICE - Booster lattice definition function</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = boosterlattice(varargin)</a>
+0002 <span class="comment">%BOOSTERLATTICE - Booster lattice definition function</span>
+0003 
+0004 
+0005 <span class="keyword">global</span> THERING 
+0006 
+0007 
+0008 <span class="comment">% Energy</span>
+0009 <span class="keyword">if</span> nargin &gt;=1 
+0010     Energy = varargin{1};
+0011 <span class="keyword">else</span>
+0012     Energy = 1.9e9;
+0013 <span class="keyword">end</span>
+0014 
+0015 
+0016 <span class="comment">% Markers</span>
+0017 START = marker(<span class="string">'START'</span>, <span class="string">'IdentityPass'</span>);
+0018 BPM   = marker(<span class="string">'BPM'</span>,   <span class="string">'IdentityPass'</span>);
+0019 TV    = marker(<span class="string">'TV'</span>,    <span class="string">'IdentityPass'</span>);
+0020 
+0021 
+0022 <span class="comment">% Aperture</span>
+0023 AP = aperture(<span class="string">'AP'</span>,  [-0.1, 0.1, -0.1, 0.1], <span class="string">'AperturePass'</span>);
+0024 
+0025 
+0026 <span class="comment">% RF SYSTEM</span>
+0027 L0 = 75;              <span class="comment">% Design length [m]</span>
+0028 C0 = 299792458;       <span class="comment">% Speed of light [m/s]</span>
+0029 HarmNumber = 125;     <span class="comment">% Base  RF on storage ring</span>
+0030 CAV = rfcavity(<span class="string">'CAV'</span> , 0 , 1.2e+6 , HarmNumber*C0/L0, HarmNumber ,<span class="string">'CavityPass'</span>);
+0031 
+0032 
+0033 <span class="comment">% Drifts</span>
+0034 L1  = drift(<span class="string">'L1'</span>, 0.546875, <span class="string">'DriftPass'</span>);
+0035 L2  = drift(<span class="string">'L2'</span>, 0.496875, <span class="string">'DriftPass'</span>);
+0036 L3  = drift(<span class="string">'L3'</span>, 2.093750, <span class="string">'DriftPass'</span>);
+0037 
+0038 
+0039 <span class="comment">% Correctors</span>
+0040 Lcm = 0;
+0041 HCM = corrector(<span class="string">'HCM'</span>, Lcm, [0 0], <span class="string">'CorrectorPass'</span>);
+0042 VCM = corrector(<span class="string">'VCM'</span>, Lcm, [0 0], <span class="string">'CorrectorPass'</span>);
+0043 
+0044 
+0045 <span class="comment">% Quadrupoles (split)</span>
+0046 QF = quadrupole(<span class="string">'QF'</span>, .15,  2.7682214, <span class="string">'StrMPoleSymplectic4RadPass'</span>); 
+0047 QD = quadrupole(<span class="string">'QD'</span>, .10, -2.5401249, <span class="string">'StrMPoleSymplectic4RadPass'</span>); 
+0048 
+0049 
+0050 <span class="comment">% Sextupoles</span>
+0051 Lsext = 0;
+0052 SD = sextupole(<span class="string">'SD'</span>, Lsext, 0.0, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0053 SF = sextupole(<span class="string">'SF'</span>, Lsext, 0.0, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0054 
+0055 
+0056 <span class="comment">% Bend (split)</span>
+0057 <span class="comment">%B = rbend('BEND', 1.05  , 15.0*pi/180, 15.0*pi/180, 15.0*pi/180, 0, 'BndMPoleSymplectic4RadPass');</span>
+0058 BU = rbend(<span class="string">'BEND'</span>, 1.05/2,  7.5*pi/180,  7.5*pi/180,           0, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0059 BD = rbend(<span class="string">'BEND'</span>, 1.05/2,  7.5*pi/180,           0,  7.5*pi/180, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0060 
+0061 
+0062 <span class="comment">% Build lattice</span>
+0063 CELL1 = [L3 QF QF BPM HCM TV L2 BU BD L1 VCM QD QD BPM SD L1 BU BD L2 HCM QF QF BPM SF L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 SF BPM QF QF HCM TV L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 HCM BPM QF QF VCM L3 BPM QD QD  ];
+0064 CELL2 = [L3 QF QF BPM HCM    L2 BU BD L1 VCM QD QD BPM SD L1 BU BD L2 HCM QF QF BPM SF L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 SF BPM QF QF HCM    L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 HCM BPM QF QF VCM L3     QD QD BPM];
+0065 CELL3 = [L3 QF QF BPM HCM    L2 BU BD L1 VCM QD QD BPM SD L1 BU BD L2 HCM QF QF BPM SF L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 SF BPM QF QF HCM    L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 HCM BPM QF QF VCM L3     QD QD BPM];
+0066 CELL4 = [L3 QF QF BPM HCM    L2 BU BD L1 VCM QD QD BPM SD L1 BU BD L2 HCM QF QF BPM SF L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 SF BPM QF QF HCM TV L2 BU BD L1 SD QD QD BPM VCM L1 BU BD L2 HCM BPM QF QF VCM L3     QD QD BPM];
+0067 
+0068 BOOSTER = [ START AP CAV CELL1 CELL2 CELL3 CELL4 ];
+0069 
+0070 
+0071 buildlat(BOOSTER);
+0072 
+0073 <span class="comment">% Add energy field everywhere</span>
+0074 THERING = setcellstruct(THERING, <span class="string">'Energy'</span>, 1:length(THERING), Energy);
+0075 
+0076 
+0077 <span class="comment">% Compute length</span>
+0078 L0 = findspos(THERING, length(THERING)+1);
+0079 fprintf(<span class="string">'   Booster Length = %.6f meters  \n'</span>, L0)
+0080 
+0081</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

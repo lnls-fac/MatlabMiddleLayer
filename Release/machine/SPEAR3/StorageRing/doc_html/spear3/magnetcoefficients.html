@@ -1,0 +1,640 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of magnetcoefficients</title>
+  <meta name="keywords" content="magnetcoefficients">
+  <meta name="description" content="[C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; magnetcoefficients.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>magnetcoefficients
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>[C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)
+ 
+ C and A are vector coefficients for the polynomial expansion of the magnet field
+ based on magnet measurements.  
+ 
+ The amp2k and k2amp functions convert between the two types of units. 
+   amp2k returns BLeff, B'Leff, or B&quot;Leff scaled by Brho if A-coefficients are used. 
+   amp2k returns B    , B'    , or B&quot;     scaled by Brho if C-coefficients are used. 
+
+ The A coefficients are direct from magnet measurements:
+   (a7/I0)*I^8+(a6/I0)*I^7+(a5/I0)*I^6+(a4/I0)*I^5+(a3/I0)*I^4+(a2/I0)*I^3+(a1/I0)*I^2+a0*I = B*Leff or B'*Leff or B&quot;*Leff
+   A = [a7 a6 a5 a4 a3 a2 a1 a0]
+
+ C coefficients have been scaled to field (AT units, except correctors) and includes a DC term:
+   c8 * I^8+ c7 * I^7+ c6 * I^6 + c5 * I^5 + c4 * I^4 + c3 * I^3 + c2 * I^2 + c1*I + c0 = B or B' or B&quot;
+   C = [c8 c7 c6 c5 c4 c3 c2 c1 c0]
+
+ For dipole:      k = B / Brho      (for AT: KickAngle = BLeff / Brho)
+ For quadrupole:  k = B'/ Brho
+ For sextupole:   k = B&quot;/ Brho / 2  (to be compatible with AT)
+                  (all coefficients all divided by 2 for sextupoles)
+
+ MagnetCoreType is the magnet measurements name for the magnet core (string, string matrix, or cell)
+   For Spear3:   BEND, BDM
+                 QD, QF, QDX, QDY, QDZ, QFZ, QFC, QFY, QFX, SkewQuad
+                 SFM, SDM, SF, SD
+                 HCM, VCM
+
+ Leff is the effective length of the magnet
+
+ Written by M. Yoon 4/8/03</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="magnetcoefficients.html" class="code" title="function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)">magnetcoefficients</a>	[C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="amp2k.html" class="code" title="function k = amp2k(Family, Field, Amps, DeviceList, Energy, C, K2AmpScaleFactor)">amp2k</a>	AMP2K - Converts amperes to simulator values</li><li><a href="k2amp.html" class="code" title="function Amps = k2amp(Family, Field, k, DeviceList, Energy, C, K2AmpScaleFactor)">k2amp</a>	K2AMP - Converts simulator values to amperes</li><li><a href="magnetcoefficients.html" class="code" title="function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)">magnetcoefficients</a>	[C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)</li><li><a href="spear3init.html" class="code" title="function spear3init">spear3init</a>	Initialize parameters for SPEAR 3 control in MATLAB</li><li><a href="spear3init_ref.html" class="code" title="function spear3init">spear3init_ref</a>	Initialize parameters for SPEAR 3 control in MATLAB</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)</a>
+0002 <span class="comment">% [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% C and A are vector coefficients for the polynomial expansion of the magnet field</span>
+0005 <span class="comment">% based on magnet measurements.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% The amp2k and k2amp functions convert between the two types of units.</span>
+0008 <span class="comment">%   amp2k returns BLeff, B'Leff, or B&quot;Leff scaled by Brho if A-coefficients are used.</span>
+0009 <span class="comment">%   amp2k returns B    , B'    , or B&quot;     scaled by Brho if C-coefficients are used.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% The A coefficients are direct from magnet measurements:</span>
+0012 <span class="comment">%   (a7/I0)*I^8+(a6/I0)*I^7+(a5/I0)*I^6+(a4/I0)*I^5+(a3/I0)*I^4+(a2/I0)*I^3+(a1/I0)*I^2+a0*I = B*Leff or B'*Leff or B&quot;*Leff</span>
+0013 <span class="comment">%   A = [a7 a6 a5 a4 a3 a2 a1 a0]</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% C coefficients have been scaled to field (AT units, except correctors) and includes a DC term:</span>
+0016 <span class="comment">%   c8 * I^8+ c7 * I^7+ c6 * I^6 + c5 * I^5 + c4 * I^4 + c3 * I^3 + c2 * I^2 + c1*I + c0 = B or B' or B&quot;</span>
+0017 <span class="comment">%   C = [c8 c7 c6 c5 c4 c3 c2 c1 c0]</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% For dipole:      k = B / Brho      (for AT: KickAngle = BLeff / Brho)</span>
+0020 <span class="comment">% For quadrupole:  k = B'/ Brho</span>
+0021 <span class="comment">% For sextupole:   k = B&quot;/ Brho / 2  (to be compatible with AT)</span>
+0022 <span class="comment">%                  (all coefficients all divided by 2 for sextupoles)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% MagnetCoreType is the magnet measurements name for the magnet core (string, string matrix, or cell)</span>
+0025 <span class="comment">%   For Spear3:   BEND, BDM</span>
+0026 <span class="comment">%                 QD, QF, QDX, QDY, QDZ, QFZ, QFC, QFY, QFX, SkewQuad</span>
+0027 <span class="comment">%                 SFM, SDM, SF, SD</span>
+0028 <span class="comment">%                 HCM, VCM</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% Leff is the effective length of the magnet</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% Written by M. Yoon 4/8/03</span>
+0033 
+0034 
+0035 <span class="comment">% NOTE: The skew quad magnets need to be updated</span>
+0036 <span class="comment">% NOTE: The skew quad magnet is distributed on two types of core,</span>
+0037 <span class="comment">%       therefore might need to pass in device list</span>
+0038 <span class="comment">%       same could be true with quadshunt (current switched into many types of cores)</span>
+0039 <span class="comment">% NOTE: All 'C' coefficients divided by Leff at bottom of program: C/Leff</span>
+0040 <span class="comment">% NOTE: Make sure the sign on the 'C' coefficients is reversed where positive current generates negative K-values</span>
+0041 
+0042 
+0043 <span class="keyword">if</span> nargin &lt; 1
+0044     error(<span class="string">'MagnetCoreType input required'</span>);
+0045 <span class="keyword">end</span>
+0046 
+0047 
+0048 <span class="comment">% For a string matrix</span>
+0049 <span class="keyword">if</span> iscell(MagnetCoreType)
+0050     <span class="keyword">for</span> i = 1:size(MagnetCoreType,1)
+0051         <span class="keyword">for</span> j = 1:size(MagnetCoreType,2)
+0052             [C{i,j}, Leff{i,j}, MagnetType{i,j}, A{i,j}] = <a href="magnetcoefficients.html" class="code" title="function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)">magnetcoefficients</a>(MagnetCoreType{i});
+0053         <span class="keyword">end</span>
+0054     <span class="keyword">end</span>
+0055     <span class="keyword">return</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 <span class="comment">% For a string matrix</span>
+0059 <span class="keyword">if</span> size(MagnetCoreType,1) &gt; 1
+0060     C=[]; Leff=[]; MagnetType=[]; A=[];
+0061     <span class="keyword">for</span> i = 1:size(MagnetCoreType,1)
+0062         [C1, Leff1, MagnetType1, A1] = <a href="magnetcoefficients.html" class="code" title="function [C, Leff, MagnetType, A] = magnetcoefficients(MagnetCoreType)">magnetcoefficients</a>(MagnetCoreType(i,:));
+0063         C(i,:) = C1;
+0064         Leff(i,:) = Leff1;
+0065         MagnetType = strvcat(MagnetType, MagnetType1);
+0066         A(i,:) = A1;
+0067     <span class="keyword">end</span>
+0068     <span class="keyword">return</span>
+0069 <span class="keyword">end</span>
+0070 
+0071 
+0072 <span class="keyword">switch</span> upper(deblank(MagnetCoreType))
+0073     
+0074     <span class="keyword">case</span> <span class="string">'BEND'</span>    <span class="comment">% 145 cm dipole</span>
+0075         a7= 0.0137956;
+0076         a6=-0.0625519;
+0077         a5= 0.1156769;
+0078         a4=-0.1141570;
+0079         a3= 0.0652128;
+0080         a2=-0.0216472;
+0081         a1= 0.0038866;
+0082         a0= 0.0028901;
+0083         i0= 700.0;
+0084         
+0085         c8 = -a7/(i0^7);           <span class="comment">%negative signs added for defocusing</span>
+0086         c7 = -a6/(i0^6);
+0087         c6 = -a5/(i0^5);
+0088         c5 = -a4/(i0^4);
+0089         c4 = -a3/(i0^3);
+0090         c3 = -a2/(i0^2);
+0091         c2 = -a1/i0;
+0092         c1 = -a0;
+0093         c0 =  0.0;
+0094         MagnetType = <span class="string">'bend'</span>;   <span class="comment">%  or Quad ????</span>
+0095         Leff=1.5048;
+0096         
+0097  
+0098         <span class="comment">% Why the 2.54842790129284 scale factor?????</span>
+0099         K2BendingAngle = 2.54842790129284 *  -0.58596106939159;  <span class="comment">% ScaleFactor * BendAngle / K</span>
+0100         c8 = c8 * K2BendingAngle;    
+0101         c7 = c7 * K2BendingAngle;
+0102         c6 = c6 * K2BendingAngle;
+0103         c5 = c5 * K2BendingAngle;
+0104         c4 = c4 * K2BendingAngle;
+0105         c3 = c3 * K2BendingAngle;
+0106         c2 = c2 * K2BendingAngle;
+0107         c1 = c1 * K2BendingAngle;
+0108         c0 = c0 * K2BendingAngle;
+0109 
+0110   
+0111     <span class="keyword">case</span> <span class="string">'BDM'</span>    <span class="comment">% 109 cm dipole</span>
+0112         a7= 0.02897777;
+0113         a6=-0.13177140;
+0114         a5= 0.24886798;
+0115         a4=-0.25373053;
+0116         a3= 0.15088883;
+0117         a2=-0.05232964;
+0118         a1= 0.00979594;
+0119         a0= 0.00165748;
+0120         i0= 700.0;
+0121 
+0122         c8 = -a7/(i0^7);
+0123         c7 = -a6/(i0^6);
+0124         c6 = -a5/(i0^5);
+0125         c5 = -a4/(i0^4);
+0126         c4 = -a3/(i0^3);
+0127         c3 = -a2/(i0^2);
+0128         c2 = -a1/i0;
+0129         c1 = -a0;
+0130         c0 = 0;
+0131         MagnetType = <span class="string">'bend'</span>;
+0132         Leff=1.14329;
+0133 
+0134         <span class="comment">% Why the 2.54842790129284 scale factor?????</span>
+0135         K2BendingAngle = 2.54842790129284 * -0.43947079695140;   <span class="comment">% ScaleFactor * BendAngle / K</span>
+0136         c8 = c8 * K2BendingAngle;    
+0137         c7 = c7 * K2BendingAngle;
+0138         c6 = c6 * K2BendingAngle;
+0139         c5 = c5 * K2BendingAngle;
+0140         c4 = c4 * K2BendingAngle;
+0141         c3 = c3 * K2BendingAngle;
+0142         c2 = c2 * K2BendingAngle;
+0143         c1 = c1 * K2BendingAngle;
+0144         c0 = c0 * K2BendingAngle;
+0145         
+0146         <span class="keyword">case</span> <span class="string">'CD1'</span>    <span class="comment">%chicane dipole #1</span>
+0147         a7= 0.02897777;
+0148         a6=-0.13177140;
+0149         a5= 0.24886798;
+0150         a4=-0.25373053;
+0151         a3= 0.15088883;
+0152         a2=-0.05232964;
+0153         a1= 0.00979594;
+0154         a0= 0.00165748;
+0155         i0= 700.0;
+0156 
+0157         c8 = -a7/(i0^7);
+0158         c7 = -a6/(i0^6);
+0159         c6 = -a5/(i0^5);
+0160         c5 = -a4/(i0^4);
+0161         c4 = -a3/(i0^3);
+0162         c3 = -a2/(i0^2);
+0163         c2 = -a1/i0;
+0164         c1 = -a0;
+0165         c0 = 0;
+0166         MagnetType = <span class="string">'bend'</span>;
+0167         Leff=1.14329;
+0168 
+0169         <span class="comment">% Why the 2.54842790129284 scale factor?????</span>
+0170         K2BendingAngle = 2.54842790129284 * -0.43947079695140;   <span class="comment">% ScaleFactor * BendAngle / K</span>
+0171         c8 = c8 * K2BendingAngle;    
+0172         c7 = c7 * K2BendingAngle;
+0173         c6 = c6 * K2BendingAngle;
+0174         c5 = c5 * K2BendingAngle;
+0175         c4 = c4 * K2BendingAngle;
+0176         c3 = c3 * K2BendingAngle;
+0177         c2 = c2 * K2BendingAngle;
+0178         c1 = c1 * K2BendingAngle;
+0179         c0 = c0 * K2BendingAngle;    
+0180         
+0181         <span class="keyword">case</span> <span class="string">'CD2'</span>    <span class="comment">%chicane dipole #2</span>
+0182         a7= 0.02897777;
+0183         a6=-0.13177140;
+0184         a5= 0.24886798;
+0185         a4=-0.25373053;
+0186         a3= 0.15088883;
+0187         a2=-0.05232964;
+0188         a1= 0.00979594;
+0189         a0= 0.00165748;
+0190         i0= 700.0;
+0191 
+0192         c8 = -a7/(i0^7);
+0193         c7 = -a6/(i0^6);
+0194         c6 = -a5/(i0^5);
+0195         c5 = -a4/(i0^4);
+0196         c4 = -a3/(i0^3);
+0197         c3 = -a2/(i0^2);
+0198         c2 = -a1/i0;
+0199         c1 = -a0;
+0200         c0 = 0;
+0201         MagnetType = <span class="string">'bend'</span>;
+0202         Leff=1.14329;
+0203 
+0204         <span class="comment">% Why the 2.54842790129284 scale factor?????</span>
+0205         K2BendingAngle = 2.54842790129284 * -0.43947079695140;   <span class="comment">% ScaleFactor * BendAngle / K</span>
+0206         c8 = c8 * K2BendingAngle;    
+0207         c7 = c7 * K2BendingAngle;
+0208         c6 = c6 * K2BendingAngle;
+0209         c5 = c5 * K2BendingAngle;
+0210         c4 = c4 * K2BendingAngle;
+0211         c3 = c3 * K2BendingAngle;
+0212         c2 = c2 * K2BendingAngle;
+0213         c1 = c1 * K2BendingAngle;
+0214         c0 = c0 * K2BendingAngle;  
+0215         
+0216         <span class="keyword">case</span> <span class="string">'CD3'</span>    <span class="comment">%chicane dipole #3</span>
+0217         a7= 0.02897777;
+0218         a6=-0.13177140;
+0219         a5= 0.24886798;
+0220         a4=-0.25373053;
+0221         a3= 0.15088883;
+0222         a2=-0.05232964;
+0223         a1= 0.00979594;
+0224         a0= 0.00165748;
+0225         i0= 700.0;
+0226 
+0227         c8 = -a7/(i0^7);
+0228         c7 = -a6/(i0^6);
+0229         c6 = -a5/(i0^5);
+0230         c5 = -a4/(i0^4);
+0231         c4 = -a3/(i0^3);
+0232         c3 = -a2/(i0^2);
+0233         c2 = -a1/i0;
+0234         c1 = -a0;
+0235         c0 = 0;
+0236         MagnetType = <span class="string">'bend'</span>;
+0237         Leff=1.14329;
+0238 
+0239         <span class="comment">% Why the 2.54842790129284 scale factor?????</span>
+0240         K2BendingAngle = 2.54842790129284 * -0.43947079695140;   <span class="comment">% ScaleFactor * BendAngle / K</span>
+0241         c8 = c8 * K2BendingAngle;    
+0242         c7 = c7 * K2BendingAngle;
+0243         c6 = c6 * K2BendingAngle;
+0244         c5 = c5 * K2BendingAngle;
+0245         c4 = c4 * K2BendingAngle;
+0246         c3 = c3 * K2BendingAngle;
+0247         c2 = c2 * K2BendingAngle;
+0248         c1 = c1 * K2BendingAngle;
+0249         c0 = c0 * K2BendingAngle;    
+0250         
+0251         <span class="keyword">case</span> <span class="string">'CD4'</span>    <span class="comment">%chicane dipole #4</span>
+0252         a7= 0.02897777;
+0253         a6=-0.13177140;
+0254         a5= 0.24886798;
+0255         a4=-0.25373053;
+0256         a3= 0.15088883;
+0257         a2=-0.05232964;
+0258         a1= 0.00979594;
+0259         a0= 0.00165748;
+0260         i0= 700.0;
+0261 
+0262         c8 = -a7/(i0^7);
+0263         c7 = -a6/(i0^6);
+0264         c6 = -a5/(i0^5);
+0265         c5 = -a4/(i0^4);
+0266         c4 = -a3/(i0^3);
+0267         c3 = -a2/(i0^2);
+0268         c2 = -a1/i0;
+0269         c1 = -a0;
+0270         c0 = 0;
+0271         MagnetType = <span class="string">'bend'</span>;
+0272         Leff=1.14329;
+0273 
+0274         <span class="comment">% Why the 2.54842790129284 scale factor?????</span>
+0275         K2BendingAngle = 2.54842790129284 * -0.43947079695140;   <span class="comment">% ScaleFactor * BendAngle / K</span>
+0276         c8 = c8 * K2BendingAngle;    
+0277         c7 = c7 * K2BendingAngle;
+0278         c6 = c6 * K2BendingAngle;
+0279         c5 = c5 * K2BendingAngle;
+0280         c4 = c4 * K2BendingAngle;
+0281         c3 = c3 * K2BendingAngle;
+0282         c2 = c2 * K2BendingAngle;
+0283         c1 = c1 * K2BendingAngle;
+0284         c0 = c0 * K2BendingAngle;    
+0285         
+0286     <span class="keyword">case</span> <span class="string">'QD'</span>    <span class="comment">% 15 cm quadrupole</span>
+0287         <span class="comment">% Find the current from the given polynomial for B'Leff</span>
+0288         a7= 0.0;
+0289         a6= 0.0;
+0290         a5= 0.0000714;
+0291         a4=-0.0010063;
+0292         a3= 0.0041290;
+0293         a2=-0.0072642;
+0294         a1= 0.0056763;
+0295         a0= 0.0400229;
+0296         i0= 30.0;
+0297         
+0298         c8 = 0.0;
+0299         c7 = 0.0;
+0300         c6 =-a5/(i0^5);           <span class="comment">%negative signs added for defocusing</span>
+0301         c5 =-a4/(i0^4);
+0302         c4 =-a3/(i0^3);
+0303         c3 =-a2/(i0^2);
+0304         c2 =-a1/i0;
+0305         c1 =-a0;
+0306         c0 = 0.0;
+0307         MagnetType = <span class="string">'quad'</span>;
+0308         Leff=0.1634591;
+0309         
+0310     <span class="keyword">case</span> {<span class="string">'QF'</span>,<span class="string">'QFZ'</span>}   <span class="comment">% 34 cm quadrupole</span>
+0311         <span class="comment">% Find the current from the given polynomial for B'Leff</span>
+0312         a7=  0.0;
+0313         a6=  0.0;
+0314         a5= -0.0003188;
+0315         a4=  0.0023622;
+0316         a3= -0.0068241;
+0317         a2=  0.0094207;
+0318         a1= -0.0061664;
+0319         a0=  0.0914316;
+0320         i0=  30.0;
+0321         
+0322         c8 = 0.0;
+0323         c7 = 0.0;
+0324         c6 = a5/(i0^5);
+0325         c5 = a4/(i0^4);
+0326         c4 = a3/(i0^3);
+0327         c3 = a2/(i0^2);
+0328         c2 = a1/i0;
+0329         c1 = a0;
+0330         c0 = 0.0;
+0331         MagnetType = <span class="string">'quad'</span>;
+0332         Leff=0.3533895;
+0333         
+0334     <span class="keyword">case</span> {<span class="string">'QDX'</span>,<span class="string">'QDY'</span>,<span class="string">'QDZ'</span>}   <span class="comment">% 34 cm quadrupole</span>
+0335         <span class="comment">% Find the current from the given polynomial for B'Leff</span>
+0336         a7=  0.0;
+0337         a6=  0.0;
+0338         a5= -0.0003188;
+0339         a4=  0.0023622;
+0340         a3= -0.0068241;
+0341         a2=  0.0094207;
+0342         a1= -0.0061664;
+0343         a0=  0.0914316;
+0344         i0=  30.0;
+0345         
+0346         c8 = 0.0;
+0347         c7 = 0.0;
+0348         c6 =-a5/(i0^5);           <span class="comment">%negative signs added for defocusing</span>
+0349         c5 =-a4/(i0^4);
+0350         c4 =-a3/(i0^3);
+0351         c3 =-a2/(i0^2);
+0352         c2 =-a1/i0;
+0353         c1 =-a0;
+0354         c0 = 0.0;
+0355         MagnetType = <span class="string">'quad'</span>;
+0356         Leff=0.3533895;
+0357         
+0358     <span class="keyword">case</span> {<span class="string">'QFC'</span>,<span class="string">'QFY'</span>}    <span class="comment">% 50 cm quadrupole</span>
+0359         <span class="comment">% Find the current from the given polynomial for B'Leff</span>
+0360         a7=  0.0;
+0361         a6=  0.0;
+0362         a5= -0.0004134;
+0363         a4=  0.0031409;
+0364         a3= -0.0092872;
+0365         a2=  0.0130952;
+0366         a1= -0.0087242;
+0367         a0=  0.1325335;
+0368         i0=  30.;
+0369         
+0370         c8 = 0.0;
+0371         c7 = 0.0;
+0372         c6 = a5/(i0^5);
+0373         c5 = a4/(i0^4);
+0374         c4 = a3/(i0^3);
+0375         c3 = a2/(i0^2);
+0376         c2 = a1/i0;
+0377         c1 = a0;
+0378         c0 = 0.0;
+0379         MagnetType = <span class="string">'quad'</span>;
+0380         Leff=0.5123803;
+0381         
+0382     <span class="keyword">case</span> <span class="string">'QFX'</span>    <span class="comment">% 60 cm quadrupole</span>
+0383         <span class="comment">% Find the current from the given polynomial for B'Leff</span>
+0384         a7=  0.0;
+0385         a6=  0.0;
+0386         a5= -0.000237;
+0387         a4=  0.001695;
+0388         a3= -0.004792;
+0389         a2=  0.006476;
+0390         a1= -0.004082;
+0391         a0=  0.156269;
+0392         i0=  30.0;
+0393         
+0394         c8 = 0.0;
+0395         c7 = 0.0;
+0396         c6 = a5/(i0^5);
+0397         c5 = a4/(i0^4);
+0398         c4 = a3/(i0^3);
+0399         c3 = a2/(i0^2);
+0400         c2 = a1/i0;
+0401         c1 = a0;
+0402         c0 = 0.0;
+0403         MagnetType = <span class="string">'quad'</span>;
+0404         Leff=0.6105311;
+0405         
+0406     <span class="keyword">case</span> {<span class="string">'SFM'</span>,<span class="string">'SF'</span>}    <span class="comment">% 21 cm focusing sextupole</span>
+0407     <span class="comment">% Find the current from the given polynomial for B''Leff</span>
+0408         a7=  0.0;
+0409         a6=  0.0;
+0410         a5= -0.0107727;
+0411         a4=  0.0459790;
+0412         a3= -0.0720837;
+0413         a2=  0.0471957;
+0414         a1= -0.0106293;
+0415         a0=  0.6128320;
+0416         i0=  100.0;
+0417 
+0418         c8 = 0.0;
+0419         c7 = 0.0;
+0420         c6 = a5/(i0^5);
+0421         c5 = a4/(i0^4);
+0422         c4 = a3/(i0^3);
+0423         c3 = a2/(i0^2);
+0424         c2 = a1/i0;
+0425         c1 = a0;
+0426         c0 = 0.0;
+0427     MagnetType = <span class="string">'sext'</span>;
+0428     Leff=0.2315;
+0429     
+0430     <span class="keyword">case</span> {<span class="string">'SDM'</span>}    <span class="comment">% 21 cm defocusing sextupole</span>
+0431     <span class="comment">% Find the current from the given polynomial for B''Leff</span>
+0432         a7=  0.0;
+0433         a6=  0.0;
+0434         a5= -0.0107727;
+0435         a4=  0.0459790;
+0436         a3= -0.0720837;
+0437         a2=  0.0471957;
+0438         a1= -0.0106293;
+0439         a0=  0.6128320;
+0440         i0=  100.0;
+0441 
+0442         c8 = -0.0;
+0443         c7 = -0.0;
+0444         c6 = -a5/(i0^5);           <span class="comment">%negative signs added for defocusing</span>
+0445         c5 = -a4/(i0^4);
+0446         c4 = -a3/(i0^3);
+0447         c3 = -a2/(i0^2);
+0448         c2 = -a1/i0;
+0449         c1 = -a0;
+0450         c0 =  0.0;
+0451     MagnetType = <span class="string">'sext'</span>;
+0452     Leff=0.2315;
+0453                 
+0454     <span class="keyword">case</span> <span class="string">'SD'</span>    <span class="comment">% 25 cm defocusing sextupole</span>
+0455 <span class="comment">% Find the current from the given polynomial for B&quot;Leff</span>
+0456         a7=  0.0;
+0457         a6=  0.0;
+0458         a5= -0.0112668;
+0459         a4=  0.0493422;
+0460         a3= -0.0794635;
+0461         a2=  0.0535139;
+0462         a1= -0.0124097;
+0463         a0=  0.7228901;
+0464         i0=  100.;
+0465 
+0466         c8 = -0.0;
+0467         c7 = -0.0;
+0468         c6 = -a5/(i0^5);           <span class="comment">%negative signs added for defocusing</span>
+0469         c5 = -a4/(i0^4);
+0470         c4 = -a3/(i0^3);
+0471         c3 = -a2/(i0^2);
+0472         c2 = -a1/i0;
+0473         c1 = -a0;
+0474         c0 = -0.0;
+0475     MagnetType = <span class="string">'sext'</span>;
+0476     Leff=0.2730;
+0477         
+0478     <span class="keyword">case</span> <span class="string">'SkewQuad'</span>    <span class="comment">% 21 cm or 25 cm sextupole</span>
+0479         <span class="comment">% Find the current from the given polynomial for B'Leff</span>
+0480         
+0481         <span class="comment">% These are not correct.  They are a copy of QD</span>
+0482         a7= 0.0;
+0483         a6= 0.0;
+0484         a5= 0.0000714;
+0485         a4=-0.0010063;
+0486         a3= 0.0041290;
+0487         a2=-0.0072642;
+0488         a1= 0.0056763;
+0489         a0= 0.0400229;
+0490         i0= 30.;
+0491         
+0492         c8 = 0.0;
+0493         c7 = 0.0;
+0494         c6 = a5/(i0^5);
+0495         c5 = a4/(i0^4);
+0496         c4 = a3/(i0^3);
+0497         c3 = a2/(i0^2);
+0498         c2 = a1/i0;
+0499         c1 = a0;
+0500         c0 = 0.0;
+0501         MagnetType = <span class="string">'quad'</span>;
+0502         Leff=0.1634591;
+0503         
+0504     <span class="keyword">case</span> <span class="string">'HCM'</span>    <span class="comment">% 15 cm horizontal corrector</span>
+0505         <span class="comment">% Magnet Spec: Theta = 1.5e-3 radians @ 3 GeV and 30 amps</span>
+0506         <span class="comment">% Theta = BLeff / Brho    [radians]</span>
+0507         <span class="comment">% Therefore,</span>
+0508         <span class="comment">%       Theta = ((BLeff/Amp)/ Brho) * I</span>
+0509         <span class="comment">%       BLeff/Amp = 1.5e-3 * getbrho(3) / 30</span>
+0510         <span class="comment">%       B*Leff = a0 * I   =&gt; a0 = 1.5e-3 * getbrho(3) / 30</span>
+0511         <span class="comment">%</span>
+0512         <span class="comment">% The C coefficients are w.r.t B</span>
+0513         <span class="comment">%       B = c0 + c1*I = (0 + a0*I)/Leff</span>
+0514         <span class="comment">% However, AT uses Theta in radians so the A coefficients</span>
+0515         <span class="comment">% must be used for correctors with the middle layer with</span>
+0516         <span class="comment">% the addition of the DC term</span>
+0517         
+0518         <span class="comment">% Find the current from the given polynomial for BLeff and B</span>
+0519         <span class="comment">% NOTE: AT used BLeff (A) for correctors</span>
+0520         Leff = .15;
+0521         i0 = 30;
+0522         MagnetType = <span class="string">'COR'</span>;       
+0523         A = [0 (1.5e-3*getbrho(3)/30)];
+0524         C = [0 A 0] / Leff;
+0525         <span class="keyword">return</span>
+0526         
+0527     <span class="keyword">case</span> <span class="string">'VCM'</span>    <span class="comment">% 15 cm vertical corrector</span>
+0528         <span class="comment">% Find the current from the given polynomial for BLeff and B</span>
+0529         Leff = .15;
+0530         i0 = 30;
+0531         MagnetType = <span class="string">'COR'</span>;       
+0532         A = [0 (.75e-3*getbrho(3)/30)];
+0533         C = [0 A 0] / Leff;
+0534         <span class="keyword">return</span>
+0535     
+0536     <span class="keyword">case</span> <span class="string">'QFVCM'</span>    <span class="comment">% chicane</span>
+0537         <span class="comment">% Find the current from the given polynomial for BLeff and B</span>
+0538         Leff = .15;
+0539         i0 = 30;
+0540         MagnetType = <span class="string">'COR'</span>;       
+0541         A = [0 (.75e-3*getbrho(3)/30)];
+0542         C = [0 A 0] / Leff;
+0543         <span class="keyword">return</span>
+0544     
+0545 <span class="keyword">otherwise</span> 
+0546         error(sprintf(<span class="string">'MagnetCoreType %s is not unknown'</span>, MagnetCoreType));
+0547         <span class="comment">%k = 0;</span>
+0548         <span class="comment">%MagnetType = '';</span>
+0549         <span class="comment">%return</span>
+0550 <span class="keyword">end</span>
+0551 
+0552 A = [a7 a6 a5 a4 a3 a2 a1 a0];
+0553 C = [c8 c7 c6 c5 c4 c3 c2 c1 c0] / Leff;
+0554 
+0555 MagnetType = upper(MagnetType);
+0556 
+0557 
+0558 <span class="comment">% Power Series Denominator (Factoral) be AT compatible</span>
+0559 <span class="keyword">if</span> strcmpi(MagnetType,<span class="string">'SEXT'</span>)
+0560     C = C / 2;
+0561 <span class="keyword">end</span>
+0562 <span class="keyword">if</span> strcmpi(MagnetType,<span class="string">'OCTO'</span>)
+0563     C = C / 6;
+0564 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

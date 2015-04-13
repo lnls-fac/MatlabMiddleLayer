@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of pbpm_plotscandcct</title>
+  <meta name="keywords" content="pbpm_plotscandcct">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; pbpm_plotscandcct.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>pbpm_plotscandcct
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="pbpm_scandcct.html" class="code" title="">pbpm_scandcct</a>	</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 
+0002 
+0003 py1 = (pBPM(1,:) - pBPM(3,:)) ./ (pBPM(1,:) + pBPM(3,:));
+0004 py2 = (pBPM(2,:) - pBPM(4,:)) ./ (pBPM(2,:) + pBPM(4,:));
+0005 
+0006 
+0007 <span class="comment">% y1-y2 should equal .978 mm (6/2006 distance between the blades)</span>
+0008 Gain = .978 ./ (py2 - py1);
+0009 py = Gain .* py1;
+0010 
+0011 
+0012 figure(1);
+0013 clf reset
+0014 subplot(2,1,1);
+0015 plot(DCCT, pBPM(1:4,:),<span class="string">'.-'</span>);
+0016 ylabel(<span class="string">'Blade Current [Volts]'</span>);
+0017 legend(<span class="string">'Top Inside'</span>,<span class="string">'Top Outside'</span>,<span class="string">'Bottom Inside'</span>,<span class="string">'Bottom Outside'</span>,0); 
+0018 title(sprintf(<span class="string">'pBPM Position vs. Beam Current (%.1f Bias Voltage,  %.1f \\muA Sensitivity Range)'</span>, BiasVoltage, 1e6*SensitivityRange));
+0019 grid on;
+0020 a = axis;
+0021 axis tight;
+0022 yaxis(a(3:4));
+0023 
+0024 
+0025 subplot(2,1,2);
+0026 <span class="comment">%plot(y(1,:)-yg(1,:), [py1; py2],'.-');</span>
+0027 [ax,h1,h2] = plotyy(DCCT, [py1; py2], DCCT, py);
+0028 set(get(ax(1),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'(Top-Bottom)/(Top+Bottom)'</span>) 
+0029 set(get(ax(2),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'Calibrated Vertical Position [mm]'</span>) 
+0030 <span class="comment">%set(h1,'LineStyle','-');</span>
+0031 <span class="comment">%set(h2,'LineStyle','-');</span>
+0032 set(h1,<span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0033 set(h2,<span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0034 <span class="comment">%set(ax(2), 'YColor', RightGraphColor);</span>
+0035 <span class="comment">%set(h2, 'Color', RightGraphColor);</span>
+0036 <span class="comment">% axes(ax(1));</span>
+0037 <span class="comment">% aa = axis;</span>
+0038 <span class="comment">% aa(1) = 0;</span>
+0039 <span class="comment">% aa(2) = xmax;</span>
+0040 <span class="comment">% axis(aa);</span>
+0041 <span class="comment">% axes(ax(2));</span>
+0042 <span class="comment">% aa = axis;</span>
+0043 <span class="comment">% aa(1) = 0;</span>
+0044 <span class="comment">% aa(2) = xmax;</span>
+0045 <span class="comment">% axis(aa);</span>
+0046 
+0047 axes(ax(1));
+0048 a = axis;
+0049 axis tight;
+0050 yaxis(a(3:4));
+0051 
+0052 xlabel(<span class="string">'Electron Beam Current [mA]'</span>);
+0053 legend(<span class="string">'Inside Blades'</span>, <span class="string">'Outside Blades'</span>, <span class="string">'Location'</span>,<span class="string">'NorthWest'</span>);
+0054 grid on;
+0055 
+0056 
+0057 axes(ax(2));
+0058 a = axis;
+0059 axis tight;
+0060 yaxis(a(3:4));
+0061 
+0062 <span class="comment">%a = axis;</span>
+0063 <span class="comment">%axis tight;</span>
+0064 <span class="comment">%yaxis(a(3:4));</span>
+0065 
+0066 
+0067 addlabel(1,0,sprintf(<span class="string">'%s'</span>, datestr(TimeStamp,0)));
+0068 yaxesposition(1.2);
+0069 orient tall
+0070 
+0071 
+0072 
+0073 i = findrowindex(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>), family2dev(<span class="string">'BPMx'</span>));
+0074 
+0075 <span class="keyword">for</span> j = size(x,2):-1:1
+0076     x(:,j) = x(:,j) - x(:,1);
+0077     y(:,j) = y(:,j) - y(:,1);
+0078 <span class="keyword">end</span>
+0079 
+0080 
+0081 figure(2);
+0082 clf reset
+0083 subplot(2,1,1);
+0084 plot(DCCT, x(i,:),<span class="string">'.-'</span>);
+0085 ylabel(<span class="string">'Horizontal Bergoz BPMs [mm]'</span>);
+0086 title(sprintf(<span class="string">'BPM Position vs. Beam Current'</span>, BiasVoltage, 1e6*SensitivityRange));
+0087 grid on;
+0088 
+0089 
+0090 subplot(2,1,2);
+0091 plot(DCCT, y(i,:),<span class="string">'.-'</span>);
+0092 ylabel(<span class="string">'Vertical Bergoz BPMs [mm]'</span>);
+0093 grid on;
+0094 
+0095 
+0096 addlabel(1,0,sprintf(<span class="string">'%s'</span>, datestr(TimeStamp,0)));
+0097 yaxesposition(1.2);
+0098 orient tall
+0099 
+0100 
+0101</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

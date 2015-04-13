@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of varykicksize</title>
+  <meta name="keywords" content="varykicksize">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; varykicksize.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>varykicksize
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getbpmaverages.html" class="code" title="function [N, T] = getbpmaverages">getbpmaverages</a>	GETBPMAVERAGES - Gets the BPM averages</li><li><a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 [N,T] = <a href="getbpmaverages.html" class="code" title="function [N, T] = getbpmaverages">getbpmaverages</a>;
+0002 MinCurrent = 13;
+0003 NewDir = <span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05'</span>;
+0004 
+0005     fprintf(<span class="string">'   Measuring dispersion\n'</span>);
+0006     [Dx, Dy, FileName] = measdisp(<span class="string">'Struct'</span>,<span class="string">'Archive'</span>);
+0007     copyfile([FileName, <span class="string">'.mat'</span>], NewDir);
+0008     fprintf(<span class="string">'   Measuring BPM sigma\n'</span>);
+0009     [BPMx, BPMy, FileName] = monbpm(0:T:3*60, <span class="string">'Struct'</span>, <span class="string">'Archive'</span>);
+0010     copyfile([FileName, <span class="string">'.mat'</span>], NewDir);
+0011     fprintf(<span class="string">'   BPM noise measurement complete\n\n'</span>);
+0012 
+0013 fprintf(<span class="string">'   Measuring response matrix 1 of 8\n'</span>);
+0014 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],1*ones(length(getsp(<span class="string">'HCM'</span>)),1),2*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R1'</span>);
+0015     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0016         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0017         <span class="keyword">return</span>
+0018     <span class="keyword">end</span>
+0019 fprintf(<span class="string">'   Measuring response matrix 2 of 8\n'</span>);
+0020 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],2*ones(length(getsp(<span class="string">'HCM'</span>)),1),4*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R2'</span>);
+0021     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0022         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0023         <span class="keyword">return</span>
+0024     <span class="keyword">end</span>
+0025 fprintf(<span class="string">'   Measuring response matrix 3 of 8\n'</span>);
+0026 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],3*ones(length(getsp(<span class="string">'HCM'</span>)),1),6*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R3'</span>);
+0027     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0028         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0029         <span class="keyword">return</span>
+0030     <span class="keyword">end</span>
+0031 fprintf(<span class="string">'   Measuring response matrix 4 of 8\n'</span>);
+0032 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],4*ones(length(getsp(<span class="string">'HCM'</span>)),1),8*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R4'</span>);
+0033     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0034         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0035         <span class="keyword">return</span>
+0036     <span class="keyword">end</span>
+0037 fprintf(<span class="string">'   Measuring response matrix 5 of 8\n'</span>);
+0038 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],5*ones(length(getsp(<span class="string">'HCM'</span>)),1),10*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R5'</span>);
+0039     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0040         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0041         <span class="keyword">return</span>
+0042     <span class="keyword">end</span>
+0043 fprintf(<span class="string">'   Measuring response matrix 6 of 8\n'</span>);
+0044 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],6*ones(length(getsp(<span class="string">'HCM'</span>)),1),12*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R6'</span>);
+0045     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0046         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0047         <span class="keyword">return</span>
+0048     <span class="keyword">end</span>
+0049 fprintf(<span class="string">'   Measuring response matrix 7 of 8\n'</span>);
+0050 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],8*ones(length(getsp(<span class="string">'HCM'</span>)),1),16*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R8'</span>);
+0051     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0052         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0053         <span class="keyword">return</span>
+0054     <span class="keyword">end</span>
+0055 fprintf(<span class="string">'   Measuring response matrix 8 of 8\n'</span>);
+0056 R = measbpmresp(<span class="string">'BPMx'</span>,[],<span class="string">'BPMy'</span>,[],<span class="string">'HCM'</span>,[],<span class="string">'VCM'</span>,[],10*ones(length(getsp(<span class="string">'HCM'</span>)),1),20*ones(length(getsp(<span class="string">'VCM'</span>)),1),<span class="string">'Archive'</span>,<span class="string">'R:\Controls\matlab\spear3data\User\Loco\2004-05-05\R10'</span>);
+0057 
+0058 
+0059     <span class="keyword">if</span> <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a> &lt; MinCurrent
+0060         fprintf(<span class="string">'   LOCO measurement stopped due to beam current &lt; %f mAmps\n'</span>, MinCurrent);
+0061         <span class="keyword">return</span>
+0062     <span class="keyword">end</span>
+0063     fprintf(<span class="string">'   Measuring dispersion\n'</span>);
+0064     [Dx, Dy, FileName] = measdisp(<span class="string">'Struct'</span>,<span class="string">'Archive'</span>);
+0065     copyfile([FileName, <span class="string">'.mat'</span>], NewDir);
+0066     fprintf(<span class="string">'   Measuring BPM sigma\n'</span>);
+0067     [BPMx, BPMy, FileName] = monbpm(0:T:3*60, <span class="string">'Struct'</span>, <span class="string">'Archive'</span>);
+0068     copyfile([FileName, <span class="string">'.mat'</span>], NewDir);
+0069     fprintf(<span class="string">'   BPM noise measurement complete\n\n'</span>);</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,1076 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setlocodata</title>
+  <meta name="keywords" content="setlocodata">
+  <meta name="description" content="SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setlocodata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setlocodata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function setlocodata(CommandInput, FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETLOCODATA - Applies the LOCO calibration data to both the middle layer &amp; the accelerator
+  setlocodata(CommandInput, FileName)
+
+  INPUTS
+  1. CommandInput
+     'Nominal'    - Sets nominal gains (1) / rolls (0) to the model.
+     'SetGains'   - Set gains/coupling from a LOCO file.
+     'Symmetrize' - Symmetry correction of the lattice based on a LOCO file.
+     'CorrectCoupling' - Coupling correction of the lattice based on a LOCO file.
+                         Option to add and dispersion wave and bump.
+     'SetModel'   - Set the model from a LOCO file.  But it only changes
+                    the part of the model that does not get corrected
+                    in 'Symmetrize' (also does a SetGains).
+     'LOCO2Model' - Set the model from a LOCO file (also does a 'SetGains').
+                    This sets all lattice machines fit in the LOCO run to the model.
+  2. FileName - LOCO file name {Default: getfamilydata('OpsData', 'LOCOFile')}
+                '' to browse for a file
+
+  NOTES
+  How one uses this function depends on how LOCO was setup.
+  1. Use setlocodata('Nominal') if no model calibration information is known.
+  2. The most typical situation is to apply:
+         setlocodata('Symmetrize') to the accelerator
+         setlocodata('SetModel')   to the middle layer (usually done in setoperationalmode)
+  3. If a LOCO run was done on the present lattice with no changes made to lattice
+     after LOCO run, then setting all the LOCO fits to the model makes sense.
+         setlocodata('LOCO2Model')
+  4. This function obviously has machine dependent parts.
+
+  See also <a href="calcdispersionwave.html" class="code" title="function [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = calcdispersionwave(varargin)">calcdispersionwave</a>
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="alsfitnuy9.html" class="code" title="function y = alsfitnuy9(x)">alsfitnuy9</a>	y = alsfitnuy9(x)</li><li><a href="alslocofit.html" class="code" title="function [x, y, ygoal, xtotal] = alslocofit(funfcn, x0, ygoal)">alslocofit</a>	ALSLOCOFIT - Gradient search method for fitting the ALS optics</li><li><a href="calcdispersionwave.html" class="code" title="function [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = calcdispersionwave(varargin)">calcdispersionwave</a>	CALCDISPERSIONWAVE - Calculates the dispersion wave and bump</li><li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li><li><a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>	UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li><li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setlocodata(CommandInput, FileName)</a>
+0002 <span class="comment">%SETLOCODATA - Applies the LOCO calibration data to both the middle layer &amp; the accelerator</span>
+0003 <span class="comment">%  setlocodata(CommandInput, FileName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. CommandInput</span>
+0007 <span class="comment">%     'Nominal'    - Sets nominal gains (1) / rolls (0) to the model.</span>
+0008 <span class="comment">%     'SetGains'   - Set gains/coupling from a LOCO file.</span>
+0009 <span class="comment">%     'Symmetrize' - Symmetry correction of the lattice based on a LOCO file.</span>
+0010 <span class="comment">%     'CorrectCoupling' - Coupling correction of the lattice based on a LOCO file.</span>
+0011 <span class="comment">%                         Option to add and dispersion wave and bump.</span>
+0012 <span class="comment">%     'SetModel'   - Set the model from a LOCO file.  But it only changes</span>
+0013 <span class="comment">%                    the part of the model that does not get corrected</span>
+0014 <span class="comment">%                    in 'Symmetrize' (also does a SetGains).</span>
+0015 <span class="comment">%     'LOCO2Model' - Set the model from a LOCO file (also does a 'SetGains').</span>
+0016 <span class="comment">%                    This sets all lattice machines fit in the LOCO run to the model.</span>
+0017 <span class="comment">%  2. FileName - LOCO file name {Default: getfamilydata('OpsData', 'LOCOFile')}</span>
+0018 <span class="comment">%                '' to browse for a file</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  NOTES</span>
+0021 <span class="comment">%  How one uses this function depends on how LOCO was setup.</span>
+0022 <span class="comment">%  1. Use setlocodata('Nominal') if no model calibration information is known.</span>
+0023 <span class="comment">%  2. The most typical situation is to apply:</span>
+0024 <span class="comment">%         setlocodata('Symmetrize') to the accelerator</span>
+0025 <span class="comment">%         setlocodata('SetModel')   to the middle layer (usually done in setoperationalmode)</span>
+0026 <span class="comment">%  3. If a LOCO run was done on the present lattice with no changes made to lattice</span>
+0027 <span class="comment">%     after LOCO run, then setting all the LOCO fits to the model makes sense.</span>
+0028 <span class="comment">%         setlocodata('LOCO2Model')</span>
+0029 <span class="comment">%  4. This function obviously has machine dependent parts.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  See also calcdispersionwave</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%  Written by Greg Portmann</span>
+0034 
+0035 
+0036 <span class="keyword">global</span> THERING
+0037 
+0038 <span class="keyword">if</span> nargin &lt; 1
+0039     CommandInput = <span class="string">''</span>;
+0040 <span class="keyword">end</span>
+0041 
+0042 <span class="keyword">if</span> isempty(CommandInput)
+0043     <span class="comment">%CommandInput = 'Default';</span>
+0044     ModeCell = {<span class="string">'Nominal - Set Gain=1 &amp; Rolls=0 in the model'</span>, <span class="string">'SetGains - Set gains/rolls from a LOCO file'</span>,<span class="string">'Symmetrize - Symmetry correction of the lattice'</span>, <span class="string">'CorrectCoupling - Coupling correction of the lattice'</span>, <span class="string">'SetModel - Set the model from a LOCO file'</span>,<span class="string">'LOCO2Model - Set the model from a LOCO file (also does a SetGains)'</span>, <span class="string">'see &quot;help setlocodata&quot; for more details'</span>};
+0045     [ModeNumber, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'ALS'</span>,<span class="string">'PromptString'</span>, <span class="keyword">...</span>
+0046         <span class="string">'Select the proper set LOCO data command:'</span>, <span class="keyword">...</span>
+0047         <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell, <span class="string">'ListSize'</span>, [500 200]);
+0048     <span class="keyword">if</span> OKFlag ~= 1
+0049         fprintf(<span class="string">'   setlocodata cancelled\n'</span>);
+0050         <span class="keyword">return</span>
+0051     <span class="keyword">end</span>
+0052     <span class="keyword">if</span> ModeNumber == 1
+0053         CommandInput = <span class="string">'Nominal'</span>;
+0054     <span class="keyword">elseif</span> ModeNumber == 2
+0055         CommandInput = <span class="string">'SetGains'</span>;
+0056     <span class="keyword">elseif</span> ModeNumber == 3
+0057         CommandInput = <span class="string">'Symmetrize'</span>;
+0058     <span class="keyword">elseif</span> ModeNumber == 4
+0059         CommandInput = <span class="string">'CorrectCoupling'</span>;
+0060     <span class="keyword">elseif</span> ModeNumber == 5
+0061         CommandInput = <span class="string">'SetModel'</span>;
+0062     <span class="keyword">elseif</span> ModeNumber == 6
+0063         CommandInput = <span class="string">'LOCO2Model'</span>;
+0064     <span class="keyword">elseif</span> ModeNumber == 7
+0065         help <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>;
+0066         <span class="keyword">return</span>
+0067     <span class="keyword">end</span>
+0068 <span class="keyword">end</span>
+0069 
+0070 <span class="keyword">if</span> nargin &lt; 2
+0071     <span class="keyword">if</span> any(strcmpi(CommandInput,{<span class="string">'SetGains'</span>,<span class="string">'SetModel'</span>}))
+0072         <span class="comment">% Default (Golden) LOCO file</span>
+0073         <span class="comment">% If empty, the user will be prompted if needed.</span>
+0074         FileName = getfamilydata(<span class="string">'OpsData'</span>,<span class="string">'LOCOFile'</span>);
+0075     <span class="keyword">else</span>
+0076         FileName = <span class="string">''</span>;
+0077     <span class="keyword">end</span>
+0078 <span class="keyword">end</span>
+0079 
+0080 
+0081 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0082 <span class="comment">% Initialize Defaults %</span>
+0083 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0084 BPMxFamily = findmemberof(<span class="string">'BPMx'</span>);
+0085 <span class="keyword">if</span> isempty(BPMxFamily)
+0086     BPMxFamily = <span class="string">'BPMx'</span>;
+0087 <span class="keyword">else</span>
+0088     BPMxFamily = BPMxFamily{1};
+0089 <span class="keyword">end</span>
+0090 
+0091 BPMyFamily = findmemberof(<span class="string">'BPMy'</span>);
+0092 <span class="keyword">if</span> isempty(BPMyFamily)
+0093     BPMyFamily = <span class="string">'BPMy'</span>;
+0094 <span class="keyword">else</span>
+0095     BPMyFamily = BPMyFamily{1};
+0096 <span class="keyword">end</span>
+0097 
+0098 HCMFamily = findmemberof(<span class="string">'HCM'</span>);
+0099 <span class="keyword">if</span> isempty(HCMFamily)
+0100     HCMFamily = <span class="string">'HCM'</span>;
+0101 <span class="keyword">else</span>
+0102     HCMFamily = HCMFamily{1};
+0103 <span class="keyword">end</span>
+0104 
+0105 VCMFamily = findmemberof(<span class="string">'VCM'</span>);
+0106 <span class="keyword">if</span> isempty(VCMFamily)
+0107     VCMFamily = <span class="string">'VCM'</span>;
+0108 <span class="keyword">else</span>
+0109     VCMFamily = VCMFamily{1};
+0110 <span class="keyword">end</span>
+0111 
+0112 
+0113 <span class="comment">% Device list for the entire family</span>
+0114 BPMxDeviceListTotal = family2dev(BPMxFamily, 0);
+0115 BPMyDeviceListTotal = family2dev(BPMyFamily, 0);
+0116 HCMDeviceListTotal  = family2dev(HCMFamily, 0);
+0117 VCMDeviceListTotal  = family2dev(VCMFamily, 0);
+0118 
+0119 <span class="comment">% % Active devices</span>
+0120 <span class="comment">% BPMxDeviceList = family2dev(BPMxFamily);</span>
+0121 <span class="comment">% BPMyDeviceList = family2dev(BPMyFamily);</span>
+0122 <span class="comment">% HCMDeviceList  = family2dev(HCMFamily);</span>
+0123 <span class="comment">% VCMDeviceList  = family2dev(VCMFamily);</span>
+0124 
+0125 
+0126 <span class="keyword">if</span> any(strcmpi(CommandInput, <span class="string">'Nominal'</span>))
+0127     fprintf(<span class="string">'   Using nominal BPM and corrector gains (1) and rolls (0).\n'</span>);
+0128 
+0129     <span class="comment">% To speed things up, put Gains/Rolls/etc in the AO</span>
+0130     AO = getao;
+0131 
+0132     <span class="comment">% Zero or one the gains and rolls</span>
+0133     AO.(BPMxFamily).Gain   =  ones(size(BPMxDeviceListTotal,1),1);
+0134     AO.(BPMyFamily).Gain   =  ones(size(BPMyDeviceListTotal,1),1);
+0135     AO.(BPMxFamily).Roll   = zeros(size(BPMxDeviceListTotal,1),1);
+0136     AO.(BPMyFamily).Roll   = zeros(size(BPMyDeviceListTotal,1),1);
+0137     AO.(BPMxFamily).Crunch = zeros(size(BPMxDeviceListTotal,1),1);
+0138     AO.(BPMyFamily).Crunch = zeros(size(BPMyDeviceListTotal,1),1);
+0139 
+0140     <span class="comment">% Set the gain, roll, &amp; crunch to the AT model to be used by getpvmodel, setpvmodel, etc</span>
+0141     setatfield(BPMxFamily, <span class="string">'GCR'</span>, [AO.(BPMxFamily).Gain AO.(BPMyFamily).Gain AO.(BPMxFamily).Crunch AO.(BPMxFamily).Roll], BPMxDeviceListTotal);
+0142 
+0143 
+0144     <span class="comment">% Corrector magnet gains/rolls</span>
+0145     AO.(HCMFamily).Gain =  ones(size(HCMDeviceListTotal,1),1);
+0146     AO.(VCMFamily).Gain =  ones(size(VCMDeviceListTotal,1),1);
+0147     AO.(HCMFamily).Roll = zeros(size(HCMDeviceListTotal,1),1);
+0148     AO.(VCMFamily).Roll = zeros(size(VCMDeviceListTotal,1),1);
+0149 
+0150     <span class="comment">% Set the AT model as well since they are used by getpvmodel, setpvmodel, etc</span>
+0151     <span class="comment">% Make sure the Roll field is 1x2 even for single plane correctors</span>
+0152     <span class="comment">% First set the cross planes to zero</span>
+0153     setatfield(HCMFamily, <span class="string">'Roll'</span>, 0*AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 2);
+0154     setatfield(VCMFamily, <span class="string">'Roll'</span>, 0*AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 1);
+0155 
+0156     <span class="comment">% Then set the roll field</span>
+0157     setatfield(HCMFamily, <span class="string">'Roll'</span>, AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 1);
+0158     setatfield(VCMFamily, <span class="string">'Roll'</span>, AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 2);
+0159 
+0160     setao(AO);
+0161     
+0162 
+0163 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'SetGains'</span>))
+0164 
+0165     <span class="keyword">if</span> isempty(FileName) || strcmp(FileName, <span class="string">'.'</span>)
+0166         <span class="keyword">if</span> isempty(FileName)
+0167             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0168         <span class="keyword">else</span>
+0169             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>);
+0170         <span class="keyword">end</span>
+0171         drawnow;
+0172         <span class="keyword">if</span> FileName == 0
+0173             fprintf(<span class="string">'   setlocodata canceled\n'</span>);
+0174             <span class="keyword">return</span>
+0175         <span class="keyword">end</span>
+0176         FileName = [DirectoryName FileName];
+0177     <span class="keyword">end</span>
+0178 
+0179     <span class="comment">% Set the model gains</span>
+0180     <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>(<span class="string">'Nominal'</span>);
+0181 
+0182     AO = getao;
+0183 
+0184     <span class="comment">% Load the LOCO data</span>
+0185     fprintf(<span class="string">'   Setting BPM and corrector gains and rolls based on %s.\n'</span>, FileName);
+0186     load(FileName);
+0187 
+0188 
+0189     <span class="comment">% Get the device list from the LOCO file</span>
+0190     <span class="keyword">try</span>
+0191         BPMxDeviceList = LocoMeasData.HBPM.DeviceList;
+0192         BPMyDeviceList = LocoMeasData.VBPM.DeviceList;
+0193         HCMDeviceList  = LocoMeasData.HCM.DeviceList;
+0194         VCMDeviceList  = LocoMeasData.VCM.DeviceList;
+0195     <span class="keyword">catch</span>
+0196         <span class="comment">% Legacy</span>
+0197         BPMxDeviceList = LocoMeasData.(BPMxFamily).DeviceList;
+0198         BPMyDeviceList = LocoMeasData.(BPMyFamily).DeviceList;
+0199         HCMDeviceList  = LocoMeasData.(HCMFamily).DeviceList;
+0200         VCMDeviceList  = LocoMeasData.(VCMFamily).DeviceList;
+0201     <span class="keyword">end</span>
+0202     
+0203 
+0204     <span class="comment">% Change to Gain, Roll, Crunch system (Need to add a logic for single view BPMs???)</span>
+0205     i = findrowindex(BPMxDeviceList, BPMxDeviceListTotal);
+0206     <span class="keyword">for</span> j = 1:length(BPMData(end).HBPMGain)
+0207         MLOCO = [BPMData(end).HBPMGain(j)     BPMData(end).HBPMCoupling(j)
+0208                  BPMData(end).VBPMCoupling(j) BPMData(end).VBPMGain(j) ];
+0209 
+0210         [AO.(BPMxFamily).Gain(i(j),:), AO.(BPMyFamily).Gain(i(j),:), AO.(BPMxFamily).Crunch(i(j),:), AO.(BPMxFamily).Roll(i(j),:)] = loco2gcr(MLOCO);
+0211     <span class="keyword">end</span>
+0212     AO.(BPMyFamily).Roll   = AO.(BPMxFamily).Roll;
+0213     AO.(BPMyFamily).Crunch = AO.(BPMxFamily).Crunch;
+0214 
+0215     <span class="keyword">if</span> ~isreal(AO.(BPMxFamily).Gain)
+0216         error(<span class="string">'Horizontal BPM gain is complex.'</span>);
+0217     <span class="keyword">end</span>
+0218     <span class="keyword">if</span> ~isreal(AO.(BPMyFamily).Gain)
+0219         error(<span class="string">'Vertical BPM gain is complex.'</span>);
+0220     <span class="keyword">end</span>
+0221     <span class="keyword">if</span> ~isreal(AO.(BPMxFamily).Crunch)
+0222         error(<span class="string">'BPM Crunch is complex.'</span>);
+0223     <span class="keyword">end</span>
+0224     <span class="keyword">if</span> ~isreal(AO.(BPMxFamily).Roll)
+0225         error(<span class="string">'BPM roll is complex.'</span>);
+0226     <span class="keyword">end</span>
+0227     
+0228     
+0229     
+0230     <span class="comment">%%%%%%%%%%%%%%</span>
+0231     <span class="comment">% Correctors %</span>
+0232     <span class="comment">%%%%%%%%%%%%%%</span>
+0233 
+0234     <span class="comment">% Kick strength (LOCO is in milliradian)</span>
+0235     <span class="comment">% LOCO is run with the original gain in hw2physics (stored in LocoMeasData.VCMGain/LocoMeasData.HCMGain).</span>
+0236     <span class="comment">% The new gain must combine the new CM gain and the one used in buildlocoinput.</span>
+0237     <span class="comment">% hw2physics:  Rad = G * amps   (original)</span>
+0238     <span class="comment">% LOCO gain:   Gloco = KickNew/KickStart</span>
+0239     <span class="comment">% New hw2physics gain: Gloco * G</span>
+0240 
+0241     <span class="comment">% HCM</span>
+0242     i = findrowindex(HCMDeviceList, HCMDeviceListTotal);
+0243 
+0244     HCMGainOldLOCO  = LocoMeasData.HCMGain .* cos(LocoMeasData.HCMRoll);
+0245     HCMGainLOCO     = HCMGainOldLOCO .* CMData(end).HCMKicks ./ CMData(1).HCMKicks;
+0246     HCMCouplingLOCO = HCMGainLOCO .* CMData(end).HCMCoupling;
+0247 
+0248     <span class="comment">%AO.(HCMFamily).Roll(i) = atan2(-HCMCouplingLOCO, HCMGainLOCO);</span>
+0249     AO.(HCMFamily).Roll(i) = atan(HCMCouplingLOCO ./ abs(HCMGainLOCO));
+0250     AO.(HCMFamily).Gain(i) = sign(HCMGainLOCO) .* sqrt(HCMCouplingLOCO.^2 + HCMGainLOCO.^2);
+0251 
+0252 
+0253     <span class="comment">% VCM</span>
+0254     i = findrowindex(VCMDeviceList, VCMDeviceListTotal);
+0255 
+0256     VCMGainOldLOCO  = LocoMeasData.VCMGain .* cos(LocoMeasData.VCMRoll);
+0257     VCMGainLOCO     = VCMGainOldLOCO .* CMData(end).VCMKicks ./ CMData(1).VCMKicks;
+0258     VCMCouplingLOCO = VCMGainLOCO .* CMData(end).VCMCoupling;
+0259 
+0260     <span class="comment">%AO.(VCMFamily).Roll(i) = atan2(-VCMCouplingLOCO, VCMGainLOCO);</span>
+0261     AO.(VCMFamily).Roll(i) = atan(-VCMCouplingLOCO ./ abs(VCMGainLOCO));
+0262     AO.(VCMFamily).Gain(i) = sign(VCMGainLOCO) .* sqrt(VCMCouplingLOCO.^2 + VCMGainLOCO.^2);
+0263 
+0264 
+0265     <span class="comment">% Set the roll, crunch to the AT model to be used by getpvmodel, setpvmodel, etc</span>
+0266     setatfield(BPMxFamily, <span class="string">'GCR'</span>, [AO.(BPMxFamily).Gain AO.(BPMyFamily).Gain AO.(BPMxFamily).Crunch AO.(BPMxFamily).Roll], BPMxDeviceListTotal);
+0267 
+0268     <span class="comment">% Set the gains to the AT model to be used by getpvmodel, setpvmodel, etc</span>
+0269     <span class="comment">% Make sure the Roll field is 1x2 even for single plane correctors</span>
+0270 
+0271     <span class="comment">% First set the cross planes to zero</span>
+0272     setatfield(HCMFamily, <span class="string">'Roll'</span>, 0*AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 2);
+0273     setatfield(VCMFamily, <span class="string">'Roll'</span>, 0*AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 1);
+0274 
+0275     <span class="comment">% Then set the roll field</span>
+0276     setatfield(HCMFamily, <span class="string">'Roll'</span>, AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 1);
+0277     setatfield(VCMFamily, <span class="string">'Roll'</span>, AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 2);
+0278 
+0279 
+0280     <span class="comment">% If other magnet fits were done (like roll), it should be add to the AT model as well</span>
+0281 
+0282     setao(AO);
+0283 
+0284 
+0285 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'SetModel'</span>))
+0286 
+0287     <span class="comment">% Some LOCO errors are applied to the accelerator 'SetMachine' and some</span>
+0288     <span class="comment">% go to the model.  If errors detected by LOCO are not applied to the accelerator,</span>
+0289     <span class="comment">% then include them in the AT and Middle Layer model.</span>
+0290 
+0291     <span class="comment">% The assumption is that setlocodata('SetMachine') has already been run.</span>
+0292     <span class="comment">% So QF, QD, QFA, QDA, SQSF, SQSD have changed in the accelerator to match</span>
+0293     <span class="comment">% the LOCO run.</span>
+0294 
+0295     <span class="keyword">if</span> isempty(FileName) || strcmp(FileName, <span class="string">'.'</span>)
+0296         <span class="keyword">if</span> isempty(FileName)
+0297             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0298         <span class="keyword">else</span>
+0299             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>);
+0300         <span class="keyword">end</span>
+0301         drawnow;
+0302         <span class="keyword">if</span> FileName == 0
+0303             fprintf(<span class="string">'   setlocodata canceled\n'</span>);
+0304             <span class="keyword">return</span>
+0305         <span class="keyword">end</span>
+0306         FileName = [DirectoryName FileName];
+0307     <span class="keyword">end</span>
+0308 
+0309 
+0310     <span class="comment">% Load the LOCO data</span>
+0311     load(FileName);
+0312 
+0313 
+0314     <span class="comment">% Set the model gains</span>
+0315     <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>(<span class="string">'SetGains'</span>, FileName);
+0316 
+0317 
+0318     <span class="comment">% Set normal bend K-value</span>
+0319     fprintf(<span class="string">'   Setting the normal BEND K-Values in the AT model to %f.\n'</span>, FitParameters(end).Values(59));
+0320     BENDfit = FitParameters(end).Values(59);
+0321     BENDDeviceList = family2dev(<span class="string">'BEND'</span>);
+0322     iIndex = findrowindex([4 2;8 2;12 2], BENDDeviceList);
+0323     BENDDeviceList(iIndex,:) = [];
+0324     setpvmodel(<span class="string">'BEND'</span>, <span class="string">'K'</span>, BENDfit, BENDDeviceList);
+0325 
+0326 
+0327     <span class="comment">% Sextupoles (set to the values in the machine save since they are not fit)</span>
+0328     <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SF.Setpoint.Data == 0)
+0329         fprintf(<span class="string">'   Setting SF to zero in the AT model.\n'</span>);
+0330         setsp(<span class="string">'SF'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0331     <span class="keyword">else</span>
+0332         <span class="comment">%setpv(LocoMeasData.MachineConfig.SF.Setpoint, 'Model');</span>
+0333     <span class="keyword">end</span>
+0334     <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SD.Setpoint.Data == 0)
+0335         fprintf(<span class="string">'   Setting SD to zero in the AT model.\n'</span>);
+0336         setsp(<span class="string">'SD'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0337     <span class="keyword">else</span>
+0338         <span class="comment">%setpv(LocoMeasData.MachineConfig.SD.Setpoint, 'Model');</span>
+0339     <span class="keyword">end</span>
+0340 
+0341 
+0342     <span class="comment">% Set the skew quad offset to the production setpoint since this value</span>
+0343     <span class="comment">% was chosen to make the machine match the model to zero.</span>
+0344     <span class="comment">%SP = getproductionlattice;</span>
+0345     <span class="comment">%setfamilydata(SP.SQSF.Setpoint.Data, 'SQSF', 'Offset', SP.SQSF.Setpoint.DeviceList);</span>
+0346     <span class="comment">%setfamilydata(SP.SQSD.Setpoint.Data, 'SQSD', 'Offset', SP.SQSD.Setpoint.DeviceList);</span>
+0347 
+0348     <span class="comment">%global THERING</span>
+0349     <span class="comment">%RINGData.Lattice = THERING;</span>
+0350     <span class="comment">%for i = 1:length(FitParameters(end).Params)</span>
+0351     <span class="comment">%    RINGData = locosetlatticeparam(RINGData, FitParameters(end).Params{i}, FitParameters(end).Values(i));</span>
+0352     <span class="comment">%end</span>
+0353     <span class="comment">%THERING = RINGData.Lattice;</span>
+0354 
+0355 
+0356 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'LOCO2Model'</span>))
+0357 
+0358     <span class="comment">% LOCO is usually used to correct the model.  If the LOCO fit parameters are</span>
+0359     <span class="comment">% not applied to the accelerator, then the entire model needs to be updated.</span>
+0360     <span class="comment">% Ie, the machine lattice file is the same as it was when the LOCO data was</span>
+0361     <span class="comment">% taken, then put the LOCO output settings in the model.</span>
+0362     
+0363     <span class="keyword">if</span> isempty(FileName) || strcmp(FileName, <span class="string">'.'</span>)
+0364         <span class="keyword">if</span> isempty(FileName)
+0365             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0366         <span class="keyword">else</span>
+0367             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>);
+0368         <span class="keyword">end</span>
+0369         drawnow;
+0370         <span class="keyword">if</span> FileName == 0
+0371             fprintf(<span class="string">'   setlocodata canceled\n'</span>);
+0372             <span class="keyword">return</span>
+0373         <span class="keyword">end</span>
+0374         FileName = [DirectoryName FileName];
+0375     <span class="keyword">end</span>
+0376 
+0377 
+0378     <span class="comment">% Load the LOCO data</span>
+0379     load(FileName);
+0380 
+0381     
+0382     <span class="comment">% Use loco file for the lattice and the fit parameter</span>
+0383     <span class="comment">% Using the loco lattice may not be what you want???</span>
+0384     <span class="keyword">global</span> THERING
+0385     <span class="comment">%RINGData.Lattice = THERING;</span>
+0386     <span class="keyword">for</span> i = 1:length(FitParameters(end).Params)
+0387         RINGData = locosetlatticeparam(RINGData, FitParameters(end).Params{i}, FitParameters(end).Values(i));
+0388     <span class="keyword">end</span>
+0389     THERING = RINGData.Lattice;
+0390 
+0391     
+0392     <span class="comment">% Since the lattice may have changed</span>
+0393     <a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>;
+0394     
+0395 
+0396     <span class="comment">% Set the model gains (this added GCR field to lattice)</span>
+0397     <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>(<span class="string">'SetGains'</span>, FileName);
+0398 
+0399     
+0400 <span class="comment">%     setlocodata('SetModel', FileName);</span>
+0401 <span class="comment">%</span>
+0402 <span class="comment">%     % Set anything else not set in SetModel</span>
+0403 <span class="comment">%     fprintf('   Setting QF, QD, QFA, QDA, SQSF, SQSD in the AT model.\n');</span>
+0404 <span class="comment">%</span>
+0405 <span class="comment">%     % Lattice Magnets</span>
+0406 <span class="comment">%     QFfit = FitParameters(end).Values(1:24);</span>
+0407 <span class="comment">%     QDfit = FitParameters(end).Values(25:48);</span>
+0408 <span class="comment">%     QFAfit = FitParameters(end).Values([49 50 51 52]);</span>
+0409 <span class="comment">%     QDAfit = FitParameters(end).Values([53 54 55 56 57 58]);</span>
+0410 <span class="comment">%</span>
+0411 <span class="comment">%     setsp('QF', QFfit, 'Physics', 'Model');</span>
+0412 <span class="comment">%     setsp('QD', QDfit, 'Physics', 'Model');</span>
+0413 <span class="comment">%     setsp('QDA', QDAfit, 'Physics', 'Model');</span>
+0414 <span class="comment">%</span>
+0415 <span class="comment">%     setsp('QFA', QFAfit(1), 'Physics', 'Model');</span>
+0416 <span class="comment">%     setsp('QFA', QFAfit(2), [ 4 1;  4 2], 'Physics', 'Model');</span>
+0417 <span class="comment">%     setsp('QFA', QFAfit(3), [ 8 1;  8 2], 'Physics', 'Model');</span>
+0418 <span class="comment">%     setsp('QFA', QFAfit(4), [12 1; 12 2], 'Physics', 'Model');</span>
+0419 <span class="comment">%</span>
+0420 <span class="comment">%</span>
+0421 <span class="comment">%     % Skew quadrupoles</span>
+0422 <span class="comment">%     if length(FitParameters(end).Values) &gt;= 131</span>
+0423 <span class="comment">%         SQSFfit = FitParameters(end).Values(60:83);</span>
+0424 <span class="comment">%         SQSDfit = FitParameters(end).Values(84:107);</span>
+0425 <span class="comment">%         SQQFfit = FitParameters(end).Values(108:131);</span>
+0426 <span class="comment">%</span>
+0427 <span class="comment">%         setsp('SQSF', SQSFfit, family2dev('SQSF',0), 'Physics', 'Model');</span>
+0428 <span class="comment">%         setsp('SQSD', SQSDfit, family2dev('SQSD',0), 'Physics', 'Model');</span>
+0429 <span class="comment">%</span>
+0430 <span class="comment">%         % Set the skew quad at QF</span>
+0431 <span class="comment">%         setpvmodel('QF', 'SkewQuad', SQQFfit);</span>
+0432 <span class="comment">%</span>
+0433 <span class="comment">%</span>
+0434 <span class="comment">%     elseif length(FitParameters(end).Values) &gt;= 107</span>
+0435 <span class="comment">%         SQSFfit = FitParameters(end).Values(60:83);</span>
+0436 <span class="comment">%         SQSDfit = FitParameters(end).Values(84:107);</span>
+0437 <span class="comment">%</span>
+0438 <span class="comment">%         setsp('SQSF', SQSFfit, family2dev('SQSF',0), 'Physics', 'Model');</span>
+0439 <span class="comment">%         setsp('SQSD', SQSDfit, family2dev('SQSD',0), 'Physics', 'Model');</span>
+0440 <span class="comment">%</span>
+0441 <span class="comment">%     elseif length(FitParameters(end).Values) &gt;= 83</span>
+0442 <span class="comment">%         % Skew quad power supply locations (Post 5-12-2005)</span>
+0443 <span class="comment">%         %sflist = [1 5 6 9 10 11 12 13 14 17 21]';</span>
+0444 <span class="comment">%         %sdlist = [3 5 6 7  9 10 11 12 13 14 15 19 23]';</span>
+0445 <span class="comment">%</span>
+0446 <span class="comment">%         SQSFfit = FitParameters(end).Values(60:71);</span>
+0447 <span class="comment">%         SQSDfit = FitParameters(end).Values(72:83);</span>
+0448 <span class="comment">%</span>
+0449 <span class="comment">%         setsp('SQSF', SQSFfit, 'Physics', 'Model');</span>
+0450 <span class="comment">%         setsp('SQSD', SQSDfit, 'Physics', 'Model');</span>
+0451 <span class="comment">%     end</span>
+0452 <span class="comment">%</span>
+0453 <span class="comment">%     % SB Fit</span>
+0454 <span class="comment">%     if length(FitParameters(end).Values) &gt;= 137</span>
+0455 <span class="comment">%         % Set the Super BEND fits for K and skewquad</span>
+0456 <span class="comment">%         SB_K        = FitParameters(end).Values(132:134);</span>
+0457 <span class="comment">%         SB_SkeqQuad = FitParameters(end).Values(135:137);</span>
+0458 <span class="comment">%</span>
+0459 <span class="comment">%         setpvmodel('BEND', 'K', SB_K, [4 2;8 2;12 2]);</span>
+0460 <span class="comment">%         setpvmodel('BEND', 'SkewQuad', SB_SkeqQuad, [4 2;8 2;12 2]);</span>
+0461 <span class="comment">%     end</span>
+0462    
+0463 
+0464 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'CorrectCoupling'</span>))
+0465 
+0466     <span class="keyword">if</span> isempty(FileName) || strcmp(FileName, <span class="string">'.'</span>)
+0467         <span class="keyword">if</span> isempty(FileName)
+0468             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0469         <span class="keyword">else</span>
+0470             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>);
+0471         <span class="keyword">end</span>
+0472         drawnow;
+0473         <span class="keyword">if</span> FileName == 0
+0474             fprintf(<span class="string">'   setlocodata canceled\n'</span>);
+0475             <span class="keyword">return</span>
+0476         <span class="keyword">end</span>
+0477         FileName = [DirectoryName FileName];
+0478     <span class="keyword">end</span>
+0479 
+0480     
+0481     [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = <a href="calcdispersionwave.html" class="code" title="function [Total, Wave, Bump, Factor_Wave, Factor_Bump, LatticeFlag] = calcdispersionwave(varargin)">calcdispersionwave</a>(<span class="string">'Physics'</span>);
+0482     SQSF_WaveBump = Total(1);
+0483     SQSD_WaveBump = Total(2);
+0484     
+0485     <span class="comment">% Load the LOCO data</span>
+0486     load(FileName);
+0487 
+0488     fprintf(<span class="string">'   Correcting the coupling based on LOCO file %s.\n'</span>, FileName);
+0489     fprintf(<span class="string">'   It is assumed that the SQSF are in FitParameters.Values(60:70)\n'</span>);
+0490     fprintf(<span class="string">'                      and SQSD are in FitParameters.Values(71:83)\n'</span>);
+0491 
+0492     <span class="comment">% Find the skew quadrupole fits</span>
+0493     <span class="keyword">if</span> length(FitParameters(end).Values) &lt; 83
+0494         error(<span class="string">'Did not find the skew quads fit parameters.'</span>);
+0495     <span class="keyword">elseif</span> length(FitParameters(end).Values) &gt; 83
+0496         fprintf(<span class="string">'   There are more than 83 fit parameters, hopefully the skew quads fits are still 60:83\n'</span>);
+0497         fprintf(<span class="string">'   If all 24 skew quadrupoles were fit this function will fail!\n'</span>);
+0498 
+0499         <span class="comment">%sflist = [1 5 6 9 10 11 12 13 14 17 21];</span>
+0500         <span class="comment">%sdlist = [3 5 6 7  9 10 11 12 13 14 15 19 23];</span>
+0501         <span class="comment">%SQSF = FitParameters(end).Values(60:83);</span>
+0502         <span class="comment">%SQSD = FitParameters(end).Values(84:107);</span>
+0503         <span class="comment">%SQSF = SQSF(sflist);</span>
+0504         <span class="comment">%SQSD = SQSD(sdlist);</span>
+0505     <span class="keyword">end</span>
+0506 
+0507     <span class="comment">% Starting setpoints</span>
+0508     SQSF00 = getsp(<span class="string">'SQSF'</span>,<span class="string">'Struct'</span>);
+0509     SQSD00 = getsp(<span class="string">'SQSD'</span>,<span class="string">'Struct'</span>);
+0510     
+0511     SQSFcoupling = FitParameters(end).Values(60:70);
+0512     SQSDcoupling = FitParameters(end).Values(71:83);
+0513 
+0514     <span class="comment">% Combine the coupling correction with the eta wave and bump</span>
+0515     SQSF = Wave(1);  <span class="comment">% Just for fields</span>
+0516     SQSF.Data = -1*SQSFcoupling + Wave(1).Data + Bump(1).Data;
+0517     SQSD = Wave(2);  <span class="comment">% Just for fields</span>
+0518     SQSD.Data = -1*SQSDcoupling + Wave(2).Data + Bump(2).Data;
+0519     
+0520     SQSFhw = physics2hw(SQSF);
+0521     SQSDhw = physics2hw(SQSD);
+0522     
+0523     <span class="comment">% Add the starting point for the skew quadrupoles when the LOCO data was measured</span>
+0524     MachineConfig = LocoMeasData.MachineConfig;
+0525     SQSFhw0 = physics2hw(MachineConfig.SQSF.Setpoint);  <span class="comment">% Probably alread in hardware units</span>
+0526     SQSDhw0 = physics2hw(MachineConfig.SQSD.Setpoint);  <span class="comment">% Probably alread in hardware units</span>
+0527 
+0528     SQSFhwTotal = SQSFhw0; <span class="comment">% Just for fields</span>
+0529     SQSDhwTotal = SQSDhw0; <span class="comment">% Just for fields</span>
+0530     SQSFhwTotal.Data = SQSFhw.Data + SQSFhw0.Data;
+0531     SQSDhwTotal.Data = SQSDhw.Data + SQSDhw0.Data;
+0532 
+0533     <span class="comment">% Convert to hardware units for viewing</span>
+0534     Wavehw = physics2hw(Wave);
+0535     Bumphw = physics2hw(Bump);
+0536     SQSFCoupling = SQSFhw.Data - Wavehw(1).Data - Bumphw(1).Data;
+0537     SQSDCoupling = SQSDhw.Data - Wavehw(2).Data - Bumphw(2).Data;
+0538     
+0539     <span class="comment">% Plot</span>
+0540     clf reset
+0541     subplot(2,1,1);
+0542     plot([-1*SQSFCoupling, Wavehw(1).Data, Bumphw(1).Data, Wavehw(1).Data+Bumphw(1).Data, SQSFhw.Data, SQSFhwTotal.Data], <span class="string">'.-'</span>);
+0543     hold on;
+0544     plot( maxsp(<span class="string">'SQSF'</span>), <span class="string">'.-k'</span>);
+0545     plot(-maxsp(<span class="string">'SQSF'</span>), <span class="string">'.-k'</span>);
+0546     hold off;
+0547     xlabel(<span class="string">'SQSF Number'</span>);
+0548     ylabel(<span class="string">'SQSF [Amps]'</span>);
+0549     title(sprintf(<span class="string">'Coupling Fit, Eta Wave (%.2f), and Eta Bump (%.2f)'</span>, Factor_Wave, Factor_Bump));
+0550     axis tight;
+0551     
+0552     subplot(2,1,2);
+0553     plot([-1*SQSDCoupling, Wavehw(2).Data, Bumphw(2).Data, Wavehw(2).Data+Bumphw(2).Data, SQSDhw.Data, SQSDhwTotal.Data], <span class="string">'.-'</span>);
+0554     hold on;
+0555     plot( maxsp(<span class="string">'SQSD'</span>), <span class="string">'.-k'</span>);
+0556     legend(<span class="string">'1. Skew Quad Fit'</span>, <span class="string">'2. Eta Wave'</span>, <span class="string">'3. Eta Bump'</span>, <span class="string">'4. Eta Wave + Eta Bump'</span>, <span class="string">'5. \Delta Skew (-1+2+3)'</span>, <span class="string">'6. New Setpoints'</span>, <span class="string">'7. Maximum Setpoint'</span>, 0);
+0557     plot(-maxsp(<span class="string">'SQSD'</span>), <span class="string">'.-k'</span>);
+0558     hold off;
+0559     xlabel(<span class="string">'SQSD Number'</span>);
+0560     ylabel(<span class="string">'SQSD [Amps]'</span>);
+0561     axis tight
+0562 
+0563     <span class="comment">% Maximum setpoint check</span>
+0564     <span class="keyword">if</span> any(abs(SQSFhw.Data)&gt;maxsp(<span class="string">'SQSF'</span>))
+0565         error(<span class="string">'At least one of the SQSF would go beyond it''s limit ... aborting'</span>);
+0566     <span class="keyword">end</span>
+0567 
+0568     <span class="keyword">if</span> any(abs(SQSDhw.Data)&gt;maxsp(<span class="string">'SQSD'</span>))
+0569         error(<span class="string">'At least one of the SQSD would go beyond it''s limit ... aborting'</span>);
+0570     <span class="keyword">end</span>
+0571 
+0572     <span class="comment">% Make the setpoint change</span>
+0573     CorrFlag = questdlg(str2mat(<span class="string">'Do you want to set skew correction?'</span>),sprintf(<span class="string">'%.1f GeV Coupling Correction'</span>,getenergy),<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0574     <span class="keyword">if</span> strcmp(CorrFlag,<span class="string">'No'</span>)
+0575         disp(<span class="string">'   No coupling correction.'</span>);
+0576     <span class="keyword">else</span>
+0577         disp(<span class="string">'   Setting SQSF &amp; SQSD families.'</span>);
+0578         setpv(SQSFhwTotal);
+0579         setpv(SQSDhwTotal);
+0580 
+0581         <span class="comment">% Keep the change?</span>
+0582         CorrectFlag = questdlg(<span class="string">'Keep the new skew quadrupole setpoints or return to the old values?'</span>,<span class="string">'SETLOCODATA(''SetCoupling'')'</span>,<span class="string">'Keep this lattice'</span>,<span class="string">'Restore Old Lattice'</span>,<span class="string">'Keep this lattice'</span>);
+0583         <span class="keyword">if</span> strcmpi(CorrectFlag, <span class="string">'Restore Old Lattice'</span>) || isempty(CorrectFlag)
+0584             fprintf(<span class="string">'   Changing the skew quadrupole magnets back to the original setpoints.\n'</span>);
+0585             setpv(SQSF00);
+0586             setpv(SQSD00);
+0587         <span class="keyword">end</span>
+0588     <span class="keyword">end</span>
+0589 
+0590 <span class="keyword">elseif</span> any(strcmpi(CommandInput, <span class="string">'Symmetrize'</span>))
+0591 
+0592     <span class="keyword">if</span> isempty(FileName) || strcmp(FileName, <span class="string">'.'</span>)
+0593         <span class="keyword">if</span> isempty(FileName)
+0594             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0595         <span class="keyword">else</span>
+0596             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'LOCO Output File Name?'</span>);
+0597         <span class="keyword">end</span>
+0598         drawnow;
+0599         <span class="keyword">if</span> FileName == 0
+0600             fprintf(<span class="string">'   setlocodata canceled\n'</span>);
+0601             <span class="keyword">return</span>
+0602         <span class="keyword">end</span>
+0603         FileName = [DirectoryName FileName];
+0604     <span class="keyword">end</span>
+0605 
+0606     
+0607     <span class="comment">% Load the LOCO data</span>
+0608     load(FileName);
+0609 
+0610 
+0611     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0612     <span class="comment">% Use the Loco Model %</span>
+0613     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0614 
+0615     <span class="comment">% If errors detected by this LOCO file are not applied to the accelerator,</span>
+0616     <span class="comment">% ie, the machine lattice file is the same as it was when the LOCO data was</span>
+0617     <span class="comment">% taken, then put the LOCO output settings in the model.</span>
+0618 
+0619     fprintf(<span class="string">'   Symmetrizing the lattice based on LOCO file %s.\n'</span>, FileName);
+0620 
+0621     <span class="comment">% Magnet fits</span>
+0622     QFfit = FitParameters(end).Values(1:24);
+0623     QDfit = FitParameters(end).Values(25:48);
+0624     QFAfit = FitParameters(end).Values([49 50 51 52]);
+0625     QDAfit = FitParameters(end).Values([53 54 55 56 57 58]);
+0626     BENDfit = FitParameters(end).Values(59);
+0627 
+0628     QFfit0 = FitParameters(1).Values(1:24);
+0629     QDfit0 = FitParameters(1).Values(25:48);
+0630     QFAfit0 = FitParameters(1).Values([49 50 51 52]);
+0631     QDAfit0 = FitParameters(1).Values([53 54 55 56 57 58]);
+0632     BENDfit0 = FitParameters(1).Values(59);
+0633 
+0634     <span class="keyword">if</span> length(FitParameters(end).Values) &gt;= 83
+0635         SQSFfit = FitParameters(end).Values(60:70);
+0636         SQSDfit = FitParameters(end).Values(71:83);
+0637 
+0638         SQSFfit0 = FitParameters(1).Values(60:70);
+0639         SQSDfit0 = FitParameters(1).Values(71:83);
+0640     <span class="keyword">end</span>
+0641 
+0642     <span class="comment">% Lattice magnets at the start of the LOCO run</span>
+0643     QF  = LocoMeasData.MachineConfig.QF.Setpoint.Data;
+0644     QD  = LocoMeasData.MachineConfig.QD.Setpoint.Data;
+0645     QFA = LocoMeasData.MachineConfig.QFA.Setpoint.Data;
+0646     QDA = LocoMeasData.MachineConfig.QDA.Setpoint.Data;
+0647     SF  = LocoMeasData.MachineConfig.SF.Setpoint.Data;
+0648     SD  = LocoMeasData.MachineConfig.SD.Setpoint.Data;
+0649     BEND= LocoMeasData.MachineConfig.BEND.Setpoint.Data;
+0650 
+0651     <span class="comment">% Save the old setpoints</span>
+0652     QFold = getsp(<span class="string">'QF'</span>);
+0653     QDold = getsp(<span class="string">'QD'</span>);
+0654     QFAold = getsp(<span class="string">'QFA'</span>);
+0655     QDAold = getsp(<span class="string">'QDA'</span>);
+0656     SFold = getsp(<span class="string">'SF'</span>);
+0657     SDold = getsp(<span class="string">'SD'</span>);
+0658 
+0659 
+0660     ModeCell = {<span class="string">'Re-fit the AT model based on the LOCO BEND k-value'</span>, <span class="string">'Use the present AT Model'</span>, <span class="string">'Hold the Magnet Mean Constant'</span>};
+0661     [ModeNumber, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'ALS'</span>,<span class="string">'PromptString'</span>, <span class="keyword">...</span>
+0662         strvcat(<span class="string">'To account for the LOCO fit k-value for the normal BEND family'</span>, <span class="keyword">...</span>
+0663         strvcat(<span class="string">'either the AT model needs to be re-fit, the present AT model'</span>, <span class="keyword">...</span>
+0664         strvcat(<span class="string">'BEND already matches the LOCO fit BEND, or the mean of all'</span>, <span class="keyword">...</span>
+0665         strvcat(<span class="string">'quadrupole families can to be held constant.'</span>, <span class="keyword">...</span>
+0666         strvcat(<span class="string">'(Computing the AT fit is recommended if the BEND was fit in LOCO.)'</span>,<span class="string">' '</span>))))), <span class="keyword">...</span>
+0667         <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell, <span class="string">'ListSize'</span>, [400 90]);
+0668     <span class="keyword">if</span> OKFlag ~= 1
+0669         fprintf(<span class="string">'   setlocodata cancelled\n'</span>);
+0670         <span class="keyword">return</span>
+0671     <span class="keyword">end</span>
+0672     <span class="keyword">if</span> ModeNumber == 1
+0673         CommandInput = <span class="string">'Compute a New AT Fit'</span>;
+0674     <span class="keyword">elseif</span> ModeNumber == 2
+0675         CommandInput = <span class="string">'Use the present AT Model'</span>;
+0676     <span class="keyword">elseif</span> ModeNumber == 3
+0677         CommandInput = <span class="string">'Hold the Magnet Mean Constant'</span>;
+0678     <span class="keyword">end</span>
+0679 
+0680     <span class="comment">% CommandInput = questdlg( ...</span>
+0681     <span class="comment">% strvcat('To account for the new k-value for the normal BEND family,', ...</span>
+0682     <span class="comment">%     strvcat('either the model needs to be accurate, fit, or the mean of', ...</span>
+0683     <span class="comment">%     strvcat('all quadrupole families needs to be held constant.', ...</span>
+0684     <span class="comment">%     strvcat(' ',strvcat('(Computing the AT fit is recommended.)',' '))))), ...</span>
+0685     <span class="comment">%     'SETLOCODATA', ...</span>
+0686     <span class="comment">%     'Compute a New AT Fit', ...</span>
+0687     <span class="comment">%     'Use the present AT Model', ...</span>
+0688     <span class="comment">%     'Hold the Magnet Mean Constant', ...</span>
+0689     <span class="comment">%     'Cancel', ...</span>
+0690     <span class="comment">%     'Compute a New AT Fit');</span>
+0691     <span class="keyword">switch</span> CommandInput
+0692         <span class="keyword">case</span> {<span class="string">'Compute a New AT Fit'</span>, <span class="string">'Use the present AT Model'</span>}
+0693 
+0694 
+0695             <span class="keyword">if</span> strcmp(CommandInput, <span class="string">'Compute a New AT Fit'</span>)
+0696 
+0697                 <span class="comment">% AT fit method</span>
+0698                 <span class="keyword">if</span> strcmpi(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.9 GeV, High Tune'</span>) | <span class="keyword">...</span>
+0699                         strcmpi(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.9 GeV, Two-Bunch'</span>) | <span class="keyword">...</span>
+0700                         strcmpi(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.5 GeV, High Tune'</span>)
+0701                     MeritFun = @<a href="alsfitnuy9.html" class="code" title="function y = alsfitnuy9(x)">alsfitnuy9</a>;
+0702                 <span class="keyword">elseif</span>  strcmpi(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.5 GeV, Isochronous Sections'</span>)
+0703                     error(<span class="string">'A isochronous sections merit function needs to be writen'</span>);
+0704                     <span class="comment">%MeritFun = @alsfitisochronous;</span>
+0705                 <span class="keyword">elseif</span> strcmpi(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.9 GeV, Low Tune'</span>)
+0706                     error(<span class="string">'A low tune merit function needs to be writen'</span>);
+0707                 <span class="keyword">else</span>
+0708                     disp(<span class="string">'Using the high tune merit function.  I''m not sure that''s what you want!!!!'</span>);
+0709                     MeritFun = @<a href="alsfitnuy9.html" class="code" title="function y = alsfitnuy9(x)">alsfitnuy9</a>;
+0710                 <span class="keyword">end</span>
+0711 
+0712 
+0713                 <span class="comment">% Radiation must be off for accurate tune measurements</span>
+0714                 [PassMethod, ATIndex, FamName, PassMethodOld, ATIndexOld] = setradiation(<span class="string">'Off'</span>);
+0715 
+0716 
+0717                 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0718                 <span class="comment">% Set normal bend K-value (no change to superbends) %</span>
+0719                 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0720                 <span class="comment">%BENDfit = BENDfit0  % To remove the LOCO BEND fit FitParameters(1).Values(59);</span>
+0721                 BENDDeviceList = family2dev(<span class="string">'BEND'</span>);
+0722                 iIndex = findrowindex([4 2;8 2;12 2], BENDDeviceList);
+0723                 BENDDeviceList(iIndex,:) = [];
+0724                 setpvmodel(<span class="string">'BEND'</span>, <span class="string">'K'</span>, BENDfit, BENDDeviceList);
+0725 
+0726 
+0727                 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0728                 <span class="comment">% The starting point of the model must be the starting LOCO model %</span>
+0729                 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0730 
+0731                 <span class="comment">% Skew quadrupoles</span>
+0732                 <span class="keyword">if</span> length(FitParameters(end).Values) &gt;= 83
+0733                     <span class="keyword">if</span> any(SQSFfit0~=0)
+0734                         fprintf(<span class="string">'   Warning: the start point in the model for SQSF is not zero.\n'</span>);
+0735                     <span class="keyword">end</span>
+0736                     <span class="keyword">if</span> any(SQSDfit0~=0)
+0737                         fprintf(<span class="string">'   Warning: the start point in the model for SQSD is not zero.\n'</span>);
+0738                     <span class="keyword">end</span>
+0739 
+0740                     setsp(<span class="string">'SQSF'</span>, SQSFfit0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0741                     setsp(<span class="string">'SQSD'</span>, SQSDfit0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0742                 <span class="keyword">else</span>
+0743                     setsp(<span class="string">'SQSF'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0744                     setsp(<span class="string">'SQSD'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0745                 <span class="keyword">end</span>
+0746 
+0747                 <span class="comment">% Sextupoles (set to the values in the machine save since they are not fit)</span>
+0748                 <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SF.Setpoint.Data == 0)
+0749                     setsp(<span class="string">'SF'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0750                 <span class="keyword">else</span>
+0751                     setpv(LocoMeasData.MachineConfig.SF.Setpoint, <span class="string">'Model'</span>);
+0752                 <span class="keyword">end</span>
+0753                 <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SD.Setpoint.Data == 0)
+0754                     setsp(<span class="string">'SD'</span>, 0, <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0755                 <span class="keyword">else</span>
+0756                     setpv(LocoMeasData.MachineConfig.SD.Setpoint, <span class="string">'Model'</span>);
+0757                 <span class="keyword">end</span>
+0758 
+0759 
+0760                 x0 = [
+0761                     QFfit0(1);
+0762                     QFfit0(7);
+0763                     QDfit0(1);
+0764                     QDfit0(7);
+0765                     QFAfit0(1);
+0766                     QFAfit0(2);
+0767                     QDAfit0(1); ];
+0768 
+0769                 <span class="comment">%x = [</span>
+0770                 <span class="comment">%    getsp('QF',  [1 1], 'Physics', 'Model');</span>
+0771                 <span class="comment">%    getsp('QF',  [4 1], 'Physics', 'Model');</span>
+0772                 <span class="comment">%    getsp('QD',  [1 1], 'Physics', 'Model');</span>
+0773                 <span class="comment">%    getsp('QD',  [4 1], 'Physics', 'Model');</span>
+0774                 <span class="comment">%    getsp('QFA', [1 1], 'Physics', 'Model');</span>
+0775                 <span class="comment">%    getsp('QFA', [4 1], 'Physics', 'Model');</span>
+0776                 <span class="comment">%    getsp('QDA', [4 1], 'Physics', 'Model') ];</span>
+0777 
+0778                 <span class="comment">% Set the model and get the starting error and goal</span>
+0779                 y0 = MeritFun(x0);
+0780 
+0781 
+0782                 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0783                 <span class="comment">% Fit the AT model with the new bend setpoint %</span>
+0784                 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0785                 CorrectFlag = <span class="string">'Refit'</span>;
+0786                 <span class="keyword">while</span> strcmp(CorrectFlag,<span class="string">'Refit'</span>)
+0787                     <span class="comment">% Run AT model fit</span>
+0788                     [x, y, ygoal] = <a href="alslocofit.html" class="code" title="function [x, y, ygoal, xtotal] = alslocofit(funfcn, x0, ygoal)">alslocofit</a>(MeritFun);
+0789 
+0790                     fprintf(<span class="string">'          Fit Results   Starting Point\n'</span>);
+0791                     fprintf(<span class="string">'   BEND =%12.8f    %12.8f  (non-superbend sectors)\n'</span>, getpvmodel(<span class="string">'BEND'</span>, <span class="string">'K'</span>, [1 1]), BENDfit0);
+0792                     fprintf(<span class="string">'   SF   =               %13.8f \n'</span>, getsp(<span class="string">'SF'</span>, [1 1], <span class="string">'Model'</span>, <span class="string">'Physics'</span>));
+0793                     fprintf(<span class="string">'   SD   =               %13.8f \n'</span>, getsp(<span class="string">'SD'</span>, [1 1], <span class="string">'Model'</span>, <span class="string">'Physics'</span>));
+0794                     d = family2dev(<span class="string">'SQSF'</span>);
+0795                     <span class="keyword">if</span> all(getsp(<span class="string">'SQSF'</span>,<span class="string">'model'</span>) == getsp(<span class="string">'SQSF'</span>,d(1,:),<span class="string">'model'</span>))
+0796                         fprintf(<span class="string">'   SQSF =               %13.8f \n'</span>, getsp(<span class="string">'SQSF'</span>,d(1,:),<span class="string">'model'</span>));
+0797                     <span class="keyword">else</span>
+0798                         fprintf(<span class="string">'   SQSF are at different setpoints\n'</span>);
+0799                     <span class="keyword">end</span>
+0800                     d = family2dev(<span class="string">'SQSD'</span>);
+0801                     <span class="keyword">if</span> all(getsp(<span class="string">'SQSD'</span>,<span class="string">'model'</span>) == getsp(<span class="string">'SQSD'</span>,d(1,:),<span class="string">'model'</span>))
+0802                         fprintf(<span class="string">'   SQSD =               %13.8f \n'</span>, getsp(<span class="string">'SQSD'</span>,d(1,:),<span class="string">'model'</span>));
+0803                     <span class="keyword">else</span>
+0804                         fprintf(<span class="string">'   SQSD are at different setpoints\n'</span>);
+0805                     <span class="keyword">end</span>
+0806 
+0807                     fprintf(<span class="string">'   QF   =%12.8f    %12.8f  (non-superbend sectors)\n'</span>,      x(1), x0(1));
+0808                     fprintf(<span class="string">'   QF   =%12.8f    %12.8f  (superbend sectors 4, 8, 12)\n'</span>, x(2), x0(2));
+0809                     fprintf(<span class="string">'   QD   =%12.8f    %12.8f  (non-superbend sectors)\n'</span>,      x(3), x0(3));
+0810                     fprintf(<span class="string">'   QD   =%12.8f    %12.8f  (superbend sectors 4, 8, 12)\n'</span>, x(4), x0(4));
+0811                     fprintf(<span class="string">'   QFA  =%12.8f    %12.8f  (non-superbend sectors)\n'</span>,      x(5), x0(5));
+0812                     fprintf(<span class="string">'   QFA  =%12.8f    %12.8f  (superbend sectors 4, 8, 12)\n'</span>, x(6), x0(6));
+0813                     fprintf(<span class="string">'   QDA  =%12.8f    %12.8f                              \n'</span>, x(7), x0(7));
+0814 
+0815                     CorrectFlag = questdlg(<span class="string">'Run the fit again, apply correctrion to the aaccelerator, or cancel?'</span>,<span class="string">'SETLOCODATA(''SetMachine'')'</span>,<span class="string">'Refit'</span>,<span class="string">'Apply'</span>,<span class="string">'Cancel'</span>, <span class="string">'Cancel'</span>);
+0816                     <span class="keyword">if</span> strcmpi(CorrectFlag, <span class="string">'Cancel'</span>) | isempty(CorrectFlag)
+0817                         fprintf(<span class="string">'\n'</span>);
+0818                         fprintf(<span class="string">'   The AT model may need to be reset.\n'</span>);
+0819                         fprintf(<span class="string">'   setlocodata(''SetMachine'') canceled.\n\n'</span>);
+0820                         <span class="keyword">return</span>
+0821                     <span class="keyword">end</span>
+0822                     fprintf(<span class="string">'\n'</span>);
+0823                 <span class="keyword">end</span>
+0824 
+0825 
+0826                 <span class="comment">% Restore the AT model or make this the new AT model setpoints???</span>
+0827                 fprintf(<span class="string">'   The AT model is being left in the witht the new fit parameters.\n'</span>);
+0828                 fprintf(<span class="string">'   Changing the AT model to these new setting may be wise.\n'</span>);
+0829 
+0830 
+0831                 <span class="comment">% Restore passmethods for radiation on/off</span>
+0832                 setpassmethod(ATIndexOld, PassMethodOld);
+0833 
+0834             <span class="keyword">else</span>
+0835 
+0836                 fprintf(<span class="string">'   Using the present AT model to set the quadrupoles.'</span>);
+0837 
+0838                 x0 = [
+0839                     QFfit0(1);
+0840                     QFfit0(7);
+0841                     QDfit0(1);
+0842                     QDfit0(7);
+0843                     QFAfit0(1);
+0844                     QFAfit0(2);
+0845                     QDAfit0(1); ];
+0846 
+0847                 x = [
+0848                     getsp(<span class="string">'QF'</span>,  [1 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0849                     getsp(<span class="string">'QF'</span>,  [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0850                     getsp(<span class="string">'QD'</span>,  [1 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0851                     getsp(<span class="string">'QD'</span>,  [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0852                     getsp(<span class="string">'QFA'</span>, [1 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0853                     getsp(<span class="string">'QFA'</span>, [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0854                     getsp(<span class="string">'QDA'</span>, [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>) ];
+0855             <span class="keyword">end</span>
+0856 
+0857 
+0858             <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0859             <span class="comment">% Make the setpoint change %</span>
+0860             <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0861 
+0862             <span class="comment">% Compute LOCO change</span>
+0863             QFnew = QF .* QFfit0 ./ QFfit;
+0864             QDnew = QD .* QDfit0 ./ QDfit;
+0865 
+0866             QFAnew([(1:6) 9:14 17:22]) = QFA([(1:6) 9:14 17:22]) * QFAfit0(1) / QFAfit(1);
+0867             QFAnew([ 7  8]) = QFA([ 7  8]) * QFAfit0(2) / QFAfit(2);
+0868             QFAnew([15 16]) = QFA([15 16]) * QFAfit0(3) / QFAfit(3);
+0869             QFAnew([23 24]) = QFA([23 24]) * QFAfit0(4) / QFAfit(4);
+0870             QFAnew = QFAnew';
+0871 
+0872             QDAnew = QDA .* QDAfit0 ./ QDAfit;
+0873 
+0874             <span class="comment">% Scale by model change (LOCO zero'th iteration to the ideal model)</span>
+0875             QFnew([(1:6) 9:14 17:22]) = QFnew([(1:6) 9:14 17:22]) * x(1) / x0(1);
+0876             QFnew([7 8 15 16 23 24])  = QFnew([7 8 15 16 23 24])  * x(2) / x0(2);
+0877             QDnew([(1:6) 9:14 17:22]) = QDnew([(1:6) 9:14 17:22]) * x(3) / x0(3);
+0878             QDnew([7 8 15 16 23 24])  = QDnew([7 8 15 16 23 24])  * x(4) / x0(4);
+0879 
+0880             QFAnew([(1:6) 9:14 17:22]) = QFAnew([(1:6) 9:14 17:22]) * x(5) / x0(5);
+0881             QFAnew([ 7  8]) = QFAnew([ 7  8]) * x(6) / x0(6);
+0882             QFAnew([15 16]) = QFAnew([15 16]) * x(6) / x0(6);
+0883             QFAnew([23 24]) = QFAnew([23 24]) * x(6) / x0(6);
+0884 
+0885             QDAnew = QDAnew * x(7) / x0(7);
+0886 
+0887 
+0888             <span class="comment">% Make the setpoint change</span>
+0889             fprintf(<span class="string">'   Changing the lattice magnets.\n'</span>);
+0890             setsp(<span class="string">'QF'</span>,  QFnew,  [], 0);
+0891             setsp(<span class="string">'QD'</span>,  QDnew,  [], 0);
+0892             setsp(<span class="string">'QFA'</span>, QFAnew, [], 0);
+0893             setsp(<span class="string">'QDA'</span>, QDAnew, [], 0);
+0894 
+0895 
+0896             <span class="keyword">if</span> any(SF~=getsp(<span class="string">'SF'</span>))
+0897                 fprintf(<span class="string">'   Warning: SF magnet setpoint is not the same as when the LOCO data set was taken.\n'</span>);
+0898             <span class="keyword">end</span>
+0899             <span class="keyword">if</span> any(SD~=getsp(<span class="string">'SD'</span>))
+0900                 fprintf(<span class="string">'   Warning: SD magnet setpoint is not the same as when the LOCO data set was taken.\n'</span>);
+0901             <span class="keyword">end</span>
+0902             <span class="comment">%setsp('SF', SF, [], 0);</span>
+0903             <span class="comment">%setsp('SD', SD, [], 0);</span>
+0904 
+0905             <span class="keyword">if</span> any(BEND~=getsp(<span class="string">'BEND'</span>))
+0906                 fprintf(<span class="string">'   Warning: BEND magnet setpoints are not the same as when the LOCO data set was taken.\n'</span>);
+0907             <span class="keyword">end</span>
+0908 
+0909 
+0910         <span class="keyword">case</span> <span class="string">'Fix Magnet Mean'</span>
+0911 
+0912             <span class="comment">% Constant Mean - This method works ok but needs iterations.</span>
+0913 
+0914             <span class="comment">% Compute LOCO predicted setpoints</span>
+0915             QFnew = QF  .* QFfit0  ./ QFfit;
+0916             QDnew = QD  .* QDfit0  ./ QDfit;
+0917             QDAnew= QDA .* QDAfit0 ./ QDAfit;
+0918 
+0919             QFA1new  = QFA1  * QFAfit0(1) / QFAfit(1);
+0920             QFA4new  = QFA4  * QFAfit0(2) / QFAfit(2);
+0921             QFA8new  = QFA8  * QFAfit0(3) / QFAfit(3);
+0922             QFA12new = QFA12 * QFAfit0(4) / QFAfit(4);
+0923             QFAnew   = [
+0924                 QFA1new  * ones(6,1)
+0925                 QFA4new  * ones(2,1)
+0926                 QFA1new  * ones(6,1)
+0927                 QFA8new  * ones(2,1)
+0928                 QFA1new  * ones(6,1)
+0929                 QFA12new * ones(2,1)
+0930                 ];
+0931 
+0932             <span class="comment">% Adjust each family to keep the mean constant</span>
+0933             QFnew  = QFnew  * mean(QF)  / mean(QFnew);
+0934             QDnew  = QDnew  * mean(QD)  / mean(QDnew);
+0935             QDAnew = QDAnew * mean(QDA) / mean(QDAnew);
+0936             QFAnew = QFAnew * mean(QFA) / mean(QFAnew);
+0937 
+0938             <span class="comment">% Make the setpoint change</span>
+0939             N = 1;
+0940             <span class="keyword">for</span> i = 1:N
+0941                 setsp(<span class="string">'QF'</span>,  QF  - (i/N) * (QF  - QFnew) , [], 0);
+0942                 setsp(<span class="string">'QD'</span>,  QD  - (i/N) * (QD  - QDnew) , [], 0);
+0943                 setsp(<span class="string">'QFA'</span>, QFA - (i/N) * (QFA - QFAnew), [], 0);
+0944                 setsp(<span class="string">'QDA'</span>, QDA - (i/N) * (QDA - QDAnew), [], 0);
+0945 
+0946                 <span class="comment">% setorbit({x.Data, y.Data}, {x,y}, {hcm,vcm}, 1, 1e-2);</span>
+0947                 <span class="comment">% pause(1);</span>
+0948             <span class="keyword">end</span>
+0949 
+0950 
+0951         <span class="keyword">case</span> <span class="string">'Ignor Bend Change'</span>
+0952 
+0953             QFnew = QF  .* QFfit0 ./ QFfit;
+0954             QDnew = QD  .* QDfit0 ./ QDfit;
+0955             QDAnew= QDA .* QDAfit0 ./ QDAfit;
+0956             QFA1new  = QFA1  * QFAfit0(1) / QFAfit(1);
+0957             QFA4new  = QFA4  * QFAfit0(2) / QFAfit(2);
+0958             QFA8new  = QFA8  * QFAfit0(3) / QFAfit(3);
+0959             QFA12new = QFA12 * QFAfit0(4) / QFAfit(4);
+0960 
+0961             setsp(<span class="string">'QF'</span>,  QFnew, [], 0);
+0962             setsp(<span class="string">'QD'</span>,  QDnew, [], 0);
+0963             setsp(<span class="string">'QDA'</span>, QDAnew, [], 0);
+0964 
+0965             setsp(<span class="string">'QFA'</span>, QFA1new, [1 1], 0);
+0966             setsp(<span class="string">'QFA'</span>, QFA4new, [4 1], 0);
+0967             setsp(<span class="string">'QFA'</span>, QFA8new, [8 1], 0);
+0968             setsp(<span class="string">'QFA'</span>, QFA12new , [12 1], 0);
+0969 
+0970         <span class="keyword">otherwise</span>
+0971 
+0972             fprintf(<span class="string">'   No change made to the lattice.\n'</span>);
+0973             <span class="keyword">return</span>;
+0974     <span class="keyword">end</span>
+0975 
+0976 
+0977     CorrectFlag = questdlg(<span class="string">'Keep the new setpoints or return to the old lattice?'</span>,<span class="string">'SETLOCODATA(''SetMachine'')'</span>,<span class="string">'Keep this lattice'</span>,<span class="string">'Restore Old Lattice'</span>,<span class="string">'Keep this lattice'</span>);
+0978     <span class="keyword">if</span> strcmpi(CorrectFlag, <span class="string">'Restore Old Lattice'</span>) || isempty(CorrectFlag)
+0979         fprintf(<span class="string">'\n'</span>);
+0980         <span class="comment">% Make the setpoint change</span>
+0981         fprintf(<span class="string">'   Changing the lattice magnets back to the original setpoints.\n'</span>);
+0982         setsp(<span class="string">'QF'</span>,  QFold, [], 0);
+0983         setsp(<span class="string">'QD'</span>,  QDold, [], 0);
+0984         setsp(<span class="string">'QFA'</span>, QFAold, [], 0);
+0985         setsp(<span class="string">'QDA'</span>, QDAold, [], 0);
+0986 
+0987         <span class="comment">%setsp('SF', SFold, [], 0);</span>
+0988         <span class="comment">%setsp('SD', SDold, [], 0);</span>
+0989     <span class="keyword">else</span>
+0990         <span class="comment">% Set the model to proper gains and bend K value</span>
+0991         <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>(<span class="string">'SetModel'</span>, FileName);
+0992     <span class="keyword">end</span>
+0993 
+0994 <span class="keyword">else</span>
+0995 
+0996     error(<span class="string">'   SETLOCODATA command not known.'</span>);
+0997 
+0998 <span class="keyword">end</span>
+0999</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

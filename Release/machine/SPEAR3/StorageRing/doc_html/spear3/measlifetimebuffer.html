@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measlifetimebuffer</title>
+  <meta name="keywords" content="measlifetimebuffer">
+  <meta name="description" content="NN = getpv('SPEAR:DcctTrace.NORD');">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; measlifetimebuffer.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measlifetimebuffer
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>NN = getpv('SPEAR:DcctTrace.NORD');</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [tau, t, DCCT] = measlifetimebuffer </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> NN = getpv('SPEAR:DcctTrace.NORD');
+ DCCTAVG = getpv('SPEAR:BeamCurrAvg');</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [tau, t, DCCT] = measlifetimebuffer</a>
+0002 
+0003 <span class="comment">% NN = getpv('SPEAR:DcctTrace.NORD');</span>
+0004 <span class="comment">% DCCTAVG = getpv('SPEAR:BeamCurrAvg');</span>
+0005 
+0006 
+0007 N = 325;
+0008 
+0009 t0 = getpv(<span class="string">'SPEAR:DcctTrace.XVAL'</span>);
+0010 d0 = getpv(<span class="string">'SPEAR:DcctTrace.RVAL'</span>);
+0011 t = t0;
+0012 d = d0;
+0013 
+0014 
+0015 <span class="comment">% Flush the first buffer</span>
+0016 <span class="keyword">while</span> d(1) == d0(1) 
+0017     t = getpv(<span class="string">'SPEAR:DcctTrace.XVAL'</span>);
+0018     d = getpv(<span class="string">'SPEAR:DcctTrace.RVAL'</span>);
+0019     pause(.5);
+0020 <span class="keyword">end</span>
+0021 
+0022 
+0023 <span class="comment">% Second buffer should be new data</span>
+0024 d0 = d;
+0025 <span class="keyword">while</span> d(1) == d0(1) 
+0026     t = getpv(<span class="string">'SPEAR:DcctTrace.XVAL'</span>);
+0027     d = getpv(<span class="string">'SPEAR:DcctTrace.RVAL'</span>);
+0028     pause(.5);
+0029 <span class="keyword">end</span>
+0030 <span class="keyword">while</span> d(330) == 0 
+0031     t = getpv(<span class="string">'SPEAR:DcctTrace.XVAL'</span>);
+0032     d = getpv(<span class="string">'SPEAR:DcctTrace.RVAL'</span>);
+0033     pause(.5);
+0034 <span class="keyword">end</span>
+0035 [tau1, t, DCCT] = measlifetime(t(1:N),100*d(1:N));
+0036 
+0037 
+0038 <span class="comment">% Average another data set</span>
+0039 d0 = d;
+0040 <span class="keyword">while</span> d(1) == d0(1) 
+0041     t = getpv(<span class="string">'SPEAR:DcctTrace.XVAL'</span>);
+0042     d = getpv(<span class="string">'SPEAR:DcctTrace.RVAL'</span>);
+0043     pause(.5);
+0044 <span class="keyword">end</span>
+0045 <span class="keyword">while</span> d(N) == 0 
+0046     t = getpv(<span class="string">'SPEAR:DcctTrace.XVAL'</span>);
+0047     d = getpv(<span class="string">'SPEAR:DcctTrace.RVAL'</span>);
+0048     pause(.5);
+0049 <span class="keyword">end</span>
+0050 [tau2, t, DCCT] = measlifetime(t(1:N),100*d(1:N));
+0051 
+0052 
+0053 tau = (tau1 + tau2)/2;
+0054 
+0055 
+0056 
+0057 <span class="comment">% hold on</span>
+0058 <span class="comment">% plot(t,DCCT,'r');</span>
+0059 <span class="comment">% hold off</span></pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

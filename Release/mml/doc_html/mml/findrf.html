@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of findrf</title>
+  <meta name="keywords" content="findrf">
+  <meta name="description" content="FINDRF - Finds the RF frequency that minimizes the energy change due">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; findrf.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>findrf
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>FINDRF - Finds the RF frequency that minimizes the energy change due</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = findrf(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FINDRF - Finds the RF frequency that minimizes the energy change due
+         to the horizonal correctors after the next orbit correction.
+         Hopefully this method also finds an optimal RF frequency setting.
+         As with anything, you should know what you are doing before
+         running this function.  How the optimal RF frequency setpoint
+         is found usually depends the type of accelerator.
+
+  INPUTS (optional)
+  1. 'Display' - Plot orbit information {Default unless there are outputs variables}
+     'NoDisplay' - No plot
+  2. 'SetRF'   - Set the RF frequency (prompts for a setpoint change if 'Display' is on)
+     'NoSetRF' - No RF frequency setpoint change
+  3. 'Position' {Default} or 'Phase' for the x-axis units (if display is on)
+  4. 'Online', 'Model', 'Manual', 'Hardware', 'Physics', etc. (the usual Units and Mode flags)
+
+  OUTPUTS
+  1. DeltaRF - Half the RF change that equates to the energy change of the horizontal correctors
+               This is a guess that seems to come close.  Iterating with orbit correction is required.
+               The exact scaling will depend on the accelerator (.35 workd well at the ALS).  It's 
+               better to use orbitcorrectionmethods with the RF frequency restricted to not change the energy.
+  2. DeltaEnergy - Total energy change due to the horizontal correctors
+  3. DeltaL - Path length change that equates to the total energy change (DeltaEnergy)
+
+  NOTES
+  1. Uses plotcm
+ 
+  See also <a href="rmdisp.html" class="code" title="function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)">rmdisp</a>, <a href="plotcm.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)">plotcm</a>, <a href="findrf1.html" class="code" title="function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName)">findrf1</a>, <a href="orbitcorrectionmethods.html" class="code" title="function [OCS, SmatNoWeights, S, U, V] = orbitcorrectionmethods(OCS, Smat, S, U, V)">orbitcorrectionmethods</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>	GETVCMFAMILY - Returns the default vertical corrector family</li><li><a href="plotcm.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)">plotcm</a>	PLOTCM - Plots the horizontal and vertical corrector magnet families and</li><li><a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a>	STEPRF - Increment change in the RF frequency</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = findrf(varargin)</a>
+0002 <span class="comment">%FINDRF - Finds the RF frequency that minimizes the energy change due</span>
+0003 <span class="comment">%         to the horizonal correctors after the next orbit correction.</span>
+0004 <span class="comment">%         Hopefully this method also finds an optimal RF frequency setting.</span>
+0005 <span class="comment">%         As with anything, you should know what you are doing before</span>
+0006 <span class="comment">%         running this function.  How the optimal RF frequency setpoint</span>
+0007 <span class="comment">%         is found usually depends the type of accelerator.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%  INPUTS (optional)</span>
+0010 <span class="comment">%  1. 'Display' - Plot orbit information {Default unless there are outputs variables}</span>
+0011 <span class="comment">%     'NoDisplay' - No plot</span>
+0012 <span class="comment">%  2. 'SetRF'   - Set the RF frequency (prompts for a setpoint change if 'Display' is on)</span>
+0013 <span class="comment">%     'NoSetRF' - No RF frequency setpoint change</span>
+0014 <span class="comment">%  3. 'Position' {Default} or 'Phase' for the x-axis units (if display is on)</span>
+0015 <span class="comment">%  4. 'Online', 'Model', 'Manual', 'Hardware', 'Physics', etc. (the usual Units and Mode flags)</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  OUTPUTS</span>
+0018 <span class="comment">%  1. DeltaRF - Half the RF change that equates to the energy change of the horizontal correctors</span>
+0019 <span class="comment">%               This is a guess that seems to come close.  Iterating with orbit correction is required.</span>
+0020 <span class="comment">%               The exact scaling will depend on the accelerator (.35 workd well at the ALS).  It's</span>
+0021 <span class="comment">%               better to use orbitcorrectionmethods with the RF frequency restricted to not change the energy.</span>
+0022 <span class="comment">%  2. DeltaEnergy - Total energy change due to the horizontal correctors</span>
+0023 <span class="comment">%  3. DeltaL - Path length change that equates to the total energy change (DeltaEnergy)</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%  NOTES</span>
+0026 <span class="comment">%  1. Uses plotcm</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%  See also rmdisp, plotcm, findrf1, orbitcorrectionmethods</span>
+0029 
+0030 <span class="comment">%  Written by Greg Portmann</span>
+0031 
+0032 
+0033 <span class="keyword">if</span> nargout == 0
+0034     DisplayFlag = <span class="string">'Display'</span>;
+0035 <span class="keyword">else</span>
+0036     DisplayFlag = <span class="string">'NoDisplay'</span>;
+0037 <span class="keyword">end</span>
+0038 XAxisFlag = <span class="string">'Position'</span>;
+0039 ChangeRFFlag = 1;
+0040 
+0041 
+0042 <span class="comment">% Input parsing</span>
+0043 InputFlags = {};
+0044 <span class="keyword">for</span> i = length(varargin):-1:1
+0045     <span class="keyword">if</span> isstruct(varargin{i})
+0046         <span class="comment">% Ignor structures</span>
+0047     <span class="keyword">elseif</span> iscell(varargin{i})
+0048         <span class="comment">% Ignor cells</span>
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0050         <span class="comment">% Just remove</span>
+0051         varargin(i) = [];
+0052     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0053         <span class="comment">% Just remove</span>
+0054         varargin(i) = [];
+0055     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Position'</span>)
+0056         XAxisFlag = <span class="string">'Position'</span>;
+0057         varargin(i) = [];
+0058     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Phase'</span>)
+0059         XAxisFlag = <span class="string">'Phase'</span>;
+0060         varargin(i) = [];
+0061     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'SetRF'</span>)
+0062         ChangeRFFlag = 1;
+0063         varargin(i) = [];
+0064     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoSetRF'</span>)
+0065         ChangeRFFlag = 0;
+0066         varargin(i) = [];
+0067     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0068         DisplayFlag = <span class="string">'Display'</span>;
+0069         varargin(i) = [];
+0070     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0071         DisplayFlag = <span class="string">'NoDisplay'</span>;
+0072         varargin(i) = [];
+0073     <span class="keyword">end</span>
+0074 <span class="keyword">end</span>
+0075 
+0076 
+0077 Family1 = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0078 Family2 = <a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>;
+0079 
+0080 [DeltaRF, HCMEnergyChangeTotal, DeltaL] = <a href="plotcm.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)">plotcm</a>(varargin{:}, DisplayFlag);
+0081 DeltaRF = DeltaRF/2;
+0082 
+0083 
+0084 <span class="comment">% Set the RF frequency</span>
+0085 <span class="keyword">if</span> ChangeRFFlag
+0086     <span class="keyword">if</span> ~isempty(DeltaRF)
+0087         <span class="comment">% Half the energy change seems to be a good RF change</span>
+0088 
+0089         <span class="keyword">if</span> DisplayFlag
+0090             [RFUnits, RFUnitsString] = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(<span class="string">'RF'</span>);
+0091             answer = inputdlg({strvcat(strvcat(sprintf(<span class="string">'Recommend change in RF is %g %s (half the energy change is a guess)'</span>, DeltaRF, RFUnitsString), <span class="string">'  '</span>), <span class="string">'Change the RF frequency?'</span>)},<span class="string">'FINDRF'</span>,1,{sprintf(<span class="string">'%g'</span>,DeltaRF)});
+0092             <span class="keyword">if</span> isempty(answer)
+0093                 fprintf(<span class="string">'   No change was made to the RF frequency.\n'</span>);
+0094                 <span class="keyword">return</span>
+0095             <span class="keyword">end</span>
+0096             DeltaRF = str2num(answer{1});
+0097         <span class="keyword">end</span>
+0098         <a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a>(DeltaRF, varargin{:});
+0099         <span class="keyword">if</span> DisplayFlag
+0100             fprintf(<span class="string">'   RF frequency change by %f %s.\n'</span>, DeltaRF, RFUnitsString);
+0101         <span class="keyword">end</span>
+0102     <span class="keyword">else</span>
+0103         <span class="keyword">if</span> DisplayFlag
+0104             error(<span class="string">'RF frequency not changed because of a problem converting the units for dispersion and orbit to RF frequency.'</span>);
+0105         <span class="keyword">end</span>
+0106     <span class="keyword">end</span>
+0107 <span class="keyword">end</span>
+0108 
+0109</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

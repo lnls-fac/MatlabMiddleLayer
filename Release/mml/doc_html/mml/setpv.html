@@ -1,0 +1,1526 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setpv</title>
+  <meta name="keywords" content="setpv">
+  <meta name="description" content="SETPV - Setpoint change of the online system or model">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setpv.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setpv
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETPV - Setpoint change of the online system or model</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function ErrorFlag = setpv(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETPV - Setpoint change of the online system or model
+
+  FamilyName Method
+  ErrorFlag = setpv(Family, Field, NewSP, DeviceList, WaitFlag)
+
+  Data Structure
+  ErrorFlag = setpv(DataStructure, WaitFlag)
+
+  ChannelName Method
+  ErrorFlag = setpv(ChannelName, NewSP, WaitFlag)
+  ErrorFlag = setpv(ChannelName, Field, NewSP, WaitFlag)
+
+  CommonName Method
+  ErrorFlag = setpv(CommonNames, NewSP, WaitFlag)
+  ErrorFlag = setpv(CommonNames, Field, NewSP, WaitFlag)
+  ErrorFlag = setpv(Family, Field, NewSP, CommonNames, WaitFlag)
+
+  INPUTS
+  1. Family - FamilyName
+              Data Structure
+              Channel Name or matrix of Channel Names (see note #5)
+              AcceleratorObject
+              Use Family=[] in CommonName method to search all Families
+              (or Cell Array of inputs)
+
+  2. Field - AcceleratorObject Field name ('Monitor', 'Setpoint', etc)
+             {Default: 'Monitor' or '' for ChannelNames method}
+             If Family is a cell array then Field must be a cell array
+
+  3. NewSP - New Setpoints or cell array of Setpoints
+             For String inputs: 
+             a. Not all setpvonline methods can handle string setpoints.  
+             b. String setpoints will fail if hw2physics or physics2hw are needed.
+             c. The Field input must exist otherwise the string Setpoint will be confused for a Field.
+
+  4. DeviceList - ([Sector Device #] or [element #]) {Default or empty list: whole family}
+                  Note: all numerical inputs must be column vectors
+     CommonName - Common name can replace a DeviceList (scalar or vector outputs)
+
+  5. WaitFlag - 0    -&gt; return immediately {Default}
+                &gt; 0  -&gt; wait until ramping is done then adds an extra delay equal to WaitFlag
+                = -1 -&gt; wait until ramping is done
+                = -2 -&gt; wait until ramping is done then adds an extra delay for fresh data
+                        from the BPMs
+                = -3 -&gt; wait until ramping is done then adds an extra delay for fresh data
+                        from the tune measurement system
+                = -4 -&gt; wait until ramping is done then wait for a carriage return
+     Note: For channel names, it is assumed the ramp time is immediate.
+
+  6. Units flag overrides
+     'Physics'  - Use physics  units
+     'Hardware' - Use hardware units
+
+  7. Mode flag overrides
+     'Online' - Set data online
+     'Model'  - Set data on the model
+     'Manual' - Set data manually
+
+  8. 'Abs' or 'Absolute'   - Absolute setpoint change {Default}
+     'Inc' or 'Incrmental' - Incremental setpoint change
+
+  OUTPUTS
+  1. ErrorFlag - 0   -&gt; OK
+                else -&gt; error or warning condition occurred
+     Note: ErrorFlag is only used if AD.ErrorWarningLevel &lt; 0, otherwise a Matlab error
+           in issued.  Use try;catch statements to catch the errors.
+
+  NOTES
+  1. For data structure inputs:
+     Family     = DataStructure.FamilyName (This field must exist)
+     Field      = DataStructure.Field      (Field can be overridden on the input line)
+     NewSP      = DataStructure.Data       (NewSP can be overridden on the input line)
+     DeviceList = DataStructure.DeviceList (DeviceList can be overridden on the input line)
+     Units      = DataStructure.Units      (Units can be overridden on the input line)
+     (The Mode field is ignored!)
+
+  2. The number of colomns of NewSP and DeviceList must be equal,
+     or NewSP must be a scalar.  If NewSP is a scalar, then all
+     devices in DeviceList will be set to the same value.
+
+  3. When using cell array all inputs must be the same size cell array
+     and the output will also be a cell array.  Field and WaitFlag can be
+     cells but they don't have to be.
+
+  4. ChannelName method:
+     a. Always Online!
+     b. The optional Field input is added as a .Field to the channel name
+     c. If use setpv(ChannelName, NewSP, WaitFlag) then NewSP must a numeric.
+        Use setpv(ChannelName, '',NewSP, WaitFlag) if NewSP is a string.
+
+  5. For cell array inputs:
+     a. Input 1 defines the maximum size of all cells
+     b. The cell array size must be 1 or equal to the number of cell in input #1
+     c. WaitFlag can be a cell but it doesn't have to be.
+
+  6. WaitFlag
+     a. If no change is seen on the AM then an error will occur.  The tolerance for this
+        may need to be changed depending on the accelerator (edit the end of this function to do so)
+     b. The delay for WaitFlag = -2 is in the AD.  It is often better to use the FreshDataFlag when
+        getting BPM data but the data must to noisy for this to work.
+
+  7. If say Golden is a software field in the MML structure in the BPMx family, then 
+     setpv('BPMx','Golden', NewValue, DeviceList) will set the data in that field. 
+
+  EXAMPES
+  1. setpv('HCM','Setpoint',1.23);               Sets the entire HCM family to 1.23
+  2. setpv({'HCM','VCM'},'Setpoint',{10.4,5.3}); Sets the entire HCM family to 10.4 and VCM family to 5.3
+  3. setpv('HCM','Setpoint',1.23,[1 3]);    Simple DeviceList method
+  4. setpv('HCM','Setpoint',1.23, 3);       Simple ElementList method
+  5. setpv(AO('HCM'),'Setpoint',1.5,[1 2]);     If AO is a properly formatted AcceleratorObject Structure
+                                                    then this sets the 1st sector, 2nd element to 1.5
+  6. setpv('HCM','Setpoint',1.23,'1CX3');   CommonName method with    a Family specified (spear3 naming convection)
+  7. setpv([],'Setpoint',1.23,'1CX3');      CommonName method without a Family specified (spear3 naming convection)
+
+  See also <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>, <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>, <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>, <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>, <a href="steppv.html" class="code" title="function ErrorFlag = steppv(varargin)">steppv</a>, <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>, setpvmodel, setpvonline</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>	COMMON2DEV - Converts a common name to a device list</li><li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>	FAMILY2CHANNEL - Converts the family name to a channel name</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>	GETRAMPRATE - Returns the ramp rate for a family</li><li><a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>	GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>	PHYSICS2HW - Converts from 'Physics' units to 'Hardware' units</li><li><a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>	SETFAMILYDATA - Sets data associated with accelerator control</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="correctors2golden.html" class="code" title="function correctors2golden">correctors2golden</a>	CORRECTORS2GOLDEN - Sets the default corrector families to the golden configuration values</li><li><a href="measidfftable.html" class="code" title="function measidfftable(Sector, BPMFlag)">measidfftable</a>	MEASIDFFTABLE - Measures an insertion device feed forward table for the vertical gap</li><li><a href="plotfamily.html" class="code" title="function varargout = plotfamily(varargin)">plotfamily</a>	PLOTFAMILY - Plots by middle layer family name</li><li><a href="setam.html" class="code" title="function ErrorFlag = setam(Family, varargin)">setam</a>	SETAM - Makes an absolute change to the 'Monitor' field</li><li><a href="setenergy.html" class="code" title="function [ConfigSetpointEnd, ConfigSetpointStart, ConfigSetpointPhysics] = setenergy(varargin)">setenergy</a>	SETENERGY - Sets the storage ring energy (GeV) by ramping all lattice magnets</li><li><a href="setmachineconfig.html" class="code" title="function [ConfigSetpoint, FileName] = setmachineconfig(varargin)">setmachineconfig</a>	SETMACHINECONFIG - Sets the storage ring setpoints from a file or configuration data structure</li><li><a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>	SETORBIT - Orbit correction function</li><li><a href="setorbitbumpgui.html" class="code" title="function varargout = setorbitbumpgui(varargin)">setorbitbumpgui</a>	SETORBITBUMPGUI M-file for setorbitbumpgui.fig</li><li><a href="setorbitgui.html" class="code" title="function varargout = setorbitgui(varargin)">setorbitgui</a>	SETORBITGUI - Orbit correction GUI</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li><li><a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>	SETRF - Sets the RF frequency</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li><li><a href="steppv.html" class="code" title="function ErrorFlag = steppv(varargin)">steppv</a>	STEPPV - Incremental setpoint change of a process variable or simulated value</li><li><a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>	STEPSP - Step the setpoint for family</li><li><a href="sweepenergy.html" class="code" title="function sweepenergy(PercentChangeInEnergy)">sweepenergy</a>	SWEEPENERGY - Energy sweep of the storage ring</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function ErrorFlag = local_setpv(AO, Field, NewSP, DeviceList, WaitFlag)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ErrorFlag = setpv(varargin)</a>
+0002 <span class="comment">%SETPV - Setpoint change of the online system or model</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  FamilyName Method</span>
+0005 <span class="comment">%  ErrorFlag = setpv(Family, Field, NewSP, DeviceList, WaitFlag)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  Data Structure</span>
+0008 <span class="comment">%  ErrorFlag = setpv(DataStructure, WaitFlag)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  ChannelName Method</span>
+0011 <span class="comment">%  ErrorFlag = setpv(ChannelName, NewSP, WaitFlag)</span>
+0012 <span class="comment">%  ErrorFlag = setpv(ChannelName, Field, NewSP, WaitFlag)</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  CommonName Method</span>
+0015 <span class="comment">%  ErrorFlag = setpv(CommonNames, NewSP, WaitFlag)</span>
+0016 <span class="comment">%  ErrorFlag = setpv(CommonNames, Field, NewSP, WaitFlag)</span>
+0017 <span class="comment">%  ErrorFlag = setpv(Family, Field, NewSP, CommonNames, WaitFlag)</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  INPUTS</span>
+0020 <span class="comment">%  1. Family - FamilyName</span>
+0021 <span class="comment">%              Data Structure</span>
+0022 <span class="comment">%              Channel Name or matrix of Channel Names (see note #5)</span>
+0023 <span class="comment">%              AcceleratorObject</span>
+0024 <span class="comment">%              Use Family=[] in CommonName method to search all Families</span>
+0025 <span class="comment">%              (or Cell Array of inputs)</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  2. Field - AcceleratorObject Field name ('Monitor', 'Setpoint', etc)</span>
+0028 <span class="comment">%             {Default: 'Monitor' or '' for ChannelNames method}</span>
+0029 <span class="comment">%             If Family is a cell array then Field must be a cell array</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  3. NewSP - New Setpoints or cell array of Setpoints</span>
+0032 <span class="comment">%             For String inputs:</span>
+0033 <span class="comment">%             a. Not all setpvonline methods can handle string setpoints.</span>
+0034 <span class="comment">%             b. String setpoints will fail if hw2physics or physics2hw are needed.</span>
+0035 <span class="comment">%             c. The Field input must exist otherwise the string Setpoint will be confused for a Field.</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">%  4. DeviceList - ([Sector Device #] or [element #]) {Default or empty list: whole family}</span>
+0038 <span class="comment">%                  Note: all numerical inputs must be column vectors</span>
+0039 <span class="comment">%     CommonName - Common name can replace a DeviceList (scalar or vector outputs)</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%  5. WaitFlag - 0    -&gt; return immediately {Default}</span>
+0042 <span class="comment">%                &gt; 0  -&gt; wait until ramping is done then adds an extra delay equal to WaitFlag</span>
+0043 <span class="comment">%                = -1 -&gt; wait until ramping is done</span>
+0044 <span class="comment">%                = -2 -&gt; wait until ramping is done then adds an extra delay for fresh data</span>
+0045 <span class="comment">%                        from the BPMs</span>
+0046 <span class="comment">%                = -3 -&gt; wait until ramping is done then adds an extra delay for fresh data</span>
+0047 <span class="comment">%                        from the tune measurement system</span>
+0048 <span class="comment">%                = -4 -&gt; wait until ramping is done then wait for a carriage return</span>
+0049 <span class="comment">%     Note: For channel names, it is assumed the ramp time is immediate.</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">%  6. Units flag overrides</span>
+0052 <span class="comment">%     'Physics'  - Use physics  units</span>
+0053 <span class="comment">%     'Hardware' - Use hardware units</span>
+0054 <span class="comment">%</span>
+0055 <span class="comment">%  7. Mode flag overrides</span>
+0056 <span class="comment">%     'Online' - Set data online</span>
+0057 <span class="comment">%     'Model'  - Set data on the model</span>
+0058 <span class="comment">%     'Manual' - Set data manually</span>
+0059 <span class="comment">%</span>
+0060 <span class="comment">%  8. 'Abs' or 'Absolute'   - Absolute setpoint change {Default}</span>
+0061 <span class="comment">%     'Inc' or 'Incrmental' - Incremental setpoint change</span>
+0062 <span class="comment">%</span>
+0063 <span class="comment">%  OUTPUTS</span>
+0064 <span class="comment">%  1. ErrorFlag - 0   -&gt; OK</span>
+0065 <span class="comment">%                else -&gt; error or warning condition occurred</span>
+0066 <span class="comment">%     Note: ErrorFlag is only used if AD.ErrorWarningLevel &lt; 0, otherwise a Matlab error</span>
+0067 <span class="comment">%           in issued.  Use try;catch statements to catch the errors.</span>
+0068 <span class="comment">%</span>
+0069 <span class="comment">%  NOTES</span>
+0070 <span class="comment">%  1. For data structure inputs:</span>
+0071 <span class="comment">%     Family     = DataStructure.FamilyName (This field must exist)</span>
+0072 <span class="comment">%     Field      = DataStructure.Field      (Field can be overridden on the input line)</span>
+0073 <span class="comment">%     NewSP      = DataStructure.Data       (NewSP can be overridden on the input line)</span>
+0074 <span class="comment">%     DeviceList = DataStructure.DeviceList (DeviceList can be overridden on the input line)</span>
+0075 <span class="comment">%     Units      = DataStructure.Units      (Units can be overridden on the input line)</span>
+0076 <span class="comment">%     (The Mode field is ignored!)</span>
+0077 <span class="comment">%</span>
+0078 <span class="comment">%  2. The number of colomns of NewSP and DeviceList must be equal,</span>
+0079 <span class="comment">%     or NewSP must be a scalar.  If NewSP is a scalar, then all</span>
+0080 <span class="comment">%     devices in DeviceList will be set to the same value.</span>
+0081 <span class="comment">%</span>
+0082 <span class="comment">%  3. When using cell array all inputs must be the same size cell array</span>
+0083 <span class="comment">%     and the output will also be a cell array.  Field and WaitFlag can be</span>
+0084 <span class="comment">%     cells but they don't have to be.</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">%  4. ChannelName method:</span>
+0087 <span class="comment">%     a. Always Online!</span>
+0088 <span class="comment">%     b. The optional Field input is added as a .Field to the channel name</span>
+0089 <span class="comment">%     c. If use setpv(ChannelName, NewSP, WaitFlag) then NewSP must a numeric.</span>
+0090 <span class="comment">%        Use setpv(ChannelName, '',NewSP, WaitFlag) if NewSP is a string.</span>
+0091 <span class="comment">%</span>
+0092 <span class="comment">%  5. For cell array inputs:</span>
+0093 <span class="comment">%     a. Input 1 defines the maximum size of all cells</span>
+0094 <span class="comment">%     b. The cell array size must be 1 or equal to the number of cell in input #1</span>
+0095 <span class="comment">%     c. WaitFlag can be a cell but it doesn't have to be.</span>
+0096 <span class="comment">%</span>
+0097 <span class="comment">%  6. WaitFlag</span>
+0098 <span class="comment">%     a. If no change is seen on the AM then an error will occur.  The tolerance for this</span>
+0099 <span class="comment">%        may need to be changed depending on the accelerator (edit the end of this function to do so)</span>
+0100 <span class="comment">%     b. The delay for WaitFlag = -2 is in the AD.  It is often better to use the FreshDataFlag when</span>
+0101 <span class="comment">%        getting BPM data but the data must to noisy for this to work.</span>
+0102 <span class="comment">%</span>
+0103 <span class="comment">%  7. If say Golden is a software field in the MML structure in the BPMx family, then</span>
+0104 <span class="comment">%     setpv('BPMx','Golden', NewValue, DeviceList) will set the data in that field.</span>
+0105 <span class="comment">%</span>
+0106 <span class="comment">%  EXAMPES</span>
+0107 <span class="comment">%  1. setpv('HCM','Setpoint',1.23);               Sets the entire HCM family to 1.23</span>
+0108 <span class="comment">%  2. setpv({'HCM','VCM'},'Setpoint',{10.4,5.3}); Sets the entire HCM family to 10.4 and VCM family to 5.3</span>
+0109 <span class="comment">%  3. setpv('HCM','Setpoint',1.23,[1 3]);    Simple DeviceList method</span>
+0110 <span class="comment">%  4. setpv('HCM','Setpoint',1.23, 3);       Simple ElementList method</span>
+0111 <span class="comment">%  5. setpv(AO('HCM'),'Setpoint',1.5,[1 2]);     If AO is a properly formatted AcceleratorObject Structure</span>
+0112 <span class="comment">%                                                    then this sets the 1st sector, 2nd element to 1.5</span>
+0113 <span class="comment">%  6. setpv('HCM','Setpoint',1.23,'1CX3');   CommonName method with    a Family specified (spear3 naming convection)</span>
+0114 <span class="comment">%  7. setpv([],'Setpoint',1.23,'1CX3');      CommonName method without a Family specified (spear3 naming convection)</span>
+0115 <span class="comment">%</span>
+0116 <span class="comment">%  See also getam, getsp, getpv, setsp, steppv, stepsp, setpvmodel, setpvonline</span>
+0117 
+0118 <span class="comment">%  Written by Greg Portmann</span>
+0119 
+0120 
+0121 <span class="comment">% Defaults</span>
+0122 WaitFlagDefault = 0;
+0123 FieldDefault = <span class="string">'Setpoint'</span>;
+0124 
+0125 
+0126 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0127 <span class="comment">% Input Parsing %</span>
+0128 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0129 Field = FieldDefault;
+0130 IncrementalFlag = 0;
+0131 DeviceList = [];
+0132 WaitFlag = [];
+0133 ModeFlag = <span class="string">''</span>;
+0134 UnitsFlag = <span class="string">''</span>;
+0135 InputFlags = {};
+0136 <span class="keyword">for</span> i = length(varargin):-1:1
+0137     <span class="keyword">if</span> isstruct(varargin{i})
+0138         <span class="comment">% Ignor structures</span>
+0139     <span class="keyword">elseif</span> iscell(varargin{i})
+0140         <span class="comment">% Ignor cells</span>
+0141     <span class="keyword">elseif</span> isnumeric(varargin{i})
+0142         <span class="comment">% Ignor numeric</span>
+0143     <span class="keyword">elseif</span> isa(varargin{i},<span class="string">'AccObj'</span>)
+0144         AccObj1 = struct(varargin{i});
+0145         Families = fieldnames(AccObj1);
+0146         j = 0;
+0147         <span class="keyword">for</span> k = 1:length(Families)
+0148             <span class="keyword">if</span> ~isempty(AccObj1.(Families{k}))
+0149                 j = j + 1;
+0150                 tmpcell{j} = AccObj1.(Families{k});
+0151             <span class="keyword">end</span>
+0152         <span class="keyword">end</span>
+0153         <span class="keyword">if</span> length(tmpcell) == 1
+0154             varargin{i} = tmpcell{1};
+0155         <span class="keyword">else</span>
+0156             varargin{i} = tmpcell;
+0157         <span class="keyword">end</span>
+0158     <span class="keyword">elseif</span> ischar(varargin{i}) &amp;&amp; size(varargin{i},1)==1
+0159         <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0160             <span class="comment">% Remove and ignor</span>
+0161             varargin(i) = [];
+0162         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0163             <span class="comment">% Remove and ignor</span>
+0164             varargin(i) = [];
+0165         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0166             ModeFlag = <span class="string">'SIMULATOR'</span>;
+0167             InputFlags = [InputFlags varargin(i)];
+0168             varargin(i) = [];
+0169         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0170             ModeFlag = <span class="string">'Online'</span>;
+0171             InputFlags = [InputFlags varargin(i)];
+0172             varargin(i) = [];
+0173         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0174             ModeFlag = <span class="string">'Manual'</span>;
+0175             InputFlags = [InputFlags varargin(i)];
+0176             varargin(i) = [];
+0177         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Special'</span>)
+0178             ModeFlag = <span class="string">'Special'</span>;
+0179             InputFlags = [InputFlags varargin(i)];
+0180             varargin(i) = [];
+0181         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0182             UnitsFlag = <span class="string">'Physics'</span>;
+0183             InputFlags = [InputFlags varargin(i)];
+0184             varargin(i) = [];
+0185         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0186             UnitsFlag = <span class="string">'Hardware'</span>;
+0187             InputFlags = [InputFlags varargin(i)];
+0188             varargin(i) = [];
+0189         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Inc'</span>) || strcmpi(varargin{i},<span class="string">'Incremental'</span>)
+0190             IncrementalFlag = 1;
+0191             InputFlags = [InputFlags varargin(i)];
+0192             varargin(i) = [];
+0193         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Abs'</span>) || strcmpi(varargin{i},<span class="string">'Absolute'</span>)
+0194             IncrementalFlag = 0;
+0195             InputFlags = [InputFlags varargin(i)];
+0196             varargin(i) = [];
+0197         <span class="comment">%elseif strcmpi(varargin{i},'String') || strcmpi(varargin{i},'Char-')</span>
+0198         <span class="comment">%    % Remove and ignor</span>
+0199         <span class="comment">%    varargin(i) = [];</span>
+0200         <span class="keyword">end</span>
+0201     <span class="keyword">end</span>
+0202 <span class="keyword">end</span>
+0203 
+0204 <span class="keyword">if</span> isempty(varargin)
+0205     error(<span class="string">'Not enough inputs'</span>);
+0206 <span class="keyword">end</span>
+0207 
+0208 Family = varargin{1};
+0209 
+0210 
+0211 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0212 <span class="comment">% CELL OR CELL ARRAY INPUT %</span>
+0213 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0214 <span class="keyword">if</span> iscell(varargin{1})
+0215     <span class="comment">% Iterate on each cell</span>
+0216     <span class="comment">% ErrorFlag = setpv(Family, Field, NewSP, DeviceList, WaitFlag)</span>
+0217     <span class="comment">% ErrorFlag = setpv(DataStructure, WaitFlag)</span>
+0218     <span class="comment">% ErrorFlag = setpv(ChannelName, NewSP)</span>
+0219     <span class="comment">% ErrorFlag = setpv(Family, Field, NewSP, CommonNames, WaitFlag)</span>
+0220 
+0221     <span class="comment">% Set everything with WaitFlag==0</span>
+0222     DoItAgainFlag = 0;
+0223     ErrorFlag = 0;
+0224     <span class="keyword">for</span> i = 1:size(varargin{1},1)
+0225         <span class="keyword">for</span> j = 1:size(varargin{1},2)
+0226 
+0227             <span class="comment">% Build the input line</span>
+0228             <span class="keyword">for</span> k = 1:length(varargin)
+0229                 <span class="keyword">if</span> ~iscell(varargin{k})
+0230                     Inputs1{1,k} = varargin{k};
+0231                 <span class="keyword">elseif</span> length(varargin{k}) == 1
+0232                     Inputs1{1,k} = varargin{k}{1};
+0233                 <span class="keyword">elseif</span> (size(varargin{k},1) == size(varargin{1},1)) &amp;&amp; (size(varargin{k},2) == size(varargin{1},2))
+0234                     Inputs1{1,k} = varargin{k}{i,j};
+0235                 <span class="keyword">else</span>
+0236                     error(<span class="string">'When using cells, all the cells must be the same size or length 1 (repeated).'</span>);
+0237                 <span class="keyword">end</span>
+0238             <span class="keyword">end</span>
+0239 
+0240             <span class="comment">% Remove WaitFlag on first set if WaitFlag~=0 on any cell</span>
+0241             <span class="keyword">if</span> isstruct(varargin{1}{i,j})
+0242                 <span class="keyword">if</span> length(Inputs1) &gt;= 2
+0243                     <span class="keyword">if</span> ischar(Inputs1{2})
+0244                         <span class="comment">% Inputs1{2} might be 'setpoint' due to setsp</span>
+0245                         <span class="keyword">if</span> length(Inputs1) &gt;= 3
+0246                             <span class="keyword">if</span> Inputs1{3} ~= 0
+0247                                 DoItAgainFlag = 1;
+0248                                 Inputs1{2} = 0;
+0249                             <span class="keyword">end</span>
+0250                             Inputs1(3) = [];
+0251                         <span class="keyword">else</span>
+0252                             DoItAgainFlag = 1;
+0253                         <span class="keyword">end</span>
+0254                     <span class="keyword">else</span>
+0255                         <span class="keyword">if</span> Inputs1{2} ~= 0
+0256                             DoItAgainFlag = 1;
+0257                             Inputs1{2} = 0;
+0258                         <span class="keyword">end</span>
+0259                     <span class="keyword">end</span>
+0260                 <span class="keyword">else</span>
+0261                     DoItAgainFlag = 1;
+0262                 <span class="keyword">end</span>
+0263             <span class="keyword">elseif</span> length(Inputs1) == 2
+0264                 <span class="comment">% For ChannelName just set once</span>
+0265             <span class="keyword">elseif</span> length(Inputs1) == 3
+0266                 DoItAgainFlag = 1;
+0267                 Inputs1{4} = [];
+0268                 Inputs1{5} = 0;
+0269             <span class="keyword">elseif</span> length(Inputs1) == 4
+0270                 DoItAgainFlag = 1;
+0271                 Inputs1{5} = 0;
+0272             <span class="keyword">elseif</span> length(Inputs1) &gt;= 5
+0273                 <span class="keyword">if</span> Inputs1{5} ~= 0
+0274                     DoItAgainFlag = 1;
+0275                     Inputs1{5} = 0;
+0276                 <span class="keyword">end</span>
+0277             <span class="keyword">end</span>
+0278             
+0279             <span class="comment">% Make the setpoint change</span>
+0280             ErrorFlagNew = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Inputs1{:}, InputFlags{:});
+0281             ErrorFlag = ErrorFlag | any(ErrorFlagNew);
+0282         <span class="keyword">end</span>
+0283     <span class="keyword">end</span>
+0284 
+0285     <span class="comment">% Wait for the waitflag</span>
+0286     <span class="keyword">if</span> DoItAgainFlag
+0287         <span class="keyword">for</span> i = 1:size(varargin{1},1)
+0288             <span class="keyword">for</span> j = 1:size(varargin{1},2)
+0289 
+0290                 <span class="comment">% Build the input line</span>
+0291                 <span class="keyword">for</span> k = 1:length(varargin)
+0292                     <span class="keyword">if</span> ~iscell(varargin{k})
+0293                         Inputs1{1,k} = varargin{k};
+0294                     <span class="keyword">elseif</span> length(varargin{k}) == 1
+0295                         Inputs1{1,k} = varargin{k}{1};
+0296                     <span class="keyword">elseif</span> (size(varargin{k},1) == size(varargin{1},1)) &amp;&amp; (size(varargin{k},2) == size(varargin{1},2))
+0297                         Inputs1{1,k} = varargin{k}{i,j};
+0298                     <span class="keyword">else</span>
+0299                         error(<span class="string">'When using cells, all the cells must be the same size or length 1 (repeated).'</span>);
+0300                     <span class="keyword">end</span>
+0301                 <span class="keyword">end</span>
+0302 
+0303                 <span class="comment">% Make the setpoint change</span>
+0304                 ErrorFlagNew = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Inputs1{:}, InputFlags{:});
+0305                 ErrorFlag = ErrorFlag | any(ErrorFlagNew);
+0306             <span class="keyword">end</span>
+0307         <span class="keyword">end</span>
+0308     <span class="keyword">end</span>
+0309 
+0310     <span class="keyword">return</span>
+0311 <span class="keyword">end</span>
+0312 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0313 <span class="comment">% End cell input %</span>
+0314 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0315 
+0316 
+0317 
+0318 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0319 <span class="comment">% COMMONNAME - Commonname input with no family input %</span>
+0320 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0321 <span class="keyword">if</span> isempty(Family)
+0322     <span class="comment">% Common names with Family = []</span>
+0323     <span class="comment">% [], Field, NewSP, CommonNames</span>
+0324     
+0325     <span class="keyword">if</span> length(varargin) &gt;= 2
+0326         <span class="keyword">if</span> ischar(varargin{2})
+0327             Field = varargin{2};
+0328             varargin(2) = [];
+0329         <span class="keyword">end</span>
+0330     <span class="keyword">end</span>
+0331     <span class="keyword">if</span> isempty(Field)
+0332         Field = FieldDefault;
+0333     <span class="keyword">end</span>
+0334     <span class="keyword">if</span> length(varargin) &gt;= 2
+0335         NewSP = varargin{2};
+0336     <span class="keyword">else</span>
+0337         error(<span class="string">'New setpoint not found on input line'</span>);
+0338     <span class="keyword">end</span>
+0339     <span class="keyword">if</span> length(varargin) &gt;= 3
+0340         CommonNames = varargin{3};
+0341     <span class="keyword">else</span>
+0342         CommonNames = [];
+0343     <span class="keyword">end</span>
+0344     <span class="keyword">if</span> length(varargin) &gt;= 4
+0345         WaitFlag = varargin{4};
+0346     <span class="keyword">end</span>
+0347     <span class="keyword">if</span> isempty(WaitFlag)
+0348         WaitFlag = WaitFlagDefault;
+0349     <span class="keyword">end</span>
+0350     
+0351     <span class="keyword">if</span> size(NewSP,1) == 1
+0352         <span class="comment">% Set all elements to same value</span>
+0353         <span class="keyword">if</span> ischar(NewSP)
+0354             NewSP = ones(size(CommonNames,1),1) * NewSP;
+0355             NewSP = num2str(NewSP,<span class="string">'%c'</span>);
+0356         <span class="keyword">else</span>
+0357             NewSP = ones(size(CommonNames,1),1) * NewSP;
+0358         <span class="keyword">end</span>
+0359     <span class="keyword">elseif</span> size(NewSP,1) == size(CommonNames,1)
+0360         <span class="comment">% Input OK</span>
+0361     <span class="keyword">else</span>
+0362         error(<span class="string">'Size of NewSP must be equal to the number of Commonnames or a scalar!'</span>);
+0363     <span class="keyword">end</span>
+0364 
+0365     <span class="comment">% Convert all the common names to Family and Device lists</span>
+0366     [DeviceList, Family] = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(CommonNames, Field);
+0367 
+0368     <span class="keyword">if</span> size(Family, 1) == 1
+0369         <span class="comment">% 1 Family, Multiple devices</span>
+0370         ErrorFlag = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Family, Field, NewSP, DeviceList, WaitFlag, InputFlags{:});
+0371     <span class="keyword">else</span>
+0372         <span class="comment">% Multiple families</span>
+0373         <span class="comment">% It has to be in a loop for the simulator and to pickup special functions</span>
+0374         ErrorFlag = 0;
+0375         <span class="keyword">for</span> i = 1:size(Family,1)
+0376             ErrorFlag1 = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Family(i,:), Field, NewSP(i,:), DeviceList(i,:), 0, InputFlags{:});
+0377             ErrorFlag = ErrorFlag | ErrorFlag1;
+0378         <span class="keyword">end</span>
+0379         <span class="keyword">if</span> WaitFlag
+0380             <span class="keyword">for</span> i = 1:size(Family,1)
+0381                 ErrorFlag1 = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Family(i,:), Field, NewSP(i,:), DeviceList(i,:), WaitFlag, InputFlags{:});
+0382                 ErrorFlag = ErrorFlag | ErrorFlag1;
+0383             <span class="keyword">end</span>
+0384         <span class="keyword">end</span>
+0385     <span class="keyword">end</span>
+0386     
+0387     <span class="keyword">return</span>
+0388 <span class="keyword">end</span>
+0389 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0390 <span class="comment">% End CommonName input with no family input %</span>
+0391 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0392 
+0393 
+0394 
+0395 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0396 <span class="comment">% Parce inputs depending on Data structure, AO structure, Family, ChannelName method %</span>
+0397 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0398 <span class="keyword">if</span> isstruct(Family)
+0399     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0400     <span class="comment">% STRUCTURE INPUTS - Data structure or AO structure %</span>
+0401     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0402     <span class="keyword">if</span> isfield(varargin{1},<span class="string">'FamilyName'</span>) &amp;&amp; isfield(varargin{1},<span class="string">'Field'</span>)
+0403         <span class="comment">% setpv(DataStruct, Field, NewSP, WaitFlag)</span>
+0404         <span class="comment">%   Select FamilyName, DeviceList, Units from the structure (if not on the input line)</span>
+0405         <span class="comment">%   Mode in the structure is ignored</span>
+0406         Family = varargin{1}.FamilyName;
+0407 
+0408         <span class="comment">% The only input for a Data Structure can Field and WaitFlag</span>
+0409         Field = <span class="string">''</span>;
+0410         <span class="keyword">if</span> length(varargin) &gt;= 2
+0411             <span class="keyword">if</span> ischar(varargin{2})
+0412                 Field = varargin{2};
+0413                 varargin(2) = [];
+0414             <span class="keyword">end</span>
+0415         <span class="keyword">end</span>
+0416         <span class="keyword">if</span> isempty(Field)
+0417             Field = varargin{1}.Field;
+0418         <span class="keyword">end</span>
+0419 
+0420         NewSP = varargin{1}.Data;
+0421         DeviceList = varargin{1}.DeviceList;
+0422 
+0423         <span class="keyword">if</span> length(varargin) &gt;= 2
+0424            WaitFlag = varargin{2};
+0425         <span class="keyword">end</span>
+0426 
+0427         <span class="comment">%if length(varargin) &gt;= 2</span>
+0428         <span class="comment">%    NewSP = varargin{2};</span>
+0429         <span class="comment">%else</span>
+0430         <span class="comment">%    NewSP = varargin{1}.Data;</span>
+0431         <span class="comment">%end</span>
+0432         <span class="comment">%if length(varargin) &gt;= 3</span>
+0433         <span class="comment">%    DeviceList = varargin{3};</span>
+0434         <span class="comment">%else</span>
+0435         <span class="comment">%    DeviceList = varargin{1}.DeviceList;</span>
+0436         <span class="comment">%end</span>
+0437         <span class="comment">%if length(varargin) &gt;= 4</span>
+0438         <span class="comment">%    WaitFlag = varargin{4};</span>
+0439         <span class="comment">%end</span>
+0440 
+0441         [FamilyIndex, AO] = <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(Family);
+0442 
+0443         <span class="comment">% Change Units to the data structure units (command-line override comes latter)</span>
+0444         <span class="keyword">if</span> isfield(AO, Field)
+0445             AO.(Field).Units = varargin{1}.Units;
+0446         <span class="keyword">end</span>
+0447         
+0448         <span class="keyword">if</span> FamilyIndex == 0
+0449             error(<span class="string">'Unknown family in the data structure'</span>);
+0450         <span class="keyword">end</span>
+0451 
+0452     <span class="keyword">elseif</span> isfield(varargin{1},<span class="string">'FamilyName'</span>)
+0453         <span class="comment">% AO structure - use the AO structure directly</span>
+0454         <span class="comment">% setpv(AO, Field, NewSP, DeviceList, WaitFlag)</span>
+0455 
+0456         Field = <span class="string">''</span>;
+0457         <span class="keyword">if</span> length(varargin) &gt;= 2
+0458             <span class="keyword">if</span> ischar(varargin{2})
+0459                 Field = varargin{2};
+0460                 varargin(2) = [];
+0461             <span class="keyword">end</span>
+0462         <span class="keyword">end</span>
+0463         <span class="keyword">if</span> length(varargin) &gt;= 2
+0464             NewSP = varargin{2};
+0465         <span class="keyword">else</span>
+0466             error(<span class="string">'New setpoint not found on input line'</span>);
+0467         <span class="keyword">end</span>
+0468         <span class="keyword">if</span> length(varargin) &gt;= 3
+0469             DeviceList = varargin{3};
+0470         <span class="keyword">else</span>
+0471             DeviceList = varargin{1}.DeviceList;
+0472             iStatus = find(varargin{1}.Status == 0);
+0473             DeviceList(iStatus,:) = [];
+0474         <span class="keyword">end</span>
+0475         <span class="keyword">if</span> length(varargin) &gt;= 4
+0476             WaitFlag = varargin{4};
+0477         <span class="keyword">end</span>
+0478 
+0479         FamilyIndex = 1;
+0480         AO = Family;
+0481 
+0482     <span class="keyword">else</span>
+0483         error(<span class="string">'Input #1 of unknown type'</span>);
+0484     <span class="keyword">end</span>
+0485 
+0486 <span class="keyword">else</span>
+0487 
+0488     <span class="comment">% Family, ChannelName, and CommmonName are left</span>
+0489     [FamilyIndex, AO] = <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(Family);
+0490 
+0491     <span class="keyword">if</span> FamilyIndex
+0492 
+0493         <span class="comment">%%%%%%%%%%%%%%</span>
+0494         <span class="comment">% FamilyName %</span>
+0495         <span class="comment">%%%%%%%%%%%%%%</span>
+0496         <span class="keyword">if</span> length(varargin) &gt;= 2
+0497             <span class="keyword">if</span> ischar(varargin{2})
+0498                 Field = varargin{2};
+0499                 varargin(2) = [];
+0500             <span class="keyword">end</span>
+0501         <span class="keyword">end</span>
+0502         <span class="keyword">if</span> isempty(Field)
+0503             Field = FieldDefault;
+0504         <span class="keyword">end</span>
+0505         <span class="keyword">if</span> length(varargin) &gt;= 2
+0506             NewSP = varargin{2};
+0507         <span class="keyword">else</span>
+0508             error(<span class="string">'New setpoint not found on input line'</span>);
+0509         <span class="keyword">end</span>
+0510         <span class="keyword">if</span> length(varargin) &gt;= 3
+0511             DeviceList = varargin{3};
+0512         <span class="keyword">end</span>
+0513         <span class="keyword">if</span> length(varargin) &gt;= 4
+0514             WaitFlag = varargin{4};
+0515         <span class="keyword">end</span>
+0516         <span class="keyword">if</span> isempty(WaitFlag)
+0517             WaitFlag = WaitFlagDefault;
+0518         <span class="keyword">end</span>
+0519 
+0520     <span class="keyword">else</span>
+0521 
+0522         <span class="comment">% Look to see if it's a channel name or a common name</span>
+0523         <span class="comment">% Just check the first name so it's a faster test</span>
+0524         [DeviceListTest, FamilyTest] = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(deblank(Family(1,:)));
+0525 
+0526         <span class="keyword">if</span> ~isempty(FamilyTest)
+0527             <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0528             <span class="comment">% Family input is a common name list %</span>
+0529             <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0530             
+0531             <span class="comment">% The DeviceList should not exist (and should not be used)</span>
+0532         
+0533             <span class="keyword">if</span> length(varargin) &gt;= 2
+0534                 <span class="keyword">if</span> ischar(varargin{2})
+0535                     Field = varargin{2};
+0536                     varargin(2) = [];
+0537                 <span class="keyword">end</span>
+0538             <span class="keyword">end</span>
+0539             <span class="keyword">if</span> isempty(Field)
+0540                 Field = FieldDefault;
+0541             <span class="keyword">end</span>
+0542             <span class="keyword">if</span> length(varargin) &gt;= 2
+0543                 NewSP = varargin{2};
+0544             <span class="keyword">else</span>
+0545                 error(<span class="string">'New setpoint not found on input line'</span>);
+0546             <span class="keyword">end</span>
+0547             <span class="keyword">if</span> length(varargin) &gt;= 3
+0548                 WaitFlag = varargin{3};
+0549             <span class="keyword">end</span>
+0550             <span class="keyword">if</span> isempty(WaitFlag)
+0551                 WaitFlag = WaitFlagDefault;
+0552             <span class="keyword">end</span>
+0553 
+0554             CommonNames = Family;
+0555             
+0556             <span class="keyword">if</span> size(NewSP,1) == 1
+0557                 <span class="comment">% Set all elements to same value</span>
+0558                 <span class="keyword">if</span> ischar(NewSP)
+0559                     NewSP = ones(size(CommonNames,1),1) * NewSP;
+0560                     NewSP = num2str(NewSP,<span class="string">'%c'</span>);
+0561                 <span class="keyword">else</span>
+0562                     NewSP = ones(size(CommonNames,1),1) * NewSP;
+0563                 <span class="keyword">end</span>
+0564             <span class="keyword">elseif</span> size(NewSP,1) == size(CommonNames,1)
+0565                 <span class="comment">% Input OK</span>
+0566             <span class="keyword">else</span>
+0567                 error(<span class="string">'Size of NewSP must be equal to the number of Commonnames or a scalar!'</span>);
+0568             <span class="keyword">end</span>
+0569 
+0570             <span class="comment">% Convert all the common names to Family and Device lists</span>
+0571             [DeviceList, Family, ErrorFlag] = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(CommonNames);
+0572 
+0573             <span class="keyword">if</span> size(Family, 1) == 1
+0574                 <span class="comment">% 1 Family, Multiple devices are ok</span>
+0575                 ErrorFlag = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Family, Field, NewSP, DeviceList, WaitFlag, InputFlags{:});
+0576             <span class="keyword">else</span>
+0577                 <span class="comment">% Multiple families (loop)</span>
+0578                 <span class="comment">% It has to be in a loop for the simulator and to pickup special functions</span>
+0579                 <span class="keyword">for</span> i = 1:size(Family,1)
+0580                     ErrorFlag1 = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Family(i,:), Field, NewSP(i,:), DeviceList(i,:), 0, InputFlags{:});
+0581                     ErrorFlag = ErrorFlag | ErrorFlag1;
+0582                 <span class="keyword">end</span>
+0583                 <span class="keyword">if</span> WaitFlag
+0584                     <span class="keyword">for</span> i = 1:size(Family,1)
+0585                         ErrorFlag1 = <a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>(Family(i,:), Field, NewSP(i,:), DeviceList(i,:), WaitFlag, InputFlags{:});
+0586                         ErrorFlag = ErrorFlag | ErrorFlag1;
+0587                     <span class="keyword">end</span>
+0588                 <span class="keyword">end</span>
+0589             <span class="keyword">end</span>
+0590                    
+0591             <span class="comment">% Return for common names in the first input</span>
+0592            <span class="keyword">return</span>
+0593             
+0594         <span class="keyword">else</span>
+0595 
+0596             <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0597             <span class="comment">% CHANNEL NAME - Online Only %</span>
+0598             <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0599 
+0600             <span class="comment">% setpv(ChannelName, Field, NewSP, WaitFlag)</span>
+0601             <span class="comment">% setpv(ChannelName, Field, NewSP)</span>
+0602             <span class="comment">% setpv(ChannelName, NewSP, WaitFlag)  % NewSP cannot be string for this case</span>
+0603             <span class="comment">% setpv(ChannelName, NewSP)</span>
+0604 
+0605             <span class="comment">% Can't use overrides with channel name method</span>
+0606             <span class="keyword">if</span> ~isempty(UnitsFlag)
+0607                 error(<span class="string">'You cannot change the units when using channel names.'</span>)
+0608             <span class="keyword">end</span>
+0609             <span class="keyword">if</span> ~(isempty(ModeFlag) || strcmpi(ModeFlag, <span class="string">'Online'</span>))
+0610                 error(<span class="string">'Channel names only have an ''Online'' Mode.'</span>)
+0611             <span class="keyword">end</span>
+0612 
+0613             Field = <span class="string">''</span>;
+0614             <span class="keyword">if</span> length(varargin) == 2
+0615                 <span class="comment">% setpv(ChannelName, NewSP)</span>
+0616                 NewSP = varargin{2};
+0617             <span class="keyword">elseif</span> length(varargin) &gt;= 3
+0618                 <span class="keyword">if</span> ischar(varargin{2})
+0619                     Field = varargin{2};
+0620                     varargin(2) = [];
+0621                 <span class="keyword">end</span>
+0622                 NewSP = varargin{2};
+0623             <span class="keyword">end</span>
+0624 
+0625             <span class="keyword">if</span> length(varargin) &gt;= 3
+0626                 WaitFlag = varargin{3};
+0627             <span class="keyword">else</span>
+0628                 WaitFlag = [];
+0629             <span class="keyword">end</span>
+0630             <span class="keyword">if</span> isempty(WaitFlag)
+0631                 WaitFlag = WaitFlagDefault;
+0632             <span class="keyword">end</span>
+0633 
+0634             <span class="comment">% Don't set NaN's for now???</span>
+0635             <span class="comment">%iNaN = find(isnan(NewSP));</span>
+0636             <span class="comment">%if ~isempty(iNaN)</span>
+0637             <span class="comment">%    Family(iNaN,:) = [];</span>
+0638             <span class="comment">%    NewSP(iNaN,:) = [];</span>
+0639             <span class="comment">%end</span>
+0640             
+0641             <span class="comment">% Get rid of repeated &amp; blank channel names</span>
+0642             [Family, i] = unique(Family, <span class="string">'rows'</span>);
+0643             <span class="keyword">if</span> size(NewSP,1) ~= 1
+0644                 NewSP = NewSP(i,:);
+0645             <span class="keyword">end</span>
+0646             <span class="keyword">if</span> isempty(deblank(Family(1,:)))
+0647                 Family(1,:) = [];
+0648                 <span class="keyword">if</span> size(NewSP,1) ~= 1
+0649                     NewSP(1,:) = [];
+0650                 <span class="keyword">end</span>
+0651             <span class="keyword">end</span>
+0652 
+0653             <span class="comment">% Add Field to Family.Field</span>
+0654             <span class="keyword">if</span> ~isempty(Field)
+0655                 Family = strcat(Family, [<span class="string">'.'</span>,Field]);
+0656             <span class="keyword">end</span>
+0657             
+0658             <span class="comment">% Incremental change in the setpoint</span>
+0659             <span class="keyword">if</span> IncrementalFlag
+0660                 <span class="comment">% Note: ModeFlag, UnitsFlag are ignored for channel name inputs</span>
+0661                 <span class="comment">%NewSP = NewSP + getpv(Family);</span>
+0662                 <span class="keyword">if</span> size(NewSP,2) == 1
+0663                     SPpresent = getpvonline(Family, <span class="string">''</span>, 1);
+0664                 <span class="keyword">else</span>
+0665                     SPpresent = getpvonline(Family);
+0666                 <span class="keyword">end</span>
+0667                 NewSP = NewSP + SPpresent;
+0668             <span class="keyword">else</span>
+0669                 <span class="keyword">if</span> size(NewSP,1) == 1 &amp;&amp; size(Family,1) &gt; 1
+0670                     <span class="comment">% Set all elements to same value</span>
+0671                     <span class="keyword">if</span> ischar(NewSP)
+0672                         NewSP = ones(size(Family,1),1) * NewSP;
+0673                         NewSP = num2str(NewSP,<span class="string">'%c'</span>);
+0674                     <span class="keyword">else</span>
+0675                         NewSP = ones(size(Family,1),1) * NewSP;
+0676                     <span class="keyword">end</span>
+0677                 <span class="keyword">end</span>
+0678             <span class="keyword">end</span>
+0679 
+0680 
+0681             <span class="comment">%%%%%%%%%%%%</span>
+0682             <span class="comment">% Set data %</span>
+0683             <span class="comment">%%%%%%%%%%%%</span>
+0684             <span class="comment">% Could add N-Steps here???</span>
+0685             ErrorFlag = setpvonline(Family, NewSP);
+0686 
+0687 
+0688             <span class="comment">% Add a delay based on the WaitFlag</span>
+0689             <span class="keyword">if</span> WaitFlag &gt; 0
+0690                 sleep(WaitFlag);
+0691             <span class="keyword">elseif</span> WaitFlag == -2
+0692                 [N, BPMDelay] = getbpmaverages;
+0693                 BPMDelay = 2.2 * max(BPMDelay);
+0694                 <span class="keyword">if</span> ~isempty(BPMDelay)
+0695                     sleep(BPMDelay);
+0696                 <span class="keyword">end</span>
+0697             <span class="keyword">elseif</span> WaitFlag == -3
+0698                 TUNEDelay = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TuneDelay'</span>);
+0699                 <span class="keyword">if</span> ~isempty(TUNEDelay)
+0700                     sleep(TUNEDelay);
+0701                 <span class="keyword">end</span>
+0702             <span class="keyword">elseif</span> WaitFlag == -4
+0703                 tmp = input(<span class="string">'   Setpoint changed.  Hit return ready. '</span>);
+0704             <span class="keyword">end</span>
+0705 
+0706             <span class="comment">% Return for channel names</span>
+0707             <span class="keyword">return</span>
+0708         <span class="keyword">end</span>
+0709     <span class="keyword">end</span>
+0710 <span class="keyword">end</span>
+0711 <span class="comment">% End input selection:  data structure, AO structure, family, commonname, and channelname method</span>
+0712 
+0713 
+0714 
+0715 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0716 <span class="comment">% SET DATA FOR FAMILIES %</span>
+0717 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0718 
+0719 <span class="comment">% Family = FamilyName or AO structure with DeviceList or CommonName List</span>
+0720 
+0721 <span class="keyword">if</span> isempty(DeviceList)                   <span class="comment">% This is a very important line, it determines the default behavior</span>
+0722     DeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family);     <span class="comment">% Default behavior comes from family2dev</span>
+0723     <span class="comment">%DeviceList = family2dev(Family,1);  % Good status only</span>
+0724     <span class="comment">%DeviceList = AO.DeviceList;         % All devices</span>
+0725 <span class="keyword">end</span>
+0726 
+0727 <span class="comment">% If DeviceList is a string it's a common name list</span>
+0728 <span class="keyword">if</span> ischar(DeviceList)
+0729     DeviceList = <a href="common2dev.html" class="code" title="function [DeviceList, FamilyName, ErrorFlag] = common2dev(CommonNames, FamilyList)">common2dev</a>(DeviceList, AO);
+0730 <span class="keyword">end</span>
+0731 
+0732 <span class="comment">% Convert DeviceList format to ElementList format</span>
+0733 <span class="keyword">if</span> (size(DeviceList,2) == 1)
+0734     DeviceList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(Family, DeviceList);
+0735 <span class="keyword">end</span>
+0736 
+0737 <span class="keyword">if</span> isempty(WaitFlag)
+0738     WaitFlag = WaitFlagDefault;
+0739 <span class="keyword">end</span>
+0740 
+0741 
+0742 <span class="comment">% Look for command-line over rides</span>
+0743 <span class="keyword">if</span> ~isempty(UnitsFlag)
+0744     AO.(Field).Units = UnitsFlag;
+0745 <span class="keyword">end</span>
+0746 <span class="keyword">if</span> ~isempty(ModeFlag)
+0747     AO.(Field).Mode = ModeFlag;
+0748 <span class="keyword">end</span>
+0749 
+0750 
+0751 <span class="keyword">if</span> size(NewSP,1) == 1 &amp;&amp; size(DeviceList,1) &gt; 1
+0752     <span class="comment">% Set all elements to same value</span>
+0753     <span class="keyword">if</span> ischar(NewSP)
+0754         NewSP = ones(size(DeviceList,1),1) * NewSP;
+0755         NewSP = num2str(NewSP,<span class="string">'%c'</span>);
+0756     <span class="keyword">else</span>
+0757         NewSP = ones(size(DeviceList,1),1) * NewSP;
+0758     <span class="keyword">end</span>
+0759 <span class="keyword">elseif</span> size(NewSP,1) ~= size(DeviceList,1)
+0760     <span class="comment">% This is either an error or NewSP equals the number of power supplies (not magnets)</span>
+0761     [DeviceList, ii, jj] = unique(DeviceList, <span class="string">'rows'</span>);
+0762     [ChannelNames, i, j] = unique(<a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(Family, DeviceList), <span class="string">'rows'</span>);
+0763     
+0764     <span class="keyword">if</span> size(NewSP,1) == size(ChannelNames,1)
+0765         NewSP = NewSP(j,:);
+0766         NewSP = NewSP(ii,:);
+0767     <span class="keyword">else</span>
+0768         error(<span class="string">'The number of setpoints does not equal the number of magnets or magnet power supplies.'</span>);
+0769     <span class="keyword">end</span>
+0770 <span class="keyword">end</span>
+0771 
+0772 
+0773 <span class="comment">% Incremental change in the setpoint</span>
+0774 <span class="keyword">if</span> IncrementalFlag
+0775     <span class="comment">% String inputs???</span>
+0776     NewSP = NewSP + <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Family, Field, DeviceList, AO.(Field).Units, AO.(Field).Mode);
+0777 <span class="keyword">end</span>
+0778 
+0779 
+0780 <span class="comment">% Main call for all applications except ChannelName method</span>
+0781 ErrorFlag = <a href="#_sub1" class="code" title="subfunction ErrorFlag = local_setpv(AO, Field, NewSP, DeviceList, WaitFlag)">local_setpv</a>(AO, Field, NewSP, DeviceList, WaitFlag);
+0782 
+0783 
+0784 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0785 <span class="comment">% End of setpv %</span>
+0786 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0787 <span class="keyword">return</span>
+0788 
+0789 
+0790 
+0791 
+0792 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0793 <span class="comment">%  Main Function for Setting Data Using the MML AO  %</span>
+0794 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0795 <a name="_sub1" href="#_subfunctions" class="code">function ErrorFlag = local_setpv(AO, Field, NewSP, DeviceList, WaitFlag)</a>
+0796 <span class="comment">% AO         - AO.(Family)</span>
+0797 <span class="comment">% Field      - which field to use</span>
+0798 <span class="comment">% DeviceList - which device list to use</span>
+0799 <span class="comment">%              AO.DeviceList is the entire device list</span>
+0800 <span class="comment">%</span>
+0801 <span class="comment">% Note: local_setpv can not be used for channel names, use setpvonline directly</span>
+0802 
+0803 
+0804 TimeOutPeriodOnWaitFlag = 12;  <span class="comment">% Seconds to wait for the monitor to change</span>
+0805 ErrorFlag = 0;
+0806 
+0807 
+0808 <span class="comment">% Don't set NaN's for now???</span>
+0809 iNaN = find(isnan(NewSP));
+0810 <span class="keyword">if</span> ~isempty(iNaN)
+0811     NewSP(iNaN,:) = [];
+0812     DeviceList(iNaN,:) = [];
+0813 <span class="keyword">end</span>
+0814 
+0815 
+0816 <span class="comment">% Check for empty device list</span>
+0817 <span class="keyword">if</span> isempty(DeviceList)
+0818     AM = [];
+0819     <span class="comment">%fprintf('   WARNING:  No devices to get for Family %s\n', AO.FamilyName));</span>
+0820     <span class="keyword">return</span>;
+0821 <span class="keyword">end</span>
+0822 
+0823 
+0824 <span class="comment">% Find the index for where the desired data is in the total device list</span>
+0825 DeviceListTotal = AO.DeviceList;
+0826 [DeviceIndex, iNotFound] = findrowindex(DeviceList, DeviceListTotal);
+0827 <span class="keyword">if</span> ~isempty(iNotFound)
+0828     <span class="comment">% Device not found</span>
+0829     <span class="keyword">for</span> i = 1:length(iNotFound)
+0830         fprintf(<span class="string">'   No devices to get for Family %s(%d,%d)\n'</span>, AO.FamilyName, DeviceList(i,1), DeviceList(i,2));
+0831     <span class="keyword">end</span>
+0832     error(sprintf(<span class="string">'%d Devices not found'</span>, length(iNotFound)));
+0833 <span class="keyword">end</span>
+0834 
+0835 
+0836 <span class="comment">% If Field is not found in the AO, it is unclear what to do next.</span>
+0837 <span class="comment">% I could error here, but it's convenient to try to set</span>
+0838 <span class="comment">% EPICS subfields or other simulator fields at this point.</span>
+0839 <span class="keyword">if</span> ~isfield(AO, Field)
+0840     <span class="comment">% Try to check it online or simulator</span>
+0841     <span class="keyword">if</span> isfield(AO, <span class="string">'Setpoint'</span>)
+0842         Mode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(AO.FamilyName, <span class="string">'Setpoint'</span>, <span class="string">'Mode'</span>);
+0843     <span class="keyword">elseif</span> isfield(AO, <span class="string">'Monitor'</span>)
+0844         Mode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(AO.FamilyName, <span class="string">'Monitor'</span>, <span class="string">'Mode'</span>);
+0845     <span class="keyword">else</span>
+0846         Mode = <span class="string">''</span>;
+0847     <span class="keyword">end</span>
+0848     <span class="keyword">if</span> strcmpi(Mode,<span class="string">'Simulator'</span>) || strcmpi(Mode,<span class="string">'Model'</span>)
+0849         ErrorFlag = setpvmodel(AO.FamilyName, Field, NewSP, DeviceList, <span class="string">'Physics'</span>);
+0850         <span class="keyword">return</span>
+0851     <span class="keyword">end</span>
+0852 
+0853 
+0854     <span class="comment">% Try changing the suffix of the Monitor or Setpoint field</span>
+0855     <span class="keyword">if</span> isfield(AO, <span class="string">'Setpoint'</span>)
+0856         Channel = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(AO, <span class="string">'Setpoint'</span>, DeviceList);
+0857     <span class="keyword">elseif</span> isfield(AO, <span class="string">'Monitor'</span>)
+0858         Channel = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(AO, <span class="string">'Monitor'</span>,  DeviceList);
+0859     <span class="keyword">else</span>
+0860         error(sprintf(<span class="string">'Field %s not found for Family %s'</span>, Field, AO.FamilyName));
+0861     <span class="keyword">end</span>
+0862     
+0863     <span class="comment">% Get rid of repeated &amp; blank channel names</span>
+0864     [Channel, i] = unique(Channel, <span class="string">'rows'</span>);
+0865     <span class="keyword">if</span> size(NewSP,1) ~= 1
+0866         NewSP = NewSP(i,:);
+0867     <span class="keyword">end</span>
+0868     <span class="keyword">if</span> isempty(deblank(Channel(1,:)))
+0869         Channel(1,:) = [];
+0870         <span class="keyword">if</span> size(NewSP,1) ~= 1
+0871             NewSP(1,:) = [];
+0872         <span class="keyword">end</span>
+0873     <span class="keyword">end</span>
+0874 
+0875     <span class="keyword">if</span> any(strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Machine'</span>),{<span class="string">'spear3'</span>,<span class="string">'spear'</span>}))
+0876         <span class="comment">% Change the last ':' Field</span>
+0877         <span class="comment">%i = findstr(Channel(1,:),':');</span>
+0878         <span class="comment">%if ~isempty(i)</span>
+0879         <span class="comment">%    Channel(:,i:end) = [];</span>
+0880         <span class="comment">%end</span>
+0881         <span class="comment">%ChannelNew = strcat(Channel, [':',Field]);</span>
+0882 
+0883         <span class="comment">% Since the location of &quot;:&quot; can be different in each row, loop</span>
+0884         ChannelNew = [];
+0885         <span class="keyword">for</span> j = 1:size(Channel,1)
+0886             i = findstr(Channel(j,:),<span class="string">':'</span>);
+0887             <span class="keyword">if</span> isempty(i)
+0888                 <span class="comment">% I'm not sure what to do if &quot;:&quot; is missing, I'm just add a &quot;:&quot;</span>
+0889                 ChannelNew = strvcat(ChannelNew, [Channel(j,1:i), <span class="string">':'</span>, Field]);
+0890             <span class="keyword">else</span>
+0891                 ChannelNew = strvcat(ChannelNew, [Channel(j,1:i), Field]);
+0892             <span class="keyword">end</span>
+0893         <span class="keyword">end</span>
+0894     <span class="keyword">else</span>
+0895         <span class="comment">% Add a .Field</span>
+0896         ChannelNew = strcat(Channel, [<span class="string">'.'</span>,Field]);
+0897     <span class="keyword">end</span>
+0898     
+0899     
+0900     ErrorFlag = setpvonline(ChannelNew, NewSP);
+0901 
+0902     <span class="keyword">if</span> WaitFlag &gt; 0
+0903         sleep(WaitFlag);
+0904     <span class="keyword">elseif</span> WaitFlag == -2
+0905         [N, BPMDelay] = getbpmaverages;
+0906         BPMDelay = 2.2 * max(BPMDelay);
+0907         <span class="keyword">if</span> ~isempty(BPMDelay)
+0908             sleep(BPMDelay);
+0909         <span class="keyword">end</span>
+0910     <span class="keyword">elseif</span> WaitFlag == -3
+0911         TUNEDelay = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TuneDelay'</span>);
+0912         <span class="keyword">if</span> ~isempty(TUNEDelay)
+0913             sleep(TUNEDelay);
+0914         <span class="keyword">end</span>
+0915     <span class="keyword">elseif</span> WaitFlag == -4
+0916         tmp = input(<span class="string">'   Setpoint changed.  Hit return ready. '</span>);
+0917     <span class="keyword">end</span>
+0918     <span class="keyword">return</span>
+0919 <span class="keyword">end</span>
+0920 
+0921 
+0922 <span class="comment">% Extract 'Mode'</span>
+0923 <span class="keyword">if</span> isfield(AO.(Field), <span class="string">'Mode'</span>)
+0924     Mode = AO.(Field).Mode;
+0925 <span class="keyword">else</span>
+0926     Mode = <span class="string">'Online'</span>;
+0927 <span class="keyword">end</span>
+0928 
+0929 
+0930 <span class="comment">% Check if Online should really be special</span>
+0931 <span class="keyword">if</span> strcmpi(Mode, <span class="string">'Online'</span>)
+0932    <span class="keyword">if</span> isfield(AO.(Field), <span class="string">'SpecialFunctionSet'</span>)
+0933        Mode = <span class="string">'Special'</span>;
+0934    <span class="keyword">end</span>
+0935 <span class="keyword">end</span>
+0936 
+0937 
+0938 <span class="keyword">if</span> ~isstruct(AO.(Field))
+0939     <span class="comment">% If it's not a structure that just set the field</span>
+0940     <span class="comment">% Hardward and physics get ignored</span>
+0941     <a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>(NewSP, AO.FamilyName, Field, DeviceList);
+0942     
+0943 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'Online'</span>)
+0944     <span class="comment">%%%%%%%%%%</span>
+0945     <span class="comment">% Online %</span>
+0946     <span class="comment">%%%%%%%%%%</span>
+0947 
+0948 
+0949     <span class="comment">% Could add N-Steps here???</span>
+0950 
+0951     
+0952     <span class="comment">% Change to hardware units if in physics units</span>
+0953     <span class="keyword">if</span> strcmpi(AO.(Field).Units, <span class="string">'Physics'</span>)
+0954         NewSP = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(AO.FamilyName, Field, NewSP, DeviceList);
+0955     <span class="keyword">end</span>
+0956 
+0957     <span class="keyword">if</span>  strcmpi(AO.(Field).DataType,<span class="string">'scalar'</span>)
+0958         
+0959         ErrorFlag = setpvonline(AO.(Field).ChannelNames(DeviceIndex,:), NewSP);
+0960         
+0961     <span class="keyword">elseif</span>  strcmpi(AO.(Field).DataType,<span class="string">'vector'</span>)
+0962         
+0963         <span class="comment">% There can only be one channel name for DataType='Vector'</span>
+0964         ChanName = deblank(AO.(Field).ChannelNames(1,:));
+0965         
+0966         <span class="comment">% Get the vector and only load what is requested</span>
+0967         FullVector = getpvonline(ChanName);
+0968         
+0969         <span class="keyword">if</span> isfield(AO.(Field), <span class="string">'DataTypeIndex'</span>)
+0970             FullVector(AO.(Field).DataTypeIndex(DeviceIndex)) = NewSP;
+0971         <span class="keyword">else</span>
+0972             FullVector(DeviceIndex) = NewSP;
+0973         <span class="keyword">end</span>        
+0974         
+0975         <span class="comment">% Vectorized put</span>
+0976         ErrorFlag = setpvonline(ChanName, FullVector);
+0977 
+0978     <span class="keyword">else</span>       
+0979         <span class="comment">% Not a scalar or vector</span>
+0980         error(sprintf(<span class="string">'Unknown DataType %s for family %s.'</span>, AO.(Field).DataType, AO.FamilyName));
+0981     <span class="keyword">end</span> 
+0982     
+0983     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0984     <span class="comment">% WaitFlag Processing %</span>
+0985     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0986     <span class="keyword">if</span> WaitFlag &amp;&amp; WaitFlag~=-4
+0987 
+0988         t00 = gettime;
+0989         [RunFlag, Delta0, Tol] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(AO, Field, DeviceList);
+0990         RampRate = <a href="getramprate.html" class="code" title="function RampRate = getramprate(varargin)">getramprate</a>(AO, DeviceList, <span class="string">'Hardware'</span>);
+0991 
+0992         <span class="keyword">if</span> any(Tol == 0) || isempty(Tol)
+0993             <span class="comment">% Tol should not be set to zero, but if it is then base time-out on percentage of SP</span>
+0994             <span class="comment">% This many not be a good criterion and may need to be adjusted based on the machine!!!</span>
+0995             TimeoutTol = abs(NewSP / 200);   <span class="comment">% .5 percent</span>
+0996         <span class="keyword">else</span>
+0997             <span class="comment">% Check if the Delta has changed by at least a few tolerances in the last TimeOutPeriodOnWaitFlag seconds</span>
+0998             <span class="comment">% This many not be a good criterion and may need to be adjusted based on the machine!!!</span>
+0999             <span class="comment">% For large tolerances, this is too big!</span>
+1000             TimeoutTol = abs(4 * Tol);  <span class="comment">% Was 5</span>
+1001 
+1002             <span class="comment">% Or base on the ramprate (if ramprate is a real channel)</span>
+1003             <span class="comment">%if ~isempty(RampRate) &amp; ~any(isnan(RampRate))</span>
+1004             <span class="comment">%    RR = max(abs(RampRate));</span>
+1005             <span class="comment">%    if ~isnan(RR)</span>
+1006             <span class="comment">%        % Base time-out on .1 what the monitor should have changed in TimeOutPeriodOnWaitFlag seconds</span>
+1007             <span class="comment">%        TimeoutTol = .1 * RR * TimeOutPeriodOnWaitFlag;</span>
+1008             <span class="comment">%    end</span>
+1009             <span class="comment">%end</span>
+1010         <span class="keyword">end</span>
+1011 
+1012         t0  = gettime;
+1013         <span class="keyword">while</span> any(RunFlag)
+1014             <span class="comment">% Pause a little so that the network doesn't get too thrashed</span>
+1015             sleep(.1);
+1016 
+1017             [RunFlag, Delta, Tol] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(AO, Field, DeviceList);
+1018 
+1019             <span class="comment">% Check if the Delta has changed in the last TimeOutPeriodOnWaitFlag seconds</span>
+1020             <span class="keyword">if</span> gettime-t0 &gt; TimeOutPeriodOnWaitFlag
+1021                 ToleranceCheck = abs(Delta) &gt; Tol;
+1022                 
+1023                 DeltaTimeoutPeriod = abs(abs(Delta)-abs(Delta0));
+1024                 
+1025                 RampRateEstimate = abs(DeltaTimeoutPeriod/TimeOutPeriodOnWaitFlag);
+1026                 RampRateCheck = (RampRateEstimate &lt; RampRate/2);
+1027                 RampRateCheck(isnan(RampRate)) = 1;  <span class="comment">% NaNs are true (no check)</span>
+1028                 
+1029                 <span class="comment">% ToleranceCheck , (DeltaTimeoutPeriod &lt;= TimeoutTol) , RampRateCheck</span>
+1030                 
+1031                 <span class="comment">% Tolerance &amp; Delta in timeout period is too small &amp; Changing at least half the ramp rate</span>
+1032                 x = ToleranceCheck &amp; (DeltaTimeoutPeriod &lt;= TimeoutTol) &amp; RampRateCheck;
+1033                 <span class="keyword">if</span> any(x)
+1034                     ChannelName = <span class="string">''</span>;
+1035                     <span class="keyword">for</span> i = 1:length(x)
+1036                         <span class="keyword">if</span> x(i)
+1037                             ChannelNameNext = <a href="family2channel.html" class="code" title="function [ChannelNames, ErrorFlag] = family2channel(varargin)">family2channel</a>(AO.FamilyName,  DeviceList(i,:));
+1038                             <span class="keyword">if</span> ~strcmp(ChannelName, ChannelNameNext)
+1039                                 <span class="keyword">if</span> isfield(AO,<span class="string">'Monitor'</span>) &amp;&amp; isfield(AO,<span class="string">'Setpoint'</span>)
+1040                                     fprintf(<span class="string">'   %s(%d,%d) SP-AM &gt; Tol and the monitor does not appear to be changing.\n'</span>, AO.FamilyName,  DeviceList(i,1), DeviceList(i,2));
+1041                                     SP = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(AO.FamilyName,  DeviceList(i,:));
+1042                                     AM = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(AO.FamilyName,  DeviceList(i,:));
+1043                                     fprintf(<span class="string">'           Setpoint = %f,  Monitor = %f,  SP-AM = %f,  getrunflag Delta = %f,  Tolerance = %f\n'</span>, SP, AM, SP-AM, Delta(i), Tol(i));
+1044                                 <span class="keyword">else</span>
+1045                                     fprintf(<span class="string">'   %s(%d,%d) timed-out waiting for run flag to change.\n'</span>, AO.FamilyName,  DeviceList(i,1), DeviceList(i,2));
+1046                                 <span class="keyword">end</span>
+1047                             <span class="keyword">end</span>
+1048                             ChannelName = ChannelNameNext;
+1049                         <span class="keyword">end</span>
+1050                     <span class="keyword">end</span>
+1051 
+1052                     <span class="comment">% Decide whether or not to error on a SP-AM problem</span>
+1053                     ErrorWarningLevel = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'ErrorWarningLevel'</span>);
+1054                     <span class="keyword">if</span> isempty(ErrorWarningLevel) || ErrorWarningLevel &gt;= 0
+1055                         error(sprintf(<span class="string">'Time-Out:  Monitor did not appear to be changing for the last %.1f seconds.'</span>, TimeOutPeriodOnWaitFlag));
+1056                     <span class="keyword">elseif</span> ErrorWarningLevel == -1
+1057                         warning(<span class="string">'Time-Out:  Monitor did not appear to be changing for the last %.1f seconds.'</span>, TimeOutPeriodOnWaitFlag);
+1058                     <span class="keyword">elseif</span> ErrorWarningLevel == -2
+1059                         <span class="keyword">try</span>
+1060                             <span class="comment">% Make some noise</span>
+1061                             sound(cos(1:10000));
+1062                         <span class="keyword">catch</span>
+1063                         <span class="keyword">end</span>
+1064                         CommandInput = questdlg( <span class="keyword">...</span>
+1065                             {<span class="string">'The run flag is not changing.  This is often a'</span>, <span class="keyword">...</span>
+1066                              <span class="string">'Setpoint-Monitor tolerance problem.  Either manually'</span>, <span class="keyword">...</span>
+1067                              <span class="string">'varify that the magnet is at the proper setpoint and'</span>, <span class="keyword">...</span>
+1068                              <span class="string">' '</span>, <span class="keyword">...</span>
+1069                              <span class="string">'Continue - recheck the run condition'</span>, <span class="keyword">...</span>
+1070                              <span class="string">'Stop - issue an error and see if there is error handling'</span>, <span class="keyword">...</span>
+1071                              <span class="string">'Ignore the problem and push on'</span>}, <span class="keyword">...</span>
+1072                             <span class="string">'SETPV Question'</span>, <span class="keyword">...</span>
+1073                             <span class="string">'Continue'</span>, <span class="keyword">...</span>
+1074                             <span class="string">'Stop'</span>, <span class="keyword">...</span>
+1075                             <span class="string">'Ignore'</span>, <span class="keyword">...</span>
+1076                             <span class="string">'Continue'</span>);
+1077                         <span class="keyword">switch</span> CommandInput
+1078                             <span class="keyword">case</span> <span class="string">'Stop'</span>
+1079                                 error(<span class="string">'SP-AM error in setpv.'</span>);
+1080                             <span class="keyword">case</span> <span class="string">'Continue'</span>
+1081                             <span class="keyword">case</span> <span class="string">'Ignore'</span>
+1082                                 RunFlag = 0;
+1083                         <span class="keyword">end</span>
+1084                     <span class="keyword">else</span> <span class="comment">% ErrorWarningLevel &lt;= -3</span>
+1085                         <span class="comment">% Do nothing</span>
+1086                         ErrorFlag = -1;
+1087                     <span class="keyword">end</span>
+1088                 <span class="keyword">end</span>
+1089 
+1090                 <span class="comment">% Reset Delta0 and timeout timer</span>
+1091                 Delta0 = Delta;
+1092                 t0 = gettime;
+1093             <span class="keyword">end</span>
+1094         <span class="keyword">end</span>
+1095 
+1096         <span class="comment">% Add extra delay for continued ramping due to the size of the tolerance</span>
+1097         <span class="keyword">if</span> isempty(Tol) &amp;&amp; isempty(Delta0)
+1098             <span class="comment">% If Tol and Delta) are empty, then WaitFlag is probably not wanted</span>
+1099             <span class="comment">%if WaitFlag &lt; 0</span>
+1100             <span class="comment">%    WaitFlag = 0;</span>
+1101             <span class="comment">%end</span>
+1102         <span class="keyword">else</span>
+1103             <span class="comment">% In case Tol is large, use the min of Tol and the present Delta SP-AM</span>
+1104             <span class="keyword">if</span> any(isnan(RampRate))
+1105                 <span class="comment">% For lack of a better idea: If the RampRate is not defined, calculate what it has been doing.</span>
+1106                 iNaN = find(isnan(RampRate));
+1107                 RampRate(iNaN) = abs(Delta0(iNaN) / (gettime-t00));
+1108             <span class="keyword">end</span>
+1109             <span class="keyword">if</span> isempty(RampRate)
+1110                 <span class="comment">% For lack of a better idea: If the RampRate is not defined, calculate what it has been doing.</span>
+1111                 RampRate = abs(Delta0 / (gettime-t00));
+1112             <span class="keyword">end</span>
+1113             <span class="keyword">if</span> any(RampRate == 0)
+1114             <span class="keyword">else</span>
+1115                 T = min([(Tol./RampRate) abs(Delta0./RampRate)],[],2);
+1116                 <span class="keyword">if</span> ~isempty(max(T))
+1117                     SleepTime = 1.05*max(T);
+1118                     <span class="keyword">if</span> SleepTime &gt; 30
+1119                         fprintf(<span class="string">'   Waiting %.2f seconds for %s family (SETPV: Delay=Tolerance/RampRate condition)\n'</span>, SleepTime, AO.FamilyName);
+1120                     <span class="keyword">end</span>
+1121                     sleep(SleepTime);
+1122                 <span class="keyword">end</span>
+1123             <span class="keyword">end</span>
+1124         <span class="keyword">end</span>
+1125     <span class="keyword">end</span>
+1126     
+1127     <span class="keyword">if</span> WaitFlag &amp;&amp; ~strcmpi(Mode,<span class="string">'Simulator'</span>)
+1128         <span class="comment">% Add a delay based on the WaitFlag</span>
+1129         <span class="keyword">if</span> WaitFlag &gt; 0
+1130             sleep(WaitFlag);
+1131         <span class="keyword">elseif</span> WaitFlag == -2
+1132             [N, BPMDelay] = getbpmaverages;
+1133             BPMDelay = 2.2 * max(BPMDelay);
+1134             <span class="keyword">if</span> ~isempty(BPMDelay)
+1135                 sleep(BPMDelay);
+1136             <span class="keyword">end</span>
+1137         <span class="keyword">elseif</span> WaitFlag == -3
+1138             TUNEDelay = 2.2 * <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TuneDelay'</span>);
+1139             <span class="keyword">if</span> ~isempty(TUNEDelay)
+1140                 sleep(TUNEDelay);
+1141             <span class="keyword">end</span>
+1142         <span class="keyword">elseif</span> WaitFlag == -4
+1143             tmp = input(<span class="string">'   Setpoint changed.  Hit return ready. '</span>);
+1144         <span class="keyword">end</span>
+1145     <span class="keyword">end</span>
+1146 
+1147 
+1148 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'Manual'</span>)
+1149     <span class="comment">%%%%%%%%%%%%%%%</span>
+1150     <span class="comment">% Manual mode %</span>
+1151     <span class="comment">%%%%%%%%%%%%%%%</span>
+1152     
+1153     <span class="comment">% Change to hardware units if in physics units</span>
+1154     <span class="keyword">if</span> strcmpi(AO.(Field).Units, <span class="string">'Physics'</span>)
+1155         NewSP = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(AO.FamilyName, Field, NewSP, DeviceList);
+1156     <span class="keyword">end</span>
+1157 
+1158     <span class="comment">% NewSP is always in hardware units at this point</span>
+1159     <span class="keyword">for</span> i = 1:length(DeviceIndex)
+1160         <span class="keyword">if</span> strcmpi(AO.(Field).Units, <span class="string">'Hardware'</span>)
+1161             fprintf(<span class="string">'   Manually set:  %s(%d,%d) = %f [%s]\n'</span>, AO.FamilyName, AO.DeviceList(DeviceIndex(i),1), AO.DeviceList(DeviceIndex(i),2), NewSP(i), AO.(Field).HWUnits);
+1162         <span class="keyword">else</span>
+1163             NewSP(i) = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(AO.FamilyName, Field, NewSP(i), AO.DeviceList(DeviceIndex(i),:));
+1164             fprintf(<span class="string">'   Manually set:  %s(%d,%d) = %f [%s]\n'</span>, AO.FamilyName, AO.DeviceList(DeviceIndex(i),1), AO.DeviceList(DeviceIndex(i),2), NewSP(i), AO.(Field).PhysicsUnits);
+1165         <span class="keyword">end</span>
+1166     <span class="keyword">end</span>
+1167     <span class="keyword">if</span> length(NewSP) == 1
+1168         input(sprintf(<span class="string">'   Set device manually and hit return '</span>));
+1169     <span class="keyword">else</span>
+1170         input(sprintf(<span class="string">'   Set these devices manually and hit return '</span>));
+1171     <span class="keyword">end</span>    
+1172     fprintf(<span class="string">'   \n'</span>);
+1173 
+1174     <span class="comment">%if strcmp(AO.FamilyName, 'RF')</span>
+1175     <span class="comment">%    input(sprintf('   Manually set the RF frequency to %f [MHz] and hit return.', NewSP));</span>
+1176     <span class="comment">%else</span>
+1177     <span class="comment">%    for i = 1:length(DeviceIndex)</span>
+1178     <span class="comment">%        fprintf('   Manually set:  %s(%d,%d) = %f\n', AO.FamilyName, AO.DeviceList(DeviceIndex(i),1), AO.DeviceList(DeviceIndex(i),2), NewSP(i));</span>
+1179     <span class="comment">%    end</span>
+1180     <span class="comment">%    input(sprintf('   Set these devices manually and hit return.'));</span>
+1181     <span class="comment">%end</span>
+1182     
+1183 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'Special'</span>)
+1184     <span class="comment">%===================================</span>
+1185     <span class="comment">% Special mode (evaluate a function)</span>
+1186     <span class="comment">%===================================</span>
+1187     
+1188     <span class="comment">% Could add N-Steps here???</span>
+1189 
+1190     <span class="comment">% Change to hardware units if in physics units</span>
+1191     <span class="keyword">if</span> strcmpi(AO.(Field).Units, <span class="string">'Physics'</span>)
+1192         NewSP = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(AO.FamilyName, Field, NewSP, DeviceList);
+1193     <span class="keyword">end</span>
+1194     
+1195     <span class="keyword">if</span> isfield(AO.(Field), <span class="string">'SpecialFunctionSet'</span>)
+1196         ErrorFlag = feval(AO.(Field).SpecialFunctionSet, AO.FamilyName, Field, NewSP, DeviceList, WaitFlag); 
+1197     <span class="keyword">else</span>
+1198         error(sprintf(<span class="string">'No special function specified for Family %s (setpv).'</span>, AO.FamilyName));
+1199     <span class="keyword">end</span>
+1200     
+1201 <span class="keyword">elseif</span> strcmpi(Mode,<span class="string">'Simulator'</span>)
+1202     <span class="comment">%==================</span>
+1203     <span class="comment">% AT simulator mode</span>
+1204     <span class="comment">%==================</span>
+1205     
+1206     ErrorFlag = setpvmodel(AO, Field, NewSP, DeviceList, AO.(Field).Units);
+1207     
+1208 <span class="keyword">else</span>
+1209     error(sprintf(<span class="string">'Unknown mode % for family %s.'</span>, Mode, AO.FamilyName));
+1210 <span class="keyword">end</span>
+1211 
+1212 
+1213 
+1214 
+1215 <span class="comment">% Old Cell Input Method</span>
+1216 
+1217 <span class="comment">%     if length(varargin) == 1</span>
+1218 <span class="comment">%         % One data structure input (NewSP contained in data structure)</span>
+1219 <span class="comment">%         % Call without WaitFlag, then set with WaitFlag</span>
+1220 <span class="comment">%         for i = 1:length(Family)</span>
+1221 <span class="comment">%             setpv(Family{i}, 0);</span>
+1222 <span class="comment">%         end</span>
+1223 <span class="comment">%</span>
+1224 <span class="comment">%         % Then set with default WaitFlag</span>
+1225 <span class="comment">%         for i = 1:length(Family)</span>
+1226 <span class="comment">%             setpv(Family{i});</span>
+1227 <span class="comment">%         end</span>
+1228 <span class="comment">%         return</span>
+1229 <span class="comment">%     end</span>
+1230 <span class="comment">%</span>
+1231 <span class="comment">%     % For (DataStructure, WaitFlag) or (ChannelName, NewSP) inputs</span>
+1232 <span class="comment">%     if length(varargin) == 2</span>
+1233 <span class="comment">%         if isstruc(Family)</span>
+1234 <span class="comment">%             % Data structure input</span>
+1235 <span class="comment">%             if iscell(Field)</span>
+1236 <span class="comment">%                 if length(Family) ~= length(Field)</span>
+1237 <span class="comment">%                     error('If WaitFlag is a cell array it must be the same size as DataStructure');</span>
+1238 <span class="comment">%                 end</span>
+1239 <span class="comment">%             end</span>
+1240 <span class="comment">%</span>
+1241 <span class="comment">%             % Call without WaitFlag, then set with WaitFlag</span>
+1242 <span class="comment">%             for i = 1:length(Family)</span>
+1243 <span class="comment">%                 setpv(Family{i}, 0);</span>
+1244 <span class="comment">%             end</span>
+1245 <span class="comment">%             for i = 1:length(Family)</span>
+1246 <span class="comment">%                 if iscell(Field)</span>
+1247 <span class="comment">%                     setpv(Family{i}, Field{i});</span>
+1248 <span class="comment">%                 else</span>
+1249 <span class="comment">%                     setpv(Family{i}, Field);</span>
+1250 <span class="comment">%                 end</span>
+1251 <span class="comment">%             end</span>
+1252 <span class="comment">%         else</span>
+1253 <span class="comment">%             % ChannelName input</span>
+1254 <span class="comment">%             if iscell(Field)</span>
+1255 <span class="comment">%                 if length(Family) ~= length(Field)</span>
+1256 <span class="comment">%                     error('Family and NewSP must be the same size cell arrays');</span>
+1257 <span class="comment">%                 end</span>
+1258 <span class="comment">%             else</span>
+1259 <span class="comment">%                 error('NewSP must be a cell array');</span>
+1260 <span class="comment">%             end</span>
+1261 <span class="comment">%             for i = 1:length(Family)            % call setpv recursively for each cell</span>
+1262 <span class="comment">%                 if iscell(Field)</span>
+1263 <span class="comment">%                     setpv(Family{i}, Field{i});</span>
+1264 <span class="comment">%                 else</span>
+1265 <span class="comment">%                     setpv(Family{i}, Field);</span>
+1266 <span class="comment">%                 end</span>
+1267 <span class="comment">%             end</span>
+1268 <span class="comment">%         end</span>
+1269 <span class="comment">%         return</span>
+1270 <span class="comment">%     end</span>
+1271 <span class="comment">%</span>
+1272 <span class="comment">%</span>
+1273 <span class="comment">%     % 3 or greater inputs implies a Family method</span>
+1274 <span class="comment">%     if length(varargin) &lt; 3</span>
+1275 <span class="comment">%         error('Must have at least 3 inputs when using cells with families');</span>
+1276 <span class="comment">%     end</span>
+1277 <span class="comment">%</span>
+1278 <span class="comment">%</span>
+1279 <span class="comment">%     % If Field is a cell it must be the same size as Family</span>
+1280 <span class="comment">%     if iscell(Field)</span>
+1281 <span class="comment">%         if length(Family) ~= length(Field)</span>
+1282 <span class="comment">%             error('If Field is a cell it must be the same size as Family');</span>
+1283 <span class="comment">%         end</span>
+1284 <span class="comment">%     end</span>
+1285 <span class="comment">%</span>
+1286 <span class="comment">%     % NewSP must a cell array equal to the length of Family</span>
+1287 <span class="comment">%     if ~iscell(NewSP)</span>
+1288 <span class="comment">%         error('If Family is a cell array, then NewSP must be a cell array');</span>
+1289 <span class="comment">%     end</span>
+1290 <span class="comment">%     if length(Family) ~= length(NewSP)</span>
+1291 <span class="comment">%         error('Family and NewSP must be the same size cell arrays');</span>
+1292 <span class="comment">%     end</span>
+1293 <span class="comment">%</span>
+1294 <span class="comment">%     if length(varargin) &gt;= 4</span>
+1295 <span class="comment">%         % DeviceList must a cell array equal to the length of Family</span>
+1296 <span class="comment">%         if ~iscell(DeviceList)</span>
+1297 <span class="comment">%             error('If Family is a cell array, then DeviceList must be a cell array');</span>
+1298 <span class="comment">%         end</span>
+1299 <span class="comment">%         if length(Family) ~= length(DeviceList)    % same number of DeviceLists as Families</span>
+1300 <span class="comment">%             error('Family and DeviceList must be the same size cell arrays');</span>
+1301 <span class="comment">%         end</span>
+1302 <span class="comment">%     end</span>
+1303 <span class="comment">%</span>
+1304 <span class="comment">%     if length(varargin) &gt;= 5</span>
+1305 <span class="comment">%         % If WaitFlag is a cell it must be the same size as Family</span>
+1306 <span class="comment">%         if iscell(WaitFlag)</span>
+1307 <span class="comment">%             if length(Family) ~= length(WaitFlag)</span>
+1308 <span class="comment">%                 error('If WaitFlag is a cell it must be the same size as Family');</span>
+1309 <span class="comment">%             end</span>
+1310 <span class="comment">%         end</span>
+1311 <span class="comment">%     end</span>
+1312 <span class="comment">%</span>
+1313 <span class="comment">%     % First set everything without WaitFlag  (still cell array of Families)</span>
+1314 <span class="comment">%     for i = 1:length(Family)</span>
+1315 <span class="comment">%         if nargin &gt;= 4</span>
+1316 <span class="comment">%            DeviceList = family2dev(Family{i});     % Default behavior comes from family2dev</span>
+1317 <span class="comment">%            %DeviceList = family2dev(Family{i},1);  % Good status only</span>
+1318 <span class="comment">%             if iscell(Field)</span>
+1319 <span class="comment">%                 setpv(Family{i}, Field{i}, NewSP{i}, DeviceList{i}, 0);</span>
+1320 <span class="comment">%             else</span>
+1321 <span class="comment">%                 setpv(Family{i}, Field, NewSP{i}, DeviceList{i}, 0);</span>
+1322 <span class="comment">%             end</span>
+1323 <span class="comment">%         else  % only 2 inputs specified (2 inputs finished above)</span>
+1324 <span class="comment">%             if iscell(Field)</span>
+1325 <span class="comment">%                 setpv(Family{i}, Field{i}, NewSP{i}, [], 0);</span>
+1326 <span class="comment">%             else</span>
+1327 <span class="comment">%                 setpv(Family{i}, Field, NewSP{i}, [], 0);</span>
+1328 <span class="comment">%             end</span>
+1329 <span class="comment">%         end  % end nargin &gt;= 4</span>
+1330 <span class="comment">%     end % end loop on Families without WaitFlag</span>
+1331 <span class="comment">%</span>
+1332 <span class="comment">%     % Then check for WaitFlag</span>
+1333 <span class="comment">%     for i = 1:length(Family)</span>
+1334 <span class="comment">%         if nargin == 3 % assumes default WaitFlag</span>
+1335 <span class="comment">%             if iscell(Field)</span>
+1336 <span class="comment">%                 ErrorFlag{i} = setpv(Family{i}, Field{i}, NewSP{i});</span>
+1337 <span class="comment">%             else</span>
+1338 <span class="comment">%                 ErrorFlag{i} = setpv(Family{i}, Field, NewSP{i});  % single entry for field</span>
+1339 <span class="comment">%             end</span>
+1340 <span class="comment">%         elseif nargin == 4</span>
+1341 <span class="comment">%             if iscell(Field)</span>
+1342 <span class="comment">%                 ErrorFlag{i} = setpv(Family{i}, Field{i}, NewSP{i}, DeviceList{i});</span>
+1343 <span class="comment">%             else</span>
+1344 <span class="comment">%                 ErrorFlag{i} = setpv(Family{i}, Field, NewSP{i}, DeviceList{i}); % single entry for field</span>
+1345 <span class="comment">%             end</span>
+1346 <span class="comment">%         else  % must be nargin == 5 because nargin == 2 complete above</span>
+1347 <span class="comment">%             if iscell(Field)</span>
+1348 <span class="comment">%                 if iscell(WaitFlag)</span>
+1349 <span class="comment">%                     ErrorFlag{i} = setpv(Family{i}, Field{i}, NewSP{i}, DeviceList{i}, WaitFlag{i});</span>
+1350 <span class="comment">%                 else</span>
+1351 <span class="comment">%                     ErrorFlag{i} = setpv(Family{i}, Field{i}, NewSP{i}, DeviceList{i}, WaitFlag);</span>
+1352 <span class="comment">%                 end</span>
+1353 <span class="comment">%             else</span>
+1354 <span class="comment">%                 if iscell(WaitFlag)</span>
+1355 <span class="comment">%                     ErrorFlag{i} = setpv(Family{i}, Field, NewSP{i}, DeviceList{i}, WaitFlag{i});</span>
+1356 <span class="comment">%                 else</span>
+1357 <span class="comment">%                     ErrorFlag{i} = setpv(Family{i}, Field, NewSP{i}, DeviceList{i}, WaitFlag);</span>
+1358 <span class="comment">%                 end</span>
+1359 <span class="comment">%             end</span>
+1360 <span class="comment">%         end</span>
+1361 <span class="comment">%     end %end second loop over families with WaitFlag</span>
+1362 <span class="comment">%     return</span>
+1363 
+1364</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

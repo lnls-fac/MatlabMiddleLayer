@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measbpmresplinearity</title>
+  <meta name="keywords" content="measbpmresplinearity">
+  <meta name="description" content="MEASBPMRESPLINEARITY - Compute BPMlinearity">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measbpmresplinearity.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measbpmresplinearity
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASBPMRESPLINEARITY - Compute BPMlinearity</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function measbpmresplinearity(CMFamily, mm, CMDeviceList, XAxisFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> MEASBPMRESPLINEARITY - Compute BPMlinearity
+ 
+  INPUTS
+  1. CMFamily - Corrector Magnet Family {Default: 'HCOR'}
+  2. mm - Vector of given amplitude {Default: mm = [.5 1 1.5 2 2.5 3 3.5 4]; 
+  3. CMDeviceList - BPM DeviceListe {Default: [1 1]}
+  4. XaxisFlag - 'meters' or 'Phase' {Defaults: 'meters'}
+
+  NOTES
+  1. Data saved in bpmresplinearitydata</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li><li><a href="mm2amp.html" class="code" title="function Amps = mm2amp(CMfamily, mm, CMDevList, varargin)">mm2amp</a>	MM2AMPS - Returns the change in corrector need for a maximum orbit change</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function measbpmresplinearity(CMFamily, mm, CMDeviceList, XAxisFlag)</a>
+0002 <span class="comment">% MEASBPMRESPLINEARITY - Compute BPMlinearity</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  INPUTS</span>
+0005 <span class="comment">%  1. CMFamily - Corrector Magnet Family {Default: 'HCOR'}</span>
+0006 <span class="comment">%  2. mm - Vector of given amplitude {Default: mm = [.5 1 1.5 2 2.5 3 3.5 4];</span>
+0007 <span class="comment">%  3. CMDeviceList - BPM DeviceListe {Default: [1 1]}</span>
+0008 <span class="comment">%  4. XaxisFlag - 'meters' or 'Phase' {Defaults: 'meters'}</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  NOTES</span>
+0011 <span class="comment">%  1. Data saved in bpmresplinearitydata</span>
+0012 
+0013 <span class="comment">%  Written by Greg Portmann</span>
+0014 <span class="comment">%  MOdified by Laurent S. Nadolski</span>
+0015 
+0016 <span class="keyword">if</span> nargin &lt; 1
+0017     CMFamily = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0018 <span class="keyword">end</span>
+0019 <span class="keyword">if</span> nargin &lt; 2
+0020     mm = [];
+0021 <span class="keyword">end</span>
+0022 <span class="keyword">if</span> isempty(mm)
+0023     mm = [.05 .25 .5 .75 1 1.25 1.5 1.75 2];
+0024     <span class="comment">%mm = [.25 .5 .75 1 1.25 1.5 1.75 2];</span>
+0025     <span class="comment">%mm = [.1 .2 .3 .4 .5 .6 .7 .8 .9 1];</span>
+0026     mm = [.5 1 1.5 2 2.5 3 3.5 4]; 
+0027 <span class="keyword">end</span>
+0028 <span class="keyword">if</span> nargin &lt; 3
+0029     CMDeviceList = [];
+0030 <span class="keyword">end</span>
+0031 <span class="keyword">if</span> isempty(CMDeviceList)
+0032     CMDeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(CMFamily);
+0033 <span class="keyword">end</span>
+0034 <span class="keyword">if</span> nargin &lt; 4
+0035     XAxisFlag = <span class="string">'meters'</span>;
+0036 <span class="keyword">end</span>
+0037 CMDeviceList = CMDeviceList(1,:);
+0038 
+0039 Fig = gcf;
+0040 
+0041 <span class="comment">% X-axis</span>
+0042 <span class="keyword">if</span> strcmpi(XAxisFlag, <span class="string">'Phase'</span>)
+0043     [BPMxspos, BPMyspos, Sx, Sy, Tune] = modeltwiss(<span class="string">'Phase'</span>, <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>, [], <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>, []);
+0044     BPMxspos = BPMxspos/2/pi;
+0045     BPMyspos = BPMyspos/2/pi;
+0046     XLabel = <span class="string">'BPM Phase'</span>;
+0047 <span class="keyword">else</span>
+0048     BPMxspos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(<a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>);
+0049     BPMyspos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(<a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>);
+0050     XLabel = <span class="string">'BPM Position [meters]'</span>;
+0051 <span class="keyword">end</span>
+0052 
+0053 <span class="comment">% BPM plane</span>
+0054 <span class="keyword">if</span> ~isempty(findstr(upper(CMFamily),<span class="string">'H'</span>)) || ~isempty(findstr(upper(CMFamily),<span class="string">'X'</span>))
+0055     BPMFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>;
+0056     BPMspos = BPMxspos;
+0057 <span class="keyword">elseif</span> ~isempty(findstr(upper(CMFamily),<span class="string">'V'</span>)) || ~isempty(findstr(upper(CMFamily),<span class="string">'Y'</span>)) || <span class="keyword">...</span>
+0058         ~isempty(findstr(upper(CMFamily),<span class="string">'Z'</span>))
+0059     BPMFamily = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;
+0060     BPMspos = BPMyspos;
+0061 <span class="keyword">else</span>
+0062     error(<span class="string">'Not sure if corrector family is horizontal or vertical.'</span>);
+0063 <span class="keyword">end</span>
+0064 BPMDeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMFamily);
+0065 
+0066 
+0067 mm = mm(:)';
+0068 Amps = <a href="mm2amp.html" class="code" title="function Amps = mm2amp(CMfamily, mm, CMDevList, varargin)">mm2amp</a>(CMFamily, mm, CMDeviceList);
+0069 
+0070 
+0071 <span class="comment">% Get data</span>
+0072 x0 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMFamily, <span class="string">'struct'</span>);
+0073 SP0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(CMFamily, CMDeviceList, <span class="string">'struct'</span>);
+0074 
+0075 <span class="comment">% if strcmpi(getmode('HCM'), 'Online')</span>
+0076 <span class="comment">%     Amps0 = mm2amps(CMFamily, .250, CMDeviceList);</span>
+0077 <span class="comment">%</span>
+0078 <span class="comment">% else</span>
+0079 <span class="comment">%     Amps0 = mm2amps(CMFamily, .025, CMDeviceList);</span>
+0080 <span class="comment">% end</span>
+0081 <span class="comment">%</span>
+0082 <span class="comment">% setsp(CMFamily, SP0 + Amps0, CMDeviceList, -2);</span>
+0083 <span class="comment">% BPMResp0 = (getam(BPMFamily, BPMDeviceList) - x0.Data) / Amp0;</span>
+0084     
+0085 <span class="keyword">for</span> i = 1:length(Amps)
+0086     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(CMFamily, SP0.Data + Amps(i), CMDeviceList, -2);
+0087     <span class="comment">%x(:,i) = (getam(BPMFamily, BPMDeviceList) - x0.Data) / Amps(i);</span>
+0088     x(:,i) = (<a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMFamily, BPMDeviceList) - x0.Data);
+0089 <span class="keyword">end</span>
+0090 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(CMFamily, SP0.Data, CMDeviceList, -2);
+0091 
+0092 
+0093 C = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0094 
+0095 save bpmresplinearitydata
+0096 
+0097 figure(Fig);
+0098 clf reset
+0099 h1 = subplot(3,1,1);
+0100 plot(BPMspos, x, <span class="string">'.-'</span>);
+0101 ylabel(sprintf(<span class="string">'%s [%s]'</span>, BPMFamily, x0.UnitsString));
+0102 title(sprintf(<span class="string">'BPM linearity using storage Ring Orbit Response for %s(%d,%d)'</span>, CMFamily, CMDeviceList(1,1), CMDeviceList(1,2)));
+0103 <span class="keyword">if</span> ~isempty(C)
+0104     xaxis([0 C]);
+0105 <span class="keyword">end</span>
+0106 
+0107 <span class="keyword">for</span> i = 1:size(x,2)
+0108     x(:,i) = x(:,i)/Amps(i);
+0109 <span class="keyword">end</span>
+0110 
+0111 h2 = subplot(3,1,2);
+0112 plot(BPMspos, x, <span class="string">'.-'</span>);
+0113 ylabel(sprintf(<span class="string">'%s [%s/%s]'</span>, BPMFamily, x0.UnitsString, SP0.UnitsString));
+0114 
+0115 x00 = x(:,1);
+0116 <span class="keyword">for</span> i = 1:size(x,2)
+0117     x(:,i) = x(:,i) - x00;
+0118 <span class="keyword">end</span>
+0119 
+0120 h3 = subplot(3,1,3);
+0121 plot(BPMspos, x, <span class="string">'.-'</span>);
+0122 xlabel(XLabel);
+0123 ylabel(sprintf(<span class="string">'Response Matrix Differences'</span>));
+0124 
+0125 linkaxes([h1 h2 h3],<span class="string">'x'</span>)
+0126 set([h1 h2 h3],<span class="string">'XGrid'</span>,<span class="string">'On'</span>,<span class="string">'YGrid'</span>,<span class="string">'On'</span>);
+0127 
+0128 addlabel(1, 0, datestr(clock,0));</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

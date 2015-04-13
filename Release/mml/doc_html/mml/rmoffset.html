@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of rmoffset</title>
+  <meta name="keywords" content="rmoffset">
+  <meta name="description" content="RMOFFSET - Remove the offset values for data set">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; rmoffset.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>rmoffset
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>RMOFFSET - Remove the offset values for data set</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function Data = rmoffset(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">RMOFFSET - Remove the offset values for data set
+  Data = rmoffset(DataStructure)
+  Data = rmoffset(Family, DataIn, DeviceList)
+  Data = rmoffset(Family, Field, DataIn, DeviceList)
+
+  INPUTS
+  1. Family - Family Name
+              Data Structure
+              Accelerator Object
+  2. Field - MML field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor' for BPM, 'Setpoint' for magnet}
+  3. DataIn - Input data
+  4. DeviceList ([Sector Device #] or [element #]) {Default: whole family}
+  5. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+  6. 'Struct'  - Return a data structure
+     'Numeric' - Return numeric outputs  {Default}
+     'Object'  - Return a accelerator object (AccObj)
+
+  OUTPUTS
+  1. Data - Input data with a offset value removed
+
+  See also <a href="rmgolden.html" class="code" title="function Data = rmgolden(varargin)">rmgolden</a>, <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>, <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="checkforcommonnames.html" class="code" title="function [Family, DeviceList] = checkforcommonnames(Family, DeviceList)">checkforcommonnames</a>	CHECKFORCOMMONNAMES - Checks for common names in the Family or DeviceList input</li><li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>	FAMILY2DATASTRUCTURE</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>	ISMEMBEROF - Returns turn if the membership information of a family (cell of strings)</li><li><a href="rmoffset.html" class="code" title="function Data = rmoffset(varargin)">rmoffset</a>	RMOFFSET - Remove the offset values for data set</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="rmoffset.html" class="code" title="function Data = rmoffset(varargin)">rmoffset</a>	RMOFFSET - Remove the offset values for data set</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Data = rmoffset(varargin)</a>
+0002 <span class="comment">%RMOFFSET - Remove the offset values for data set</span>
+0003 <span class="comment">%  Data = rmoffset(DataStructure)</span>
+0004 <span class="comment">%  Data = rmoffset(Family, DataIn, DeviceList)</span>
+0005 <span class="comment">%  Data = rmoffset(Family, Field, DataIn, DeviceList)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS</span>
+0008 <span class="comment">%  1. Family - Family Name</span>
+0009 <span class="comment">%              Data Structure</span>
+0010 <span class="comment">%              Accelerator Object</span>
+0011 <span class="comment">%  2. Field - MML field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor' for BPM, 'Setpoint' for magnet}</span>
+0012 <span class="comment">%  3. DataIn - Input data</span>
+0013 <span class="comment">%  4. DeviceList ([Sector Device #] or [element #]) {Default: whole family}</span>
+0014 <span class="comment">%  5. 'Physics'  - Use physics  units (optional override of units)</span>
+0015 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0016 <span class="comment">%  6. 'Struct'  - Return a data structure</span>
+0017 <span class="comment">%     'Numeric' - Return numeric outputs  {Default}</span>
+0018 <span class="comment">%     'Object'  - Return a accelerator object (AccObj)</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  OUTPUTS</span>
+0021 <span class="comment">%  1. Data - Input data with a offset value removed</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  See also rmgolden, getoffset, getgolden</span>
+0024 
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 
+0029 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0030 <span class="comment">% Input parsing %</span>
+0031 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0032 UnitsFlagCell = {};
+0033 StructFlag = 0;
+0034 NumericFlag = 0;
+0035 <span class="keyword">for</span> i = length(varargin):-1:1
+0036     <span class="keyword">if</span> isstruct(varargin{i})
+0037         <span class="comment">% Ignor structures</span>
+0038     <span class="keyword">elseif</span> iscell(varargin{i})
+0039         <span class="comment">% Ignor cells</span>
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0041         StructFlag = 1;
+0042         NumericFlag = 0;
+0043         varargin(i) = [];
+0044     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0045         StructFlag = 0;
+0046         NumericFlag = 1;
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>) || strcmpi(varargin{i},<span class="string">'Online'</span>) || strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0049         <span class="comment">% Remove and ignor</span>
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0052         UnitsFlagCell = {<span class="string">'Physics'</span>};
+0053         varargin(i) = [];
+0054     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0055         UnitsFlagCell = {<span class="string">'Hardware'</span>};
+0056         varargin(i) = [];
+0057     <span class="keyword">end</span>
+0058 <span class="keyword">end</span>
+0059 
+0060 
+0061 <span class="keyword">if</span> isempty(varargin)
+0062     error(<span class="string">'Must have at least a family name input'</span>);
+0063 <span class="keyword">elseif</span> iscell(varargin{1})
+0064     <span class="comment">% Cell input</span>
+0065     <span class="keyword">for</span> i = 1:length(varargin{1})
+0066         <span class="keyword">if</span> length(varargin) == 1
+0067             Data{i} = <a href="rmoffset.html" class="code" title="function Data = rmoffset(varargin)">rmoffset</a>(varargin{1}{i}, UnitsFlagCell{:});
+0068         <span class="keyword">elseif</span> length(varargin) == 2
+0069             Data{i} = <a href="rmoffset.html" class="code" title="function Data = rmoffset(varargin)">rmoffset</a>(varargin{1}{i}, varargin{2}{i}, UnitsFlagCell{:});
+0070         <span class="keyword">elseif</span> length(varargin) == 3
+0071             Data{i} = <a href="rmoffset.html" class="code" title="function Data = rmoffset(varargin)">rmoffset</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i}, UnitsFlagCell{:});
+0072         <span class="keyword">else</span>
+0073             Data{i} = <a href="rmoffset.html" class="code" title="function Data = rmoffset(varargin)">rmoffset</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i}, varargin{4}{i}, UnitsFlagCell{:});
+0074         <span class="keyword">end</span>
+0075     <span class="keyword">end</span>
+0076     <span class="keyword">return</span>
+0077 <span class="keyword">end</span>
+0078 
+0079 
+0080 
+0081 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0082 <span class="comment">% Family or data structure inputs beyond this point %</span>
+0083 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0084 Family = varargin{1};
+0085 <span class="keyword">if</span> isstruct(Family)
+0086     <span class="keyword">if</span> ~NumericFlag
+0087         StructFlag = 1;
+0088         StructOut = Family; 
+0089     <span class="keyword">end</span>
+0090     
+0091     <span class="comment">% Data structure inputs</span>
+0092     <span class="keyword">if</span> length(varargin) &lt; 2
+0093         <span class="keyword">if</span> isfield(Family,<span class="string">'Field'</span>)
+0094             Field = Family.Field;
+0095         <span class="keyword">else</span>
+0096             Field = <span class="string">''</span>;
+0097         <span class="keyword">end</span>
+0098     <span class="keyword">end</span>
+0099     <span class="keyword">if</span> length(varargin) &lt; 3 
+0100         <span class="keyword">if</span> isfield(Family,<span class="string">'Data'</span>)
+0101             Data = Family.Data;
+0102         <span class="keyword">else</span>
+0103             error(<span class="string">'A .Data field must exist for data structure inputs.'</span>);
+0104         <span class="keyword">end</span>
+0105     <span class="keyword">end</span>
+0106     <span class="keyword">if</span> length(varargin) &lt; 4
+0107         <span class="keyword">if</span> isfield(Family,<span class="string">'DeviceList'</span>)
+0108             DeviceList = Family.DeviceList;
+0109         <span class="keyword">else</span>
+0110             DeviceList = [];
+0111         <span class="keyword">end</span>
+0112     <span class="keyword">end</span>
+0113     <span class="keyword">if</span> isempty(UnitsFlagCell)
+0114         <span class="keyword">if</span> isfield(Family,<span class="string">'Units'</span>)
+0115             UnitsFlagCell{1} = Family.Units; 
+0116         <span class="keyword">end</span>
+0117     <span class="keyword">end</span>
+0118     <span class="keyword">if</span> isfield(Family,<span class="string">'FamilyName'</span>)
+0119         Family = Family.FamilyName;
+0120     <span class="keyword">else</span>
+0121         error(<span class="string">'For data structure inputs FamilyName field must exist'</span>)
+0122     <span class="keyword">end</span>
+0123 <span class="keyword">else</span>
+0124     <span class="comment">% Family string input</span>
+0125     <span class="keyword">if</span> length(varargin) &gt;= 2 &amp;&amp; ischar(varargin{2})
+0126         Field = varargin{2};
+0127         varargin(2) = [];
+0128     <span class="keyword">else</span>
+0129         Field = <span class="string">''</span>;
+0130     <span class="keyword">end</span>
+0131     <span class="keyword">if</span> length(varargin) &gt;= 2
+0132         Data = varargin{2};
+0133     <span class="keyword">else</span>
+0134         Data = <span class="string">''</span>;
+0135     <span class="keyword">end</span>
+0136     <span class="keyword">if</span> length(varargin) &gt;= 3
+0137         DeviceList = varargin{3};
+0138     <span class="keyword">else</span>
+0139         DeviceList = [];
+0140     <span class="keyword">end</span>
+0141 
+0142     StructOut = [];
+0143 <span class="keyword">end</span>
+0144 
+0145 <span class="keyword">if</span> isnumeric(Field)
+0146     DeviceList = Data;
+0147     Data = Field;
+0148     Field = <span class="string">''</span>;
+0149 <span class="keyword">end</span>
+0150 <span class="keyword">if</span> isempty(Field)
+0151     <span class="keyword">if</span> <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(Family,<span class="string">'BPM'</span>) || <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(Family,<span class="string">'TUNE'</span>) || strcmpi(Family, <span class="string">'TUNE'</span>)
+0152         Field = <span class="string">'Monitor'</span>;
+0153     <span class="keyword">else</span>
+0154         Field = <span class="string">'Setpoint'</span>;
+0155     <span class="keyword">end</span>
+0156 <span class="keyword">end</span>
+0157 
+0158 <span class="keyword">if</span> isempty(DeviceList)
+0159     DeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(Family);
+0160 <span class="keyword">end</span>
+0161 <span class="keyword">if</span> (size(DeviceList,2) == 1) 
+0162     DeviceList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(Family, DeviceList);
+0163 <span class="keyword">end</span>
+0164 
+0165 <span class="keyword">if</span> isempty(Data) || ~isnumeric(Data)
+0166     <span class="comment">%error('Data input required');</span>
+0167     Data = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Family, Field, DeviceList);
+0168 <span class="keyword">end</span>
+0169 
+0170 <span class="keyword">if</span> size(Data,1) == 1
+0171     Data = ones(size(DeviceList,1),1) * Data;
+0172 <span class="keyword">end</span>
+0173 
+0174 
+0175 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0176 <span class="comment">% Check DeviceList or Family is a common name list %</span>
+0177 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0178 [Family, DeviceList] = <a href="checkforcommonnames.html" class="code" title="function [Family, DeviceList] = checkforcommonnames(Family, DeviceList)">checkforcommonnames</a>(Family, DeviceList);
+0179 
+0180 
+0181 <span class="comment">%%%%%%%%%%%%</span>
+0182 <span class="comment">% rmoffset %</span>
+0183 <span class="comment">%%%%%%%%%%%%</span>
+0184 
+0185 Offset = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(Family, Field, DeviceList, UnitsFlagCell{:});
+0186 
+0187 <span class="keyword">for</span> i = 1:size(Data,1)
+0188     Data(i,:) = Data(i,:) - Offset(i,:); 
+0189 <span class="keyword">end</span>
+0190 
+0191 
+0192 <span class="keyword">if</span> StructFlag
+0193     <span class="keyword">if</span> isempty(StructOut)
+0194         StructOut = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(Family, Field, DeviceList);
+0195         StructOut.DataDescriptor = <span class="string">'rmoffset'</span>;
+0196     <span class="keyword">end</span>
+0197     StructOut.Data = Data;
+0198     Data = StructOut;
+0199 <span class="keyword">end</span>
+0200 
+0201</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

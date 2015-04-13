@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of showmachinedata</title>
+  <meta name="keywords" content="showmachinedata">
+  <meta name="description" content="SHOWMACHINEDATA - Display setpoints and readbacks for families in AcceleratorObjects">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; showmachinedata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>showmachinedata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SHOWMACHINEDATA - Display setpoints and readbacks for families in AcceleratorObjects</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function showmachinedata(families) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SHOWMACHINEDATA - Display setpoints and readbacks for families in AcceleratorObjects
+  showmachinedata(Family)
+
+  INPUTS
+  1. Family - Can be char or cell array, showmachinedata{'Q1'; 'Q2';}</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getad.html" class="code" title="function  AD = getad">getad</a>	GETAD - returns the Accelerator Data (AD) structure</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>	ISMEMBEROF - Returns turn if the membership information of a family (cell of strings)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function showmachinedata(families)</a>
+0002 <span class="comment">%SHOWMACHINEDATA - Display setpoints and readbacks for families in AcceleratorObjects</span>
+0003 <span class="comment">%  showmachinedata(Family)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Family - Can be char or cell array, showmachinedata{'Q1'; 'Q2';}</span>
+0007 
+0008 <span class="comment">% Written by Jeff Corbett</span>
+0009 <span class="comment">% Modified by Laurent S. Nadolski</span>
+0010 
+0011 
+0012 <span class="keyword">if</span> nargin == 0 
+0013     families = <span class="string">''</span>;
+0014 <span class="keyword">end</span>
+0015 
+0016 ad = <a href="getad.html" class="code" title="function  AD = getad">getad</a>; <span class="comment">% gets Accelerator Data</span>
+0017 
+0018 <span class="comment">% Prints out current time</span>
+0019 fprintf(<span class="string">'%30s\n\n'</span>,[ad.Machine <span class="string">' Accelerator Settings: '</span> datestr(now,0)]);
+0020 
+0021 <span class="keyword">if</span> isempty(families)
+0022     families=<a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0023 <span class="keyword">elseif</span> ischar(families)
+0024     families=char(families);   <span class="comment">%make sure same length</span>
+0025 <span class="keyword">elseif</span> iscell(families)
+0026     families=char(families{:});
+0027 <span class="keyword">end</span>
+0028 
+0029 <span class="keyword">for</span> ii = 1:size(families,1)
+0030     family = deblank(families(ii,:));
+0031 
+0032     <span class="keyword">if</span> ~<a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(family)
+0033         disp([<span class="string">'   Warning: family not available... '</span>, family]);
+0034     <span class="keyword">else</span>
+0035         <span class="keyword">if</span> <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(family, <span class="string">'Magnet'</span>)
+0036 
+0037             DevList     = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(family);
+0038             <span class="comment">%SetpointPV  = char(getfamilydata(family,'Setpoint','TangoNames'));</span>
+0039             Setpoint    = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(family,<span class="string">'hardware'</span>);
+0040             PSetpoint   = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(family,<span class="string">'Setpoint'</span>,Setpoint);
+0041 
+0042             <span class="comment">%MonitorPV   = char(getfamilydata(family,'Monitor','TangoNames'));</span>
+0043             Monitor     = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(family,<span class="string">'hardware'</span>);
+0044             PMonitor    = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(family,<span class="string">'Monitor'</span>, Monitor);
+0045 
+0046 
+0047             <span class="comment">%display hardware values</span>
+0048             fprintf(<span class="string">'%s\n'</span>,[<span class="string">'   Family  DeviceList  HWSetpoint PhysicsSetpoint     HWReadback    PhysicsReadback   SP-MON (HW)   SP-MON (Physics)'</span>]);
+0049             <span class="comment">%fprintf('%s\n',['   Family  DeviceList  HWSetpoint PhysicsSetpoint     HWReadback    PhysicsReadback   SP-MON (HW)   SP-MON (Physics)  Setpoint_PV             Monitor_PV']);</span>
+0050 
+0051             <span class="keyword">for</span> jj=1:size(DevList,1)
+0052                 fprintf(<span class="string">'%8s    [%2d,%d] %14.5f %14.5f %14.5f %14.5f %14.5f %14.5f\n'</span>,family,DevList(jj,1),DevList(jj,2),Setpoint(jj),PSetpoint(jj),Monitor(jj),PMonitor(jj),Setpoint(jj)-Monitor(jj),PSetpoint(jj)-PMonitor(jj));
+0053                 <span class="comment">%fprintf('%8s    [%2d,%d] %14.5f %14.5f %14.5f %14.5f %14.5f %14.5f %28s %20s\n',family,DevList(jj,1),DevList(jj,2),Setpoint(jj),PSetpoint(jj),Monitor(jj),PMonitor(jj),Setpoint(jj)-Monitor(jj),PSetpoint(jj)-PMonitor(jj),SetpointPV(jj,:),MonitorPV(jj,:));</span>
+0054             <span class="keyword">end</span>
+0055             disp(<span class="string">' '</span>);
+0056         <span class="keyword">end</span>
+0057     <span class="keyword">end</span>
+0058 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

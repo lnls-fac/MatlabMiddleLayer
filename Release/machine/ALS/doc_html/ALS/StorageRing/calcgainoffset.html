@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcgainoffset</title>
+  <meta name="keywords" content="calcgainoffset">
+  <meta name="description" content="CALCGAINOFFSET - Calculate the gain and offset of the analog monitors">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; calcgainoffset.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>calcgainoffset
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>CALCGAINOFFSET - Calculate the gain and offset of the analog monitors</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Gain, Offset] = calcgainoffset </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">CALCGAINOFFSET - Calculate the gain and offset of the analog monitors</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Gain, Offset] = calcgainoffset</a>
+0002 <span class="comment">%CALCGAINOFFSET - Calculate the gain and offset of the analog monitors</span>
+0003 
+0004 
+0005 
+0006 
+0007 <span class="comment">%[SP1, AM1] = getinjectionlattice;</span>
+0008 
+0009 
+0010 Family = {<span class="string">'BEND'</span>, <span class="string">'QFA'</span>};
+0011 <span class="comment">%Family = {'HCM', 'VCM'};</span>
+0012 <span class="comment">%Family = {'QF', 'QD', 'QDA'};</span>
+0013 <span class="comment">%Family = {'SF', 'SD'};</span>
+0014 <span class="comment">%Family = {'SQSF', 'SQSD'};</span>
+0015 
+0016 MonmagsFlag = 1;
+0017 
+0018 <span class="keyword">for</span> i = 1:length(Family)
+0019 
+0020     <span class="keyword">if</span> MonmagsFlag
+0021         DirectoryName = getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>);
+0022         DirectoryName = [DirectoryName, <span class="string">'Magnets'</span>, filesep];
+0023         load([DirectoryName, <span class="string">'magnetdata_2007-06-14_Production.mat'</span>]);
+0024     <span class="keyword">else</span>
+0025         [MagnetSetpoints, MagnetMonitors] = getproductionlattice;
+0026     <span class="keyword">end</span>
+0027 
+0028     SP2 = MagnetSetpoints.(Family{i}).Setpoint.Data;
+0029     AM2 = mean(MagnetMonitors.(Family{i}).Monitor.Data, 2);
+0030 
+0031 
+0032     <span class="keyword">if</span> MonmagsFlag
+0033         DirectoryName = getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>);
+0034         DirectoryName = [DirectoryName, <span class="string">'Magnets'</span>, filesep];
+0035         load([DirectoryName, <span class="string">'magnetdata_2007-06-12_Injection.mat'</span>]);
+0036         <span class="comment">%load([DirectoryName, 'magnetdata_2007-06-14_Injection.mat']);</span>
+0037         SP1 = MagnetSetpoints.(Family{i}).Setpoint.Data;
+0038         AM1 = mean(MagnetMonitors.(Family{i}).Monitor.Data, 2);
+0039     <span class="keyword">else</span>
+0040         [MagnetSetpoints, MagnetMonitors] = getinjectionlattice;
+0041     <span class="keyword">end</span>
+0042 
+0043     SP1 = MagnetSetpoints.(Family{i}).Setpoint.Data;
+0044     AM1 = mean(MagnetMonitors.(Family{i}).Monitor.Data, 2);
+0045 
+0046 
+0047     figure(MonmagsFlag+1);
+0048     subplot(length(Family),1,i);
+0049     plot(1:length(SP2), SP2-AM2, <span class="string">'.-b'</span>, 1:length(SP1), SP1-AM1, <span class="string">'.-r'</span>);
+0050     ylabel(sprintf(<span class="string">'%s  SP-AM [Amps]'</span>,Family{i}));
+0051     
+0052     
+0053     figure(MonmagsFlag+1+2);
+0054     subplot(length(Family),1,i);
+0055     plot(1:length(SP2), SP2./AM2, <span class="string">'.-b'</span>, 1:length(SP1), SP1./AM1, <span class="string">'.-r'</span>);
+0056     ylabel(sprintf(<span class="string">'%s  AM Gain [Amps]'</span>,Family{i}));
+0057 
+0058     <span class="comment">% Gain or Offset (not Gain/Offset!)</span>
+0059     Gain{i}   = mean([SP2./AM2 SP1./AM1],2);
+0060     Offset{i} = mean([SP2-AM2 SP1-AM1],2);
+0061 
+0062 <span class="keyword">end</span>
+0063 
+0064 
+0065 
+0066 
+0067 figure(MonmagsFlag+1);
+0068 subplot(length(Family),1,1);
+0069 <span class="keyword">if</span> MonmagsFlag
+0070     title(<span class="string">'Setpoint - Monitor Offset at the Production and Injection Lattices (monmags)'</span>);
+0071 <span class="keyword">else</span>
+0072     title(<span class="string">'Setpoint - Monitor Offset at the Production and Injection Lattices'</span>);
+0073 <span class="keyword">end</span>
+0074 
+0075 subplot(length(Family),1,length(Family));
+0076 xlabel(<span class="string">'Magnet Number'</span>);
+0077 orient tall
+0078 
+0079 
+0080 figure(MonmagsFlag+1+2);
+0081 subplot(length(Family),1,1);
+0082 <span class="keyword">if</span> MonmagsFlag
+0083     title(<span class="string">'AM  Gain:  Setpoint = Gain * Monitor (monmags)'</span>);
+0084 <span class="keyword">else</span>
+0085     title(<span class="string">'AM  Gain:  Setpoint = Gain * Monitor'</span>);
+0086 <span class="keyword">end</span>
+0087 
+0088 subplot(length(Family),1,length(Family));
+0089 xlabel(<span class="string">'Magnet Number'</span>);
+0090 orient tall
+0091 
+0092 
+0093 
+0094</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

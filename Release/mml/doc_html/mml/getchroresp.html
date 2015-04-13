@@ -1,0 +1,351 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getchroresp</title>
+  <meta name="keywords" content="getchroresp">
+  <meta name="description" content="GETCHRORESP - Loads the chromaticity response vector (or matrix) for multiple sextupole families">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; getchroresp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getchroresp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETCHRORESP - Loads the chromaticity response vector (or matrix) for multiple sextupole families</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ChromaticityMatrix, FileName] = getchroresp(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETCHRORESP - Loads the chromaticity response vector (or matrix) for multiple sextupole families
+  [ChromaticityMatrix, FileName] = getchroresp(FamilyName1, DeviceList1, FamilyName2, DeviceList2, ... , FileName, GeV)
+  [ChromaticityMatrix, FileName] = getchroresp(DataStructure1, DataStructure2, ... , FileName, GeV)
+
+  INPUTS  
+  1. FamilyName - Sextupole family name
+  2. DeviceList - DeviceList for a sextuopole family.  If [] or no input, then ChromaticityMatrix 
+                  will be a column vector which is the cumulative sum of all magnets in the family.
+  3. FileName - File name to look for the response matrix (or cell array of file names)
+                [] or '' - prompt the user to choose a response matrix file
+                To put the filename anywhere in the function call use the keyword, 'Filename' followed by the actual 
+                filename or '' to get a dialog box.  For example, m = getchroresp('FileName','RmatABC') to search in RmatABC.mat.
+  4. GeV is the energy that the response matrix will be used at {Default or []: getenergy}.
+     It's not always desirable to scale by the energy, so the following keywords can be used.
+     'EnergyScaling' - Scale the response matrix by energy (getenergy / measured energy) {Default}
+     'NoEnergyScaling' - Don't scale with energy
+  5. 'Struct'  will return the response matrix structure {default for data structure inputs}
+     'Numeric' will return a numeric matrix {default for non-data structure inputs}
+  Note: FamilyName and DeviceList can be cell arrays instead of multiple input pairs
+
+  OUTPUTS 
+  1. ChromaticityMatrix - Response matrix {Default is physics units}
+  
+     It is assumed that most common use of this function is with the chromaticity
+     corrector families on a ganged power supply.  Hence, the default 
+     behavior is to return the cumulative sum of all the magnets in the chain.
+     If there is more than one FamilyName, then ChromaticityMatrix will be a matrix  
+     where each column is the sum of the contribution of all magnets in that family.
+
+     To get the response matrix for individual magnets in the family use getrespmat:
+     getrespmat('Chromaticity', [1 1;1 2], MagnetFamilyName, MagnetDeviceList)
+     For instance, getrespmat('Chromaticity', [1 1;1 2], 'SF', [])
+
+  EXAMPLES
+  1. M = getchroresp
+     M = getchroresp( 'SF','SD') 
+     M = getchroresp({'SF','SD'}) 
+     M = getchroresp({'SF','SD'},{[],[]})
+     All returns the same 2x2 matrix of SF and SD to horizontal and vertical chromaticity
+
+  2. M = getchroresp('SF')
+     M = getchroresp('SF', []) 
+     M = getchroresp('SF',getlist('SF'))
+     Returns a 2x1 matrix representing the cumulative sum of all the magnets in the chain
+
+  3. SF_DataStruct = getsp('SF','Struct');
+     M = getchroresp(SF_DataStruct); 
+     Returns a 2x1 matrix representing the cumulative sum of all the magnets in the chain
+
+  4. Change the chromaticity by [.1; -.1] using the entire 'SF' and 'SD' families (see stepchro)
+     DeltaChromaticity = [.1; -.1];
+     DeltaAmps = inv(getchroresp) * DeltaChromaticity;
+     setsp({'SF', 'SD'}, {getsp('SF')+DeltaAmps(1), getsp('SD')+DeltaAmps(2)});
+
+  See also <a href="measchroresp.html" class="code" title="function [Rmat, OutputFileName] = measchroresp(varargin)">measchroresp</a>, <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>, <a href="stepchro.html" class="code" title="function  [DelSext, ActuatorFamily] = stepchro(varargin)">stepchro</a>, <a href="getbpmresp.html" class="code" title="function [S, FileName] = getbpmresp(varargin)">getbpmresp</a>, <a href="gettuneresp.html" class="code" title="function [TuneMatrix, FileName] = gettuneresp(varargin)">gettuneresp</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>	FINDMEMBEROF - Finds all family members</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>	GETRESPMAT - Get response matrix data from a file</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="measchroresp.html" class="code" title="function [Rmat, OutputFileName] = measchroresp(varargin)">measchroresp</a>	MEASCHRORESP - measures the response from sextupoles to chromaticity</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="stepchro.html" class="code" title="function  [DelSext, ActuatorFamily] = stepchro(varargin)">stepchro</a>	STEPCHRO - Incremental change in the chromaticity (Delta Tune / Delta RF)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ChromaticityMatrix, FileName] = getchroresp(varargin)</a>
+0002 <span class="comment">%GETCHRORESP - Loads the chromaticity response vector (or matrix) for multiple sextupole families</span>
+0003 <span class="comment">%  [ChromaticityMatrix, FileName] = getchroresp(FamilyName1, DeviceList1, FamilyName2, DeviceList2, ... , FileName, GeV)</span>
+0004 <span class="comment">%  [ChromaticityMatrix, FileName] = getchroresp(DataStructure1, DataStructure2, ... , FileName, GeV)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. FamilyName - Sextupole family name</span>
+0008 <span class="comment">%  2. DeviceList - DeviceList for a sextuopole family.  If [] or no input, then ChromaticityMatrix</span>
+0009 <span class="comment">%                  will be a column vector which is the cumulative sum of all magnets in the family.</span>
+0010 <span class="comment">%  3. FileName - File name to look for the response matrix (or cell array of file names)</span>
+0011 <span class="comment">%                [] or '' - prompt the user to choose a response matrix file</span>
+0012 <span class="comment">%                To put the filename anywhere in the function call use the keyword, 'Filename' followed by the actual</span>
+0013 <span class="comment">%                filename or '' to get a dialog box.  For example, m = getchroresp('FileName','RmatABC') to search in RmatABC.mat.</span>
+0014 <span class="comment">%  4. GeV is the energy that the response matrix will be used at {Default or []: getenergy}.</span>
+0015 <span class="comment">%     It's not always desirable to scale by the energy, so the following keywords can be used.</span>
+0016 <span class="comment">%     'EnergyScaling' - Scale the response matrix by energy (getenergy / measured energy) {Default}</span>
+0017 <span class="comment">%     'NoEnergyScaling' - Don't scale with energy</span>
+0018 <span class="comment">%  5. 'Struct'  will return the response matrix structure {default for data structure inputs}</span>
+0019 <span class="comment">%     'Numeric' will return a numeric matrix {default for non-data structure inputs}</span>
+0020 <span class="comment">%  Note: FamilyName and DeviceList can be cell arrays instead of multiple input pairs</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  OUTPUTS</span>
+0023 <span class="comment">%  1. ChromaticityMatrix - Response matrix {Default is physics units}</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%     It is assumed that most common use of this function is with the chromaticity</span>
+0026 <span class="comment">%     corrector families on a ganged power supply.  Hence, the default</span>
+0027 <span class="comment">%     behavior is to return the cumulative sum of all the magnets in the chain.</span>
+0028 <span class="comment">%     If there is more than one FamilyName, then ChromaticityMatrix will be a matrix</span>
+0029 <span class="comment">%     where each column is the sum of the contribution of all magnets in that family.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%     To get the response matrix for individual magnets in the family use getrespmat:</span>
+0032 <span class="comment">%     getrespmat('Chromaticity', [1 1;1 2], MagnetFamilyName, MagnetDeviceList)</span>
+0033 <span class="comment">%     For instance, getrespmat('Chromaticity', [1 1;1 2], 'SF', [])</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%  EXAMPLES</span>
+0036 <span class="comment">%  1. M = getchroresp</span>
+0037 <span class="comment">%     M = getchroresp( 'SF','SD')</span>
+0038 <span class="comment">%     M = getchroresp({'SF','SD'})</span>
+0039 <span class="comment">%     M = getchroresp({'SF','SD'},{[],[]})</span>
+0040 <span class="comment">%     All returns the same 2x2 matrix of SF and SD to horizontal and vertical chromaticity</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">%  2. M = getchroresp('SF')</span>
+0043 <span class="comment">%     M = getchroresp('SF', [])</span>
+0044 <span class="comment">%     M = getchroresp('SF',getlist('SF'))</span>
+0045 <span class="comment">%     Returns a 2x1 matrix representing the cumulative sum of all the magnets in the chain</span>
+0046 <span class="comment">%</span>
+0047 <span class="comment">%  3. SF_DataStruct = getsp('SF','Struct');</span>
+0048 <span class="comment">%     M = getchroresp(SF_DataStruct);</span>
+0049 <span class="comment">%     Returns a 2x1 matrix representing the cumulative sum of all the magnets in the chain</span>
+0050 <span class="comment">%</span>
+0051 <span class="comment">%  4. Change the chromaticity by [.1; -.1] using the entire 'SF' and 'SD' families (see stepchro)</span>
+0052 <span class="comment">%     DeltaChromaticity = [.1; -.1];</span>
+0053 <span class="comment">%     DeltaAmps = inv(getchroresp) * DeltaChromaticity;</span>
+0054 <span class="comment">%     setsp({'SF', 'SD'}, {getsp('SF')+DeltaAmps(1), getsp('SD')+DeltaAmps(2)});</span>
+0055 <span class="comment">%</span>
+0056 <span class="comment">%  See also measchroresp, measchro, stepchro, getbpmresp, gettuneresp</span>
+0057 
+0058 <span class="comment">%  Written by Greg Portmann</span>
+0059 
+0060 
+0061 FileName = <span class="string">''</span>;
+0062 NumericFlag = 1;
+0063 InputFlags = {};
+0064 <span class="keyword">for</span> i = length(varargin):-1:1
+0065     <span class="keyword">if</span> isstruct(varargin{i})
+0066         <span class="comment">% Ignore structures</span>
+0067     <span class="keyword">elseif</span> iscell(varargin{i})
+0068         <span class="comment">% Ignore cells</span>
+0069     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Struct'</span>)
+0070         NumericFlag = 0;
+0071         varargin(i) = [];
+0072     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Numeric'</span>)
+0073         NumericFlag = 1;
+0074         varargin(i) = [];
+0075     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0076         <span class="comment">% Remove</span>
+0077         fprintf(<span class="string">'   GETCHRORESP WARNING: ''Online'' input ignored.  Used measchroresp to get the chromaticity response matrix.\n'</span>);
+0078         varargin(i) = [];
+0079     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Simulator'</span>)
+0080         <span class="comment">% Remove</span>
+0081         fprintf(<span class="string">'   GETCHRORESP WARNING: ''Simulator'' input ignored.\n   Used measchroresp(''Simulator'') to get the simulated chromaticity response matrix.\n'</span>);
+0082         varargin(i) = [];
+0083     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Model'</span>)
+0084         <span class="comment">% Remove</span>
+0085         fprintf(<span class="string">'   GETCHRORESP WARNING: ''Model'' input ignored.\n   Use measchroresp(''Model'') to get the model chromaticity response matrix.\n'</span>);
+0086         varargin(i) = [];
+0087     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Physics'</span>)
+0088         InputFlags = [InputFlags varargin(i)];
+0089         varargin(i) = [];
+0090     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0091         InputFlags = [InputFlags varargin(i)];
+0092         varargin(i) = [];
+0093     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'EnergyScaling'</span>)
+0094         InputFlags = [InputFlags varargin(i)];
+0095         varargin(i) = [];
+0096     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoEnergyScaling'</span>)
+0097         InputFlags = [InputFlags varargin(i)];
+0098         varargin(i) = [];
+0099     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'FileName'</span>)
+0100         <span class="keyword">if</span> length(varargin) &gt;= i+1 &amp;&amp; ischar(varargin{i+1})
+0101             FileName = varargin{i+1};
+0102             varargin(i:i+1) = [];
+0103         <span class="keyword">else</span>
+0104             varargin(i) = [];
+0105         <span class="keyword">end</span>
+0106         <span class="keyword">if</span> isempty(FileName)
+0107             DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'ChroResponse'</span>);
+0108             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a chromaticity response matrix file'</span>, DirectoryName);
+0109             FileName = [DirectoryName FileName];
+0110         <span class="keyword">end</span>
+0111         InputFlags = [InputFlags {FileName}];
+0112     <span class="keyword">end</span>
+0113 <span class="keyword">end</span>
+0114 
+0115 
+0116 <span class="comment">% Default units</span>
+0117 <span class="keyword">if</span> ~any(strcmpi(InputFlags,<span class="string">'Physics'</span>)) &amp;&amp; ~any(strcmpi(InputFlags,<span class="string">'Hardware'</span>))
+0118     InputFlags{length(InputFlags)+1} = <span class="string">'Physics'</span>;
+0119 <span class="keyword">end</span>
+0120 
+0121 
+0122 ActuatorFamilyDefault = <a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>(<span class="string">'Chromaticity Corrector'</span>)';
+0123 <span class="keyword">if</span> isempty(ActuatorFamilyDefault)
+0124     error(<span class="string">'MemberOf ''Chromaticity Corrector'' was not found'</span>);
+0125 <span class="keyword">end</span>
+0126 
+0127 <span class="keyword">if</span> isempty(varargin)
+0128     FamilyNameCell = ActuatorFamilyDefault;
+0129     DeviceListCell = cell(size(ActuatorFamilyDefault));
+0130     NumFamilies = length(ActuatorFamilyDefault);
+0131     
+0132 <span class="keyword">elseif</span> length(varargin) == 1 &amp;&amp; isempty(varargin{1})
+0133     FamilyNameCell = ActuatorFamilyDefault;
+0134     DeviceListCell = cell(size(ActuatorFamilyDefault));
+0135     NumFamilies = length(ActuatorFamilyDefault);
+0136 
+0137 <span class="keyword">elseif</span> iscell(varargin{1})
+0138     FamilyNameCell = varargin{1};
+0139     varargin(1) = [];
+0140     <span class="keyword">if</span> length(varargin) &gt;= 1
+0141         DeviceListCell = varargin{1};
+0142         varargin(1) = [];
+0143     <span class="keyword">else</span>
+0144         <span class="keyword">for</span> i = 1:length(FamilyNameCell)
+0145             DeviceListCell{i} = [];
+0146         <span class="keyword">end</span>
+0147     <span class="keyword">end</span>
+0148     NumFamilies = length(FamilyNameCell);
+0149     <span class="keyword">if</span> ~iscell(DeviceListCell)
+0150         error(<span class="string">'If FamilyName is a cell array then DeviceList must be a cell array'</span>)
+0151     <span class="keyword">end</span>
+0152     
+0153 <span class="keyword">elseif</span> isstruct(varargin{1})
+0154     NumFamilies = 0;
+0155     <span class="keyword">while</span> ~isempty(varargin)
+0156         <span class="comment">% Look for Family and DeviceList</span>
+0157         <span class="keyword">if</span> length(varargin) &gt;= 1
+0158             <span class="keyword">if</span> ~isstruct(varargin{1})
+0159                 <span class="keyword">break</span>
+0160             <span class="keyword">end</span>
+0161             <span class="keyword">if</span> ~<a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(varargin{1}.FamilyName)
+0162                 error(<span class="string">'Unknown family name in data structure'</span>);
+0163             <span class="keyword">end</span>
+0164             NumFamilies = NumFamilies + 1;
+0165             FamilyNameCell{NumFamilies} = varargin{1}.FamilyName;
+0166             DeviceListCell{NumFamilies} = varargin{1}.DeviceList;
+0167             varargin(1) = [];
+0168         <span class="keyword">end</span>
+0169     <span class="keyword">end</span>
+0170     
+0171 <span class="keyword">else</span>
+0172     NumFamilies = 0;
+0173     <span class="keyword">while</span> ~isempty(varargin)
+0174         <span class="comment">% Look for Family and DeviceList</span>
+0175         <span class="keyword">if</span> length(varargin) &gt;= 1
+0176             <span class="keyword">if</span> ~<a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(varargin{1})
+0177                 <span class="keyword">break</span>
+0178             <span class="keyword">end</span>
+0179             NumFamilies = NumFamilies + 1;
+0180             FamilyNameCell{NumFamilies} = varargin{1};
+0181             varargin(1) = [];
+0182         <span class="keyword">end</span>
+0183         <span class="keyword">if</span> length(varargin) &gt;= 1
+0184             <span class="keyword">if</span> isnumeric(varargin{1}) || isempty(varargin{1})
+0185                 DeviceListCell{NumFamilies} = varargin{1};
+0186                 varargin(1) = [];
+0187             <span class="keyword">else</span>
+0188                 DeviceListCell{NumFamilies} = [];
+0189             <span class="keyword">end</span>
+0190         <span class="keyword">else</span>
+0191             DeviceListCell{NumFamilies} = [];
+0192         <span class="keyword">end</span>
+0193     <span class="keyword">end</span>
+0194 <span class="keyword">end</span>
+0195 
+0196 
+0197 <span class="comment">% FileName should be the next input (if a string, or [] for dialog box)</span>
+0198 <span class="keyword">if</span> length(varargin) &gt;= 1
+0199     <span class="keyword">if</span> ischar(varargin{1}) || isempty(varargin{1})
+0200         FileName = varargin{1};
+0201         varargin(1) = [];
+0202         
+0203         <span class="keyword">if</span> isempty(FileName)
+0204             <span class="comment">% Note: This only works if all families are in the same file</span>
+0205             DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'ChroResponse'</span>);  
+0206             [FileName, DirectoryName, FilterIndex] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select Sextupole-to-Chromaticity Response Matrix File'</span>, DirectoryName);
+0207             <span class="keyword">if</span> FilterIndex == 0
+0208                 ChromaticityMatrix = [];
+0209                 FileName = [];
+0210                 <span class="keyword">return</span>
+0211             <span class="keyword">end</span>
+0212             
+0213             FileName = [DirectoryName FileName];
+0214             InputFlags = [{FileName} InputFlags];
+0215         <span class="keyword">end</span>
+0216     <span class="keyword">end</span>
+0217 <span class="keyword">end</span>
+0218 
+0219 
+0220 <span class="comment">% The only thing left on the input line can be energy which can be left in varargin</span>
+0221 
+0222 
+0223 <span class="comment">% Get the response matrix</span>
+0224 <span class="keyword">if</span> NumericFlag == 1
+0225     ChromaticityMatrix = [];
+0226 <span class="keyword">end</span>
+0227 <span class="keyword">for</span> i = 1:NumFamilies
+0228     <span class="keyword">if</span> NumericFlag == 1
+0229         <span class="keyword">try</span>
+0230             [M, FileName] = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(<span class="string">'Chromaticity'</span>, [1 1;1 2], FamilyNameCell{i}, DeviceListCell{i}, <span class="string">'Numeric'</span>, InputFlags{:}, varargin{:});
+0231         <span class="keyword">catch</span>
+0232             fprintf(<span class="string">'   Could not find a chromaticity response matrix file, so using the model (%s).\n'</span>, FamilyNameCell{i});
+0233             M = <a href="measchroresp.html" class="code" title="function [Rmat, OutputFileName] = measchroresp(varargin)">measchroresp</a>(FamilyNameCell{i}, DeviceListCell{i}, <span class="string">'Model'</span>, <span class="string">'Numeric'</span>, InputFlags{:}, varargin{:});
+0234             <span class="comment">%M = measrespmat('Chromaticity', [1 1;1 2], FamilyNameCell{i}, DeviceListCell{i}, 'Model', 'Numeric', InputFlags{:}, varargin{:});</span>
+0235             FileName = <span class="string">''</span>;
+0236         <span class="keyword">end</span>
+0237         ChromaticityMatrix = [ChromaticityMatrix sum(M,2)];
+0238     <span class="keyword">else</span>
+0239         <span class="keyword">try</span>
+0240             [ChromaticityMatrix(1,i), FileName] = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(<span class="string">'Chromaticity'</span>, [1 1;1 2], FamilyNameCell{i}, DeviceListCell{i}, <span class="string">'Struct'</span>, InputFlags{:}, varargin{:});
+0241             <span class="comment">%ChromaticityMatrix(1,i).Data = sum(ChromaticityMatrix(1,i).Data,2);</span>
+0242             <span class="comment">%ChromaticityMatrix(1,i).ActuatorDelta = mean(ChromaticityMatrix(1,i).ActuatorDelta,1);</span>
+0243             <span class="comment">%ChromaticityMatrix(1,i).Actuator.Data = mean(ChromaticityMatrix(1,i).Actuator.Data,1);</span>
+0244         <span class="keyword">catch</span>
+0245             fprintf(<span class="string">'   Could not find a chromaticity response matrix file, so using the model (%s).\n'</span>, FamilyNameCell{i});
+0246             ChromaticityMatrix(1,i) = <a href="measchroresp.html" class="code" title="function [Rmat, OutputFileName] = measchroresp(varargin)">measchroresp</a>(FamilyNameCell{i}, DeviceListCell{i}, <span class="string">'Model'</span>, <span class="string">'Struct'</span>, InputFlags{:}, varargin{:});
+0247             FileName = <span class="string">''</span>;
+0248         <span class="keyword">end</span>
+0249     <span class="keyword">end</span>
+0250 <span class="keyword">end</span>
+0251</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

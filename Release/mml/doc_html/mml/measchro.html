@@ -1,0 +1,670 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measchro</title>
+  <meta name="keywords" content="measchro">
+  <meta name="description" content="MEASCHRO -  measures the chromaticity function emperically">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measchro.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measchro
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASCHRO -  measures the chromaticity function emperically</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Chromaticity, FileName] = measchro(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MEASCHRO -  measures the chromaticity function emperically
+  Chrom         = measchro(DeltaRF, WaitFlag);
+  ChromHardware = measchro(DeltaRF, WaitFlag, 'Hardware'); 
+  ChromPhysics  = measchro(DeltaRF, WaitFlag, 'Physics');
+  ChromStruct   = measchro(DeltaRF, WaitFlag, 'Struct');
+
+  INPUTS
+  1. DeltaRF - Vector of master oscillator values to scan over
+               {Default:  [-.4% -.2% 0 .2% .4%] energy change}
+  2. WaitFlag &gt;= 0, WaitFlag seconds before measuring the tune (sec)
+               = -1, wait until the magnets are done ramping
+               = -3, wait until the magnets are done ramping + a delay of 2.2*getfamilydata('TuneDelay') {default} 
+               = -4, wait until keyboard input
+               = -5, input the tune measurement manually by keyboard input
+  4. 'Hardware' - Returns chromaticity in hardware units (typically, Tune/MHz or Tune/MHz)
+     'Physics'  - Returns chromaticity in physics  units (Tune/(dp/p))  {Default}
+  5. 'Struct'  - Will return a two element dispersion data structure array {Default, unless Mode='Model'}
+     'Numeric' - Will return vector outputs
+  6. Optional override of the mode:
+     'Online'    - Set/Get data online  
+     'Simulator' - Set/Get data on the simulated accelerator (ie, same commands as 'Online')
+     'Model'     - Get the model chromaticity directly from the model (uses modelchro, DeltaRF is ignored)
+     'Manual'    - Set/Get data manually
+  7. 'Archive'   - Save a chromaticity data structure to \&lt;Directory.ChroData&gt;\Chromaticity\
+                   with filename &lt;ChroArchiveFile&gt;&lt;Date&gt;&lt;Time&gt;.mat  {Default, unless Mode='Model'}
+                   To change the filename, included the filename after the 'Archive', '' to browse
+     'NoArchive' - No file archive {Default}
+  8. 'Display'   - Prints status information to the command window {Default, unless Mode='Model'}
+     'NoDisplay' - Nothing is printed to the command window
+
+  
+  OUTPUT
+                  | Horizontal Chromaticity |
+  ChromHardware = |                         |  [Delta Tune / Delta Frequency]
+                  | Vertical Chromaticity   |       (Hardware Units)
+
+  
+                 | Horizontal Chromaticity |
+  ChromPhysics = |                         |  [Delta Tune / Delta Energy]
+                 | Vertical Chromaticity   |       (Physics Units)
+
+  When computing physics units the momentum compaction factor is required.  The default MCF is
+  found using getmcf.  To override the default enter the new value after the 'Physics' input.
+  For example,  ChromPhysics = measchro(DeltaRF, WaitFlag, 'Physics', .0011);
+
+  Tune vs RF frequency or momentum are plotted to the screen
+
+  Fields for structure outputs:
+            Data: [2x1] Chromaticity vector
+      FamilyName: 'Chromaticity'
+         Monitor: Tune structure
+        Actuator: RF frequency structure
+   DeltaActuator: Vector of frequency shifts in Hz
+       TimeStamp: Timestamp
+  DataDescriptor: 'Chromacity'
+       CreatedBy: 'measchro'
+             MCF: Momentum compaction factor/linear
+              RF: Vector of frequency settings in Hz
+               X: Reference orbit
+               Y: Reference orbit
+           Tune0: Initial tune
+            Tune: Tune change with RF frequency, 2 row vectors
+              dp: Vector of normalized momentum shifts
+         PolyFit: Polynomial fit of chromaticity in terms of rf shift or momentum
+
+  NOTE
+  1. 'Hardware', 'Physics', 'Eta', 'Archive', 'Numeric', and 'Struct' are not case sensitive
+  2. 'Zeta' can be used instead of 'Physics'
+  3.  All inputs are optional
+  4.  One reason FamilyName is added to the output structure so that getrespmat can be 
+      used to locate archived dispersion measurements.
+  5.  Units for DeltaRF depend on the 'Physics' or 'Hardware' flags
+  6. Beware of what units you are working in.  The default units for chromaticity
+     are physics units.  This is an exception to the normal middle layer convention.
+     Hardware units for &quot;chromaticity&quot; is in tune change per change in RF frequency.  
+     Since this is an unusual unit to work with, the default units for chromaticity
+     is physics units.  Note that goal chromaticity is also stored in physics units.
+     plotchro can switch between 'Hardware' and 'Physics' after the measurement is taken.
+     As an example of the difference between the units, at Spear3 1 unit of chromaticity
+     in physics units corresponds to roughly -1.8 units in hardware units.  
+
+  See also <a href="plotchro.html" class="code" title="function [c, FileName] = plotchro(varargin)">plotchro</a>, <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>	FAMILY2DATASTRUCTURE</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getenergy.html" class="code" title="function [Energy, HCMEnergy] = getenergy(varargin)">getenergy</a>	GETENERGY - Returns the beam energy base on the bend magnet</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>	GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>	GETTUNE - Returns the betatron tunes</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li><li><a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>	GETX - Returns the horizontal orbit</li><li><a href="gety.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = gety(varargin)">gety</a>	GETY - Returns the vertical orbit</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="plotchro.html" class="code" title="function [c, FileName] = plotchro(varargin)">plotchro</a>	PLOTCHRO - Plot the chromaticity function</li><li><a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>	SETRF - Sets the RF frequency</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getchro.html" class="code" title="function [Data, FileName] = getchro(varargin)">getchro</a>	GETCHRO - Return the chromaticity function (from file)</li><li><a href="measchroresp.html" class="code" title="function [Rmat, OutputFileName] = measchroresp(varargin)">measchroresp</a>	MEASCHRORESP - measures the response from sextupoles to chromaticity</li><li><a href="setchro.html" class="code" title="function [DelSext, ActuatorFamily] = setchro(varargin)">setchro</a>	SETCHRO - Measures then sets the chromaticity</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Chromaticity, FileName] = measchro(varargin)</a>
+0002 <span class="comment">%MEASCHRO -  measures the chromaticity function emperically</span>
+0003 <span class="comment">%  Chrom         = measchro(DeltaRF, WaitFlag);</span>
+0004 <span class="comment">%  ChromHardware = measchro(DeltaRF, WaitFlag, 'Hardware');</span>
+0005 <span class="comment">%  ChromPhysics  = measchro(DeltaRF, WaitFlag, 'Physics');</span>
+0006 <span class="comment">%  ChromStruct   = measchro(DeltaRF, WaitFlag, 'Struct');</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  INPUTS</span>
+0009 <span class="comment">%  1. DeltaRF - Vector of master oscillator values to scan over</span>
+0010 <span class="comment">%               {Default:  [-.4% -.2% 0 .2% .4%] energy change}</span>
+0011 <span class="comment">%  2. WaitFlag &gt;= 0, WaitFlag seconds before measuring the tune (sec)</span>
+0012 <span class="comment">%               = -1, wait until the magnets are done ramping</span>
+0013 <span class="comment">%               = -3, wait until the magnets are done ramping + a delay of 2.2*getfamilydata('TuneDelay') {default}</span>
+0014 <span class="comment">%               = -4, wait until keyboard input</span>
+0015 <span class="comment">%               = -5, input the tune measurement manually by keyboard input</span>
+0016 <span class="comment">%  4. 'Hardware' - Returns chromaticity in hardware units (typically, Tune/MHz or Tune/MHz)</span>
+0017 <span class="comment">%     'Physics'  - Returns chromaticity in physics  units (Tune/(dp/p))  {Default}</span>
+0018 <span class="comment">%  5. 'Struct'  - Will return a two element dispersion data structure array {Default, unless Mode='Model'}</span>
+0019 <span class="comment">%     'Numeric' - Will return vector outputs</span>
+0020 <span class="comment">%  6. Optional override of the mode:</span>
+0021 <span class="comment">%     'Online'    - Set/Get data online</span>
+0022 <span class="comment">%     'Simulator' - Set/Get data on the simulated accelerator (ie, same commands as 'Online')</span>
+0023 <span class="comment">%     'Model'     - Get the model chromaticity directly from the model (uses modelchro, DeltaRF is ignored)</span>
+0024 <span class="comment">%     'Manual'    - Set/Get data manually</span>
+0025 <span class="comment">%  7. 'Archive'   - Save a chromaticity data structure to \&lt;Directory.ChroData&gt;\Chromaticity\</span>
+0026 <span class="comment">%                   with filename &lt;ChroArchiveFile&gt;&lt;Date&gt;&lt;Time&gt;.mat  {Default, unless Mode='Model'}</span>
+0027 <span class="comment">%                   To change the filename, included the filename after the 'Archive', '' to browse</span>
+0028 <span class="comment">%     'NoArchive' - No file archive {Default}</span>
+0029 <span class="comment">%  8. 'Display'   - Prints status information to the command window {Default, unless Mode='Model'}</span>
+0030 <span class="comment">%     'NoDisplay' - Nothing is printed to the command window</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%  OUTPUT</span>
+0034 <span class="comment">%                  | Horizontal Chromaticity |</span>
+0035 <span class="comment">%  ChromHardware = |                         |  [Delta Tune / Delta Frequency]</span>
+0036 <span class="comment">%                  | Vertical Chromaticity   |       (Hardware Units)</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">%                 | Horizontal Chromaticity |</span>
+0040 <span class="comment">%  ChromPhysics = |                         |  [Delta Tune / Delta Energy]</span>
+0041 <span class="comment">%                 | Vertical Chromaticity   |       (Physics Units)</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%  When computing physics units the momentum compaction factor is required.  The default MCF is</span>
+0044 <span class="comment">%  found using getmcf.  To override the default enter the new value after the 'Physics' input.</span>
+0045 <span class="comment">%  For example,  ChromPhysics = measchro(DeltaRF, WaitFlag, 'Physics', .0011);</span>
+0046 <span class="comment">%</span>
+0047 <span class="comment">%  Tune vs RF frequency or momentum are plotted to the screen</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">%  Fields for structure outputs:</span>
+0050 <span class="comment">%            Data: [2x1] Chromaticity vector</span>
+0051 <span class="comment">%      FamilyName: 'Chromaticity'</span>
+0052 <span class="comment">%         Monitor: Tune structure</span>
+0053 <span class="comment">%        Actuator: RF frequency structure</span>
+0054 <span class="comment">%   DeltaActuator: Vector of frequency shifts in Hz</span>
+0055 <span class="comment">%       TimeStamp: Timestamp</span>
+0056 <span class="comment">%  DataDescriptor: 'Chromacity'</span>
+0057 <span class="comment">%       CreatedBy: 'measchro'</span>
+0058 <span class="comment">%             MCF: Momentum compaction factor/linear</span>
+0059 <span class="comment">%              RF: Vector of frequency settings in Hz</span>
+0060 <span class="comment">%               X: Reference orbit</span>
+0061 <span class="comment">%               Y: Reference orbit</span>
+0062 <span class="comment">%           Tune0: Initial tune</span>
+0063 <span class="comment">%            Tune: Tune change with RF frequency, 2 row vectors</span>
+0064 <span class="comment">%              dp: Vector of normalized momentum shifts</span>
+0065 <span class="comment">%         PolyFit: Polynomial fit of chromaticity in terms of rf shift or momentum</span>
+0066 <span class="comment">%</span>
+0067 <span class="comment">%  NOTE</span>
+0068 <span class="comment">%  1. 'Hardware', 'Physics', 'Eta', 'Archive', 'Numeric', and 'Struct' are not case sensitive</span>
+0069 <span class="comment">%  2. 'Zeta' can be used instead of 'Physics'</span>
+0070 <span class="comment">%  3.  All inputs are optional</span>
+0071 <span class="comment">%  4.  One reason FamilyName is added to the output structure so that getrespmat can be</span>
+0072 <span class="comment">%      used to locate archived dispersion measurements.</span>
+0073 <span class="comment">%  5.  Units for DeltaRF depend on the 'Physics' or 'Hardware' flags</span>
+0074 <span class="comment">%  6. Beware of what units you are working in.  The default units for chromaticity</span>
+0075 <span class="comment">%     are physics units.  This is an exception to the normal middle layer convention.</span>
+0076 <span class="comment">%     Hardware units for &quot;chromaticity&quot; is in tune change per change in RF frequency.</span>
+0077 <span class="comment">%     Since this is an unusual unit to work with, the default units for chromaticity</span>
+0078 <span class="comment">%     is physics units.  Note that goal chromaticity is also stored in physics units.</span>
+0079 <span class="comment">%     plotchro can switch between 'Hardware' and 'Physics' after the measurement is taken.</span>
+0080 <span class="comment">%     As an example of the difference between the units, at Spear3 1 unit of chromaticity</span>
+0081 <span class="comment">%     in physics units corresponds to roughly -1.8 units in hardware units.</span>
+0082 <span class="comment">%</span>
+0083 <span class="comment">%  See also plotchro, measdisp</span>
+0084 
+0085 <span class="comment">%  Written by Greg Portmann and Jeff Corbett</span>
+0086 
+0087 
+0088 NRFSteps = 1;
+0089 WaitFlag = -3;
+0090 MCF = [];
+0091 BPMxFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>;  <span class="comment">% Just an extra monitor</span>
+0092 BPMyFamily = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;  <span class="comment">% Just an extra monitor</span>
+0093 StructOutputFlag = 0;
+0094 FileName = -1;
+0095 ArchiveFlag = -1;
+0096 DisplayFlag = -1;
+0097 ModeFlag  = <span class="string">''</span>;         <span class="comment">% model, online, manual, or '' for default mode</span>
+0098 UnitsFlag = <span class="string">'Physics'</span>;  <span class="comment">% hardware, physics, or '' for default units</span>
+0099 
+0100 
+0101 <span class="comment">% Look if 'struct' or 'numeric' in on the input line</span>
+0102 <span class="keyword">for</span> i = length(varargin):-1:1
+0103     <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'Struct'</span>)
+0104         StructOutputFlag = 1;
+0105         varargin(i) = [];
+0106     <span class="keyword">elseif</span> iscell(varargin{i})
+0107         <span class="comment">% Ignor cells</span>
+0108     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Numeric'</span>)
+0109         StructOutputFlag = 0;
+0110         varargin(i) = [];
+0111     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Archive'</span>)
+0112         ArchiveFlag = 1;
+0113         <span class="keyword">if</span> length(varargin) &gt; i
+0114             <span class="comment">% Look for a filename as the next input</span>
+0115             <span class="keyword">if</span> ischar(varargin{i+1})
+0116                 FileName = varargin{i+1};
+0117                 varargin(i+1) = [];
+0118             <span class="keyword">end</span>
+0119         <span class="keyword">end</span>
+0120         varargin(i) = [];
+0121     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoArchive'</span>)
+0122         ArchiveFlag = 0;
+0123         varargin(i) = [];
+0124     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Zeta'</span>) || strcmpi(varargin{i},<span class="string">'Physics'</span>)
+0125         UnitsFlag = <span class="string">'Physics'</span>;
+0126         varargin(i) = [];
+0127         <span class="keyword">if</span> length(varargin) &gt;= i
+0128             <span class="keyword">if</span> isnumeric(varargin{i})
+0129                 MCF = varargin{i};
+0130                 varargin(i) = [];
+0131                 <span class="keyword">if</span> any(size(MCF)&gt;1)
+0132                     error(<span class="string">'Input MCF must be a scalar'</span>);
+0133                 <span class="keyword">end</span>
+0134             <span class="keyword">end</span>
+0135         <span class="keyword">end</span>
+0136     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0137         UnitsFlag = <span class="string">'Hardware'</span>;
+0138         varargin(i) = [];
+0139         <span class="keyword">if</span> length(varargin) &gt;= i
+0140             <span class="keyword">if</span> isnumeric(varargin{i})
+0141                 MCF = varargin{i};
+0142                 varargin(i) = [];
+0143                 <span class="keyword">if</span> any(size(MCF)&gt;1)
+0144                     error(<span class="string">'Input MCF must be a scalar'</span>);
+0145                 <span class="keyword">end</span>
+0146             <span class="keyword">end</span>
+0147         <span class="keyword">end</span>
+0148     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Simulator'</span>) || strcmpi(varargin{i},<span class="string">'Model'</span>) || strcmpi(varargin{i},<span class="string">'Online'</span>) || strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0149         ModeFlag = varargin{i};
+0150         varargin(i) = [];
+0151     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0152         DisplayFlag = 0;
+0153         varargin(i) = [];
+0154     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0155         DisplayFlag = 1;
+0156         varargin(i) = [];
+0157     <span class="keyword">end</span>
+0158 <span class="keyword">end</span>
+0159 
+0160 <span class="comment">% Default for Model is no display, no archive</span>
+0161 <span class="keyword">if</span> DisplayFlag == -1 &amp;&amp; strcmpi(ModeFlag,<span class="string">'Model'</span>)
+0162     DisplayFlag = 0;
+0163 <span class="keyword">end</span>
+0164 <span class="keyword">if</span> ArchiveFlag == -1 &amp;&amp; strcmpi(ModeFlag,<span class="string">'Model'</span>)
+0165     ArchiveFlag = 0;
+0166 <span class="keyword">end</span>
+0167 
+0168 
+0169 <span class="comment">% DeltaRF input</span>
+0170 <span class="keyword">if</span> length(varargin) &gt;= 1
+0171     <span class="keyword">if</span> isnumeric(varargin{1})
+0172         DeltaRF = varargin{1}; 
+0173     <span class="keyword">else</span>
+0174         DeltaRF = [];
+0175     <span class="keyword">end</span>
+0176 <span class="keyword">else</span>
+0177     DeltaRF = [];
+0178 <span class="keyword">end</span>
+0179 
+0180 <span class="comment">% WaitFlag input</span>
+0181 <span class="keyword">if</span> length(varargin) &gt;= 2
+0182     WaitFlag = varargin{2};
+0183 <span class="keyword">end</span>
+0184 <span class="keyword">if</span> isempty(WaitFlag) || WaitFlag == -3
+0185     WaitFlag = 2.2 * <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TuneDelay'</span>);
+0186 <span class="keyword">end</span>
+0187 <span class="keyword">if</span> isempty(WaitFlag)
+0188     WaitFlag = input(<span class="string">'   Delay for Tune Measurement (Seconds, Keyboard Pause = -4, or Manual Tune Input = -5) = '</span>);
+0189 <span class="keyword">end</span>
+0190 
+0191 
+0192 <span class="comment">% Archive data structure</span>
+0193 <span class="keyword">if</span> ArchiveFlag
+0194     <span class="keyword">if</span> isempty(FileName)
+0195         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'ChroArchiveFile'</span>));
+0196         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'ChroData'</span>);
+0197         <span class="keyword">if</span> isempty(DirectoryName)
+0198             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'Chromaticity'</span>, filesep];
+0199         <span class="keyword">else</span>
+0200             <span class="comment">% Make sure default directory exists</span>
+0201             DirStart = pwd;
+0202             [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0203             cd(DirStart);
+0204         <span class="keyword">end</span>
+0205         [FileName, DirectoryName] = uiputfile(<span class="string">'*.mat'</span>, <span class="string">'Select Chromaticity File'</span>, [DirectoryName FileName]);
+0206         <span class="keyword">if</span> FileName == 0 
+0207             ArchiveFlag = 0;
+0208             disp(<span class="string">'   Chromaticity measurement canceled.'</span>);
+0209             Chromaticity=[]; FileName=<span class="string">''</span>;
+0210             <span class="keyword">return</span>
+0211         <span class="keyword">end</span>
+0212         FileName = [DirectoryName, FileName];
+0213     <span class="keyword">elseif</span> FileName == -1
+0214         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'ChroArchiveFile'</span>));
+0215         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'ChroData'</span>);
+0216         <span class="keyword">if</span> isempty(DirectoryName)
+0217             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'Chromaticity'</span>, filesep];
+0218         <span class="keyword">end</span>
+0219         FileName = [DirectoryName, FileName];
+0220     <span class="keyword">end</span>
+0221 <span class="keyword">end</span>
+0222 
+0223 
+0224 <span class="comment">% Get units from the RF frequency</span>
+0225 <span class="keyword">if</span> isempty(UnitsFlag)
+0226     UnitsFlag = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'Units'</span>);
+0227 <span class="keyword">end</span>
+0228 
+0229 
+0230 <span class="comment">% if isempty(ModeFlag)</span>
+0231 <span class="comment">%     if strcmpi(getfamilydata('RF','Setpoint','Mode'), getfamilydata(BPMxFamily,'Monitor','Mode'))</span>
+0232 <span class="comment">%         ModeFlag = getfamilydata(BPMxFamily,'Monitor','Mode');</span>
+0233 <span class="comment">%     else</span>
+0234 <span class="comment">%         error('Mix Mode for RF and orbits');</span>
+0235 <span class="comment">%     end</span>
+0236 <span class="comment">% end</span>
+0237 
+0238 
+0239 
+0240 <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Hardware'</span>)
+0241     RFUnitsString = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'HWUnits'</span>);
+0242 <span class="keyword">elseif</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0243     RFUnitsString = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'PhysicsUnits'</span>);
+0244 <span class="keyword">else</span>
+0245     error(<span class="string">'RF units unknown.  Inputs DeltaRF directly.'</span>);
+0246 <span class="keyword">end</span>
+0247 
+0248 <span class="comment">% DeltaRF default</span>
+0249 <span class="keyword">if</span> isempty(DeltaRF)
+0250     <span class="comment">% Get the default from the AD is in Hardware units</span>
+0251     DeltaRF = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'DeltaRFChro'</span>);
+0252     
+0253     <span class="comment">% If the default is not in the AD</span>
+0254     <span class="keyword">if</span> isempty(DeltaRF)
+0255         DeltaRF = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Hardware'</span>) * <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> * [-.004 -.002 0 .002 .004] ;  <span class="comment">% .2% energy change per step</span>
+0256 
+0257         <span class="comment">%DeltaRF = [-2000 -1000 0 1000 2000];  % Hz</span>
+0258         <span class="comment">%if strcmpi(RFUnitsString, 'Hz')</span>
+0259         <span class="comment">%    % Default units OK</span>
+0260         <span class="comment">%elseif strcmpi(RFUnitsString, 'kHz')</span>
+0261         <span class="comment">%    % Change to kHz</span>
+0262         <span class="comment">%    DeltaRF = DeltaRF / 1e3;</span>
+0263         <span class="comment">%elseif strcmpi(RFUnitsString, 'MHz')</span>
+0264         <span class="comment">%    % Change to MHz</span>
+0265         <span class="comment">%    DeltaRF = DeltaRF / 1e6;</span>
+0266         <span class="comment">%else</span>
+0267         <span class="comment">%    error('RF units unknown.  Input DeltaRF directly or put the default in AD.DeltaRFChro.');</span>
+0268         <span class="comment">%end</span>
+0269     <span class="keyword">else</span>
+0270         <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0271             <span class="comment">% Since the default from the AO must be in hardware units, change to physics units</span>
+0272             DeltaRF = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(<span class="string">'RF'</span>, <span class="string">'Setpoint'</span>, DeltaRF, [1 1], ModeFlag);
+0273         <span class="keyword">end</span>
+0274     <span class="keyword">end</span>    
+0275 <span class="keyword">end</span>
+0276 
+0277 
+0278 <span class="comment">% Check DeltaRF for resonable values</span>
+0279 <span class="keyword">if</span> strcmpi(RFUnitsString, <span class="string">'MHz'</span>)
+0280     <span class="keyword">if</span> abs(max(DeltaRF)-min(DeltaRF)) &gt; .020;  <span class="comment">% .020 MHz</span>
+0281         tmp = questdlg(sprintf(<span class="string">'%f MHz is a large RF change.  Do you want to continue?'</span>, abs(max(DeltaRF)-min(DeltaRF))),<span class="string">'Dispersion Measurement'</span>,<span class="string">'YES'</span>,<span class="string">'NO'</span>,<span class="string">'YES'</span>);
+0282         <span class="keyword">if</span> strcmp(tmp,<span class="string">'NO'</span>)
+0283             Chromaticity=[];
+0284             <span class="keyword">return</span>
+0285         <span class="keyword">end</span>
+0286     <span class="keyword">end</span>
+0287 <span class="keyword">elseif</span> strcmpi(RFUnitsString, <span class="string">'kHz'</span>)
+0288     <span class="keyword">if</span> abs(max(DeltaRF)-min(DeltaRF)) &gt; 20;  <span class="comment">% kHz</span>
+0289         tmp = questdlg(sprintf(<span class="string">'%f kHz is a large RF change.  Do you want to continue?'</span>, abs(max(DeltaRF)-min(DeltaRF))),<span class="string">'Dispersion Measurement'</span>,<span class="string">'YES'</span>,<span class="string">'NO'</span>,<span class="string">'YES'</span>);
+0290         <span class="keyword">if</span> strcmp(tmp,<span class="string">'NO'</span>)
+0291             Chromaticity=[];
+0292             <span class="keyword">return</span>
+0293         <span class="keyword">end</span>
+0294     <span class="keyword">end</span>
+0295 <span class="keyword">elseif</span> strcmpi(RFUnitsString, <span class="string">'Hz'</span>)
+0296     <span class="keyword">if</span> abs(max(DeltaRF)-min(DeltaRF)) &gt; 20000;  <span class="comment">% Hz</span>
+0297         tmp = questdlg(sprintf(<span class="string">'%f Hz is a large RF change.  Do you want to continue?'</span>, abs(max(DeltaRF)-min(DeltaRF))),<span class="string">'Dispersion Measurement'</span>,<span class="string">'YES'</span>,<span class="string">'NO'</span>,<span class="string">'YES'</span>);
+0298         <span class="keyword">if</span> strcmp(tmp,<span class="string">'NO'</span>)
+0299             Chromaticity=[];
+0300             <span class="keyword">return</span>
+0301         <span class="keyword">end</span>
+0302     <span class="keyword">end</span>
+0303 <span class="keyword">else</span>
+0304     <span class="comment">% Don't who how to check, hence no check made</span>
+0305 <span class="keyword">end</span>
+0306 
+0307 <span class="comment">% DeltaRF must be in &quot;RFUnitsString&quot; units at this point</span>
+0308 
+0309 
+0310 RFsp = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Struct'</span>, UnitsFlag, ModeFlag);
+0311 
+0312 <span class="keyword">if</span> isempty(MCF)
+0313     MCF = <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>(ModeFlag);
+0314 <span class="keyword">end</span>
+0315 
+0316 
+0317 <span class="comment">% Fill the chromaticity structure (response matrix structure + some fields)</span>
+0318 c.Data = [];
+0319 c.FamilyName = <span class="string">'Chromaticity'</span>;
+0320 <span class="keyword">if</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0321     c.Monitor = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(<span class="string">'TUNE'</span>,<span class="string">'Monitor'</span>,[1 1;1 2]);
+0322 <span class="keyword">else</span>
+0323     c.Monitor = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>(<span class="string">'Struct'</span>, <span class="string">'Model'</span>);  <span class="comment">% Just to fill the structure</span>
+0324     c.Monitor.Data = NaN * c.Monitor.Data;
+0325 <span class="keyword">end</span>
+0326 c.Actuator = RFsp;
+0327 c.ActuatorDelta = DeltaRF;
+0328 c.GeV = <a href="getenergy.html" class="code" title="function [Energy, HCMEnergy] = getenergy(varargin)">getenergy</a>(ModeFlag);
+0329 c.DCCT = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(<span class="string">'DCCT'</span>, ModeFlag);
+0330 c.ModulationMethod = <span class="string">'Unipolar'</span>;
+0331 c.WaitFlag = WaitFlag;
+0332 c.TimeStamp = clock;
+0333 c.Mode = ModeFlag;
+0334 c.Units = UnitsFlag;
+0335 c.UnitsString = [];
+0336 c.DataDescriptor = <span class="string">'Chromaticity'</span>;
+0337 c.CreatedBy = <span class="string">'measchro'</span>;
+0338 c.OperationalMode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OperationalMode'</span>);
+0339 
+0340 <span class="comment">% Nonstandard response matrix fields</span>
+0341 <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'Manual'</span>)
+0342     c.X = NaN;
+0343     c.Y = NaN;
+0344 <span class="keyword">else</span>
+0345     c.X = <a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>(<span class="string">'Struct'</span>, UnitsFlag, ModeFlag);
+0346     c.Y = <a href="gety.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = gety(varargin)">gety</a>(<span class="string">'Struct'</span>, UnitsFlag, ModeFlag);
+0347 <span class="keyword">end</span>
+0348 c.MCF = MCF;
+0349 RF0 = RFsp.Data(1);
+0350 c.dp = -DeltaRF / (RF0*MCF);
+0351 
+0352 
+0353 <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'Model'</span>) || strcmpi(ModeFlag,<span class="string">'Simulator'</span>)
+0354     <span class="comment">% No need for delays with the model</span>
+0355     WaitFlag = 0;
+0356     ExtraDelay = 0; 
+0357 <span class="keyword">end</span>
+0358 
+0359 
+0360 <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'Model'</span>)
+0361     c.Data = modelchro(<span class="string">'Physics'</span>);
+0362     
+0363     <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0364         TuneUnitsString = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TUNE'</span>,<span class="string">'Monitor'</span>,<span class="string">'PhysicsUnits'</span>);
+0365         <span class="keyword">if</span> isempty(TuneUnitsString)
+0366             TuneUnitsString = <span class="string">'Fractional Tune'</span>;
+0367         <span class="keyword">end</span>
+0368         c.UnitsString = [TuneUnitsString, <span class="string">'/(dp/p)'</span>];
+0369     <span class="keyword">else</span>
+0370         <span class="comment">% Tune Shift vs. RF Frequency</span>
+0371         c.Data(1,1) = c.Data(1,1) / (-RF0 * MCF);
+0372         c.Data(2,1) = c.Data(2,1) / (-RF0 * MCF);       
+0373         TuneUnitsString = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TUNE'</span>,<span class="string">'Monitor'</span>,<span class="string">'HWUnits'</span>);
+0374         <span class="keyword">if</span> isempty(TuneUnitsString)
+0375             TuneUnitsString = <span class="string">'Fractional Tune'</span>;
+0376         <span class="keyword">end</span>
+0377         c.UnitsString = [TuneUnitsString, <span class="string">'/'</span>,<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'HWUnits'</span>)];
+0378     <span class="keyword">end</span>
+0379     
+0380 <span class="keyword">else</span>
+0381     <span class="comment">% Online or Simulator</span>
+0382     <span class="comment">% Start measurement</span>
+0383     <span class="keyword">if</span> DisplayFlag
+0384         fprintf(<span class="string">'   Begin chromaticity measurement\n'</span>);
+0385     <span class="keyword">end</span>    
+0386     <span class="keyword">for</span> i = 1:length(DeltaRF)
+0387         <span class="comment">%setrf(RF0 + DeltaRF(i), UnitsFlag, ModeFlag);</span>
+0388         <span class="keyword">if</span> (isempty(ModeFlag) &amp;&amp; strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'Mode'</span>),<span class="string">'Manual'</span>)) || strcmpi(ModeFlag,<span class="string">'Manual'</span>)
+0389             <span class="comment">% One shot setting of RF</span>
+0390             <a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>(RF0 + DeltaRF(i), UnitsFlag, ModeFlag);
+0391         <span class="keyword">else</span>
+0392             <span class="comment">% Slow setting of RF</span>
+0393             rf = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(UnitsFlag, ModeFlag);
+0394             <span class="keyword">for</span> k = 1:NRFSteps
+0395                 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(<span class="string">'RF'</span>, rf + k/NRFSteps * (RF0+DeltaRF(i)-rf), [], -1, UnitsFlag, ModeFlag);
+0396                 pause(0.1);
+0397             <span class="keyword">end</span>
+0398         <span class="keyword">end</span>
+0399         
+0400         RF(:,i) = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(UnitsFlag, ModeFlag);
+0401         <span class="keyword">if</span> DisplayFlag
+0402             fprintf(<span class="string">'   %d. RF frequency is %.5f\n'</span>, i, RF(:,i));
+0403         <span class="keyword">end</span>
+0404 
+0405         <span class="comment">% Wait for tune monitor to have fresh data</span>
+0406         <span class="keyword">if</span> WaitFlag &gt;= 0
+0407             <span class="keyword">if</span> DisplayFlag &amp;&amp; ~strcmpi(ModeFlag,<span class="string">'Manual'</span>)
+0408                 fprintf(<span class="string">'      Pausing %f seconds for the tune measurement\n'</span>, WaitFlag); 
+0409                 pause(0);
+0410             <span class="keyword">end</span>
+0411             sleep(WaitFlag);
+0412             Tune(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>(ModeFlag);
+0413         <span class="keyword">elseif</span> WaitFlag == -4
+0414             tmp = input(<span class="string">'      Hit return when the tune measurement is ready. '</span>);
+0415             Tune(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>(ModeFlag);
+0416         <span class="keyword">elseif</span> WaitFlag == -5
+0417             Tune(1,i) = input(<span class="string">'      Input the horizontal tune = '</span>);
+0418             Tune(2,i) = input(<span class="string">'      Input the  vertical  tune = '</span>);
+0419         <span class="keyword">else</span>
+0420             error(<span class="string">'Tune delay method unknown'</span>);
+0421         <span class="keyword">end</span> 
+0422         
+0423         <span class="comment">%if any(isnan(Tune))</span>
+0424         <span class="comment">%    fprintf('   Chromaticity measurement failed.  RF frequency reset.\n');</span>
+0425         <span class="comment">%    setrf(RF0, UnitsFlag, ModeFlag);</span>
+0426         <span class="comment">%    Chromaticity = [NaN; NaN];</span>
+0427         <span class="comment">%    return;</span>
+0428         <span class="comment">%end</span>
+0429     <span class="keyword">end</span>
+0430     
+0431     
+0432     <span class="comment">% Reset RF</span>
+0433     <span class="comment">%setrf(RF0, UnitsFlag, ModeFlag);</span>
+0434     <span class="keyword">if</span> isempty(ModeFlag) &amp;&amp; strcmpi(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'Mode'</span>),<span class="string">'Manual'</span>)
+0435         <span class="comment">% One shot setting of RF</span>
+0436         <a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>(RF0, UnitsFlag, ModeFlag);
+0437     <span class="keyword">else</span>
+0438         <span class="comment">% Slow setting of RF</span>
+0439         rf = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(UnitsFlag, ModeFlag);
+0440         <span class="keyword">for</span> k = 1:NRFSteps
+0441             <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(<span class="string">'RF'</span>, rf + k/NRFSteps * (RF0-rf), [], -1, UnitsFlag, ModeFlag);
+0442             pause(0.1);
+0443         <span class="keyword">end</span>
+0444     <span class="keyword">end</span>
+0445     
+0446     
+0447     <span class="comment">% Load Tune measurements into the chromaticy structure</span>
+0448     c.Tune = Tune;
+0449     
+0450     <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0451         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0452         <span class="comment">% Tune Shift vs. Momentum %</span>
+0453         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0454         
+0455         <span class="comment">% Horizontal tune vs. momentum</span>
+0456         p = polyfit(c.dp, Tune(1,:), 2);              <span class="comment">%2nd order polynomial fit to data</span>
+0457         c.PolyFit(1,:) = p;
+0458         c.Data(1,1) = p(2);
+0459         
+0460         <span class="comment">% Vertical  tune vs. rf frequency</span>
+0461         p = polyfit(c.dp, Tune(2,:), 2);
+0462         c.PolyFit(2,:) = p;
+0463         c.Data(2,1) = p(2);
+0464         
+0465         TuneUnitsString = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TUNE'</span>,<span class="string">'Monitor'</span>,<span class="string">'PhysicsUnits'</span>);
+0466         <span class="keyword">if</span> isempty(TuneUnitsString)
+0467             c.UnitsString = [<span class="string">'Fractional Tune/(dp/p)'</span>];
+0468         <span class="keyword">else</span>
+0469             c.UnitsString = [TuneUnitsString,<span class="string">'/(dp/p)'</span>];
+0470         <span class="keyword">end</span>
+0471         
+0472         <span class="comment">%fprintf('\n   Horizontal Chromaticity (Un-normalized) = %f \n', c.Data(1));</span>
+0473         <span class="comment">%fprintf('   Vertical   Chromaticity (Un-normalized) = %f \n'  , c.Data(2));</span>
+0474     <span class="keyword">else</span>
+0475         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0476         <span class="comment">% Tune Shift vs. RF Frequency %</span>
+0477         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0478         
+0479         <span class="comment">% Horizontal tune vs. rf frequency</span>
+0480         p = polyfit(DeltaRF, Tune(1,:), 2);      <span class="comment">% 2nd order polynomial fit to data</span>
+0481         c.PolyFit(1,:) = p;
+0482         c.Data(1,1) = p(2);
+0483         
+0484         <span class="comment">% Vertical  tune vs. rf frequency</span>
+0485         p = polyfit(DeltaRF, Tune(2,:), 2);
+0486         c.PolyFit(2,:) = p;
+0487         c.Data(2,1) = p(2);
+0488         
+0489         TuneUnitsString = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TUNE'</span>,<span class="string">'Monitor'</span>,<span class="string">'HWUnits'</span>);
+0490         <span class="keyword">if</span> isempty(TuneUnitsString)
+0491             c.UnitsString = [<span class="string">'Fractional Tune/'</span>,<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'HWUnits'</span>)];
+0492         <span class="keyword">else</span>
+0493             c.UnitsString = [TuneUnitsString,<span class="string">'/'</span>,<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'RF'</span>,<span class="string">'Setpoint'</span>,<span class="string">'HWUnits'</span>)];
+0494         <span class="keyword">end</span>
+0495     <span class="keyword">end</span>
+0496 <span class="keyword">end</span>
+0497 
+0498 <span class="keyword">if</span> DisplayFlag
+0499     fprintf(<span class="string">'   Chromaticity = %f [%s]\n'</span>, c.Data(1), c.UnitsString);
+0500     fprintf(<span class="string">'   Chromaticity = %f [%s]\n'</span>, c.Data(2), c.UnitsString);
+0501 <span class="keyword">end</span>
+0502 
+0503 <span class="keyword">if</span> DisplayFlag &amp;&amp; ~strcmpi(ModeFlag,<span class="string">'Model'</span>)
+0504     <span class="comment">%figure;</span>
+0505     <a href="plotchro.html" class="code" title="function [c, FileName] = plotchro(varargin)">plotchro</a>(c);
+0506 <span class="keyword">end</span>
+0507 
+0508 
+0509 <span class="comment">% Archive data structure</span>
+0510 <span class="keyword">if</span> ArchiveFlag
+0511     <span class="comment">% If the filename contains a directory then make sure it exists</span>
+0512     [DirectoryName, FileName, Ext] = fileparts(FileName);
+0513     DirStart = pwd;
+0514     [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0515     Chromaticity = c;
+0516     save(FileName, <span class="string">'Chromaticity'</span>);
+0517     <span class="keyword">if</span> DisplayFlag
+0518         fprintf(<span class="string">'   Chromaticity data saved to %s.mat\n'</span>, [DirectoryName FileName]);
+0519         <span class="keyword">if</span> ErrorFlag
+0520             fprintf(<span class="string">'   Warning: %s was not the desired directory\n'</span>, DirectoryName);
+0521         <span class="keyword">end</span>
+0522     <span class="keyword">end</span>
+0523     cd(DirStart);
+0524     FileName = [DirectoryName, FileName, <span class="string">'.mat'</span>];
+0525 <span class="keyword">end</span>
+0526 <span class="keyword">if</span> FileName == -1
+0527     FileName = <span class="string">''</span>;
+0528 <span class="keyword">end</span>
+0529 
+0530 
+0531 <span class="comment">% Load output data</span>
+0532 <span class="keyword">if</span> StructOutputFlag
+0533     Chromaticity = c;
+0534 <span class="keyword">else</span>
+0535     Chromaticity = c.Data;
+0536 <span class="keyword">end</span>
+0537 
+0538 
+0539 <span class="keyword">if</span> DisplayFlag
+0540     fprintf(<span class="string">'   Chromaticity measurement is complete.\n'</span>);
+0541 <span class="keyword">end</span>
+0542 
+0543</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

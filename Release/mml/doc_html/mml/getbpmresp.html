@@ -1,0 +1,466 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getbpmresp</title>
+  <meta name="keywords" content="getbpmresp">
+  <meta name="description" content="GETBPMRESP - Returns the BPM response matrix in the horizontal and vertical planes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; getbpmresp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getbpmresp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETBPMRESP - Returns the BPM response matrix in the horizontal and vertical planes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [S, FileName] = getbpmresp(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETBPMRESP - Returns the BPM response matrix in the horizontal and vertical planes
+
+  For family name, device list inputs:
+  [Rmat, FileName] = getbpmresp(BPMxFamily, BPMxList, BPMyFamily, BPMyList, HCMFamily, HCMList, VCMFamily, VCMList, FileName)
+
+  For data structure inputs: 
+  [Rmat, FileName] = getbpmresp(BPMxStruct, BPMyStruct, HCMStruct, VCMStruct, FileName)
+
+  INPUTS
+  1. BPMxFamily     - BPMx family name {Default: gethbpmfamily}
+     BPMxDeviceList - BPMx device list {Default: all devices with good status}
+     or 
+     BPMxStruct can replace BPMxFamily and BPMxList
+
+  2. BPMyFamily     - BPMy family name {Default: getvbpmfamily}
+     BPMyDeviceList - BPMy device list {Default: all devices with good status}
+     or 
+     BPMyStruct can replace BPMyFamily and BPMyList
+
+  3. HCMFamily     - HCM family name {Default: gethcmfamily}
+     HCMDeviceList - HCM device list {Default: all devices with good status}
+     or 
+     HCMStruct can replace HCMFamily and HCMList
+
+  4. VCMFamily     - VCM family name {Default: getvcmfamily} 
+     VCMDeviceList - VCM device list {Default: all devices with good status}
+     or 
+     VCMStruct can replace VCMFamily and VCMList
+
+  5. FileName - File name for response matrix (or cell array of file names) {Default: use getfamilydata('OpsData','RespFiles')}
+                [] or '' - prompt the user to choose a response matrix file
+     To put the filename anywhere in the function call use the keyword, 'Filename' followed by the actual 
+     filename or '' to get a dialog box.  For example, m = getbpmresp('FileName','RmatABC') to search in RmatABC.mat.
+     
+  6. The response matrix will linearly scale to the present energy (getenergy) from the measured energy.
+     It's not always desirable to scale by the energy, so the following keywords can be used.
+     'EnergyScaling' - Scale the response matrix by energy (getenergy / measured energy) {Default}
+     'NoEnergyScaling' - Don't scale with energy
+  7. 'Struct'  will return the response matrix structure {Default if BPMxFamily is a structure input}
+     'Numeric' will return a numeric matrix {Default for non-data structure inputs}
+
+  OUTPUTS
+  1. Rmat = Orbit response matrix (delta(orbit)/delta(Kick))
+
+     Numeric Output:
+       Rmat = [x/x  x/y  
+               y/x  y/y] 
+
+     Ie, columns are correctors arranged horizontal to vertical
+         rows are BPMs arranged horizontal to vertical
+
+     Stucture Output:
+     Rmat(BPM Plane, Corrector Plane) - 2x2 struct array
+     Rmat(1,1).Data = x/x;   % Kick x, look x
+     Rmat(2,1).Data = y/x;   % Kick x, look y
+     Rmat(1,2).Data = x/y;   % Kick y, look x
+     Rmat(2,2).Data = y/y;   % Kick y, look y
+           
+     Rmat(Monitor, Actuator).Data - Response matrix
+                            .Monitor  - BPM data structure (starting orbit)
+                            .Monitor1 - BPM matrix (first  data point)
+                            .Monitor2 - BPM matrix (second data point)
+                            .Actuator - Corrector data structure
+                            .ActuatorDelta - Corrector kick vector
+                            .GeV - Electron beam energy
+                            .ModulationMethod - 'unipolar' or 'bipolar'
+                            .WaitFlag - Wait flag used when acquiring data
+                            .TimeStamp
+                            .CreatedBy
+                            .DCCT
+
+  2. FileName = File name where the data was found
+
+
+  NOTES
+  1. If the DeviceList is empty, [], or not present, all the device in that response matrix will be returned.
+  2. GeV will linearly scale the response matrix from the measured energy.  
+
+
+  EXAMPLES
+  1. Get the default corrector to BPM response matrix and plot
+     S = getbpmresp;
+          or
+     S = getbpmresp('BPMx', 'BPMy', 'HCM', 'VCM');
+     surf(S);
+
+  2. Get a HCM to BPM response matrix but return as a structure 
+     S = getbpmresp('BPMx', 'BPMy', 'HCM', 'VCM', 'Struct');
+
+  4. Structure inputs:
+     Xmon = getx([1 2;2 1; 3 3],'struct'); 
+     Ymon = gety([1 2;2 1; 3 3],'struct'); 
+     Xact = getsp('HCM', [1 2;2 1;2 2;4 1],'struct');
+     Yact = getsp('VCM', [1 2;2 1;2 2;4 1],'struct');
+     S = getbpmresp(Xmon, Ymon, Xact, Yact);
+     Returns the same matrix as in Example 1.
+
+  See also <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>, <a href="measbpmresp.html" class="code" title="function [Rmat, OutputFileName] = measbpmresp(varargin)">measbpmresp</a>, <a href="measrespmat.html" class="code" title="function S = measrespmat(varargin)">measrespmat</a>, <a href="gettuneresp.html" class="code" title="function [TuneMatrix, FileName] = gettuneresp(varargin)">gettuneresp</a>, <a href="getchroresp.html" class="code" title="function [ChromaticityMatrix, FileName] = getchroresp(varargin)">getchroresp</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>	GETRESPMAT - Get response matrix data from a file</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li><li><a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>	GETVCMFAMILY - Returns the default vertical corrector family</li><li><a href="measbpmresp.html" class="code" title="function [Rmat, OutputFileName] = measbpmresp(varargin)">measbpmresp</a>	MEASBPMRESP - Measures the BPM response matrix in the horizontal and vertical planes</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="bpmresp2loco.html" class="code" title="function [R, Data, DataMM] = bpmresp2loco(R)">bpmresp2loco</a>	BPMRESP2LOCO - Convert a MML response matrix to LOCO units</li><li><a href="meascmhysteresis.html" class="code" title="function meascmhysteresis(BPMList, CMFamily, CMList, MaxChange, NSteps)">meascmhysteresis</a>	MEASCMHYSTERESIS - Measure corrector magnet hysteresis</li><li><a href="plotbpmresp.html" class="code" title="function plotbpmresp(varargin)">plotbpmresp</a>	PLOTBPMRESP - Plots the orbit response matrix in various ways</li><li><a href="plotbpmrespsym.html" class="code" title="function plotbpmrespsym(R)">plotbpmrespsym</a>	PLOTBPMRESPSYM - Looks for symmetry of the orbit response matrix</li><li><a href="plotorbitdata.html" class="code" title="function [BPMx, BPMy] = plotorbitdata(varargin)">plotorbitdata</a>	PLOTORBITDATA - Plots BPM statistics</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [S, FileName] = getbpmresp(varargin)</a>
+0002 <span class="comment">%GETBPMRESP - Returns the BPM response matrix in the horizontal and vertical planes</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  For family name, device list inputs:</span>
+0005 <span class="comment">%  [Rmat, FileName] = getbpmresp(BPMxFamily, BPMxList, BPMyFamily, BPMyList, HCMFamily, HCMList, VCMFamily, VCMList, FileName)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  For data structure inputs:</span>
+0008 <span class="comment">%  [Rmat, FileName] = getbpmresp(BPMxStruct, BPMyStruct, HCMStruct, VCMStruct, FileName)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  INPUTS</span>
+0011 <span class="comment">%  1. BPMxFamily     - BPMx family name {Default: gethbpmfamily}</span>
+0012 <span class="comment">%     BPMxDeviceList - BPMx device list {Default: all devices with good status}</span>
+0013 <span class="comment">%     or</span>
+0014 <span class="comment">%     BPMxStruct can replace BPMxFamily and BPMxList</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  2. BPMyFamily     - BPMy family name {Default: getvbpmfamily}</span>
+0017 <span class="comment">%     BPMyDeviceList - BPMy device list {Default: all devices with good status}</span>
+0018 <span class="comment">%     or</span>
+0019 <span class="comment">%     BPMyStruct can replace BPMyFamily and BPMyList</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%  3. HCMFamily     - HCM family name {Default: gethcmfamily}</span>
+0022 <span class="comment">%     HCMDeviceList - HCM device list {Default: all devices with good status}</span>
+0023 <span class="comment">%     or</span>
+0024 <span class="comment">%     HCMStruct can replace HCMFamily and HCMList</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  4. VCMFamily     - VCM family name {Default: getvcmfamily}</span>
+0027 <span class="comment">%     VCMDeviceList - VCM device list {Default: all devices with good status}</span>
+0028 <span class="comment">%     or</span>
+0029 <span class="comment">%     VCMStruct can replace VCMFamily and VCMList</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  5. FileName - File name for response matrix (or cell array of file names) {Default: use getfamilydata('OpsData','RespFiles')}</span>
+0032 <span class="comment">%                [] or '' - prompt the user to choose a response matrix file</span>
+0033 <span class="comment">%     To put the filename anywhere in the function call use the keyword, 'Filename' followed by the actual</span>
+0034 <span class="comment">%     filename or '' to get a dialog box.  For example, m = getbpmresp('FileName','RmatABC') to search in RmatABC.mat.</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">%  6. The response matrix will linearly scale to the present energy (getenergy) from the measured energy.</span>
+0037 <span class="comment">%     It's not always desirable to scale by the energy, so the following keywords can be used.</span>
+0038 <span class="comment">%     'EnergyScaling' - Scale the response matrix by energy (getenergy / measured energy) {Default}</span>
+0039 <span class="comment">%     'NoEnergyScaling' - Don't scale with energy</span>
+0040 <span class="comment">%  7. 'Struct'  will return the response matrix structure {Default if BPMxFamily is a structure input}</span>
+0041 <span class="comment">%     'Numeric' will return a numeric matrix {Default for non-data structure inputs}</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%  OUTPUTS</span>
+0044 <span class="comment">%  1. Rmat = Orbit response matrix (delta(orbit)/delta(Kick))</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">%     Numeric Output:</span>
+0047 <span class="comment">%       Rmat = [x/x  x/y</span>
+0048 <span class="comment">%               y/x  y/y]</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">%     Ie, columns are correctors arranged horizontal to vertical</span>
+0051 <span class="comment">%         rows are BPMs arranged horizontal to vertical</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">%     Stucture Output:</span>
+0054 <span class="comment">%     Rmat(BPM Plane, Corrector Plane) - 2x2 struct array</span>
+0055 <span class="comment">%     Rmat(1,1).Data = x/x;   % Kick x, look x</span>
+0056 <span class="comment">%     Rmat(2,1).Data = y/x;   % Kick x, look y</span>
+0057 <span class="comment">%     Rmat(1,2).Data = x/y;   % Kick y, look x</span>
+0058 <span class="comment">%     Rmat(2,2).Data = y/y;   % Kick y, look y</span>
+0059 <span class="comment">%</span>
+0060 <span class="comment">%     Rmat(Monitor, Actuator).Data - Response matrix</span>
+0061 <span class="comment">%                            .Monitor  - BPM data structure (starting orbit)</span>
+0062 <span class="comment">%                            .Monitor1 - BPM matrix (first  data point)</span>
+0063 <span class="comment">%                            .Monitor2 - BPM matrix (second data point)</span>
+0064 <span class="comment">%                            .Actuator - Corrector data structure</span>
+0065 <span class="comment">%                            .ActuatorDelta - Corrector kick vector</span>
+0066 <span class="comment">%                            .GeV - Electron beam energy</span>
+0067 <span class="comment">%                            .ModulationMethod - 'unipolar' or 'bipolar'</span>
+0068 <span class="comment">%                            .WaitFlag - Wait flag used when acquiring data</span>
+0069 <span class="comment">%                            .TimeStamp</span>
+0070 <span class="comment">%                            .CreatedBy</span>
+0071 <span class="comment">%                            .DCCT</span>
+0072 <span class="comment">%</span>
+0073 <span class="comment">%  2. FileName = File name where the data was found</span>
+0074 <span class="comment">%</span>
+0075 <span class="comment">%</span>
+0076 <span class="comment">%  NOTES</span>
+0077 <span class="comment">%  1. If the DeviceList is empty, [], or not present, all the device in that response matrix will be returned.</span>
+0078 <span class="comment">%  2. GeV will linearly scale the response matrix from the measured energy.</span>
+0079 <span class="comment">%</span>
+0080 <span class="comment">%</span>
+0081 <span class="comment">%  EXAMPLES</span>
+0082 <span class="comment">%  1. Get the default corrector to BPM response matrix and plot</span>
+0083 <span class="comment">%     S = getbpmresp;</span>
+0084 <span class="comment">%          or</span>
+0085 <span class="comment">%     S = getbpmresp('BPMx', 'BPMy', 'HCM', 'VCM');</span>
+0086 <span class="comment">%     surf(S);</span>
+0087 <span class="comment">%</span>
+0088 <span class="comment">%  2. Get a HCM to BPM response matrix but return as a structure</span>
+0089 <span class="comment">%     S = getbpmresp('BPMx', 'BPMy', 'HCM', 'VCM', 'Struct');</span>
+0090 <span class="comment">%</span>
+0091 <span class="comment">%  4. Structure inputs:</span>
+0092 <span class="comment">%     Xmon = getx([1 2;2 1; 3 3],'struct');</span>
+0093 <span class="comment">%     Ymon = gety([1 2;2 1; 3 3],'struct');</span>
+0094 <span class="comment">%     Xact = getsp('HCM', [1 2;2 1;2 2;4 1],'struct');</span>
+0095 <span class="comment">%     Yact = getsp('VCM', [1 2;2 1;2 2;4 1],'struct');</span>
+0096 <span class="comment">%     S = getbpmresp(Xmon, Ymon, Xact, Yact);</span>
+0097 <span class="comment">%     Returns the same matrix as in Example 1.</span>
+0098 <span class="comment">%</span>
+0099 <span class="comment">%  See also getrespmat, measbpmresp, measrespmat, gettuneresp, getchroresp</span>
+0100 
+0101 <span class="comment">%  Written by Greg Portmann</span>
+0102 
+0103 
+0104 <span class="comment">% Initialize defaults</span>
+0105 BPMxFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>; 
+0106 BPMxList   = [];
+0107 
+0108 BPMyFamily = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;
+0109 BPMyList   = [];
+0110 
+0111 HCMFamily = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0112 HCMList   = [];
+0113 HCMKicks  = [];
+0114 
+0115 VCMFamily = <a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>;
+0116 VCMList   = [];
+0117 VCMKicks  = [];
+0118 
+0119 FileName = <span class="string">''</span>;
+0120 InputFlags = {};
+0121 <span class="keyword">for</span> i = length(varargin):-1:1
+0122     <span class="keyword">if</span> isstruct(varargin{i})
+0123         <span class="comment">% Ignor structures</span>
+0124     <span class="keyword">elseif</span> iscell(varargin{i})
+0125         <span class="comment">% Ignor cells</span>
+0126     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Struct'</span>)
+0127         InputFlags = [InputFlags varargin(i)];
+0128         varargin(i) = [];
+0129     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Numeric'</span>)
+0130         InputFlags = [InputFlags varargin(i)];
+0131         varargin(i) = [];
+0132     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Model'</span>) || strcmpi(varargin{i},<span class="string">'Simulator'</span>)
+0133         fprintf(<span class="string">'WARNING: Model input ignored.  Used measbpmresp to get the model response matrix.\n'</span>);
+0134         varargin(i) = [];
+0135     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'EnergyScaling'</span>)
+0136         InputFlags = [InputFlags varargin(i)];
+0137         varargin(i) = [];
+0138     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoEnergyScaling'</span>)
+0139         InputFlags = [InputFlags varargin(i)];
+0140         varargin(i) = [];
+0141     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Physics'</span>)
+0142         InputFlags = [InputFlags varargin(i)];
+0143         varargin(i) = [];
+0144     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0145         InputFlags = [InputFlags varargin(i)];
+0146         varargin(i) = [];
+0147     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'FileName'</span>)
+0148         <span class="keyword">if</span> length(varargin) &gt;= i+1 &amp;&amp; ischar(varargin{i+1})
+0149             FileName = varargin{i+1};
+0150             varargin(i:i+1) = [];
+0151         <span class="keyword">else</span>
+0152             varargin(i) = [];
+0153         <span class="keyword">end</span>
+0154         <span class="keyword">if</span> isempty(FileName)
+0155             DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'BPMResponse'</span>);
+0156             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a BPM response matrix file'</span>, DirectoryName);
+0157             <span class="keyword">if</span> FileName == 0
+0158                 S = [];
+0159                 FileName = [];
+0160                 <span class="keyword">return</span>;
+0161             <span class="keyword">end</span>
+0162             FileName = [DirectoryName FileName];
+0163         <span class="keyword">end</span>
+0164     <span class="keyword">end</span>
+0165 <span class="keyword">end</span>
+0166 
+0167 
+0168 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0169 <span class="comment">% Parse Inputs %</span>
+0170 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0171 
+0172 <span class="comment">% Special case: empty in input 1, ask for a file</span>
+0173 <span class="keyword">if</span> length(varargin) == 1 &amp;&amp; (isempty(varargin{1}) || strcmp(varargin{1},<span class="string">'.'</span>))
+0174     FileName = varargin{1};
+0175     varargin(1) = [];
+0176 
+0177     <span class="keyword">if</span> isempty(FileName)
+0178         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'BPMResponse'</span>);
+0179     <span class="keyword">elseif</span> strcmp(FileName, <span class="string">'.'</span>)
+0180         DirectoryName = <span class="string">''</span>;
+0181     <span class="keyword">end</span>
+0182     [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a BPM response matrix file'</span>, DirectoryName);
+0183     <span class="keyword">if</span> FileName == 0
+0184         S = [];
+0185         FileName = [];
+0186         <span class="keyword">return</span>;
+0187     <span class="keyword">end</span>
+0188     FileName = [DirectoryName FileName];
+0189 <span class="keyword">end</span>
+0190 
+0191 <span class="comment">% Look for BPMx family info</span>
+0192 <span class="keyword">if</span> length(varargin) &gt;= 1
+0193     <span class="keyword">if</span> isstruct(varargin{1})
+0194         BPMxFamily = varargin{1}.FamilyName;
+0195         BPMxList = varargin{1}.DeviceList;
+0196         varargin(1) = [];
+0197         <span class="keyword">if</span> ~any(strcmpi(InputFlags,<span class="string">'Numeric'</span>))
+0198             <span class="comment">% Only change to structure output if 'Numeric' is not on the input line</span>
+0199             InputFlags = [{<span class="string">'Struct'</span>} InputFlags];
+0200         <span class="keyword">end</span>
+0201     <span class="keyword">elseif</span> ischar(varargin{1})
+0202         BPMxFamily = varargin{1};
+0203         varargin(1) = [];
+0204         <span class="keyword">if</span> length(varargin) &gt;= 1
+0205             <span class="keyword">if</span> isnumeric(varargin{1})
+0206                 BPMxList = varargin{1};
+0207                 varargin(1) = [];
+0208             <span class="keyword">end</span>
+0209         <span class="keyword">end</span>
+0210     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0211         BPMxList = varargin{1};
+0212         varargin(1) = [];
+0213     <span class="keyword">end</span>
+0214 <span class="keyword">end</span>
+0215 <span class="keyword">if</span> isempty(BPMxList) &amp;&amp; ~isempty(BPMxFamily)
+0216     BPMxList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMxFamily, 1);
+0217 <span class="keyword">end</span>
+0218 
+0219 <span class="comment">% Look for BPMy family info</span>
+0220 <span class="keyword">if</span> length(varargin) &gt;= 1
+0221     <span class="keyword">if</span> isstruct(varargin{1})
+0222         BPMyFamily = varargin{1}.FamilyName;
+0223         BPMyList = varargin{1}.DeviceList;
+0224         varargin(1) = [];
+0225     <span class="keyword">elseif</span> ischar(varargin{1})
+0226         BPMyFamily = varargin{1};
+0227         varargin(1) = [];
+0228         <span class="keyword">if</span> length(varargin) &gt;= 1
+0229             <span class="keyword">if</span> isnumeric(varargin{1})
+0230                 BPMyList = varargin{1};
+0231                 varargin(1) = [];
+0232             <span class="keyword">end</span>
+0233         <span class="keyword">end</span>
+0234     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0235         BPMyList = varargin{1};
+0236         varargin(1) = [];
+0237     <span class="keyword">end</span>
+0238 <span class="keyword">end</span>
+0239 <span class="keyword">if</span> isempty(BPMyList) &amp;&amp; ~isempty(BPMyFamily)
+0240     BPMyList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMyFamily, 1);
+0241 <span class="keyword">end</span>
+0242 
+0243 <span class="comment">% Look for HCM family info</span>
+0244 <span class="keyword">if</span> length(varargin) &gt;= 1
+0245     <span class="keyword">if</span> isstruct(varargin{1})
+0246         HCMFamily = varargin{1}.FamilyName;
+0247         HCMList = varargin{1}.DeviceList;
+0248         varargin(1) = [];
+0249     <span class="keyword">elseif</span> ischar(varargin{1})
+0250         HCMFamily = varargin{1};
+0251         varargin(1) = [];
+0252         <span class="keyword">if</span> length(varargin) &gt;= 1
+0253             <span class="keyword">if</span> isnumeric(varargin{1})
+0254                 HCMList = varargin{1};
+0255                 varargin(1) = [];
+0256             <span class="keyword">end</span>
+0257         <span class="keyword">end</span>
+0258     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0259         HCMList = varargin{1};
+0260         varargin(1) = [];
+0261     <span class="keyword">end</span>
+0262 <span class="keyword">end</span>
+0263 <span class="keyword">if</span> isempty(HCMList) &amp;&amp; ~isempty(HCMFamily)
+0264     HCMList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(HCMFamily, 1);
+0265 <span class="keyword">end</span>
+0266 
+0267 <span class="comment">% Look for VCM family info</span>
+0268 <span class="keyword">if</span> length(varargin) &gt;= 1
+0269     <span class="keyword">if</span> isstruct(varargin{1})
+0270         VCMFamily = varargin{1}.FamilyName;
+0271         VCMList = varargin{1}.DeviceList;
+0272         varargin(1) = [];
+0273     <span class="keyword">elseif</span> ischar(varargin{1})
+0274         VCMFamily = varargin{1};
+0275         varargin(1) = [];
+0276         <span class="keyword">if</span> length(varargin) &gt;= 1
+0277             <span class="keyword">if</span> isnumeric(varargin{1})
+0278                 VCMList = varargin{1};
+0279                 varargin(1) = [];
+0280             <span class="keyword">end</span>
+0281         <span class="keyword">end</span>
+0282     <span class="keyword">elseif</span> isnumeric(varargin{1})
+0283         VCMList = varargin{1};
+0284         varargin(1) = [];
+0285     <span class="keyword">end</span>
+0286 <span class="keyword">end</span>
+0287 <span class="keyword">if</span> isempty(VCMList) &amp;&amp; ~isempty(VCMFamily)
+0288     VCMList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(VCMFamily, 1);
+0289 <span class="keyword">end</span>
+0290 
+0291 
+0292 <span class="keyword">if</span> length(varargin) &gt;= 1
+0293     <span class="keyword">if</span> ischar(varargin{1}) 
+0294         FileName = varargin{1};
+0295         varargin(1) = [];
+0296         <span class="keyword">if</span> isempty(FileName)
+0297             DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'BPMResponse'</span>);
+0298             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a BPM response matrix file'</span>, DirectoryName);
+0299             <span class="keyword">if</span> FileName == 0
+0300                 S = [];
+0301                 FileName = [];
+0302                 <span class="keyword">return</span>;
+0303             <span class="keyword">end</span>
+0304             FileName = [DirectoryName FileName];
+0305         <span class="keyword">end</span>
+0306     <span class="keyword">end</span>
+0307 <span class="keyword">end</span>
+0308 
+0309 
+0310 <span class="keyword">try</span>
+0311     <span class="keyword">if</span> ~isempty(FileName)
+0312         [S, FileName] = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>({BPMxFamily, BPMyFamily}, {BPMxList, BPMyList}, {HCMFamily, VCMFamily}, {HCMList, VCMList}, FileName, InputFlags{:});
+0313     <span class="keyword">else</span>
+0314         [S, FileName] = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>({BPMxFamily, BPMyFamily}, {BPMxList, BPMyList}, {HCMFamily, VCMFamily}, {HCMList, VCMList}, InputFlags{:});
+0315     <span class="keyword">end</span>
+0316 <span class="keyword">catch</span>
+0317     fprintf(<span class="string">'   Could not find a BPM response matrix file, so using the model (%s &amp; %s).\n'</span>, HCMFamily, VCMFamily);
+0318     S = <a href="measbpmresp.html" class="code" title="function [Rmat, OutputFileName] = measbpmresp(varargin)">measbpmresp</a>(<span class="string">'Model'</span>,{BPMxFamily, BPMyFamily}, {BPMxList, BPMyList}, {HCMFamily, VCMFamily}, {HCMList, VCMList}, InputFlags{:}, varargin{:});
+0319     FileName = <span class="string">''</span>;
+0320 <span class="keyword">end</span>
+0321 
+0322 
+0323</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

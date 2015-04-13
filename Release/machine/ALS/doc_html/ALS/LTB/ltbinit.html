@@ -1,0 +1,738 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ltbinit</title>
+  <meta name="keywords" content="ltbinit">
+  <meta name="description" content="LTBINIT">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">LTB</a> &gt; ltbinit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\LTB&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>ltbinit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LTBINIT</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function ltbinit(OperationalMode) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LTBINIT</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="aoinit.html" class="code" title="function aoinit(SubMachineName)">aoinit</a>	AOINIT - Initialization function for the Matlab Middle Layer (MML)</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [Amps] = local_minsp(Family, List)</a></li><li><a href="#_sub2" class="code">function [Amps] = local_maxsp(Family, List)</a></li><li><a href="#_sub3" class="code">function tol = gettol(Family)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ltbinit(OperationalMode)</a>
+0002 <span class="comment">%LTBINIT</span>
+0003 
+0004 <span class="keyword">if</span> nargin &lt; 1
+0005     <span class="comment">% 1 =&gt; 50 MeV injection</span>
+0006     OperationalMode = 1;
+0007 <span class="keyword">end</span>
+0008 
+0009 
+0010 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0011 <span class="comment">% Build the AO %</span>
+0012 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0013 setao([]);
+0014 
+0015 <span class="comment">% BPM</span>
+0016 AO.BPMx.FamilyName = <span class="string">'BPMx'</span>;
+0017 AO.BPMx.MemberOf   = {<span class="string">'PlotFamily'</span>; <span class="string">'BPM'</span>;<span class="string">'BPMx'</span>;};
+0018 AO.BPMx.DeviceList = [1 1; 1 2; 1 3; 1 4; 1 5; 1 6;];
+0019 AO.BPMx.ElementList = [1 2 3 4 5 6]';
+0020 AO.BPMx.Status = ones(6,1);
+0021 
+0022 AO.BPMx.Monitor.MemberOf = {};
+0023 AO.BPMx.Monitor.Mode = <span class="string">'Simulator'</span>;
+0024 AO.BPMx.Monitor.DataType = <span class="string">'Scalar'</span>;
+0025 AO.BPMx.Monitor.ChannelNames = getname_bts(AO.BPMx.FamilyName, <span class="string">'Monitor'</span>);
+0026 <span class="comment">%AO.BPMx.Monitor.SpecialFunctionGet = @getx_bts;</span>
+0027 AO.BPMx.Monitor.Units = <span class="string">'Hardware'</span>;
+0028 AO.BPMx.Monitor.HWUnits          = <span class="string">'mm'</span>;
+0029 AO.BPMx.Monitor.PhysicsUnits     = <span class="string">'Meter'</span>;
+0030 AO.BPMx.Monitor.HW2PhysicsParams = 1e-3;  <span class="comment">% HW [mm], Simulator [Meters]</span>
+0031 AO.BPMx.Monitor.Physics2HWParams = 1000;
+0032 
+0033 
+0034 AO.BPMy.FamilyName  = <span class="string">'BPMy'</span>;
+0035 AO.BPMy.MemberOf    = {<span class="string">'PlotFamily'</span>; <span class="string">'BPM'</span>;<span class="string">'BPMy'</span>;};
+0036 AO.BPMy.DeviceList  = AO.BPMx.DeviceList;
+0037 AO.BPMy.ElementList = AO.BPMx.ElementList;
+0038 AO.BPMy.Status      = AO.BPMx.Status;
+0039 
+0040 AO.BPMy.Monitor.MemberOf = {};
+0041 AO.BPMy.Monitor.Mode = <span class="string">'Simulator'</span>;
+0042 AO.BPMy.Monitor.DataType = <span class="string">'Scalar'</span>;
+0043 AO.BPMy.Monitor.ChannelNames = getname_bts(AO.BPMy.FamilyName, <span class="string">'Monitor'</span>);
+0044 <span class="comment">%AO.BPMy.Monitor.SpecialFunctionGet = @gety_bts;</span>
+0045 AO.BPMy.Monitor.Units = <span class="string">'Hardware'</span>;
+0046 AO.BPMy.Monitor.HWUnits          = <span class="string">'mm'</span>;
+0047 AO.BPMy.Monitor.PhysicsUnits     = <span class="string">'Meter'</span>;
+0048 AO.BPMy.Monitor.HW2PhysicsParams = 1e-3;  <span class="comment">% HW [mm], Simulator [Meters]</span>
+0049 AO.BPMy.Monitor.Physics2HWParams = 1000;
+0050 
+0051 
+0052 <span class="comment">% HCM</span>
+0053 AO.HCM.FamilyName = <span class="string">'HCM'</span>;
+0054 AO.HCM.MemberOf   = {<span class="string">'PlotFamily'</span>; <span class="string">'MachineConfig'</span>; <span class="string">'COR'</span>; <span class="string">'HCM'</span>; <span class="string">'Magnet'</span>};
+0055 AO.HCM.DeviceList = [1 1; 1 2; 1 3; 1 4; 1 5; 1 6; 1 7; 1 8; 1 9];
+0056 AO.HCM.ElementList = [1 2 3 4 5 6 7 8 9]';
+0057 AO.HCM.Status = ones(9,1);
+0058 
+0059 AO.HCM.Monitor.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0060 AO.HCM.Monitor.Mode = <span class="string">'Simulator'</span>;
+0061 AO.HCM.Monitor.DataType = <span class="string">'Scalar'</span>;
+0062 AO.HCM.Monitor.ChannelNames = getname_bts(AO.HCM.FamilyName, <span class="string">'Monitor'</span>);
+0063 AO.HCM.Monitor.HW2PhysicsFcn = @bts2at;
+0064 AO.HCM.Monitor.Physics2HWFcn = @at2bts;
+0065 AO.HCM.Monitor.Units = <span class="string">'Hardware'</span>;
+0066 AO.HCM.Monitor.HWUnits      = <span class="string">'Ampere'</span>;
+0067 AO.HCM.Monitor.PhysicsUnits = <span class="string">'Radian'</span>;
+0068 
+0069 AO.HCM.Setpoint.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'COR'</span>; <span class="string">'HCM'</span>; <span class="string">'Magnet'</span>; <span class="string">'Setpoint'</span>};
+0070 AO.HCM.Setpoint.Mode = <span class="string">'Simulator'</span>;
+0071 AO.HCM.Setpoint.DataType = <span class="string">'Scalar'</span>;
+0072 AO.HCM.Setpoint.ChannelNames = getname_bts(AO.HCM.FamilyName, <span class="string">'Setpoint'</span>);
+0073 AO.HCM.Setpoint.HW2PhysicsFcn = @bts2at;
+0074 AO.HCM.Setpoint.Physics2HWFcn = @at2bts;
+0075 AO.HCM.Setpoint.Units = <span class="string">'Hardware'</span>;
+0076 AO.HCM.Setpoint.HWUnits      = <span class="string">'Ampere'</span>;
+0077 AO.HCM.Setpoint.PhysicsUnits = <span class="string">'Radian'</span>;
+0078 
+0079 <span class="comment">% AO.HCM.RampRate.MemberOf = {'PlotFamily';'MachineConfig';};</span>
+0080 <span class="comment">% AO.HCM.RampRate.Mode = 'Simulator';</span>
+0081 <span class="comment">% AO.HCM.RampRate.DataType = 'Scalar';</span>
+0082 <span class="comment">% AO.HCM.RampRate.ChannelNames = getname_bts(AO.HCM.FamilyName, 'RampRate');</span>
+0083 <span class="comment">% AO.HCM.RampRate.HW2PhysicsParams = 1;</span>
+0084 <span class="comment">% AO.HCM.RampRate.Physics2HWParams = 1;</span>
+0085 <span class="comment">% AO.HCM.RampRate.Units = 'Hardware';</span>
+0086 <span class="comment">% AO.HCM.RampRate.HWUnits      = 'Ampere/Second';</span>
+0087 <span class="comment">% AO.HCM.RampRate.PhysicsUnits = 'Ampere/Second';</span>
+0088 <span class="comment">%</span>
+0089 <span class="comment">% AO.HCM.TimeConstant.MemberOf = {'PlotFamily';};</span>
+0090 <span class="comment">% AO.HCM.TimeConstant.Mode = 'Simulator';</span>
+0091 <span class="comment">% AO.HCM.TimeConstant.DataType = 'Scalar';</span>
+0092 <span class="comment">% AO.HCM.TimeConstant.ChannelNames = getname_bts(AO.HCM.FamilyName, 'TimeConstant');</span>
+0093 <span class="comment">% AO.HCM.TimeConstant.HW2PhysicsParams = 1;</span>
+0094 <span class="comment">% AO.HCM.TimeConstant.Physics2HWParams = 1;</span>
+0095 <span class="comment">% AO.HCM.TimeConstant.Units = 'Hardware';</span>
+0096 <span class="comment">% AO.HCM.TimeConstant.HWUnits      = 'Second';</span>
+0097 <span class="comment">% AO.HCM.TimeConstant.PhysicsUnits = 'Second';</span>
+0098 <span class="comment">%</span>
+0099 <span class="comment">% AO.HCM.DAC.MemberOf = {'PlotFamily';};</span>
+0100 <span class="comment">% AO.HCM.DAC.Mode = 'Simulator';</span>
+0101 <span class="comment">% AO.HCM.DAC.DataType = 'Scalar';</span>
+0102 <span class="comment">% AO.HCM.DAC.ChannelNames = getname_bts(AO.HCM.FamilyName, 'DAC');</span>
+0103 <span class="comment">% AO.HCM.DAC.HW2PhysicsParams = 1;</span>
+0104 <span class="comment">% AO.HCM.DAC.Physics2HWParams = 1;</span>
+0105 <span class="comment">% AO.HCM.DAC.Units = 'Hardware';</span>
+0106 <span class="comment">% AO.HCM.DAC.HWUnits      = 'Ampere';</span>
+0107 <span class="comment">% AO.HCM.DAC.PhysicsUnits = 'Ampere';</span>
+0108 
+0109 AO.HCM.On.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0110 AO.HCM.On.Mode = <span class="string">'Simulator'</span>;
+0111 AO.HCM.On.DataType = <span class="string">'Scalar'</span>;
+0112 AO.HCM.On.ChannelNames = getname_bts(AO.HCM.FamilyName, <span class="string">'On'</span>);
+0113 AO.HCM.On.HW2PhysicsParams = 1;
+0114 AO.HCM.On.Physics2HWParams = 1;
+0115 AO.HCM.On.Units = <span class="string">'Hardware'</span>;
+0116 AO.HCM.On.HWUnits      = <span class="string">''</span>;
+0117 AO.HCM.On.PhysicsUnits = <span class="string">''</span>;
+0118 
+0119 AO.HCM.OnControl.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0120 AO.HCM.OnControl.Mode = <span class="string">'Simulator'</span>;
+0121 AO.HCM.OnControl.DataType = <span class="string">'Scalar'</span>;
+0122 AO.HCM.OnControl.ChannelNames = getname_bts(AO.HCM.FamilyName, <span class="string">'OnControl'</span>);
+0123 AO.HCM.OnControl.HW2PhysicsParams = 1;
+0124 AO.HCM.OnControl.Physics2HWParams = 1;
+0125 AO.HCM.OnControl.Units = <span class="string">'Hardware'</span>;
+0126 AO.HCM.OnControl.HWUnits      = <span class="string">''</span>;
+0127 AO.HCM.OnControl.PhysicsUnits = <span class="string">''</span>;
+0128 
+0129 AO.HCM.Reset.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0130 AO.HCM.Reset.Mode = <span class="string">'Simulator'</span>;
+0131 AO.HCM.Reset.DataType = <span class="string">'Scalar'</span>;
+0132 AO.HCM.Reset.ChannelNames = getname_bts(AO.HCM.FamilyName, <span class="string">'Reset'</span>);
+0133 AO.HCM.Reset.HW2PhysicsParams = 1;
+0134 AO.HCM.Reset.Physics2HWParams = 1;
+0135 AO.HCM.Reset.Units = <span class="string">'Hardware'</span>;
+0136 AO.HCM.Reset.HWUnits      = <span class="string">''</span>;
+0137 AO.HCM.Reset.PhysicsUnits = <span class="string">''</span>;
+0138 
+0139 AO.HCM.Ready.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0140 AO.HCM.Ready.Mode = <span class="string">'Simulator'</span>;
+0141 AO.HCM.Ready.DataType = <span class="string">'Scalar'</span>;
+0142 AO.HCM.Ready.ChannelNames = getname_bts(AO.HCM.FamilyName, <span class="string">'Ready'</span>);
+0143 AO.HCM.Ready.HW2PhysicsParams = 1;
+0144 AO.HCM.Ready.Physics2HWParams = 1;
+0145 AO.HCM.Ready.Units = <span class="string">'Hardware'</span>;
+0146 AO.HCM.Ready.HWUnits      = <span class="string">''</span>;
+0147 AO.HCM.Ready.PhysicsUnits = <span class="string">''</span>;
+0148 
+0149 
+0150 <span class="comment">% VCM</span>
+0151 AO.VCM.FamilyName = <span class="string">'VCM'</span>;
+0152 AO.VCM.MemberOf   = {<span class="string">'PlotFamily'</span>; <span class="string">'MachineConfig'</span>; <span class="string">'COR'</span>; <span class="string">'VCM'</span>; <span class="string">'Magnet'</span>};
+0153 AO.VCM.DeviceList = [1 1; 1 2; 1 3; 1 4; 1 5; 1 6; 1 7; 1 8; 1 9];
+0154 AO.VCM.ElementList = [1 2 3 4 5 6 7 8 9]';
+0155 AO.VCM.Status = ones(9,1);
+0156 
+0157 AO.VCM.Monitor.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0158 AO.VCM.Monitor.Mode = <span class="string">'Simulator'</span>;
+0159 AO.VCM.Monitor.DataType = <span class="string">'Scalar'</span>;
+0160 AO.VCM.Monitor.ChannelNames = getname_bts(AO.VCM.FamilyName, <span class="string">'Monitor'</span>);
+0161 AO.VCM.Monitor.HW2PhysicsFcn = @bts2at;
+0162 AO.VCM.Monitor.Physics2HWFcn = @at2bts;
+0163 AO.VCM.Monitor.Units = <span class="string">'Hardware'</span>;
+0164 AO.VCM.Monitor.HWUnits      = <span class="string">'Ampere'</span>;
+0165 AO.VCM.Monitor.PhysicsUnits = <span class="string">'Radian'</span>;
+0166 
+0167 AO.VCM.Setpoint.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'COR'</span>; <span class="string">'VCM'</span>; <span class="string">'Magnet'</span>; <span class="string">'Setpoint'</span>};
+0168 AO.VCM.Setpoint.Mode = <span class="string">'Simulator'</span>;
+0169 AO.VCM.Setpoint.DataType = <span class="string">'Scalar'</span>;
+0170 AO.VCM.Setpoint.ChannelNames = getname_bts(AO.VCM.FamilyName, <span class="string">'Setpoint'</span>);
+0171 AO.VCM.Setpoint.HW2PhysicsFcn = @bts2at;
+0172 AO.VCM.Setpoint.Physics2HWFcn = @at2bts;
+0173 AO.VCM.Setpoint.Units = <span class="string">'Hardware'</span>;
+0174 AO.VCM.Setpoint.HWUnits      = <span class="string">'Ampere'</span>;
+0175 AO.VCM.Setpoint.PhysicsUnits = <span class="string">'Radian'</span>;
+0176 
+0177 <span class="comment">% AO.VCM.RampRate.MemberOf = {'PlotFamily'; 'MachineConfig';};</span>
+0178 <span class="comment">% AO.VCM.RampRate.Mode = 'Simulator';</span>
+0179 <span class="comment">% AO.VCM.RampRate.DataType = 'Scalar';</span>
+0180 <span class="comment">% AO.VCM.RampRate.ChannelNames = getname_bts(AO.VCM.FamilyName, 'RampRate');</span>
+0181 <span class="comment">% AO.VCM.RampRate.HW2PhysicsParams = 1;</span>
+0182 <span class="comment">% AO.VCM.RampRate.Physics2HWParams = 1;</span>
+0183 <span class="comment">% AO.VCM.RampRate.Units = 'Hardware';</span>
+0184 <span class="comment">% AO.VCM.RampRate.HWUnits      = 'Ampere/Second';</span>
+0185 <span class="comment">% AO.VCM.RampRate.PhysicsUnits = 'Ampere/Second';</span>
+0186 <span class="comment">%</span>
+0187 <span class="comment">% AO.VCM.TimeConstant.MemberOf = {'PlotFamily'; };</span>
+0188 <span class="comment">% AO.VCM.TimeConstant.Mode = 'Simulator';</span>
+0189 <span class="comment">% AO.VCM.TimeConstant.DataType = 'Scalar';</span>
+0190 <span class="comment">% AO.VCM.TimeConstant.ChannelNames = getname_bts(AO.VCM.FamilyName, 'TimeConstant');</span>
+0191 <span class="comment">% AO.VCM.TimeConstant.HW2PhysicsParams = 1;</span>
+0192 <span class="comment">% AO.VCM.TimeConstant.Physics2HWParams = 1;</span>
+0193 <span class="comment">% AO.VCM.TimeConstant.Units = 'Hardware';</span>
+0194 <span class="comment">% AO.VCM.TimeConstant.HWUnits      = 'Second';</span>
+0195 <span class="comment">% AO.VCM.TimeConstant.PhysicsUnits = 'Second';</span>
+0196 <span class="comment">%</span>
+0197 <span class="comment">% AO.VCM.DAC.MemberOf = {'PlotFamily';};</span>
+0198 <span class="comment">% AO.VCM.DAC.Mode = 'Simulator';</span>
+0199 <span class="comment">% AO.VCM.DAC.DataType = 'Scalar';</span>
+0200 <span class="comment">% AO.VCM.DAC.ChannelNames = getname_bts(AO.VCM.FamilyName, 'DAC');</span>
+0201 <span class="comment">% AO.VCM.DAC.HW2PhysicsParams = 1;</span>
+0202 <span class="comment">% AO.VCM.DAC.Physics2HWParams = 1;</span>
+0203 <span class="comment">% AO.VCM.DAC.Units = 'Hardware';</span>
+0204 <span class="comment">% AO.VCM.DAC.HWUnits      = 'Ampere';</span>
+0205 <span class="comment">% AO.VCM.DAC.PhysicsUnits = 'Ampere';</span>
+0206 
+0207 AO.VCM.On.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0208 AO.VCM.On.Mode = <span class="string">'Simulator'</span>;
+0209 AO.VCM.On.DataType = <span class="string">'Scalar'</span>;
+0210 AO.VCM.On.ChannelNames = getname_bts(AO.VCM.FamilyName, <span class="string">'On'</span>);
+0211 AO.VCM.On.HW2PhysicsParams = 1;
+0212 AO.VCM.On.Physics2HWParams = 1;
+0213 AO.VCM.On.Units = <span class="string">'Hardware'</span>;
+0214 AO.VCM.On.HWUnits      = <span class="string">''</span>;
+0215 AO.VCM.On.PhysicsUnits = <span class="string">''</span>;
+0216 
+0217 AO.VCM.OnControl.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0218 AO.VCM.OnControl.Mode = <span class="string">'Simulator'</span>;
+0219 AO.VCM.OnControl.DataType = <span class="string">'Scalar'</span>;
+0220 AO.VCM.OnControl.ChannelNames = getname_bts(AO.VCM.FamilyName, <span class="string">'OnControl'</span>);
+0221 AO.VCM.OnControl.HW2PhysicsParams = 1;
+0222 AO.VCM.OnControl.Physics2HWParams = 1;
+0223 AO.VCM.OnControl.Units = <span class="string">'Hardware'</span>;
+0224 AO.VCM.OnControl.HWUnits      = <span class="string">''</span>;
+0225 AO.VCM.OnControl.PhysicsUnits = <span class="string">''</span>;
+0226 
+0227 AO.VCM.Reset.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0228 AO.VCM.Reset.Mode = <span class="string">'Simulator'</span>;
+0229 AO.VCM.Reset.DataType = <span class="string">'Scalar'</span>;
+0230 AO.VCM.Reset.ChannelNames = getname_bts(AO.VCM.FamilyName, <span class="string">'Reset'</span>);
+0231 AO.VCM.Reset.HW2PhysicsParams = 1;
+0232 AO.VCM.Reset.Physics2HWParams = 1;
+0233 AO.VCM.Reset.Units = <span class="string">'Hardware'</span>;
+0234 AO.VCM.Reset.HWUnits      = <span class="string">''</span>;
+0235 AO.VCM.Reset.PhysicsUnits = <span class="string">''</span>;
+0236 
+0237 AO.VCM.Ready.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0238 AO.VCM.Ready.Mode = <span class="string">'Simulator'</span>;
+0239 AO.VCM.Ready.DataType = <span class="string">'Scalar'</span>;
+0240 AO.VCM.Ready.ChannelNames = getname_bts(AO.VCM.FamilyName, <span class="string">'Ready'</span>);
+0241 AO.VCM.Ready.HW2PhysicsParams = 1;
+0242 AO.VCM.Ready.Physics2HWParams = 1;
+0243 AO.VCM.Ready.Units = <span class="string">'Hardware'</span>;
+0244 AO.VCM.Ready.HWUnits      = <span class="string">'Second'</span>;
+0245 AO.VCM.Ready.PhysicsUnits = <span class="string">'Second'</span>;
+0246 
+0247 
+0248 
+0249 AO.Q.FamilyName = <span class="string">'Q'</span>;
+0250 AO.Q.MemberOf   = {<span class="string">'PlotFamily'</span>; <span class="string">'MachineConfig'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>};
+0251 AO.Q.DeviceList = [1 1; 2 1;2 2; 3 1; 3 2; 4 1; 5 1; 5 2; 6 1; 6 2; 7 1;];
+0252 AO.Q.ElementList = (1:size(AO.Q.DeviceList,1))';
+0253 AO.Q.Status = 1;
+0254 
+0255 AO.Q.Monitor.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0256 AO.Q.Monitor.Mode = <span class="string">'Simulator'</span>;
+0257 AO.Q.Monitor.DataType = <span class="string">'Scalar'</span>;
+0258 AO.Q.Monitor.ChannelNames = getname_bts(AO.Q.FamilyName, <span class="string">'Monitor'</span>);
+0259 AO.Q.Monitor.HW2PhysicsFcn = @bts2at;
+0260 AO.Q.Monitor.Physics2HWFcn = @at2bts;
+0261 AO.Q.Monitor.Units = <span class="string">'Hardware'</span>;
+0262 AO.Q.Monitor.HWUnits      = <span class="string">'Ampere'</span>;
+0263 AO.Q.Monitor.PhysicsUnits = <span class="string">'1/Meter^2'</span>;
+0264 
+0265 AO.Q.Setpoint.MemberOf = {<span class="string">'MachineConfig'</span>;};
+0266 AO.Q.Setpoint.Mode = <span class="string">'Simulator'</span>;
+0267 AO.Q.Setpoint.DataType = <span class="string">'Scalar'</span>;
+0268 AO.Q.Setpoint.ChannelNames = getname_bts(AO.Q.FamilyName, <span class="string">'Setpoint'</span>);
+0269 AO.Q.Setpoint.HW2PhysicsFcn = @bts2at;
+0270 AO.Q.Setpoint.Physics2HWFcn = @at2bts;
+0271 AO.Q.Setpoint.Units = <span class="string">'Hardware'</span>;
+0272 AO.Q.Setpoint.HWUnits      = <span class="string">'Ampere'</span>;
+0273 AO.Q.Setpoint.PhysicsUnits = <span class="string">'1/Meter^2'</span>;
+0274 
+0275 <span class="comment">% AO.Q.RampRate.MemberOf = {'PlotFamily'; 'MachineConfig';};</span>
+0276 <span class="comment">% AO.Q.RampRate.Mode = 'Simulator';</span>
+0277 <span class="comment">% AO.Q.RampRate.DataType = 'Scalar';</span>
+0278 <span class="comment">% AO.Q.RampRate.ChannelNames = getname_bts('Q', 'RampRate');</span>
+0279 <span class="comment">% AO.Q.RampRate.HW2PhysicsFcn = @bts2at;</span>
+0280 <span class="comment">% AO.Q.RampRate.Physics2HWFcn = @at2bts;</span>
+0281 <span class="comment">% AO.Q.RampRate.Units = 'Hardware';</span>
+0282 <span class="comment">% AO.Q.RampRate.HWUnits      = 'Ampere/Second';</span>
+0283 <span class="comment">% AO.Q.RampRate.PhysicsUnits = 'Ampere/Second';</span>
+0284 <span class="comment">%</span>
+0285 <span class="comment">% AO.Q.TimeConstant.MemberOf = {'PlotFamily'; 'MachineConfig';};</span>
+0286 <span class="comment">% AO.Q.TimeConstant.Mode = 'Simulator';</span>
+0287 <span class="comment">% AO.Q.TimeConstant.DataType = 'Scalar';</span>
+0288 <span class="comment">% AO.Q.TimeConstant.ChannelNames = getname_bts('Q', 'TimeConstant');</span>
+0289 <span class="comment">% AO.Q.TimeConstant.HW2PhysicsParams = 1;</span>
+0290 <span class="comment">% AO.Q.TimeConstant.Physics2HWParams = 1;</span>
+0291 <span class="comment">% AO.Q.TimeConstant.Units = 'Hardware';</span>
+0292 <span class="comment">% AO.Q.TimeConstant.HWUnits      = 'Second';</span>
+0293 <span class="comment">% AO.Q.TimeConstant.PhysicsUnits = 'Second';</span>
+0294 <span class="comment">%</span>
+0295 <span class="comment">% AO.Q.DAC.MemberOf = {'PlotFamily';};</span>
+0296 <span class="comment">% AO.Q.DAC.Mode = 'Simulator';</span>
+0297 <span class="comment">% AO.Q.DAC.DataType = 'Scalar';</span>
+0298 <span class="comment">% AO.Q.DAC.ChannelNames = getname_bts('Q', 'DAC');</span>
+0299 <span class="comment">% AO.Q.DAC.HW2PhysicsParams = 1;</span>
+0300 <span class="comment">% AO.Q.DAC.Physics2HWParams = 1;</span>
+0301 <span class="comment">% AO.Q.DAC.Units = 'Hardware';</span>
+0302 <span class="comment">% AO.Q.DAC.HWUnits      = 'Ampere';</span>
+0303 <span class="comment">% AO.Q.DAC.PhysicsUnits = 'Ampere';</span>
+0304 
+0305 AO.Q.On.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0306 AO.Q.On.Mode = <span class="string">'Simulator'</span>;
+0307 AO.Q.On.DataType = <span class="string">'Scalar'</span>;
+0308 AO.Q.On.ChannelNames = getname_bts(<span class="string">'Q'</span>, <span class="string">'On'</span>);
+0309 AO.Q.On.HW2PhysicsParams = 1;
+0310 AO.Q.On.Physics2HWParams = 1;
+0311 AO.Q.On.Units = <span class="string">'Hardware'</span>;
+0312 AO.Q.On.HWUnits      = <span class="string">''</span>;
+0313 AO.Q.On.PhysicsUnits = <span class="string">''</span>;
+0314 
+0315 AO.Q.OnControl.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0316 AO.Q.OnControl.Mode = <span class="string">'Simulator'</span>;
+0317 AO.Q.OnControl.DataType = <span class="string">'Scalar'</span>;
+0318 AO.Q.OnControl.ChannelNames = getname_bts(<span class="string">'Q'</span>, <span class="string">'OnControl'</span>);
+0319 AO.Q.OnControl.HW2PhysicsParams = 1;
+0320 AO.Q.OnControl.Physics2HWParams = 1;
+0321 AO.Q.OnControl.Units = <span class="string">'Hardware'</span>;
+0322 AO.Q.OnControl.HWUnits      = <span class="string">''</span>;
+0323 AO.Q.OnControl.PhysicsUnits = <span class="string">''</span>;
+0324 
+0325 AO.Q.Reset.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0326 AO.Q.Reset.Mode = <span class="string">'Simulator'</span>;
+0327 AO.Q.Reset.DataType = <span class="string">'Scalar'</span>;
+0328 AO.Q.Reset.ChannelNames = getname_bts(<span class="string">'Q'</span>, <span class="string">'Reset'</span>);
+0329 AO.Q.Reset.HW2PhysicsParams = 1;
+0330 AO.Q.Reset.Physics2HWParams = 1;
+0331 AO.Q.Reset.Units = <span class="string">'Hardware'</span>;
+0332 AO.Q.Reset.HWUnits      = <span class="string">''</span>;
+0333 AO.Q.Reset.PhysicsUnits = <span class="string">''</span>;
+0334 
+0335 AO.Q.Ready.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0336 AO.Q.Ready.Mode = <span class="string">'Simulator'</span>;
+0337 AO.Q.Ready.DataType = <span class="string">'Scalar'</span>;
+0338 AO.Q.Ready.ChannelNames = getname_bts(<span class="string">'Q'</span>, <span class="string">'Ready'</span>);
+0339 AO.Q.Ready.HW2PhysicsParams = 1;
+0340 AO.Q.Ready.Physics2HWParams = 1;
+0341 AO.Q.Ready.Units = <span class="string">'Hardware'</span>;
+0342 AO.Q.Ready.HWUnits      = <span class="string">''</span>;
+0343 AO.Q.Ready.PhysicsUnits = <span class="string">''</span>;
+0344 
+0345 
+0346 
+0347 AO.BEND.FamilyName = <span class="string">'BEND'</span>;
+0348 AO.BEND.MemberOf   = {<span class="string">'PlotFamily'</span>; <span class="string">'MachineConfig'</span>; <span class="string">'BEND'</span>; <span class="string">'Magnet'</span>};
+0349 AO.BEND.DeviceList = [1 1; 1 2; 1 3; 1 4;];
+0350 AO.BEND.ElementList = [1 2 3 4]';
+0351 AO.BEND.Status = [1 1 1 1]';
+0352 
+0353 AO.BEND.Monitor.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0354 AO.BEND.Monitor.Mode = <span class="string">'Simulator'</span>;
+0355 AO.BEND.Monitor.DataType = <span class="string">'Scalar'</span>;
+0356 AO.BEND.Monitor.ChannelNames = getname_bts(AO.BEND.FamilyName, <span class="string">'Monitor'</span>);
+0357 AO.BEND.Monitor.HW2PhysicsFcn = @bts2at;
+0358 AO.BEND.Monitor.Physics2HWFcn = @at2bts;
+0359 AO.BEND.Monitor.Units = <span class="string">'Hardware'</span>;
+0360 AO.BEND.Monitor.HWUnits = <span class="string">'Ampere'</span>;
+0361 AO.BEND.Monitor.PhysicsUnits = <span class="string">'Radian'</span>;
+0362 
+0363 AO.BEND.Setpoint.MemberOf = {<span class="string">'MachineConfig'</span>;};
+0364 AO.BEND.Setpoint.Mode = <span class="string">'Simulator'</span>;
+0365 AO.BEND.Setpoint.DataType = <span class="string">'Scalar'</span>;
+0366 AO.BEND.Setpoint.ChannelNames = getname_bts(AO.BEND.FamilyName, <span class="string">'Setpoint'</span>);
+0367 AO.BEND.Setpoint.SpecialFunctionSet = <span class="string">'setbtsbend'</span>;
+0368 AO.BEND.Setpoint.HW2PhysicsFcn = @bts2at;
+0369 AO.BEND.Setpoint.Physics2HWFcn = @at2bts;
+0370 AO.BEND.Setpoint.Units = <span class="string">'Hardware'</span>;
+0371 AO.BEND.Setpoint.HWUnits = <span class="string">'Ampere'</span>;
+0372 AO.BEND.Setpoint.PhysicsUnits = <span class="string">'Radian'</span>;
+0373 
+0374 <span class="comment">% AO.BEND.RampRate.MemberOf = {'PlotFamily'; 'MachineConfig';};</span>
+0375 <span class="comment">% AO.BEND.RampRate.Mode = 'Simulator';</span>
+0376 <span class="comment">% AO.BEND.RampRate.DataType = 'Scalar';</span>
+0377 <span class="comment">% AO.BEND.RampRate.ChannelNames = getname_bts(AO.BEND.FamilyName, 'RampRate');</span>
+0378 <span class="comment">% AO.BEND.RampRate.HW2PhysicsParams = 1;</span>
+0379 <span class="comment">% AO.BEND.RampRate.Physics2HWParams = 1;</span>
+0380 <span class="comment">% AO.BEND.RampRate.Units = 'Hardware';</span>
+0381 <span class="comment">% AO.BEND.RampRate.HWUnits      = 'Ampere/Second';</span>
+0382 <span class="comment">% AO.BEND.RampRate.PhysicsUnits = 'Ampere/Second';</span>
+0383 <span class="comment">%</span>
+0384 <span class="comment">% AO.BEND.TimeConstant.MemberOf = {'PlotFamily'; 'MachineConfig';};</span>
+0385 <span class="comment">% AO.BEND.TimeConstant.Mode = 'Simulator';</span>
+0386 <span class="comment">% AO.BEND.TimeConstant.DataType = 'Scalar';</span>
+0387 <span class="comment">% AO.BEND.TimeConstant.ChannelNames = getname_bts(AO.BEND.FamilyName, 'TimeConstant');</span>
+0388 <span class="comment">% AO.BEND.TimeConstant.HW2PhysicsParams = 1;</span>
+0389 <span class="comment">% AO.BEND.TimeConstant.Physics2HWParams = 1;</span>
+0390 <span class="comment">% AO.BEND.TimeConstant.Units = 'Hardware';</span>
+0391 <span class="comment">% AO.BEND.TimeConstant.HWUnits      = 'Second';</span>
+0392 <span class="comment">% AO.BEND.TimeConstant.PhysicsUnits = 'Second';</span>
+0393 <span class="comment">%</span>
+0394 <span class="comment">% AO.BEND.DAC.MemberOf = {'PlotFamily';};</span>
+0395 <span class="comment">% AO.BEND.DAC.Mode = 'Simulator';</span>
+0396 <span class="comment">% AO.BEND.DAC.DataType = 'Scalar';</span>
+0397 <span class="comment">% AO.BEND.DAC.ChannelNames = getname_bts(AO.BEND.FamilyName, 'DAC');</span>
+0398 <span class="comment">% AO.BEND.DAC.HW2PhysicsParams = 1;</span>
+0399 <span class="comment">% AO.BEND.DAC.Physics2HWParams = 1;</span>
+0400 <span class="comment">% AO.BEND.DAC.Units = 'Hardware';</span>
+0401 <span class="comment">% AO.BEND.DAC.HWUnits      = 'Ampere';</span>
+0402 <span class="comment">% AO.BEND.DAC.PhysicsUnits = 'Ampere';</span>
+0403 
+0404 AO.BEND.On.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0405 AO.BEND.On.Mode = <span class="string">'Simulator'</span>;
+0406 AO.BEND.On.DataType = <span class="string">'Scalar'</span>;
+0407 AO.BEND.On.ChannelNames = getname_bts(AO.BEND.FamilyName, <span class="string">'On'</span>);
+0408 AO.BEND.On.HW2PhysicsParams = 1;
+0409 AO.BEND.On.Physics2HWParams = 1;
+0410 AO.BEND.On.Units = <span class="string">'Hardware'</span>;
+0411 AO.BEND.On.HWUnits      = <span class="string">''</span>;
+0412 AO.BEND.On.PhysicsUnits = <span class="string">''</span>;
+0413 
+0414 AO.BEND.OnControl.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0415 AO.BEND.OnControl.Mode = <span class="string">'Simulator'</span>;
+0416 AO.BEND.OnControl.DataType = <span class="string">'Scalar'</span>;
+0417 AO.BEND.OnControl.ChannelNames = getname_bts(AO.BEND.FamilyName, <span class="string">'OnControl'</span>);
+0418 AO.BEND.OnControl.HW2PhysicsParams = 1;
+0419 AO.BEND.OnControl.Physics2HWParams = 1;
+0420 AO.BEND.OnControl.Units = <span class="string">'Hardware'</span>;
+0421 AO.BEND.OnControl.HWUnits      = <span class="string">''</span>;
+0422 AO.BEND.OnControl.PhysicsUnits = <span class="string">''</span>;
+0423 
+0424 AO.BEND.Reset.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0425 AO.BEND.Reset.Mode = <span class="string">'Simulator'</span>;
+0426 AO.BEND.Reset.DataType = <span class="string">'Scalar'</span>;
+0427 AO.BEND.Reset.ChannelNames = getname_bts(AO.BEND.FamilyName, <span class="string">'Reset'</span>);
+0428 AO.BEND.Reset.HW2PhysicsParams = 1;
+0429 AO.BEND.Reset.Physics2HWParams = 1;
+0430 AO.BEND.Reset.Units = <span class="string">'Hardware'</span>;
+0431 AO.BEND.Reset.HWUnits      = <span class="string">''</span>;
+0432 AO.BEND.Reset.PhysicsUnits = <span class="string">''</span>;
+0433 
+0434 AO.BEND.Ready.MemberOf = {<span class="string">'PlotFamily'</span>;};
+0435 AO.BEND.Ready.Mode = <span class="string">'Simulator'</span>;
+0436 AO.BEND.Ready.DataType = <span class="string">'Scalar'</span>;
+0437 AO.BEND.Ready.ChannelNames = getname_bts(AO.BEND.FamilyName, <span class="string">'Ready'</span>);
+0438 AO.BEND.Ready.HW2PhysicsParams = 1;
+0439 AO.BEND.Ready.Physics2HWParams = 1;
+0440 AO.BEND.Ready.Units = <span class="string">'Hardware'</span>;
+0441 AO.BEND.Ready.HWUnits      = <span class="string">''</span>;
+0442 AO.BEND.Ready.PhysicsUnits = <span class="string">''</span>;
+0443 
+0444 
+0445 <span class="comment">% AO.DCCT.FamilyName = 'DCCT';</span>
+0446 <span class="comment">% AO.DCCT.MemberOf = {};</span>
+0447 <span class="comment">% AO.DCCT.DeviceList = [1 1];</span>
+0448 <span class="comment">% AO.DCCT.ElementList = [1];</span>
+0449 <span class="comment">% AO.DCCT.Status = 1;</span>
+0450 <span class="comment">%</span>
+0451 <span class="comment">% AO.DCCT.Monitor.Mode = 'Simulator';</span>
+0452 <span class="comment">% AO.DCCT.Monitor.DataType = 'Scalar';</span>
+0453 <span class="comment">% AO.DCCT.Monitor.ChannelNames = '';</span>
+0454 <span class="comment">% %AO.DCCT.Monitor.SpecialFunctionGet = 'getdcct_bts';</span>
+0455 <span class="comment">% AO.DCCT.Monitor.HW2PhysicsParams = 1;</span>
+0456 <span class="comment">% AO.DCCT.Monitor.Physics2HWParams = 1;</span>
+0457 <span class="comment">% AO.DCCT.Monitor.Units = 'Hardware';</span>
+0458 <span class="comment">% AO.DCCT.Monitor.HWUnits = 'mAmps';</span>
+0459 <span class="comment">% AO.DCCT.Monitor.PhysicsUnits = 'mAmps';</span>
+0460 
+0461 
+0462 <span class="comment">% % This is a soft family for energy ramping</span>
+0463 <span class="comment">% AO.GeV.FamilyName = 'GeV';</span>
+0464 <span class="comment">% AO.GeV.MemberOf = {};</span>
+0465 <span class="comment">% AO.GeV.Status = 1;</span>
+0466 <span class="comment">% AO.GeV.DeviceList = [1 1];</span>
+0467 <span class="comment">% AO.GeV.ElementList = [1];</span>
+0468 <span class="comment">%</span>
+0469 <span class="comment">% AO.GeV.Monitor.Mode = 'Simulator';</span>
+0470 <span class="comment">% AO.GeV.Monitor.DataType = 'Scalar';</span>
+0471 <span class="comment">% AO.GeV.Monitor.ChannelNames = '';</span>
+0472 <span class="comment">% AO.GeV.Monitor.SpecialFunctionGet = 'getenergy_als';  %'bend2gev';</span>
+0473 <span class="comment">% AO.GeV.Monitor.HW2PhysicsParams = 1;</span>
+0474 <span class="comment">% AO.GeV.Monitor.Physics2HWParams = 1;</span>
+0475 <span class="comment">% AO.GeV.Monitor.Units = 'Hardware';</span>
+0476 <span class="comment">% AO.GeV.Monitor.HWUnits      = 'GeV';</span>
+0477 <span class="comment">% AO.GeV.Monitor.PhysicsUnits = 'GeV';</span>
+0478 <span class="comment">%</span>
+0479 <span class="comment">% AO.GeV.Setpoint.Mode = 'Simulator';</span>
+0480 <span class="comment">% AO.GeV.Setpoint.DataType = 'Scalar';</span>
+0481 <span class="comment">% AO.GeV.Setpoint.ChannelNames = '';</span>
+0482 <span class="comment">% AO.GeV.Setpoint.SpecialFunctionGet = 'getenergy_als';</span>
+0483 <span class="comment">% AO.GeV.Setpoint.SpecialFunctionSet = 'setenergy_als';</span>
+0484 <span class="comment">% AO.GeV.Setpoint.HW2PhysicsParams = 1;</span>
+0485 <span class="comment">% AO.GeV.Setpoint.Physics2HWParams = 1;</span>
+0486 <span class="comment">% AO.GeV.Setpoint.Units = 'Hardware';</span>
+0487 <span class="comment">% AO.GeV.Setpoint.HWUnits      = 'GeV';</span>
+0488 <span class="comment">% AO.GeV.Setpoint.PhysicsUnits = 'GeV';</span>
+0489 
+0490 
+0491 <span class="comment">% TV</span>
+0492 AO.TV.FamilyName = <span class="string">'TV'</span>;
+0493 AO.TV.MemberOf   = {<span class="string">'PlotFamily'</span>; <span class="string">'TV'</span>;};
+0494 AO.TV.DeviceList = [1 1; 1 2; 1 3; 1 4; 1 5; 1 6;];
+0495 AO.TV.ElementList = [1 2 3 4 5 6]';
+0496 AO.TV.Status = ones(6,1);
+0497 
+0498 AO.TV.Monitor.MemberOf   = {<span class="string">'PlotFamily'</span>; };
+0499 AO.TV.Monitor.Mode = <span class="string">'Simulator'</span>;
+0500 AO.TV.Monitor.DataType = <span class="string">'Scalar'</span>;
+0501 AO.TV.Monitor.ChannelNames = getname_bts(AO.TV.FamilyName, <span class="string">'Monitor'</span>);
+0502 AO.TV.Monitor.Units = <span class="string">'Hardware'</span>;
+0503 AO.TV.Monitor.HWUnits          = <span class="string">''</span>;
+0504 AO.TV.Monitor.PhysicsUnits     = <span class="string">''</span>;
+0505 AO.TV.Monitor.HW2PhysicsParams = 1;
+0506 AO.TV.Monitor.Physics2HWParams = 1;
+0507 
+0508 AO.TV.Setpoint.MemberOf   = {<span class="string">'TV'</span>};
+0509 AO.TV.Setpoint.Mode = <span class="string">'Simulator'</span>;
+0510 AO.TV.Setpoint.DataType = <span class="string">'Scalar'</span>;
+0511 AO.TV.Setpoint.ChannelNames = getname_bts(AO.TV.FamilyName, <span class="string">'Setpoint'</span>);
+0512 AO.TV.Setpoint.SpecialFunctionGet = @gettv_bts;
+0513 AO.TV.Setpoint.SpecialFunctionSet = @settv_bts;
+0514 AO.TV.Setpoint.Units = <span class="string">'Hardware'</span>;
+0515 AO.TV.Setpoint.HWUnits          = <span class="string">''</span>;
+0516 AO.TV.Setpoint.PhysicsUnits     = <span class="string">''</span>;
+0517 AO.TV.Setpoint.HW2PhysicsParams = 1;
+0518 AO.TV.Setpoint.Physics2HWParams = 1;
+0519 
+0520 AO.TV.In.MemberOf   = {<span class="string">'PlotFamily'</span>; };
+0521 AO.TV.In.Mode = <span class="string">'Simulator'</span>;
+0522 AO.TV.In.DataType = <span class="string">'Scalar'</span>;
+0523 AO.TV.In.ChannelNames = getname_bts(AO.TV.FamilyName, <span class="string">'In'</span>);
+0524 AO.TV.In.Units = <span class="string">'Hardware'</span>;
+0525 AO.TV.In.HWUnits          = <span class="string">''</span>;
+0526 AO.TV.In.PhysicsUnits     = <span class="string">''</span>;
+0527 AO.TV.In.HW2PhysicsParams = 1;
+0528 AO.TV.In.Physics2HWParams = 1;
+0529 
+0530 AO.TV.Out.MemberOf   = {<span class="string">'PlotFamily'</span>; };
+0531 AO.TV.Out.Mode = <span class="string">'Simulator'</span>;
+0532 AO.TV.Out.DataType = <span class="string">'Scalar'</span>;
+0533 AO.TV.Out.ChannelNames = getname_bts(AO.TV.FamilyName, <span class="string">'Out'</span>);
+0534 AO.TV.Out.Units = <span class="string">'Hardware'</span>;
+0535 AO.TV.Out.HWUnits          = <span class="string">''</span>;
+0536 AO.TV.Out.PhysicsUnits     = <span class="string">''</span>;
+0537 AO.TV.Out.HW2PhysicsParams = 1;
+0538 AO.TV.Out.Physics2HWParams = 1;
+0539 
+0540 AO.TV.InControl.MemberOf   = {<span class="string">'PlotFamily'</span>; };
+0541 AO.TV.InControl.Mode = <span class="string">'Simulator'</span>;
+0542 AO.TV.InControl.DataType = <span class="string">'Scalar'</span>;
+0543 AO.TV.InControl.ChannelNames = getname_bts(AO.TV.FamilyName, <span class="string">'InControl'</span>);
+0544 AO.TV.InControl.Units = <span class="string">'Hardware'</span>;
+0545 AO.TV.InControl.HWUnits          = <span class="string">''</span>;
+0546 AO.TV.InControl.PhysicsUnits     = <span class="string">''</span>;
+0547 AO.TV.InControl.HW2PhysicsParams = 1;
+0548 AO.TV.InControl.Physics2HWParams = 1;
+0549 
+0550 AO.TV.Lamp.MemberOf   = {<span class="string">'PlotFamily'</span>; };
+0551 AO.TV.Lamp.Mode = <span class="string">'Simulator'</span>;
+0552 AO.TV.Lamp.DataType = <span class="string">'Scalar'</span>;
+0553 AO.TV.Lamp.ChannelNames = getname_bts(AO.TV.FamilyName, <span class="string">'Lamp'</span>);
+0554 AO.TV.Lamp.Units = <span class="string">'Hardware'</span>;
+0555 AO.TV.Lamp.HWUnits          = <span class="string">''</span>;
+0556 AO.TV.Lamp.PhysicsUnits     = <span class="string">''</span>;
+0557 AO.TV.Lamp.HW2PhysicsParams = 1;
+0558 AO.TV.Lamp.Physics2HWParams = 1;
+0559 
+0560 
+0561 <span class="comment">% Save the AO so that family2dev will work</span>
+0562 setao(AO);
+0563 
+0564 
+0565 <span class="comment">%%%%%%%%%%%%%</span>
+0566 <span class="comment">% Get Range %</span>
+0567 <span class="comment">%%%%%%%%%%%%%</span>
+0568 AO.HCM.Setpoint.Range     = [<a href="#_sub1" class="code" title="subfunction [Amps] = local_minsp(Family, List)">local_minsp</a>(AO.HCM.FamilyName, AO.HCM.DeviceList) <a href="#_sub2" class="code" title="subfunction [Amps] = local_maxsp(Family, List)">local_maxsp</a>(AO.HCM.FamilyName, AO.HCM.DeviceList)];
+0569 AO.HCM.OnControl.Range    = [0 1];
+0570 AO.HCM.Reset.Range        = [0 1];
+0571 <span class="comment">%AO.HCM.RampRate.Range     = [0 10000];</span>
+0572 <span class="comment">%AO.HCM.TimeConstant.Range = [0 10000];</span>
+0573 
+0574 AO.VCM.Setpoint.Range     = [<a href="#_sub1" class="code" title="subfunction [Amps] = local_minsp(Family, List)">local_minsp</a>(AO.VCM.FamilyName, AO.VCM.DeviceList) <a href="#_sub2" class="code" title="subfunction [Amps] = local_maxsp(Family, List)">local_maxsp</a>(AO.VCM.FamilyName, AO.VCM.DeviceList)];
+0575 AO.VCM.OnControl.Range    = [0 1];
+0576 AO.VCM.Reset.Range        = [0 1];
+0577 <span class="comment">%AO.VCM.RampRate.Range     = [0 10000];</span>
+0578 <span class="comment">%AO.VCM.TimeConstant.Range = [0 10000];</span>
+0579 
+0580 AO.Q.Setpoint.Range     = [<a href="#_sub1" class="code" title="subfunction [Amps] = local_minsp(Family, List)">local_minsp</a>(AO.Q.FamilyName, AO.Q.DeviceList) <a href="#_sub2" class="code" title="subfunction [Amps] = local_maxsp(Family, List)">local_maxsp</a>(AO.Q.FamilyName, AO.Q.DeviceList)];
+0581 AO.Q.OnControl.Range    = [0 1];
+0582 AO.Q.Reset.Range        = [0 1];
+0583 <span class="comment">%AO.Q.RampRate.Range     = [0 10000];</span>
+0584 <span class="comment">%AO.Q.TimeConstant.Range = [0 10000];</span>
+0585  
+0586 AO.BEND.Setpoint.Range     = [<a href="#_sub1" class="code" title="subfunction [Amps] = local_minsp(Family, List)">local_minsp</a>(AO.BEND.FamilyName, AO.BEND.DeviceList) <a href="#_sub2" class="code" title="subfunction [Amps] = local_maxsp(Family, List)">local_maxsp</a>(AO.BEND.FamilyName, AO.BEND.DeviceList)];
+0587 AO.BEND.OnControl.Range    = [0 1];
+0588 AO.BEND.Reset.Range        = [0 1];
+0589 <span class="comment">%AO.BEND.RampRate.Range     = [0 10000];</span>
+0590 <span class="comment">%AO.BEND.TimeConstant.Range = [0 10000];</span>
+0591 
+0592 AO.TV.Setpoint.Range  = [0 1];
+0593 AO.TV.InControl.Range = [0 1];
+0594 AO.TV.Lamp.Range = [0 1];
+0595 
+0596 
+0597 <span class="comment">% The operational mode sets the path, filenames, and other important parameters</span>
+0598 <span class="comment">% Run setoperationalmode after most of the AO is built so that the Units and Mode fields</span>
+0599 <span class="comment">% can be set in setoperationalmode</span>
+0600 setao(AO);
+0601 <a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>(OperationalMode);
+0602 AO = getao;
+0603 
+0604 
+0605 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0606 <span class="comment">% Response Matrix Kick Size (hardware units) %</span>
+0607 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0608 AO.HCM.Setpoint.DeltaRespMat = .5e-3;
+0609 AO.VCM.Setpoint.DeltaRespMat = .5e-3;
+0610 AO.Q.Setpoint.DeltaRespMat   = 1e-5;
+0611 
+0612 
+0613 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0614 <span class="comment">% Tolerance (hardware units) %</span>
+0615 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0616 AO.HCM.Setpoint.Tolerance  = <a href="#_sub3" class="code" title="subfunction tol = gettol(Family)">gettol</a>(AO.HCM.FamilyName)  * ones(length(AO.HCM.ElementList),  1);
+0617 AO.VCM.Setpoint.Tolerance  = <a href="#_sub3" class="code" title="subfunction tol = gettol(Family)">gettol</a>(AO.VCM.FamilyName)  * ones(length(AO.VCM.ElementList),  1);
+0618 AO.Q.Setpoint.Tolerance    = <a href="#_sub3" class="code" title="subfunction tol = gettol(Family)">gettol</a>(AO.Q.FamilyName)    * ones(length(AO.Q.ElementList),    1);
+0619 AO.BEND.Setpoint.Tolerance = <a href="#_sub3" class="code" title="subfunction tol = gettol(Family)">gettol</a>(AO.BEND.FamilyName) * ones(length(AO.BEND.ElementList), 1);
+0620 AO.TV.Setpoint.Tolerance   = <a href="#_sub3" class="code" title="subfunction tol = gettol(Family)">gettol</a>(AO.TV.FamilyName)   * ones(length(AO.TV.ElementList),   1);
+0621 
+0622 
+0623 setao(AO);
+0624 
+0625 
+0626 
+0627 <a name="_sub1" href="#_subfunctions" class="code">function [Amps] = local_minsp(Family, List)</a>
+0628 
+0629 <span class="keyword">for</span> i = 1:size(List,1)
+0630     <span class="keyword">if</span> strcmp(Family,<span class="string">'HCM'</span>)
+0631         Amps(i,1) = -6;
+0632     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'VCM'</span>)
+0633         Amps(i,1) = -6;
+0634     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'Q'</span>)
+0635         Amps(i,1) = 0;
+0636     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BEND'</span>)
+0637         Amps(i,1) = 0;
+0638     <span class="keyword">else</span>
+0639         fprintf(<span class="string">'   Minimum setpoint unknown for %s family, hence set to Inf.\n'</span>, Family);
+0640         Amps(i,1) = -Inf;
+0641     <span class="keyword">end</span>
+0642 <span class="keyword">end</span>
+0643 
+0644 
+0645 <a name="_sub2" href="#_subfunctions" class="code">function [Amps] = local_maxsp(Family, List)</a>
+0646 
+0647 <span class="keyword">for</span> i = 1:size(List,1)
+0648     <span class="keyword">if</span> strcmp(Family,<span class="string">'HCM'</span>)
+0649         Amps(i,1) = 6;
+0650     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'VCM'</span>)
+0651         Amps(i,1) = 6;
+0652     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'Q'</span>)
+0653         Amps(i,1) = 130;
+0654 
+0655         <span class="comment">%if all(List(i,:) == [1 1])</span>
+0656         <span class="comment">%    Amps(i,1) = 50;</span>
+0657         <span class="comment">%elseif all(List(i,:) == [2 1])</span>
+0658         <span class="comment">%    Amps(i,1) = 50;</span>
+0659         <span class="comment">%elseif all(List(i,:) == [2 2])</span>
+0660         <span class="comment">%    Amps(i,1) = 50;</span>
+0661         <span class="comment">%end</span>
+0662     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BEND'</span>)
+0663         Amps(i,1) = 1000;
+0664     <span class="keyword">elseif</span> strcmp(Family,<span class="string">'TV'</span>)
+0665         Amps(i,1) = .1;
+0666     <span class="keyword">else</span>
+0667         fprintf(<span class="string">'   Maximum setpoint unknown for %s family, hence set to Inf.\n'</span>, Family);
+0668         Amps(i,1) = Inf;
+0669     <span class="keyword">end</span>
+0670 <span class="keyword">end</span>
+0671 
+0672 
+0673 <a name="_sub3" href="#_subfunctions" class="code">function tol = gettol(Family)</a>
+0674 <span class="comment">%  tol = gettol(Family)</span>
+0675 <span class="comment">%  tolerance on the SP-AM for that family</span>
+0676 
+0677 <span class="keyword">if</span> strcmp(Family,<span class="string">'HCM'</span>)
+0678     tol = 0.1;
+0679 <span class="keyword">elseif</span> strcmp(Family,<span class="string">'VCM'</span>)
+0680     tol = 0.1;
+0681 <span class="keyword">elseif</span> strcmp(Family,<span class="string">'Q'</span>)
+0682     tol = 0.6;
+0683 <span class="keyword">elseif</span> strcmp(Family,<span class="string">'BEND'</span>)
+0684     tol = 10;
+0685 <span class="keyword">else</span>
+0686     fprintf(<span class="string">'   Tolerance unknown for %s family, hence set to zero.\n'</span>, Family);
+0687     tol = 0;
+0688 <span class="keyword">end</span>
+0689 
+0690</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,995 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of vuvinit</title>
+  <meta name="keywords" content="vuvinit">
+  <meta name="description" content="VUVINIT - Initialize NSLS VUV ring parameters for control in MATLAB">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">machine</a> &gt; <a href="#">VUV</a> &gt; <a href="index.html">800MeV</a> &gt; vuvinit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for machine\VUV\800MeV&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>vuvinit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>VUVINIT - Initialize NSLS VUV ring parameters for control in MATLAB</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function vuvinit(OperationalMode) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">VUVINIT - Initialize NSLS VUV ring parameters for control in MATLAB
+
+==========================
+ Accelerator Family Fields
+==========================
+ FamilyName            BPMx, HCM, etc
+ DeviceList            [Sector, Number]
+ ElementList           number in list
+ Position              s, magnet center
+
+ Monitor Fields
+ Mode                  online/manual/special/simulator
+ ChannelNames          PV for monitor
+ Units                 Physics or HW
+ HW2PhysicsFcn         function handle used to convert from hardware to physics units ==&gt; inline will not compile, see below
+ HW2PhysicsParams      parameters used for conversion function
+ Physics2HWFcn         function handle used to convert from physics to hardware units
+ Physics2HWParams      parameters used for conversion function
+ HWUnits               units for Hardware 'Ampere';           
+ PhysicsUnits          units for physics 'radian';
+ Handles               monitor handle
+
+ Setpoint Fields
+ Mode                  online/manual/special/simulator
+ ChannelNames          PV for monitor
+ Units                 hardware or physics
+ HW2PhysicsFcn         function handle used to convert from hardware to physics units
+ HW2PhysicsParams      parameters used for conversion function
+ Physics2HWFcn         function handle used to convert from physics to hardware units
+ Physics2HWParams      parameters used for conversion function
+ HWUnits               units for Hardware 'Ampere';           
+ PhysicsUnits          units for physics 'radian';
+ Range                 minsetpoint, maxsetpoint;
+ Tolerance             Allowable differnce between setpoint and monitor
+ 
+=============================================  
+ Accelerator Toolbox Simulation Fields
+=============================================
+ ATType                Quad, Sext, etc
+ ATIndex               index in THERING
+ ATParameterGroup      parameter group</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(OperationalMode)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="aoinit.html" class="code" title="function aoinit(SubMachineName)">aoinit</a>	AOINIT - Initialization function for the Matlab Middle Layer (MML)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function vuvinit(OperationalMode)</a>
+0002 <span class="comment">%VUVINIT - Initialize NSLS VUV ring parameters for control in MATLAB</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%==========================</span>
+0005 <span class="comment">% Accelerator Family Fields</span>
+0006 <span class="comment">%==========================</span>
+0007 <span class="comment">% FamilyName            BPMx, HCM, etc</span>
+0008 <span class="comment">% DeviceList            [Sector, Number]</span>
+0009 <span class="comment">% ElementList           number in list</span>
+0010 <span class="comment">% Position              s, magnet center</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Monitor Fields</span>
+0013 <span class="comment">% Mode                  online/manual/special/simulator</span>
+0014 <span class="comment">% ChannelNames          PV for monitor</span>
+0015 <span class="comment">% Units                 Physics or HW</span>
+0016 <span class="comment">% HW2PhysicsFcn         function handle used to convert from hardware to physics units ==&gt; inline will not compile, see below</span>
+0017 <span class="comment">% HW2PhysicsParams      parameters used for conversion function</span>
+0018 <span class="comment">% Physics2HWFcn         function handle used to convert from physics to hardware units</span>
+0019 <span class="comment">% Physics2HWParams      parameters used for conversion function</span>
+0020 <span class="comment">% HWUnits               units for Hardware 'Ampere';</span>
+0021 <span class="comment">% PhysicsUnits          units for physics 'radian';</span>
+0022 <span class="comment">% Handles               monitor handle</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% Setpoint Fields</span>
+0025 <span class="comment">% Mode                  online/manual/special/simulator</span>
+0026 <span class="comment">% ChannelNames          PV for monitor</span>
+0027 <span class="comment">% Units                 hardware or physics</span>
+0028 <span class="comment">% HW2PhysicsFcn         function handle used to convert from hardware to physics units</span>
+0029 <span class="comment">% HW2PhysicsParams      parameters used for conversion function</span>
+0030 <span class="comment">% Physics2HWFcn         function handle used to convert from physics to hardware units</span>
+0031 <span class="comment">% Physics2HWParams      parameters used for conversion function</span>
+0032 <span class="comment">% HWUnits               units for Hardware 'Ampere';</span>
+0033 <span class="comment">% PhysicsUnits          units for physics 'radian';</span>
+0034 <span class="comment">% Range                 minsetpoint, maxsetpoint;</span>
+0035 <span class="comment">% Tolerance             Allowable differnce between setpoint and monitor</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">%=============================================</span>
+0038 <span class="comment">% Accelerator Toolbox Simulation Fields</span>
+0039 <span class="comment">%=============================================</span>
+0040 <span class="comment">% ATType                Quad, Sext, etc</span>
+0041 <span class="comment">% ATIndex               index in THERING</span>
+0042 <span class="comment">% ATParameterGroup      parameter group</span>
+0043 
+0044 
+0045 <span class="keyword">if</span> nargin &lt; 1
+0046     OperationalMode = 1;  <span class="comment">% Often set in aoinit</span>
+0047 <span class="keyword">end</span>
+0048 
+0049 
+0050 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0051 <span class="comment">% Build the AO structure %</span>
+0052 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0053 
+0054 <span class="comment">% Clear previous AcceleratorObjects</span>
+0055 setao([]);
+0056 
+0057 Mode = <span class="string">'ONLINE'</span>;
+0058 
+0059 <span class="comment">%=============================================</span>
+0060 <span class="comment">%BPM data: status field designates if BPM in use</span>
+0061 <span class="comment">%=============================================</span>
+0062 ntbpm=24;
+0063 AO.BPMx.FamilyName               = <span class="string">'BPMx'</span>;
+0064 AO.BPMx.MemberOf                 = {<span class="string">'PlotFamily'</span>; <span class="string">'BPM'</span>; <span class="string">'Diagnostics'</span>; <span class="string">'BPMx'</span>};
+0065 AO.BPMx.Monitor.Mode             = Mode;
+0066 AO.BPMx.Monitor.DataType         = <span class="string">'Scalar'</span>;
+0067 AO.BPMx.Monitor.DataTypeIndex    = 1:ntbpm;
+0068 AO.BPMx.Monitor.Units            = <span class="string">'Hardware'</span>;
+0069 AO.BPMx.Monitor.HWUnits          = <span class="string">'mm'</span>;
+0070 AO.BPMx.Monitor.PhysicsUnits     = <span class="string">'meter'</span>;
+0071 
+0072 AO.BPMy.FamilyName               = <span class="string">'BPMy'</span>;
+0073 AO.BPMy.MemberOf                 = {<span class="string">'PlotFamily'</span>; <span class="string">'BPM'</span>; <span class="string">'Diagnostics'</span>; <span class="string">'BPMy'</span>};
+0074 AO.BPMy.Monitor.Mode             = Mode;
+0075 AO.BPMy.Monitor.DataType         = <span class="string">'Scalar'</span>;
+0076 AO.BPMy.Monitor.DataTypeIndex    = 1:ntbpm;
+0077 AO.BPMy.Monitor.Units            = <span class="string">'Hardware'</span>;
+0078 AO.BPMy.Monitor.HWUnits          = <span class="string">'mm'</span>;
+0079 AO.BPMy.Monitor.PhysicsUnits     = <span class="string">'meter'</span>;
+0080 
+0081 <span class="comment">% x-name     x-chname  xstat y-name     y-chname  ystat DevList Elem</span>
+0082 
+0083 bpm={
+0084  <span class="string">'upue01h'</span> <span class="string">'upue01h:am'</span>  1  <span class="string">'upue01v'</span> <span class="string">'upue01v:am'</span>  1   [1 1]    1; <span class="keyword">...</span>
+0085  <span class="string">'upue02h'</span> <span class="string">'upue02h:am'</span>  1  <span class="string">'upue02v'</span> <span class="string">'upue02v:am'</span>  1   [1 2]    2; <span class="keyword">...</span>
+0086  <span class="string">'upue03h'</span> <span class="string">'upue03h:am'</span>  1  <span class="string">'upue03v'</span> <span class="string">'upue03v:am'</span>  1   [1 3]    3; <span class="keyword">...</span>
+0087  <span class="string">'upue04h'</span> <span class="string">'upue04h:am'</span>  1  <span class="string">'upue04v'</span> <span class="string">'upue04v:am'</span>  1   [1 4]    4; <span class="keyword">...</span>
+0088  <span class="string">'upue05h'</span> <span class="string">'upue05h:am'</span>  1  <span class="string">'upue05v'</span> <span class="string">'upue05v:am'</span>  1   [1 5]    5; <span class="keyword">...</span>
+0089  <span class="string">'upue06h'</span> <span class="string">'upue06h:am'</span>  1  <span class="string">'upue06v'</span> <span class="string">'upue06v:am'</span>  1   [1 6]    6; <span class="keyword">...</span>
+0090  <span class="string">'upue07h'</span> <span class="string">'upue07h:am'</span>  1  <span class="string">'upue07v'</span> <span class="string">'upue07v:am'</span>  1   [2 1]    7; <span class="keyword">...</span>
+0091  <span class="string">'upue08h'</span> <span class="string">'upue08h:am'</span>  1  <span class="string">'upue08v'</span> <span class="string">'upue08v:am'</span>  1   [2 2]    8; <span class="keyword">...</span>
+0092  <span class="string">'upue09h'</span> <span class="string">'upue09h:am'</span>  1  <span class="string">'upue09v'</span> <span class="string">'upue09v:am'</span>  1   [2 3]    9; <span class="keyword">...</span>
+0093  <span class="string">'upue10h'</span> <span class="string">'upue10h:am'</span>  1  <span class="string">'upue10v'</span> <span class="string">'upue10v:am'</span>  1   [2 4]   10; <span class="keyword">...</span>
+0094  <span class="string">'upue11h'</span> <span class="string">'upue11h:am'</span>  1  <span class="string">'upue11v'</span> <span class="string">'upue11v:am'</span>  1   [2 5]   11; <span class="keyword">...</span>
+0095  <span class="string">'upue12h'</span> <span class="string">'upue12h:am'</span>  1  <span class="string">'upue12v'</span> <span class="string">'upue12v:am'</span>  1   [2 6]   12; <span class="keyword">...</span>
+0096  <span class="string">'upue13h'</span> <span class="string">'upue13h:am'</span>  1  <span class="string">'upue13v'</span> <span class="string">'upue13v:am'</span>  1   [3 1]   13; <span class="keyword">...</span>
+0097  <span class="string">'upue14h'</span> <span class="string">'upue14h:am'</span>  1  <span class="string">'upue14v'</span> <span class="string">'upue14v:am'</span>  1   [3 2]   14; <span class="keyword">...</span>
+0098  <span class="string">'upue15h'</span> <span class="string">'upue15h:am'</span>  1  <span class="string">'upue15v'</span> <span class="string">'upue15v:am'</span>  1   [3 3]   15; <span class="keyword">...</span>
+0099  <span class="string">'upue16h'</span> <span class="string">'upue16h:am'</span>  1  <span class="string">'upue16v'</span> <span class="string">'upue16v:am'</span>  1   [3 4]   16; <span class="keyword">...</span>
+0100  <span class="string">'upue17h'</span> <span class="string">'upue17h:am'</span>  1  <span class="string">'upue17v'</span> <span class="string">'upue17v:am'</span>  1   [3 5]   17; <span class="keyword">...</span>
+0101  <span class="string">'upue18h'</span> <span class="string">'upue18h:am'</span>  1  <span class="string">'upue18v'</span> <span class="string">'upue18v:am'</span>  1   [3 6]   18; <span class="keyword">...</span>
+0102  <span class="string">'upue19h'</span> <span class="string">'upue19h:am'</span>  1  <span class="string">'upue19v'</span> <span class="string">'upue19v:am'</span>  1   [4 1]   19; <span class="keyword">...</span>
+0103  <span class="string">'upue20h'</span> <span class="string">'upue20h:am'</span>  1  <span class="string">'upue20v'</span> <span class="string">'upue20v:am'</span>  1   [4 2]   20; <span class="keyword">...</span>
+0104  <span class="string">'upue21h'</span> <span class="string">'upue21h:am'</span>  1  <span class="string">'upue21v'</span> <span class="string">'upue21v:am'</span>  1   [4 3]   21; <span class="keyword">...</span>
+0105  <span class="string">'upue22h'</span> <span class="string">'upue22h:am'</span>  1  <span class="string">'upue22v'</span> <span class="string">'upue22v:am'</span>  1   [4 4]   22; <span class="keyword">...</span>
+0106  <span class="string">'upue23h'</span> <span class="string">'upue23h:am'</span>  1  <span class="string">'upue23v'</span> <span class="string">'upue23v:am'</span>  1   [4 5]   23; <span class="keyword">...</span>
+0107  <span class="string">'upue24h'</span> <span class="string">'upue24h:am'</span>  1  <span class="string">'upue24v'</span> <span class="string">'upue24v:am'</span>  1   [4 6]   24; <span class="keyword">...</span>
+0108  
+0109 };
+0110 
+0111 <span class="comment">%Load fields from data block</span>
+0112 <span class="keyword">for</span> ii=1:size(bpm,1)
+0113       <span class="comment">%AO.BPMx.CommonNames(ii,:)         = bpm{ii,1};</span>
+0114       AO.BPMx.Monitor.ChannelNames(ii,:)= bpm{ii,2};
+0115       AO.BPMx.Status(ii,:)              = bpm{ii,3};   
+0116       <span class="comment">%AO.BPMy.CommonNames(ii,:)         = bpm{ii,4};</span>
+0117       AO.BPMy.Monitor.ChannelNames(ii,:)= bpm{ii,5};
+0118       AO.BPMy.Status(ii,:)              = bpm{ii,6};  
+0119       AO.BPMx.DeviceList(ii,:)          = bpm{ii,7};   
+0120       AO.BPMy.DeviceList(ii,:)          = bpm{ii,7};
+0121       AO.BPMx.ElementList(ii,:)         = bpm{ii,8};   
+0122       AO.BPMy.ElementList(ii,:)         = bpm{ii,8};
+0123       AO.BPMx.Monitor.HW2PhysicsParams(ii,:) = 1e-3;
+0124       AO.BPMx.Monitor.Physics2HWParams(ii,:) = 1000;
+0125       AO.BPMy.Monitor.HW2PhysicsParams(ii,:) = 1e-3;
+0126       AO.BPMy.Monitor.Physics2HWParams(ii,:) = 1000;
+0127 <span class="keyword">end</span>
+0128 
+0129 AO.BPMx.Status = AO.BPMx.Status(:);
+0130 AO.BPMy.Status = AO.BPMy.Status(:);
+0131 
+0132 
+0133 <span class="comment">% Scalar channel method</span>
+0134 AO.BPMx.Monitor.DataType = <span class="string">'Scalar'</span>;
+0135 AO.BPMy.Monitor.DataType = <span class="string">'Scalar'</span>;
+0136 
+0137 AO.BPMx.Monitor = rmfield(AO.BPMx.Monitor, <span class="string">'DataTypeIndex'</span>);
+0138 AO.BPMy.Monitor = rmfield(AO.BPMy.Monitor, <span class="string">'DataTypeIndex'</span>);
+0139 
+0140 
+0141 
+0142 <span class="comment">%===========================================================</span>
+0143 <span class="comment">%Corrector data: status field designates if corrector in use</span>
+0144 <span class="comment">%===========================================================</span>
+0145 
+0146 AO.HCM.FamilyName               = <span class="string">'HCM'</span>;
+0147 AO.HCM.MemberOf                 = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>;  <span class="string">'COR'</span>; <span class="string">'MCOR'</span>; <span class="string">'HCM'</span>; <span class="string">'Magnet'</span>};
+0148 
+0149 AO.HCM.Monitor.Mode             = Mode;
+0150 AO.HCM.Monitor.DataType         = <span class="string">'Scalar'</span>;
+0151 AO.HCM.Monitor.Units            = <span class="string">'Hardware'</span>;
+0152 AO.HCM.Monitor.HWUnits          = <span class="string">'Ampere'</span>;           
+0153 AO.HCM.Monitor.PhysicsUnits     = <span class="string">'radian'</span>;
+0154 <span class="comment">%AO.HCM.Monitor.HW2PhysicsFcn = @amp2k;</span>
+0155 <span class="comment">%AO.HCM.Monitor.Physics2HWFcn = @k2amp;</span>
+0156 
+0157 AO.HCM.Setpoint.Mode            = Mode;
+0158 AO.HCM.Setpoint.DataType        = <span class="string">'Scalar'</span>;
+0159 AO.HCM.Setpoint.Units           = <span class="string">'Hardware'</span>;
+0160 AO.HCM.Setpoint.HWUnits         = <span class="string">'Ampere'</span>;           
+0161 AO.HCM.Setpoint.PhysicsUnits    = <span class="string">'radian'</span>;
+0162 <span class="comment">%AO.HCM.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0163 <span class="comment">%AO.HCM.Setpoint.Physics2HWFcn = @k2amp;</span>
+0164 
+0165 HCMRange  = 10.0;  <span class="comment">% [A]</span>
+0166 HCMGain_S = 1.933e-3/HCMRange;   <span class="comment">% [rad/A] for standalone</span>
+0167 HCMGain_B = 2.264e-3/HCMRange;   <span class="comment">% [rad/A] for backleg</span>
+0168 RMKICK    = 1.0;  <span class="comment">% Kick size for orbit response matrix measurement [A]</span>
+0169 HCMTol    = 0.10; <span class="comment">% Tolerance [A]</span>
+0170 
+0171 <span class="comment">% HW in ampere, Physics in radian                                           ** radian units converted to ampere below ***</span>
+0172 
+0173 <span class="comment">%x-common     x-monitor    x-setpoint   xstat  devlist elem   range (Ampere)    tol    x-kick     H2P_X      P2H_X</span>
+0174 hcor={
+0175  <span class="string">'u1hs1   '</span>  <span class="string">'u1hs1:am  '</span>  <span class="string">'u1hs1:sp '</span>    1    [1 ,1]   1   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0176  <span class="string">'u1hs2   '</span>  <span class="string">'u1hs2:am  '</span>  <span class="string">'u1hs2:sp '</span>    1    [1 ,2]   2   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0177  <span class="string">'u1hs3   '</span>  <span class="string">'u1hs3:am  '</span>  <span class="string">'u1hs3:sp '</span>    0    [1 ,3]   3   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0178  <span class="string">'u1hs4   '</span>  <span class="string">'u1hs4:am  '</span>  <span class="string">'u1hs4:sp '</span>    0    [1 ,4]   4   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0179  <span class="comment">% u1hs3 and u1hs4 have malfunctioning readbacks</span>
+0180  <span class="keyword">...</span><span class="comment"> </span>
+0181  <span class="string">'u2hs5   '</span>  <span class="string">'u2hs5:am  '</span>  <span class="string">'u2hs5:sp '</span>    1    [2 ,1]   5   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0182  <span class="string">'u2hs6   '</span>  <span class="string">'u2hs6:am  '</span>  <span class="string">'u2hs6:sp '</span>    0    [2 ,2]   6   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0183  <span class="string">'u2hs7   '</span>  <span class="string">'u2hs7:am  '</span>  <span class="string">'u2hs7:sp '</span>    0    [2 ,3]   7   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0184  <span class="string">'u2hs8   '</span>  <span class="string">'u2hs8:am  '</span>  <span class="string">'u2hs8:sp '</span>    1    [2 ,4]   8   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0185  <span class="keyword">...</span>
+0186  <span class="string">'u3hs9   '</span>  <span class="string">'u3hs9:am  '</span>  <span class="string">'u3hs9:sp '</span>    1    [3 ,1]   9   [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0187  <span class="string">'u3hs10  '</span>  <span class="string">'u3hs10:am '</span>  <span class="string">'u3hs10:sp'</span>    0    [3 ,2]   10  [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0188  <span class="string">'u3hs11  '</span>  <span class="string">'u3hs11:am '</span>  <span class="string">'u3hs11:sp'</span>    0    [3 ,3]   11  [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0189  <span class="string">'u3hs12  '</span>  <span class="string">'u3hs12:am '</span>  <span class="string">'u3hs12:sp'</span>    1    [3 ,4]   12  [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0190  <span class="keyword">...</span>
+0191  <span class="string">'u4hs13  '</span>  <span class="string">'u4hs13:am '</span>  <span class="string">'u4hs13:sp'</span>    1    [4 ,1]   13  [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0192  <span class="string">'u4hs14  '</span>  <span class="string">'u4hs14:am '</span>  <span class="string">'u4hs14:sp'</span>    0    [4 ,2]   14  [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0193  <span class="string">'u4hs15  '</span>  <span class="string">'u4hs15:am '</span>  <span class="string">'u4hs15:sp'</span>    0    [4 ,3]   15  [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_B   1/HCMGain_B; <span class="keyword">...</span>
+0194  <span class="string">'u4hs16  '</span>  <span class="string">'u4hs16:am '</span>  <span class="string">'u4hs16:sp'</span>    1    [4 ,4]   16  [-HCMRange +HCMRange]  HCMTol  RMKICK   HCMGain_S   1/HCMGain_S; <span class="keyword">...</span>
+0195 };
+0196 
+0197 <span class="keyword">for</span> ii=1:size(hcor,1)
+0198 <span class="comment">%AO.HCM.CommonNames(ii,:)           = hcor{ii,1};</span>
+0199 AO.HCM.Monitor.ChannelNames(ii,:)  = hcor{ii,2};
+0200 AO.HCM.Setpoint.ChannelNames(ii,:) = hcor{ii,3};     
+0201 AO.HCM.Status(ii,1)                = hcor{ii,4};
+0202 AO.HCM.DeviceList(ii,:)            = hcor{ii,5};
+0203 AO.HCM.ElementList(ii,1)           = hcor{ii,6};
+0204 AO.HCM.Setpoint.Range(ii,:)        = hcor{ii,7};
+0205 AO.HCM.Setpoint.Tolerance(ii,1)    = hcor{ii,8};
+0206 AO.HCM.Setpoint.DeltaRespMat(ii,1) = hcor{ii,9};
+0207 
+0208 AO.HCM.Monitor.HW2PhysicsParams(ii,:)  = hcor{ii,10};          
+0209 AO.HCM.Monitor.Physics2HWParams(ii,:)  = hcor{ii,11};
+0210 AO.HCM.Setpoint.HW2PhysicsParams(ii,:) = hcor{ii,10};          
+0211 AO.HCM.Setpoint.Physics2HWParams(ii,:) = hcor{ii,11};
+0212 <span class="keyword">end</span>
+0213 
+0214 
+0215 AO.VCM.FamilyName               = <span class="string">'VCM'</span>;
+0216 AO.VCM.MemberOf                 = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>;  <span class="string">'COR'</span>; <span class="string">'VCM'</span>; <span class="string">'Magnet'</span>};
+0217 
+0218 AO.VCM.Monitor.Mode             = Mode;
+0219 AO.VCM.Monitor.DataType         = <span class="string">'Scalar'</span>;
+0220 AO.VCM.Monitor.Units            = <span class="string">'Hardware'</span>;
+0221 AO.VCM.Monitor.HWUnits          = <span class="string">'Ampere'</span>;           
+0222 AO.VCM.Monitor.PhysicsUnits     = <span class="string">'radian'</span>;
+0223 <span class="comment">%AO.VCM.Monitor.HW2PhysicsFcn = @amp2k;</span>
+0224 <span class="comment">%AO.VCM.Monitor.Physics2HWFcn = @k2amp;</span>
+0225 
+0226 AO.VCM.Setpoint.Mode            = Mode;
+0227 AO.VCM.Setpoint.DataType        = <span class="string">'Scalar'</span>;
+0228 AO.VCM.Setpoint.Units           = <span class="string">'Hardware'</span>;
+0229 AO.VCM.Setpoint.HWUnits         = <span class="string">'Ampere'</span>;           
+0230 AO.VCM.Setpoint.PhysicsUnits    = <span class="string">'radian'</span>;
+0231 <span class="comment">%AO.VCM.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0232 <span class="comment">%AO.VCM.Setpoint.Physics2HWFcn = @k2amp;</span>
+0233 
+0234 
+0235 VCMRange  = 10.0;  <span class="comment">% [A]</span>
+0236 VCMGain_S = 1.933e-3/VCMRange;   <span class="comment">% [rad/A] for standalone</span>
+0237 VCMGain_A = 0.957e-3/VCMRange;   <span class="comment">% [rad/A] for aircore</span>
+0238 RMKICK    = 1.0;  <span class="comment">% Kick size for orbit response matrix measurement [A]</span>
+0239 VCMTol    = 0.10; <span class="comment">% Tolerance [A]</span>
+0240 
+0241 <span class="comment">% HW in ampere, Physics in radian                          ** radian units converted to ampere below ***</span>
+0242 
+0243 <span class="comment">%y-common  y-monitor   y-setpoint   ystat devlist elem   range (Ampere)    tol    y-kick     H2P_Y        P2H_Y</span>
+0244 vcor={
+0245  <span class="string">'u1vs1 '</span> <span class="string">'u1vs1:am '</span>  <span class="string">'u1vs1:sp '</span>    1    [1 ,1]   1  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0246  <span class="string">'u1vs2 '</span> <span class="string">'u1vs2:am '</span>  <span class="string">'u1vs2:sp '</span>    1    [1 ,2]   2  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0247  <span class="string">'u1vs3 '</span> <span class="string">'u1vs3:am '</span>  <span class="string">'u1vs3:sp '</span>    1    [1 ,3]   3  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0248  <span class="string">'u1vs4 '</span> <span class="string">'u1vs4:am '</span>  <span class="string">'u1vs4:sp '</span>    1    [1 ,4]   4  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0249  <span class="keyword">...</span><span class="comment"> </span>
+0250  <span class="string">'u2vs5 '</span> <span class="string">'u2vs5:am '</span>  <span class="string">'u2vs5:sp '</span>    1    [2 ,1]   5  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0251  <span class="string">'u2vs6 '</span> <span class="string">'u2vs6:am '</span>  <span class="string">'u2vs6:sp '</span>    1    [2 ,2]   6  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0252  <span class="string">'u2vs7 '</span> <span class="string">'u2vs7:am '</span>  <span class="string">'u2vs7:sp '</span>    1    [2 ,3]   7  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0253  <span class="string">'u2vs8 '</span> <span class="string">'u2vs8:am '</span>  <span class="string">'u2vs8:sp '</span>    1    [2 ,4]   8  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0254  <span class="keyword">...</span>
+0255  <span class="string">'u3vs9 '</span> <span class="string">'u3vs9:am '</span>  <span class="string">'u3vs9:sp '</span>    1    [3 ,1]   9  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0256  <span class="string">'u3vs10'</span> <span class="string">'u3vs10:am'</span>  <span class="string">'u3vs10:sp'</span>    1    [3 ,2]  10  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0257  <span class="string">'u3vs11'</span> <span class="string">'u3vs11:am'</span>  <span class="string">'u3vs11:sp'</span>    1    [3 ,3]  11  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0258  <span class="string">'u3vs12'</span> <span class="string">'u3vs12:am'</span>  <span class="string">'u3vs12:sp'</span>    1    [3 ,4]  12  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0259  <span class="keyword">...</span>
+0260  <span class="string">'u4vs13'</span> <span class="string">'u4vs13:am'</span>  <span class="string">'u4vs13:sp'</span>    1    [4 ,1]  13  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0261  <span class="string">'u4vs14'</span> <span class="string">'u4vs14:am'</span>  <span class="string">'u4vs14:sp'</span>    1    [4 ,2]  14  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0262  <span class="string">'u4vs15'</span> <span class="string">'u4vs15:am'</span>  <span class="string">'u4vs15:sp'</span>    1    [4 ,3]  15  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_A  1/VCMGain_A; <span class="keyword">...</span>
+0263  <span class="string">'u4vs16'</span> <span class="string">'u4vs16:am'</span>  <span class="string">'u4vs16:sp'</span>    1    [4 ,4]  16  [-VCMRange +VCMRange]  VCMTol  RMKICK  VCMGain_S  1/VCMGain_S; <span class="keyword">...</span>
+0264 };
+0265 
+0266 
+0267 <span class="keyword">for</span> ii=1:size(vcor,1)
+0268 
+0269 <span class="comment">%AO.VCM.CommonNames(ii,:)           = vcor{ii,1};</span>
+0270 AO.VCM.Monitor.ChannelNames(ii,:)  = vcor{ii,2};
+0271 AO.VCM.Setpoint.ChannelNames(ii,:) = vcor{ii,3};     
+0272 AO.VCM.Status(ii,1)                = vcor{ii,4};
+0273 AO.VCM.DeviceList(ii,:)            = vcor{ii,5};
+0274 AO.VCM.ElementList(ii,1)           = vcor{ii,6};
+0275 AO.VCM.Setpoint.Range(ii,:)        = vcor{ii,7};
+0276 AO.VCM.Setpoint.Tolerance(ii,1)    = vcor{ii,8};
+0277 AO.VCM.Setpoint.DeltaRespMat(ii,1) = vcor{ii,9};
+0278 
+0279 AO.VCM.Monitor.HW2PhysicsParams(ii,:)  = vcor{ii,10};          
+0280 AO.VCM.Monitor.Physics2HWParams(ii,:)  = vcor{ii,11};
+0281 AO.VCM.Setpoint.HW2PhysicsParams(ii,:) = vcor{ii,10};          
+0282 AO.VCM.Setpoint.Physics2HWParams(ii,:) = vcor{ii,11};
+0283 <span class="keyword">end</span>  
+0284 
+0285 
+0286 AO.HCM.Status=AO.HCM.Status(:);
+0287 AO.VCM.Status=AO.VCM.Status(:);
+0288 
+0289 
+0290 
+0291 <span class="comment">%convert response matrix kicks to HWUnits (after AO is loaded to AppData)</span>
+0292 setao(AO);   <span class="comment">%required to make physics2hw function</span>
+0293 <span class="comment">% AO.HCM.Setpoint.DeltaRespMat = physics2hw('HCM','Setpoint', AO.HCM.Setpoint.DeltaRespMat, AO.HCM.DeviceList);</span>
+0294 <span class="comment">% AO.VCM.Setpoint.DeltaRespMat = physics2hw('VCM','Setpoint', AO.VCM.Setpoint.DeltaRespMat, AO.VCM.DeviceList);</span>
+0295 
+0296 
+0297 
+0298 
+0299 <span class="comment">%=============================</span>
+0300 <span class="comment">%        MAIN MAGNETS</span>
+0301 <span class="comment">%=============================</span>
+0302 
+0303 <span class="comment">%===========</span>
+0304 <span class="comment">%Dipole data</span>
+0305 <span class="comment">%===========</span>
+0306 
+0307 <span class="comment">% *** BEND ***</span>
+0308 AO.BEND.FamilyName = <span class="string">'BEND'</span>;
+0309 AO.BEND.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'BEND'</span>; <span class="string">'Magnet'</span>;};
+0310 
+0311 AO.BEND.Monitor.Mode           = Mode;
+0312 AO.BEND.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0313 AO.BEND.Monitor.Units          = <span class="string">'Hardware'</span>;
+0314 AO.BEND.Monitor.HWUnits        = <span class="string">'Ampere'</span>;           
+0315 AO.BEND.Monitor.PhysicsUnits   = <span class="string">'radian'</span>;
+0316 <span class="comment">%AO.BEND.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0317 <span class="comment">%AO.BEND.Monitor.Physics2HWFcn  = @k2amp;</span>
+0318 
+0319 AO.BEND.Setpoint.Mode          = Mode;
+0320 AO.BEND.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0321 AO.BEND.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0322 AO.BEND.Setpoint.HWUnits       = <span class="string">'Ampere'</span>;           
+0323 AO.BEND.Setpoint.PhysicsUnits  = <span class="string">'radian'</span>;
+0324 <span class="comment">%AO.BEND.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0325 <span class="comment">%AO.BEND.Setpoint.Physics2HWFcn = @k2amp;</span>
+0326 
+0327 bendrange = 2000;  <span class="comment">% setpoint (1891.5 for readback)</span>
+0328 
+0329 BENDGain = 4.532e-4;  <span class="comment">%  rad/A  for setpoint (for readback 4.792e-4)</span>
+0330 AO.BEND.Monitor.HW2PhysicsParams  = BENDGain;          
+0331 AO.BEND.Monitor.Physics2HWParams  = 1.0/BENDGain;
+0332 AO.BEND.Setpoint.HW2PhysicsParams = BENDGain;          
+0333 AO.BEND.Setpoint.Physics2HWParams = 1.0/BENDGain;
+0334 
+0335 
+0336 <span class="comment">%common    monitor   setpoint stat devlist elem  range   tol</span>
+0337 bend={
+0338   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [1, 1]  1  [0 bendrange] 1.0; <span class="keyword">...</span>
+0339   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [1, 2]  2  [0 bendrange] 1.0; <span class="keyword">...</span>
+0340   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [2, 1]  3  [0 bendrange] 1.0; <span class="keyword">...</span>
+0341   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [2, 2]  4  [0 bendrange] 1.0; <span class="keyword">...</span>
+0342   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [3, 1]  5  [0 bendrange] 1.0; <span class="keyword">...</span>
+0343   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [3, 2]  6  [0 bendrange] 1.0; <span class="keyword">...</span>
+0344   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [4, 1]  7  [0 bendrange] 1.0; <span class="keyword">...</span>
+0345   <span class="string">'uvdip'</span> <span class="string">'uvdip:am'</span> <span class="string">'uvdip:sp'</span>  1  [4, 2]  8  [0 bendrange] 1.0; <span class="keyword">...</span>
+0346 };
+0347 
+0348 <span class="keyword">for</span> ii=1:size(bend, 1)
+0349   <span class="comment">%AO.BEND.CommonNames(ii, :)           = bend{ii, 1};</span>
+0350   AO.BEND.Monitor.ChannelNames(ii, :)  = bend{ii, 2};
+0351   AO.BEND.Setpoint.ChannelNames(ii, :) = bend{ii, 3};     
+0352   AO.BEND.Status(ii, 1)                = bend{ii, 4};
+0353   AO.BEND.DeviceList(ii, :)            = bend{ii, 5};
+0354   AO.BEND.ElementList(ii, 1)           = bend{ii, 6};
+0355 
+0356   AO.BEND.Setpoint.Range(ii, :)        = bend{ii, 7};
+0357   AO.BEND.Setpoint.Tolerance(ii, 1)    = bend{ii, 8};
+0358 <span class="keyword">end</span>
+0359 
+0360 setao(AO);
+0361 
+0362 
+0363 <span class="comment">%===============</span>
+0364 <span class="comment">%Quadrupole data</span>
+0365 <span class="comment">%===============</span>
+0366 
+0367 Qrange = 200;
+0368 QGain = 1.418e-2;  <span class="comment">%  m^-2/A ??</span>
+0369 
+0370 <span class="comment">% *** Q1 ***</span>
+0371 AO.Q1.FamilyName = <span class="string">'Q1'</span>;
+0372 AO.Q1.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>; <span class="string">'Tune Corrector'</span>; };
+0373 
+0374 AO.Q1.Monitor.Mode           = Mode;
+0375 AO.Q1.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0376 AO.Q1.Monitor.Units          = <span class="string">'Hardware'</span>;
+0377 AO.Q1.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0378 AO.Q1.Monitor.PhysicsUnits   = <span class="string">'m^-2'</span>;
+0379 <span class="comment">%AO.Q1.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0380 <span class="comment">%AO.Q1.Monitor.Physics2HWFcn  = @k2amp;</span>
+0381 
+0382 AO.Q1.Setpoint.Mode          = Mode;
+0383 AO.Q1.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0384 AO.Q1.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0385 AO.Q1.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0386 AO.Q1.Setpoint.PhysicsUnits  = <span class="string">'m^-2'</span>;
+0387 <span class="comment">%AO.Q1.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0388 <span class="comment">%AO.Q1.Setpoint.Physics2HWFcn = @k2amp;</span>
+0389 
+0390 AO.Q1.Monitor.HW2PhysicsParams  = QGain;          
+0391 AO.Q1.Monitor.Physics2HWParams  = 1.0/QGain;
+0392 AO.Q1.Setpoint.HW2PhysicsParams = QGain;          
+0393 AO.Q1.Setpoint.Physics2HWParams = 1.0/QGain;
+0394 
+0395 <span class="comment">% common      desired         monitor  setpoint stat devlist elem  range     tol respkick</span>
+0396 q1={
+0397   <span class="string">'uvq1'</span> <span class="string">'uvq1:CurrSetptDes'</span> <span class="string">'uvq1:am'</span> <span class="string">'uvq1:sp'</span>  1  [1, 1]   1  [0  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0398   <span class="string">'uvq1'</span> <span class="string">'uvq1:CurrSetptDes'</span> <span class="string">'uvq1:am'</span> <span class="string">'uvq1:sp'</span>  1  [2, 1]   2  [0  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0399   <span class="string">'uvq1'</span> <span class="string">'uvq1:CurrSetptDes'</span> <span class="string">'uvq1:am'</span> <span class="string">'uvq1:sp'</span>  1  [3, 1]   3  [0  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0400   <span class="string">'uvq1'</span> <span class="string">'uvq1:CurrSetptDes'</span> <span class="string">'uvq1:am'</span> <span class="string">'uvq1:sp'</span>  1  [4, 1]   4  [0  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0401   };
+0402 
+0403 <span class="keyword">for</span> ii=1:size(q1, 1)
+0404   <span class="comment">%AO.Q1.CommonNames(ii, :)           = q1{ii, 1};</span>
+0405   AO.Q1.Monitor.ChannelNames(ii, :)  = q1{ii, 3};
+0406   AO.Q1.Setpoint.ChannelNames(ii, :) = q1{ii, 4};     
+0407   AO.Q1.Status(ii, 1)                = q1{ii, 5};
+0408   AO.Q1.DeviceList(ii, :)            = q1{ii, 6};
+0409   AO.Q1.ElementList(ii, 1)           = q1{ii, 7};
+0410   AO.Q1.Setpoint.Range(ii, :)        = q1{ii, 8};
+0411   AO.Q1.Setpoint.Tolerance(ii, 1)    = q1{ii, 9};
+0412   AO.Q1.Setpoint.DeltaRespMat(ii, 1) = q1{ii, 10};
+0413 <span class="keyword">end</span>
+0414 
+0415 setao(AO);
+0416 
+0417 
+0418 <span class="comment">% *** Q2 ***</span>
+0419 AO.Q2.FamilyName = <span class="string">'Q2'</span>;
+0420 AO.Q2.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>; <span class="string">'Tune Corrector'</span>; };
+0421 
+0422 AO.Q2.Monitor.Mode           = Mode;
+0423 AO.Q2.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0424 AO.Q2.Monitor.Units          = <span class="string">'Hardware'</span>;
+0425 AO.Q2.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0426 AO.Q2.Monitor.PhysicsUnits   = <span class="string">'m^-2'</span>;
+0427 <span class="comment">%AO.Q2.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0428 <span class="comment">%AO.Q2.Monitor.Physics2HWFcn  = @k2amp;</span>
+0429 
+0430 AO.Q2.Setpoint.Mode          = Mode;
+0431 AO.Q2.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0432 AO.Q2.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0433 AO.Q2.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0434 AO.Q2.Setpoint.PhysicsUnits  = <span class="string">'m^-2'</span>;
+0435 <span class="comment">%AO.Q2.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0436 <span class="comment">%AO.Q2.Setpoint.Physics2HWFcn = @k2amp;</span>
+0437 
+0438 AO.Q2.Monitor.HW2PhysicsParams  = -QGain;          
+0439 AO.Q2.Monitor.Physics2HWParams  = -1.0/QGain;
+0440 AO.Q2.Setpoint.HW2PhysicsParams = -QGain;          
+0441 AO.Q2.Setpoint.Physics2HWParams = -1.0/QGain;
+0442 
+0443 <span class="comment">% common      desired         monitor  setpoint stat devlist elem  range     tol respkick</span>
+0444 q2={
+0445   <span class="string">'uvq2'</span> <span class="string">'uvq2:CurrSetptDes'</span> <span class="string">'uvq2:am'</span> <span class="string">'uvq2:sp'</span>  1  [1, 1]   1  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0446   <span class="string">'uvq2'</span> <span class="string">'uvq2:CurrSetptDes'</span> <span class="string">'uvq2:am'</span> <span class="string">'uvq2:sp'</span>  1  [2, 1]   2  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0447   <span class="string">'uvq2'</span> <span class="string">'uvq2:CurrSetptDes'</span> <span class="string">'uvq2:am'</span> <span class="string">'uvq2:sp'</span>  1  [3, 1]   3  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0448   <span class="string">'uvq2'</span> <span class="string">'uvq2:CurrSetptDes'</span> <span class="string">'uvq2:am'</span> <span class="string">'uvq2:sp'</span>  1  [4, 1]   4  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0449 };
+0450 
+0451 <span class="keyword">for</span> ii=1:size(q2, 1)
+0452   <span class="comment">%AO.Q2.CommonNames(ii, :)           = q2{ii, 1};</span>
+0453   AO.Q2.Monitor.ChannelNames(ii, :)  = q2{ii, 3};
+0454   AO.Q2.Setpoint.ChannelNames(ii, :) = q2{ii, 4};     
+0455   AO.Q2.Status(ii, 1)                = q2{ii, 5};
+0456   AO.Q2.DeviceList(ii, :)            = q2{ii, 6};
+0457   AO.Q2.ElementList(ii, 1)           = q2{ii, 7};
+0458   AO.Q2.Setpoint.Range(ii, :)        = q2{ii, 8};
+0459   AO.Q2.Setpoint.Tolerance(ii, 1)    = q2{ii, 9};
+0460   AO.Q2.Setpoint.DeltaRespMat(ii, 1) = q2{ii, 10};
+0461 <span class="keyword">end</span> 
+0462 
+0463 setao(AO);
+0464 
+0465 
+0466 <span class="comment">% *** Q3 ***</span>
+0467 AO.Q3.FamilyName = <span class="string">'Q3'</span>;
+0468 AO.Q3.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>;};
+0469 
+0470 AO.Q3.Monitor.Mode           = Mode;
+0471 AO.Q3.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0472 AO.Q3.Monitor.Units          = <span class="string">'Hardware'</span>;
+0473 AO.Q3.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0474 AO.Q3.Monitor.PhysicsUnits   = <span class="string">'m^-2'</span>;
+0475 <span class="comment">%AO.Q3.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0476 <span class="comment">%AO.Q3.Monitor.Physics2HWFcn  = @k2amp;</span>
+0477 
+0478 AO.Q3.Setpoint.Mode          = Mode;
+0479 AO.Q3.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0480 AO.Q3.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0481 AO.Q3.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0482 AO.Q3.Setpoint.PhysicsUnits  = <span class="string">'m^-2'</span>;
+0483 <span class="comment">%AO.Q3.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0484 <span class="comment">%AO.Q3.Setpoint.Physics2HWFcn = @k2amp;</span>
+0485 
+0486 AO.Q3.Monitor.HW2PhysicsParams  = QGain;          
+0487 AO.Q3.Monitor.Physics2HWParams  = 1.0/QGain;
+0488 AO.Q3.Setpoint.HW2PhysicsParams = QGain;          
+0489 AO.Q3.Setpoint.Physics2HWParams = 1.0/QGain;
+0490 
+0491 <span class="comment">% common      desired         monitor  setpoint stat devlist elem  range     tol respkick</span>
+0492 q3={
+0493   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [1, 1]   1  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0494   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [1, 2]   2  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0495   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [2, 1]   3  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0496   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [2, 2]   4  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0497   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [3, 1]   5  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0498   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [3, 2]   6  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0499   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [4, 1]   7  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0500   <span class="string">'uvq3'</span> <span class="string">'uvq3:CurrSetptDes'</span> <span class="string">'uvq3:am'</span> <span class="string">'uvq3:sp'</span>  1  [4, 2]   8  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0501 };
+0502 
+0503 <span class="keyword">for</span> ii=1:size(q3, 1)
+0504   <span class="comment">%AO.Q3.CommonNames(ii, :)           = q3{ii, 1};</span>
+0505   AO.Q3.Monitor.ChannelNames(ii, :)  = q3{ii, 3};
+0506   AO.Q3.Setpoint.ChannelNames(ii, :) = q3{ii, 4};     
+0507   AO.Q3.Status(ii, 1)                = q3{ii, 5};
+0508   AO.Q3.DeviceList(ii, :)            = q3{ii, 6};
+0509   AO.Q3.ElementList(ii, 1)           = q3{ii, 7};
+0510   AO.Q3.Setpoint.Range(ii, :)        = q3{ii, 8};
+0511   AO.Q3.Setpoint.Tolerance(ii, 1)    = q3{ii, 9};
+0512   AO.Q3.Setpoint.DeltaRespMat(ii, 1) = q3{ii, 10};
+0513 <span class="keyword">end</span> 
+0514 
+0515 setao(AO);
+0516 
+0517 <span class="comment">% *** Q4 ***</span>
+0518 AO.Q4.FamilyName = <span class="string">'Q4'</span>;
+0519 AO.Q4.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>;};
+0520 
+0521 AO.Q4.Monitor.Mode           = Mode;
+0522 AO.Q4.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0523 AO.Q4.Monitor.Units          = <span class="string">'Hardware'</span>;
+0524 AO.Q4.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0525 AO.Q4.Monitor.PhysicsUnits   = <span class="string">'m^-2'</span>;
+0526 <span class="comment">%AO.Q4.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0527 <span class="comment">%AO.Q4.Monitor.Physics2HWFcn  = @k2amp;</span>
+0528 
+0529 AO.Q4.Setpoint.Mode          = Mode;
+0530 AO.Q4.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0531 AO.Q4.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0532 AO.Q4.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0533 AO.Q4.Setpoint.PhysicsUnits  = <span class="string">'m^-2'</span>;
+0534 <span class="comment">%AO.Q4.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0535 <span class="comment">%AO.Q4.Setpoint.Physics2HWFcn = @k2amp;</span>
+0536 
+0537 AO.Q4.Monitor.HW2PhysicsParams  = -QGain;          
+0538 AO.Q4.Monitor.Physics2HWParams  = -1.0/QGain;
+0539 AO.Q4.Setpoint.HW2PhysicsParams = -QGain;          
+0540 AO.Q4.Setpoint.Physics2HWParams = -1.0/QGain;
+0541 
+0542 <span class="comment">% common      desired         monitor  setpoint stat devlist elem  range     tol respkick</span>
+0543 q4={
+0544   <span class="string">'uvq4'</span> <span class="string">'uvq4:CurrSetptDes'</span> <span class="string">'uvq4:am'</span> <span class="string">'uvq4:sp'</span>  1  [1, 1]   1  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0545   <span class="string">'uvq4'</span> <span class="string">'uvq4:CurrSetptDes'</span> <span class="string">'uvq4:am'</span> <span class="string">'uvq4:sp'</span>  1  [2, 1]   2  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0546 };
+0547 
+0548 <span class="keyword">for</span> ii=1:size(q4, 1)
+0549   <span class="comment">%AO.Q4.CommonNames(ii, :)           = q4{ii, 1};</span>
+0550   AO.Q4.Monitor.ChannelNames(ii, :)  = q4{ii, 3};
+0551   AO.Q4.Setpoint.ChannelNames(ii, :) = q4{ii, 4};     
+0552   AO.Q4.Status(ii, 1)                = q4{ii, 5};
+0553   AO.Q4.DeviceList(ii, :)            = q4{ii, 6};
+0554   AO.Q4.ElementList(ii, 1)           = q4{ii, 7};
+0555   AO.Q4.Setpoint.Range(ii, :)        = q4{ii, 8};
+0556   AO.Q4.Setpoint.Tolerance(ii, 1)    = q4{ii, 9};
+0557   AO.Q4.Setpoint.DeltaRespMat(ii, 1) = q4{ii, 10};
+0558 <span class="keyword">end</span> 
+0559 
+0560 setao(AO);
+0561 
+0562 <span class="comment">% *** Q5 ***</span>
+0563 AO.Q5.FamilyName = <span class="string">'Q5'</span>;
+0564 AO.Q5.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>;};
+0565 
+0566 AO.Q5.Monitor.Mode           = Mode;
+0567 AO.Q5.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0568 AO.Q5.Monitor.Units          = <span class="string">'Hardware'</span>;
+0569 AO.Q5.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0570 AO.Q5.Monitor.PhysicsUnits   = <span class="string">'m^-2'</span>;
+0571 <span class="comment">%AO.Q5.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0572 <span class="comment">%AO.Q5.Monitor.Physics2HWFcn  = @k2amp;</span>
+0573 
+0574 AO.Q5.Setpoint.Mode          = Mode;
+0575 AO.Q5.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0576 AO.Q5.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0577 AO.Q5.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0578 AO.Q5.Setpoint.PhysicsUnits  = <span class="string">'m^-2'</span>;
+0579 <span class="comment">%AO.Q5.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0580 <span class="comment">%AO.Q5.Setpoint.Physics2HWFcn = @k2amp;</span>
+0581 
+0582 AO.Q5.Monitor.HW2PhysicsParams  = QGain;          
+0583 AO.Q5.Monitor.Physics2HWParams  = 1.0/QGain;
+0584 AO.Q5.Setpoint.HW2PhysicsParams = QGain;          
+0585 AO.Q5.Setpoint.Physics2HWParams = 1.0/QGain;
+0586 
+0587 <span class="comment">% common      desired         monitor  setpoint stat devlist elem  range     tol respkick</span>
+0588 q5={
+0589   <span class="string">'uvq5'</span> <span class="string">'uvq5:CurrSetptDes'</span> <span class="string">'uvq5:am'</span> <span class="string">'uvq5:sp'</span>  1  [1, 1]   1  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0590   <span class="string">'uvq5'</span> <span class="string">'uvq5:CurrSetptDes'</span> <span class="string">'uvq5:am'</span> <span class="string">'uvq5:sp'</span>  1  [2, 1]   2  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0591 };
+0592 
+0593 <span class="keyword">for</span> ii=1:size(q5, 1)
+0594   <span class="comment">%AO.Q5.CommonNames(ii, :)           = q5{ii, 1};</span>
+0595   AO.Q5.Monitor.ChannelNames(ii, :)  = q5{ii, 3};
+0596   AO.Q5.Setpoint.ChannelNames(ii, :) = q5{ii, 4};     
+0597   AO.Q5.Status(ii, 1)                = q5{ii, 5};
+0598   AO.Q5.DeviceList(ii, :)            = q5{ii, 6};
+0599   AO.Q5.ElementList(ii, 1)           = q5{ii, 7};
+0600   AO.Q5.Setpoint.Range(ii, :)        = q5{ii, 8};
+0601   AO.Q5.Setpoint.Tolerance(ii, 1)    = q5{ii, 9};
+0602   AO.Q5.Setpoint.DeltaRespMat(ii, 1) = q5{ii, 10};
+0603 <span class="keyword">end</span> 
+0604 
+0605 setao(AO);
+0606 
+0607 <span class="comment">% *** Q6 ***</span>
+0608 AO.Q6.FamilyName = <span class="string">'Q6'</span>;
+0609 AO.Q6.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>;};
+0610 
+0611 AO.Q6.Monitor.Mode           = Mode;
+0612 AO.Q6.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0613 AO.Q6.Monitor.Units          = <span class="string">'Hardware'</span>;
+0614 AO.Q6.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0615 AO.Q6.Monitor.PhysicsUnits   = <span class="string">'m^-2'</span>;
+0616 <span class="comment">%AO.Q6.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0617 <span class="comment">%AO.Q6.Monitor.Physics2HWFcn  = @k2amp;</span>
+0618 
+0619 AO.Q6.Setpoint.Mode          = Mode;
+0620 AO.Q6.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0621 AO.Q6.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0622 AO.Q6.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0623 AO.Q6.Setpoint.PhysicsUnits  = <span class="string">'m^-2'</span>;
+0624 <span class="comment">%AO.Q6.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0625 <span class="comment">%AO.Q6.Setpoint.Physics2HWFcn = @k2amp;</span>
+0626 
+0627 AO.Q6.Monitor.HW2PhysicsParams  = -QGain;          
+0628 AO.Q6.Monitor.Physics2HWParams  = -1.0/QGain;
+0629 AO.Q6.Setpoint.HW2PhysicsParams = -QGain;          
+0630 AO.Q6.Setpoint.Physics2HWParams = -1.0/QGain;
+0631 
+0632 <span class="comment">% common      desired         monitor  setpoint stat devlist elem  range     tol respkick</span>
+0633 q6={
+0634   <span class="string">'uvq6'</span> <span class="string">'uvq6:CurrSetptDes'</span> <span class="string">'uvq6:am'</span> <span class="string">'uvq6:sp'</span>  1  [3, 1]   1  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0635   <span class="string">'uvq6'</span> <span class="string">'uvq6:CurrSetptDes'</span> <span class="string">'uvq6:am'</span> <span class="string">'uvq6:sp'</span>  1  [4, 1]   2  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0636 };
+0637 
+0638 <span class="keyword">for</span> ii=1:size(q6, 1)
+0639   <span class="comment">%AO.Q6.CommonNames(ii, :)           = q6{ii, 1};</span>
+0640   AO.Q6.Monitor.ChannelNames(ii, :)  = q6{ii, 3};
+0641   AO.Q6.Setpoint.ChannelNames(ii, :) = q6{ii, 4};     
+0642   AO.Q6.Status(ii, 1)                = q6{ii, 5};
+0643   AO.Q6.DeviceList(ii, :)            = q6{ii, 6};
+0644   AO.Q6.ElementList(ii, 1)           = q6{ii, 7};
+0645   AO.Q6.Setpoint.Range(ii, :)        = q6{ii, 8};
+0646   AO.Q6.Setpoint.Tolerance(ii, 1)    = q6{ii, 9};
+0647   AO.Q6.Setpoint.DeltaRespMat(ii, 1) = q6{ii, 10};
+0648 <span class="keyword">end</span> 
+0649 
+0650 setao(AO);
+0651 
+0652 
+0653 <span class="comment">% *** Q7 ***</span>
+0654 AO.Q7.FamilyName = <span class="string">'Q7'</span>;
+0655 AO.Q7.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>; <span class="string">'QUAD'</span>; <span class="string">'Magnet'</span>;};
+0656 
+0657 AO.Q7.Monitor.Mode           = Mode;
+0658 AO.Q7.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0659 AO.Q7.Monitor.Units          = <span class="string">'Hardware'</span>;
+0660 AO.Q7.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0661 AO.Q7.Monitor.PhysicsUnits   = <span class="string">'m^-2'</span>;
+0662 <span class="comment">%AO.Q7.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0663 <span class="comment">%AO.Q7.Monitor.Physics2HWFcn  = @k2amp;</span>
+0664 
+0665 AO.Q7.Setpoint.Mode          = Mode;
+0666 AO.Q7.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0667 AO.Q7.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0668 AO.Q7.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0669 AO.Q7.Setpoint.PhysicsUnits  = <span class="string">'m^-2'</span>;
+0670 <span class="comment">%AO.Q7.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0671 <span class="comment">%AO.Q7.Setpoint.Physics2HWFcn = @k2amp;</span>
+0672 
+0673 AO.Q7.Monitor.HW2PhysicsParams  = QGain;          
+0674 AO.Q7.Monitor.Physics2HWParams  = 1.0/QGain;
+0675 AO.Q7.Setpoint.HW2PhysicsParams = QGain;          
+0676 AO.Q7.Setpoint.Physics2HWParams = 1.0/QGain;
+0677 
+0678 <span class="comment">% common      desired         monitor  setpoint stat devlist elem  range     tol respkick</span>
+0679 q7={
+0680   <span class="string">'uvq7'</span> <span class="string">'uvq7:CurrSetptDes'</span> <span class="string">'uvq7:am'</span> <span class="string">'uvq7:sp'</span>  1  [3, 1]   1  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0681   <span class="string">'uvq7'</span> <span class="string">'uvq7:CurrSetptDes'</span> <span class="string">'uvq7:am'</span> <span class="string">'uvq7:sp'</span>  1  [4, 1]   2  [0,  Qrange] 0.20 0.4; <span class="keyword">...</span>
+0682 };
+0683 
+0684 <span class="keyword">for</span> ii=1:size(q7, 1)
+0685   <span class="comment">%AO.Q7.CommonNames(ii, :)           = q7{ii, 1};</span>
+0686   AO.Q7.Monitor.ChannelNames(ii, :)  = q7{ii, 3};
+0687   AO.Q7.Setpoint.ChannelNames(ii, :) = q7{ii, 4};     
+0688   AO.Q7.Status(ii, 1)                = q7{ii, 5};
+0689   AO.Q7.DeviceList(ii, :)            = q7{ii, 6};
+0690   AO.Q7.ElementList(ii, 1)           = q7{ii, 7};
+0691   AO.Q7.Setpoint.Range(ii, :)        = q7{ii, 8};
+0692   AO.Q7.Setpoint.Tolerance(ii, 1)    = q7{ii, 9};
+0693   AO.Q7.Setpoint.DeltaRespMat(ii, 1) = q7{ii, 10};
+0694 <span class="keyword">end</span> 
+0695 
+0696 setao(AO);
+0697 
+0698 
+0699 
+0700 <span class="comment">%===============</span>
+0701 <span class="comment">%Sextupole data</span>
+0702 <span class="comment">%===============</span>
+0703 
+0704 Srange = 100; <span class="comment">% 95 ?</span>
+0705 
+0706 <span class="comment">% *** SF ***</span>
+0707 
+0708 AO.SF.FamilyName = <span class="string">'SF'</span>;
+0709 AO.SF.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>;  <span class="string">'SEXT'</span>; <span class="string">'Magnet'</span>; <span class="string">'Chromaticity Corrector'</span>;};
+0710 
+0711 AO.SF.Monitor.Mode           = Mode;
+0712 AO.SF.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0713 AO.SF.Monitor.Units          = <span class="string">'Hardware'</span>;
+0714 AO.SF.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0715 AO.SF.Monitor.PhysicsUnits   = <span class="string">'m^-3'</span>;
+0716 <span class="comment">%AO.SF.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0717 <span class="comment">%AO.SF.Monitor.Physics2HWFcn  = @k2amp;</span>
+0718 
+0719 AO.SF.Setpoint.Mode          = Mode;
+0720 AO.SF.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0721 AO.SF.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0722 AO.SF.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0723 AO.SF.Setpoint.PhysicsUnits  = <span class="string">'m^-3'</span>;
+0724 <span class="comment">%AO.SF.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0725 <span class="comment">%AO.SF.Setpoint.Physics2HWFcn = @k2amp;</span>
+0726 
+0727 SFGain = 0.403; <span class="comment">% 0.3925 m^-3/A ??</span>
+0728 AO.SF.Monitor.HW2PhysicsParams  = SFGain;          
+0729 AO.SF.Monitor.Physics2HWParams  = 1.0/SFGain;
+0730 AO.SF.Setpoint.HW2PhysicsParams = SFGain;          
+0731 AO.SF.Setpoint.Physics2HWParams = 1.0/SFGain;
+0732 
+0733 <span class="comment">% common      desired            monitor   setpoint stat devlist elem  range    tol respkick</span>
+0734 sf={
+0735   <span class="string">'usxf'</span> <span class="string">'usxf:CurrSetptDes'</span> <span class="string">'usxf:am'</span> <span class="string">'usxf:sp'</span>  1  [1, 1]  1  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0736   <span class="string">'usxf'</span> <span class="string">'usxf:CurrSetptDes'</span> <span class="string">'usxf:am'</span> <span class="string">'usxf:sp'</span>  1  [2, 1]  2  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0737   <span class="string">'usxf'</span> <span class="string">'usxf:CurrSetptDes'</span> <span class="string">'usxf:am'</span> <span class="string">'usxf:sp'</span>  1  [3, 1]  3  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0738   <span class="string">'usxf'</span> <span class="string">'usxf:CurrSetptDes'</span> <span class="string">'usxf:am'</span> <span class="string">'usxf:sp'</span>  1  [4, 1]  4  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0739 };
+0740 
+0741 <span class="keyword">for</span> ii=1:size(sf,1)
+0742   <span class="comment">%AO.SF.CommonNames(ii,:)           = sf{ii,1};</span>
+0743   AO.SF.Monitor.ChannelNames(ii,:)  = sf{ii,3};
+0744   AO.SF.Setpoint.ChannelNames(ii,:) = sf{ii,4};     
+0745   AO.SF.Status(ii,1)                = sf{ii,5};
+0746   AO.SF.DeviceList(ii,:)            = sf{ii,6};
+0747   AO.SF.ElementList(ii,1)           = sf{ii,7};
+0748 
+0749   AO.SF.Setpoint.Range(ii,:)        = sf{ii,8};
+0750   AO.SF.Setpoint.Tolerance(ii,1)    = sf{ii,9};
+0751   AO.SF.Setpoint.DeltaRespMat(ii,1) = sf{ii,10};
+0752 <span class="keyword">end</span>
+0753 
+0754 setao(AO);
+0755 
+0756 
+0757 <span class="comment">% *** SD ***</span>
+0758 AO.SD.FamilyName = <span class="string">'SD'</span>;
+0759 AO.SD.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>;  <span class="string">'SEXT'</span>; <span class="string">'Magnet'</span>; <span class="string">'Chromaticity Corrector'</span>;};
+0760 
+0761 AO.SD.Monitor.Mode           = Mode;
+0762 AO.SD.Monitor.DataType       = <span class="string">'Scalar'</span>;
+0763 AO.SD.Monitor.Units          = <span class="string">'Hardware'</span>;
+0764 AO.SD.Monitor.HWUnits        = <span class="string">'A'</span>;           
+0765 AO.SD.Monitor.PhysicsUnits   = <span class="string">'m^-3'</span>;
+0766 <span class="comment">%AO.SD.Monitor.HW2PhysicsFcn  = @amp2k;</span>
+0767 <span class="comment">%AO.SD.Monitor.Physics2HWFcn  = @k2amp;</span>
+0768 
+0769 AO.SD.Setpoint.Mode          = Mode;
+0770 AO.SD.Setpoint.DataType      = <span class="string">'Scalar'</span>;
+0771 AO.SD.Setpoint.Units         = <span class="string">'Hardware'</span>;
+0772 AO.SD.Setpoint.HWUnits       = <span class="string">'A'</span>;           
+0773 AO.SD.Setpoint.PhysicsUnits  = <span class="string">'m^-3'</span>;
+0774 <span class="comment">%AO.SD.Setpoint.HW2PhysicsFcn = @amp2k;</span>
+0775 <span class="comment">%AO.SD.Setpoint.Physics2HWFcn = @k2amp;</span>
+0776 
+0777 SDGain = -0.403;  <span class="comment">%  m^-3/A</span>
+0778 AO.SD.Monitor.HW2PhysicsParams  = SDGain;          
+0779 AO.SD.Monitor.Physics2HWParams  = 1.0/SDGain;
+0780 AO.SD.Setpoint.HW2PhysicsParams = SDGain;          
+0781 AO.SD.Setpoint.Physics2HWParams = 1.0/SDGain;
+0782 
+0783 <span class="comment">% common      desired           monitor    setpoint stat devlist elem  range    tol respkick</span>
+0784 sd={
+0785   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [1, 1]  1  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0786   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [1, 2]  2  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0787   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [2, 1]  3  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0788   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [2, 2]  4  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0789   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [3, 1]  5  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0790   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [3, 2]  6  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0791   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [4, 1]  7  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0792   <span class="string">'usxd'</span> <span class="string">'usxd:CurrSetptDes'</span> <span class="string">'usxd:am'</span> <span class="string">'usxd:sp'</span>  1  [4, 2]  8  [0, Srange] 1.0 2.5; <span class="keyword">...</span>
+0793 };
+0794 
+0795 <span class="keyword">for</span> ii=1:size(sd,1)
+0796   <span class="comment">%AO.SD.CommonNames(ii,:)           = sd{ii,1};</span>
+0797   AO.SD.Monitor.ChannelNames(ii,:)  = sd{ii,3};
+0798   AO.SD.Setpoint.ChannelNames(ii,:) = sd{ii,4};     
+0799   AO.SD.Status(ii,1)                = sd{ii,5};
+0800   AO.SD.DeviceList(ii,:)            = sd{ii,6};
+0801   AO.SD.ElementList(ii,1)           = sd{ii,7};
+0802  
+0803   AO.SD.Setpoint.Range(ii,:)        = sd{ii,8};
+0804   AO.SD.Setpoint.Tolerance(ii,1)    = sd{ii,9};
+0805   AO.SD.Setpoint.DeltaRespMat(ii,1) = sd{ii,10};
+0806 <span class="keyword">end</span>
+0807 
+0808 setao(AO);
+0809 
+0810 
+0811 <span class="comment">%============</span>
+0812 <span class="comment">%RF System</span>
+0813 <span class="comment">%============</span>
+0814 AO.RF.FamilyName = <span class="string">'RF'</span>;
+0815 AO.RF.MemberOf = {<span class="string">'MachineConfig'</span>; <span class="string">'PlotFamily'</span>;  <span class="string">'RF'</span>; <span class="string">'RFSystem'</span>};
+0816 AO.RF.Status = 1;
+0817 AO.RF.CommonNames = <span class="string">'RF'</span>;
+0818 AO.RF.DeviceList = [1 1];
+0819 AO.RF.ElementList = 1;
+0820 
+0821 <span class="comment">%Frequency Readback</span>
+0822 AO.RF.Monitor.Mode                = <span class="string">'Special'</span>;
+0823 AO.RF.Monitor.DataType            = <span class="string">'Scalar'</span>;
+0824 AO.RF.Monitor.SpecialFunctionGet  = <span class="string">'getrfvuv'</span>;
+0825 AO.RF.Monitor.Units               = <span class="string">'Hardware'</span>;
+0826 AO.RF.Monitor.HW2PhysicsParams    = 1e+6;
+0827 AO.RF.Monitor.Physics2HWParams    = 1e-6;
+0828 AO.RF.Monitor.HWUnits             = <span class="string">'MHz'</span>;           
+0829 AO.RF.Monitor.PhysicsUnits        = <span class="string">'Hz'</span>;
+0830 
+0831 <span class="comment">%Frequency Setpoint</span>
+0832 AO.RF.Setpoint.Mode               = <span class="string">'Special'</span>;
+0833 AO.RF.Setpoint.DataType           = <span class="string">'Scalar'</span>;
+0834 AO.RF.Setpoint.SpecialFunctionSet = <span class="string">'setrfvuv'</span>;
+0835 AO.RF.Setpoint.SpecialFunctionGet = <span class="string">'getrfvuv'</span>;
+0836 AO.RF.Setpoint.Units              = <span class="string">'Hardware'</span>;
+0837 AO.RF.Setpoint.HW2PhysicsParams   = 1e+6;         
+0838 AO.RF.Setpoint.Physics2HWParams   = 1e-6;
+0839 AO.RF.Setpoint.HWUnits            = <span class="string">'MHz'</span>;           
+0840 AO.RF.Setpoint.PhysicsUnits       = <span class="string">'Hz'</span>;
+0841 AO.RF.Setpoint.Range              = [52.760000 53.010000]; <span class="comment">%10% acceptance</span>
+0842 <span class="comment">%                                    52.885 MHz central frequency</span>
+0843 AO.RF.Setpoint.Tolerance          = 1;
+0844 
+0845 
+0846 <span class="comment">%====</span>
+0847 <span class="comment">%TUNE</span>
+0848 <span class="comment">%====</span>
+0849 AO.TUNE.FamilyName  = <span class="string">'TUNE'</span>;
+0850 AO.TUNE.MemberOf    = {<span class="string">'Diagnostics'</span>};
+0851 AO.TUNE.CommonNames = [<span class="string">'xtune'</span>; <span class="string">'ytune'</span>; <span class="string">'stune'</span>];
+0852 AO.TUNE.DeviceList  = [1 1; 1 2; 1 3];
+0853 AO.TUNE.ElementList = [1 2 3]';
+0854 AO.TUNE.Status      = [1 1 0]';
+0855 AO.TUNE.Position    = 0;
+0856 
+0857 AO.TUNE.Monitor.Mode                   = <span class="string">'Special'</span>;
+0858 AO.TUNE.Monitor.DataType               = <span class="string">'Scalar'</span>;
+0859 AO.TUNE.Monitor.ChannelNames           = [<span class="string">'utuneh:am'</span>; <span class="string">'utunev:am'</span>; <span class="string">'         '</span>];    
+0860 <span class="comment">%AO.TUNE.Monitor.SpecialFunctionGet     = 'gettune_vuv';</span>
+0861 AO.TUNE.Monitor.Units                  = <span class="string">'Hardware'</span>;
+0862 AO.TUNE.Monitor.HW2PhysicsParams       = 1;
+0863 AO.TUNE.Monitor.Physics2HWParams       = 1;
+0864 AO.TUNE.Monitor.HWUnits                = <span class="string">'fractional tune'</span>;           
+0865 AO.TUNE.Monitor.PhysicsUnits           = <span class="string">'fractional tune'</span>;
+0866 
+0867 
+0868 <span class="comment">%====</span>
+0869 <span class="comment">%DCCT</span>
+0870 <span class="comment">%====</span>
+0871 AO.DCCT.FamilyName               = <span class="string">'DCCT'</span>;
+0872 AO.DCCT.MemberOf                 = {<span class="string">'DCCT'</span>; <span class="string">'Beam Current'</span>; <span class="string">'Diagnostics'</span>};
+0873 AO.DCCT.CommonNames              = <span class="string">'DCCT'</span>;
+0874 AO.DCCT.DeviceList               = [1 1];
+0875 AO.DCCT.ElementList              = 1;
+0876 AO.DCCT.Status                   = 1;
+0877 AO.DCCT.Position                 = 0;
+0878 
+0879 AO.DCCT.Monitor.Mode             = Mode;
+0880 AO.DCCT.Monitor.DataType         = <span class="string">'Scalar'</span>;
+0881 AO.DCCT.Monitor.ChannelNames     = <span class="string">'uvcurr:am'</span>;    
+0882 AO.DCCT.Monitor.Units            = <span class="string">'Hardware'</span>;
+0883 AO.DCCT.Monitor.HWUnits          = <span class="string">'mA'</span>;           
+0884 AO.DCCT.Monitor.PhysicsUnits     = <span class="string">'A'</span>;
+0885 AO.DCCT.Monitor.HW2PhysicsParams = 0.001;          
+0886 AO.DCCT.Monitor.Physics2HWParams = 1000.0;
+0887 
+0888 
+0889 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0890 <span class="comment">% AcceleratorData structure, AT indices, etc %</span>
+0891 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0892 setao(AO);
+0893 <a href="setoperationalmode.html" class="code" title="function setoperationalmode(OperationalMode)">setoperationalmode</a>(OperationalMode);
+0894 AO = getao;
+0895 
+0896 
+0897 <span class="comment">% Set response matrix kick size in hardware units</span>
+0898 <span class="comment">% AO.HCM.Setpoint.DeltaRespMat = physics2hw('HCM','Setpoint', .15e-3 / 3, AO.HCM.DeviceList);</span>
+0899 <span class="comment">% AO.VCM.Setpoint.DeltaRespMat = physics2hw('VCM','Setpoint', .15e-3 / 3, AO.VCM.DeviceList);</span>
+0900 <span class="comment">%</span>
+0901 <span class="comment">% AO.QF.Setpoint.DeltaRespMat = .15;</span>
+0902 <span class="comment">% AO.QD.Setpoint.DeltaRespMat = .1;</span>
+0903 <span class="comment">%</span>
+0904 <span class="comment">% AO.SF.Setpoint.DeltaRespMat = 5;  % 10</span>
+0905 <span class="comment">% AO.SD.Setpoint.DeltaRespMat = 5; % 10;</span>
+0906 
+0907 
+0908 setao(AO);
+0909</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

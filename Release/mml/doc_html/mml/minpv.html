@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of minpv</title>
+  <meta name="keywords" content="minpv">
+  <meta name="description" content="MinPV - Maximum value of a process variable">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; minpv.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>minpv
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MinPV - Maximum value of a process variable</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Data, ErrorFlag] = minpv(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MinPV - Maximum value of a process variable
+  [MinPV, ErrorFlag] = minpv(Family, Field, DeviceList)
+  [MinPV, ErrorFlag] = minpv(Family, DeviceList)      (Field will default to 'Setpoint')
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Accelerator Object
+  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {'Monitor'}
+  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}
+  4. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+  5. 'Numeric' - Numeric output {Default}
+     'Struct'  - Data structure output
+
+  OUTPUTS
+  1. MinPV = Minimum value corresponding to the Family, Field, and DeviceList
+ 
+  NOTES
+  1. If Family is a cell array, then DeviceList and Field can also be a cell arrays
+  2. Same as first column of getfamilydata(Family, Field, 'Range', DeviceList)
+
+  See also <a href="maxpv.html" class="code" title="function [Data, ErrorFlag] = maxpv(varargin)">maxpv</a>, <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>	FAMILY2DATASTRUCTURE</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>	INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList</li><li><a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>	MinPV - Maximum value of a process variable</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="checklimits.html" class="code" title="function [LimitFlag, LimitList] = checklimits(varargin)">checklimits</a>	CHECKLIMITS - Checks if the setpoint will exceed a limit</li><li><a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>	MinPV - Maximum value of a process variable</li><li><a href="minsp.html" class="code" title="function [Data, ErrorFlag] = minsp(varargin)">minsp</a>	MINSP - Minimum value of the setpoint</li><li><a href="plotfamily.html" class="code" title="function varargout = plotfamily(varargin)">plotfamily</a>	PLOTFAMILY - Plots by middle layer family name</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Data, ErrorFlag] = minpv(varargin)</a>
+0002 <span class="comment">%MinPV - Maximum value of a process variable</span>
+0003 <span class="comment">%  [MinPV, ErrorFlag] = minpv(Family, Field, DeviceList)</span>
+0004 <span class="comment">%  [MinPV, ErrorFlag] = minpv(Family, DeviceList)      (Field will default to 'Setpoint')</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. Family - Family Name</span>
+0008 <span class="comment">%              Data Structure</span>
+0009 <span class="comment">%              Accelerator Object</span>
+0010 <span class="comment">%  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {'Monitor'}</span>
+0011 <span class="comment">%  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}</span>
+0012 <span class="comment">%  4. 'Physics'  - Use physics  units (optional override of units)</span>
+0013 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0014 <span class="comment">%  5. 'Numeric' - Numeric output {Default}</span>
+0015 <span class="comment">%     'Struct'  - Data structure output</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  OUTPUTS</span>
+0018 <span class="comment">%  1. MinPV = Minimum value corresponding to the Family, Field, and DeviceList</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  NOTES</span>
+0021 <span class="comment">%  1. If Family is a cell array, then DeviceList and Field can also be a cell arrays</span>
+0022 <span class="comment">%  2. Same as first column of getfamilydata(Family, Field, 'Range', DeviceList)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  See also maxpv, getfamilydata</span>
+0025 
+0026 <span class="comment">%  Written by Greg Portmann</span>
+0027 
+0028 
+0029 <span class="comment">% Input parsing</span>
+0030 UnitsFlagCell = {};
+0031 StructOutputFlag = 0;
+0032 <span class="keyword">for</span> i = length(varargin):-1:1
+0033     <span class="keyword">if</span> isstruct(varargin{i})
+0034         <span class="comment">% Ignor structures</span>
+0035     <span class="keyword">elseif</span> iscell(varargin{i})
+0036         <span class="comment">% Ignor cells</span>
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0038         StructOutputFlag = 1;
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0041         StructOutputFlag = 0;
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>) || strcmpi(varargin{i},<span class="string">'Online'</span>) || strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0044         <span class="comment">% Remove and ignor</span>
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0047         UnitsFlagCell = {<span class="string">'Physics'</span>};
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0050         UnitsFlagCell = {<span class="string">'Hardware'</span>};
+0051         varargin(i) = [];
+0052     <span class="keyword">end</span>
+0053 <span class="keyword">end</span>
+0054 
+0055 <span class="keyword">if</span> isempty(varargin)
+0056     error(<span class="string">'Must have at least a family name input'</span>);
+0057 <span class="keyword">end</span>
+0058 
+0059 
+0060 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0061 <span class="comment">% Cell Array Inputs %</span>
+0062 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0063 <span class="keyword">if</span> iscell(varargin{1})
+0064     <span class="keyword">for</span> i = 1:length(varargin{1})
+0065         <span class="keyword">if</span> length(varargin) &lt; 2
+0066             [Data{i}, ErrorFlag{i}] = <a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>(varargin{1}{i}, UnitsFlagCell{:});
+0067         <span class="keyword">elseif</span> length(varargin) &lt; 3
+0068             <span class="keyword">if</span> iscell(varargin{2})
+0069                 [Data{i}, ErrorFlag{i}] = <a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>(varargin{1}{i}, varargin{2}{i}, UnitsFlagCell{:});
+0070             <span class="keyword">else</span>
+0071                 [Data{i}, ErrorFlag{i}] = <a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>(varargin{1}{i}, varargin{2}, UnitsFlagCell{:});
+0072             <span class="keyword">end</span>
+0073         <span class="keyword">else</span>
+0074             <span class="keyword">if</span> iscell(varargin{3})
+0075                 [Data{i}, ErrorFlag{i}] = <a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i}, UnitsFlagCell{:});
+0076             <span class="keyword">else</span>
+0077                 [Data{i}, ErrorFlag{i}] = <a href="minpv.html" class="code" title="function [Data, ErrorFlag] = minpv(varargin)">minpv</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}, UnitsFlagCell{:});
+0078             <span class="keyword">end</span>
+0079         <span class="keyword">end</span>
+0080     <span class="keyword">end</span>
+0081     <span class="keyword">return</span>
+0082 <span class="keyword">end</span>
+0083 
+0084 
+0085 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0086 <span class="comment">% Parse Family, Field, DeviceList %</span>
+0087 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0088 [Family, Field, DeviceList, UnitsFlag] = <a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>(varargin{:});
+0089 
+0090 
+0091 <span class="comment">% Units flag</span>
+0092 <span class="keyword">if</span> isempty(UnitsFlagCell)
+0093     <span class="comment">% For structure inputs, use the units in the structure (from inputparsingffd)</span>
+0094     <span class="comment">% Else, get the default family value</span>
+0095     <span class="keyword">if</span> isempty(UnitsFlag)
+0096         UnitsFlag = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(Family);
+0097     <span class="keyword">end</span>
+0098 <span class="keyword">else</span>
+0099     <span class="comment">% Input override has priority</span>
+0100     UnitsFlag = UnitsFlagCell{1};
+0101 <span class="keyword">end</span>
+0102 
+0103 
+0104 <span class="comment">% Default field is Setpoint</span>
+0105 <span class="keyword">if</span> isempty(Field)
+0106     Field = <span class="string">'Setpoint'</span>;
+0107 <span class="keyword">end</span>
+0108 
+0109 
+0110 <span class="comment">%%%%%%%%%%%%</span>
+0111 <span class="comment">% Get data %</span>
+0112 <span class="comment">%%%%%%%%%%%%</span>
+0113 [Data, ErrorFlag] = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'Range'</span>, DeviceList);
+0114 <span class="keyword">if</span> isempty(Data)
+0115     <span class="comment">% Try the .Setpoint range (this maynot be such a good ideal)</span>
+0116     [Data, ErrorFlag] = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'Setpoint'</span>, <span class="string">'Range'</span>, DeviceList);
+0117     <span class="keyword">if</span> isempty(Data)
+0118         <span class="comment">% Could check LOPR here if using EPICs</span>
+0119         error(sprintf(<span class="string">'%s.%s minimum setpoint limit not known, .Range field missing.'</span>, Family, Field));
+0120     <span class="keyword">end</span>
+0121 <span class="keyword">end</span>
+0122 Data = Data(:,1);
+0123 
+0124 
+0125 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0126 <span class="comment">% Change to physics units if requested %</span>
+0127 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0128 <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0129     Data = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(Family, Field, Data, DeviceList);
+0130 <span class="keyword">end</span>
+0131 
+0132 
+0133 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0134 <span class="comment">% Return a data structure if requested %</span>
+0135 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0136 <span class="keyword">if</span> StructOutputFlag
+0137     DataNumeric = Data;
+0138     Data = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(Family, Field, DeviceList, UnitsFlag);
+0139     Data.Data = DataNumeric;
+0140     Data.DataDescriptor = sprintf(<span class="string">'%s.%s Minimum'</span>, Family, Field);
+0141     Data.CreatedBy = <span class="string">'minpv'</span>;
+0142 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

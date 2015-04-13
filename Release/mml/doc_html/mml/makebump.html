@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of makebump</title>
+  <meta name="keywords" content="makebump">
+  <meta name="description" content="MAKEBUMP - Creates and orbit correction structure (OCS) usable by setorbit">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; makebump.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>makebump
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MAKEBUMP - Creates and orbit correction structure (OCS) usable by setorbit</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function OCS = makebump(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MAKEBUMP - Creates and orbit correction structure (OCS) usable by setorbit
+  OCS = makebump(BPMFamily, BPMDeviceList, GoalOrbit, CMFamily, CMIncrementList, BPMWeight {optional})
+  OCS = makebump(OCS, GoalOrbit, CMIncrementList, BPMWeight {optional})
+
+  INPUTS
+  1. BPMFamily
+  2. BPMDeviceList
+  3. GoalOrbit
+  4. CMFamily
+  5. CMIncrementList
+  6. BPMWeight - Weight applied to the BPMs inside the bump (GoalOrbit).  BPM weighting
+                 should only be required when the corrector are in a region of dispersion
+                 and the RF frequency is not used in the orbit correction.
+                {Default BPMWeight is to weight the leakage twice as much as the GoalOrbit}
+  7. 'Display' - Display bump characteristics
+  8. Optional flags used in setorbit can also be used:
+     'FitRF' flag to include the RF frequency as part of orbit correction.
+
+  NOTES
+  1. makebump creates an OCS structure.  Use setorbit to actually change the orbit.
+
+  See also setbump, setbumpgui, <a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>	FAMILY2DATASTRUCTURE</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>	GETGOLDEN - Returns the golden values for a family</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function OCS = makebump(varargin)</a>
+0002 <span class="comment">%MAKEBUMP - Creates and orbit correction structure (OCS) usable by setorbit</span>
+0003 <span class="comment">%  OCS = makebump(BPMFamily, BPMDeviceList, GoalOrbit, CMFamily, CMIncrementList, BPMWeight {optional})</span>
+0004 <span class="comment">%  OCS = makebump(OCS, GoalOrbit, CMIncrementList, BPMWeight {optional})</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. BPMFamily</span>
+0008 <span class="comment">%  2. BPMDeviceList</span>
+0009 <span class="comment">%  3. GoalOrbit</span>
+0010 <span class="comment">%  4. CMFamily</span>
+0011 <span class="comment">%  5. CMIncrementList</span>
+0012 <span class="comment">%  6. BPMWeight - Weight applied to the BPMs inside the bump (GoalOrbit).  BPM weighting</span>
+0013 <span class="comment">%                 should only be required when the corrector are in a region of dispersion</span>
+0014 <span class="comment">%                 and the RF frequency is not used in the orbit correction.</span>
+0015 <span class="comment">%                {Default BPMWeight is to weight the leakage twice as much as the GoalOrbit}</span>
+0016 <span class="comment">%  7. 'Display' - Display bump characteristics</span>
+0017 <span class="comment">%  8. Optional flags used in setorbit can also be used:</span>
+0018 <span class="comment">%     'FitRF' flag to include the RF frequency as part of orbit correction.</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  NOTES</span>
+0021 <span class="comment">%  1. makebump creates an OCS structure.  Use setorbit to actually change the orbit.</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  See also setbump, setbumpgui, setorbit</span>
+0024 
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="comment">%%%%%%%%%%%%</span>
+0029 <span class="comment">% Defaults %</span>
+0030 <span class="comment">%%%%%%%%%%%%</span>
+0031 nIter = 3;
+0032 BPMWeight = [];
+0033 GoalOrbit = [];
+0034 IncrementalFlag = 1;
+0035 DisplayFlag = 0;
+0036 
+0037 
+0038 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0039 <span class="comment">% Input parsing and checking %</span>
+0040 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0041 OCS.Flags = {};
+0042 <span class="keyword">for</span> i = length(varargin):-1:1
+0043     <span class="keyword">if</span> isstruct(varargin{i})
+0044         <span class="comment">% Ignor structures</span>
+0045     <span class="keyword">elseif</span> iscell(varargin{i})
+0046         <span class="comment">% Ignor cells</span>
+0047     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Golden'</span>)
+0048         <span class="comment">% Use the golden orbit</span>
+0049         GoalOrbit = <span class="string">'Golden'</span>;
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Offset'</span>)
+0052         <span class="comment">% Use the offset orbit</span>
+0053         GoalOrbit = <span class="string">'Golden'</span>;
+0054         varargin(i) = [];
+0055     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0056         OCS.Flags = [OCS.Flags varargin(i)];
+0057         DisplayFlag = 1;
+0058         varargin(i) = [];
+0059     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'ModelResp'</span>)
+0060         OCS.Flags = [OCS.Flags varargin(i)];
+0061         varargin(i) = [];
+0062     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'FitRF'</span>)
+0063         OCS.Flags = [OCS.Flags varargin(i)];
+0064         varargin(i) = [];
+0065     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'ModelDisp'</span>)
+0066         OCS.Flags = [OCS.Flags varargin(i)];
+0067         varargin(i) = [];
+0068     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'MeasDisp'</span>)
+0069         OCS.Flags = [OCS.Flags varargin(i)];
+0070         varargin(i) = [];
+0071     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'GoldenDisp'</span>)
+0072         OCS.Flags = [OCS.Flags varargin(i)];
+0073         varargin(i) = [];
+0074     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Inc'</span>) || strcmpi(varargin{i},<span class="string">'Incremental'</span>)
+0075         IncrementalFlag = 1;
+0076         varargin(i) = [];
+0077     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Abs'</span>) || strcmpi(varargin{i},<span class="string">'Absolute'</span>)
+0078         IncrementalFlag = 0;
+0079         varargin(i) = [];
+0080     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0081         ModeFlag = <span class="string">'SIMULATOR'</span>;
+0082         OCS.Flags = [OCS.Flags varargin(i)];
+0083         varargin(i) = [];
+0084     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0085         ModeFlag = <span class="string">'Online'</span>;
+0086         OCS.Flags = [OCS.Flags varargin(i)];
+0087         varargin(i) = [];
+0088     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0089         ModeFlag = <span class="string">'Manual'</span>;
+0090         OCS.Flags = [OCS.Flags varargin(i)];
+0091         varargin(i) = [];
+0092     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0093         UnitsFlag = <span class="string">'Physics'</span>;
+0094         OCS.Flags = [OCS.Flags varargin(i)];
+0095         varargin(i) = [];
+0096     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0097         UnitsFlag = <span class="string">'Hardware'</span>;
+0098         OCS.Flags = [OCS.Flags varargin(i)];
+0099         varargin(i) = [];
+0100     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'archive'</span>)
+0101         <span class="comment">% Just remove</span>
+0102         varargin(i) = [];
+0103     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'noarchive'</span>)
+0104         <span class="comment">% Just remove</span>
+0105         varargin(i) = [];
+0106     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0107         <span class="comment">% Just remove</span>
+0108         varargin(i) = [];
+0109     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0110         <span class="comment">% Just remove</span>
+0111         varargin(i) = [];
+0112     <span class="keyword">end</span>
+0113 <span class="keyword">end</span>
+0114 i=length(OCS.Flags);
+0115 <span class="keyword">if</span> IncrementalFlag
+0116     OCS.Flags{i+1} = <span class="string">'Incremental'</span>;
+0117 <span class="keyword">else</span>
+0118     OCS.Flags{i+1} = <span class="string">'Absolute'</span>;
+0119 <span class="keyword">end</span>
+0120 
+0121 
+0122 <span class="keyword">if</span> isstruct(varargin{1})
+0123     OCS = varargin{1};
+0124     varargin(1) = [];
+0125     <span class="keyword">if</span> length(varargin) &lt; 2
+0126         error(<span class="string">'An OCS plus at least 2 inputs are required'</span>);
+0127     <span class="keyword">end</span>
+0128     GoalOrbit = varargin{1};
+0129     varargin(1) = [];
+0130     CMIncrementList = varargin{1};
+0131     varargin(1) = [];
+0132 <span class="keyword">else</span>
+0133     <span class="keyword">if</span> length(varargin) &lt; 5
+0134         error(<span class="string">'At least 5 inputs or an orbit correction structure is required'</span>);
+0135     <span class="keyword">end</span>
+0136     OCS.BPM.FamilyName = varargin{1};
+0137     OCS.BPM.DeviceList = varargin{2};
+0138     GoalOrbit = varargin{3};
+0139     OCS.CM.FamilyName = varargin{4};
+0140     CMIncrementList = varargin{5};
+0141     varargin(1:5) = [];
+0142 <span class="keyword">end</span>
+0143 
+0144 <span class="keyword">if</span> length(varargin) &gt;= 1
+0145     <span class="keyword">if</span> isnumeric(varargin{1})
+0146         BPMWeight = varargin{1};
+0147         varargin(1) = [];
+0148     <span class="keyword">end</span>
+0149 <span class="keyword">end</span>
+0150 
+0151 <span class="comment">% Pass the extra inputs on</span>
+0152 <span class="keyword">if</span> length(varargin) &gt;= 1
+0153     OCS.Flags = [OCS.Flags varargin];
+0154 <span class="keyword">end</span>
+0155 
+0156 
+0157 <span class="comment">% Possibly convert the GoalOrbit</span>
+0158 <span class="keyword">if</span> ischar(GoalOrbit)
+0159     <span class="keyword">if</span> strcmpi(GoalOrbit, <span class="string">'Golden'</span>)
+0160         GoalOrbit = <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>(OCS.BPM.FamilyName, OCS.BPM.DeviceList);
+0161     <span class="keyword">elseif</span> strcmpi(GoalOrbit, <span class="string">'Offset'</span>)
+0162         GoalOrbit = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(OCS.BPM.FamilyName, OCS.BPM.DeviceList);
+0163     <span class="keyword">else</span>
+0164         error(<span class="string">'Goal unknown'</span>);
+0165     <span class="keyword">end</span>
+0166 <span class="keyword">end</span>
+0167 GoalOrbit = GoalOrbit(:);
+0168 
+0169 <span class="comment">% Check the length</span>
+0170 <span class="keyword">if</span> length(GoalOrbit) ~= size(OCS.BPM.DeviceList,1)
+0171     error(<span class="string">'Length of the GoalOrbit must equal the number of devices in BPMList'</span>);
+0172 <span class="keyword">end</span>
+0173 
+0174 
+0175 <span class="comment">% CMIncrementList must be a vector, no zeros, no repeats</span>
+0176 CMIncrementList = CMIncrementList(:);
+0177 CMIncrementList = sort(CMIncrementList);
+0178 CMIncrementList(find(CMIncrementList==0)) = [];
+0179 CMIncrementList(find(diff(CMIncrementList)==0)) = [];
+0180 
+0181 
+0182 <span class="comment">% Get BPM postions</span>
+0183 BPMListTotal = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(OCS.BPM.FamilyName, 1);
+0184 BPMsposTotal = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.BPM.FamilyName, BPMListTotal);
+0185 BPMspos      = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.BPM.FamilyName, OCS.BPM.DeviceList);
+0186 
+0187 
+0188 <span class="comment">% Stack 3 rings so you you don't have to worry about the L to 0 transition</span>
+0189 CMListTotal = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(OCS.CM.FamilyName, 1);
+0190 CMsposTotal = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.CM.FamilyName, CMListTotal);
+0191 L = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0192 CMListTotal = [CMListTotal; CMListTotal; CMListTotal];
+0193 CMsposTotal = [CMsposTotal-L; CMsposTotal; CMsposTotal+L];
+0194 
+0195 
+0196 <span class="comment">% Find the correctors</span>
+0197 <span class="keyword">for</span> i = 1:length(CMIncrementList)
+0198     <span class="keyword">if</span> CMIncrementList(i) &lt;= 0
+0199         j = find(CMsposTotal &lt;= BPMspos(1));
+0200         OCS.CM.DeviceList(i,:) = CMListTotal(j(end)+CMIncrementList(i)+1,:);
+0201     <span class="keyword">else</span>
+0202         j = find(CMsposTotal &gt;= BPMspos(end));
+0203         OCS.CM.DeviceList(i,:) = CMListTotal(j(1)+CMIncrementList(i)-1,:);        
+0204     <span class="keyword">end</span>
+0205 <span class="keyword">end</span>
+0206 
+0207 
+0208 <span class="comment">% Find all BPMs outside the bump (leakage control BPMs)</span>
+0209 CMspos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.CM.FamilyName, OCS.CM.DeviceList);
+0210 j1 = find(BPMsposTotal &lt; CMspos(1));
+0211 j2 = find(BPMsposTotal &gt; CMspos(end));
+0212 <span class="keyword">if</span> isempty(j1) &amp;&amp; isempty(j2)
+0213     error(<span class="string">'Cound not find any leakage control BPMs'</span>);
+0214 <span class="keyword">end</span>
+0215 OCS.BPM.DeviceList = [BPMListTotal(j1,:); OCS.BPM.DeviceList; BPMListTotal(j2,:);];
+0216 
+0217 <span class="keyword">if</span> IncrementalFlag
+0218     OCS.GoalOrbit = [zeros(length(j1),1); GoalOrbit; zeros(length(j2),1)];
+0219 <span class="keyword">else</span>
+0220     OCS.GoalOrbit = [<a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(OCS.BPM.FamilyName,BPMListTotal(j1,:)); GoalOrbit; <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(OCS.BPM.FamilyName,BPMListTotal(j2,:))];
+0221 <span class="keyword">end</span>
+0222 
+0223 
+0224 <span class="comment">% Add a weight</span>
+0225 <span class="keyword">if</span> isempty(BPMWeight)
+0226     <span class="comment">% Default BPMWeight is to weight the leakage twice as much as the bump goal</span>
+0227     BPMWeight = .5 * (length(j1) + length(j2)) / length(GoalOrbit);
+0228     OCS.BPMWeight = [ones(length(j1),1); BPMWeight .* ones(length(GoalOrbit),1); ones(length(j2),1)];
+0229 <span class="keyword">else</span>
+0230     OCS.BPMWeight = [ones(length(j1),1); BPMWeight .* ones(length(GoalOrbit),1); ones(length(j2),1)];
+0231 <span class="keyword">end</span>
+0232 
+0233 
+0234 <span class="comment">% Create data structure</span>
+0235 OCS.BPM = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(OCS.BPM.FamilyName, OCS.BPM.DeviceList);
+0236 OCS.CM = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(OCS.CM.FamilyName, OCS.CM.DeviceList);
+0237 
+0238 
+0239 <span class="comment">% Bumps stats</span>
+0240 <span class="keyword">if</span> DisplayFlag
+0241     <span class="comment">% Corrector strength (meters/radian) and (mm/amp)</span>
+0242     <span class="comment">% Warn on when to add RF frequency (generated dispersion is greater than mm per amp or % of mm/amp bump)</span>
+0243 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

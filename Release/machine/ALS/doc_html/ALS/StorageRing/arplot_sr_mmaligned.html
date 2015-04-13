@@ -1,0 +1,2215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of arplot_sr_mmaligned</title>
+  <meta name="keywords" content="arplot_sr_mmaligned">
+  <meta name="description" content="arplot_sr_mmaligned(Month1 String, Days1, Year1, Month2 String, Days2, Year2)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; arplot_sr_mmaligned.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>arplot_sr_mmaligned
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>arplot_sr_mmaligned(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function arplot_sr_mmaligned(monthStr, days, year1, month2Str, days2, year2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> arplot_sr_mmaligned(Month1 String, Days1, Year1, Month2 String, Days2, Year2)
+ 
+ Plots a whole bunch of storage ring related archived data.
+ Only plots data when feed forward is on.
+
+ Used for the special case when the spiricon beamsize monitor is set up
+        in &quot;mm-aligned&quot; mode
+
+ Example #1:  arplot_sr_mmaligned('January',22:24,1998);
+              plots data from 1/22, 1/23, and 1/24 in 1998
+
+ Example #2:  arplot_sr_mmaligned('January',28:31,1998,'February',1:4,1998);
+              plots data from the last 4 days in Jan. and the first 4 days in Feb.
+
+ Greg Portmann, 1999
+
+ modified by C. Steier, 2001</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arglobal.html" class="code" title="">arglobal</a>	Just used to make archived variables global</li><li><a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>	ARREAD - Loads one day of archived data into matlab global memory</li><li><a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>	ARSELECT - Return the archived data for a group on channel names</li><li><a href="gap2tune.html" class="code" title="function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)">gap2tune</a>	GAP2TUNE - Computes the vertical tune shift for a insertion device gap change.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function arplot_sr_mmaligned(monthStr, days, year1, month2Str, days2, year2)</a>
+0002 <span class="comment">% arplot_sr_mmaligned(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Plots a whole bunch of storage ring related archived data.</span>
+0005 <span class="comment">% Only plots data when feed forward is on.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Used for the special case when the spiricon beamsize monitor is set up</span>
+0008 <span class="comment">%        in &quot;mm-aligned&quot; mode</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Example #1:  arplot_sr_mmaligned('January',22:24,1998);</span>
+0011 <span class="comment">%              plots data from 1/22, 1/23, and 1/24 in 1998</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% Example #2:  arplot_sr_mmaligned('January',28:31,1998,'February',1:4,1998);</span>
+0014 <span class="comment">%              plots data from the last 4 days in Jan. and the first 4 days in Feb.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Greg Portmann, 1999</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% modified by C. Steier, 2001</span>
+0019 
+0020 alsglobe
+0021 
+0022 FFFlag = 0;
+0023 
+0024 <span class="keyword">if</span> isempty(IDXoffset) | isempty(IDXoffset) | isempty(IDXgolden) | isempty(IDXgolden)
+0025    disp(<span class="string">'  Run alsvars (or alsinit) before running this function.'</span>);
+0026    <span class="keyword">return</span>
+0027 <span class="keyword">end</span>
+0028 
+0029 
+0030 <span class="comment">% Inputs</span>
+0031 <span class="keyword">if</span> nargin &lt; 2
+0032    error(<span class="string">'ARPLOTS:  You need at least two input arguments.'</span>);
+0033 <span class="keyword">elseif</span> nargin == 2
+0034    tmp = clock;
+0035    year1 = tmp(1);
+0036    monthStr2 = [];
+0037    days2 = [];
+0038    year2 = [];
+0039 <span class="keyword">elseif</span> nargin == 3
+0040    monthStr2 = [];
+0041    days2 = [];
+0042    year2 = [];
+0043 <span class="keyword">elseif</span> nargin == 4
+0044    error(<span class="string">'ARPLOTS:  You need 2, 3, 5, or 6 input arguments.'</span>);
+0045 <span class="keyword">elseif</span> nargin == 5
+0046    tmp = clock;
+0047    year2 = tmp(1);
+0048 <span class="keyword">elseif</span> nargin == 6
+0049 <span class="keyword">else</span>
+0050    error(<span class="string">'ARPLOTS:  Inputs incorrect.'</span>);
+0051 <span class="keyword">end</span>
+0052 
+0053 
+0054 <a href="arglobal.html" class="code" title="">arglobal</a>
+0055 
+0056 
+0057 t=[];
+0058 
+0059 dcct=[];
+0060 lifetime=[];
+0061 lcw=[];
+0062 gev=[];
+0063 
+0064 QFAam=[];
+0065 
+0066 TC7_1=[];
+0067 TC7_2=[];
+0068 TC7_3=[];
+0069 TC7_4=[];
+0070 
+0071 TC8_1=[];
+0072 TC8_2=[];
+0073 TC8_3=[];
+0074 TC8_4=[];
+0075 
+0076 TC9_1=[];
+0077 TC9_2=[];
+0078 TC9_3=[];
+0079 TC9_4=[];
+0080 
+0081 TC10_1=[];
+0082 TC10_2=[];
+0083 TC10_3=[];
+0084 TC10_4=[];
+0085 
+0086 TC12_1=[];
+0087 TC12_2=[];
+0088 TC12_3=[];
+0089 TC12_4=[];
+0090 
+0091 IDgap = [];
+0092 EPU4=[];
+0093 
+0094 FF7Enable = [];
+0095 
+0096 ID1BPM1x=[];
+0097 ID1BPM1y=[];
+0098 
+0099 ID2BPM1x=[];
+0100 ID2BPM1y=[];
+0101 ID2BPM2x=[];
+0102 ID2BPM2y=[];
+0103 
+0104 ID4BPM1x=[];
+0105 ID4BPM1y=[];
+0106 ID4BPM2x=[];
+0107 ID4BPM2y=[];
+0108 ID4BPM3x=[];
+0109 ID4BPM3y=[];
+0110 ID4BPM4x=[];
+0111 ID4BPM4y=[];
+0112 
+0113 ID5BPM1x=[];
+0114 ID5BPM1y=[];
+0115 ID5BPM2x=[];
+0116 ID5BPM2y=[];
+0117 
+0118 ID6BPM1x=[];
+0119 ID6BPM1y=[];
+0120 ID6BPM2x=[];
+0121 ID6BPM2y=[];
+0122 
+0123 ID7BPM1x=[];
+0124 ID7BPM1y=[];
+0125 ID7BPM2x=[];
+0126 ID7BPM2y=[];
+0127 
+0128 ID8BPM1x=[];
+0129 ID8BPM1y=[];
+0130 ID8BPM2x=[];
+0131 ID8BPM2y=[];
+0132 
+0133 ID9BPM1x=[];
+0134 ID9BPM1y=[];
+0135 ID9BPM2x=[];
+0136 ID9BPM2y=[];
+0137 
+0138 ID10BPM1x=[];
+0139 ID10BPM1y=[];
+0140 ID10BPM2x=[];
+0141 ID10BPM2y=[];
+0142 
+0143 ID11BPM1x=[];
+0144 ID11BPM1y=[];
+0145 ID11BPM2x=[];
+0146 ID11BPM2y=[];
+0147 
+0148 ID12BPM1x=[];
+0149 ID12BPM1y=[];
+0150 ID12BPM2x=[];
+0151 ID12BPM2y=[];
+0152 
+0153 ID9BPM2xRMS=[];
+0154 ID9BPM2yRMS=[];
+0155 ID9BPM5xRMS=[];
+0156 ID9BPM5yRMS=[];
+0157 
+0158 BPM44x=[];
+0159 BPM44y=[];
+0160 
+0161 BPM45x=[];
+0162 BPM45y=[];
+0163 
+0164 BPM84x=[];
+0165 BPM84y=[];
+0166 
+0167 BPM85x=[];
+0168 BPM85y=[];
+0169 
+0170 BPM94x=[];
+0171 BPM94y=[];
+0172 
+0173 BPM95x=[];
+0174 BPM95y=[];
+0175 
+0176 BPM124x=[];
+0177 BPM124y=[];
+0178 
+0179 BPM125x=[];
+0180 BPM125y=[];
+0181 
+0182 hqmofm=[];
+0183 
+0184 SigX=[];
+0185 SigY=[];
+0186 SpiroX = [];
+0187 SpiroY = [];
+0188 Spirorient = [];
+0189 
+0190 C1TEMP=[];
+0191 C2TEMP=[];
+0192 
+0193 HPcounter=[];
+0194 HPsyn=[];
+0195 
+0196 <span class="keyword">if</span> isempty(days2)
+0197    <span class="keyword">if</span> length(days) == [1]
+0198       month  = mon2num(monthStr);
+0199       NumDays = length(days);
+0200       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0201       EndDayStr =   [<span class="string">''</span>];
+0202       titleStr = [StartDayStr];
+0203    <span class="keyword">else</span>
+0204       month  = mon2num(monthStr);
+0205       NumDays = length(days);
+0206       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0207       EndDayStr =   [monthStr, <span class="string">' '</span>, num2str(days(length(days))),<span class="string">', '</span>, num2str(year1)];
+0208       titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0209    <span class="keyword">end</span>
+0210 <span class="keyword">else</span>
+0211    month  = mon2num(monthStr);
+0212    month2 = mon2num(month2Str);
+0213    NumDays = length(days) + length(days2);
+0214    StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0215    EndDayStr =   [month2Str, <span class="string">' '</span>, num2str(days2(length(days2))),<span class="string">', '</span>, num2str(year2)];
+0216    titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0217 <span class="keyword">end</span>
+0218 
+0219 
+0220 StartDay = days(1);
+0221 EndDay = days(length(days));
+0222 
+0223 <span class="keyword">for</span> day = days
+0224     <span class="keyword">try</span>
+0225         year1str = num2str(year1);
+0226         <span class="keyword">if</span> year1 &lt; 2000
+0227             year1str = year1str(3:4);
+0228             FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0229         <span class="keyword">else</span>
+0230             FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year1str, month, day);
+0231         <span class="keyword">end</span>
+0232         <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName, FFFlag);
+0233         
+0234         [y1, idcct] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___DCCTLP_AM01'</span>);
+0235         [y2, ilcw ] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___LCWTMP_AM00'</span>);
+0236         dcct = [dcct y1];
+0237         lcw  = [lcw  y2];
+0238         
+0239         [y1, igev] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'cmm:sr_energy'</span>);
+0240         gev = [gev y1];
+0241         
+0242         [y1, ilifetime] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___DCCT2__AM00'</span>);
+0243         lifetime = [lifetime  y1];
+0244         
+0245         [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04U___ODS1PS_AM00'</span>);
+0246         EPU4 =[EPU4  y1];
+0247         
+0248         [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(getname(<span class="string">'IDpos'</span>));
+0249         IDgap =[IDgap  y1];
+0250         
+0251         <span class="keyword">if</span> FFFlag
+0252             [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'sr07u:FFEnable:bi'</span>);
+0253             FF7Enable =[FF7Enable  y1];
+0254         <span class="keyword">end</span>
+0255         
+0256         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC1__AM'</span>);
+0257         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC2__AM'</span>);
+0258         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC3__AM'</span>);
+0259         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC4__AM'</span>);
+0260         TC7_1=[TC7_1 y1];
+0261         TC7_2=[TC7_2 y2]; 
+0262         TC7_3=[TC7_3 y3];
+0263         TC7_4=[TC7_4 y4];
+0264         
+0265         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC1__AM'</span>);
+0266         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC2__AM'</span>);
+0267         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC3__AM'</span>);
+0268         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC4__AM'</span>);
+0269         TC8_1=[TC8_1 y1];
+0270         TC8_2=[TC8_2 y2]; 
+0271         TC8_3=[TC8_3 y3];
+0272         TC8_4=[TC8_4 y4];
+0273         
+0274         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC1__AM'</span>);
+0275         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC2__AM'</span>);
+0276         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC3__AM'</span>);
+0277         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC4__AM'</span>);
+0278         TC9_1=[TC9_1 y1];
+0279         TC9_2=[TC9_2 y2]; 
+0280         TC9_3=[TC9_3 y3];
+0281         TC9_4=[TC9_4 y4];
+0282         
+0283         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC1__AM'</span>);
+0284         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC2__AM'</span>);
+0285         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC3__AM'</span>);
+0286         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC4__AM'</span>);
+0287         TC10_1=[TC10_1 y1];
+0288         TC10_2=[TC10_2 y2]; 
+0289         TC10_3=[TC10_3 y3];
+0290         TC10_4=[TC10_4 y4];
+0291         
+0292         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC1__AM'</span>);
+0293         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC2__AM'</span>);
+0294         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC3__AM'</span>);
+0295         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC4__AM'</span>);
+0296         TC12_1=[TC12_1 y1];
+0297         TC12_2=[TC12_2 y2]; 
+0298         TC12_3=[TC12_3 y3];
+0299         TC12_4=[TC12_4 y4];
+0300       
+0301           [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01S___IBPM1X_AM'</span>);
+0302         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01S___IBPM1Y_AM'</span>);
+0303 <span class="comment">%        [y3, i] = arselect('SR01S___IBPM2X_AM');</span>
+0304 <span class="comment">%        [y4, i] = arselect('SR01S___IBPM2Y_AM');</span>
+0305         ID1BPM1x=[ID1BPM1x y1];
+0306         ID1BPM1y=[ID1BPM1y y2]; 
+0307 <span class="comment">%        ID1BPM2x=[ID1BPM2x y3];</span>
+0308 <span class="comment">%        ID1BPM2y=[ID1BPM2y y4];</span>
+0309 
+0310         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM1X_AM'</span>);
+0311         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM1Y_AM'</span>);
+0312         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM2X_AM'</span>);
+0313         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM2Y_AM'</span>);
+0314         ID2BPM1x=[ID2BPM1x y1];
+0315         ID2BPM1y=[ID2BPM1y y2]; 
+0316         ID2BPM2x=[ID2BPM2x y3];
+0317         ID2BPM2y=[ID2BPM2y y4];
+0318         
+0319         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM1X_AM'</span>);
+0320         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM1Y_AM'</span>);
+0321         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM2X_AM'</span>);
+0322         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM2Y_AM'</span>);
+0323         ID4BPM1x=[ID4BPM1x y1];
+0324         ID4BPM1y=[ID4BPM1y y2]; 
+0325         ID4BPM2x=[ID4BPM2x y3];
+0326         ID4BPM2y=[ID4BPM2y y4];
+0327         
+0328         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM3X_AM'</span>);
+0329         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM3Y_AM'</span>);
+0330         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM4X_AM'</span>);
+0331         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM4Y_AM'</span>);
+0332         ID4BPM3x=[ID4BPM3x y1];
+0333         ID4BPM3y=[ID4BPM3y y2]; 
+0334         ID4BPM4x=[ID4BPM4x y3];
+0335         ID4BPM4y=[ID4BPM4y y4];
+0336         
+0337         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM1X_AM'</span>);
+0338         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM1Y_AM'</span>);
+0339         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM2X_AM'</span>);
+0340         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM2Y_AM'</span>);
+0341         ID5BPM1x=[ID5BPM1x y1];
+0342         ID5BPM1y=[ID5BPM1y y2]; 
+0343         ID5BPM2x=[ID5BPM2x y3];
+0344         ID5BPM2y=[ID5BPM2y y4];
+0345         
+0346         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM1X_AM'</span>);
+0347         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM1Y_AM'</span>);
+0348         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM2X_AM'</span>);
+0349         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM2Y_AM'</span>);
+0350         ID6BPM1x=[ID6BPM1x y1];
+0351         ID6BPM1y=[ID6BPM1y y2]; 
+0352         ID6BPM2x=[ID6BPM2x y3];
+0353         ID6BPM2y=[ID6BPM2y y4];
+0354         
+0355         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM1X_AM'</span>);
+0356         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM1Y_AM'</span>);
+0357         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM2X_AM'</span>);
+0358         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM2Y_AM'</span>);
+0359         ID7BPM1x=[ID7BPM1x y1];
+0360         ID7BPM1y=[ID7BPM1y y2]; 
+0361         ID7BPM2x=[ID7BPM2x y3];
+0362         ID7BPM2y=[ID7BPM2y y4];
+0363         
+0364         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM1X_AM'</span>);
+0365         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM1Y_AM'</span>);
+0366         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM2X_AM'</span>);
+0367         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM2Y_AM'</span>);
+0368         ID8BPM1x=[ID8BPM1x y1];
+0369         ID8BPM1y=[ID8BPM1y y2]; 
+0370         ID8BPM2x=[ID8BPM2x y3];
+0371         ID8BPM2y=[ID8BPM2y y4];
+0372         
+0373         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM1X_AM'</span>);
+0374         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM1Y_AM'</span>);
+0375         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM2X_AM'</span>);
+0376         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM2Y_AM'</span>);
+0377         ID9BPM1x=[ID9BPM1x y1];
+0378         ID9BPM1y=[ID9BPM1y y2]; 
+0379         ID9BPM2x=[ID9BPM2x y3];
+0380         ID9BPM2y=[ID9BPM2y y4];
+0381         
+0382         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM1X_AM'</span>);
+0383         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM1Y_AM'</span>);
+0384         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM2X_AM'</span>);
+0385         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM2Y_AM'</span>);
+0386         ID10BPM1x=[ID10BPM1x y1];
+0387         ID10BPM1y=[ID10BPM1y y2]; 
+0388         ID10BPM2x=[ID10BPM2x y3];
+0389         ID10BPM2y=[ID10BPM2y y4];
+0390         
+0391         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM1X_AM'</span>);
+0392         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM1Y_AM'</span>);
+0393         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM2X_AM'</span>);
+0394         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM2Y_AM'</span>);
+0395         ID11BPM1x=[ID11BPM1x y1];
+0396         ID11BPM1y=[ID11BPM1y y2]; 
+0397         ID11BPM2x=[ID11BPM2x y3];
+0398         ID11BPM2y=[ID11BPM2y y4];
+0399         
+0400         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM1X_AM'</span>);
+0401         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM1Y_AM'</span>);
+0402         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM2X_AM'</span>);
+0403         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM2Y_AM'</span>);
+0404         ID12BPM1x=[ID12BPM1x y1];
+0405         ID12BPM1y=[ID12BPM1y y2]; 
+0406         ID12BPM2x=[ID12BPM2x y3];
+0407         ID12BPM2y=[ID12BPM2y y4];
+0408         
+0409         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S_IBPM2X_RMS'</span>);
+0410         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S_IBPM2Y_RMS'</span>);
+0411         [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C_IBPM5X_RMS'</span>);
+0412         [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C_IBPM5Y_RMS'</span>);
+0413         ID9BPM2xRMS=[ID9BPM2xRMS y1];
+0414         ID9BPM2yRMS=[ID9BPM2yRMS y2]; 
+0415         ID9BPM5xRMS=[ID9BPM5xRMS y3];
+0416         ID9BPM5yRMS=[ID9BPM5yRMS y4];
+0417         
+0418            [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM4XT_AM00'</span>);
+0419         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM4YT_AM01'</span>);
+0420         BPM44x=[BPM44x y1];
+0421         BPM44y=[BPM44y y2]; 
+0422         
+0423         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM5XT_AM02'</span>);
+0424         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM5YT_AM03'</span>);
+0425         BPM45x=[BPM45x y1];
+0426         BPM45y=[BPM45y y2]; 
+0427       
+0428            [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM4XT_AM00'</span>);
+0429         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM4YT_AM01'</span>);
+0430         BPM84x=[BPM84x y1];
+0431         BPM84y=[BPM84y y2]; 
+0432         
+0433         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM5XT_AM02'</span>);
+0434         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM5YT_AM03'</span>);
+0435         BPM85x=[BPM85x y1];
+0436         BPM85y=[BPM85y y2]; 
+0437         
+0438         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM4XT_AM00'</span>);
+0439         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM4YT_AM01'</span>);
+0440         BPM94x=[BPM94x y1];
+0441         BPM94y=[BPM94y y2]; 
+0442         
+0443         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM5XT_AM02'</span>);
+0444         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM5YT_AM03'</span>);
+0445         BPM95x=[BPM95x y1];
+0446         BPM95y=[BPM95y y2]; 
+0447       
+0448            [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM4XT_AM00'</span>);
+0449         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM4YT_AM01'</span>);
+0450         BPM124x=[BPM124x y1];
+0451         BPM124y=[BPM124y y2]; 
+0452         
+0453         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM5XT_AM02'</span>);
+0454         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM5YT_AM03'</span>);
+0455         BPM125x=[BPM125x y1];
+0456         BPM125y=[BPM125y y2]; 
+0457  
+0458         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___C1TEMP_AM'</span>);
+0459         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___C2TEMP_AM'</span>);
+0460         C1TEMP=[C1TEMP y1];
+0461         C2TEMP=[C2TEMP y2];
+0462         
+0463         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM06'</span>);
+0464         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM11'</span>);
+0465         SigX=[SigX y1];
+0466         SigY=[SigY y2];
+0467         
+0468         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM01'</span>);
+0469         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM02'</span>);
+0470         SpiroX=[SpiroX y1];
+0471       SpiroY=[SpiroY y2];
+0472       
+0473       [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM03'</span>);
+0474       Spirorient=[Spirorient y1];
+0475 
+0476         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___FREQB__AM00'</span>);
+0477         HPcounter=[HPcounter y1];
+0478         
+0479         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___RFFREQ_AM00RF'</span>);
+0480         HPsyn=[HPsyn y1];
+0481       
+0482         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'EG______HQMOFM_AC01'</span>);
+0483         hqmofm=[hqmofm y1*4.988e3];
+0484 
+0485            [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___QFA____AM00'</span>);
+0486         QFAam=[QFAam y1];  
+0487         
+0488         t = [t  ARt+(day-StartDay)*24*60*60];
+0489         
+0490     <span class="keyword">catch</span>
+0491         fprintf(<span class="string">'  Error reading archived data file.\n'</span>);
+0492         fprintf(<span class="string">'  %s will be ignored.\n'</span>, FileName);
+0493     <span class="keyword">end</span>
+0494     
+0495     disp(<span class="string">' '</span>);
+0496 <span class="keyword">end</span>
+0497 
+0498 
+0499 <span class="keyword">if</span> ~isempty(days2)
+0500     
+0501     StartDay = days2(1);
+0502     EndDay = days2(length(days2));
+0503     
+0504     <span class="keyword">for</span> day = days2
+0505         <span class="keyword">try</span>
+0506             year2str = num2str(year2);
+0507             <span class="keyword">if</span> year2 &lt; 2000
+0508                 year2str = year2str(3:4);
+0509                 FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month2, day);
+0510             <span class="keyword">else</span>
+0511                 FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year2str, month2, day);
+0512             <span class="keyword">end</span>
+0513             <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName, FFFlag);
+0514             
+0515             [y1, idcct] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___DCCTLP_AM01'</span>);
+0516             [y2, ilcw ] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___LCWTMP_AM00'</span>);
+0517             dcct = [dcct y1];
+0518             lcw  = [lcw  y2];
+0519             
+0520             [y1, igev] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'cmm:sr_energy'</span>);
+0521             gev = [gev y1];
+0522             
+0523             [y1, ilifetime] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___DCCT2__AM00'</span>);
+0524             lifetime = [lifetime  y1];
+0525             
+0526             [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04U___ODS1PS_AM00'</span>);
+0527             EPU4 =[EPU4  y1];
+0528             
+0529             [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(getname(<span class="string">'IDpos'</span>));
+0530             IDgap =[IDgap  y1];
+0531             
+0532             <span class="keyword">if</span> FFFlag
+0533                 [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'sr07u:FFEnable:bi'</span>);
+0534                 FF7Enable =[FF7Enable  y1];
+0535             <span class="keyword">end</span>
+0536             
+0537             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC1__AM'</span>);
+0538             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC2__AM'</span>);
+0539             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC3__AM'</span>);
+0540             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07U___IDTC4__AM'</span>);
+0541             TC7_1=[TC7_1 y1];
+0542             TC7_2=[TC7_2 y2]; 
+0543             TC7_3=[TC7_3 y3];
+0544             TC7_4=[TC7_4 y4];
+0545             
+0546             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC1__AM'</span>);
+0547             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC2__AM'</span>);
+0548             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC3__AM'</span>);
+0549             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08U___IDTC4__AM'</span>);
+0550             TC8_1=[TC8_1 y1];
+0551             TC8_2=[TC8_2 y2]; 
+0552             TC8_3=[TC8_3 y3];
+0553             TC8_4=[TC8_4 y4];
+0554             
+0555             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC1__AM'</span>);
+0556             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC2__AM'</span>);
+0557             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC3__AM'</span>);
+0558             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09U___IDTC4__AM'</span>);
+0559             TC9_1=[TC9_1 y1];
+0560             TC9_2=[TC9_2 y2]; 
+0561             TC9_3=[TC9_3 y3];
+0562             TC9_4=[TC9_4 y4];
+0563             
+0564             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC1__AM'</span>);
+0565             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC2__AM'</span>);
+0566             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC3__AM'</span>);
+0567             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10U___IDTC4__AM'</span>);
+0568             TC10_1=[TC10_1 y1];
+0569             TC10_2=[TC10_2 y2]; 
+0570             TC10_3=[TC10_3 y3];
+0571             TC10_4=[TC10_4 y4];
+0572             
+0573             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC1__AM'</span>);
+0574             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC2__AM'</span>);
+0575             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC3__AM'</span>);
+0576             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12U___IDTC4__AM'</span>);
+0577             TC12_1=[TC12_1 y1];
+0578             TC12_2=[TC12_2 y2]; 
+0579             TC12_3=[TC12_3 y3];
+0580             TC12_4=[TC12_4 y4];
+0581          
+0582            [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01S___IBPM1X_AM'</span>);
+0583         [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01S___IBPM1Y_AM'</span>);
+0584 <span class="comment">%        [y3, i] = arselect('SR01S___IBPM2X_AM');</span>
+0585 <span class="comment">%        [y4, i] = arselect('SR01S___IBPM2Y_AM');</span>
+0586         ID1BPM1x=[ID1BPM1x y1];
+0587         ID1BPM1y=[ID1BPM1y y2]; 
+0588 <span class="comment">%        ID1BPM2x=[ID1BPM2x y3];</span>
+0589 <span class="comment">%        ID1BPM2y=[ID1BPM2y y4];</span>
+0590 
+0591             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM1X_AM'</span>);
+0592             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM1Y_AM'</span>);
+0593             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM2X_AM'</span>);
+0594             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02S___IBPM2Y_AM'</span>);
+0595             ID2BPM1x=[ID2BPM1x y1];
+0596             ID2BPM1y=[ID2BPM1y y2]; 
+0597             ID2BPM2x=[ID2BPM2x y3];
+0598             ID2BPM2y=[ID2BPM2y y4];
+0599             
+0600             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM1X_AM'</span>);
+0601             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM1Y_AM'</span>);
+0602             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM2X_AM'</span>);
+0603             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM2Y_AM'</span>);
+0604             ID4BPM1x=[ID4BPM1x y1];
+0605             ID4BPM1y=[ID4BPM1y y2]; 
+0606             ID4BPM2x=[ID4BPM2x y3];
+0607             ID4BPM2y=[ID4BPM2y y4];
+0608             
+0609             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM3X_AM'</span>);
+0610             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM3Y_AM'</span>);
+0611             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM4X_AM'</span>);
+0612             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___IBPM4Y_AM'</span>);
+0613             ID4BPM3x=[ID4BPM3x y1];
+0614             ID4BPM3y=[ID4BPM3y y2]; 
+0615             ID4BPM4x=[ID4BPM4x y3];
+0616             ID4BPM4y=[ID4BPM4y y4];
+0617             
+0618             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM1X_AM'</span>);
+0619             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM1Y_AM'</span>);
+0620             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM2X_AM'</span>);
+0621             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05S___IBPM2Y_AM'</span>);
+0622             ID5BPM1x=[ID5BPM1x y1];
+0623             ID5BPM1y=[ID5BPM1y y2]; 
+0624             ID5BPM2x=[ID5BPM2x y3];
+0625             ID5BPM2y=[ID5BPM2y y4];
+0626             
+0627             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM1X_AM'</span>);
+0628             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM1Y_AM'</span>);
+0629             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM2X_AM'</span>);
+0630             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06S___IBPM2Y_AM'</span>);
+0631             ID6BPM1x=[ID6BPM1x y1];
+0632             ID6BPM1y=[ID6BPM1y y2]; 
+0633             ID6BPM2x=[ID6BPM2x y3];
+0634             ID6BPM2y=[ID6BPM2y y4];
+0635             
+0636             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM1X_AM'</span>);
+0637             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM1Y_AM'</span>);
+0638             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM2X_AM'</span>);
+0639             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07S___IBPM2Y_AM'</span>);
+0640             ID7BPM1x=[ID7BPM1x y1];
+0641             ID7BPM1y=[ID7BPM1y y2]; 
+0642             ID7BPM2x=[ID7BPM2x y3];
+0643             ID7BPM2y=[ID7BPM2y y4];
+0644             
+0645             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM1X_AM'</span>);
+0646             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM1Y_AM'</span>);
+0647             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM2X_AM'</span>);
+0648             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08S___IBPM2Y_AM'</span>);
+0649             ID8BPM1x=[ID8BPM1x y1];
+0650             ID8BPM1y=[ID8BPM1y y2]; 
+0651             ID8BPM2x=[ID8BPM2x y3];
+0652             ID8BPM2y=[ID8BPM2y y4];
+0653             
+0654             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM1X_AM'</span>);
+0655             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM1Y_AM'</span>);
+0656             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM2X_AM'</span>);
+0657             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S___IBPM2Y_AM'</span>);
+0658             ID9BPM1x=[ID9BPM1x y1];
+0659             ID9BPM1y=[ID9BPM1y y2]; 
+0660             ID9BPM2x=[ID9BPM2x y3];
+0661             ID9BPM2y=[ID9BPM2y y4];
+0662             
+0663             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM1X_AM'</span>);
+0664             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM1Y_AM'</span>);
+0665             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM2X_AM'</span>);
+0666             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10S___IBPM2Y_AM'</span>);
+0667             ID10BPM1x=[ID10BPM1x y1];
+0668             ID10BPM1y=[ID10BPM1y y2]; 
+0669             ID10BPM2x=[ID10BPM2x y3];
+0670             ID10BPM2y=[ID10BPM2y y4];
+0671             
+0672             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM1X_AM'</span>);
+0673             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM1Y_AM'</span>);
+0674             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM2X_AM'</span>);
+0675             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11S___IBPM2Y_AM'</span>);
+0676             ID11BPM1x=[ID11BPM1x y1];
+0677             ID11BPM1y=[ID11BPM1y y2]; 
+0678             ID11BPM2x=[ID11BPM2x y3];
+0679             ID11BPM2y=[ID11BPM2y y4];
+0680             
+0681             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM1X_AM'</span>);
+0682             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM1Y_AM'</span>);
+0683             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM2X_AM'</span>);
+0684             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12S___IBPM2Y_AM'</span>);
+0685             ID12BPM1x=[ID12BPM1x y1];
+0686             ID12BPM1y=[ID12BPM1y y2]; 
+0687             ID12BPM2x=[ID12BPM2x y3];
+0688             ID12BPM2y=[ID12BPM2y y4];
+0689             
+0690             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S_IBPM2X_RMS'</span>);
+0691             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09S_IBPM2Y_RMS'</span>);
+0692             [y3, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C_IBPM5X_RMS'</span>);
+0693             [y4, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C_IBPM5Y_RMS'</span>);
+0694             ID9BPM2xRMS=[ID9BPM2xRMS y1];
+0695             ID9BPM2yRMS=[ID9BPM2yRMS y2]; 
+0696             ID9BPM5xRMS=[ID9BPM5xRMS y3];
+0697             ID9BPM5yRMS=[ID9BPM5yRMS y4];
+0698             
+0699              [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM4XT_AM00'</span>);
+0700             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM4YT_AM01'</span>);
+0701              BPM44x=[BPM44x y1];
+0702             BPM44y=[BPM44y y2]; 
+0703         
+0704             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM5XT_AM02'</span>);
+0705             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___BPM5YT_AM03'</span>);
+0706             BPM45x=[BPM45x y1];
+0707             BPM45y=[BPM45y y2]; 
+0708       
+0709          [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM4XT_AM00'</span>);
+0710          [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM4YT_AM01'</span>);
+0711          BPM84x=[BPM84x y1];
+0712          BPM84y=[BPM84y y2]; 
+0713          
+0714          [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM5XT_AM02'</span>);
+0715          [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___BPM5YT_AM03'</span>);
+0716          BPM85x=[BPM85x y1];
+0717          BPM85y=[BPM85y y2]; 
+0718          
+0719          [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM4XT_AM00'</span>);
+0720          [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM4YT_AM01'</span>);
+0721          BPM94x=[BPM94x y1];
+0722          BPM94y=[BPM94y y2]; 
+0723          
+0724          [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM5XT_AM02'</span>);
+0725          [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___BPM5YT_AM03'</span>);
+0726          BPM95x=[BPM95x y1];
+0727          BPM95y=[BPM95y y2]; 
+0728          
+0729          [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM4XT_AM00'</span>);
+0730          [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM4YT_AM01'</span>);
+0731          BPM124x=[BPM124x y1];
+0732          BPM124y=[BPM124y y2]; 
+0733          
+0734          [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM5XT_AM02'</span>);
+0735          [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___BPM5YT_AM03'</span>);
+0736          BPM125x=[BPM125x y1];
+0737          BPM125y=[BPM125y y2]; 
+0738          
+0739          [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___C1TEMP_AM'</span>);
+0740             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___C2TEMP_AM'</span>);
+0741             C1TEMP=[C1TEMP y1];
+0742             C2TEMP=[C2TEMP y2];
+0743             
+0744             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM06'</span>);
+0745             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM11'</span>);
+0746             SigX=[SigX y1];
+0747             SigY=[SigY y2];
+0748             
+0749             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM01'</span>);
+0750             [y2, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM02'</span>);
+0751             SpiroX=[SpiroX y1];
+0752             SpiroY=[SpiroY y2];
+0753           
+0754           [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04S___SPIRICOAM03'</span>);
+0755           Spirorient=[Spirorient y1];
+0756         
+0757             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___FREQB__AM00'</span>);
+0758             HPcounter=[HPcounter y1];
+0759             
+0760             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03S___RFFREQ_AM00RF'</span>);
+0761             HPsyn=[HPsyn y1];
+0762          
+0763             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'EG______HQMOFM_AC01'</span>);
+0764             hqmofm=[hqmofm y1*4.988e3];
+0765          
+0766             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___QFA____AM00'</span>);
+0767             QFAam=[QFAam y1];  
+0768             
+0769             t = [t  ARt+(day-StartDay+(days(length(days))-days(1)+1))*24*60*60];
+0770             
+0771         <span class="keyword">catch</span>
+0772             fprintf(<span class="string">'  Error reading archived data file.\n'</span>);
+0773             fprintf(<span class="string">'  %s will be ignored.\n'</span>, FileName);
+0774         <span class="keyword">end</span>
+0775         
+0776         disp(<span class="string">' '</span>);
+0777     <span class="keyword">end</span>
+0778 <span class="keyword">end</span>
+0779 
+0780 
+0781 <span class="comment">% Plot data</span>
+0782 dcct = 100*dcct;
+0783 
+0784 
+0785 <span class="comment">% Remove points when the current is below .5 mamps for the lifetime calculation</span>
+0786 i = find(dcct &lt; .5);
+0787 dcct(i) = NaN;
+0788 dlogdcct = diff(log(dcct));
+0789 lifetime1 = -diff(t/60/60)./(dlogdcct);
+0790 i = find(lifetime1 &lt; 0);
+0791 lifetime1(i) = NaN;
+0792 
+0793 
+0794 <span class="comment">% Remove points when current is below 1 mamps</span>
+0795 [y, i]=find(dcct&lt;1);
+0796 ID1BPM1x(i)=NaN*ones(size(i));
+0797 ID1BPM1y(i)=NaN*ones(size(i));
+0798 <span class="comment">% ID1BPM2x(i)=NaN*ones(size(i));</span>
+0799 <span class="comment">% ID1BPM2y(i)=NaN*ones(size(i));</span>
+0800 ID2BPM1x(i)=NaN*ones(size(i));
+0801 ID2BPM1y(i)=NaN*ones(size(i));
+0802 ID2BPM2x(i)=NaN*ones(size(i));
+0803 ID2BPM2y(i)=NaN*ones(size(i));
+0804 ID4BPM1x(i)=NaN*ones(size(i));
+0805 ID4BPM1y(i)=NaN*ones(size(i));
+0806 ID4BPM2x(i)=NaN*ones(size(i));
+0807 ID4BPM2y(i)=NaN*ones(size(i));
+0808 ID4BPM3x(i)=NaN*ones(size(i));
+0809 ID4BPM3y(i)=NaN*ones(size(i));
+0810 ID4BPM4x(i)=NaN*ones(size(i));
+0811 ID4BPM4y(i)=NaN*ones(size(i));
+0812 ID5BPM1x(i)=NaN*ones(size(i));
+0813 ID5BPM1y(i)=NaN*ones(size(i));
+0814 ID5BPM2x(i)=NaN*ones(size(i));
+0815 ID5BPM2y(i)=NaN*ones(size(i));
+0816 ID6BPM1x(i)=NaN*ones(size(i));
+0817 ID6BPM1y(i)=NaN*ones(size(i));
+0818 ID6BPM2x(i)=NaN*ones(size(i));
+0819 ID6BPM2y(i)=NaN*ones(size(i));
+0820 ID7BPM1x(i)=NaN*ones(size(i));
+0821 ID7BPM1y(i)=NaN*ones(size(i));
+0822 ID7BPM2x(i)=NaN*ones(size(i));
+0823 ID7BPM2y(i)=NaN*ones(size(i));
+0824 ID8BPM1x(i)=NaN*ones(size(i));
+0825 ID8BPM1y(i)=NaN*ones(size(i));
+0826 ID8BPM2x(i)=NaN*ones(size(i));
+0827 ID8BPM2y(i)=NaN*ones(size(i));
+0828 ID9BPM1x(i)=NaN*ones(size(i));
+0829 ID9BPM1y(i)=NaN*ones(size(i));
+0830 ID9BPM2x(i)=NaN*ones(size(i));
+0831 ID9BPM2y(i)=NaN*ones(size(i));
+0832 ID10BPM1x(i)=NaN*ones(size(i));
+0833 ID10BPM1y(i)=NaN*ones(size(i));
+0834 ID10BPM2x(i)=NaN*ones(size(i));
+0835 ID10BPM2y(i)=NaN*ones(size(i));
+0836 ID11BPM1x(i)=NaN*ones(size(i));
+0837 ID11BPM1y(i)=NaN*ones(size(i));
+0838 ID11BPM2x(i)=NaN*ones(size(i));
+0839 ID11BPM2y(i)=NaN*ones(size(i));
+0840 ID12BPM1x(i)=NaN*ones(size(i));
+0841 ID12BPM1y(i)=NaN*ones(size(i));
+0842 ID12BPM2x(i)=NaN*ones(size(i));
+0843 ID12BPM2y(i)=NaN*ones(size(i));
+0844 BPM44x(i)=NaN*ones(size(i));
+0845 BPM44y(i)=NaN*ones(size(i));
+0846 BPM45x(i)=NaN*ones(size(i));
+0847 BPM45y(i)=NaN*ones(size(i));
+0848 BPM84x(i)=NaN*ones(size(i));
+0849 BPM84y(i)=NaN*ones(size(i));
+0850 BPM85x(i)=NaN*ones(size(i));
+0851 BPM85y(i)=NaN*ones(size(i));
+0852 BPM94x(i)=NaN*ones(size(i));
+0853 BPM94y(i)=NaN*ones(size(i));
+0854 BPM95x(i)=NaN*ones(size(i));
+0855 BPM95y(i)=NaN*ones(size(i));
+0856 BPM124x(i)=NaN*ones(size(i));
+0857 BPM124y(i)=NaN*ones(size(i));
+0858 BPM125x(i)=NaN*ones(size(i));
+0859 BPM125y(i)=NaN*ones(size(i));
+0860 ID9BPM2xRMS(i)=NaN*ones(size(i));
+0861 ID9BPM5xRMS(i)=NaN*ones(size(i));
+0862 ID9BPM2yRMS(i)=NaN*ones(size(i));
+0863 ID9BPM5yRMS(i)=NaN*ones(size(i));
+0864 <span class="comment">%dcct(i)=NaN*ones(size(i));</span>
+0865 EPU4(i)=NaN*ones(size(i));
+0866 IDgap(:,i)=NaN*ones(size(IDgap,1),length(i));
+0867 SigX(i)=NaN*ones(size(i));
+0868 SigY(i)=NaN*ones(size(i));
+0869 SpiroX(i)=NaN*ones(size(i));
+0870 SpiroY(i)=NaN*ones(size(i));
+0871 Spirorient(i)=NaN*ones(size(i));
+0872 gev(i)=NaN*ones(size(i));
+0873 lifetime(i)=NaN*ones(size(i));
+0874 
+0875 
+0876 <span class="comment">% Remove points when FF is disabled</span>
+0877 <span class="keyword">if</span> FFFlag 
+0878    [y, i]=find(FF7Enable==0);
+0879    ID1BPM1x(i)=NaN*ones(size(i));
+0880    ID1BPM1y(i)=NaN*ones(size(i));
+0881 <span class="comment">%   ID1BPM2x(i)=NaN*ones(size(i));</span>
+0882 <span class="comment">%   ID1BPM2y(i)=NaN*ones(size(i));</span>
+0883    ID2BPM1x(i)=NaN*ones(size(i));
+0884    ID2BPM1y(i)=NaN*ones(size(i));
+0885    ID2BPM2x(i)=NaN*ones(size(i));
+0886    ID2BPM2y(i)=NaN*ones(size(i));
+0887    ID4BPM1x(i)=NaN*ones(size(i));
+0888    ID4BPM1y(i)=NaN*ones(size(i));
+0889    ID4BPM2x(i)=NaN*ones(size(i));
+0890    ID4BPM2y(i)=NaN*ones(size(i));
+0891    ID4BPM3x(i)=NaN*ones(size(i));
+0892    ID4BPM3y(i)=NaN*ones(size(i));
+0893    ID4BPM4x(i)=NaN*ones(size(i));
+0894    ID4BPM4y(i)=NaN*ones(size(i));
+0895    ID5BPM1x(i)=NaN*ones(size(i));
+0896    ID5BPM1y(i)=NaN*ones(size(i));
+0897    ID5BPM2x(i)=NaN*ones(size(i));
+0898    ID5BPM2y(i)=NaN*ones(size(i));
+0899    ID6BPM1x(i)=NaN*ones(size(i));
+0900    ID6BPM1y(i)=NaN*ones(size(i));
+0901    ID6BPM2x(i)=NaN*ones(size(i));
+0902    ID6BPM2y(i)=NaN*ones(size(i));
+0903    ID7BPM1x(i)=NaN*ones(size(i));
+0904    ID7BPM1y(i)=NaN*ones(size(i));
+0905    ID7BPM2x(i)=NaN*ones(size(i));
+0906    ID7BPM2y(i)=NaN*ones(size(i));
+0907    ID8BPM1x(i)=NaN*ones(size(i));
+0908    ID8BPM1y(i)=NaN*ones(size(i));
+0909    ID8BPM2x(i)=NaN*ones(size(i));
+0910    ID8BPM2y(i)=NaN*ones(size(i));
+0911    ID9BPM1x(i)=NaN*ones(size(i));
+0912    ID9BPM1y(i)=NaN*ones(size(i));
+0913    ID9BPM2x(i)=NaN*ones(size(i));
+0914    ID9BPM2y(i)=NaN*ones(size(i));
+0915    ID10BPM1x(i)=NaN*ones(size(i));
+0916    ID10BPM1y(i)=NaN*ones(size(i));
+0917    ID10BPM2x(i)=NaN*ones(size(i));
+0918    ID10BPM2y(i)=NaN*ones(size(i));
+0919    ID11BPM1x(i)=NaN*ones(size(i));
+0920    ID11BPM1y(i)=NaN*ones(size(i));
+0921    ID11BPM2x(i)=NaN*ones(size(i));
+0922    ID11BPM2y(i)=NaN*ones(size(i));
+0923    ID12BPM1x(i)=NaN*ones(size(i));
+0924    ID12BPM1y(i)=NaN*ones(size(i));
+0925    ID12BPM2x(i)=NaN*ones(size(i));
+0926    ID12BPM2y(i)=NaN*ones(size(i));
+0927    BPM44x(i)=NaN*ones(size(i));
+0928    BPM44y(i)=NaN*ones(size(i));
+0929    BPM45x(i)=NaN*ones(size(i));
+0930    BPM45y(i)=NaN*ones(size(i));
+0931    BPM84x(i)=NaN*ones(size(i));
+0932    BPM84y(i)=NaN*ones(size(i));
+0933    BPM85x(i)=NaN*ones(size(i));
+0934    BPM85y(i)=NaN*ones(size(i));
+0935    BPM94x(i)=NaN*ones(size(i));
+0936    BPM94y(i)=NaN*ones(size(i));
+0937    BPM95x(i)=NaN*ones(size(i));
+0938    BPM95y(i)=NaN*ones(size(i));
+0939    BPM124x(i)=NaN*ones(size(i));
+0940    BPM124y(i)=NaN*ones(size(i));
+0941    BPM125x(i)=NaN*ones(size(i));
+0942    BPM125y(i)=NaN*ones(size(i));
+0943     ID9BPM2xRMS(i)=NaN*ones(size(i));
+0944     ID9BPM5xRMS(i)=NaN*ones(size(i));
+0945     ID9BPM2yRMS(i)=NaN*ones(size(i));
+0946     ID9BPM5yRMS(i)=NaN*ones(size(i));
+0947    <span class="comment">%dcct(i)=NaN*ones(size(i));</span>
+0948    EPU4(i)=NaN*ones(size(i));
+0949    IDgap(:,i)=NaN*ones(size(IDgap,1),length(i));
+0950    SigX(i)=NaN*ones(size(i));
+0951    SigY(i)=NaN*ones(size(i));
+0952     SpiroX(i)=NaN*ones(size(i));    
+0953     SpiroY(i)=NaN*ones(size(i));
+0954     Spirorient(i)=NaN*ones(size(i));
+0955    gev(i)=NaN*ones(size(i));
+0956    lifetime(i)=NaN*ones(size(i));
+0957 <span class="keyword">end</span>   
+0958 
+0959 <span class="comment">% Remove points when the gaps are open</span>
+0960 <span class="comment">%j = any([IDgap5;IDgap7;IDgap8;IDgap9;IDgap10;IDgap12] &lt; 80);</span>
+0961 j = any(IDgap &lt; 80);
+0962 i = 1:length(t);
+0963 i(j) = [];
+0964 ID1BPM1x(i)=NaN*ones(size(i));
+0965 ID1BPM1y(i)=NaN*ones(size(i));
+0966 <span class="comment">% ID1BPM2x(i)=NaN*ones(size(i));</span>
+0967 <span class="comment">% ID1BPM2y(i)=NaN*ones(size(i));</span>
+0968 ID2BPM1x(i)=NaN*ones(size(i));
+0969 ID2BPM1y(i)=NaN*ones(size(i));
+0970 ID2BPM2x(i)=NaN*ones(size(i));
+0971 ID2BPM2y(i)=NaN*ones(size(i));
+0972 ID4BPM1x(i)=NaN*ones(size(i));
+0973 ID4BPM1y(i)=NaN*ones(size(i));
+0974 ID4BPM2x(i)=NaN*ones(size(i));
+0975 ID4BPM2y(i)=NaN*ones(size(i));
+0976 ID4BPM3x(i)=NaN*ones(size(i));
+0977 ID4BPM3y(i)=NaN*ones(size(i));
+0978 ID4BPM4x(i)=NaN*ones(size(i));
+0979 ID4BPM4y(i)=NaN*ones(size(i));
+0980 ID5BPM1x(i)=NaN*ones(size(i));
+0981 ID5BPM1y(i)=NaN*ones(size(i));
+0982 ID5BPM2x(i)=NaN*ones(size(i));
+0983 ID5BPM2y(i)=NaN*ones(size(i));
+0984 ID6BPM1x(i)=NaN*ones(size(i));
+0985 ID6BPM1y(i)=NaN*ones(size(i));
+0986 ID6BPM2x(i)=NaN*ones(size(i));
+0987 ID6BPM2y(i)=NaN*ones(size(i));
+0988 ID7BPM1x(i)=NaN*ones(size(i));
+0989 ID7BPM1y(i)=NaN*ones(size(i));
+0990 ID7BPM2x(i)=NaN*ones(size(i));
+0991 ID7BPM2y(i)=NaN*ones(size(i));
+0992 ID8BPM1x(i)=NaN*ones(size(i));
+0993 ID8BPM1y(i)=NaN*ones(size(i));
+0994 ID8BPM2x(i)=NaN*ones(size(i));
+0995 ID8BPM2y(i)=NaN*ones(size(i));
+0996 ID9BPM1x(i)=NaN*ones(size(i));
+0997 ID9BPM1y(i)=NaN*ones(size(i));
+0998 ID9BPM2x(i)=NaN*ones(size(i));
+0999 ID9BPM2y(i)=NaN*ones(size(i));
+1000 ID10BPM1x(i)=NaN*ones(size(i));
+1001 ID10BPM1y(i)=NaN*ones(size(i));
+1002 ID10BPM2x(i)=NaN*ones(size(i));
+1003 ID10BPM2y(i)=NaN*ones(size(i));
+1004 ID11BPM1x(i)=NaN*ones(size(i));
+1005 ID11BPM1y(i)=NaN*ones(size(i));
+1006 ID11BPM2x(i)=NaN*ones(size(i));
+1007 ID11BPM2y(i)=NaN*ones(size(i));
+1008 ID12BPM1x(i)=NaN*ones(size(i));
+1009 ID12BPM1y(i)=NaN*ones(size(i));
+1010 ID12BPM2x(i)=NaN*ones(size(i));
+1011 ID12BPM2y(i)=NaN*ones(size(i));
+1012 BPM44x(i)=NaN*ones(size(i));
+1013 BPM44y(i)=NaN*ones(size(i));
+1014 BPM45x(i)=NaN*ones(size(i));
+1015 BPM45y(i)=NaN*ones(size(i));
+1016 BPM84x(i)=NaN*ones(size(i));
+1017 BPM84y(i)=NaN*ones(size(i));
+1018 BPM85x(i)=NaN*ones(size(i));
+1019 BPM85y(i)=NaN*ones(size(i));
+1020 BPM94x(i)=NaN*ones(size(i));
+1021 BPM94y(i)=NaN*ones(size(i));
+1022 BPM95x(i)=NaN*ones(size(i));
+1023 BPM95y(i)=NaN*ones(size(i));
+1024 BPM124x(i)=NaN*ones(size(i));
+1025 BPM124y(i)=NaN*ones(size(i));
+1026 BPM125x(i)=NaN*ones(size(i));
+1027 BPM125y(i)=NaN*ones(size(i));
+1028 ID9BPM2xRMS(i)=NaN*ones(size(i));
+1029 ID9BPM5xRMS(i)=NaN*ones(size(i));
+1030 ID9BPM2yRMS(i)=NaN*ones(size(i));
+1031 ID9BPM5yRMS(i)=NaN*ones(size(i));
+1032 <span class="comment">%dcct(i)=NaN*ones(size(i));</span>
+1033 EPU4(i)=NaN*ones(size(i));
+1034 IDgap(:,i)=NaN*ones(size(IDgap,1),length(i));
+1035 SigX(i)=NaN*ones(size(i));
+1036 SigY(i)=NaN*ones(size(i));
+1037 SpiroX(i)=NaN*ones(size(i));
+1038 SpiroY(i)=NaN*ones(size(i));
+1039 Spirorient(i)=NaN*ones(size(i));
+1040 gev(i)=NaN*ones(size(i));
+1041 lifetime(i)=NaN*ones(size(i));
+1042 
+1043 
+1044 <span class="comment">% Remove points before/after a NaN</span>
+1045 [y, i]=find(isnan(ID2BPM1x));
+1046 i = i + 1;
+1047 <span class="keyword">if</span> i(end) &gt; length(ID2BPM1x)
+1048    i = i(1:end-1);
+1049 <span class="keyword">end</span>
+1050 ID1BPM1x(i)=NaN*ones(size(i));
+1051 ID1BPM1y(i)=NaN*ones(size(i));
+1052 <span class="comment">% ID1BPM2x(i)=NaN*ones(size(i));</span>
+1053 <span class="comment">% ID1BPM2y(i)=NaN*ones(size(i));</span>
+1054 ID2BPM1x(i)=NaN*ones(size(i));
+1055 ID2BPM1y(i)=NaN*ones(size(i));
+1056 ID2BPM2x(i)=NaN*ones(size(i));
+1057 ID2BPM2y(i)=NaN*ones(size(i));
+1058 ID4BPM1x(i)=NaN*ones(size(i));
+1059 ID4BPM1y(i)=NaN*ones(size(i));
+1060 ID4BPM2x(i)=NaN*ones(size(i));
+1061 ID4BPM2y(i)=NaN*ones(size(i));
+1062 ID4BPM3x(i)=NaN*ones(size(i));
+1063 ID4BPM3y(i)=NaN*ones(size(i));
+1064 ID4BPM4x(i)=NaN*ones(size(i));
+1065 ID4BPM4y(i)=NaN*ones(size(i));
+1066 ID5BPM1x(i)=NaN*ones(size(i));
+1067 ID5BPM1y(i)=NaN*ones(size(i));
+1068 ID5BPM2x(i)=NaN*ones(size(i));
+1069 ID5BPM2y(i)=NaN*ones(size(i));
+1070 ID6BPM1x(i)=NaN*ones(size(i));
+1071 ID6BPM1y(i)=NaN*ones(size(i));
+1072 ID6BPM2x(i)=NaN*ones(size(i));
+1073 ID6BPM2y(i)=NaN*ones(size(i));
+1074 ID7BPM1x(i)=NaN*ones(size(i));
+1075 ID7BPM1y(i)=NaN*ones(size(i));
+1076 ID7BPM2x(i)=NaN*ones(size(i));
+1077 ID7BPM2y(i)=NaN*ones(size(i));
+1078 ID8BPM1x(i)=NaN*ones(size(i));
+1079 ID8BPM1y(i)=NaN*ones(size(i));
+1080 ID8BPM2x(i)=NaN*ones(size(i));
+1081 ID8BPM2y(i)=NaN*ones(size(i));
+1082 ID9BPM1x(i)=NaN*ones(size(i));
+1083 ID9BPM1y(i)=NaN*ones(size(i));
+1084 ID9BPM2x(i)=NaN*ones(size(i));
+1085 ID9BPM2y(i)=NaN*ones(size(i));
+1086 ID10BPM1x(i)=NaN*ones(size(i));
+1087 ID10BPM1y(i)=NaN*ones(size(i));
+1088 ID10BPM2x(i)=NaN*ones(size(i));
+1089 ID10BPM2y(i)=NaN*ones(size(i));
+1090 ID11BPM1x(i)=NaN*ones(size(i));
+1091 ID11BPM1y(i)=NaN*ones(size(i));
+1092 ID11BPM2x(i)=NaN*ones(size(i));
+1093 ID11BPM2y(i)=NaN*ones(size(i));
+1094 ID12BPM1x(i)=NaN*ones(size(i));
+1095 ID12BPM1y(i)=NaN*ones(size(i));
+1096 ID12BPM2x(i)=NaN*ones(size(i));
+1097 ID12BPM2y(i)=NaN*ones(size(i));
+1098 BPM44x(i)=NaN*ones(size(i));
+1099 BPM44y(i)=NaN*ones(size(i));
+1100 BPM45x(i)=NaN*ones(size(i));
+1101 BPM45y(i)=NaN*ones(size(i));
+1102 BPM84x(i)=NaN*ones(size(i));
+1103 BPM84y(i)=NaN*ones(size(i));
+1104 BPM85x(i)=NaN*ones(size(i));
+1105 BPM85y(i)=NaN*ones(size(i));
+1106 BPM94x(i)=NaN*ones(size(i));
+1107 BPM94y(i)=NaN*ones(size(i));
+1108 BPM95x(i)=NaN*ones(size(i));
+1109 BPM95y(i)=NaN*ones(size(i));
+1110 BPM124x(i)=NaN*ones(size(i));
+1111 BPM124y(i)=NaN*ones(size(i));
+1112 BPM125x(i)=NaN*ones(size(i));
+1113 BPM125y(i)=NaN*ones(size(i));
+1114 ID9BPM2xRMS(i)=NaN*ones(size(i));
+1115 ID9BPM5xRMS(i)=NaN*ones(size(i));
+1116 ID9BPM2yRMS(i)=NaN*ones(size(i));
+1117 ID9BPM5yRMS(i)=NaN*ones(size(i));
+1118 <span class="comment">%dcct(i)=NaN*ones(size(i));</span>
+1119 EPU4(i)=NaN*ones(size(i));
+1120 IDgap(:,i)=NaN*ones(size(IDgap,1),length(i));
+1121 SigX(i)=NaN*ones(size(i));
+1122 SigY(i)=NaN*ones(size(i));
+1123 SpiroX(i)=NaN*ones(size(i));
+1124 SpiroY(i)=NaN*ones(size(i));
+1125 Spirorient(i)=NaN*ones(size(i));
+1126 gev(i)=NaN*ones(size(i));
+1127 lifetime(i)=NaN*ones(size(i));
+1128 
+1129 i = i - 2;
+1130 <span class="keyword">if</span> i(1) &lt; 1
+1131    i = i(2:end);
+1132 <span class="keyword">end</span>
+1133 ID1BPM1x(i)=NaN*ones(size(i));
+1134 ID1BPM1y(i)=NaN*ones(size(i));
+1135 <span class="comment">% ID1BPM2x(i)=NaN*ones(size(i));</span>
+1136 <span class="comment">% ID1BPM2y(i)=NaN*ones(size(i));</span>
+1137 ID2BPM1x(i)=NaN*ones(size(i));
+1138 ID2BPM1y(i)=NaN*ones(size(i));
+1139 ID2BPM2x(i)=NaN*ones(size(i));
+1140 ID2BPM2y(i)=NaN*ones(size(i));
+1141 ID4BPM1x(i)=NaN*ones(size(i));
+1142 ID4BPM1y(i)=NaN*ones(size(i));
+1143 ID4BPM2x(i)=NaN*ones(size(i));
+1144 ID4BPM2y(i)=NaN*ones(size(i));
+1145 ID4BPM3x(i)=NaN*ones(size(i));
+1146 ID4BPM3y(i)=NaN*ones(size(i));
+1147 ID4BPM4x(i)=NaN*ones(size(i));
+1148 ID4BPM4y(i)=NaN*ones(size(i));
+1149 ID5BPM1x(i)=NaN*ones(size(i));
+1150 ID5BPM1y(i)=NaN*ones(size(i));
+1151 ID5BPM2x(i)=NaN*ones(size(i));
+1152 ID5BPM2y(i)=NaN*ones(size(i));
+1153 ID6BPM1x(i)=NaN*ones(size(i));
+1154 ID6BPM1y(i)=NaN*ones(size(i));
+1155 ID6BPM2x(i)=NaN*ones(size(i));
+1156 ID6BPM2y(i)=NaN*ones(size(i));
+1157 ID7BPM1x(i)=NaN*ones(size(i));
+1158 ID7BPM1y(i)=NaN*ones(size(i));
+1159 ID7BPM2x(i)=NaN*ones(size(i));
+1160 ID7BPM2y(i)=NaN*ones(size(i));
+1161 ID8BPM1x(i)=NaN*ones(size(i));
+1162 ID8BPM1y(i)=NaN*ones(size(i));
+1163 ID8BPM2x(i)=NaN*ones(size(i));
+1164 ID8BPM2y(i)=NaN*ones(size(i));
+1165 ID9BPM1x(i)=NaN*ones(size(i));
+1166 ID9BPM1y(i)=NaN*ones(size(i));
+1167 ID9BPM2x(i)=NaN*ones(size(i));
+1168 ID9BPM2y(i)=NaN*ones(size(i));
+1169 ID10BPM1x(i)=NaN*ones(size(i));
+1170 ID10BPM1y(i)=NaN*ones(size(i));
+1171 ID10BPM2x(i)=NaN*ones(size(i));
+1172 ID10BPM2y(i)=NaN*ones(size(i));
+1173 ID11BPM1x(i)=NaN*ones(size(i));
+1174 ID11BPM1y(i)=NaN*ones(size(i));
+1175 ID11BPM2x(i)=NaN*ones(size(i));
+1176 ID11BPM2y(i)=NaN*ones(size(i));
+1177 ID12BPM1x(i)=NaN*ones(size(i));
+1178 ID12BPM1y(i)=NaN*ones(size(i));
+1179 ID12BPM2x(i)=NaN*ones(size(i));
+1180 ID12BPM2y(i)=NaN*ones(size(i));
+1181 BPM44x(i)=NaN*ones(size(i));
+1182 BPM44y(i)=NaN*ones(size(i));
+1183 BPM45x(i)=NaN*ones(size(i));
+1184 BPM45y(i)=NaN*ones(size(i));
+1185 BPM84x(i)=NaN*ones(size(i));
+1186 BPM84y(i)=NaN*ones(size(i));
+1187 BPM85x(i)=NaN*ones(size(i));
+1188 BPM85y(i)=NaN*ones(size(i));
+1189 BPM94x(i)=NaN*ones(size(i));
+1190 BPM94y(i)=NaN*ones(size(i));
+1191 BPM95x(i)=NaN*ones(size(i));
+1192 BPM95y(i)=NaN*ones(size(i));
+1193 BPM124x(i)=NaN*ones(size(i));
+1194 BPM124y(i)=NaN*ones(size(i));
+1195 BPM125x(i)=NaN*ones(size(i));
+1196 BPM125y(i)=NaN*ones(size(i));
+1197 ID9BPM2xRMS(i)=NaN*ones(size(i));
+1198 ID9BPM5xRMS(i)=NaN*ones(size(i));
+1199 ID9BPM2yRMS(i)=NaN*ones(size(i));
+1200 ID9BPM5yRMS(i)=NaN*ones(size(i));
+1201 <span class="comment">%dcct(i)=NaN*ones(size(i));</span>
+1202 EPU4(i)=NaN*ones(size(i));
+1203 IDgap(:,i)=NaN*ones(size(IDgap,1),length(i));
+1204 SigX(i)=NaN*ones(size(i));
+1205 SigY(i)=NaN*ones(size(i));
+1206 SpiroX(i)=NaN*ones(size(i));
+1207 SpiroY(i)=NaN*ones(size(i));
+1208 Spirorient(i)=NaN*ones(size(i));
+1209 gev(i)=NaN*ones(size(i));
+1210 lifetime(i)=NaN*ones(size(i));
+1211 
+1212 
+1213 <span class="comment">% Subtract the point at 9.5 hours</span>
+1214 <span class="comment">%i=find(ARt&gt;9.5*60*60);</span>
+1215 <span class="comment">%i7_1x=ID7BPM1x(i(1)), ID7BPM1x=ID7BPM1x-ID7BPM1x(i(1));</span>
+1216 <span class="comment">%i7_1y=ID7BPM1y(i(1)), ID7BPM1y=ID7BPM1y-ID7BPM1y(i(1));</span>
+1217 <span class="comment">%i7_2x=ID7BPM2x(i(1)), ID7BPM2x=ID7BPM2x-ID7BPM2x(i(1));</span>
+1218 <span class="comment">%i7_2y=ID7BPM2y(i(1)), ID7BPM2y=ID7BPM2y-ID7BPM2y(i(1));</span>
+1219 <span class="comment">%i12_1x=ID12BPM1x(i(1)), ID12BPM1x=ID12BPM1x-ID12BPM1x(i(1));</span>
+1220 <span class="comment">%i12_1y=ID12BPM1y(i(1)), ID12BPM1y=ID12BPM1y-ID12BPM1y(i(1));</span>
+1221 <span class="comment">%i12_2x=ID12BPM2x(i(1)), ID12BPM2x=ID12BPM2x-ID12BPM2x(i(1));</span>
+1222 <span class="comment">%i12_2y=ID12BPM2y(i(1)), ID12BPM2y=ID12BPM2y-ID12BPM2y(i(1));</span>
+1223 
+1224 
+1225 <span class="comment">% Subtract known amount (golden orbit)</span>
+1226 Sector = 1;
+1227 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [12 9; 1 2]);
+1228 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [12 9; 1 2]);
+1229 i1_1x=IDBPMgoalx(1); ID1BPM1x=ID1BPM1x-i1_1x;
+1230 i1_1y=IDBPMgoaly(1); ID1BPM1y=ID1BPM1y-i1_1y;
+1231 i1_2x=IDBPMgoalx(2); ID1BPM2x=ID1BPM2x-i1_2x;
+1232 i1_2y=IDBPMgoaly(2); ID1BPM2y=ID1BPM2y-i1_2y;
+1233 
+1234 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1235 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1236 b1_4x=BBPMgoalx(1); BPM14x=BPM14x-b1_4x;
+1237 b1_4y=BBPMgoaly(1); BPM14y=BPM14y-b1_4y;
+1238 b1_5x=BBPMgoalx(2); BPM15x=BPM15x-b1_5x;
+1239 b1_5y=BBPMgoaly(2); BPM15y=BPM15y-b1_5y;
+1240 
+1241 Sector = 2;
+1242 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1243 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1244 i2_1x=IDBPMgoalx(1); ID2BPM1x=ID2BPM1x-i2_1x;
+1245 i2_1y=IDBPMgoaly(1); ID2BPM1y=ID2BPM1y-i2_1y;
+1246 i2_2x=IDBPMgoalx(2); ID2BPM2x=ID2BPM2x-i2_2x;
+1247 i2_2y=IDBPMgoaly(2); ID2BPM2y=ID2BPM2y-i2_2y;
+1248 
+1249 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1250 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1251 b2_4x=BBPMgoalx(1); BPM24x=BPM24x-b2_4x;
+1252 b2_4y=BBPMgoaly(1); BPM24y=BPM24y-b2_4y;
+1253 b2_5x=BBPMgoalx(2); BPM25x=BPM25x-b2_5x;
+1254 b2_5y=BBPMgoaly(2); BPM25y=BPM25y-b2_5y;
+1255 
+1256 Sector = 3;
+1257 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 9; Sector 2]);
+1258 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 9; Sector 2]);
+1259 i3_1x=IDBPMgoalx(1); ID3BPM1x=ID3BPM1x-i3_1x;
+1260 i3_1y=IDBPMgoaly(1); ID3BPM1y=ID3BPM1y-i3_1y;
+1261 i3_2x=IDBPMgoalx(2); ID3BPM2x=ID3BPM2x-i3_2x;
+1262 i3_2y=IDBPMgoaly(2); ID3BPM2y=ID3BPM2y-i3_2y;
+1263 
+1264 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1265 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1266 b3_4x=BBPMgoalx(1); BPM34x=BPM34x-b3_4x;
+1267 b3_4y=BBPMgoaly(1); BPM34y=BPM34y-b3_4y;
+1268 b3_5x=BBPMgoalx(2); BPM35x=BPM35x-b3_5x;
+1269 b3_5y=BBPMgoaly(2); BPM35y=BPM35y-b3_5y;
+1270 
+1271 Sector = 4;
+1272 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1273 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1274 i4_1x=IDBPMgoalx(1); ID4BPM1x=ID4BPM1x-i4_1x;
+1275 i4_1y=IDBPMgoaly(1); ID4BPM1y=ID4BPM1y-i4_1y;
+1276 i4_2x=IDBPMgoalx(2); ID4BPM2x=ID4BPM2x-i4_2x;
+1277 i4_2y=IDBPMgoaly(2); ID4BPM2y=ID4BPM2y-i4_2y;
+1278 
+1279 IDBPMgoalx = getgolden(<span class="string">'IDBPMx'</span>, [Sector-1 11; Sector-1 12]);
+1280 IDBPMgoaly = getgolden(<span class="string">'IDBPMy'</span>, [Sector-1 11; Sector-1 12]);
+1281 i4_3x=IDBPMgoalx(1); ID4BPM3x=ID4BPM3x-i4_3x;
+1282 i4_3y=IDBPMgoaly(1); ID4BPM3y=ID4BPM3y-i4_3y;
+1283 i4_4x=IDBPMgoalx(2); ID4BPM4x=ID4BPM4x-i4_4x;
+1284 i4_4y=IDBPMgoaly(2); ID4BPM4y=ID4BPM4y-i4_4y;
+1285 
+1286 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1287 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1288 b4_4x=BBPMgoalx(1); BPM44x=BPM44x-b4_4x;
+1289 b4_4y=BBPMgoaly(1); BPM44y=BPM44y-b4_4y;
+1290 b4_5x=BBPMgoalx(2); BPM45x=BPM45x-b4_5x;
+1291 b4_5y=BBPMgoaly(2); BPM45y=BPM45y-b4_5y;
+1292 
+1293 Sector = 5;
+1294 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1295 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1296 i5_1x=IDBPMgoalx(1); ID5BPM1x=ID5BPM1x-i5_1x;
+1297 i5_1y=IDBPMgoaly(1); ID5BPM1y=ID5BPM1y-i5_1y;
+1298 i5_2x=IDBPMgoalx(2); ID5BPM2x=ID5BPM2x-i5_2x;
+1299 i5_2y=IDBPMgoaly(2); ID5BPM2y=ID5BPM2y-i5_2y;
+1300 
+1301 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1302 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1303 b5_4x=BBPMgoalx(1); BPM54x=BPM54x-b5_4x;
+1304 b5_4y=BBPMgoaly(1); BPM54y=BPM54y-b5_4y;
+1305 b5_5x=BBPMgoalx(2); BPM55x=BPM55x-b5_5x;
+1306 b5_5y=BBPMgoaly(2); BPM55y=BPM55y-b5_5y;
+1307 
+1308 Sector = 6;
+1309 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1310 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1311 i6_1x=IDBPMgoalx(1); ID6BPM1x=ID6BPM1x-i6_1x;
+1312 i6_1y=IDBPMgoaly(1); ID6BPM1y=ID6BPM1y-i6_1y;
+1313 i6_2x=IDBPMgoalx(2); ID6BPM2x=ID6BPM2x-i6_2x;
+1314 i6_2y=IDBPMgoaly(2); ID6BPM2y=ID6BPM2y-i6_2y;
+1315 
+1316 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1317 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1318 b6_4x=BBPMgoalx(1); BPM64x=BPM64x-b6_4x;
+1319 b6_4y=BBPMgoaly(1); BPM64y=BPM64y-b6_4y;
+1320 b6_5x=BBPMgoalx(2); BPM65x=BPM65x-b6_5x;
+1321 b6_5y=BBPMgoaly(2); BPM65y=BPM65y-b6_5y;
+1322 
+1323 Sector =7;
+1324 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1325 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1326 i7_1x=IDBPMgoalx(1); ID7BPM1x=ID7BPM1x-i7_1x;
+1327 i7_1y=IDBPMgoaly(1); ID7BPM1y=ID7BPM1y-i7_1y;
+1328 i7_2x=IDBPMgoalx(2); ID7BPM2x=ID7BPM2x-i7_2x;
+1329 i7_2y=IDBPMgoaly(2); ID7BPM2y=ID7BPM2y-i7_2y;
+1330 
+1331 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1332 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1333 b7_4x=BBPMgoalx(1); BPM74x=BPM74x-b7_4x;
+1334 b7_4y=BBPMgoaly(1); BPM74y=BPM74y-b7_4y;
+1335 b7_5x=BBPMgoalx(2); BPM75x=BPM75x-b7_5x;
+1336 b7_5y=BBPMgoaly(2); BPM75y=BPM75y-b7_5y;
+1337 
+1338 Sector = 8;
+1339 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1340 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1341 i8_1x=IDBPMgoalx(1); ID8BPM1x=ID8BPM1x-i8_1x;
+1342 i8_1y=IDBPMgoaly(1); ID8BPM1y=ID8BPM1y-i8_1y;
+1343 i8_2x=IDBPMgoalx(2); ID8BPM2x=ID8BPM2x-i8_2x;
+1344 i8_2y=IDBPMgoaly(2); ID8BPM2y=ID8BPM2y-i8_2y;
+1345 
+1346 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1347 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1348 b8_4x=BBPMgoalx(1); BPM84x=BPM84x-b8_4x;
+1349 b8_4y=BBPMgoaly(1); BPM84y=BPM84y-b8_4y;
+1350 b8_5x=BBPMgoalx(2); BPM85x=BPM85x-b8_5x;
+1351 b8_5y=BBPMgoaly(2); BPM85y=BPM85y-b8_5y;
+1352 
+1353 Sector = 9;
+1354 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1355 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1356 i9_1x=IDBPMgoalx(1); ID9BPM1x=ID9BPM1x-i9_1x;
+1357 i9_1y=IDBPMgoaly(1); ID9BPM1y=ID9BPM1y-i9_1y;
+1358 i9_2x=IDBPMgoalx(2); ID9BPM2x=ID9BPM2x-i9_2x;
+1359 i9_2y=IDBPMgoaly(2); ID9BPM2y=ID9BPM2y-i9_2y;
+1360 
+1361 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1362 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1363 b9_4x=BBPMgoalx(1); BPM94x=BPM94x-b9_4x;
+1364 b9_4y=BBPMgoaly(1); BPM94y=BPM94y-b9_4y;
+1365 b9_5x=BBPMgoalx(2); BPM95x=BPM95x-b9_5x;
+1366 b9_5y=BBPMgoaly(2); BPM95y=BPM95y-b9_5y;
+1367 
+1368 Sector = 10;
+1369 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1370 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1371 i10_1x=IDBPMgoalx(1); ID10BPM1x=ID10BPM1x-i10_1x;
+1372 i10_1y=IDBPMgoaly(1); ID10BPM1y=ID10BPM1y-i10_1y;
+1373 i10_2x=IDBPMgoalx(2); ID10BPM2x=ID10BPM2x-i10_2x;
+1374 i10_2y=IDBPMgoaly(2); ID10BPM2y=ID10BPM2y-i10_2y;
+1375 
+1376 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1377 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1378 b10_4x=BBPMgoalx(1); BPM104x=BPM104x-b10_4x;
+1379 b10_4y=BBPMgoaly(1); BPM104y=BPM104y-b10_4y;
+1380 b10_5x=BBPMgoalx(2); BPM105x=BPM105x-b10_5x;
+1381 b10_5y=BBPMgoaly(2); BPM105y=BPM105y-b10_5y;
+1382 
+1383 Sector = 11;
+1384 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1385 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1386 i11_1x=IDBPMgoalx(1); ID11BPM1x=ID11BPM1x-i11_1x;
+1387 i11_1y=IDBPMgoaly(1); ID11BPM1y=ID11BPM1y-i11_1y;
+1388 i11_2x=IDBPMgoalx(2); ID11BPM2x=ID11BPM2x-i11_2x;
+1389 i11_2y=IDBPMgoaly(2); ID11BPM2y=ID11BPM2y-i11_2y;
+1390 
+1391 IDBPMgoalx = getgolden(<span class="string">'IDBPMx'</span>, [Sector-1 11; Sector-1 12]);
+1392 IDBPMgoaly = getgolden(<span class="string">'IDBPMy'</span>, [Sector-1 11; Sector-1 12]);
+1393 i11_3x=IDBPMgoalx(1); ID11BPM3x=ID11BPM3x-i11_3x;
+1394 i11_3y=IDBPMgoaly(1); ID11BPM3y=ID11BPM3y-i11_3y;
+1395 i11_4x=IDBPMgoalx(2); ID11BPM4x=ID11BPM4x-i11_4x;
+1396 i11_4y=IDBPMgoaly(2); ID11BPM4y=ID11BPM4y-i11_4y;
+1397 
+1398 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1399 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1400 b11_4x=BBPMgoalx(1); BPM114x=BPM114x-b11_4x;
+1401 b11_4y=BBPMgoaly(1); BPM114y=BPM114y-b11_4y;
+1402 b11_5x=BBPMgoalx(2); BPM115x=BPM115x-b11_5x;
+1403 b11_5y=BBPMgoaly(2); BPM115y=BPM115y-b11_5y;
+1404 
+1405 Sector = 12;
+1406 IDBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector-1 10; Sector 1]);
+1407 IDBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector-1 10; Sector 1]);
+1408 i12_1x=IDBPMgoalx(1); ID12BPM1x=ID12BPM1x-i12_1x;
+1409 i12_1y=IDBPMgoaly(1); ID12BPM1y=ID12BPM1y-i12_1y;
+1410 i12_2x=IDBPMgoalx(2); ID12BPM2x=ID12BPM2x-i12_2x;
+1411 i12_2y=IDBPMgoaly(2); ID12BPM2y=ID12BPM2y-i12_2y;
+1412 
+1413 BBPMgoalx = getgolden(<span class="string">'BPMx'</span>, [Sector 5; Sector 6]);
+1414 BBPMgoaly = getgolden(<span class="string">'BPMy'</span>, [Sector 5; Sector 6]);
+1415 b12_4x=BBPMgoalx(1); BPM124x=BPM124x-b12_4x;
+1416 b12_4y=BBPMgoaly(1); BPM124y=BPM124y-b12_4y;
+1417 b12_5x=BBPMgoalx(2); BPM125x=BPM125x-b12_5x;
+1418 b12_5y=BBPMgoaly(2); BPM125y=BPM125y-b12_5y;
+1419 
+1420 
+1421 <span class="comment">% Find the tune shift due to insertion devices</span>
+1422 TuneShift = zeros(size(IDgap(1,:)));
+1423 i = find(IDlist(:,1) == 5);              <span class="comment">% remove sector 5</span>
+1424 list = 1:size(IDlist,1);
+1425 list(i) = []; 
+1426 <span class="keyword">for</span> i = 1:length(list)
+1427    TuneShift = TuneShift + <a href="gap2tune.html" class="code" title="function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)">gap2tune</a>(IDlist(list(i),1),IDgap(list(i),:),gev);
+1428 <span class="keyword">end</span>
+1429 
+1430 <span class="comment">% Hours or days for the x-axis?</span>
+1431 <span class="keyword">if</span> t(end)/60/60/24 &gt; 3
+1432    t = t/60/60/24;
+1433    xlabelstring = [<span class="string">'Date since '</span>, StartDayStr, <span class="string">' [Days]'</span>];
+1434    DayFlag = 1;
+1435 <span class="keyword">else</span>
+1436    t = t/60/60;
+1437    xlabelstring = [<span class="string">'Time since '</span>, StartDayStr, <span class="string">' [Hours]'</span>];
+1438    DayFlag = 0;
+1439 <span class="keyword">end</span>
+1440 Days = [days days2];
+1441 xmax = max(t);
+1442 
+1443 figure(1); clf;
+1444 subplot(7,1,1);
+1445 plot(t, dcct, <span class="string">'b'</span>); grid on;
+1446 ylabel(<span class="string">'Beam Current, I [mAmps]'</span>,<span class="string">'fontsize'</span>,10);
+1447 title(titleStr);
+1448 axis([0 xmax 0 450]);
+1449 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1450 
+1451 subplot(7,1,2);
+1452 plot(t, lifetime, <span class="string">'b'</span>); grid on;
+1453 <span class="comment">%plot(t, lifetime, 'b', t(2:end)/60/60, lifetime1, 'r'); grid on;</span>
+1454 ylabel(<span class="string">'Lifetime, \tau [Hours]'</span>,<span class="string">'fontsize'</span>,10);
+1455 axis([0 xmax 0 18]);
+1456 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1457 
+1458 subplot(7,1,3);
+1459 plot(t, SigX/2.0,<span class="string">'-b'</span>,t, SigY/2.0,<span class="string">'r'</span>); grid on;
+1460 ylabel(<span class="string">'\fontsize{7}RMS  \fontsize{14}\sigma_x \sigma_y \fontsize{10}[\mum]'</span>);
+1461 axis tight;
+1462 axis([0 xmax 30 90]);
+1463 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1464 
+1465 subplot(7,1,4);
+1466 plot(t, Spirorient,<span class="string">'b'</span>); grid on;
+1467 ylabel(<span class="string">'Orientation [deg]'</span>,<span class="string">'fontsize'</span>,10);
+1468 axis tight;
+1469 axis([0 xmax -100 100]);
+1470 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1471 
+1472 subplot(7,1,5);
+1473 plot(t, dcct .* lifetime ./ (SigX/2.0) ./ (SigY/2.0), <span class="string">'b'</span>); grid on;
+1474 ylabel(<span class="string">'I \tau / (\sigma_x \sigma_y)'</span>,<span class="string">'fontsize'</span>,10);
+1475 axis([0 xmax .25 1.25]);
+1476 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1477 
+1478 subplot(7,1,6);
+1479 plot(t,TuneShift,<span class="string">'b'</span>); grid on;
+1480 ylabel(<span class="string">'\Delta \nu_y(Gap)^1'</span>,<span class="string">'fontsize'</span>,10);
+1481 axis([0 xmax 0 .05]);
+1482 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1483 
+1484 subplot(7,1,7)
+1485 plot(t,IDgap);
+1486 hold on;
+1487 plot(t,EPU4,<span class="string">'r'</span>);
+1488 hold off
+1489 xlabel(xlabelstring);
+1490 ylabel(<span class="string">'Insertion Device Gap [mm]'</span>,<span class="string">'fontsize'</span>,10);
+1491 <span class="comment">%legend('ID4','ID5  ','ID7  ', 'ID8  ', 'ID9  ','ID10  ','ID12  ');</span>
+1492 axis([0 xmax -27 60]);
+1493 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1494 orient tall
+1495 addlabel(1,0,<span class="string">'^1W16 and EPU(4) longitudinal tune shifts are not included.'</span>);
+1496 
+1497 
+1498 figure(2); clf;
+1499 
+1500 subplot(14,1,1);
+1501 <span class="comment">% plot(t, 1000*ID1BPM1x, '-b', t, 1000*ID1BPM2x, '--r'); grid on;</span>
+1502 plot(t, 1000*ID1BPM1x, <span class="string">'-b'</span>); grid on;
+1503 ylabel(<span class="string">'1'</span>);
+1504 title([<span class="string">'Horizontal IDBPM Data in \mum: '</span>,titleStr]);
+1505 axis([0 xmax -30 30]);
+1506 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1507 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1508 
+1509 subplot(14,1,2);
+1510 plot(t, 1000*ID2BPM1x, <span class="string">'-b'</span>, t, 1000*ID2BPM2x, <span class="string">'--r'</span>); grid on;
+1511 ylabel(<span class="string">'2'</span>);
+1512 axis([0 xmax -30 30]);
+1513 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1514 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1515 
+1516 subplot(14,1,3);
+1517 plot(t, 1000*ID4BPM1x, <span class="string">'-b'</span>, t, 1000*ID4BPM2x, <span class="string">'--r'</span>,<span class="keyword">...</span>
+1518    t, 1000*ID4BPM3x, <span class="string">'-c'</span>, t, 1000*ID4BPM4x, <span class="string">'--m'</span>); grid on;
+1519 ylabel(<span class="string">'4EPU'</span>);
+1520 axis([0 xmax -30 30]);
+1521 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1522 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1523 
+1524 subplot(14,1,4);
+1525 plot(t, 1000*ID5BPM1x, <span class="string">'-b'</span>, t, 1000*ID5BPM2x, <span class="string">'--r'</span>); grid on;
+1526 ylabel(<span class="string">'5W'</span>);
+1527 axis([0 xmax -30 30]);
+1528 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1529 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1530 
+1531 subplot(14,1,5);
+1532 plot(t, 1000*ID6BPM1x, <span class="string">'-b'</span>, t, 1000*ID6BPM2x, <span class="string">'--r'</span>); grid on;
+1533 ylabel(<span class="string">'6'</span>);
+1534 axis([0 xmax -30 30]);
+1535 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1536 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1537 
+1538 subplot(14,1,6);
+1539 plot(t, 1000*ID7BPM1x, <span class="string">'-b'</span>, t, 1000*ID7BPM2x, <span class="string">'--r'</span>); grid on;
+1540 ylabel(<span class="string">'7U'</span>);
+1541 axis([0 xmax -30 30]);
+1542 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1543 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1544 
+1545 subplot(14,1,7);
+1546 plot(t, 1000*ID8BPM1x, <span class="string">'-b'</span>, t, 1000*ID8BPM2x, <span class="string">'--r'</span>); grid on;
+1547 ylabel(<span class="string">'8U'</span>);
+1548 axis([0 xmax -30 30]);
+1549 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1550 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1551 
+1552 subplot(14,1,8);
+1553 plot(t, 1000*ID9BPM1x, <span class="string">'-b'</span>, t, 1000*ID9BPM2x, <span class="string">'--r'</span>); grid on;
+1554 ylabel(<span class="string">'9U'</span>);
+1555 axis([0 xmax -30 30]);
+1556 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1557 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1558 
+1559 subplot(14,1,9);
+1560 plot(t, 1000*ID10BPM1x, <span class="string">'-b'</span>, t, 1000*ID10BPM2x, <span class="string">'--r'</span>); grid on;
+1561 ylabel(<span class="string">'10U'</span>);
+1562 axis([0 xmax -30 30]);
+1563 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1564 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1565 
+1566 subplot(14,1,10);
+1567 plot(t, 1000*ID11BPM1x, <span class="string">'-b'</span>, t, 1000*ID11BPM2x, <span class="string">'--r'</span>); grid on;
+1568 ylabel(<span class="string">'11'</span>);
+1569 axis([0 xmax -30 30]);
+1570 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1571 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1572 
+1573 subplot(14,1,11);
+1574 plot(t, 1000*ID12BPM1x, <span class="string">'-b'</span>, t, 1000*ID12BPM2x, <span class="string">'--r'</span>); grid on;
+1575 xlabel(xlabelstring);
+1576 ylabel(<span class="string">'12U'</span>);
+1577 axis([0 xmax -30 30]);
+1578 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1579 
+1580 subplot(14,1,12);
+1581 
+1582 plot(t, 1000*BPM44x, <span class="string">'-'</span>, t, 1000*BPM45x, <span class="string">'--'</span>,<span class="keyword">...</span>
+1583     t, 1000*BPM84x, <span class="string">'-'</span>, t, 1000*BPM85x, <span class="string">'--'</span>,<span class="keyword">...</span>
+1584    t, 1000*BPM94x, <span class="string">'-'</span>, t, 1000*BPM95x, <span class="string">'--'</span>,<span class="keyword">...</span>
+1585    t, 1000*BPM124x, <span class="string">'-'</span>, t, 1000*BPM125x, <span class="string">'--'</span>); grid on;
+1586 ylabel(<span class="string">'arc 4,8,9,12'</span>);
+1587 axis([0 xmax -30 30]);
+1588 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1589 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1590 
+1591 subplot(14,1,13);
+1592 plot(t, ID9BPM2xRMS, <span class="string">'-b'</span>, t, ID9BPM5xRMS, <span class="string">'--r'</span>); grid on;
+1593 ylabel(<span class="string">'rms noise'</span>);
+1594 axis tight;
+1595 axis([0 xmax 0 6]);
+1596 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1597 
+1598 subplot(14,1,14);
+1599 plot(t, hqmofm); grid on;
+1600 xlabel(xlabelstring);
+1601 ylabel(<span class="string">'\Delta f_{RF} [Hz]'</span>);
+1602 xaxis([0 xmax]);
+1603 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1604 
+1605 orient tall
+1606 
+1607 <span class="comment">%addlabel(1,0,sprintf('Mean removed from: X(4,3)=%.3f, X(4,4)=%.3f, X(9,4)=%.3f, X(9,5)=%.3f',mean(ID4BPM3x(imean)),mean(ID4BPM4x(imean)),mean(BPM94x(imean)),mean(BPM95x(imean))));</span>
+1608 <span class="comment">%addlabel(1,0,'Offset: X(4,3)=1.089, X(4,4)=1.015, X(9,4)=-.270, X(9,5)=.070');</span>
+1609 
+1610 figure(3); clf;
+1611 
+1612 subplot(13,1,1);
+1613 <span class="comment">%plot(t, 1000*ID1BPM1y, '-b', t, 1000*ID1BPM2y, '--r'); grid on;</span>
+1614 plot(t, 1000*ID1BPM1y, <span class="string">'-b'</span>); grid on;
+1615 ylabel(<span class="string">'1'</span>);
+1616 title([<span class="string">'Vertical IDBPM Data in \mum: '</span>,titleStr]);
+1617 axis([0 xmax -10 10]);
+1618 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1619 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1620 
+1621 subplot(13,1,2);
+1622 plot(t, 1000*ID2BPM1y, <span class="string">'-b'</span>, t, 1000*ID2BPM2y, <span class="string">'--r'</span>); grid on;
+1623 ylabel(<span class="string">'2'</span>);
+1624 axis([0 xmax -10 10]);
+1625 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1626 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1627 
+1628 subplot(13,1,3);
+1629 plot(t, 1000*ID4BPM1y, <span class="string">'-b'</span>, t, 1000*ID4BPM2y, <span class="string">'--r'</span>,<span class="keyword">...</span>
+1630    t, 1000*ID4BPM3y, <span class="string">'-c'</span>, t, 1000*ID4BPM4y, <span class="string">'--m'</span>); grid on;
+1631 ylabel(<span class="string">'4EPU'</span>);
+1632 axis([0 xmax -10 10]);
+1633 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1634 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1635 
+1636 subplot(13,1,4);
+1637 plot(t, 1000*ID5BPM1y, <span class="string">'-b'</span>, t, 1000*ID5BPM2y, <span class="string">'--r'</span>); grid on;
+1638 ylabel(<span class="string">'5W'</span>);
+1639 axis([0 xmax -10 10]);
+1640 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1641 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1642 
+1643 subplot(13,1,5);
+1644 plot(t, 1000*ID6BPM1y, <span class="string">'-b'</span>, t, 1000*ID6BPM2y, <span class="string">'--r'</span>); grid on;
+1645 ylabel(<span class="string">'6'</span>);
+1646 axis([0 xmax -10 10]);
+1647 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1648 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1649 
+1650 subplot(13,1,6);
+1651 plot(t, 1000*ID7BPM1y, <span class="string">'-b'</span>, t, 1000*ID7BPM2y, <span class="string">'--r'</span>); grid on;
+1652 ylabel(<span class="string">'7U'</span>);
+1653 axis([0 xmax -10 10]);
+1654 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1655 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1656 
+1657 subplot(13,1,7);
+1658 plot(t, 1000*ID8BPM1y, <span class="string">'-b'</span>, t, 1000*ID8BPM2y, <span class="string">'--r'</span>); grid on;
+1659 ylabel(<span class="string">'8U'</span>);
+1660 axis([0 xmax -10 10]);
+1661 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1662 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1663 
+1664 subplot(13,1,8);
+1665 plot(t, 1000*ID9BPM1y, <span class="string">'-b'</span>, t, 1000*ID9BPM2y, <span class="string">'--r'</span>); grid on;
+1666 ylabel(<span class="string">'9U'</span>);
+1667 axis([0 xmax -10 10]);
+1668 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1669 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1670 
+1671 subplot(13,1,9);
+1672 plot(t, 1000*ID10BPM1y, <span class="string">'-b'</span>, t, 1000*ID10BPM2y, <span class="string">'--r'</span>); grid on;
+1673 ylabel(<span class="string">'10U'</span>);
+1674 axis([0 xmax -10 10]);
+1675 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1676 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1677 
+1678 subplot(13,1,10);
+1679 plot(t, 1000*ID11BPM1y, <span class="string">'-b'</span>, t, 1000*ID11BPM2y, <span class="string">'--r'</span>); grid on;
+1680 ylabel(<span class="string">'11'</span>);
+1681 axis([0 xmax -10 10]);
+1682 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1683 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1684 
+1685 subplot(13,1,11);
+1686 plot(t, 1000*ID12BPM1y, <span class="string">'-b'</span>, t, 1000*ID12BPM2y, <span class="string">'--r'</span>); grid on;
+1687 xlabel(xlabelstring);
+1688 ylabel(<span class="string">'12U'</span>);
+1689 axis([0 xmax -10 10]);
+1690 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1691 
+1692 subplot(13,1,12);
+1693 plot(t, 1000*BPM44y, <span class="string">'-'</span>, t, 1000*BPM45y, <span class="string">'--'</span>,<span class="keyword">...</span>
+1694     t, 1000*BPM84y, <span class="string">'-'</span>, t, 1000*BPM85y, <span class="string">'--'</span>,<span class="keyword">...</span>
+1695    t, 1000*BPM94y, <span class="string">'-'</span>, t, 1000*BPM95y, <span class="string">'--'</span>,<span class="keyword">...</span>
+1696    t, 1000*BPM124y, <span class="string">'-'</span>, t, 1000*BPM125y, <span class="string">'--'</span>); grid on;
+1697 ylabel(<span class="string">'arc 4,8,9,12'</span>);
+1698 axis([0 xmax -30 30]);
+1699 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1700 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1701 
+1702 subplot(13,1,13);
+1703 plot(t, ID9BPM2yRMS, <span class="string">'-b'</span>, t, ID9BPM5yRMS, <span class="string">'--r'</span>); grid on;
+1704 xlabel(xlabelstring);
+1705 ylabel(<span class="string">'rms noise'</span>);
+1706 axis tight;
+1707 axis([0 xmax 0 3]);
+1708 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1709 
+1710 orient tall
+1711 
+1712 <span class="comment">%addlabel(1,0,sprintf('Mean removed from: Y(4,3)=%.3f, Y(4,4)=%.3f, Y(9,4)=%.3f, Y(9,5)=%.3f',mean(ID4BPM3y(imean)),mean(ID4BPM4y(imean)),mean(BPM94y(imean)),mean(BPM95y(imean))));</span>
+1713 <span class="comment">%addlabel(1,0,'Offsets: Y(4,3)=-.620, Y(4,4)=-.136, Y(9,4)=-.030, Y(9,5)=.380');</span>
+1714 
+1715 <span class="keyword">if</span> 1
+1716    <span class="comment">% b - absolute feedback</span>
+1717    <span class="comment">% g - non ID straight</span>
+1718    <span class="comment">% r - not in feedback</span>
+1719    figure(4); clf;
+1720    subplot(2,1,1);
+1721    plot(t, 1000*ID6BPM1x, <span class="string">'-b'</span>, t, 1000*ID6BPM2x, <span class="string">'-r'</span>); 
+1722    hold on
+1723    plot(t, 1000*BPM44x, <span class="string">'-g'</span>, t, 1000*BPM45x, <span class="string">'-g'</span>);
+1724    plot(t, 1000*BPM84x, <span class="string">'-g'</span>, t, 1000*BPM85x, <span class="string">'-g'</span>);
+1725    plot(t, 1000*BPM94x, <span class="string">'-g'</span>, t, 1000*BPM95x, <span class="string">'-g'</span>);
+1726    plot(t, 1000*BPM124x, <span class="string">'-g'</span>, t, 1000*BPM125x, <span class="string">'-g'</span>);
+1727    plot(t, 1000*ID1BPM1x, <span class="string">'-r'</span>);
+1728    plot(t, 1000*ID2BPM1x, <span class="string">'-b'</span>, t, 1000*ID2BPM2x, <span class="string">'-b'</span>);
+1729    plot(t, 1000*ID5BPM1x, <span class="string">'-b'</span>, t, 1000*ID5BPM2x, <span class="string">'-b'</span>);
+1730    plot(t, 1000*ID4BPM3x, <span class="string">'-r'</span>, t, 1000*ID4BPM4x, <span class="string">'-r'</span>);
+1731    plot(t, 1000*ID7BPM1x, <span class="string">'-b'</span>, t, 1000*ID7BPM2x, <span class="string">'-b'</span>);
+1732    plot(t, 1000*ID8BPM1x, <span class="string">'-b'</span>, t, 1000*ID8BPM2x, <span class="string">'-b'</span>);
+1733    plot(t, 1000*ID9BPM1x, <span class="string">'-b'</span>, t, 1000*ID9BPM2x, <span class="string">'-b'</span>);
+1734    plot(t, 1000*ID10BPM1x,<span class="string">'-b'</span>, t, 1000*ID10BPM2x,<span class="string">'-b'</span>);
+1735    plot(t, 1000*ID11BPM1x,<span class="string">'-b'</span>, t, 1000*ID11BPM2x,<span class="string">'-b'</span>);
+1736    plot(t, 1000*ID12BPM1x,<span class="string">'-b'</span>, t, 1000*ID12BPM2x,<span class="string">'-b'</span>);
+1737    ylabel(<span class="string">'Horizontal IDBPMs [\mum]'</span>);
+1738    title([titleStr]);
+1739    hold off
+1740    axis([0 xmax -30 30]);
+1741    <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1742    grid on;
+1743    
+1744    legend(<span class="string">'In Feedback Loop'</span>,<span class="string">'Not in Feedback Loop'</span>,<span class="string">'Arc BPMs'</span>,0);
+1745    
+1746    
+1747    subplot(2,1,2);
+1748    plot(t, 1000*ID6BPM1y, <span class="string">'-b'</span>, t, 1000*ID6BPM2y, <span class="string">'-r'</span>);
+1749    hold on;
+1750    plot(t, 1000*BPM44y,   <span class="string">'-g'</span>, t, 1000*BPM45y,   <span class="string">'-g'</span>);
+1751    plot(t, 1000*BPM84y,   <span class="string">'-g'</span>, t, 1000*BPM85y,   <span class="string">'-g'</span>);
+1752    plot(t, 1000*BPM94y,   <span class="string">'-g'</span>, t, 1000*BPM95y,   <span class="string">'-g'</span>);
+1753    plot(t, 1000*BPM124y,   <span class="string">'-g'</span>, t, 1000*BPM125y,   <span class="string">'-g'</span>);
+1754    plot(t, 1000*ID1BPM1y, <span class="string">'-r'</span>); 
+1755    plot(t, 1000*ID2BPM1y, <span class="string">'-b'</span>, t, 1000*ID2BPM2y, <span class="string">'-b'</span>); 
+1756    plot(t, 1000*ID5BPM1y, <span class="string">'-b'</span>, t, 1000*ID5BPM2y, <span class="string">'-b'</span>);
+1757    plot(t, 1000*ID4BPM3y, <span class="string">'-r'</span>, t, 1000*ID4BPM4y, <span class="string">'-r'</span>);
+1758    plot(t, 1000*ID7BPM1y, <span class="string">'-b'</span>, t, 1000*ID7BPM2y, <span class="string">'-b'</span>);
+1759    plot(t, 1000*ID8BPM1y, <span class="string">'-b'</span>, t, 1000*ID8BPM2y, <span class="string">'-b'</span>);
+1760    plot(t, 1000*ID9BPM1y, <span class="string">'-b'</span>, t, 1000*ID9BPM2y, <span class="string">'-b'</span>);
+1761    plot(t, 1000*ID10BPM1y,<span class="string">'-b'</span>, t, 1000*ID10BPM2y,<span class="string">'-b'</span>);
+1762    plot(t, 1000*ID11BPM1y,<span class="string">'-b'</span>, t, 1000*ID11BPM2y,<span class="string">'-b'</span>);
+1763    plot(t, 1000*ID12BPM1y,<span class="string">'-b'</span>, t, 1000*ID12BPM2y,<span class="string">'-b'</span>);
+1764    xlabel(xlabelstring);
+1765    ylabel(<span class="string">'Vertical IDBPMs [\mum]'</span>);
+1766    hold off
+1767    axis([0 xmax -15 15]);
+1768    <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1769    grid on;
+1770    orient tall
+1771 <span class="keyword">else</span>
+1772    <span class="comment">% mm</span>
+1773    
+1774    
+1775    <span class="comment">% b - absolute feedback</span>
+1776    <span class="comment">% g - non ID straight</span>
+1777    <span class="comment">% r - not in feedback</span>
+1778    figure(4); clf;
+1779    subplot(2,1,1);
+1780    plot(t, ID6BPM1x, <span class="string">'-b'</span>, t, ID6BPM2x, <span class="string">'-b'</span>); 
+1781    hold on
+1782    plot(t, ID5BPM1x, <span class="string">'-b'</span>, t, ID5BPM2x, <span class="string">'-b'</span>);
+1783    plot(t, ID2BPM1x, <span class="string">'-b'</span>, t, ID2BPM2x, <span class="string">'-b'</span>);
+1784    plot(t, ID7BPM1x, <span class="string">'-b'</span>, t, ID7BPM2x, <span class="string">'-b'</span>);
+1785    plot(t, ID8BPM1x, <span class="string">'-b'</span>, t, ID8BPM2x, <span class="string">'-b'</span>);
+1786    plot(t, ID9BPM1x, <span class="string">'-b'</span>, t, ID9BPM2x, <span class="string">'-b'</span>);
+1787    plot(t, ID10BPM1x,<span class="string">'-b'</span>, t, ID10BPM2x,<span class="string">'-b'</span>);
+1788    plot(t, ID11BPM1x,<span class="string">'-b'</span>, t, ID11BPM2x,<span class="string">'-b'</span>);
+1789    plot(t, ID12BPM1x,<span class="string">'-b'</span>, t, ID12BPM2x,<span class="string">'-b'</span>);
+1790    ylabel(<span class="string">'Horizontal IDBPMs [mm]'</span>);
+1791    title([titleStr]);
+1792    hold off
+1793    axis([0 xmax -.11 .11]);
+1794    <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1795    grid on;
+1796    
+1797   
+1798    subplot(2,1,2);
+1799    plot(t, ID2BPM1y, <span class="string">'-b'</span>, t, ID2BPM2y, <span class="string">'-b'</span>); 
+1800    hold on;
+1801    plot(t, ID5BPM1y, <span class="string">'-b'</span>, t, ID5BPM2y, <span class="string">'-b'</span>);
+1802    plot(t, ID6BPM1y, <span class="string">'-b'</span>, t, ID6BPM2y, <span class="string">'-b'</span>);
+1803    plot(t, ID7BPM1y, <span class="string">'-b'</span>, t, ID7BPM2y, <span class="string">'-b'</span>);
+1804    plot(t, ID8BPM1y, <span class="string">'-b'</span>, t, ID8BPM2y, <span class="string">'-b'</span>);
+1805    plot(t, ID9BPM1y, <span class="string">'-b'</span>, t, ID9BPM2y, <span class="string">'-b'</span>);
+1806    plot(t, ID10BPM1y,<span class="string">'-b'</span>, t, ID10BPM2y,<span class="string">'-b'</span>);
+1807    plot(t, ID11BPM1y,<span class="string">'-b'</span>, t, ID11BPM2y,<span class="string">'-b'</span>);
+1808    plot(t, ID12BPM1y,<span class="string">'-b'</span>, t, ID12BPM2y,<span class="string">'-b'</span>);
+1809    xlabel(xlabelstring);
+1810    ylabel(<span class="string">'Vertical IDBPMs [mm]'</span>);
+1811    hold off
+1812    axis([0 xmax -.06 .06]);
+1813    <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1814    grid on;
+1815    orient tall
+1816    
+1817 <span class="keyword">end</span>
+1818 
+1819 
+1820 figure(5); clf;
+1821 subplot(2,2,1);
+1822 plot(t, ID9BPM2xRMS); grid on;
+1823 xlabel(xlabelstring);
+1824 ylabel(<span class="string">'IDBPMx(9,2) [\mum]'</span>);
+1825 axis tight;
+1826 axis([0 xmax 0 6]);
+1827 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1828 
+1829 subplot(2,2,2);
+1830 plot(t, ID9BPM5xRMS); grid on;
+1831 xlabel(xlabelstring);
+1832 ylabel(<span class="string">'IDBPMx(9,5) [\mum]'</span>);
+1833 axis tight;
+1834 axis([0 xmax 0 2]);
+1835 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1836 
+1837 subplot(2,2,3);
+1838 plot(t, ID9BPM2yRMS); grid on;
+1839 xlabel(xlabelstring);
+1840 ylabel(<span class="string">'IDBPMy(9,2) [\mum]'</span>);
+1841 axis tight;
+1842 axis([0 xmax 0 2]);
+1843 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1844 
+1845 subplot(2,2,4);
+1846 plot(t, ID9BPM5yRMS); grid on;
+1847 xlabel(xlabelstring);
+1848 ylabel(<span class="string">'IDBPMy(9,5) [\mum]'</span>);
+1849 axis tight;
+1850 axis([0 xmax 0 1]);
+1851 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1852 
+1853 h=addlabel(.5,1,sprintf(<span class="string">'IDBPM RMS:  %s'</span>,titleStr));
+1854 set(h,<span class="string">'fontsize'</span>,10);
+1855 set(h,<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>);
+1856 set(h,<span class="string">'VerticalAlignment'</span>,<span class="string">'Top'</span>);
+1857 
+1858 orient landscape
+1859 
+1860 
+1861 figure(6);clf;
+1862 subplot(3,1,1)
+1863 plot(t, 1000*ID4BPM1x, <span class="string">'b'</span>); hold on
+1864 plot(t, 1000*ID4BPM2x, <span class="string">'r'</span>); 
+1865 plot(t, 1000*ID4BPM3x, <span class="string">'k'</span>);
+1866 plot(t, 1000*ID4BPM4x, <span class="string">'g'</span>);
+1867 hold off;
+1868 ylabel(<span class="string">'Horizontal [\mum]'</span>,<span class="string">'fontsize'</span>,10);
+1869 title(titleStr);
+1870 axis([0 xmax -30 30]);
+1871 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1872 
+1873 subplot(3,1,2)
+1874 plot(t, 1000*ID4BPM1y, <span class="string">'b'</span>); hold on
+1875 plot(t, 1000*ID4BPM2y, <span class="string">'r'</span>); 
+1876 plot(t, 1000*ID4BPM3y, <span class="string">'k'</span>);
+1877 plot(t, 1000*ID4BPM4y, <span class="string">'g'</span>);
+1878 hold off;
+1879 ylabel(<span class="string">'Vertical [\mum]'</span>,<span class="string">'fontsize'</span>,10);
+1880 axis([0 xmax -10 10]);
+1881 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1882 legend(<span class="string">'IDBPM(4,1)'</span>,<span class="string">'IDBPM(4,2)'</span>,<span class="string">'IDBPM(4,3)'</span>,<span class="string">'IDBPM(4,4)'</span>,0);
+1883 
+1884 subplot(3,1,3)
+1885 i = find(IDlist(:,1) == 4);
+1886 plot(t,IDgap(i,:),<span class="string">'b'</span>, t,EPU4,<span class="string">'r'</span>);
+1887 xlabel(xlabelstring);
+1888 ylabel(<span class="string">'EPU 4 [mm]'</span>,<span class="string">'fontsize'</span>,10);
+1889 axis([0 xmax -30 60]);
+1890 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1891 
+1892 orient tall
+1893 
+1894 
+1895 
+1896 
+1897 figure(7); clf;
+1898 subplot(7,1,1);
+1899 plot(t,TC7_3,<span class="string">'-b'</span>, t,TC7_4,<span class="string">'--r'</span>); grid on;
+1900 ylabel(<span class="string">'Sector 7 [Celsius]'</span>);
+1901 title([<span class="string">'SR Temperature at ID, '</span>, titleStr]);
+1902 axis tight
+1903 xaxis([0 xmax]);
+1904 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1905 <span class="comment">%axis([0 xmax 21.5 24]);</span>
+1906 <span class="comment">%legend(    'Sector 7, Aisle Side', ...</span>
+1907 <span class="comment">%     'Sector 7, Beamline Side');</span>
+1908 
+1909 subplot(7,1,2);
+1910 plot(t,TC8_3,<span class="string">'-b'</span>, t,TC8_4,<span class="string">'--r'</span>); grid on;
+1911 ylabel(<span class="string">'Sector 8 [Celsius]'</span>);
+1912 axis tight
+1913 xaxis([0 xmax]);
+1914 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1915 <span class="comment">%axis([0 xmax 21.5 24]);</span>
+1916 <span class="comment">%title(['SR Temperature at ID, ',titleStr]);</span>
+1917 <span class="comment">%legend(    'Sector 8, Aisle Side', ...</span>
+1918 <span class="comment">%     'Sector 8, Beamline Side');</span>
+1919 
+1920 subplot(7,1,3);
+1921 plot(t,TC9_3,<span class="string">'-b'</span>, t,TC9_4,<span class="string">'--r'</span>); grid on;
+1922 ylabel(<span class="string">'Sector 9 [Celsius]'</span>);
+1923 axis tight
+1924 xaxis([0 xmax]);
+1925 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1926 <span class="comment">%axis([0 xmax 21.5 24]);</span>
+1927 <span class="comment">%title(['SR Temperature at ID, ',titleStr]);</span>
+1928 <span class="comment">%legend(    'Sector 9, Aisle Side', ...</span>
+1929 <span class="comment">%     'Sector 9, Beamline Side');</span>
+1930 
+1931 subplot(7,1,4);
+1932 plot(t,TC10_3,<span class="string">'-b'</span>, t,TC10_4,<span class="string">'--r'</span>); grid on;
+1933 ylabel(<span class="string">'Sector 10 [Celsius]'</span>);
+1934 axis tight
+1935 xaxis([0 xmax]);
+1936 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1937 <span class="comment">%axis([0 xmax 21.5 24]);</span>
+1938 <span class="comment">%legend(    'Sector 10, Aisle Side', ...</span>
+1939 <span class="comment">%     'Sector 10, Beamline Side');</span>
+1940 
+1941 subplot(7,1,5);
+1942 plot(t,TC12_3,<span class="string">'-b'</span>, t,TC12_4,<span class="string">'--r'</span>); grid on;
+1943 ylabel(<span class="string">'Sector 12 [Celsius]'</span>);
+1944 axis tight
+1945 xaxis([0 xmax]);
+1946 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1947 <span class="comment">%axis([0 xmax 21.5 24]);</span>
+1948 <span class="comment">%legend(    'Sector 12, Aisle Side', ...</span>
+1949 <span class="comment">%     'Sector 12, Beamline Side');</span>
+1950 
+1951 subplot(7,1,6);
+1952 plot(t,mean([TC7_3;TC7_4;TC8_3;TC8_4;TC9_3;TC9_4;TC10_3;TC10_4;TC12_3;TC12_4]),<span class="string">'b'</span>); grid on;
+1953 axis tight
+1954 xaxis([0 xmax]);
+1955 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1956 ylabel(<span class="string">'Avg. Air [Celsius]'</span>);
+1957 
+1958 subplot(7,1,7);
+1959 plot(t, lcw, <span class="string">'b'</span>); grid on;
+1960 xlabel(xlabelstring);
+1961 ylabel(<span class="string">'LCW [Celsius]'</span>);
+1962 axis tight
+1963 xaxis([0 xmax]);
+1964 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1965 <span class="comment">%axis([0 xmax 20 24]);</span>
+1966 orient tall
+1967 
+1968 
+1969 figure(8); clf;
+1970 subplot(7,1,1);
+1971 plot(t,TC7_1,<span class="string">'-b'</span>, t,TC7_2,<span class="string">'--r'</span>); grid on;
+1972 ylabel(<span class="string">'Sector 7 [Celsius]'</span>);
+1973 title([<span class="string">'ID Backing Beam Temperature , '</span>,titleStr]);
+1974 axis tight
+1975 xaxis([0 xmax]);
+1976 <span class="comment">%axis([0 xmax 22.5 25]);</span>
+1977 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1978 
+1979 subplot(7,1,2);
+1980 plot(t,TC8_1,<span class="string">'-b'</span>, t,TC8_2,<span class="string">'--r'</span>); grid on;
+1981 ylabel(<span class="string">'Sector 8 [Celsius]'</span>);
+1982 axis tight
+1983 xaxis([0 xmax]);
+1984 <span class="comment">%axis([0 xmax 22.5 25]);</span>
+1985 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1986 
+1987 subplot(7,1,3);
+1988 plot(t,TC9_1,<span class="string">'-b'</span>, t,TC9_2,<span class="string">'--r'</span>); grid on;
+1989 ylabel(<span class="string">'Sector 9 [Celsius]'</span>);
+1990 axis tight
+1991 xaxis([0 xmax]);
+1992 <span class="comment">%axis([0 xmax 22.5 25]);</span>
+1993 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1994 
+1995 subplot(7,1,4);
+1996 plot(t,TC10_1,<span class="string">'-b'</span>, t,TC10_2,<span class="string">'--r'</span>); grid on;
+1997 ylabel(<span class="string">'Sector 10 [Celsius]'</span>);
+1998 axis tight
+1999 xaxis([0 xmax]);
+2000 <span class="comment">%axis([0 xmax 22.5 25]);</span>
+2001 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2002 
+2003 subplot(7,1,5);
+2004 plot(t,TC12_1,<span class="string">'-b'</span>, t,TC12_2,<span class="string">'--r'</span>); grid on;
+2005 ylabel(<span class="string">'Sector 12 [Celsius]'</span>);
+2006 axis tight
+2007 xaxis([0 xmax]);
+2008 <span class="comment">%axis([0 xmax 22.5 25]);</span>
+2009 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2010 
+2011 subplot(7,1,6);
+2012 plot(t, mean([TC7_1;TC7_2;TC8_1;TC8_2;TC9_1;TC9_2;TC10_1;TC10_2;TC12_1;TC12_2]), <span class="string">'b'</span>); grid on;
+2013 axis tight
+2014 xaxis([0 xmax]);
+2015 ylabel(<span class="string">'Avg. Air [Celsius]'</span>);
+2016 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2017 
+2018 subplot(7,1,7);
+2019 plot(t, lcw, <span class="string">'b'</span>); grid on;
+2020 xlabel(xlabelstring);
+2021 ylabel(<span class="string">'LCW [Celsius]'</span>);
+2022 axis tight
+2023 xaxis([0 xmax]);
+2024 <span class="comment">%axis([0 xmax 20 24]);</span>
+2025 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2026 orient tall
+2027 
+2028 
+2029 itmp = find(isnan(SpiroX));
+2030 imean = 1:length(SpiroX);
+2031 imean(itmp)=[];
+2032 
+2033 figure(9); clf;
+2034 subplot(6,1,1);
+2035 plot(t, dcct, <span class="string">'b'</span>); grid on;
+2036 ylabel(<span class="string">'Beam Current, I [mA]'</span>,<span class="string">'fontsize'</span>,9);
+2037 title(titleStr);
+2038 axis([0 xmax 0 450]);
+2039 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2040 
+2041 subplot(6,1,2);
+2042 <span class="comment">%plot(t, 1000*(BPM94x-mean(BPM94x(imean))), '-b', t, 1000*(BPM95x-mean(BPM95x(imean))), '--r'); grid on;</span>
+2043 plot(t, 1000*BPM44x, <span class="string">'-'</span>, t, 1000*BPM45x, <span class="string">'--'</span>,<span class="keyword">...</span>
+2044     t, 1000*BPM84x, <span class="string">'-'</span>, t, 1000*BPM85x, <span class="string">'--'</span>,<span class="keyword">...</span>
+2045    t, 1000*BPM94x, <span class="string">'-'</span>, t, 1000*BPM95y, <span class="string">'--'</span>,<span class="keyword">...</span>
+2046    t, 1000*BPM124x, <span class="string">'-'</span>, t, 1000*BPM125x, <span class="string">'--'</span>); grid on;
+2047 ylabel(<span class="string">'X (arcs 4,8,9,12) [\mum]'</span>);
+2048 axis([0 xmax -50 50]);
+2049 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+2050 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2051 
+2052 subplot(6,1,3);
+2053 plot(t, SpiroX-mean(SpiroX(imean)), <span class="string">'b'</span>); grid on;
+2054 ylabel(<span class="string">'Spiricon X [\mum]'</span>,<span class="string">'fontsize'</span>,10);
+2055 axis([0 xmax -50 50]);
+2056 <span class="comment">%xaxis([0 xmax]);</span>
+2057 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2058 
+2059 subplot(6,1,4);
+2060 <span class="comment">%plot(t, 1000*(BPM94y-mean(BPM94y(imean))), '-b', t, 1000*(BPM95y-mean(BPM95y(imean))), '--r'); grid on;</span>
+2061 plot(t, 1000*BPM44y, <span class="string">'-'</span>, t, 1000*BPM45y, <span class="string">'--'</span>,<span class="keyword">...</span>
+2062     t, 1000*BPM84y, <span class="string">'-'</span>, t, 1000*BPM85y, <span class="string">'--'</span>,<span class="keyword">...</span>
+2063    t, 1000*BPM94y, <span class="string">'-'</span>, t, 1000*BPM95y, <span class="string">'--'</span>,<span class="keyword">...</span>
+2064    t, 1000*BPM124y, <span class="string">'-'</span>, t, 1000*BPM125y, <span class="string">'--'</span>); grid on;
+2065 ylabel(<span class="string">'Y (arcs 4,8,9,12) [\mum]'</span>);
+2066 axis([0 xmax -50 50]);
+2067 set(gca,<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+2068 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2069 
+2070 subplot(6,1,5);
+2071 plot(t, SpiroY-mean(SpiroY(imean)), <span class="string">'b'</span>); grid on;
+2072 ylabel(<span class="string">'Spiricon Y [\mum]'</span>,<span class="string">'fontsize'</span>,10);
+2073 <span class="comment">%xaxis([0 xmax]);</span>
+2074 axis([0 xmax -50 50]);
+2075 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2076 
+2077 subplot(6,1,6);
+2078 plot(t, SigX/2.0,<span class="string">'-b'</span>,t, SigY/2.0,<span class="string">'r'</span>); grid on;
+2079 ylabel(<span class="string">'\fontsize{7}RMS  \fontsize{14}\sigma_x \sigma_y \fontsize{10}[\mum]'</span>);
+2080 axis tight;
+2081 axis([0 xmax 30 100]);
+2082 xlabel(xlabelstring);
+2083 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+2084 orient tall
+2085 
+2086 
+2087 
+2088 
+2089 figure(10); clf;
+2090 subplot(3,1,1);
+2091 plot(t, C1TEMP,<span class="string">'b'</span>, t, C2TEMP,<span class="string">'--r'</span>); grid on;
+2092 ylabel(<span class="string">'Temperature [Celsius]'</span>);
+2093 legend(<span class="string">'RF Cavity #1 '</span>, <span class="string">'RF Cavity #2  '</span>);
+2094 title(titleStr);
+2095 xaxis([0 xmax]);
+2096 
+2097 subplot(3,1,2);
+2098 <span class="comment">%plot(t, HPsyn,'b',t, HPcounter,'--r'); grid on;</span>
+2099 plot(t, HPcounter,<span class="string">'-b'</span>); grid on;
+2100 ylabel(<span class="string">'RF Frequency [MHz]'</span>);
+2101 <span class="comment">%legend('RF Synthesizer', 'HP Counter');</span>
+2102 legend(<span class="string">'HP Counter'</span>);
+2103 xaxis([0 xmax]);
+2104 
+2105 subplot(3,1,3);
+2106 plot(t, hqmofm,<span class="string">'-m'</span>); grid on;
+2107 xlabel(xlabelstring);
+2108 ylabel(<span class="string">'\Delta f_{RF} [Hz]'</span>);
+2109 legend(<span class="string">'FM input user synthesizer'</span>);
+2110 xaxis([0 xmax]);
+2111 
+2112 orient tall
+2113 
+2114 <span class="comment">%save ar_save</span>
+2115 
+2116 <span class="keyword">return</span>
+2117 
+2118 
+2119 
+2120 
+2121 <a name="_sub1" href="#_subfunctions" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a>
+2122 <span class="keyword">if</span> DayFlag
+2123    <span class="keyword">if</span> size(Days,2) &gt; 1
+2124       Days = Days'; <span class="comment">% Make a column vector</span>
+2125    <span class="keyword">end</span>
+2126    
+2127    MaxDay = round(max(t));
+2128    set(gca,<span class="string">'XTick'</span>,[0:MaxDay]');
+2129    
+2130    <span class="keyword">if</span> length(Days) &lt; MaxDay-1
+2131        <span class="comment">% Days were skipped</span>
+2132        set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str([0:MaxDay-1]'+Days(1)),<span class="string">' '</span>));  
+2133    <span class="keyword">else</span>
+2134        <span class="comment">% All days plotted</span>
+2135        set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str(Days),<span class="string">' '</span>));  
+2136    <span class="keyword">end</span>
+2137    
+2138    XTickLabelString = get(gca,<span class="string">'XTickLabel'</span>);
+2139    <span class="keyword">if</span> MaxDay &lt; 20
+2140       <span class="comment">% ok</span>
+2141    <span class="keyword">elseif</span> MaxDay &lt; 40
+2142       set(gca,<span class="string">'XTick'</span>,[0:2:MaxDay]');       
+2143       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:2:MaxDay-1,:));       
+2144    <span class="keyword">elseif</span> MaxDay &lt; 63
+2145       set(gca,<span class="string">'XTick'</span>,[0:3:MaxDay]');       
+2146       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:3:MaxDay-1,:));       
+2147    <span class="keyword">elseif</span> MaxDay &lt; 80
+2148       set(gca,<span class="string">'XTick'</span>,[0:4:MaxDay]');       
+2149       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:4:MaxDay-1,:));       
+2150    <span class="keyword">end</span>
+2151 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

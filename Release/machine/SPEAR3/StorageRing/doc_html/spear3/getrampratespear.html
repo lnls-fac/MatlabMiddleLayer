@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getrampratespear</title>
+  <meta name="keywords" content="getrampratespear">
+  <meta name="description" content="GETRAMPRATESPEAR - Returns the ramp rate for a family at Spear">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; getrampratespear.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getrampratespear
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETRAMPRATESPEAR - Returns the ramp rate for a family at Spear</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function RampRate = getramprate(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETRAMPRATESPEAR - Returns the ramp rate for a family at Spear
+  RampRate = getrampratespear(Family, Field, DeviceList)
+  RampRate = getrampratespear(Family, Field)
+  RampRate = getrampratespear(Family, DeviceList)
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Accelerator Object
+  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Setpoint'}
+  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}
+  4. 'Physics'  - Use physics  units (optional override of units)
+     'Hardware' - Use hardware units (optional override of units)
+
+  OUTPUTS
+  1. RampRate - Ramp rate for the family
+ 
+  NOTES
+  1. If the ramprate is not known, then pick a value should be used that makes the delay when  
+     waiting one tolerance step resonable.   That is, Tol = family2tol is used by setpv and steppv
+     when the WaitFlag = -2.  After the setpoint is within tolerance, an extra delay of 
+     Tol / RampRate is done.  
+  2. For HCM and VCM it's not the actual ramprate, it's the rate for a 1 ampere step
+  3. If Family is a cell array, then DeviceList and Field can also be a cell arrays
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function RampRate = getramprate(varargin)</a>
+0002 <span class="comment">%GETRAMPRATESPEAR - Returns the ramp rate for a family at Spear</span>
+0003 <span class="comment">%  RampRate = getrampratespear(Family, Field, DeviceList)</span>
+0004 <span class="comment">%  RampRate = getrampratespear(Family, Field)</span>
+0005 <span class="comment">%  RampRate = getrampratespear(Family, DeviceList)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS</span>
+0008 <span class="comment">%  1. Family - Family Name</span>
+0009 <span class="comment">%              Data Structure</span>
+0010 <span class="comment">%              Accelerator Object</span>
+0011 <span class="comment">%  2. Field - Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Setpoint'}</span>
+0012 <span class="comment">%  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}</span>
+0013 <span class="comment">%  4. 'Physics'  - Use physics  units (optional override of units)</span>
+0014 <span class="comment">%     'Hardware' - Use hardware units (optional override of units)</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  OUTPUTS</span>
+0017 <span class="comment">%  1. RampRate - Ramp rate for the family</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  NOTES</span>
+0020 <span class="comment">%  1. If the ramprate is not known, then pick a value should be used that makes the delay when</span>
+0021 <span class="comment">%     waiting one tolerance step resonable.   That is, Tol = family2tol is used by setpv and steppv</span>
+0022 <span class="comment">%     when the WaitFlag = -2.  After the setpoint is within tolerance, an extra delay of</span>
+0023 <span class="comment">%     Tol / RampRate is done.</span>
+0024 <span class="comment">%  2. For HCM and VCM it's not the actual ramprate, it's the rate for a 1 ampere step</span>
+0025 <span class="comment">%  3. If Family is a cell array, then DeviceList and Field can also be a cell arrays</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  Written by Greg Portmann</span>
+0028 
+0029 
+0030 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0031 <span class="comment">% Input parsing %</span>
+0032 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0033 UnitsFlag = {};
+0034 <span class="keyword">for</span> i = length(varargin):-1:1
+0035     <span class="keyword">if</span> isstruct(varargin{i})
+0036         <span class="comment">% Ignor structures</span>
+0037     <span class="keyword">elseif</span> iscell(varargin{i})
+0038         <span class="comment">% Ignor cells</span>
+0039     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0040         <span class="comment">% Remove and ignor</span>
+0041         varargin(i) = [];
+0042     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0043         <span class="comment">% Remove and ignor</span>
+0044         varargin(i) = [];
+0045     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>) | strcmpi(varargin{i},<span class="string">'Online'</span>) | strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0046         <span class="comment">% Remove and ignor</span>
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0049         UnitsFlag = {<span class="string">'Physics'</span>};
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0052         UnitsFlag = {<span class="string">'Hardware'</span>};
+0053         varargin(i) = [];
+0054     <span class="keyword">end</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 <span class="keyword">if</span> length(varargin) == 0
+0058     error(<span class="string">'Must have at least a family name input'</span>);
+0059 <span class="keyword">else</span>
+0060     Family = varargin{1};
+0061     <span class="keyword">if</span> length(varargin) &gt;= 2
+0062         Field = varargin{2};
+0063     <span class="keyword">end</span>
+0064     <span class="keyword">if</span> length(varargin) &gt;= 3
+0065         DeviceList = varargin{3};
+0066     <span class="keyword">end</span>
+0067 <span class="keyword">end</span>
+0068 
+0069 
+0070 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0071 <span class="comment">% Cell Array Inputs %</span>
+0072 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0073 <span class="keyword">if</span> iscell(Family)
+0074     <span class="keyword">for</span> i = 1:length(Family)
+0075         <span class="keyword">if</span> length(varargin) &lt; 2
+0076             RampRate{i} = getramprate(Family{i}, UnitsFlag{:});
+0077         <span class="keyword">elseif</span> length(varargin) &lt; 3
+0078             <span class="keyword">if</span> iscell(Field)
+0079                 RampRate{i} = getramprate(Family{i}, Field{i}, UnitsFlag{:});
+0080             <span class="keyword">else</span>
+0081                 RampRate{i} = getramprate(Family{i}, Field, UnitsFlag{:});
+0082             <span class="keyword">end</span>
+0083         <span class="keyword">else</span>
+0084             <span class="keyword">if</span> iscell(DeviceList)
+0085                 RampRate{i} = getramprate(Family{i}, Field{i}, DeviceList{i}, UnitsFlag{:});
+0086             <span class="keyword">else</span>
+0087                 RampRate{i} = getramprate(Family{i}, Field{i}, DeviceList, UnitsFlag{:});
+0088             <span class="keyword">end</span>
+0089         <span class="keyword">end</span>
+0090     <span class="keyword">end</span>
+0091     <span class="keyword">return</span>
+0092 <span class="keyword">end</span>
+0093 
+0094 
+0095 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0096 <span class="comment">% Family or data structure inputs beyond this point %</span>
+0097 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0098 <span class="keyword">if</span> isstruct(Family)
+0099     <span class="comment">% Data structure inputs</span>
+0100     <span class="keyword">if</span> length(varargin) &lt; 2
+0101         <span class="keyword">if</span> isfield(Family,<span class="string">'Field'</span>)
+0102             Field = Family.Field;
+0103         <span class="keyword">else</span>
+0104             Field = <span class="string">''</span>;
+0105         <span class="keyword">end</span>
+0106     <span class="keyword">end</span>
+0107     <span class="keyword">if</span> length(varargin) &lt; 3 
+0108         <span class="keyword">if</span> isfield(Family,<span class="string">'DeviceList'</span>)
+0109             DeviceList = Family.DeviceList;
+0110         <span class="keyword">else</span>
+0111             DeviceList = [];
+0112         <span class="keyword">end</span>
+0113     <span class="keyword">end</span>
+0114     <span class="keyword">if</span> isempty(UnitsFlag)
+0115         <span class="keyword">if</span> isfield(Family,<span class="string">'Units'</span>)
+0116             UnitsFlag{1} = Family.Units; 
+0117         <span class="keyword">end</span>
+0118     <span class="keyword">end</span>
+0119     <span class="keyword">if</span> isfield(Family,<span class="string">'FamilyName'</span>)
+0120         Family = Family.FamilyName;
+0121     <span class="keyword">else</span>
+0122         error(<span class="string">'For data structure inputs FamilyName field must exist'</span>)
+0123     <span class="keyword">end</span>
+0124 <span class="keyword">else</span>
+0125     <span class="comment">% Family string input</span>
+0126     <span class="keyword">if</span> length(varargin) &lt; 2
+0127         Field = <span class="string">''</span>;
+0128     <span class="keyword">end</span>
+0129     <span class="keyword">if</span> length(varargin) &lt; 3
+0130         DeviceList = [];
+0131     <span class="keyword">end</span>
+0132 <span class="keyword">end</span>
+0133 <span class="keyword">if</span> isnumeric(Field)
+0134     DeviceList = Field;
+0135     Field = <span class="string">''</span>;
+0136 <span class="keyword">end</span>
+0137 <span class="keyword">if</span> isempty(Field)
+0138     Field = <span class="string">'Setpoint'</span>;
+0139 <span class="keyword">end</span>
+0140 <span class="keyword">if</span> isempty(DeviceList)
+0141     DeviceList = family2dev(Family);
+0142 <span class="keyword">end</span>
+0143 <span class="keyword">if</span> (size(DeviceList,2) == 1) 
+0144     DeviceList = elem2dev(Family, DeviceList);
+0145 <span class="keyword">end</span>
+0146 
+0147 <span class="keyword">if</span> isempty(UnitsFlag)
+0148     UnitsFlag = <span class="string">''</span>;
+0149 <span class="keyword">else</span>
+0150     UnitsFlag = UnitsFlag{1};    
+0151 <span class="keyword">end</span>
+0152 
+0153 
+0154 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0155 <span class="comment">% CommonName Input:  Convert common names to a DeviceList %</span>
+0156 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0157 <span class="keyword">if</span> isstr(DeviceList)
+0158     DeviceList = common2dev(DeviceList, Family);
+0159     <span class="keyword">if</span> isempty(DeviceList)
+0160         error(<span class="string">'DeviceList was a string but common names could not be found.'</span>);
+0161     <span class="keyword">end</span>
+0162 <span class="keyword">end</span>
+0163 
+0164 
+0165 <span class="keyword">switch</span> Family
+0166     <span class="keyword">case</span> {<span class="string">'HCM'</span>, <span class="string">'VCM'</span>}
+0167         <span class="comment">% For correctors, 2000 steps in 1 second</span>
+0168         <span class="comment">% But it doesn't matter how big the step is so the ramprate cannot be determined</span>
+0169         <span class="comment">% I'll make the default be for a 1 amp step</span>
+0170         NSteps = getpv(Family, <span class="string">'CurrInterSteps'</span>, DeviceList);
+0171         RampRate = NSteps / 2000;
+0172     <span class="keyword">otherwise</span>
+0173         RampRate = [];
+0174         <span class="keyword">return</span>
+0175 <span class="keyword">end</span>
+0176 
+0177 <span class="comment">% Change to physics units if requested</span>
+0178 <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0179     RampRate = hw2physics(Family, Field, RampRate, DeviceList);
+0180 <span class="keyword">end</span>
+0181 
+0182</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

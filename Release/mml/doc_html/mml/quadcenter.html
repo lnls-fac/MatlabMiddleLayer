@@ -1,0 +1,1146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of quadcenter</title>
+  <meta name="keywords" content="quadcenter">
+  <meta name="description" content="QUADCENTER - Measure the magnet center of a quadrupole magnet">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; quadcenter.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>quadcenter
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>QUADCENTER - Measure the magnet center of a quadrupole magnet</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">QUADCENTER - Measure the magnet center of a quadrupole magnet
+  [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)
+                     or
+  [QMS1, QMS2] = quadcenter(QMSstructure, FigureHandle)
+
+  Finds the center of an individual quadrupole magnet.
+  The data is automatically appended to quadcenter.log and 
+  saved to an individual mat file named by family, sector, and element number
+
+  INPUTS 
+  1. QuadFamily  = Family name
+  2. QuadDev     = Device list for quadrupole family
+  3. XYPlane     = 0 -&gt; both horizontal and vertical {default}
+                   1 -&gt; horizontal only
+                   2 -&gt; vertical only 
+  4. FigureHandle can be a figure handle, a vector of 4 axes handles 
+                 (used by quadplot), or zero for no plots
+
+  The QuadFamily and QuadDev input get converted to a QMSstructure using quadcenterinit.  
+  One can also directly input this data structure.
+  QMSstructure = 
+         QuadFamily: Quadrupole family name, like 'QF'
+            QuadDev: Quadrupole device, like [7 1]
+          QuadDelta: Modulation amplitude in the quadrupole, like 1
+          QuadPlane: Horizontal (1) or vertical (2) plane
+         CorrFamily: Corrector magnet family, like 'HCM'
+        CorrDevList: Corrector magnet(s) using to vary the orbit in the quadrupole, like [7 1]
+          CorrDelta: Maximum change in the corrector(s), like 0.5000
+          BPMFamily: BPM family name, like 'BPMx'
+             BPMDev: BPM device next to the quadrupole, like [7 1]
+         BPMDevList: BPM device list used calculate the center and for orbit correction ([nx2 array])
+   ModulationMethod: Method for changing the quadrupole
+                         'bipolar' changes the quadrupole by +/- QuadDelta on each step
+                         'unipolar' changes the quadrupole from 0 to QuadDelta on each step
+                         'sweep' moves the quadrupole by QuadDelta at each step.  This allows for
+                                 staying on a given hysteresis branch.
+     NumberOfPoints: Number of points, like 3
+      DataDirectory: Directory to store the results.  Leave this field out or '.' will put the data
+                         in the present directory.
+       QuadraticFit: 0 = linear fit, else quadratic fit  (used by quadplot)
+      OutlierFactor: if abs(data - fit) &gt; OutlierFactor, then remove that BPM from the center calculation [mm] (used by quadplot)
+         ExtraDelay: Extra delay added before reading the BPMs [seconds] {optional}
+
+  OUTPUTS
+  The QMSstructure input structure will get the following output fields appended to it.  
+  This structure will be output as well as saved to a file which is named based on the 
+  sector, quadrupole family name, and device number.  A log file will also be updated.
+  QMSstructure = 
+          OldCenter: Old quadrupole center (from getoffsetorbit)
+                 x1: horizonal data at quadrupole value #1
+                 x2: horizonal data at quadrupole value #2
+                 y1: vertical data at quadrupole value #1
+                 y2: vertical data at quadrupole value #2
+               Xerr: Horizonal BPM starting error
+               Yerr: Vertical  BPM starting error
+          TimeStamp: Time stamp as output by clock (6 element vector)
+          CreatedBy: 'quadcenter'
+      QMS.BPMStatus: Status of the BPMs
+         QMS.BPMSTD: Standard deviation of the BPMs (from getsigma)
+             Center: Mean of the BPM center calculations
+          CenterSTD: Standard deviation of the BPM center calculations 
+  For two planes, QMS1 is the horizontal and QMS2 is the vertical.  When only finding
+  one plane, only the first output is used.  For multiple magnets, the output is a column
+  vector containing the quadrupole center. 
+
+  NOTE
+  1. It is a good idea to have the global orbit reasonable well corrected at the start
+  2. If the quadrupole modulation system is not a simple device with one family name then
+     edit the setquad function (machine specific).
+  3. For the new BPM offsets to take effect, they must be loaded into the main AO data structure. 
+  4. This program changes the MML warning level to -2 -&gt; Dialog Box
+     That way the measurement can be salvaged if something goes wrong
+
+  Machine specific setup:
+  1. setquad and getquad must exist for setting and getting the quadrupole current.
+     These function are often machine dependent.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>	FAMILY2STATUS - Returns the device status</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li><li><a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>	GETLIST - Returns Device List for a Family</li><li><a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>	GETMODE - Returns the present family mode ('Online', 'Simulator', 'Manual', 'Special', etc)</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>	GETRESPMAT - Get response matrix data from a file</li><li><a href="getsigma.html" class="code" title="function [Data, FileName] = getsigma(varargin)">getsigma</a>	GETSIGMA - Return the standard deviation in the monitor for a family</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>	GETTUNE - Returns the betatron tunes</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>	ISMEMBEROF - Returns turn if the membership information of a family (cell of strings)</li><li><a href="maxsp.html" class="code" title="function [Data, ErrorFlag] = maxsp(varargin)">maxsp</a>	MAXSP - Maximum value of the setpoint</li><li><a href="minsp.html" class="code" title="function [Data, ErrorFlag] = minsp(varargin)">minsp</a>	MINSP - Minimum value of the setpoint</li><li><a href="quadcenter.html" class="code" title="function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)">quadcenter</a>	QUADCENTER - Measure the magnet center of a quadrupole magnet</li><li><a href="quadplot.html" class="code" title="function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM)">quadplot</a>	QUADPLOT - Plots quadrupole centering data</li><li><a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>	SETFAMILYDATA - Sets data associated with accelerator control</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li><li><a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>	STEPSP - Step the setpoint for family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="quadcenter.html" class="code" title="function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)">quadcenter</a>	QUADCENTER - Measure the magnet center of a quadrupole magnet</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)</a>
+0002 <span class="comment">%QUADCENTER - Measure the magnet center of a quadrupole magnet</span>
+0003 <span class="comment">%  [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)</span>
+0004 <span class="comment">%                     or</span>
+0005 <span class="comment">%  [QMS1, QMS2] = quadcenter(QMSstructure, FigureHandle)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  Finds the center of an individual quadrupole magnet.</span>
+0008 <span class="comment">%  The data is automatically appended to quadcenter.log and</span>
+0009 <span class="comment">%  saved to an individual mat file named by family, sector, and element number</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  INPUTS</span>
+0012 <span class="comment">%  1. QuadFamily  = Family name</span>
+0013 <span class="comment">%  2. QuadDev     = Device list for quadrupole family</span>
+0014 <span class="comment">%  3. XYPlane     = 0 -&gt; both horizontal and vertical {default}</span>
+0015 <span class="comment">%                   1 -&gt; horizontal only</span>
+0016 <span class="comment">%                   2 -&gt; vertical only</span>
+0017 <span class="comment">%  4. FigureHandle can be a figure handle, a vector of 4 axes handles</span>
+0018 <span class="comment">%                 (used by quadplot), or zero for no plots</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  The QuadFamily and QuadDev input get converted to a QMSstructure using quadcenterinit.</span>
+0021 <span class="comment">%  One can also directly input this data structure.</span>
+0022 <span class="comment">%  QMSstructure =</span>
+0023 <span class="comment">%         QuadFamily: Quadrupole family name, like 'QF'</span>
+0024 <span class="comment">%            QuadDev: Quadrupole device, like [7 1]</span>
+0025 <span class="comment">%          QuadDelta: Modulation amplitude in the quadrupole, like 1</span>
+0026 <span class="comment">%          QuadPlane: Horizontal (1) or vertical (2) plane</span>
+0027 <span class="comment">%         CorrFamily: Corrector magnet family, like 'HCM'</span>
+0028 <span class="comment">%        CorrDevList: Corrector magnet(s) using to vary the orbit in the quadrupole, like [7 1]</span>
+0029 <span class="comment">%          CorrDelta: Maximum change in the corrector(s), like 0.5000</span>
+0030 <span class="comment">%          BPMFamily: BPM family name, like 'BPMx'</span>
+0031 <span class="comment">%             BPMDev: BPM device next to the quadrupole, like [7 1]</span>
+0032 <span class="comment">%         BPMDevList: BPM device list used calculate the center and for orbit correction ([nx2 array])</span>
+0033 <span class="comment">%   ModulationMethod: Method for changing the quadrupole</span>
+0034 <span class="comment">%                         'bipolar' changes the quadrupole by +/- QuadDelta on each step</span>
+0035 <span class="comment">%                         'unipolar' changes the quadrupole from 0 to QuadDelta on each step</span>
+0036 <span class="comment">%                         'sweep' moves the quadrupole by QuadDelta at each step.  This allows for</span>
+0037 <span class="comment">%                                 staying on a given hysteresis branch.</span>
+0038 <span class="comment">%     NumberOfPoints: Number of points, like 3</span>
+0039 <span class="comment">%      DataDirectory: Directory to store the results.  Leave this field out or '.' will put the data</span>
+0040 <span class="comment">%                         in the present directory.</span>
+0041 <span class="comment">%       QuadraticFit: 0 = linear fit, else quadratic fit  (used by quadplot)</span>
+0042 <span class="comment">%      OutlierFactor: if abs(data - fit) &gt; OutlierFactor, then remove that BPM from the center calculation [mm] (used by quadplot)</span>
+0043 <span class="comment">%         ExtraDelay: Extra delay added before reading the BPMs [seconds] {optional}</span>
+0044 <span class="comment">%</span>
+0045 <span class="comment">%  OUTPUTS</span>
+0046 <span class="comment">%  The QMSstructure input structure will get the following output fields appended to it.</span>
+0047 <span class="comment">%  This structure will be output as well as saved to a file which is named based on the</span>
+0048 <span class="comment">%  sector, quadrupole family name, and device number.  A log file will also be updated.</span>
+0049 <span class="comment">%  QMSstructure =</span>
+0050 <span class="comment">%          OldCenter: Old quadrupole center (from getoffsetorbit)</span>
+0051 <span class="comment">%                 x1: horizonal data at quadrupole value #1</span>
+0052 <span class="comment">%                 x2: horizonal data at quadrupole value #2</span>
+0053 <span class="comment">%                 y1: vertical data at quadrupole value #1</span>
+0054 <span class="comment">%                 y2: vertical data at quadrupole value #2</span>
+0055 <span class="comment">%               Xerr: Horizonal BPM starting error</span>
+0056 <span class="comment">%               Yerr: Vertical  BPM starting error</span>
+0057 <span class="comment">%          TimeStamp: Time stamp as output by clock (6 element vector)</span>
+0058 <span class="comment">%          CreatedBy: 'quadcenter'</span>
+0059 <span class="comment">%      QMS.BPMStatus: Status of the BPMs</span>
+0060 <span class="comment">%         QMS.BPMSTD: Standard deviation of the BPMs (from getsigma)</span>
+0061 <span class="comment">%             Center: Mean of the BPM center calculations</span>
+0062 <span class="comment">%          CenterSTD: Standard deviation of the BPM center calculations</span>
+0063 <span class="comment">%  For two planes, QMS1 is the horizontal and QMS2 is the vertical.  When only finding</span>
+0064 <span class="comment">%  one plane, only the first output is used.  For multiple magnets, the output is a column</span>
+0065 <span class="comment">%  vector containing the quadrupole center.</span>
+0066 <span class="comment">%</span>
+0067 <span class="comment">%  NOTE</span>
+0068 <span class="comment">%  1. It is a good idea to have the global orbit reasonable well corrected at the start</span>
+0069 <span class="comment">%  2. If the quadrupole modulation system is not a simple device with one family name then</span>
+0070 <span class="comment">%     edit the setquad function (machine specific).</span>
+0071 <span class="comment">%  3. For the new BPM offsets to take effect, they must be loaded into the main AO data structure.</span>
+0072 <span class="comment">%  4. This program changes the MML warning level to -2 -&gt; Dialog Box</span>
+0073 <span class="comment">%     That way the measurement can be salvaged if something goes wrong</span>
+0074 <span class="comment">%</span>
+0075 <span class="comment">%  Machine specific setup:</span>
+0076 <span class="comment">%  1. setquad and getquad must exist for setting and getting the quadrupole current.</span>
+0077 <span class="comment">%     These function are often machine dependent.</span>
+0078 
+0079 <span class="comment">%  Written by Greg Portmann</span>
+0080 
+0081 
+0082 
+0083 <span class="comment">% Extra delay can be written over by the QMS.ExtraDelay field.  If this</span>
+0084 <span class="comment">% does not exist, then the value below is used.</span>
+0085 ExtraDelay = 0; 
+0086 
+0087 
+0088 <span class="comment">% Set the waitflag on power supply setpoints to wait for fresh data from the BPMs</span>
+0089 WaitFlag = -2; 
+0090 
+0091 
+0092 <span class="comment">% Record the tune at each point.</span>
+0093 <span class="comment">% In simulate mode the tunes are always saved unless the TUNE family does not exist.</span>
+0094 GetTuneFlag = 0;
+0095 
+0096 
+0097 <span class="comment">% Inputs</span>
+0098 QMS1 = [];
+0099 QMS2 = [];
+0100 <span class="keyword">if</span> nargin &lt; 1
+0101     FamilyList = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0102     [tmp,i] = <a href="ismemberof.html" class="code" title="function  [IsTest, Index] = ismemberof(FamilyName, Field, MemberString)">ismemberof</a>(FamilyList,<span class="string">'QUAD'</span>);
+0103     <span class="keyword">if</span> ~isempty(i)
+0104         FamilyList = FamilyList(i,:);
+0105     <span class="keyword">end</span>
+0106     <span class="keyword">if</span> size(FamilyList,1) == 1
+0107         QuadFamily = deblank(FamilyList);
+0108     <span class="keyword">else</span>
+0109         [i,ok] = listdlg(<span class="string">'PromptString'</span>, <span class="string">'Select a quadrupole family:'</span>, <span class="keyword">...</span>
+0110             <span class="string">'SelectionMode'</span>, <span class="string">'single'</span>, <span class="keyword">...</span>
+0111             <span class="string">'ListString'</span>, FamilyList);
+0112         <span class="keyword">if</span> ok == 0
+0113             <span class="keyword">return</span>
+0114         <span class="keyword">else</span>
+0115             QuadFamily = deblank(FamilyList(i,:));
+0116         <span class="keyword">end</span>
+0117     <span class="keyword">end</span>
+0118 <span class="keyword">end</span>
+0119 
+0120 <span class="keyword">if</span> isstruct(QuadFamily)
+0121     QMS = QuadFamily;
+0122     XYPlane = QMS.QuadPlane;
+0123     <span class="keyword">if</span> QMS.QuadPlane == 1
+0124         QMS_Horizontal = QMS;
+0125         QMS_Vertical   = quadcenterinit(QMS.QuadFamily, QMS.QuadDev, 2);
+0126         QMS_Vertical.CorrectOrbit = QMS.CorrectOrbit;
+0127     <span class="keyword">elseif</span> QMS.QuadPlane == 2
+0128         QMS_Horizontal = quadcenterinit(QMS.QuadFamily, QMS.QuadDev, 1);
+0129         QMS_Horizontal.CorrectOrbit = QMS.CorrectOrbit;
+0130         QMS_Vertical = QMS;
+0131     <span class="keyword">else</span>
+0132         error(<span class="string">'QMS.QuadPlane must be 1 or 2 when using a QMS structure input'</span>);
+0133     <span class="keyword">end</span>
+0134     <span class="keyword">if</span> nargin &gt;= 2 
+0135         FigureHandle = QuadDev;
+0136     <span class="keyword">else</span>
+0137         FigureHandle = [];
+0138     <span class="keyword">end</span>
+0139     QuadFamily = QMS.QuadFamily;
+0140     QuadDev    = QMS.QuadDev;
+0141 <span class="keyword">else</span>
+0142     <span class="keyword">if</span> ~<a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(QuadFamily)
+0143         error(sprintf(<span class="string">'Quadrupole family %s does not exist.  Make sure the middle layer had been initialized properly.'</span>,QuadFamily));
+0144     <span class="keyword">end</span>
+0145     <span class="keyword">if</span> nargin &lt; 2
+0146         QuadDev = editlist(<a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>(QuadFamily),QuadFamily,zeros(length(<a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>(QuadFamily)),1));
+0147     <span class="keyword">end</span>
+0148     <span class="keyword">if</span> nargin &lt; 3
+0149         ButtonNumber = menu(<span class="string">'Which Plane?'</span>, <span class="string">'Both'</span>,<span class="string">'Horizontal Only'</span>,<span class="string">'Vertical Only'</span>,<span class="string">'Cancel'</span>);  
+0150         drawnow;
+0151         <span class="keyword">switch</span> ButtonNumber
+0152             <span class="keyword">case</span> 1
+0153                 XYPlane = 0;
+0154             <span class="keyword">case</span> 2
+0155                 XYPlane = 1;
+0156             <span class="keyword">case</span> 3
+0157                 XYPlane = 2;
+0158             <span class="keyword">otherwise</span>
+0159                 fprintf(<span class="string">'   quadcenter cancelled\n'</span>);
+0160                 <span class="keyword">return</span>
+0161         <span class="keyword">end</span>
+0162     <span class="keyword">end</span>
+0163     <span class="keyword">if</span> nargin &lt; 4 
+0164         FigureHandle = [];
+0165     <span class="keyword">end</span>
+0166     
+0167     <span class="comment">% If QuadDev is a vector</span>
+0168     <span class="keyword">if</span> size(QuadDev,1) &gt; 1
+0169         <span class="keyword">for</span> i = 1:size(QuadDev,1)
+0170             <span class="keyword">if</span> XYPlane == 0
+0171                 [Q1, Q2] = <a href="quadcenter.html" class="code" title="function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)">quadcenter</a>(QuadFamily, QuadDev(i,:), XYPlane, FigureHandle);
+0172                 QMS1(i,1) = Q1.Center;
+0173                 QMS2(i,1) = Q2.Center;
+0174             <span class="keyword">else</span>
+0175                 [Q1] = <a href="quadcenter.html" class="code" title="function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)">quadcenter</a>(QuadFamily, QuadDev(i,:), XYPlane, FigureHandle);
+0176                 QMS1(i,1) = Q1.Center;
+0177             <span class="keyword">end</span>
+0178         <span class="keyword">end</span>
+0179         <span class="keyword">return</span>
+0180     <span class="keyword">end</span>
+0181     
+0182     
+0183     <span class="comment">% Get QMS structure</span>
+0184     QMS_Horizontal = quadcenterinit(QuadFamily, QuadDev, 1);
+0185     QMS_Vertical   = quadcenterinit(QuadFamily, QuadDev, 2);
+0186 <span class="keyword">end</span>
+0187 
+0188 
+0189 <span class="comment">% Change the MML warning level to -2 -&gt; Dialog Box</span>
+0190 <span class="comment">% That way the measurement can be salvaged if something goes wrong</span>
+0191 ErrorWarningLevel = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'ErrorWarningLevel'</span>);
+0192 <a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>(-2, <span class="string">'ErrorWarningLevel'</span>);
+0193 
+0194 
+0195 <span class="comment">% Initialize variables</span>
+0196 HCMFamily  = QMS_Horizontal.CorrFamily;
+0197 HCMDev     = QMS_Horizontal.CorrDevList;
+0198 DelHCM     = QMS_Horizontal.CorrDelta;
+0199 BPMxFamily = QMS_Horizontal.BPMFamily;
+0200 BPMxDev    = QMS_Horizontal.BPMDev;
+0201 BPMxDevList= QMS_Horizontal.BPMDevList;
+0202 
+0203 VCMFamily  = QMS_Vertical.CorrFamily;
+0204 VCMDev     = QMS_Vertical.CorrDevList;
+0205 DelVCM     = QMS_Vertical.CorrDelta;
+0206 BPMyFamily = QMS_Vertical.BPMFamily;
+0207 BPMyDev    = QMS_Vertical.BPMDev;
+0208 BPMyDevList= QMS_Vertical.BPMDevList;
+0209 
+0210 Xcenter = NaN;
+0211 Ycenter = NaN;
+0212 
+0213 
+0214 <span class="comment">% Check status for BPMs next to the quadrupole and correctors used in orbit correction</span>
+0215 HCMStatus = <a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>(HCMFamily, HCMDev);
+0216 
+0217 <span class="keyword">if</span> ~isnan(HCMStatus) &amp;&amp; any(HCMStatus==0) 
+0218     error(sprintf(<span class="string">'A %s corrector used in finding the center has a bad status'</span>, HCMFamily));
+0219 <span class="keyword">end</span>
+0220 VCMStatus = <a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>(VCMFamily, VCMDev);
+0221 <span class="keyword">if</span> ~isnan(VCMStatus) &amp;&amp; any(VCMStatus==0) 
+0222     error(sprintf(<span class="string">'A %s corrector used in finding the center has a bad status'</span>, VCMFamily));
+0223 <span class="keyword">end</span>
+0224 BPMxStatus = <a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>(BPMxFamily, BPMxDev);
+0225 <span class="keyword">if</span> ~isnan(BPMxStatus) &amp;&amp; any(BPMxStatus==0) 
+0226     error(sprintf(<span class="string">'The %s monitor next to the quadrupole has bad status'</span>, BPMxFamily));
+0227 <span class="keyword">end</span>
+0228 BPMyStatus = <a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>(BPMxFamily, BPMxDev);
+0229 <span class="keyword">if</span> ~isnan(BPMyStatus) &amp;&amp; any(BPMyStatus==0) 
+0230     error(sprintf(<span class="string">'The %s monitor next to the quadrupole has bad status'</span>, BPMxFamily));
+0231 <span class="keyword">end</span>
+0232 
+0233     
+0234 <span class="comment">% Record start directory</span>
+0235 DirStart = pwd;
+0236 
+0237 
+0238 <span class="comment">% Get the current offset orbit</span>
+0239 Xoffset = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(BPMxFamily, BPMxDev);
+0240 Yoffset = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(BPMyFamily, BPMyDev);
+0241 XoffsetOld = Xoffset;
+0242 YoffsetOld = Yoffset;
+0243 
+0244 <span class="comment">% Starting correctors</span>
+0245 HCM00 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMDev);
+0246 VCM00 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMDev);
+0247 
+0248 
+0249 <span class="comment">% % Global orbit correction</span>
+0250 <span class="comment">% CM = getsp('HCM','struct');</span>
+0251 <span class="comment">% BPM = getx('struct');</span>
+0252 <span class="comment">% BPMWeight = ones(size(BPM.DeviceList,1),1);</span>
+0253 <span class="comment">% i = findrowindex(BPMxDev, BPM.DeviceList);</span>
+0254 <span class="comment">%</span>
+0255 <span class="comment">% x = getoffset('BPMx');</span>
+0256 <span class="comment">% x = .1 * BPMWeight;</span>
+0257 <span class="comment">% %x(i) = -.2;</span>
+0258 <span class="comment">% BPMWeight(i) = 100;</span>
+0259 <span class="comment">%</span>
+0260 <span class="comment">% setorbit(x, BPM, CM, 3, 20, BPMWeight, 'Display');</span>
+0261 
+0262 
+0263 <span class="comment">% Correct orbit to the old offsets first</span>
+0264 <span class="keyword">if</span> strcmpi(QMS_Horizontal.CorrectOrbit, <span class="string">'yes'</span>)
+0265     fprintf(<span class="string">'   Correcting the orbit to the old horizontal center of %s(%d,%d)\n'</span>, QuadFamily, QuadDev); pause(0);
+0266     <span class="keyword">if</span> ~isnan(Xoffset)
+0267         <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Xoffset, BPMxFamily, BPMxDev, HCMFamily, HCMDev, 4);
+0268     <span class="keyword">end</span>
+0269 <span class="keyword">end</span>
+0270 <span class="keyword">if</span> strcmpi(QMS_Vertical.CorrectOrbit, <span class="string">'yes'</span>)
+0271     fprintf(<span class="string">'   Correcting the orbit to the old vertical center of %s(%d,%d)\n'</span>, QuadFamily, QuadDev); pause(0);
+0272     <span class="keyword">if</span> ~isnan(Yoffset)
+0273         <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Yoffset, BPMyFamily, BPMyDev, VCMFamily, VCMDev, 4);
+0274     <span class="keyword">end</span>
+0275 <span class="keyword">end</span>
+0276 
+0277 <span class="comment">%OrbitCorrection(Xoffset, BPMxFamily, BPMxDev, HCMFamily, HCMDev);</span>
+0278 <span class="comment">%OrbitCorrection(Yoffset, BPMyFamily, BPMyDev, VCMFamily, VCMDev);</span>
+0279 
+0280 
+0281 
+0282 <span class="comment">% Algorithm</span>
+0283 <span class="comment">% 1.  Change the horzontal orbit in the quad</span>
+0284 <span class="comment">% 2.  Correct the vertical orbit</span>
+0285 <span class="comment">% 3.  Record the orbit</span>
+0286 <span class="comment">% 4.  Step the quad</span>
+0287 <span class="comment">% 5.  Record the orbit</span>
+0288 
+0289 
+0290 <span class="comment">% FIND HORIZONTAL OFFSET</span>
+0291 <span class="keyword">if</span> XYPlane==0 || XYPlane==1    
+0292     FigureHandle = 1;
+0293         
+0294     <span class="comment">% BPM processor delay</span>
+0295     <span class="keyword">if</span> isfield(QMS_Horizontal, <span class="string">'ExtraDelay'</span>) 
+0296         ExtraDelay = QMS_Horizontal.ExtraDelay;
+0297     <span class="keyword">end</span>
+0298 
+0299     <span class="comment">% Get mode</span>
+0300     Mode = <a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>(QMS_Horizontal.QuadFamily);
+0301     
+0302     <span class="comment">% Record starting point</span>
+0303     QUAD0 = getquad(QMS_Horizontal);
+0304     HCM0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMDev);
+0305     VCM0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMDev);
+0306     Xerr = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDev) - Xoffset;
+0307     Yerr = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDev) - Yoffset;
+0308     xstart = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0309     ystart = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0310 
+0311     QMS_Horizontal.Orbit0 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList, <span class="string">'Struct'</span>);
+0312     
+0313     [tmp, iNotFound] = findrowindex(BPMxDev, BPMxDevList);
+0314     <span class="keyword">if</span> ~isempty(iNotFound)
+0315         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(HCMFamily, HCM00, HCMDev, 0);
+0316         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(VCMFamily, VCM00, VCMDev, 0);
+0317         error(<span class="string">'BPM at the quadrupole not found in the BPM device list'</span>);
+0318     <span class="keyword">end</span>
+0319       
+0320     DelQuad = QMS_Horizontal.QuadDelta;
+0321     N = abs(round(QMS_Horizontal.NumberOfPoints));
+0322     <span class="keyword">if</span> N &lt; 1
+0323         error(<span class="string">'The number of points must be 2 or more.'</span>);
+0324     <span class="keyword">end</span>
+0325     
+0326    
+0327     fprintf(<span class="string">'   Finding horizontal center of %s(%d,%d)\n'</span>, QuadFamily, QuadDev);
+0328     fprintf(<span class="string">'   Starting orbit error: %s(%d,%d)=%f , %s(%d,%d)=%f %s\n'</span>, BPMxFamily, BPMxDev, Xerr, BPMyFamily, BPMyDev, Yerr, QMS_Horizontal.Orbit0.UnitsString);
+0329     <span class="keyword">if</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'bipolar'</span>)
+0330         fprintf(<span class="string">'   Quadrupole starting current = %.3f, modulate by +/- %.3f\n'</span>, getquad(QMS_Horizontal), DelQuad);
+0331     <span class="keyword">elseif</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'unipolar'</span>)
+0332         fprintf(<span class="string">'   Quadrupole starting current = %.3f, modulate by 0 to %.3f\n'</span>, getquad(QMS_Horizontal), DelQuad);
+0333     <span class="keyword">elseif</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'sweep'</span>)
+0334         fprintf(<span class="string">'   Quadrupole starting current = %.3f, sweep by %.3f on each step\n'</span>, getquad(QMS_Horizontal), DelQuad);        
+0335     <span class="keyword">else</span>
+0336         <span class="comment">% Reset or error</span>
+0337         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(HCMFamily, HCM00, HCMDev, 0);
+0338         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(VCMFamily, VCM00, VCMDev, 0);
+0339         setquad(QMS_Horizontal, QUAD0, 0);
+0340         cd(DirStart);
+0341         error(<span class="string">'Unknown ModulationMethod in the QMS input structure (likely a problem with quadcenterinit)'</span>);
+0342     <span class="keyword">end</span>
+0343     pause(0);
+0344     
+0345     <span class="comment">% Establish a hysteresis loop</span>
+0346     <span class="keyword">if</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'bipolar'</span>)
+0347         fprintf(<span class="string">'   Establishing a hysteresis loop on the quadrupole (bi-polar case)\n'</span>); pause(0);
+0348         setquad(QMS_Horizontal, DelQuad+QUAD0, -1);
+0349         setquad(QMS_Horizontal,-DelQuad+QUAD0, -1);
+0350         setquad(QMS_Horizontal, DelQuad+QUAD0, -1);
+0351         setquad(QMS_Horizontal,-DelQuad+QUAD0, -1);
+0352         setquad(QMS_Horizontal,         QUAD0, -1);
+0353     <span class="keyword">elseif</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'unipolar'</span>)
+0354         fprintf(<span class="string">'   Establishing a hysteresis loop on the quadrupole (uni-polar case)\n'</span>); pause(0);
+0355         setquad(QMS_Horizontal, DelQuad+QUAD0, -1);
+0356         setquad(QMS_Horizontal,         QUAD0, -1);
+0357         setquad(QMS_Horizontal, DelQuad+QUAD0, -1);
+0358         setquad(QMS_Horizontal,         QUAD0, -1);
+0359     <span class="keyword">end</span>
+0360     
+0361     
+0362     <span class="comment">% Corrector step size</span>
+0363     CorrStep = 2 * DelHCM / (N-1);
+0364 
+0365     
+0366     <span class="comment">% Start the corrector a little lower first for hysteresis reasons</span>
+0367     <span class="comment">%stepsp(HCMFamily, -1.0*DelHCM, HCMDev, -1);</span>
+0368     <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(HCMFamily, -1.2*DelHCM, HCMDev, -1);
+0369     <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(HCMFamily,   .2*DelHCM, HCMDev, WaitFlag); 
+0370 
+0371     
+0372     <span class="comment">% Main horizontal data loop</span>
+0373     clear DCCT
+0374     <span class="keyword">for</span> i = 1:N
+0375         <span class="comment">% Step the horizontal orbit</span>
+0376         <span class="keyword">if</span> i ~= 1
+0377             <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(HCMFamily, CorrStep, HCMDev, WaitFlag);
+0378         <span class="keyword">end</span>
+0379         
+0380         fprintf(<span class="string">'   %d. %s(%d,%d) sp/am = %+.4f/%+.4f, %s(%d,%d) = %+.5f %s\n'</span>, i, HCMFamily, HCMDev(1,:), <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMDev(1,:)), <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(HCMFamily, HCMDev(1,:)),  BPMxFamily, BPMxDev, <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDev), QMS_Horizontal.Orbit0.UnitsString); pause(0);  
+0381         
+0382         <span class="comment">% If correcting the orbit, then recorrect the vertical center now</span>
+0383         <span class="keyword">if</span> strcmpi(QMS_Horizontal.CorrectOrbit, <span class="string">'yes'</span>)
+0384            <span class="comment">% Correct the vertical orbit</span>
+0385            <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Yoffset, BPMyFamily, BPMyDev, VCMFamily, VCMDev, 4);
+0386         <span class="keyword">end</span>
+0387         
+0388         <span class="keyword">if</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'sweep'</span>)
+0389             <span class="comment">% One directional sweep of the quadrupole</span>
+0390             sleep(ExtraDelay);
+0391             x1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0392             y1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0393             x0(:,i) = x1(:,i);
+0394             y0(:,i) = y1(:,i);
+0395            
+0396             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0397                 QMS_Horizontal.Tune1(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0398             <span class="keyword">end</span>
+0399 
+0400             setquad(QMS_Horizontal, i*DelQuad+QUAD0, WaitFlag);
+0401             sleep(ExtraDelay);
+0402 
+0403             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0404             <span class="keyword">if</span> strcmpi(QMS_Horizontal.CorrectOrbit, <span class="string">'yes'</span>)
+0405                 <span class="comment">% Correct the vertical orbit</span>
+0406                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Yoffset, BPMyFamily, BPMyDev, VCMFamily, VCMDev, 4);
+0407                 sleep(ExtraDelay);
+0408             <span class="keyword">end</span>
+0409 
+0410             x2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0411             y2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0412             
+0413             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0414                 QMS_Horizontal.Tune2(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0415             <span class="keyword">end</span>
+0416    
+0417         <span class="keyword">elseif</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'bipolar'</span>)
+0418             <span class="comment">% Modulate the quadrupole</span>
+0419             sleep(ExtraDelay);
+0420             x0(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0421             y0(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0422             setquad(QMS_Horizontal, DelQuad+QUAD0, WaitFlag);
+0423             sleep(ExtraDelay);
+0424 
+0425             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0426             <span class="keyword">if</span> strcmpi(QMS_Horizontal.CorrectOrbit, <span class="string">'yes'</span>)
+0427                 <span class="comment">% Correct the vertical orbit</span>
+0428                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Yoffset, BPMyFamily, BPMyDev, VCMFamily, VCMDev, 4);
+0429                 sleep(ExtraDelay);
+0430             <span class="keyword">end</span>
+0431 
+0432             x1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0433             y1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0434             
+0435             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0436                 QMS_Horizontal.Tune1(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0437             <span class="keyword">end</span>
+0438 
+0439             setquad(QMS_Horizontal,-DelQuad+QUAD0, WaitFlag);
+0440             sleep(ExtraDelay);
+0441 
+0442             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0443             <span class="keyword">if</span> strcmpi(QMS_Horizontal.CorrectOrbit, <span class="string">'yes'</span>)
+0444                 <span class="comment">% Correct the vertical orbit</span>
+0445                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Yoffset, BPMyFamily, BPMyDev, VCMFamily, VCMDev, 4);
+0446                 sleep(ExtraDelay);
+0447             <span class="keyword">end</span>
+0448 
+0449             x2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0450             y2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0451             
+0452             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0453                 QMS_Horizontal.Tune2(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0454             <span class="keyword">end</span>
+0455 
+0456             setquad(QMS_Horizontal, QUAD0, WaitFlag);
+0457         
+0458         <span class="keyword">elseif</span> strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'unipolar'</span>)
+0459             <span class="comment">% Modulate the quadrupole</span>
+0460             sleep(ExtraDelay);
+0461             x1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0462             y1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0463             x0(:,i) = x1(:,i);
+0464             y0(:,i) = y1(:,i);
+0465             
+0466             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0467                 QMS_Horizontal.Tune1(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0468             <span class="keyword">end</span>
+0469 
+0470             setquad(QMS_Horizontal, DelQuad+QUAD0, WaitFlag);
+0471             sleep(ExtraDelay);
+0472 
+0473             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0474             <span class="keyword">if</span> strcmpi(QMS_Horizontal.CorrectOrbit, <span class="string">'yes'</span>)
+0475                 <span class="comment">% Correct the vertical orbit</span>
+0476                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Yoffset, BPMyFamily, BPMyDev, VCMFamily, VCMDev, 4);
+0477                 sleep(ExtraDelay);
+0478             <span class="keyword">end</span>
+0479 
+0480             x2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0481             y2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0482             
+0483             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0484                 QMS_Horizontal.Tune2(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0485             <span class="keyword">end</span>
+0486 
+0487             setquad(QMS_Horizontal, QUAD0, WaitFlag);
+0488         <span class="keyword">end</span>
+0489 
+0490         DCCT(i) = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>;
+0491     <span class="keyword">end</span>
+0492 
+0493     <span class="comment">% Get the horizontal data filename and save the data</span>
+0494     <span class="comment">% Append data and time</span>
+0495     FileName = [<span class="string">'s'</span>, num2str(QuadDev(1,1)), QuadFamily, num2str(QuadDev(1,2)), <span class="string">'h1'</span>];
+0496     FileName = appendtimestamp(FileName, clock);
+0497 
+0498     <span class="comment">% Use a version number</span>
+0499     <span class="comment">%i=1;</span>
+0500     <span class="comment">%FileName = ['s', num2str(QuadDev(1,1)), QuadFamily, num2str(QuadDev(1,2)), 'h', num2str(i)];</span>
+0501     <span class="comment">%while exist([FileName,'.mat'], 'file')</span>
+0502     <span class="comment">%    i = i + 1;</span>
+0503     <span class="comment">%    FileName = ['s', num2str(QuadDev(1,1)), QuadFamily, num2str(QuadDev(1,2)), 'h', num2str(i)];</span>
+0504     <span class="comment">%end</span>
+0505     
+0506     QMS = QMS_Horizontal;
+0507     QMS.QuadPlane = 1;
+0508     
+0509     QMS.OldCenter = Xoffset;
+0510     QMS.XOffsetOld = XoffsetOld;
+0511     QMS.YOffsetOld = YoffsetOld;
+0512     
+0513     QMS.xstart = xstart;
+0514     QMS.ystart = ystart;
+0515     
+0516     QMS.x0 = x0;
+0517     QMS.x1 = x1;
+0518     QMS.x2 = x2;
+0519     QMS.y0 = y0;
+0520     QMS.y1 = y1;
+0521     QMS.y2 = y2;
+0522     QMS.Xerr = Xerr;
+0523     QMS.Yerr = Yerr;
+0524     QMS.TimeStamp = clock;
+0525     QMS.DCCT = DCCT;
+0526     QMS.DataDescriptor = <span class="string">'Quadrupole Center'</span>;
+0527     QMS.CreatedBy = <span class="string">'quadcenter'</span>;
+0528     
+0529     <span class="comment">% Get and store the BPM status and standard deviation (to be used by the center calculation routine)</span>
+0530     QMS.BPMStatus = <a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>(BPMxFamily, BPMxDevList);
+0531     N = getbpmaverages(BPMxDevList);
+0532     QMS.BPMSTD = <a href="getsigma.html" class="code" title="function [Data, FileName] = getsigma(varargin)">getsigma</a>(BPMxFamily, BPMxDevList, N);
+0533 
+0534     <span class="comment">% Set up figures, plot and find horizontal center</span>
+0535     <span class="keyword">try</span>
+0536         <span class="keyword">if</span> isempty(FigureHandle)
+0537             QMS = <a href="quadplot.html" class="code" title="function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM)">quadplot</a>(QMS);
+0538         <span class="keyword">else</span>
+0539             QMS = <a href="quadplot.html" class="code" title="function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM)">quadplot</a>(QMS, FigureHandle);
+0540         <span class="keyword">end</span>
+0541         drawnow;
+0542     <span class="keyword">catch</span>
+0543         fprintf(<span class="string">'\n%s\n'</span>, lasterr);
+0544     <span class="keyword">end</span>
+0545     QMS1 = QMS;
+0546 
+0547     <span class="comment">% Save the horizontal data</span>
+0548     <span class="keyword">if</span> isfield(QMS_Horizontal, <span class="string">'DataDirectory'</span>)
+0549         [FinalDir, ErrorFlag] = gotodirectory(QMS_Horizontal.DataDirectory);
+0550     <span class="keyword">end</span>
+0551     QMS.DataDirectory = pwd;
+0552     save(FileName, <span class="string">'QMS'</span>);
+0553     fprintf(<span class="string">'   Data saved to file %s in directory %s\n\n'</span>, FileName, QMS.DataDirectory);
+0554 
+0555     <span class="comment">% Output data to file</span>
+0556     fid1 = fopen(<span class="string">'quadcenter.log'</span>,<span class="string">'at'</span>);
+0557     time=clock;
+0558     fprintf(fid1, <span class="string">'%s   %d:%d:%2.0f \n'</span>, date, time(4),time(5),time(6));
+0559     fprintf(fid1, <span class="string">'Data saved to file %s (%s)\n'</span>, FileName, QMS.DataDirectory);
+0560     fprintf(fid1, <span class="string">'%s(%d,%d) %s(%d,%d) = %f (+/- %f) [%s]\n\n'</span>, QuadFamily, QuadDev, BPMxFamily, BPMxDev, QMS.Center, QMS.CenterSTD, QMS_Horizontal.Orbit0.UnitsString);
+0561     fclose(fid1);
+0562     cd(DirStart);
+0563 
+0564     <span class="comment">% Change the offset orbit to the new center so that the vertical plane uses it</span>
+0565     Xoffset = QMS.Center;
+0566     
+0567     <span class="comment">% Restore magnets their starting points (correctors to values after orbit correction)</span>
+0568     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(HCMFamily, HCM0, HCMDev, WaitFlag);
+0569     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(VCMFamily, VCM0, VCMDev, WaitFlag);
+0570     setquad(QMS_Horizontal, QUAD0, WaitFlag);
+0571     
+0572     <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0573         <span class="comment">% Print the tune information</span>
+0574         fprintf(<span class="string">'   Tune and tune difference for the 1st points in the merit function (QMS.Tune1): \n'</span>);
+0575         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune1(1,:));
+0576         fprintf(<span class="string">'  Horizontal\n'</span>);
+0577         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune1(2,:));
+0578         fprintf(<span class="string">'  Vertical\n'</span>);
+0579         fprintf(<span class="string">'   ===================================================\n'</span>);
+0580         fprintf(<span class="string">'   %8.5f'</span>, diff(QMS.Tune1));
+0581         fprintf(<span class="string">'  Difference \n\n'</span>);
+0582         
+0583         fprintf(<span class="string">'   Tune and tune difference for the 2nd points in the merit function (QMS.Tune2): \n'</span>);
+0584         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune2(1,:));
+0585         fprintf(<span class="string">'  Horizontal\n'</span>);
+0586         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune2(2,:));
+0587         fprintf(<span class="string">'  Vertical\n'</span>);
+0588         fprintf(<span class="string">'   ===================================================\n'</span>);
+0589         fprintf(<span class="string">'   %8.5f'</span>, diff(QMS.Tune2));
+0590         fprintf(<span class="string">'  Difference\n\n'</span>);
+0591 
+0592         dTune1 = diff(QMS.Tune1);
+0593         dTune2 = diff(QMS.Tune2);
+0594         
+0595         <span class="keyword">if</span> any(sign(dTune1/dTune1(1))==-1)
+0596             fprintf(<span class="string">'   Tune change sign!!!\n'</span>);            
+0597         <span class="keyword">end</span>
+0598         
+0599         <span class="keyword">if</span> any(abs(dTune1) &lt; .025) || any(abs(dTune2) &lt; .025)
+0600             fprintf(<span class="string">'   Horizontal and vertical tunes seem too close.\n'</span>);
+0601         <span class="keyword">end</span>
+0602     <span class="keyword">end</span>    
+0603 <span class="keyword">end</span>
+0604 
+0605 
+0606 
+0607 <span class="comment">% FIND VERTICAL OFFSET</span>
+0608 <span class="keyword">if</span> XYPlane==0 || XYPlane==2    
+0609     FigureHandle = 1;
+0610 
+0611     <span class="comment">% BPM processor delay</span>
+0612     <span class="keyword">if</span> isfield(QMS_Vertical, <span class="string">'ExtraDelay'</span>)
+0613         ExtraDelay = QMS_Vertical.ExtraDelay;
+0614     <span class="keyword">end</span>
+0615 
+0616     <span class="comment">% Get mode</span>
+0617     Mode = <a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>(QMS_Horizontal.QuadFamily);
+0618     
+0619     <span class="comment">% Record starting point</span>
+0620     QUAD0 = getquad(QMS_Vertical);
+0621     HCM0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(HCMFamily, HCMDev);
+0622     VCM0 = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMDev);
+0623     Xerr = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDev) - Xoffset;
+0624     Yerr = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDev) - Yoffset;
+0625     xstart = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0626     ystart = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0627     
+0628     QMS_Vertical.Orbit0 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList, <span class="string">'Struct'</span>);
+0629 
+0630     [tmp, iNotFound] = findrowindex(BPMyDev, BPMyDevList);
+0631     <span class="keyword">if</span> ~isempty(iNotFound)
+0632         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(HCMFamily, HCM00, HCMDev, 0);
+0633         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(VCMFamily, VCM00, VCMDev, 0);
+0634         error(<span class="string">'BPM at the quadrupole not found in the BPM device list'</span>);
+0635     <span class="keyword">end</span>
+0636 
+0637     DelQuad = QMS_Vertical.QuadDelta;
+0638     N = abs(round(QMS_Vertical.NumberOfPoints));
+0639     <span class="keyword">if</span> N &lt; 1
+0640         error(<span class="string">'The number of points must be 2 or more.'</span>);
+0641     <span class="keyword">end</span>
+0642 
+0643     fprintf(<span class="string">'   Finding vertical center of %s(%d,%d)\n'</span>, QuadFamily, QuadDev);
+0644     fprintf(<span class="string">'   Starting orbit error: %s(%d,%d)=%f , %s(%d,%d)=%f %s\n'</span>, BPMxFamily, BPMxDev, Xerr, BPMyFamily, BPMyDev, Yerr, QMS_Vertical.Orbit0.UnitsString);
+0645     <span class="keyword">if</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'bipolar'</span>)
+0646         fprintf(<span class="string">'   Quadrupole starting current = %.3f, modulate by +/- %.3f\n'</span>, getquad(QMS_Vertical), DelQuad);
+0647     <span class="keyword">elseif</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'unipolar'</span>)
+0648         fprintf(<span class="string">'   Quadrupole starting current = %.3f, modulate by 0 to %.3f\n'</span>, getquad(QMS_Vertical), DelQuad);
+0649     <span class="keyword">elseif</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'sweep'</span>)
+0650         fprintf(<span class="string">'   Quadrupole starting current = %.3f, sweep by %.3f on each step\n'</span>, getquad(QMS_Vertical), DelQuad);
+0651     <span class="keyword">else</span>
+0652         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(HCMFamily, HCM00, HCMDev, 0);
+0653         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(VCMFamily, VCM00, VCMDev, 0);
+0654         setquad(QMS_Vertical, QUAD0, 0);
+0655         cd(DirStart);
+0656         error(<span class="string">'Unknown ModulationMethod in the QMS input structure (likely a problem with quadcenterinit)'</span>);
+0657     <span class="keyword">end</span>
+0658     pause(0);
+0659     
+0660     
+0661     <span class="comment">% Establish a hysteresis loop (if not already done, or if the horizontal plane was sweep)</span>
+0662     <span class="keyword">if</span> XYPlane == 2 || strcmpi(QMS_Horizontal.ModulationMethod, <span class="string">'sweep'</span>)
+0663         <span class="keyword">if</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'bipolar'</span>)
+0664             fprintf(<span class="string">'   Establishing a hysteresis loop on the quadrupole (bi-polar case)\n'</span>); pause(0);
+0665             setquad(QMS_Vertical, DelQuad+QUAD0, -1);
+0666             setquad(QMS_Vertical,-DelQuad+QUAD0, -1);
+0667             setquad(QMS_Vertical, DelQuad+QUAD0, -1);
+0668             setquad(QMS_Vertical,-DelQuad+QUAD0, -1);
+0669             setquad(QMS_Vertical,         QUAD0, -1);
+0670         <span class="keyword">elseif</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'unipolar'</span>)
+0671             fprintf(<span class="string">'   Establishing a hysteresis loop on the quadrupole (uni-polar case)\n'</span>); pause(0);
+0672             setquad(QMS_Vertical, DelQuad+QUAD0, -1);
+0673             setquad(QMS_Vertical,         QUAD0, -1);
+0674             setquad(QMS_Vertical, DelQuad+QUAD0, -1);
+0675             setquad(QMS_Vertical,         QUAD0, -1);
+0676         <span class="keyword">end</span>
+0677     <span class="keyword">end</span>
+0678     
+0679 
+0680     <span class="comment">% Corrector step size</span>
+0681     CorrStep = 2 * DelVCM / (N-1);
+0682 
+0683     
+0684     <span class="comment">% Start the corrector a little lower first for hysteresis reasons</span>
+0685     <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(VCMFamily, -1.2*DelVCM, VCMDev, -1);
+0686     <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(VCMFamily,   .2*DelVCM, VCMDev, WaitFlag);
+0687 
+0688 
+0689 <span class="comment">%     Debug</span>
+0690 <span class="comment">%     setquad(QMS_Vertical, DelQuad+QUAD0, WaitFlag);</span>
+0691 <span class="comment">%     QUAD0 = getquad(QMS_Vertical);</span>
+0692 <span class="comment">%     Xstart = getam(BPMxFamily, BPMxDev)</span>
+0693     
+0694 
+0695     clear DCCT
+0696     <span class="keyword">for</span> i = 1:N
+0697 
+0698         <span class="comment">% Step the vertical orbit</span>
+0699         <span class="keyword">if</span> i ~= 1
+0700             <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(VCMFamily, CorrStep, VCMDev, WaitFlag);
+0701         <span class="keyword">end</span>
+0702 
+0703         fprintf(<span class="string">'   %d. %s(%d,%d) sp/am = %+.4f/%+.4f, %s(%d,%d) = %+.5f %s\n'</span>, i, VCMFamily, VCMDev(1,:), <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(VCMFamily, VCMDev(1,:)), <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(VCMFamily, VCMDev(1,:)),  BPMyFamily, BPMyDev, <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDev), QMS_Vertical.Orbit0.UnitsString); pause(0);
+0704         
+0705         
+0706         <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0707         <span class="keyword">if</span> strcmpi(QMS_Vertical.CorrectOrbit, <span class="string">'yes'</span>)
+0708            <span class="comment">% Correct the horizontal orbit</span>
+0709            <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Xoffset, BPMxFamily, BPMxDev, HCMFamily, HCMDev, 4);
+0710         <span class="keyword">end</span>
+0711 
+0712                
+0713         <span class="keyword">if</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'sweep'</span>)
+0714             <span class="comment">% One dimensional sweep of the quadrupole</span>
+0715             sleep(ExtraDelay);
+0716             x1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0717             y1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0718             x0(:,i) = x1(:,i);
+0719             y0(:,i) = y1(:,i);
+0720             
+0721             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0722                 QMS_Vertical.Tune1(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0723             <span class="keyword">end</span>
+0724 
+0725             setquad(QMS_Vertical, i*DelQuad+QUAD0, WaitFlag);
+0726             sleep(ExtraDelay);
+0727 
+0728             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0729             <span class="keyword">if</span> strcmpi(QMS_Vertical.CorrectOrbit, <span class="string">'yes'</span>)
+0730                 <span class="comment">% Correct the horizontal orbit</span>
+0731                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Xoffset, BPMxFamily, BPMxDev, HCMFamily, HCMDev, 4);
+0732                 sleep(ExtraDelay);
+0733             <span class="keyword">end</span>
+0734 
+0735             x2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0736             y2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0737             
+0738             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0739                 QMS_Vertical.Tune2(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0740             <span class="keyword">end</span>
+0741 
+0742         <span class="keyword">elseif</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'bipolar'</span>)
+0743             <span class="comment">% Modulate the quadrupole</span>
+0744             sleep(ExtraDelay);
+0745             x0(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0746             y0(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0747             setquad(QMS_Vertical, DelQuad+QUAD0, WaitFlag);
+0748             sleep(ExtraDelay);
+0749 
+0750             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0751             <span class="keyword">if</span> strcmpi(QMS_Vertical.CorrectOrbit, <span class="string">'yes'</span>)
+0752                 <span class="comment">% Correct the horizontal orbit</span>
+0753                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Xoffset, BPMxFamily, BPMxDev, HCMFamily, HCMDev, 4);
+0754                 sleep(ExtraDelay);
+0755             <span class="keyword">end</span>
+0756 
+0757             x1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0758             y1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0759             
+0760             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0761                 QMS_Vertical.Tune1(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0762             <span class="keyword">end</span>
+0763 
+0764             setquad(QMS_Vertical,-DelQuad+QUAD0, WaitFlag);
+0765             sleep(ExtraDelay);
+0766 
+0767             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0768             <span class="keyword">if</span> strcmpi(QMS_Vertical.CorrectOrbit, <span class="string">'yes'</span>)
+0769                 <span class="comment">% Correct the horizontal orbit</span>
+0770                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Xoffset, BPMxFamily, BPMxDev, HCMFamily, HCMDev, 4);
+0771                 sleep(ExtraDelay);
+0772             <span class="keyword">end</span>
+0773 
+0774             x2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0775             y2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0776             
+0777             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0778                 QMS_Vertical.Tune2(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0779             <span class="keyword">end</span>
+0780 
+0781             setquad(QMS_Vertical, QUAD0, WaitFlag);
+0782             
+0783         <span class="keyword">elseif</span> strcmpi(QMS_Vertical.ModulationMethod, <span class="string">'unipolar'</span>)
+0784             <span class="comment">% Modulate the quadrupole</span>
+0785             sleep(ExtraDelay);
+0786             x1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0787             y1(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0788             x0(:,i) = x1(:,i);
+0789             y0(:,i) = y1(:,i);
+0790             
+0791             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0792                 QMS_Vertical.Tune1(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0793             <span class="keyword">end</span>
+0794 
+0795             setquad(QMS_Vertical, DelQuad+QUAD0, WaitFlag);
+0796             sleep(ExtraDelay);
+0797 
+0798             <span class="comment">% If correcting the orbit, then recorrect the horizontal center now</span>
+0799             <span class="keyword">if</span> strcmpi(QMS_Vertical.CorrectOrbit, <span class="string">'yes'</span>)
+0800                 <span class="comment">% Correct the horizontal orbit</span>
+0801                 <a href="#_sub1" class="code" title="subfunction OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)">OrbitCorrection</a>(Xoffset, BPMxFamily, BPMxDev, HCMFamily, HCMDev, 4);
+0802                 sleep(ExtraDelay);
+0803             <span class="keyword">end</span>
+0804 
+0805             x2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMxFamily, BPMxDevList);
+0806             y2(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMyFamily, BPMyDevList);
+0807             
+0808             <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0809                 QMS_Vertical.Tune2(:,i) = <a href="gettune.html" class="code" title="function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)">gettune</a>;
+0810             <span class="keyword">end</span>
+0811 
+0812             setquad(QMS_Vertical, QUAD0, WaitFlag);
+0813         <span class="keyword">end</span>
+0814         
+0815         DCCT(i) = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>;
+0816     <span class="keyword">end</span>
+0817 
+0818     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(VCMFamily, VCM0, VCMDev, -1);
+0819 
+0820     
+0821     <span class="comment">% Get the vertical data filename and save the data</span>
+0822     <span class="comment">% Append data and time</span>
+0823     FileName = [<span class="string">'s'</span>, num2str(QuadDev(1,1)), QuadFamily, num2str(QuadDev(1,2)), <span class="string">'v1'</span>];
+0824     FileName = appendtimestamp(FileName, clock);
+0825 
+0826     <span class="comment">%% Append version number</span>
+0827     <span class="comment">%i=1;</span>
+0828     <span class="comment">%FileName = ['s', num2str(QuadDev(1,1)), QuadFamily, num2str(QuadDev(1,2)), 'v', num2str(i)];</span>
+0829     <span class="comment">%while exist([FileName,'.mat'], 'file')</span>
+0830     <span class="comment">%    i = i + 1;</span>
+0831     <span class="comment">%    FileName = ['s', num2str(QuadDev(1,1)), QuadFamily, num2str(QuadDev(1,2)), 'v', num2str(i)];</span>
+0832     <span class="comment">%end</span>
+0833 
+0834     QMS = QMS_Vertical;
+0835     QMS.QuadPlane = 2;
+0836 
+0837     QMS.OldCenter = Yoffset;
+0838     QMS.XOffsetOld = XoffsetOld;
+0839     QMS.YOffsetOld = YoffsetOld;
+0840     
+0841     QMS.xstart = xstart;
+0842     QMS.ystart = ystart;
+0843     QMS.x0 = x0;
+0844     QMS.x1 = x1;
+0845     QMS.x2 = x2;
+0846     QMS.y0 = y0;
+0847     QMS.y1 = y1;
+0848     QMS.y2 = y2;
+0849     QMS.Xerr = Xerr;
+0850     QMS.Yerr = Yerr;
+0851     QMS.TimeStamp = clock;
+0852     QMS.DCCT = DCCT;
+0853     QMS.DataDescriptor = <span class="string">'Quadrupole Center'</span>;
+0854     QMS.CreatedBy = <span class="string">'quadcenter'</span>;
+0855 
+0856     <span class="comment">% Get and store the BPM status and standard deviation (to be used by the center calculation routine)</span>
+0857     QMS.BPMStatus = <a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>(BPMyFamily, BPMyDevList);
+0858     N = getbpmaverages(BPMyDevList);
+0859     QMS.BPMSTD = <a href="getsigma.html" class="code" title="function [Data, FileName] = getsigma(varargin)">getsigma</a>(BPMyFamily, BPMyDevList, N);
+0860 
+0861     
+0862     <span class="comment">% Set up figures, plot and find vertical center</span>
+0863     <span class="keyword">if</span> isempty(FigureHandle)
+0864         QMS = <a href="quadplot.html" class="code" title="function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM)">quadplot</a>(QMS);
+0865     <span class="keyword">else</span>
+0866         QMS = <a href="quadplot.html" class="code" title="function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM)">quadplot</a>(QMS, FigureHandle);
+0867     <span class="keyword">end</span>
+0868     drawnow;
+0869 
+0870     <span class="keyword">if</span> XYPlane==0
+0871         QMS2 = QMS;
+0872     <span class="keyword">else</span>
+0873         QMS1 = QMS;
+0874     <span class="keyword">end</span>
+0875     
+0876     
+0877     <span class="comment">% Save the vertical data</span>
+0878     <span class="keyword">if</span> isfield(QMS_Vertical,<span class="string">'DataDirectory'</span>)  
+0879         [FinalDir, ErrorFlag] = gotodirectory(QMS_Vertical.DataDirectory);
+0880     <span class="keyword">end</span>
+0881     QMS.DataDirectory = pwd;    
+0882     save(FileName, <span class="string">'QMS'</span>);
+0883     fprintf(<span class="string">'   Data saved to file %s in directory %s\n\n'</span>, FileName, QMS.DataDirectory);
+0884     
+0885     <span class="comment">% Output data to log file</span>
+0886     fid1 = fopen(<span class="string">'quadcenter.log'</span>,<span class="string">'at'</span>);
+0887     time=clock;
+0888     fprintf(fid1, <span class="string">'%s   %d:%d:%2.0f \n'</span>, date, time(4),time(5),time(6));
+0889     fprintf(fid1, <span class="string">'Data saved to file %s (%s)\n'</span>, FileName, QMS.DataDirectory);
+0890     fprintf(fid1, <span class="string">'%s(%d,%d) %s(%d,%d) = %f (+/- %f) [%s]\n\n'</span>, QuadFamily, QuadDev, BPMyFamily, BPMyDev, QMS.Center, QMS.CenterSTD);
+0891     fclose(fid1);
+0892     cd(DirStart);
+0893 
+0894     <span class="keyword">if</span> (GetTuneFlag || strcmpi(Mode, <span class="string">'Simulator'</span>)) &amp;&amp; <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(<span class="string">'TUNE'</span>)
+0895         <span class="comment">% Print the tune information</span>
+0896         fprintf(<span class="string">'   Tune and tune difference for the 1st points in the merit function (QMS.Tune1): \n'</span>);
+0897         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune1(1,:));
+0898         fprintf(<span class="string">'  Horizontal\n'</span>);
+0899         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune1(2,:));
+0900         fprintf(<span class="string">'  Vertical\n'</span>);
+0901         fprintf(<span class="string">'   ===================================================\n'</span>);
+0902         fprintf(<span class="string">'   %8.5f'</span>, diff(QMS.Tune1));
+0903         fprintf(<span class="string">'  Difference \n\n'</span>);
+0904         
+0905         fprintf(<span class="string">'   Tune and tune difference for the 2nd points in the merit function (QMS.Tune2): \n'</span>);
+0906         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune2(1,:));
+0907         fprintf(<span class="string">'  Horizontal\n'</span>);
+0908         fprintf(<span class="string">'   %8.5f'</span>, QMS.Tune2(2,:));
+0909         fprintf(<span class="string">'  Vertical\n'</span>);
+0910         fprintf(<span class="string">'   ===================================================\n'</span>);
+0911         fprintf(<span class="string">'   %8.5f'</span>, diff(QMS.Tune2));
+0912         fprintf(<span class="string">'  Difference\n\n'</span>);
+0913 
+0914         dTune1 = diff(QMS.Tune1);
+0915         dTune2 = diff(QMS.Tune2);
+0916         
+0917         <span class="keyword">if</span> any(sign(dTune1/dTune1(1))==-1)
+0918             fprintf(<span class="string">'   Tune change sign!!!\n'</span>);            
+0919         <span class="keyword">end</span>
+0920         
+0921         <span class="keyword">if</span> any(abs(dTune1) &lt; .025) || any(abs(dTune2) &lt; .025)
+0922             fprintf(<span class="string">'   Horizontal and vertical tunes seem too close.\n'</span>);
+0923         <span class="keyword">end</span>
+0924     <span class="keyword">end</span>
+0925 <span class="keyword">end</span>
+0926 
+0927 
+0928 <span class="comment">% Restore magnets their starting points</span>
+0929 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(HCMFamily, HCM00, HCMDev, 0);
+0930 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(VCMFamily, VCM00, VCMDev, 0);
+0931 setquad(QMS_Horizontal, QUAD0, 0);
+0932 
+0933 
+0934 <span class="comment">% Restore the MML error warning level</span>
+0935 <a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>(ErrorWarningLevel, <span class="string">'ErrorWarningLevel'</span>);
+0936 
+0937 
+0938 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0939 <span class="comment">% End Main Function %</span>
+0940 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0941 
+0942 
+0943 
+0944 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0945 <span class="comment">% Sub-Functions %</span>
+0946 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0947 
+0948 <a name="_sub1" href="#_subfunctions" class="code">function OrbitCorrection(GoalOrbit, BPMFamily, BPMDevList, CMFamily, CMDevList, Iter)</a>
+0949 
+0950 WaitFlag = -2;
+0951 
+0952 <span class="keyword">if</span> nargin &lt; 6
+0953     Iter = 3;
+0954 <span class="keyword">end</span>
+0955 
+0956 <span class="keyword">if</span> size(CMDevList,1) &gt; 1
+0957     <span class="comment">% Pick the corrector based on the most effective corrector in the response matrix</span>
+0958     <span class="comment">% This routine does not handle local bumps at the moment</span>
+0959     R = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(BPMFamily, BPMDevList, CMFamily, [], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0960     [i, iNotFound] = findrowindex(BPMDevList, R.Monitor.DeviceList);
+0961     m = R.Data(i,:);
+0962     [MaxValue, j] = max(abs(m));
+0963     CMDevList = R.Actuator.DeviceList(j,:);
+0964 <span class="keyword">end</span>
+0965 
+0966 s = <a href="getrespmat.html" class="code" title="function [S, FileName] = getrespmat(varargin)">getrespmat</a>(BPMFamily, BPMDevList, CMFamily, CMDevList);
+0967 <span class="keyword">if</span> any(any(isnan(s)))
+0968     error(<span class="string">'Response matrix has a NaN'</span>);
+0969 <span class="keyword">end</span>
+0970 
+0971 
+0972 <span class="keyword">for</span> i = 1:Iter
+0973     x = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMFamily, BPMDevList) - GoalOrbit;
+0974     
+0975     CorrectorSP = -(x./s);
+0976     CorrectorSP = CorrectorSP(:);
+0977     
+0978     <span class="comment">% Check limits</span>
+0979     MinSP = <a href="minsp.html" class="code" title="function [Data, ErrorFlag] = minsp(varargin)">minsp</a>(CMFamily, CMDevList);
+0980     MaxSP = <a href="maxsp.html" class="code" title="function [Data, ErrorFlag] = maxsp(varargin)">maxsp</a>(CMFamily, CMDevList);
+0981     <span class="keyword">if</span> any(<a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(CMFamily,CMDevList)+CorrectorSP &gt; MaxSP-5) 
+0982         fprintf(<span class="string">'   Orbit not corrected because a maximum power supply limit would have been exceeded!\n'</span>);
+0983         <span class="keyword">return</span>;
+0984     <span class="keyword">end</span>
+0985     <span class="keyword">if</span> any(<a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(CMFamily,CMDevList)+CorrectorSP &lt; MinSP+5) 
+0986         fprintf(<span class="string">'   Orbit not corrected because a minimum power supply limit would have been exceeded!\n'</span>);
+0987         <span class="keyword">return</span>;
+0988     <span class="keyword">end</span>
+0989     
+0990     <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily, CorrectorSP, CMDevList, WaitFlag);
+0991     
+0992     <span class="comment">%x = getam(BPMFamily, BPMDevList) - GoalOrbit</span>
+0993 <span class="keyword">end</span>
+0994 
+0995 
+0996 
+0997 
+0998 <span class="comment">% function AM = getquad(QMS)</span>
+0999 <span class="comment">% % AM = getquad(QMS)</span>
+1000 <span class="comment">%</span>
+1001 <span class="comment">% QuadFamily = QMS.QuadFamily;</span>
+1002 <span class="comment">% QuadDev = QMS.QuadDev;</span>
+1003 <span class="comment">%</span>
+1004 <span class="comment">% % Check operational mode</span>
+1005 <span class="comment">% %mode = getfamilydata(QuadFamily, 'Setpoint', 'Mode', QuadDev);</span>
+1006 <span class="comment">%</span>
+1007 <span class="comment">% AM = getam(QuadFamily, QuadDev);</span>
+1008 
+1009 
+1010 <span class="comment">% function setquad(QMS, QuadSetpoint, WaitFlag)</span>
+1011 <span class="comment">% % setquad(QMS, QuadSetpoint, WaitFlag)</span>
+1012 <span class="comment">%</span>
+1013 <span class="comment">% if nargin &lt; 3</span>
+1014 <span class="comment">%     WaitFlag = -2;</span>
+1015 <span class="comment">% end</span>
+1016 <span class="comment">%</span>
+1017 <span class="comment">% QuadFamily = QMS.QuadFamily;</span>
+1018 <span class="comment">% QuadDev = QMS.QuadDev;</span>
+1019 <span class="comment">%</span>
+1020 <span class="comment">% setsp(QuadFamily, QuadSetpoint, QuadDev, WaitFlag);</span>
+1021 
+1022 
+1023</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

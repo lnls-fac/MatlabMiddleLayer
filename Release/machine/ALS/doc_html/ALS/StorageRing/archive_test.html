@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of archive_test</title>
+  <meta name="keywords" content="archive_test">
+  <meta name="description" content="ARCHIVE_SR - Archive storage ring data to the mysql database">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; archive_test.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>archive_test
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>ARCHIVE_SR - Archive storage ring data to the mysql database</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function archive_sr(DropTableFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">ARCHIVE_SR - Archive storage ring data to the mysql database
+
+  archive_sr(DropTableFlag)
+
+  See also <a href="archive_size.html" class="code" title="function archive_size">archive_size</a>, <a href="getmysqldata.html" class="code" title="function [data, t, StartTime, EndTime] = getmysqldata(ColumnNames, StartTime, EndTime, Table, User, DataBaseName)">getmysqldata</a>, <a href="buildsrdatabase.html" class="code" title="function buildsrdatabase">buildsrdatabase</a>
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function archive_sr(DropTableFlag)</a>
+0002 <span class="comment">%ARCHIVE_SR - Archive storage ring data to the mysql database</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  archive_sr(DropTableFlag)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  See also archive_size, getmysqldata, buildsrdatabase</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  Written by Greg Portmann</span>
+0009 
+0010 
+0011 <span class="comment">% Connect as localhost/root at the command line:</span>
+0012 <span class="comment">% shell&gt; mysql -u root -p</span>
+0013 
+0014 <span class="comment">% To change a password</span>
+0015 <span class="comment">% mysql&gt; update user set Password=password('new_password') where User='mysql';</span>
+0016 <span class="comment">%  or</span>
+0017 <span class="comment">% shell&gt; mysql -u root mysql</span>
+0018 <span class="comment">% mysql&gt; SET PASSWORD FOR root@localhost=PASSWORD('new_password');</span>
+0019 
+0020 
+0021 <span class="comment">% To create a user account with full privilege using password 'pw'</span>
+0022 <span class="comment">% GRANT ALL PRIVILEGES ON *.* TO 'physdata'@'localhost' IDENTIFIED BY 'pw' WITH GRANT OPTION;</span>
+0023 <span class="comment">% GRANT ALL PRIVILEGES ON *.* TO 'physdata'@'%' IDENTIFIED BY 'pw' WITH GRANT OPTION;</span>
+0024 <span class="comment">% FLUSH PRIVILEGES;</span>
+0025 
+0026 <span class="comment">% To creat a new database???</span>
+0027 <span class="comment">% shell&gt; mysql -h host -u user -p physlogs</span>
+0028 <span class="comment">% Enter password: ********</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% To creat a new database and table</span>
+0031 <span class="comment">% CREATE DATABASE physlogs;</span>
+0032 
+0033 
+0034 <span class="comment">% This is for the compiled version</span>
+0035 checkforao;
+0036 
+0037 
+0038 <span class="comment">% Sampling period in seconds</span>
+0039 T = 10;  
+0040 
+0041 
+0042 <span class="keyword">global</span> StopMySQLDataLogger
+0043 StopMySQLDataLogger = 0;
+0044 
+0045 
+0046 <span class="keyword">if</span> nargin == 0
+0047     DropTableFlag = 0;
+0048 <span class="keyword">end</span>
+0049 
+0050 
+0051 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0052 <span class="comment">% Open a connection %</span>
+0053 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0054 <span class="comment">%Host = 'cgsrv';</span>
+0055 <span class="comment">%User = 'croper';</span>
+0056 
+0057 <span class="comment">%Host = 'pharos';</span>
+0058 <span class="comment">%User = 'crdev';</span>
+0059 
+0060 
+0061 
+0062 <span class="comment">% This works on crconlnx1, crconm12,</span>
+0063 Host = <span class="string">'thor.als.lbl.gov'</span>;  
+0064 User = <span class="string">'physdata'</span>;   <span class="comment">% alsoper</span>
+0065 PassWord = <span class="string">'EightBall'</span>;
+0066 
+0067 
+0068 <span class="comment">% This works on thor</span>
+0069 <span class="comment">%Host = 'thor.als.lbl.gov';  % or  'thor.als' ok,  'thor' hangs matlab</span>
+0070 <span class="comment">%User = 'root';</span>
+0071 <span class="comment">%PassWord = '';</span>
+0072 
+0073 
+0074 <span class="comment">%[User, PassWord] = logindlg('MySQL Connection', User);</span>
+0075 <span class="keyword">if</span> ~isempty(User)
+0076     OpenResult = mym(<span class="string">'open'</span>, Host, User, PassWord);
+0077 <span class="keyword">else</span>
+0078     <span class="keyword">return</span>
+0079 <span class="keyword">end</span>
+0080 clear PassWord
+0081 
+0082 
+0083 
+0084 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0085 <span class="comment">% Select a database %</span>
+0086 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0087 mym(<span class="string">'use physlogs'</span>);
+0088 
+0089 
+0090     
+0091 <span class="comment">%%%%%%%%%%%%%%</span>
+0092 <span class="comment">% TEST TABLE %</span>
+0093 <span class="comment">%%%%%%%%%%%%%%</span>
+0094 
+0095 <span class="keyword">if</span> DropTableFlag
+0096     <span class="comment">% Drop the table and create a new one</span>
+0097     mym(<span class="string">'drop table if exists TEST'</span>);
+0098 <span class="keyword">end</span>
+0099 
+0100 
+0101 <span class="comment">% Create the table</span>
+0102 <span class="comment">% CommandString = [</span>
+0103 <span class="comment">%     'create table if not exists TEST (', ...</span>
+0104 <span class="comment">%     'Time datetime not null PRIMARY KEY', ...</span>
+0105 <span class="comment">%     ', TimeSec double', ...</span>
+0106 <span class="comment">%     ', x1 float', ...</span>
+0107 <span class="comment">%     ', x2 float', ...</span>
+0108 <span class="comment">%     ', x3 float', ...</span>
+0109 <span class="comment">%     ', x4 float', ...</span>
+0110 <span class="comment">%     ', x5 float);'];</span>
+0111 
+0112 CommandString = [
+0113     <span class="string">'create table if not exists TEST ('</span>, <span class="keyword">...</span>
+0114     <span class="string">'Time1 datetime, '</span>, <span class="keyword">...</span>
+0115     <span class="string">'x1 float, '</span>, <span class="keyword">...</span>
+0116     <span class="string">'Time2 datetime, '</span>, <span class="keyword">...</span>
+0117     <span class="string">'x2 float, '</span>, <span class="keyword">...</span>
+0118     <span class="string">'Time3 datetime, '</span>, <span class="keyword">...</span>
+0119     <span class="string">'x3 float, '</span>, <span class="keyword">...</span>
+0120     <span class="string">'Time4 datetime, '</span>, <span class="keyword">...</span>
+0121     <span class="string">'x4 float, '</span>, <span class="keyword">...</span>
+0122     <span class="string">'Time5 time, '</span>, <span class="keyword">...</span>
+0123     <span class="string">'x5 float);'</span>];
+0124 
+0125 <span class="comment">%mym('alter table TEST add x6 double;')</span>
+0126 
+0127 <span class="comment">% Create the SQL table</span>
+0128 mym(CommandString);
+0129 
+0130 <span class="comment">% Print table info</span>
+0131 <span class="comment">%mym('show table status from physlogs;');</span>
+0132 
+0133 TableInfo = mym(<span class="string">'show table status from physlogs;'</span>);
+0134 
+0135 <span class="keyword">for</span> i = 1:length(TableInfo.Name)
+0136     <span class="keyword">if</span> strcmp(TableInfo.Name{i}, <span class="string">'TEST'</span>)
+0137         <span class="keyword">break</span>
+0138     <span class="keyword">end</span>
+0139 <span class="keyword">end</span>
+0140 
+0141 fprintf(<span class="string">'   %s was created %s and the last update was %s\n'</span>, TableInfo.Name{i}, TableInfo.Create_time{i}, TableInfo.Update_time{i});
+0142 fprintf(<span class="string">'   It is presently %f GBytes with %d rows\n'</span>, TableInfo.Data_length(i)/2^30, TableInfo.Rows(i));
+0143 
+0144 
+0145 
+0146 <span class="comment">% Get data</span>
+0147 <span class="keyword">for</span> i = 1:2 
+0148     [MatlabTime, MatlabClock] = gettime;
+0149     Data = randn(1,1);
+0150     DataString = [<span class="string">'insert into TEST (Time5, x5) values ('</span>, sprintf(<span class="string">'&quot;%s.12335&quot;'</span>, datestr(MatlabClock,31)), sprintf(<span class="string">', %f'</span>,Data),<span class="string">');'</span>];
+0151     
+0152     
+0153     <span class="comment">%Data = randn(6,1);</span>
+0154     <span class="comment">%DataString = ['insert into TEST values (', sprintf('&quot;%s&quot;, %f', datestr(MatlabClock,31), MatlabTime), sprintf(', %f',Data),');'];</span>
+0155 
+0156     <span class="comment">%Data = randn(3,1);</span>
+0157     <span class="comment">%DataString = ['insert into TEST (Time, TimeSec, x1, x2, x6) values (', sprintf('&quot;%s&quot;, %f', datestr(MatlabClock,31), MatlabTime), sprintf(', %f',Data),');'];</span>
+0158     <span class="comment">%DataString = ['insert into TEST (x1, x2, x3) values (1, 2, 3);'];</span>
+0159     
+0160     
+0161     mym(DataString);
+0162     pause(1.1);
+0163 <span class="keyword">end</span>
+0164 
+0165 
+0166 SQLcommand = [<span class="string">'select Time5, x5 from TEST order by Time5;'</span>];
+0167 <span class="comment">%SQLcommand = ['select x5 from TEST order by Time5;'];</span>
+0168 d = mym(SQLcommand);
+0169 
+0170 
+0171 
+0172 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0173 <span class="comment">% Print some output to the screen %</span>
+0174 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0175 <span class="comment">%mym('explain TEST;');</span>
+0176 
+0177 
+0178 
+0179 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0180 <span class="comment">% Close the database %</span>
+0181 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0182 mym(<span class="string">'close'</span>);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of alslocofit</title>
+  <meta name="keywords" content="alslocofit">
+  <meta name="description" content="ALSLOCOFIT - Gradient search method for fitting the ALS optics">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; alslocofit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>alslocofit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>ALSLOCOFIT - Gradient search method for fitting the ALS optics</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [x, y, ygoal, xtotal] = alslocofit(funfcn, x0, ygoal) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">ALSLOCOFIT - Gradient search method for fitting the ALS optics 
+  [x, y, ygoal, xtotal] = alslocofit(funfcn, x0, ygoal)
+
+  Default fgoal: 
+  ygoal(1) = 14.25/4;  Horizontal Tune after 3 sectors
+  ygoal(2) = 14.25/3;  Horizontal Tune after 4 sectors
+  ygoal(3) = 9.20/3;   Vertical   Tune after 4 sectors
+  ygoal(4) = 0;        Horizontal Alpha at injection is zero
+  ygoal(5) = 0;        Vertical   Alpha at injection is zero
+  ygoal(6) = .060;     Horizontal Eta at injection .060 meters
+  ygoal(7) = 0;        Horizontal Eta-prime at injection is zero
+
+  Note: this function is used in the ALS setup!
+
+  See also setlocogains, <a href="alsfitnuy9.html" class="code" title="function y = alsfitnuy9(x)">alsfitnuy9</a>
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="alsfitnuy9.html" class="code" title="function y = alsfitnuy9(x)">alsfitnuy9</a>	y = alsfitnuy9(x)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [x, y, ygoal, xtotal] = alslocofit(funfcn, x0, ygoal)</a>
+0002 <span class="comment">%ALSLOCOFIT - Gradient search method for fitting the ALS optics</span>
+0003 <span class="comment">%  [x, y, ygoal, xtotal] = alslocofit(funfcn, x0, ygoal)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Default fgoal:</span>
+0006 <span class="comment">%  ygoal(1) = 14.25/4;  Horizontal Tune after 3 sectors</span>
+0007 <span class="comment">%  ygoal(2) = 14.25/3;  Horizontal Tune after 4 sectors</span>
+0008 <span class="comment">%  ygoal(3) = 9.20/3;   Vertical   Tune after 4 sectors</span>
+0009 <span class="comment">%  ygoal(4) = 0;        Horizontal Alpha at injection is zero</span>
+0010 <span class="comment">%  ygoal(5) = 0;        Vertical   Alpha at injection is zero</span>
+0011 <span class="comment">%  ygoal(6) = .060;     Horizontal Eta at injection .060 meters</span>
+0012 <span class="comment">%  ygoal(7) = 0;        Horizontal Eta-prime at injection is zero</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  Note: this function is used in the ALS setup!</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  See also setlocogains, alsfitnuy9</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  Written by Greg Portmann</span>
+0019 
+0020 
+0021 <span class="comment">% Parameter delta for the gradiant calculation</span>
+0022 Delta = .0001;
+0023 
+0024 
+0025 <span class="keyword">if</span> nargin &lt; 1
+0026     funfcn = @<a href="alsfitnuy9.html" class="code" title="function y = alsfitnuy9(x)">alsfitnuy9</a>;
+0027 <span class="keyword">end</span>
+0028 
+0029 <span class="keyword">if</span> nargin &lt; 2
+0030     x0 = [
+0031         getsp(<span class="string">'QF'</span>,  [1 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0032         getsp(<span class="string">'QF'</span>,  [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0033         getsp(<span class="string">'QD'</span>,  [1 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0034         getsp(<span class="string">'QD'</span>,  [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0035         getsp(<span class="string">'QFA'</span>, [1 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0036         getsp(<span class="string">'QFA'</span>, [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>);
+0037         getsp(<span class="string">'QDA'</span>, [4 1], <span class="string">'Physics'</span>, <span class="string">'Model'</span>) ];
+0038 <span class="keyword">end</span>
+0039 
+0040 
+0041 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0042 <span class="comment">% Get the goal %</span>
+0043 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0044 <span class="keyword">if</span> nargin &lt; 3
+0045     <span class="comment">% Tune after 3 sectors should be 14.25/4</span>
+0046     ygoal(1,1) = 14.25/4;
+0047 
+0048     <span class="comment">% Tune after 4 sectors should be 14.25/3 and 9.2/3</span>
+0049     ygoal(2,1) = 14.25/3;
+0050     ygoal(3,1) = 9.20/3;
+0051 
+0052     <span class="comment">% Alpha x/y at injection is zero</span>
+0053     ygoal(4,1) = 0;
+0054     ygoal(5,1) = 0;
+0055 
+0056     <span class="comment">% Horizontal Eta at injection .060 meters</span>
+0057     ygoal(6,1) = .060;
+0058 
+0059     <span class="comment">% Horizontal Eta-prime at injection is zero</span>
+0060     ygoal(7,1) = 0; 
+0061 <span class="keyword">end</span>
+0062 
+0063 
+0064 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0065 <span class="comment">% Starting point %</span>
+0066 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0067 y0 = funfcn(x0);
+0068 
+0069 [tunefrac, tuneint] = modeltune;
+0070 Tune0 = tunefrac + tuneint;
+0071 
+0072 
+0073 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0074 <span class="comment">% Get the gradiate matrix %</span>
+0075 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0076 x = x0;
+0077 y = y0;
+0078 xtotal = [];
+0079 <span class="keyword">for</span> iter = 1:6
+0080 
+0081     <span class="keyword">if</span> 1
+0082         <span class="comment">% Compute the gradient matrix</span>
+0083         <span class="keyword">if</span> iter == 1
+0084             tic;
+0085             fprintf(<span class="string">'   Computing the gradient matrix ... '</span>);
+0086             <span class="keyword">for</span> i = 1:length(x)
+0087                 Xnew = x;
+0088                 Xnew(i) = Xnew(i) + Delta * Xnew(i);
+0089                 ytmp = funfcn(Xnew);
+0090 
+0091                 M(:,i) = (ytmp - y) / (Delta * Xnew(i));
+0092             <span class="keyword">end</span>
+0093             fprintf(<span class="string">'%f seconds\n\n'</span>,toc);
+0094             
+0095             <span class="comment">% Reset the lattice</span>
+0096             funfcn(x);
+0097         <span class="keyword">end</span>
+0098     <span class="keyword">else</span>
+0099         <span class="comment">% Use an old one</span>
+0100         M = [
+0101              1.9995    0.2312    0.2988    0.0402    1.0745   -0.0542    0.0031
+0102              2.2201    0.7406    0.3364    0.1138    1.0242    0.3187    0.0493
+0103             -1.4082   -0.4693   -1.9681   -0.6525   -0.5585   -0.1923   -0.0479
+0104             -1.3972    1.3885   -0.2380    0.2418    0.3189   -0.3254    0.0188
+0105             -6.3947    5.9128   -8.5015    7.7463   -1.7888    1.4925   -0.2447
+0106             -0.5293    0.0702   -0.0801    0.0108    0.8770   -0.1091   -0.0227
+0107              0.0255   -0.0256    0.0039   -0.0039   -0.0423    0.0396    0.0083 ];
+0108     <span class="keyword">end</span>
+0109 
+0110 
+0111     <span class="comment">% Find the solution</span>
+0112     <span class="comment">%delx = pinv(M) * (ygoal - y);</span>
+0113     delxsq = inv(M) * (ygoal - y);
+0114     x = x + delxsq;
+0115 
+0116     <span class="comment">%[U,S,V] = svd(M, 'econ');</span>
+0117     <span class="comment">%Ivec = 1:size(S,1)-1;</span>
+0118     <span class="comment">%delx = V(:,Ivec) * diag(diag(S(Ivec,Ivec)).^(-1)) * U(:,Ivec)' * (ygoal - y);</span>
+0119     <span class="comment">%x = x + delx;</span>
+0120 
+0121     <span class="comment">% Set the lattice to the solution</span>
+0122     y = funfcn(x);
+0123     [tunefrac, tuneint] = modeltune;
+0124     Tune = tunefrac + tuneint;
+0125     
+0126     xtotal = [xtotal x];
+0127 
+0128     <span class="keyword">if</span> iter == 1
+0129     fprintf(<span class="string">'       ------- Tune ------   ------------- Sector Tunes -------------  ---------- Alpha ----------       Eta         Eta Prime \n'</span>);
+0130     fprintf(<span class="string">'   #   Horizontal Vertical     Sector 3x     Sector 4x     Sector 4y     Horizontal     Vertical      Horizontal     Horizontal\n'</span>);
+0131     fprintf(<span class="string">'   0.  %9.6f %9.6f  %13.5e %13.5e %13.5e  %13.5e %13.5e  %13.5e  %13.5e\n'</span>, Tune0(1), Tune0(2), y0(1), y0(2), y0(3), y0(4), y0(5), y0(6), y0(7));
+0132     <span class="keyword">end</span>
+0133     fprintf(<span class="string">'%4d.  %9.6f %9.6f  %13.5e %13.5e %13.5e  %13.5e %13.5e  %13.5e  %13.5e\n'</span>, iter, Tune(1), Tune(2), y(1), y(2), y(3), y(4), y(5), y(6), y(7));
+0134 <span class="keyword">end</span>
+0135 
+0136 fprintf(<span class="string">'\n'</span>);
+0137 fprintf(<span class="string">'                     Goal:  %13.5e %13.5e %13.5e  %13.5e %13.5e  %13.5e  %13.5e\n'</span>, ygoal(1), ygoal(2), ygoal(3), ygoal(4), ygoal(5), ygoal(6), ygoal(7));
+0138 fprintf(<span class="string">'                    Error:  %13.5e %13.5e %13.5e  %13.5e %13.5e  %13.5e  %13.5e\n'</span>, ygoal(1)-y(1), ygoal(2)-y(2), ygoal(3)-y(3), ygoal(4)-y(4), ygoal(5)-y(5), ygoal(6)-y(6), ygoal(7)-y(7));
+0139 fprintf(<span class="string">'\n'</span>);
+0140 
+0141 
+0142</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

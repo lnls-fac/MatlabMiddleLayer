@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of checkbpmavg</title>
+  <meta name="keywords" content="checkbpmavg">
+  <meta name="description" content="checkbpmavg(TestHz {2 Hz}, BPMlist {default: all BPMs returned by getlist})">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; checkbpmavg.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>checkbpmavg
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>checkbpmavg(TestHz {2 Hz}, BPMlist {default: all BPMs returned by getlist})</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function checkbpmavg(TestHz, list) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> checkbpmavg(TestHz {2 Hz}, BPMlist {default: all BPMs returned by getlist})
+
+   This function checks that the number of averages for the BPMs in BPMlist
+   is set so that the data rate is at least TestHz Hertz.  The assumption
+   is that 190 averages is 2 Hz.  If not, this function will prompt the user
+   to change the number of averages.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>	GETBPMAVERAGES - Gets the BPM averages</li><li><a href="setbpmaverages.html" class="code" title="function setbpmaverages(T, DeviceList)">setbpmaverages</a>	SETBPMAVERAGES - Sets the BPM sampling period [second]</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="checkbpms.html" class="code" title="function ProblemFlag = checkbpms(InfoFlag)">checkbpms</a>	ProblemFlag = checkbpms(InfoFlag {1})</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function checkbpmavg(TestHz, list)</a>
+0002 <span class="comment">% checkbpmavg(TestHz {2 Hz}, BPMlist {default: all BPMs returned by getlist})</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   This function checks that the number of averages for the BPMs in BPMlist</span>
+0005 <span class="comment">%   is set so that the data rate is at least TestHz Hertz.  The assumption</span>
+0006 <span class="comment">%   is that 190 averages is 2 Hz.  If not, this function will prompt the user</span>
+0007 <span class="comment">%   to change the number of averages.</span>
+0008 <span class="comment">%</span>
+0009 
+0010 <span class="keyword">if</span> nargin &lt; 1
+0011    TestHz = 2;
+0012 <span class="keyword">end</span>
+0013 
+0014 <span class="keyword">if</span> nargin &lt; 2
+0015    list = getlist(<span class="string">'BPMx'</span>);
+0016 <span class="keyword">end</span>
+0017 <span class="keyword">if</span> size(list,2) == 1
+0018    list = elem2dev(<span class="string">'BPMx'</span>, list);
+0019 <span class="keyword">end</span>
+0020 
+0021 TestHz = abs(TestHz(1,1));
+0022 <span class="keyword">if</span> TestHz &lt; .001
+0023    <span class="keyword">return</span>
+0024 <span class="keyword">end</span>
+0025 
+0026 
+0027 Avg = <a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>;
+0028 TestAvg = floor(2*190/TestHz);
+0029 <span class="keyword">if</span> TestAvg &lt; 1
+0030    TestAvg = 1;
+0031    disp(<span class="string">'  WARNING:  the requested BPM data rate is too high.'</span>);
+0032    disp(<span class="string">'            10 Hz is about all the control system is capable of doing.'</span>);
+0033 <span class="keyword">end</span>
+0034 
+0035 <span class="keyword">if</span> any(Avg &gt; TestAvg)
+0036    <span class="comment">% Prompt to change the number of averages</span>
+0037    titlestr=sprintf(<span class="string">'Change the number of BPM averages.'</span>);
+0038    prompt={strvcat( <span class="keyword">...</span>
+0039          sprintf(<span class="string">'At least one of the BPM averages is set too high (%d averages).'</span>,  max(Avg)),  <span class="keyword">...</span>
+0040          sprintf(<span class="string">'The BPM data rate is crucial for many functions to work properly.'</span>), <span class="keyword">...</span>
+0041          sprintf(<span class="string">'380 averages corresponds to 1 Hz data rate.'</span>), <span class="keyword">...</span>
+0042          sprintf(<span class="string">'%.1f Hertz -&gt; %d averages recommended.'</span>, TestHz, TestAvg), <span class="keyword">...</span>
+0043          sprintf(<span class="string">' '</span>), <span class="keyword">...</span>
+0044          sprintf(<span class="string">'Enter the new BPM averages:'</span>))};
+0045    def={num2str(TestAvg)};
+0046    lineNo=1;
+0047    answer=inputdlg(prompt,titlestr,lineNo,def);
+0048    
+0049    <span class="keyword">if</span> isempty(answer)
+0050       disp(<span class="string">'  No changes made to the number of BPM averages.  You''re on your own!'</span>);
+0051       <span class="keyword">return</span>
+0052    <span class="keyword">end</span>
+0053    AvgNew = str2num(answer{1});
+0054    <span class="keyword">if</span> isempty(AvgNew)
+0055       disp(<span class="string">'  No changes made to the number of BPM averages.  You''re on your own!'</span>);
+0056       <span class="keyword">return</span>
+0057    <span class="keyword">end</span>
+0058    <span class="keyword">if</span> AvgNew &gt; TestAvg
+0059       fprintf(<span class="string">'  I think %d BPM averages is too high, but you''re the boss.\n'</span>, AvgNew);
+0060    <span class="keyword">end</span>
+0061    <a href="setbpmaverages.html" class="code" title="function setbpmaverages(T, DeviceList)">setbpmaverages</a>(AvgNew);
+0062 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

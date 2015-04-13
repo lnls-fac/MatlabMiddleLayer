@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotvibrationpsd</title>
+  <meta name="keywords" content="plotvibrationpsd">
+  <meta name="description" content="[PddSum,Paa, f, Pdd, Drms, Pdd_int] = vib_psd2(InputFileName, Accelerometer Gain [volts/g], Fmin, Fmax, LineColor, OffsetForInt, TitleStr, FigNum)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; plotvibrationpsd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>plotvibrationpsd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[PddSum,Paa, f, Pdd, Drms, Pdd_int] = vib_psd2(InputFileName, Accelerometer Gain [volts/g], Fmin, Fmax, LineColor, OffsetForInt, TitleStr, FigNum)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [PddSum, Paa, f, Pdd, Drms, Pdd_int] = vib_psd2(FileName, Gain, Fmin, Fmax, LineColor, IntOffset, TitleStr, FigNum) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [PddSum,Paa, f, Pdd, Drms, Pdd_int] = vib_psd2(InputFileName, Accelerometer Gain [volts/g], Fmin, Fmax, LineColor, OffsetForInt, TitleStr, FigNum)
+
+ Program to analyze vibration PSD data from the control system analyzer
+ 
+          Paa     = acceleration power spectrum [(m/s/s)^2/Hz]
+          f       = frequency vector [Hz]
+          Pdd     = displacement power spectrum  [(m)^2/Hz]
+          Drms    = RMS deplacement [m]
+          Pdd_int = Integrated RMS deplacement squared [m^2]</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [PddSum, Paa, f, Pdd, Drms, Pdd_int] = vib_psd2(FileName, Gain, Fmin, Fmax, LineColor, IntOffset, TitleStr, FigNum)</a>
+0002 <span class="comment">% [PddSum,Paa, f, Pdd, Drms, Pdd_int] = vib_psd2(InputFileName, Accelerometer Gain [volts/g], Fmin, Fmax, LineColor, OffsetForInt, TitleStr, FigNum)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Program to analyze vibration PSD data from the control system analyzer</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%          Paa     = acceleration power spectrum [(m/s/s)^2/Hz]</span>
+0007 <span class="comment">%          f       = frequency vector [Hz]</span>
+0008 <span class="comment">%          Pdd     = displacement power spectrum  [(m)^2/Hz]</span>
+0009 <span class="comment">%          Drms    = RMS deplacement [m]</span>
+0010 <span class="comment">%          Pdd_int = Integrated RMS deplacement squared [m^2]</span>
+0011 <span class="comment">%</span>
+0012 
+0013 StartDirectory = pwd;
+0014 
+0015 <span class="keyword">if</span> nargin &lt; 1
+0016     [FileName, DirectoryName, ErrorFlag] = uigetfile(<span class="string">'*.m'</span>, <span class="string">'Select a Vibration Data File'</span>);
+0017     cd(DirectoryName);
+0018 <span class="keyword">end</span>
+0019 <span class="keyword">if</span> nargin &lt; 2
+0020   Gain = 1000;
+0021 <span class="keyword">end</span>
+0022 <span class="keyword">if</span> nargin &lt; 3
+0023   Fmin = 0;
+0024 <span class="keyword">end</span>
+0025 <span class="keyword">if</span> nargin &lt; 4
+0026   Fmax = 1e10;
+0027 <span class="keyword">end</span>
+0028 <span class="keyword">if</span> nargin &lt; 5
+0029   LineColor = <span class="string">'b'</span>;
+0030 <span class="keyword">end</span>
+0031 <span class="keyword">if</span> nargin &lt; 6
+0032   IntOffset = 0;
+0033 <span class="keyword">end</span>
+0034 <span class="keyword">if</span> nargin &lt; 7
+0035   TitleStr = <span class="string">'Accelerometer Power Spectral Density'</span>;
+0036 <span class="keyword">end</span>
+0037 <span class="keyword">if</span> nargin &lt; 8
+0038   FigNum = gcf;
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="keyword">if</span> strcmpi(FileName(end-1:end), <span class="string">'.m'</span>)
+0042     FileName(end-1:end) = [];
+0043 <span class="keyword">end</span>
+0044 
+0045 <span class="comment">% Get data</span>
+0046 eval(FileName);
+0047 cd(StartDirectory);
+0048 
+0049 fprintf(<span class="string">'   Accelerometer gain is %f volts. /n'</span>, Gain);
+0050 
+0051 N_f = Npts;     <span class="comment">% number of frequence points</span>
+0052 
+0053 T = 1/deltaX;
+0054 T1 = T/N;
+0055 w0 = 2*pi/T;
+0056 
+0057 f0 = deltaX;
+0058 f=f0*(0:N_f-1)';
+0059 
+0060 <span class="comment">% scale data to the proper units:  [(m/s/s)^2 / Hz]</span>
+0061 Paa = data * (9.8/Gain)^2;   <span class="comment">%  Gain on the accelerometers</span>
+0062 
+0063 <span class="comment">%Paa = Paa*10^2;</span>
+0064 
+0065 <span class="comment">% continuous to discrete scaling for the PSD</span>
+0066 Paa = Paa/T1;
+0067 
+0068 
+0069 <span class="keyword">if</span> (windowflag == 1)
+0070 <span class="comment">%  Paa = data /.375;   % hanning window (correction done in the CSA 3563A)</span>
+0071   fprintf(<span class="string">'   Data hanning windowed.\n'</span>);
+0072 <span class="keyword">else</span>
+0073 <span class="comment">% Paa = Paa;           % box car window (i.e. no window)</span>
+0074   fprintf(<span class="string">'   No windowing.\n'</span>);
+0075 <span class="keyword">end</span>
+0076 
+0077 fprintf(<span class="string">'   Number of averages = %f\n'</span>,avg);
+0078 
+0079 
+0080 <span class="comment">% Divide by 1/s and 1/s^2 to get velocity and position power spectra</span>
+0081 Pvv(2:N/2,1) = Paa(2:N/2) .* (ones(length(f(2:N/2)),1)./(2*pi*f(2:N/2)).^2);
+0082 Pdd(2:N/2,1) = Paa(2:N/2) .* (ones(length(f(2:N/2)),1)./(2*pi*f(2:N/2)).^4);
+0083 Pvv(1) = 0;
+0084 Pdd(1) = 0;
+0085 
+0086 <span class="comment">% Paa(0) is the DC term, and the first few data points are questionable in an FFT</span>
+0087 Paa(1) = 0;   <span class="comment">% not sure if the DC term is correct</span>
+0088 Paa1=Paa;
+0089 Pvv1=Pvv;
+0090 Pdd1=Pdd;
+0091 
+0092 [ii] = find(f&gt;=Fmin);
+0093 m = ii(1);
+0094 <span class="comment">%m = 8;</span>
+0095 <span class="keyword">for</span> i=1:m
+0096   Paa1(i) = 0;
+0097   Pvv1(i) = 0;
+0098   Pdd1(i) = 0;
+0099 <span class="keyword">end</span>
+0100 
+0101 [ii] = find(f&lt;=Fmax);
+0102 Imax = max(ii);
+0103 
+0104 
+0105 <span class="comment">% Parseval's Thm</span>
+0106 Arms  = sqrt(sum(Paa1)/N);
+0107 Vrms  = sqrt(sum(Pvv1)/N);
+0108 Drms  = sqrt(sum(Pdd1)/N);
+0109 Pvv_int = cumsum(Pvv1)/N;
+0110 Pdd_int = cumsum(Pdd1)/N;
+0111 
+0112 <span class="comment">%Pvv_int = cumsum(Pvv1)/N;</span>
+0113 <span class="comment">%Pdd_int = cumsum(Pdd1(length(Pdd1):-1:1))/N;</span>
+0114 <span class="comment">%Pdd_int = Pdd_int(length(Pdd_int):-1:1);</span>
+0115 
+0116 fprintf(<span class="string">'\n  RMS Acceleration: %g m/s^2   (PSD, Parseval''s Thm, first %d frequencies removed).\n'</span>, Arms, m-1);
+0117 fprintf(<span class="string">'  RMS     Velocity: %g m/s   (PSD, Parseval''s Thm, first %d frequencies removed).\n'</span>, Vrms, m-1);
+0118 fprintf(<span class="string">'  RMS Displacement: %g m   (PSD, Parseval''s Thm, first %d frequencies removed).\n\n'</span>, Drms, m-1);
+0119 
+0120 
+0121 <span class="comment">% Make PSD the same units as on the Control System Analyzer (CSA)</span>
+0122 Paa = T1*Paa;
+0123 Pvv = T1*Pvv;
+0124 Pdd = T1*Pdd;
+0125 
+0126 
+0127 <span class="comment">% Plot the full power spectrum</span>
+0128 <span class="comment">%figure(FigNum)</span>
+0129 <span class="comment">%clf reset</span>
+0130 
+0131 subplot(2,1,1);
+0132 <span class="comment">%loglog(f(2:N_f),Paa(2:N_f),LineColor, f(2:N_f), Pdd(2:N_f),['--',LineColor]);</span>
+0133 <span class="comment">%legend('Acceleration PSD','Displacement PSD')</span>
+0134 <span class="comment">%loglog(f(2:N_f),Paa(2:N_f),LineColor);</span>
+0135 <span class="comment">%ylabel('[(meters/sec^2)^2/Hz] and [meters^2/Hz]');</span>
+0136 
+0137 <span class="comment">%loglog(f(2:N_f),Pdd(2:N_f),LineColor);</span>
+0138 <span class="comment">%loglog(f(m:Imax),1e12*Paa(m:Imax), 'Color', LineColor);</span>
+0139 loglog(f(m:Imax),1e12*Pdd(m:Imax), <span class="string">'Color'</span>, LineColor);
+0140 grid on
+0141 ylabel(<span class="string">'[(\mum/sec^2)^2/Hz]'</span>);
+0142 legend off;
+0143 title([TitleStr]);
+0144 xlabel(<span class="string">'Frequency (Hz)'</span>);
+0145 
+0146 
+0147 <span class="comment">% Velocity spectrum</span>
+0148 <span class="comment">%figure(2);</span>
+0149 <span class="comment">%semilogx(f(2:N_f),Pvv_int(2:N_f),LineColor); grid on;</span>
+0150 <span class="comment">%title('INTEGRATED VELOCITY POWER SPECTRUM');</span>
+0151 <span class="comment">%xlabel('Frequency (Hz)');</span>
+0152 <span class="comment">%ylabel('Mean Square Velocity [meters/sec]^2');</span>
+0153 
+0154 
+0155 <span class="comment">% Position spectrum</span>
+0156 subplot(2,1,2);
+0157 <span class="comment">%loglog(f(m:Imax),sqrt(Pdd_int(m:Imax)),LineColor); grid on;</span>
+0158 <span class="comment">%loglog(f(m:Imax),sqrt(Pdd_int(m:Imax)+IntOffset-Pdd_int(Imax)),LineColor);</span>
+0159 <span class="comment">%semilogx(f(m:Imax), Pdd_int(m:Imax)+IntOffset-Pdd_int(Imax), LineColor);</span>
+0160 semilogx(f(m:Imax), 1e12*Pdd_int(m:Imax), <span class="string">'Color'</span>, LineColor); 
+0161 grid on;
+0162 
+0163 <span class="comment">%title(['Square Root of the Cumulative Reverse Integral of the Displacement PSD']);</span>
+0164 title(sprintf(<span class="string">'\\fontsize{12}Cumulative  \\fontsize{16}\\int \\fontsize{12} Displacement PSD df  (%f \\mum)'</span>,1e6*sqrt(Pdd_int(end))));
+0165 <span class="comment">%title(['Square Root of the Cumulative Reverse Integral of the Displacement PSD']);</span>
+0166 xlabel(<span class="string">'Frequency (Hz)'</span>);
+0167 ylabel(<span class="string">'[\mum{^2}]'</span>);
+0168 
+0169 PddSum = Pdd_int(end);
+0170 
+0171 <span class="comment">% fprintf('  CUM. REVERSE INTEGRAL at f(%d)=%f: %g m   (PSD)\n', m, f(m), sqrt(1e-12*Pdd_int(m)));</span>
+0172 <span class="comment">% fprintf('  CUM. REVERSE INTEGRAL at f(%d)=%f: %g m   (PSD)\n\n', Imax, f(Imax), sqrt(1e-12*Pdd_int(Imax)));</span>
+0173 
+0174 
+0175 <span class="comment">% For output</span>
+0176 f = f(m:Imax);
+0177 Paa = Paa(m:Imax);
+0178 Pdd = Pdd(m:Imax);
+0179 Pdd_int = Pdd_int(m:Imax)+IntOffset-Pdd_int(Imax);
+0180</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of hwinit</title>
+  <meta name="keywords" content="hwinit">
+  <meta name="description" content="HWINIT - This function initializes the storage ring parameters the user operation">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; hwinit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>hwinit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>HWINIT - This function initializes the storage ring parameters the user operation</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function hwinit(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">HWINIT - This function initializes the storage ring parameters the user operation</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setbpmaverages.html" class="code" title="function setbpmaverages(T, DeviceList)">setbpmaverages</a>	SETBPMAVERAGES - Sets the BPM sampling period [second]</li><li><a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>	SETQFASHUNT - Sets the QFA shunts</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="bpmrespinit.html" class="code" title="">bpmrespinit</a>	</li><li><a href="srinit.html" class="code" title="function srinit(varargin)">srinit</a>	SRINIT - Just an alias to hwinit</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function hwinit(varargin)</a>
+0002 <span class="comment">%HWINIT - This function initializes the storage ring parameters the user operation</span>
+0003 
+0004 
+0005 DisplayFlag = 1;
+0006 <span class="comment">% for i = length(varargin):-1:1</span>
+0007 <span class="comment">%     if strcmpi(varargin{i},'Display')</span>
+0008 <span class="comment">%         DisplayFlag = 1;</span>
+0009 <span class="comment">%         varargin(i) = [];</span>
+0010 <span class="comment">%     elseif strcmpi(varargin{i},'NoDisplay')</span>
+0011 <span class="comment">%         DisplayFlag = 0;</span>
+0012 <span class="comment">%         varargin(i) = [];</span>
+0013 <span class="comment">%     end</span>
+0014 <span class="comment">% end</span>
+0015 
+0016 
+0017 fprintf(<span class="string">'   Initializing storage ring parameters (srinit)\n'</span>)
+0018 
+0019 
+0020 <span class="comment">% Set the BPM averaging/timeconstant</span>
+0021 <span class="keyword">try</span>
+0022     BPMFreshDataSamplingPeriod = .5;  <span class="comment">% seconds</span>
+0023     fprintf(<span class="string">'   1. BPM averaging/timeconstant set for fresh data every %.2f seconds ... '</span>, BPMFreshDataSamplingPeriod);
+0024     <a href="setbpmaverages.html" class="code" title="function setbpmaverages(T, DeviceList)">setbpmaverages</a>(BPMFreshDataSamplingPeriod);
+0025     fprintf(<span class="string">'Done\n'</span>);
+0026 <span class="keyword">catch</span>
+0027     fprintf(<span class="string">'\n      Error setting BPM averaging/timeconstant.\n\n'</span>);
+0028 <span class="keyword">end</span>
+0029 
+0030 
+0031 <span class="comment">% FADs off</span>
+0032 <span class="keyword">try</span>
+0033     fprintf(<span class="string">'   2. Setting BPM FADs off ... '</span>);
+0034     setfad(0);
+0035     fprintf(<span class="string">'Done\n'</span>);
+0036 <span class="keyword">catch</span>
+0037     fprintf(<span class="string">'\n      Error BPM FADs off.\n\n'</span>);
+0038 <span class="keyword">end</span>
+0039 
+0040 
+0041 <span class="comment">% Set corrector magnets to slow mode</span>
+0042 <span class="keyword">try</span>
+0043     fprintf(<span class="string">'   3. Setting storage ring corrector magnets HCM and VCM in slow mode (set HCSD, VCSF, and HCSF on windows) ... '</span>);
+0044     setpv(<span class="string">'HCM'</span>, <span class="string">'RampRate'</span>, 1, [], 0);
+0045     setpv(<span class="string">'VCM'</span>, <span class="string">'RampRate'</span>, 1, [], 0);
+0046     
+0047     <span class="comment">%fprintf('   3. Setting storage ring corrector magnets HCM and VCM to fast mode (1000 Amp/Sec) (set HCSD, VCSF, and HCSF manually) ... ');</span>
+0048     <span class="comment">%setpv('HCM', 'RampRate', 1000, [], 0);</span>
+0049     <span class="comment">%setpv('VCM', 'RampRate', 1000, [], 0);</span>
+0050     
+0051     fprintf(<span class="string">'Done\n'</span>);
+0052 <span class="keyword">catch</span>
+0053     fprintf(<span class="string">'\n      Error setting storage ring corrector magnets HCM and VCM in slow mode.\n\n'</span>);
+0054 <span class="keyword">end</span>
+0055 
+0056 <span class="comment">% Set the chicanes magnet trim coils ramp rate</span>
+0057 <span class="keyword">try</span>
+0058     <span class="comment">%fprintf('   4. Chicanes magnet trim coils set to slow mode (1 Amp/Sec) ... ');</span>
+0059     <span class="comment">%setpv('SR04U___HCM2___AC20',0);</span>
+0060     <span class="comment">%setpv('SR04U___HCM2___AC30',1);</span>
+0061     <span class="comment">%setpv('SR04U___VCM2___AC20',0);</span>
+0062     <span class="comment">%setpv('SR04U___VCM2___AC30',1);</span>
+0063     <span class="comment">%</span>
+0064     <span class="comment">%setpv('SR06U___HCM2___AC20',0);</span>
+0065     <span class="comment">%setpv('SR06U___HCM2___AC30',1);</span>
+0066     <span class="comment">%setpv('SR06U___VCM2___AC20',0);</span>
+0067     <span class="comment">%setpv('SR06U___VCM2___AC30',1);</span>
+0068     <span class="comment">%</span>
+0069     <span class="comment">%setpv('SR11U___HCM2___AC20',0);</span>
+0070     <span class="comment">%setpv('SR11U___HCM2___AC30',1);</span>
+0071     <span class="comment">%setpv('SR11U___VCM2___AC20',0);</span>
+0072     <span class="comment">%setpv('SR11U___VCM2___AC30',1);</span>
+0073     <span class="comment">%fprintf('Done\n');</span>
+0074 
+0075     <span class="comment">% This is a temporary solution since orbit feedback does not have a trim channel for these magnets yet</span>
+0076     fprintf(<span class="string">'   4. Chicanes magnet trim coils set to fast mode (1000 Amp/Sec) ... '</span>);
+0077     setpv(<span class="string">'SR04U___HCM2___AC20'</span>,0);
+0078     setpv(<span class="string">'SR04U___HCM2___AC30'</span>,1000);
+0079     setpv(<span class="string">'SR04U___VCM2___AC20'</span>,0);
+0080     setpv(<span class="string">'SR04U___VCM2___AC30'</span>,1000);
+0081     
+0082     setpv(<span class="string">'SR06U___HCM2___AC20'</span>,0);
+0083     setpv(<span class="string">'SR06U___HCM2___AC30'</span>,1000);
+0084     setpv(<span class="string">'SR06U___VCM2___AC20'</span>,0);
+0085     setpv(<span class="string">'SR06U___VCM2___AC30'</span>,1000);
+0086     
+0087     setpv(<span class="string">'SR11U___HCM2___AC20'</span>,0);
+0088     setpv(<span class="string">'SR11U___HCM2___AC30'</span>,1000);
+0089     setpv(<span class="string">'SR11U___VCM2___AC20'</span>,0);
+0090     setpv(<span class="string">'SR11U___VCM2___AC30'</span>,1000);
+0091     fprintf(<span class="string">'Done\n'</span>);
+0092 
+0093 <span class="keyword">catch</span>
+0094     fprintf(<span class="string">'\n      Error setting chicanes magnet trim coils in to fast mode.\n\n'</span>);
+0095 <span class="keyword">end</span>
+0096 
+0097 
+0098 <span class="comment">% Set power supply ramprates and time constants</span>
+0099 <span class="keyword">try</span>
+0100     fprintf(<span class="string">'   5. Setting time constant and ramp rates set for BEND, QF, QD, QFA, QDA, SF, SD, and CHICANE magnets ... '</span>);
+0101 
+0102     setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>, 10.5, [1 1], 0);  <span class="comment">% Just the normal bend power supply</span>
+0103     setpv(<span class="string">'QFA'</span>,  <span class="string">'RampRate'</span>,  5.9, [], 0);
+0104     setpv(<span class="string">'QDA'</span>,  <span class="string">'RampRate'</span>,  1.0, [], 0);
+0105     setpv(<span class="string">'QF'</span>,   <span class="string">'RampRate'</span>,  1.0, [], 0);
+0106     setpv(<span class="string">'QD'</span>,   <span class="string">'RampRate'</span>,  1.0, [], 0);
+0107     setpv(<span class="string">'SF'</span>,   <span class="string">'RampRate'</span>,  4.3, [], 0);
+0108     setpv(<span class="string">'SD'</span>,   <span class="string">'RampRate'</span>,  3.0, [], 0);
+0109     setpv(<span class="string">'HCMCHICANE'</span>, <span class="string">'RampRate'</span>, 2.0, [4 1;4 3;6 1], 0);   <span class="comment">% [S 2] set as part of the HCM family</span>
+0110     <span class="comment">%setpv('VCMCHICANE', 'RampRate', 2.0, [4 1;4 3;6 1], 0);   % no longer a family, use VCM</span>
+0111 
+0112     setpv(<span class="string">'BEND'</span>, <span class="string">'TimeConstant'</span>, 0, [], 0);
+0113     setpv(<span class="string">'QDA'</span>,  <span class="string">'TimeConstant'</span>, 0, [], 0);
+0114     setpv(<span class="string">'QFA'</span>,  <span class="string">'TimeConstant'</span>, 0, [], 0);
+0115     setpv(<span class="string">'QDA'</span>,  <span class="string">'TimeConstant'</span>, 0, [], 0);
+0116     setpv(<span class="string">'QF'</span>,   <span class="string">'TimeConstant'</span>, 0, [], 0);
+0117     setpv(<span class="string">'QD'</span>,   <span class="string">'TimeConstant'</span>, 0, [], 0);
+0118     setpv(<span class="string">'SF'</span>,   <span class="string">'TimeConstant'</span>, 0, [], 0);
+0119     setpv(<span class="string">'SD'</span>,   <span class="string">'TimeConstant'</span>, 0, [], 0);
+0120     setpv(<span class="string">'HCMCHICANE'</span>, <span class="string">'TimeConstant'</span>, 0, [4 1;4 3;6 1], 0);   <span class="comment">% [S 2] set as part of the HCM family</span>
+0121     <span class="comment">%setpv('VCMCHICANE', 'TimeConstant', 0, [4 1;4 3;6 1], 0);  % no longer a family, use VCM</span>
+0122     fprintf(<span class="string">'Done\n'</span>);
+0123 <span class="keyword">catch</span>
+0124     fprintf(<span class="string">'\n      Error setting time constant and ramp rates set for BEND, QF, QD, QFA, QDA, SF, SD, and CHICANE magnets.\n\n'</span>);
+0125 <span class="keyword">end</span>
+0126 
+0127 
+0128 <span class="comment">% Set Superbend maximum current and ramprate</span>
+0129 <span class="comment">% Added by Christoph Steier, 2001-09-02</span>
+0130 <span class="keyword">try</span>
+0131     fprintf(<span class="string">'   6. Setting superbend magnet ramp rates (0.4 A/s) and limits (302 A) ... '</span>);
+0132     setpv(<span class="string">'BEND'</span>, <span class="string">'RampRate'</span>, 0.4, [4 2; 8 2; 12 2], 0);
+0133     
+0134     <span class="comment">%setpv('BSC', 'Limit', 302, [4 2; 8 2; 12 2], 0);  % BSC family may disappear in the future</span>
+0135     setpv(<span class="string">'SR04C___BSC_P__AC02'</span>, 302);
+0136     setpv(<span class="string">'SR08C___BSC_P__AC02'</span>, 302);
+0137     setpv(<span class="string">'SR12C___BSC_P__AC02'</span>, 302);
+0138 
+0139     fprintf(<span class="string">'Done\n'</span>);
+0140 <span class="keyword">catch</span>
+0141     fprintf(<span class="string">'\n      Error setting ramp rate (0.4 A/s) and Limit (302 A) set for Superbend magnets.\n\n'</span>);
+0142 <span class="keyword">end</span>
+0143 
+0144 
+0145 <span class="comment">% QFA shunts off</span>
+0146 <span class="keyword">try</span>
+0147     fprintf(<span class="string">'   7. Switching QFA shunts off ... '</span>);
+0148     <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 0, [], 0);
+0149     <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(2, 0, [], 0);
+0150     fprintf(<span class="string">'Done\n'</span>);
+0151 <span class="keyword">catch</span>
+0152     fprintf(<span class="string">'\n      Error switching QFA shunts off.\n\n'</span>);
+0153 <span class="keyword">end</span>
+0154 
+0155 
+0156 <span class="comment">% Set extra PS sum channels to zero</span>
+0157 <span class="keyword">try</span>
+0158     fprintf(<span class="string">'   8. Setting feed forward magnet sum channels to zero (HCM, VCM, QF, QD) ... '</span>);
+0159     setpv(<span class="string">'HCM'</span>, <span class="string">'FF1'</span>, 0);
+0160     setpv(<span class="string">'HCM'</span>, <span class="string">'FF2'</span>, 0);
+0161     setpv(<span class="string">'VCM'</span>, <span class="string">'FF1'</span>, 0);
+0162     setpv(<span class="string">'VCM'</span>, <span class="string">'FF2'</span>, 0);
+0163 
+0164     <span class="comment">% EPU Skew Quad Trim Coils</span>
+0165     setpv(<span class="string">'SQEPU'</span>, 0);
+0166     setpv(<span class="string">'SQEPU'</span>, <span class="string">'RampRate'</span>, 100); <span class="comment">% set ramprate to fast</span>
+0167     setpv(<span class="string">'SR04U___Q1FF___AC00'</span>, 0);
+0168     setpv(<span class="string">'SR04U___Q1M____AC00'</span>, 1);
+0169     setpv(<span class="string">'SR11U___Q1FF___AC00'</span>, 0);
+0170     setpv(<span class="string">'SR11U___Q1M____AC01'</span>, 1);
+0171     setpv(<span class="string">'SR11U___Q2FF___AC00'</span>, 0);
+0172     setpv(<span class="string">'SR11U___Q2M____AC01'</span>, 1);
+0173 
+0174     setpv(<span class="string">'QF'</span>, <span class="string">'FF'</span>, 0);
+0175     setpv(<span class="string">'QD'</span>, <span class="string">'FF'</span>, 0);
+0176     fprintf(<span class="string">'Done\n'</span>);
+0177 <span class="keyword">catch</span>
+0178     fprintf(<span class="string">'\n      Error setting feed forward corrector magnet channels to zero.\n\n'</span>);
+0179 <span class="keyword">end</span>
+0180 
+0181 
+0182 <span class="comment">% Set corrector magnet trim channels to zero</span>
+0183 <span class="comment">% Added by Tom Scarvie, 2002-04-29</span>
+0184 <span class="keyword">try</span>
+0185     fprintf(<span class="string">'   9. Set corrector magnet trim channels to zero ... '</span>);
+0186     setpv(<span class="string">'HCM'</span>, <span class="string">'Trim'</span>, 0, [], 0);
+0187     setpv(<span class="string">'VCM'</span>, <span class="string">'Trim'</span>, 0, [], 0);
+0188     fprintf(<span class="string">'Done\n'</span>);
+0189 <span class="keyword">catch</span>
+0190     fprintf(<span class="string">'\n      Error setting corrector magnet trim channels to zero.\n\n'</span>);
+0191 <span class="keyword">end</span>
+0192 
+0193 
+0194 <span class="comment">% Set the maximum horizontal speed for the EPU in sector 4 with velocity profile on to 3 mm/s</span>
+0195 <span class="comment">% Added by Christoph Steier, 2000-11-14</span>
+0196 <span class="keyword">try</span>
+0197     fprintf(<span class="string">'  10. Setting EPU 4 (11 not set), horizontal velocity profile restricted to 3 mm/s ... '</span>);
+0198     setpv(<span class="string">'sr04u1:Hor_profile_max_vel'</span>, 3.0);
+0199     <span class="comment">%setpv('sr11u1:Hor_profile_max_vel', 3.0);</span>
+0200     fprintf(<span class="string">'Done\n'</span>);
+0201 <span class="keyword">catch</span>
+0202     fprintf(<span class="string">'\n      Error setting EPU 4 and 11, horizontal velocity profile restricted to 3 mm/s\n\n'</span>);
+0203 <span class="keyword">end</span>
+0204 
+0205 
+0206 <span class="comment">% Open the scrapers (BTS horizontal scrapers, JH scrapers, SR03 normal scrapers)</span>
+0207 <span class="keyword">try</span>
+0208     fprintf(<span class="string">'  11. Setting the BTS and SR03 scrapers to 0 mm (full open)\n'</span>);
+0209     fprintf(<span class="string">'      Not changing the Jackson Hole scrapers ... '</span>);
+0210     setpv(<span class="string">'BTS_____SCRAP1LAC01.VAL'</span>, 0);
+0211     setpv(<span class="string">'BTS_____SCRAP1RAC01.VAL'</span>, 0);
+0212     setpv(<span class="string">'BTS_____SCRAP2LAC01.VAL'</span>, 0);
+0213     setpv(<span class="string">'BTS_____SCRAP2RAC01.VAL'</span>, 0);
+0214     <span class="comment">%setpv('SR01C___SCRAP1BAC01.VAL', 0);</span>
+0215     <span class="comment">%setpv('SR01C___SCRAP1TAC01.VAL', 0);</span>
+0216     <span class="comment">%setpv('SR02C___SCRAP1BAC01.VAL', 0);</span>
+0217     <span class="comment">%setpv('SR02C___SCRAP1TAC01.VAL', 0);</span>
+0218     <span class="comment">%setpv('SR02C___SCRAP6TAC01.VAL', 0);</span>
+0219     setpv(<span class="string">'SR03S___SCRAPT_AC01.VAL'</span>, 0);
+0220     setpv(<span class="string">'SR03S___SCRAPB_AC02.VAL'</span>, 0);
+0221     setpv(<span class="string">'SR03S___SCRAPH_AC00.VAL'</span>, 0);
+0222     <span class="comment">%setpv('SR12C___SCRAP6TAC01.VAL', 0);</span>
+0223     fprintf(<span class="string">'Done\n'</span>);
+0224 <span class="keyword">catch</span>
+0225     fprintf(<span class="string">'\n      Error setting the scrapers to 0 (open)\n\n'</span>);
+0226 <span class="keyword">end</span>
+0227 
+0228 
+0229 <span class="comment">% Quad FF multipliers</span>
+0230 <span class="keyword">try</span>
+0231     fprintf(<span class="string">'  12. Setting the FF multipliers for the QF  &amp; QD  families to 1 ... '</span>);
+0232     setpv(<span class="string">'QF'</span>, <span class="string">'FFMultiplier'</span>, 1);
+0233     setpv(<span class="string">'QD'</span>, <span class="string">'FFMultiplier'</span>, 1);
+0234     fprintf(<span class="string">'Done\n'</span>);
+0235 <span class="keyword">catch</span>
+0236     fprintf(<span class="string">'\n      Error setting the FF multipliers for the QF &amp; QD families\n\n'</span>);
+0237 <span class="keyword">end</span>
+0238 
+0239 <span class="comment">% Corrector FF multipliers</span>
+0240 <span class="keyword">try</span>
+0241     fprintf(<span class="string">'  13. Setting the FF multipliers for the HCM &amp; VCM families to 1 ... '</span>);
+0242     <span class="comment">%setpv('HCM', 'FFMultiplier', 1);</span>
+0243     <span class="comment">%setpv('VCM', 'FFMultiplier', 1);</span>
+0244     
+0245     <span class="comment">%EPU 4-1</span>
+0246     setpv(<span class="string">'SR03C___HCM4M__AC00'</span>, 1);
+0247     setpv(<span class="string">'SR04U___HCM2M__AC00'</span>, 1);
+0248 
+0249     setpv(<span class="string">'SR03C___VCM4M__AC00'</span>, 1);
+0250     setpv(<span class="string">'SR04U___VCM2M__AC00'</span>, 1);
+0251 
+0252     <span class="comment">%SR06 IVID</span>
+0253     setpv(<span class="string">'SR05C___HCM4M__AC00'</span>, 1);
+0254     setpv(<span class="string">'SR06U___HCM2M__AC00'</span>, 1);
+0255 
+0256     setpv(<span class="string">'SR05C___VCM4M__AC00'</span>, 1);
+0257     setpv(<span class="string">'SR06U___VCM2M__AC00'</span>, 1);
+0258 
+0259     <span class="comment">%EPU 11-1 and 11-2</span>
+0260     setpv(<span class="string">'SR10C___HCM4M__AC00'</span>, 1);
+0261     setpv(<span class="string">'SR11U___HCM2M__AC00'</span>, 1);
+0262     setpv(<span class="string">'SR11C___HCM1M__AC00'</span>, 1);
+0263 
+0264     setpv(<span class="string">'SR10C___VCM4M__AC00'</span>, 1);
+0265     setpv(<span class="string">'SR11U___VCM2M__AC00'</span>, 1);
+0266     setpv(<span class="string">'SR11C___VCM1M__AC00'</span>, 1);
+0267     fprintf(<span class="string">'Done\n'</span>);
+0268 <span class="keyword">catch</span>
+0269     fprintf(<span class="string">'\n      Error setting the FF multipliers for the HCM &amp; VCM families\n\n'</span>);
+0270 <span class="keyword">end</span>
+0271 
+0272 <span class="comment">% setup FOFB parameters</span>
+0273 FOFBFreq = 1000;
+0274 <span class="comment">% PIDs below are known good values for user ops as of 8-1-05</span>
+0275 HorP = 2;
+0276 HorI = 300;
+0277 HorD = 0.002;
+0278 VertP = 1;
+0279 VertI = 100;
+0280 VertD = 0.0015;
+0281 <span class="keyword">try</span>
+0282     setsp(<span class="string">'SR01____FFBFREQAC00'</span>, FOFBFreq); <span class="comment">% set freq</span>
+0283     fprintf(<span class="string">'  14. Fast orbit feedback frequency is set to %.0f Hz.\n'</span>, getpv(<span class="string">'SR01____FFBFREQAM00'</span>));
+0284     write_pid_ffb2_patch(HorP, HorI, HorD, VertP, VertI, VertD); <span class="comment">% set PIDs</span>
+0285     fprintf(<span class="string">'  15. Setting FFB gains to Horizontal P=%.2f, I=%.1f, D=%.4f;  Vertical P=%.2f, I=%.1f, D=%.4f\n'</span>, HorP, HorI, HorD, VertP, VertI, VertD);
+0286 <span class="keyword">catch</span>
+0287     disp(<span class="string">'   Trouble setting Fast Orbit Feedback parameters!'</span>);
+0288 <span class="keyword">end</span>
+0289 
+0290 <span class="comment">% Set all UDF fields</span>
+0291 <span class="comment">% if islabca</span>
+0292 <span class="comment">%     fprintf('  14. UDF fields not set!!! \n');</span>
+0293 <span class="comment">%     fprintf('      sca or MCA must be used to set the .UDF field. \n');</span>
+0294 <span class="comment">%     fprintf('      &gt;&gt; setpathals sca\n');</span>
+0295 <span class="comment">%     fprintf('      to change.\n');</span>
+0296 <span class="comment">% else</span>
+0297 <span class="comment">%     try</span>
+0298 <span class="comment">%         fprintf('  16. Setting the UDF fields for all families to 0 ... ');</span>
+0299 <span class="comment">%         resetudferrors;</span>
+0300 <span class="comment">%         fprintf('Done\n');</span>
+0301 <span class="comment">%     catch</span>
+0302 <span class="comment">%         fprintf('\n      Error setting the UDF for all families\n\n');</span>
+0303 <span class="comment">%     end</span>
+0304 <span class="comment">% end</span>
+0305 
+0306 
+0307 <span class="comment">% DCCT2 Setup?</span>
+0308 
+0309 
+0310 fprintf(<span class="string">'\n'</span>);
+0311 
+0312</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of whichx</title>
+  <meta name="keywords" content="whichx">
+  <meta name="description" content="WHICHX   file search within matlab search path using wildcards">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; whichx.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>whichx
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>WHICHX   file search within matlab search path using wildcards</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function varargout = whichx(inputstr) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">WHICHX   file search within matlab search path using wildcards
+   For example, WHICHX *.m lists all the M-files in the matlab search paths.
+
+   D = WHICHX('*.m') returns the results in an M-by-1
+   structure with the fields: 
+       name  -- filename
+       date  -- modification date
+       bytes -- number of bytes allocated to the file
+       isdir -- 1 if name is a directory and 0 if not%
+       path  -- directory
+
+   See also  WHICH, DIR, MATLABPATH.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = whichx(inputstr)</a>
+0002 <span class="comment">%WHICHX   file search within matlab search path using wildcards</span>
+0003 <span class="comment">%   For example, WHICHX *.m lists all the M-files in the matlab search paths.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   D = WHICHX('*.m') returns the results in an M-by-1</span>
+0006 <span class="comment">%   structure with the fields:</span>
+0007 <span class="comment">%       name  -- filename</span>
+0008 <span class="comment">%       date  -- modification date</span>
+0009 <span class="comment">%       bytes -- number of bytes allocated to the file</span>
+0010 <span class="comment">%       isdir -- 1 if name is a directory and 0 if not%</span>
+0011 <span class="comment">%       path  -- directory</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   See also  WHICH, DIR, MATLABPATH.</span>
+0014 
+0015 <span class="comment">% Autor: Elmar Tarajan [MCommander@gmx.de]</span>
+0016 <span class="comment">% Version: 2.2</span>
+0017 <span class="comment">% Date: 2006/01/12 09:10:05</span>
+0018 
+0019 <span class="keyword">if</span> nargin == 0
+0020    help(<span class="string">'whichx'</span>)
+0021    <span class="keyword">return</span>
+0022 <span class="keyword">end</span><span class="comment">% if</span>
+0023 <span class="comment">%</span>
+0024 <span class="keyword">if</span> ispc
+0025    tmp = eval([<span class="string">'{'''</span> strrep(matlabpath,<span class="string">';'</span>,<span class="string">''','''</span>) <span class="string">'''}'</span>]);
+0026 <span class="keyword">elseif</span> isunix
+0027    tmp = eval([<span class="string">'{'''</span> strrep(matlabpath,<span class="string">':'</span>,<span class="string">''','''</span>) <span class="string">'''}'</span>]);
+0028 <span class="keyword">else</span>
+0029    error(<span class="string">'plattform doesn''t supported'</span>)
+0030 <span class="keyword">end</span><span class="comment">% if</span>
+0031 <span class="comment">%</span>
+0032 <span class="keyword">if</span> ~any(strcmpi(tmp,cd))
+0033    tmp = [tmp {cd}];
+0034 <span class="keyword">end</span><span class="comment">% if</span>
+0035 <span class="comment">%</span>
+0036 output = [];
+0037 <span class="keyword">for</span> i=tmp
+0038    tmp = dir(fullfile(char(i),inputstr));
+0039    <span class="keyword">if</span> ~isempty(tmp)
+0040       <span class="keyword">for</span> j=1:length(tmp)
+0041          tmp(j).path = fullfile(char(i),tmp(j).name);
+0042       <span class="keyword">end</span><span class="comment">% for</span>
+0043       output = [output;tmp];
+0044    <span class="keyword">end</span><span class="comment">% if</span>
+0045 <span class="keyword">end</span><span class="comment">% for</span>
+0046 <span class="comment">%</span>
+0047 <span class="keyword">if</span> nargout==0
+0048    <span class="keyword">if</span> ~isempty(output)
+0049       <span class="keyword">if</span> usejava(<span class="string">'jvm'</span>)
+0050          out = [];
+0051          h = [];
+0052          <span class="keyword">for</span> i=1:length(output)
+0053             <span class="comment">%</span>
+0054             <span class="keyword">if</span> ~mod(i,200)
+0055                <span class="keyword">if</span> ishandle(h)
+0056                   waitbar(i/length(output),h,sprintf(<span class="string">'%.0f%%'</span>,(i*100)/length(output)))
+0057                <span class="keyword">elseif</span> isempty(h)
+0058                   h = waitbar(i/length(output),<span class="string">''</span>,<span class="string">'Name'</span>,sprintf(<span class="string">'Please wait... %d files are founded.'</span>,length(output)));
+0059                <span class="keyword">else</span>
+0060                   <span class="keyword">return</span>
+0061                <span class="keyword">end</span><span class="comment">% if</span>
+0062                drawnow
+0063             <span class="keyword">end</span><span class="comment">% if</span>
+0064             <span class="comment">%</span>
+0065             [p f e] = fileparts(output(i).path);
+0066             p = strrep([p filesep],[filesep filesep],filesep);
+0067             e = strrep([<span class="string">'.'</span> e],<span class="string">'..'</span>,<span class="string">'.'</span>);
+0068             fl = strrep(output(i).path,<span class="string">''''</span>,<span class="string">''''''</span>);
+0069             <span class="keyword">switch</span> lower(e)
+0070                <span class="keyword">case</span> <span class="string">'.m'</span>
+0071                   out = [out sprintf(<span class="string">'&lt;a href=&quot;matlab: %s&quot;&gt;run&lt;/a&gt; &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s&lt;a href=&quot;matlab:edit(''%s'')&quot;&gt;%s%s&lt;/a&gt;\n'</span>, f, p, p, fl, f, e)];
+0072                <span class="keyword">case</span> {<span class="string">'.asv'</span> <span class="string">'.cdr'</span> <span class="string">'.rtw'</span> <span class="string">'.tmf'</span> <span class="string">'.tlc'</span> <span class="string">'.c'</span> <span class="string">'.h'</span> <span class="string">'.ads'</span> <span class="string">'.adb'</span>}
+0073                   out = [out sprintf(<span class="string">'    &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s&lt;a href=&quot;matlab:open(''%s'')&quot;&gt;%s%s&lt;/a&gt;\n'</span>, p, p, fl, f, e)];
+0074                <span class="keyword">case</span> <span class="string">'.mat'</span>
+0075                   out = [out sprintf(<span class="string">'    &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s&lt;a href=&quot;matlab:load(''%s'');disp([''%s loaded''])&quot;&gt;%s%s&lt;/a&gt;\n'</span>, p, p, fl, fl, f, e)];
+0076                <span class="keyword">case</span> <span class="string">'.fig'</span>
+0077                   out = [out sprintf(<span class="string">'    &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s&lt;a href=&quot;matlab:guide(''%s'')&quot;&gt;%s%s&lt;/a&gt;\n'</span>, p, p, fl, f, e)];
+0078                <span class="keyword">case</span> <span class="string">'.p'</span>
+0079                   out = [out sprintf(<span class="string">'&lt;a href=&quot;matlab: %s&quot;&gt;run&lt;/a&gt; &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s\n'</span>, f, p, fl)];
+0080                <span class="keyword">case</span> <span class="string">'.mdl'</span>
+0081                   out = [out sprintf(<span class="string">'    &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s&lt;a href=&quot;matlab:open(''%s'')&quot;&gt;%s%s&lt;/a&gt;\n'</span>, p, p, fl, f, e)];
+0082                <span class="keyword">otherwise</span>
+0083                   <span class="keyword">if</span> output(i).isdir
+0084                      out = [out sprintf(<span class="string">'    &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s\n'</span>, [p f], output(i).path)];
+0085                   <span class="keyword">else</span>
+0086                      out = [out sprintf(<span class="string">'    &lt;a href=&quot;matlab:cd(''%s'')&quot;&gt;cd&lt;/a&gt; %s&lt;a href=&quot;matlab:try;winopen(''%s'');catch;disp(lasterr);end&quot;&gt;%s%s&lt;/a&gt;\n'</span>, p, p, fl, f, e)];                   
+0087                   <span class="keyword">end</span><span class="comment">% if</span>
+0088             <span class="keyword">end</span><span class="comment">% switch</span>
+0089          <span class="keyword">end</span><span class="comment">% for</span>
+0090          close(h)
+0091          disp(char(out));
+0092       <span class="keyword">else</span>
+0093          disp(char(output.path));
+0094       <span class="keyword">end</span><span class="comment">% if</span>
+0095    <span class="keyword">else</span>
+0096       disp([<span class="string">''''</span> inputstr <span class="string">''''</span> <span class="string">' not found.'</span>])
+0097    <span class="keyword">end</span><span class="comment">% if</span>
+0098 <span class="keyword">else</span>
+0099    varargout{1} = output;
+0100 <span class="keyword">end</span><span class="comment">% if</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

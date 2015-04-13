@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotlattice</title>
+  <meta name="keywords" content="plotlattice">
+  <meta name="description" content="PLOTLATTICE - Plot the lattice">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; plotlattice.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plotlattice
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>PLOTLATTICE - Plot the lattice</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function plotlattice(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTLATTICE - Plot the lattice
+  plotlattice(FamilyName, FileName)
+  plotlattice(FamilyName, FileName)
+
+  KEY WORDS
+  1. 'Production' or 'Golden' - Golden lattice {Default}
+  2. 'Injection' - Injection lattice
+  3. 'Present'   - Present lattice</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>	GETMACHINECONFIG - Returns or saves to file the present storage ring setpoints and monitors</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function plotlattice(varargin)</a>
+0002 <span class="comment">%PLOTLATTICE - Plot the lattice</span>
+0003 <span class="comment">%  plotlattice(FamilyName, FileName)</span>
+0004 <span class="comment">%  plotlattice(FamilyName, FileName)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  KEY WORDS</span>
+0007 <span class="comment">%  1. 'Production' or 'Golden' - Golden lattice {Default}</span>
+0008 <span class="comment">%  2. 'Injection' - Injection lattice</span>
+0009 <span class="comment">%  3. 'Present'   - Present lattice</span>
+0010 
+0011 
+0012 <span class="comment">%  3. 'Position'  - X-axis is the position along the ring {Default}</span>
+0013 <span class="comment">%  4. 'Phase'     - X-axis is the phase along the ring</span>
+0014 
+0015 <span class="comment">% Written by Greg Portmann</span>
+0016 
+0017 
+0018 XAxisFlag = <span class="string">'Position'</span>;
+0019 XLabel = <span class="string">'Position [meters]'</span>;
+0020 
+0021 FamilyName = <span class="string">''</span>;
+0022 FileName = <span class="string">''</span>;
+0023 ConfigSetpoint = [];
+0024 
+0025 <span class="comment">% Input parsing</span>
+0026 <span class="keyword">for</span> i = length(varargin):-1:1
+0027     <span class="keyword">if</span> isstruct(varargin{i})
+0028         <span class="comment">% Ignor structures</span>
+0029     <span class="keyword">elseif</span> iscell(varargin{i})
+0030         <span class="comment">% Ignor cells</span>
+0031     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0032         <span class="comment">% Just remove</span>
+0033         varargin(i) = [];
+0034     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0035         <span class="comment">% Just remove</span>
+0036         varargin(i) = [];
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Position'</span>)
+0038         XAxisFlag = <span class="string">'Position'</span>;
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Phase'</span>)
+0041         XAxisFlag = <span class="string">'Phase'</span>;
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Golden'</span>) || strcmpi(varargin{i},<span class="string">'Production'</span>)
+0044         FileName = <span class="string">'Production'</span>;
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Present'</span>)
+0047         FileName = <span class="string">'Present'</span>;
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Injection'</span>) || strcmpi(varargin{i},<span class="string">'Inj'</span>)
+0050         FileName = <span class="string">'Injection'</span>;
+0051         varargin(i) = [];
+0052     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Offset'</span>)
+0053         <span class="comment">% Just remove</span>
+0054         varargin(i) = [];
+0055     <span class="keyword">end</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 <span class="keyword">if</span> length(varargin) &gt;= 1
+0059     <span class="keyword">if</span> iscell(varargin{1})
+0060         FamilyName = varargin{1};
+0061         varargin(1) = [];
+0062     <span class="keyword">elseif</span> size(varargin{1},1) &gt; 1 &amp;&amp; ischar(varargin{1})
+0063         FamilyName = varargin{1};
+0064         varargin(1) = [];
+0065     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(varargin{1})
+0066         FamilyName = varargin{1};
+0067         varargin(1) = [];
+0068     <span class="keyword">elseif</span> isstruct(varargin{1})
+0069         ConfigSetpoint = varargin{1};
+0070         varargin(1) = [];
+0071     <span class="keyword">elseif</span> ischar(varargin{1})
+0072         FileName = varargin{1};
+0073         varargin(1) = [];
+0074     <span class="keyword">end</span>
+0075 <span class="keyword">end</span>
+0076 <span class="keyword">if</span> length(varargin) &gt;= 1
+0077     <span class="keyword">if</span> iscell(varargin{1})
+0078         FamilyName = varargin{1};
+0079         varargin(1) = [];
+0080     <span class="keyword">elseif</span> size(varargin{1},1) &gt; 1 &amp;&amp; ischar(varargin{1})
+0081         FamilyName = varargin{1};
+0082         varargin(1) = [];
+0083     <span class="keyword">elseif</span> <a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(varargin{1})
+0084         FamilyName = varargin{1};
+0085         varargin(1) = [];
+0086     <span class="keyword">elseif</span> isstruct(varargin{1})
+0087         ConfigSetpoint = varargin{1};
+0088         varargin(1) = [];
+0089     <span class="keyword">elseif</span> ischar(varargin{1})
+0090         FileName = varargin{1};
+0091         varargin(1) = [];
+0092     <span class="keyword">end</span>
+0093 <span class="keyword">end</span>
+0094 
+0095 <span class="keyword">if</span> isempty(ConfigSetpoint)
+0096     <span class="keyword">try</span>
+0097         <span class="keyword">if</span> isempty(FileName)
+0098             <span class="comment">% Default file</span>
+0099             <span class="comment">%FileName = getfamilydata('Default', 'CNFArchiveFile');</span>
+0100             DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'ConfigData'</span>);
+0101             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a configuration file to load'</span>, DirectoryName);
+0102             <span class="keyword">if</span> FileName == 0
+0103                 <span class="keyword">return</span>
+0104             <span class="keyword">end</span>
+0105             load([DirectoryName FileName]);
+0106             FileName = [DirectoryName FileName];
+0107             AskStartQuestion = 0;
+0108         <span class="keyword">elseif</span> strcmpi(FileName, <span class="string">'.'</span>)
+0109             <span class="comment">% Default</span>
+0110             [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a configuration file to load'</span>);
+0111             <span class="keyword">if</span> FileName == 0
+0112                 <span class="keyword">return</span>
+0113             <span class="keyword">end</span>
+0114             load([DirectoryName FileName]);
+0115             FileName = [DirectoryName FileName];
+0116             AskStartQuestion = 0;
+0117         <span class="keyword">elseif</span> strcmpi(FileName, <span class="string">'Production'</span>)
+0118             <span class="comment">% Get the production file name (full path)</span>
+0119             <span class="comment">% AD.OpsData.LatticeFile could have the full path else default to AD.Directory.OpsData</span>
+0120             FileName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OpsData'</span>,<span class="string">'LatticeFile'</span>);
+0121             [DirectoryName, FileName, Ext, VerNumber] = fileparts(FileName);
+0122             <span class="keyword">if</span> isempty(DirectoryName)
+0123                 DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0124             <span class="keyword">end</span>
+0125             FileName = fullfile(DirectoryName,[FileName, <span class="string">'.mat'</span>]);
+0126             load(FileName);
+0127         <span class="keyword">elseif</span> strcmpi(FileName, <span class="string">'Injection'</span>)
+0128             <span class="comment">% Get the injection file name (full path)</span>
+0129             <span class="comment">% AD.OpsData.InjectionFile could have the full path else default to AD.Directory.OpsData</span>
+0130             FileName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OpsData'</span>,<span class="string">'InjectionFile'</span>);
+0131             [DirectoryName, FileName, Ext, VerNumber] = fileparts(FileName);
+0132             <span class="keyword">if</span> isempty(DirectoryName)
+0133                 DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0134             <span class="keyword">end</span>
+0135             FileName = fullfile(DirectoryName,[FileName, <span class="string">'.mat'</span>]);
+0136             load(FileName);
+0137         <span class="keyword">elseif</span> strcmpi(FileName, <span class="string">'Present'</span>)
+0138             [ConfigSetpoint, ConfigMonitor, FileName] = <a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>;
+0139         <span class="keyword">else</span>
+0140             <span class="comment">% Input file name</span>
+0141             load(FileName);
+0142         <span class="keyword">end</span>
+0143     <span class="keyword">catch</span>
+0144         fprintf(<span class="string">'%s\n'</span>, lasterr)
+0145         <span class="keyword">return</span>
+0146     <span class="keyword">end</span>
+0147 <span class="keyword">end</span>
+0148 
+0149 
+0150 L = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0151 
+0152 clf reset
+0153 <span class="keyword">if</span> ~isempty(FamilyName)
+0154     FamilyName = [FamilyName,<span class="string">'.Setpoint'</span>];
+0155     plot(<a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(ConfigSetpoint.(FamilyName)), ConfigSetpoint.(FamilyName).Data, <span class="string">'.-'</span>);
+0156     xlabel(XLabel);
+0157     ylabel(sprintf(<span class="string">'%s [%s]'</span>,ConfigSetpoint.(FamilyName).FamilyName, ConfigSetpoint.(FamilyName).UnitsString));
+0158 <span class="keyword">else</span>
+0159     <span class="comment">% Plot a bunch of typical families</span>
+0160     subplot(2,2,1);
+0161     plot(<a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(ConfigSetpoint.HCM.Setpoint), ConfigSetpoint.HCM.Setpoint.Data, <span class="string">'.-'</span>);
+0162     <span class="comment">%xlabel(XLabel);</span>
+0163     ylabel(sprintf(<span class="string">'%s [%s]'</span>,ConfigSetpoint.HCM.Setpoint.FamilyName, ConfigSetpoint.HCM.Setpoint.UnitsString));
+0164     
+0165     subplot(2,2,3);
+0166     plot(<a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(ConfigSetpoint.VCM.Setpoint), ConfigSetpoint.VCM.Setpoint.Data, <span class="string">'.-'</span>);
+0167     xlabel(XLabel);
+0168     ylabel(sprintf(<span class="string">'%s [%s]'</span>,ConfigSetpoint.VCM.Setpoint.FamilyName, ConfigSetpoint.VCM.Setpoint.UnitsString));
+0169     
+0170     subplot(2,2,2);
+0171     plot(<a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(ConfigSetpoint.QF.Setpoint), ConfigSetpoint.QF.Setpoint.Data, <span class="string">'.-'</span>);
+0172     <span class="comment">%xlabel(XLabel);</span>
+0173     ylabel(sprintf(<span class="string">'%s [%s]'</span>,ConfigSetpoint.QF.Setpoint.FamilyName, ConfigSetpoint.QF.Setpoint.UnitsString));
+0174     
+0175     subplot(2,2,4);
+0176     plot(<a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(ConfigSetpoint.QD.Setpoint), ConfigSetpoint.QD.Setpoint.Data, <span class="string">'.-'</span>);
+0177     xlabel(XLabel);
+0178     ylabel(sprintf(<span class="string">'%s [%s]'</span>,ConfigSetpoint.QD.Setpoint.FamilyName, ConfigSetpoint.QD.Setpoint.UnitsString));
+0179 <span class="keyword">end</span>
+0180 xaxiss([0 L]);
+0181 
+0182 
+0183 addlabel(1, 0, [<span class="string">'Lattice saved on '</span>, datestr(ConfigSetpoint.VCM.Setpoint.TimeStamp,0)]);
+0184 
+0185 <span class="comment">%addlabel(0, 0, sprintf(sprintf('RMS: Horizontal %6.3f %s  Vertical %6.3f %s', std(x.Data), x.UnitsString, std(y.Data), y.UnitsString)));</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

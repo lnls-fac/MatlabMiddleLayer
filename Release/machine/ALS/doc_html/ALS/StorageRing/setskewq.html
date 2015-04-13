@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setskewq</title>
+  <meta name="keywords" content="setskewq">
+  <meta name="description" content="setskewq">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setskewq.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setskewq
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>setskewq</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function setskewq </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  setskewq
+  This function set the skew quardrupoles and corrects the orbit.
+  Note:  The BPMs must be calibrated for this program to work.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li><li><a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>	GETBPMLIST - Return a corrector magnet list based on key words and sector numbers</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setskewq</a>
+0002 <span class="comment">%  setskewq</span>
+0003 <span class="comment">%  This function set the skew quardrupoles and corrects the orbit.</span>
+0004 <span class="comment">%  Note:  The BPMs must be calibrated for this program to work.</span>
+0005 
+0006 
+0007 fprintf(<span class="string">'   This program sets skew quadrupoles with orbit correction.\n'</span>);
+0008 <span class="comment">%fprintf('  SQSF1 is presently %.3f amps.\n', getsp('SQSF',1));</span>
+0009 <span class="comment">%fprintf('  SQSF2 is presently %.3f amps.\n', getsp('SQSF',2));</span>
+0010 <span class="comment">%fprintf('  SQSD1 is presently %.3f amps.\n', getsp('SQSD',1));</span>
+0011 fprintf(<span class="string">'   SQSD2 is presently %.3f amps.\n'</span>, getsp(<span class="string">'SQSD'</span>,[1 2]));
+0012 
+0013 
+0014 <span class="comment">% Which BPMs to use</span>
+0015 ButtonName = questdlg(<span class="string">'Use all BPMs or only Bergoz style BPMs?'</span>,<span class="string">'SETSKEWQ'</span>,<span class="string">'All'</span>,<span class="string">'Bergoz'</span>,<span class="string">'Bergoz'</span>);
+0016 <span class="keyword">switch</span> ButtonName,
+0017     <span class="keyword">case</span> <span class="string">'All'</span>
+0018         BPMDevList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>;
+0019     <span class="keyword">case</span> <span class="string">'Bergoz'</span>
+0020         BPMDevList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>);
+0021     <span class="keyword">otherwise</span>
+0022         fprintf(<span class="string">'   No changes to the lattice made.\n'</span>);
+0023         <span class="keyword">return</span>
+0024 <span class="keyword">end</span>
+0025 
+0026 BPMs = getspos(<span class="string">'BPMx'</span>, BPMDevList);
+0027 
+0028 
+0029 
+0030 <span class="comment">%SQnumber = menu('Which Skew Quadrupole?','         SQSF1         ','         SQSF2         ','         SQSD1         ','         SQSD2         ');</span>
+0031 SQnumber = 1;
+0032 
+0033 <span class="comment">%if SQnumber == 1</span>
+0034 <span class="comment">%   Quad0 = getsp('SQSF', 1);</span>
+0035 <span class="comment">%   titlestr=sprintf('SQSF1 is presently at %.3f amps', Quad0);</span>
+0036 <span class="comment">%elseif SQnumber == 2</span>
+0037 <span class="comment">%   Quad0 = getsp('SQSF', 2);</span>
+0038 <span class="comment">%   titlestr=sprintf('SQSF2 is presently at %.3f amps', Quad0);</span>
+0039 <span class="comment">%elseif SQnumber == 3</span>
+0040 <span class="comment">%   Quad0 = getsp('SQSD', 1);</span>
+0041 <span class="comment">%   titlestr=sprintf('SQSD1 is presently at %.3f amps', Quad0);</span>
+0042 <span class="comment">%elseif SQnumber == 4</span>
+0043 <span class="comment">%   Quad0 = getsp('SQSD', 2);</span>
+0044 <span class="comment">%   titlestr=sprintf('SQSD2 is presently at %.3f amps', Quad0);</span>
+0045 <span class="comment">%end</span>
+0046 <span class="keyword">if</span> SQnumber == 1
+0047     Quad0 = getsp(<span class="string">'SQSD'</span>, [1 2]);
+0048     titlestr = sprintf(<span class="string">'SQSD(1,2) is presently at %.3f amps'</span>, Quad0);
+0049 <span class="keyword">end</span>
+0050 
+0051 prompt={<span class="string">'Enter the new skew quadrupole current'</span>};
+0052 def={num2str(Quad0)};
+0053 lineNo=1;
+0054 answer=inputdlg(prompt,titlestr,lineNo,def);
+0055 <span class="keyword">if</span> isempty(answer)
+0056     fprintf(<span class="string">'   No changes to the lattice made.\n'</span>);
+0057     <span class="keyword">return</span>
+0058 <span class="keyword">end</span>
+0059 QuadNew = str2num(answer{1});
+0060 <span class="keyword">if</span> isempty(QuadNew)
+0061     fprintf(<span class="string">'   No changes to the lattice made.\n'</span>);
+0062     <span class="keyword">return</span>
+0063 <span class="keyword">end</span>
+0064 <span class="keyword">if</span> QuadNew == Quad0
+0065     fprintf(<span class="string">'   The desired setpoint is the same as the present setpoint,\n'</span>);
+0066     fprintf(<span class="string">'   hence, no change has been made to the lattice.\n'</span>);
+0067     <span class="keyword">return</span>
+0068 <span class="keyword">end</span>
+0069 
+0070 
+0071 <span class="comment">% Starting orbit</span>
+0072 x0 = getx(BPMDevList);
+0073 y0 = gety(BPMDevList);
+0074 
+0075 
+0076 <span class="comment">% Set the skew quadrupole</span>
+0077 <span class="comment">%if SQnumber == 1</span>
+0078 <span class="comment">%   setsp('SQSF', QuadNew, [1 1], -2);</span>
+0079 <span class="comment">%   fprintf('  SQSF1: Correcting the orbit using HCM #4 and VCM #4 in each sector.'\n);</span>
+0080 <span class="comment">%   HCMDevList = getcmlist('HCM', '4');                  % Corrector magnet list</span>
+0081 <span class="comment">%   VCMDevList = getcmlist('VCM', '4');                  % Corrector magnet list</span>
+0082 <span class="comment">%elseif SQnumber == 2</span>
+0083 <span class="comment">%   setsp('SQSF', QuadNew, [1 2], -2);</span>
+0084 <span class="comment">%   fprintf('  SQSF2: Correcting the orbit using HCM #5 and VCM #5 in each sector.'\n);</span>
+0085 <span class="comment">%   HCMDevList = getcmlist('HCM', '5');                  % Corrector magnet list</span>
+0086 <span class="comment">%   VCMDevList = getcmlist('VCM', '5');                  % Corrector magnet list</span>
+0087 <span class="comment">%elseif SQnumber == 3</span>
+0088 <span class="comment">%   setsp('SQSD', QuadNew, [1 1], -2);</span>
+0089 <span class="comment">%   fprintf('  SQSD1: Correcting the orbit using HCM #3 and VCM #2 in each sector.'\n);</span>
+0090 <span class="comment">%   HCMDevList = getcmlist('HCM', '3');                  % Corrector magnet list</span>
+0091 <span class="comment">%   VCMDevList = getcmlist('VCM', '2');                  % Corrector magnet list</span>
+0092 <span class="comment">%elseif SQnumber == 4</span>
+0093 <span class="comment">%   setsp('SQSD', QuadNew, [1 2], -2);</span>
+0094 <span class="comment">%   fprintf('  SQSD2: Correcting the orbit using HCM #6 and VCM #7 in each sector.'\n);</span>
+0095 <span class="comment">%   HCMDevList = getcmlist('HCM', '6');                  % Corrector magnet list</span>
+0096 <span class="comment">%   VCMDevList = getcmlist('VCM', '7');                  % Corrector magnet list</span>
+0097 <span class="comment">%end</span>
+0098 <span class="keyword">if</span> SQnumber == 1
+0099     setsp(<span class="string">'SQSD'</span>, QuadNew, [1 2], -2);
+0100     fprintf(<span class="string">'   SQSD(1,2): Correcting the orbit using HCM #6 and VCM #7 in each sector.\n'</span>);
+0101     HCMDevList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>, <span class="string">'6'</span>);                  <span class="comment">% Corrector magnet list</span>
+0102     VCMDevList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>, <span class="string">'7'</span>);                  <span class="comment">% Corrector magnet list</span>
+0103 <span class="keyword">end</span>
+0104 
+0105 
+0106 x1 = getx(BPMDevList);
+0107 y1 = gety(BPMDevList);
+0108 
+0109 
+0110 <span class="comment">% Setup figures</span>
+0111 Fig1 = gcf;
+0112 <span class="comment">%Buffer = .03;</span>
+0113 <span class="comment">%HeightBuffer = .07;</span>
+0114 <span class="comment">%set(Fig1,'units','normal','position',[.0+Buffer .5+Buffer .5-2*Buffer .5-2*Buffer-HeightBuffer]);</span>
+0115 
+0116 
+0117 figure(Fig1);
+0118 clf reset
+0119 subplot(2,1,1);
+0120 plot(BPMs, x1-x0,<span class="string">'b'</span>);
+0121 ylabel(<span class="string">'Horizontal [mm]'</span>);
+0122 title(<span class="string">'Skew Quad Change (blue)'</span>);
+0123 hold on
+0124 
+0125 subplot(2,1,2);
+0126 plot(BPMs, y1-y0,<span class="string">'b'</span>);
+0127 ylabel(<span class="string">'Vertical [mm]'</span>);
+0128 xlabel(<span class="string">'BPM Position'</span>)
+0129 hold on
+0130 
+0131 
+0132 
+0133 <span class="comment">% SVD orbit correction</span>
+0134 ivec = [1:12]; <span class="comment">%input('     E-vector numbers ([1 2 3 etc]) = ');</span>
+0135 fprintf(<span class="string">'   Using %d BPMs and %d singular vectors.\n'</span>, size(BPMDevList,1), length(ivec));
+0136 
+0137 <span class="comment">% Response matrix</span>
+0138 Ax = getrespmat(<span class="string">'BPMx'</span>, BPMDevList, <span class="string">'HCM'</span>, HCMDevList);
+0139 Ay = getrespmat(<span class="string">'BPMy'</span>, BPMDevList, <span class="string">'VCM'</span>, VCMDevList);
+0140 
+0141 HCMsp0 = getsp(<span class="string">'HCM'</span>, HCMDevList);
+0142 VCMsp0 = getsp(<span class="string">'VCM'</span>, VCMDevList);
+0143 
+0144 <span class="keyword">for</span> i = 1:3
+0145     <span class="comment">% Orbt correction: In the model it works better to correct the</span>
+0146     <span class="comment">%                  vertical orbit first</span>
+0147     
+0148     <span class="comment">% Compute vertical correction</span>
+0149     [U,S,V] = svd(Ay);
+0150     A = Ay * V(:,ivec);
+0151     b = inv(A'*A)*A' * (y0-gety(BPMDevList));
+0152     Y = V(:,ivec) * b;                     <span class="comment">% corrector strengths</span>
+0153     stepsp(<span class="string">'VCM'</span>, Y, VCMDevList, -2);
+0154     VCMsp1 = getsp(<span class="string">'VCM'</span>, VCMDevList);
+0155     pause(0);
+0156     sleep(.5);
+0157 
+0158     <span class="comment">% Compute horizontal correction</span>
+0159     [U,S,V] = svd(Ax);
+0160     A = Ax * V(:,ivec);
+0161     b = inv(A'*A)*A' * (x0-getx(BPMDevList));
+0162     X = V(:,ivec) * b;                     <span class="comment">% corrector strengths</span>
+0163     stepsp(<span class="string">'HCM'</span>, X, HCMDevList, -2);
+0164     HCMsp1 = getsp(<span class="string">'HCM'</span>, HCMDevList);
+0165     pause(0);
+0166 
+0167 
+0168     figure(Fig1);
+0169     x2 = getx(BPMDevList);
+0170     y2 = gety(BPMDevList);
+0171     subplot(2,1,1);
+0172     plot(BPMs, x2-x0, <span class="string">'g'</span>);
+0173     ylabel(<span class="string">'Delta BPMx [mm]'</span>);
+0174     title(<span class="string">'After Skew Quad Change (blue), Correction 1 &amp; 2 (grn)'</span>);
+0175 
+0176     subplot(2,1,2);
+0177     plot(BPMs, y2-y0, <span class="string">'g'</span>);
+0178     ylabel(<span class="string">'Delta BPMy [mm]'</span>);
+0179     xlabel(<span class="string">'BPM Position [meters]'</span>)
+0180 <span class="keyword">end</span>
+0181 
+0182 
+0183 figure(Fig1);
+0184 subplot(2,1,1);
+0185 plot(BPMs, x2-x0,<span class="string">'r'</span>);
+0186 ylabel(<span class="string">'Delta BPMx [mm]'</span>);
+0187 title(<span class="string">'After Skew Quad Change (blue), Correction 1 &amp; 2 (grn), Correction 3 (red)'</span>);
+0188 hold off
+0189 
+0190 subplot(2,1,2);
+0191 plot(BPMs, y2-y0,<span class="string">'r'</span>);
+0192 ylabel(<span class="string">'Delta BPMy [mm]'</span>);
+0193 xlabel(<span class="string">'BPM Position [meters]'</span>)
+0194 hold off
+0195 
+0196 
+0197 <span class="comment">% Reset?</span>
+0198 ButtonName = questdlg(<span class="string">'Keep Skew Quad Setting and Orbit Correction or Reset?'</span>,<span class="string">'SETSKEWQ'</span>,<span class="string">'Keep'</span>,<span class="string">'Reset'</span>,<span class="string">'Keep'</span>);
+0199 <span class="keyword">switch</span> ButtonName,
+0200     <span class="keyword">case</span> <span class="string">'Reset'</span>
+0201         setsp(<span class="string">'SQSD'</span>, Quad0, [1 2], -2);
+0202         setsp(<span class="string">'HCM'</span>, HCMsp0, HCMDevList, -2);
+0203         setsp(<span class="string">'VCM'</span>, VCMsp0, VCMDevList, -2);
+0204         fprintf(<span class="string">'   Final analog monitor for SQSD(1,2) is %.3f amps.\n'</span>, getam(<span class="string">'SQSD'</span>,[1 2]));
+0205         fprintf(<span class="string">'   Setskew and correctors reset.\n'</span>);
+0206     <span class="keyword">otherwise</span>
+0207         fprintf(<span class="string">'   Final analog monitor for SQSD(1,2) is %.3f amps.\n'</span>, getam(<span class="string">'SQSD'</span>,[1 2]));
+0208         fprintf(<span class="string">'   Setskewq complete.\n'</span>);
+0209 <span class="keyword">end</span>
+0210</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

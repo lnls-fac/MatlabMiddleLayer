@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of logindlg</title>
+  <meta name="keywords" content="logindlg">
+  <meta name="description" content="LOGINDLG - Get the login name and password from a dialog box">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; logindlg.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>logindlg
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LOGINDLG - Get the login name and password from a dialog box</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [varargout]=logindlg(Title, LoginName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOGINDLG - Get the login name and password from a dialog box
+  [Login, Password] = logindlg(Title)
+
+  Author: Jeremy Smith
+  Date: September 24, 2005
+  Version: 1.1
+  Tested on: Matlab 7.0.4.365 (R14) Service Pack 2
+  Description: custom login dialog because Matlab doesn't have an option
+              for characters in an edit field to be replaced by asterixes
+              (password security)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function KeyPress_Function(h,eventdata)</a></li><li><a href="#_sub2" class="code">function Cancel(h,eventdata,fig)</a></li><li><a href="#_sub3" class="code">function OK(h,eventdata,fig)</a></li><li><a href="#_sub4" class="code">function Escape(h,eventdata,fig)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [varargout]=logindlg(Title, LoginName)</a>
+0002 <span class="comment">%LOGINDLG - Get the login name and password from a dialog box</span>
+0003 <span class="comment">%  [Login, Password] = logindlg(Title)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Author: Jeremy Smith</span>
+0006 <span class="comment">%  Date: September 24, 2005</span>
+0007 <span class="comment">%  Version: 1.1</span>
+0008 <span class="comment">%  Tested on: Matlab 7.0.4.365 (R14) Service Pack 2</span>
+0009 <span class="comment">%  Description: custom login dialog because Matlab doesn't have an option</span>
+0010 <span class="comment">%              for characters in an edit field to be replaced by asterixes</span>
+0011 <span class="comment">%              (password security)</span>
+0012 
+0013 
+0014 <span class="comment">% Changelist:</span>
+0015 <span class="comment">%   1.1: -Added positioning code so it'll display in the center of the screen</span>
+0016 <span class="comment">%        -If only one output is specified the password will be returned</span>
+0017 <span class="comment">%            instead of the login as in Version 1.0</span>
+0018 <span class="comment">%        -Escape will not only close the dialog if neither edit box is active</span>
+0019 <span class="comment">%        -When the dialog appears the first edit box will be active</span>
+0020 <span class="comment">%        -Added a few more comments</span>
+0021 <span class="comment">%        -Removed the clc, it was left in by mistake in Version 1.0</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%   Portmann - added a default input for login name</span>
+0024 
+0025 
+0026 <span class="comment">% Input Error Check</span>
+0027 <span class="keyword">if</span> nargin &lt; 1 || nargin == 1 &amp;&amp; ischar(Title) == 0
+0028     Title = <span class="string">'Login'</span>;
+0029 <span class="keyword">end</span>
+0030 
+0031 <span class="keyword">if</span> nargin &lt; 2
+0032     LoginName = <span class="string">''</span>;
+0033 <span class="keyword">end</span>
+0034 
+0035 <span class="comment">% Output Error Check</span>
+0036 <span class="keyword">if</span> nargout &gt; 2
+0037     error(<span class="string">'Too many output arguments.'</span>)
+0038 <span class="keyword">end</span>
+0039 
+0040 <span class="comment">% Get Properties</span>
+0041 Color = get(0,<span class="string">'DefaultUicontrolBackgroundcolor'</span>);
+0042 
+0043 <span class="comment">% Determine the size and position of the login interface</span>
+0044 set(0,<span class="string">'Units'</span>,<span class="string">'characters'</span>)
+0045 Screen = get(0,<span class="string">'screensize'</span>);
+0046 Position = [Screen(3)/2-17.5 Screen(4)/2-4.75 35 9.5];
+0047 set(0,<span class="string">'Units'</span>,<span class="string">'pixels'</span>)
+0048 
+0049 <span class="comment">% Create the GUI</span>
+0050 gui.main = dialog(<span class="string">'HandleVisibility'</span>,<span class="string">'on'</span>,<span class="keyword">...</span>
+0051     <span class="string">'IntegerHandle'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+0052     <span class="string">'Menubar'</span>,<span class="string">'none'</span>,<span class="keyword">...</span>
+0053     <span class="string">'NumberTitle'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+0054     <span class="string">'Name'</span>,<span class="string">'Login'</span>,<span class="keyword">...</span>
+0055     <span class="string">'Tag'</span>,<span class="string">'logindlg'</span>,<span class="keyword">...</span>
+0056     <span class="string">'Color'</span>,Color,<span class="keyword">...</span>
+0057     <span class="string">'Units'</span>,<span class="string">'characters'</span>,<span class="keyword">...</span>
+0058     <span class="string">'Userdata'</span>,<span class="string">'logindlg'</span>,<span class="keyword">...</span>
+0059     <span class="string">'Position'</span>,Position);
+0060 
+0061 <span class="comment">% Set the title</span>
+0062 <span class="keyword">if</span> ischar(Title) == 1
+0063     set(gui.main,<span class="string">'Name'</span>,Title,<span class="string">'Closerequestfcn'</span>,{@<a href="#_sub2" class="code" title="subfunction Cancel(h,eventdata,fig)">Cancel</a>,gui.main},<span class="string">'Keypressfcn'</span>,{@<a href="#_sub4" class="code" title="subfunction Escape(h,eventdata,fig)">Escape</a>,gui.main})
+0064 <span class="keyword">end</span>
+0065 
+0066 <span class="comment">% Texts</span>
+0067 gui.login_text = uicontrol(gui.main,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'FontSize'</span>,8,<span class="string">'HorizontalAlign'</span>,<span class="string">'left'</span>,<span class="string">'Units'</span>,<span class="string">'characters'</span>,<span class="string">'String'</span>,<span class="string">'Login'</span>,<span class="string">'Position'</span>,[1 7.65 20 1]);
+0068 gui.password_text = uicontrol(gui.main,<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="string">'FontSize'</span>,8,<span class="string">'HorizontalAlign'</span>,<span class="string">'left'</span>,<span class="string">'Units'</span>,<span class="string">'characters'</span>,<span class="string">'String'</span>,<span class="string">'Password'</span>,<span class="string">'Position'</span>,[1 4.15 20 1]);
+0069 
+0070 <span class="comment">% Edits</span>
+0071 gui.edit1 = uicontrol(gui.main,<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="string">'FontSize'</span>,8,<span class="string">'HorizontalAlign'</span>,<span class="string">'left'</span>,<span class="string">'BackgroundColor'</span>,<span class="string">'white'</span>,<span class="string">'Units'</span>,<span class="string">'characters'</span>,<span class="string">'String'</span>,LoginName,<span class="string">'Position'</span>,[1 6.02 33 1.7]);
+0072 gui.edit2 = uicontrol(gui.main,<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="string">'FontSize'</span>,8,<span class="string">'HorizontalAlign'</span>,<span class="string">'left'</span>,<span class="string">'BackgroundColor'</span>,<span class="string">'white'</span>,<span class="string">'Units'</span>,<span class="string">'characters'</span>,<span class="string">'String'</span>,<span class="string">''</span>,<span class="string">'Position'</span>,[1 2.52 33 1.7],<span class="string">'Callback'</span>,{@<a href="#_sub3" class="code" title="subfunction OK(h,eventdata,fig)">OK</a>,gui.main},<span class="string">'KeyPressfcn'</span>,{@<a href="#_sub1" class="code" title="subfunction KeyPress_Function(h,eventdata)">KeyPress_Function</a>},<span class="string">'Userdata'</span>,<span class="string">''</span>);
+0073 
+0074 <span class="comment">% Buttons</span>
+0075 gui.OK = uicontrol(gui.main,<span class="string">'Style'</span>,<span class="string">'push'</span>,<span class="string">'FontSize'</span>,8,<span class="string">'HorizontalAlign'</span>,<span class="string">'left'</span>,<span class="string">'Units'</span>,<span class="string">'characters'</span>,<span class="string">'String'</span>,<span class="string">'OK'</span>,<span class="string">'Position'</span>,[12 .2 10 1.7],<span class="string">'Callback'</span>,{@<a href="#_sub3" class="code" title="subfunction OK(h,eventdata,fig)">OK</a>,gui.main});
+0076 gui.Cancel = uicontrol(gui.main,<span class="string">'Style'</span>,<span class="string">'push'</span>,<span class="string">'FontSize'</span>,8,<span class="string">'HorizontalAlign'</span>,<span class="string">'left'</span>,<span class="string">'Units'</span>,<span class="string">'characters'</span>,<span class="string">'String'</span>,<span class="string">'Cancel'</span>,<span class="string">'Position'</span>,[23 .2 10 1.7],<span class="string">'Callback'</span>,{@<a href="#_sub2" class="code" title="subfunction Cancel(h,eventdata,fig)">Cancel</a>,gui.main});
+0077 
+0078 setappdata(0,<span class="string">'logindlg'</span>,gui) <span class="comment">% Save handle data</span>
+0079 setappdata(gui.main,<span class="string">'Check'</span>,0) <span class="comment">% Error check setup. If Check remains 0 an empty cell array will be returned</span>
+0080 
+0081 <span class="keyword">if</span> isempty(LoginName)
+0082     uicontrol(gui.edit1) <span class="comment">% Make the first edit box active</span>
+0083 <span class="keyword">else</span>
+0084     uicontrol(gui.edit2) <span class="comment">% Make the second edit box active</span>
+0085 <span class="keyword">end</span>
+0086 
+0087 <span class="comment">% Pause the GUI and wait for a button to be pressed</span>
+0088 uiwait(gui.main)
+0089 
+0090 Check = getappdata(gui.main,<span class="string">'Check'</span>); <span class="comment">% Check to see if a button was pressed</span>
+0091 
+0092 <span class="comment">% Format output</span>
+0093 <span class="keyword">if</span> Check == 1
+0094     Login = get(gui.edit1,<span class="string">'String'</span>);
+0095     Password = get(gui.edit2,<span class="string">'Userdata'</span>);
+0096     
+0097     <span class="keyword">if</span> nargout == 1 <span class="comment">% If only one output specified output Password</span>
+0098         varargout(1) = {Login};
+0099     <span class="keyword">elseif</span> nargout == 2 <span class="comment">% If two outputs specified output both Login and Password</span>
+0100         varargout(1) = {Login};
+0101         varargout(2) = {Password};
+0102     <span class="keyword">end</span>
+0103 <span class="keyword">else</span> <span class="comment">% If OK wasn't pressed output nothing</span>
+0104     <span class="keyword">if</span> nargout == 1
+0105         varargout(1) = {[]};
+0106     <span class="keyword">elseif</span> nargout == 2
+0107         varargout(1) = {[]};
+0108         varargout(2) = {[]};
+0109     <span class="keyword">end</span>
+0110 <span class="keyword">end</span>
+0111 
+0112 delete(gui.main) <span class="comment">% Close the GUI</span>
+0113 setappdata(0,<span class="string">'logindlg'</span>,[]) <span class="comment">% Erase handles from memory</span>
+0114 
+0115 <span class="comment">%% Hide Password</span>
+0116 <a name="_sub1" href="#_subfunctions" class="code">function KeyPress_Function(h,eventdata)</a>
+0117 <span class="comment">% Function to replace all characters in the password edit box with</span>
+0118 <span class="comment">% asterixes</span>
+0119 password = get(h,<span class="string">'Userdata'</span>);
+0120 key = get(gcf,<span class="string">'currentkey'</span>);
+0121 <span class="keyword">if</span> isempty(strfind(key,<span class="string">'backspace'</span>)) == 0
+0122     password = password(1:end-1); <span class="comment">% Delete the last character in the password</span>
+0123 <span class="keyword">elseif</span> isempty(strfind(key,<span class="string">'return'</span>)) == 0
+0124     <span class="comment">% Don't add 'return' to the password</span>
+0125 <span class="keyword">else</span>
+0126     password = [password get(gcf,<span class="string">'currentcharacter'</span>)]; <span class="comment">% Add the typed character to the password</span>
+0127 <span class="keyword">end</span>
+0128 ch = get(gcf,<span class="string">'currentcharacter'</span>); <span class="comment">% Get the typed character</span>
+0129 
+0130 SizePass = size(password); <span class="comment">% Find the number of asterixes</span>
+0131 <span class="keyword">if</span> SizePass(2) &gt; 0
+0132     asterix(1,1:SizePass(2)) = <span class="string">'*'</span>; <span class="comment">% Create a string of asterixes the same size as the password</span>
+0133     set(h,<span class="string">'String'</span>,asterix) <span class="comment">% Set the text in the password edit box to the asterix string</span>
+0134 <span class="keyword">else</span>
+0135     set(h,<span class="string">'String'</span>,<span class="string">''</span>)
+0136 <span class="keyword">end</span>
+0137 
+0138 set(h,<span class="string">'Userdata'</span>,password) <span class="comment">% Store the password in its current state</span>
+0139 
+0140 <span class="comment">%% Cancel</span>
+0141 <a name="_sub2" href="#_subfunctions" class="code">function Cancel(h,eventdata,fig)</a>
+0142 uiresume(fig)
+0143 
+0144 <span class="comment">%% OK</span>
+0145 <a name="_sub3" href="#_subfunctions" class="code">function OK(h,eventdata,fig)</a>
+0146 <span class="comment">% Set the check and resume</span>
+0147 setappdata(fig,<span class="string">'Check'</span>,1)
+0148 uiresume(fig)
+0149 
+0150 <span class="comment">%% Escape</span>
+0151 <a name="_sub4" href="#_subfunctions" class="code">function Escape(h,eventdata,fig)</a>
+0152 <span class="comment">% Close the login if the escape button is pushed and neither edit box is</span>
+0153 <span class="comment">% active</span>
+0154 key = get(fig,<span class="string">'currentkey'</span>);
+0155 
+0156 <span class="keyword">if</span> isempty(strfind(key,<span class="string">'escape'</span>)) == 0 &amp;&amp; h == fig
+0157     <a href="#_sub2" class="code" title="subfunction Cancel(h,eventdata,fig)">Cancel</a>([],[],fig)
+0158 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

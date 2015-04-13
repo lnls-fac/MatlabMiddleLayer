@@ -1,0 +1,1291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of arplot_boosterRF</title>
+  <meta name="keywords" content="arplot_boosterRF">
+  <meta name="description" content="arplot_boosterRF(Month1 String, Days1, Year1, Month2 String, Days2, Year2)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; arplot_boosterRF.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>arplot_boosterRF
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>arplot_boosterRF(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function arplot_boosterRF(monthStr, days, year1, month2Str, days2, year2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> arplot_boosterRF(Month1 String, Days1, Year1, Month2 String, Days2, Year2)
+ 
+ Plots a whole bunch of Booster RF related archived data.
+
+ Example #1:  arplot_boosterRF('January',22:24,1998);
+              plots data from 1/22, 1/23, and 1/24 in 1998
+
+ Example #2:  arplot_boosterRF('January',28:31,1998,'February',1:4,1998);
+              plots data from the last 4 days in Jan. and the first 4 days in Feb.
+
+ See also <a href="arplot.html" class="code" title="function [yout, ivecout] = arplot(ChanName, LineType);">arplot</a> <a href="arplot_sr_report.html" class="code" title="function [FileName, DirectoryName] = arplot_sr_report(DirectoryName)">arplot_sr_report</a> <a href="arplot_sbm.html" class="code" title="function arplot_sbm(monthStr, days, year1, month2Str, days2, year2)">arplot_sbm</a>
+
+ Written by Greg Portmann &amp; Tom Scarvie</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arglobal.html" class="code" title="">arglobal</a>	Just used to make archived variables global</li><li><a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>	ARREAD - Loads one day of archived data into matlab global memory</li><li><a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>	ARSELECT - Return the archived data for a group on channel names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function arplot_boosterRF(monthStr, days, year1, month2Str, days2, year2)</a>
+0002 <span class="comment">% arplot_boosterRF(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Plots a whole bunch of Booster RF related archived data.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Example #1:  arplot_boosterRF('January',22:24,1998);</span>
+0007 <span class="comment">%              plots data from 1/22, 1/23, and 1/24 in 1998</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% Example #2:  arplot_boosterRF('January',28:31,1998,'February',1:4,1998);</span>
+0010 <span class="comment">%              plots data from the last 4 days in Jan. and the first 4 days in Feb.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% See also arplot arplot_sr_report arplot_sbm</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Written by Greg Portmann &amp; Tom Scarvie</span>
+0015 
+0016 
+0017 LeftGraphColor = <span class="string">'b'</span>;
+0018 RightGraphColor = <span class="string">'r'</span>;
+0019 FFFlag = 1;
+0020 
+0021 
+0022 <span class="comment">% Inputs</span>
+0023 <span class="keyword">if</span> nargin &lt; 2
+0024    error(<span class="string">'ARPLOTS:  You need at least two input arguments.'</span>);
+0025 <span class="keyword">elseif</span> nargin == 2
+0026    tmp = clock;
+0027    year1 = tmp(1);
+0028    monthStr2 = [];
+0029    days2 = [];
+0030    year2 = [];
+0031 <span class="keyword">elseif</span> nargin == 3
+0032    monthStr2 = [];
+0033    days2 = [];
+0034    year2 = [];
+0035 <span class="keyword">elseif</span> nargin == 4
+0036    error(<span class="string">'ARPLOTS:  You need 2, 3, 5, or 6 input arguments.'</span>);
+0037 <span class="keyword">elseif</span> nargin == 5
+0038    tmp = clock;
+0039    year2 = tmp(1);
+0040 <span class="keyword">elseif</span> nargin == 6
+0041 <span class="keyword">else</span>
+0042    error(<span class="string">'ARPLOTS:  Inputs incorrect.'</span>);
+0043 <span class="keyword">end</span>
+0044 
+0045 
+0046 <a href="arglobal.html" class="code" title="">arglobal</a>
+0047 
+0048 
+0049 t=[];
+0050 
+0051 GapEnableNames = family2channel(<span class="string">'ID'</span>,<span class="string">'GapEnable'</span>);
+0052 
+0053 dcct=[];
+0054 i_cam=[];
+0055 lifetime=[];
+0056 lcw=[];
+0057 gev=[];
+0058 IDgap=[];
+0059 GapEnable=[];
+0060 FF7Enable=[];
+0061 
+0062 <span class="comment">%initialize BR RF variables</span>
+0063 Power_RF_fwd=[];
+0064 Power_RF_ref=[];
+0065 Power_drive=[];
+0066 HV_setpoint=[];
+0067 Beam_volts=[];
+0068 Beam_current=[];
+0069 Bias_volts=[];
+0070 Bias_current=[];
+0071 Heater_Voltage=[];
+0072 Heater_current=[];
+0073 Focus_voltage=[];
+0074 Focus_current=[];
+0075 VacIon_voltage=[];
+0076 VacIon_current=[];
+0077 Thy_Grid1_volts=[];
+0078 Thy_Grid2_volts=[];
+0079 Thy_heater_volts=[];
+0080 Thy_heater_current=[];
+0081 Body_Current=[];
+0082 Temp_HV_enclose=[];
+0083 Temp_IOT_enclose=[];
+0084 Temp_IOT_cooling=[];
+0085 Temp_ceramic_output=[];
+0086 
+0087 BR_CLDFWD=[];
+0088 BR_WGREV=[];
+0089 BR_WGFWD=[];
+0090 BR_RFCONT=[];
+0091 BR_PHSCON_AM=[];
+0092 BR_PHSCON_AC=[];
+0093 BR_TUNPOS=[];
+0094 BR_TUNERR=[];
+0095 BR_CAVTMP=[];
+0096 BR_LCWTMP=[];
+0097 BR_CLDFLW=[];
+0098 BR_CIRFLW=[];
+0099 BR_SLDTMP=[];
+0100 BR_CIRTMP=[];
+0101 BR_SLDFLW=[];
+0102 BR_CLDTMP=[];
+0103 BR_CAVFLW=[];
+0104 BR_WINFLW=[];
+0105 BR_TUNFLW=[];
+0106 
+0107 <span class="keyword">if</span> isempty(days2)
+0108    <span class="keyword">if</span> length(days) == [1]
+0109       month  = mon2num(monthStr);
+0110       NumDays = length(days);
+0111       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0112       EndDayStr =   [<span class="string">''</span>];
+0113       titleStr = [StartDayStr];
+0114       DirectoryDate = sprintf(<span class="string">'%d-%02d-%02d'</span>, year1, month, days(1)); 
+0115    <span class="keyword">else</span>
+0116       month  = mon2num(monthStr);
+0117       NumDays = length(days);
+0118       StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0119       EndDayStr =   [monthStr, <span class="string">' '</span>, num2str(days(length(days))),<span class="string">', '</span>, num2str(year1)];
+0120       titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0121       DirectoryDate = sprintf(<span class="string">'%d-%02d-%02d to %d-%02d-%02d'</span>, year1, month, days(1), year1, month, days(end)); 
+0122    <span class="keyword">end</span>
+0123 <span class="keyword">else</span>
+0124    month  = mon2num(monthStr);
+0125    month2 = mon2num(month2Str);
+0126    NumDays = length(days) + length(days2);
+0127    StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0128    EndDayStr =   [month2Str, <span class="string">' '</span>, num2str(days2(length(days2))),<span class="string">', '</span>, num2str(year2)];
+0129    titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0130    DirectoryDate = sprintf(<span class="string">'%d-%02d-%02d to %d-%02d-%02d'</span>, year1, month, days(1), year2, month2, days2(end));
+0131 <span class="keyword">end</span>
+0132 
+0133 StartDay = days(1);
+0134 EndDay = days(length(days));
+0135 
+0136 tic;
+0137 <span class="keyword">for</span> day = days
+0138       <span class="comment">%   try</span>
+0139       year1str = num2str(year1);
+0140       <span class="keyword">if</span> year1 &lt; 2000
+0141          year1str = year1str(3:4);
+0142          FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0143       <span class="keyword">else</span>
+0144          FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year1str, month, day);
+0145       <span class="keyword">end</span>
+0146       <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName, FFFlag);
+0147       
+0148       [y1, igev] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'cmm:sr_energy'</span>);
+0149       gev = [gev y1];
+0150 
+0151       [y1, ilifetime] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___DCCT2__AM00'</span>);
+0152       lifetime = [lifetime  y1];
+0153 
+0154       <span class="comment">% ID vertical gap</span>
+0155       IDlist = family2dev(<span class="string">'ID'</span>);
+0156       [y1, i, iNotFound] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(family2channel(<span class="string">'ID'</span>,<span class="string">'Monitor'</span>,IDlist));
+0157       y1(iNotFound,:) = [];
+0158       IDlist(iNotFound,:) = [];
+0159       IDgap = [IDgap  y1];
+0160       IDLegend = mat2cell(ARChanNames(i,3:5),ones(length(i),1),3);
+0161       IDLegend = strcat(IDLegend,ARChanNames(i,12));
+0162 
+0163 
+0164       <span class="keyword">if</span> FFFlag
+0165           GapEnable = [GapEnable <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(GapEnableNames)];
+0166       
+0167           [y1,i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'sr07u:FFEnable:bi'</span>);
+0168           FF7Enable = [FF7Enable  y1];
+0169       <span class="keyword">end</span>
+0170      
+0171         <span class="comment">% BR RF parameters</span>
+0172       [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Power_RF_fwd'</span>);
+0173         Power_RF_fwd=[Power_RF_fwd y1];
+0174 
+0175         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Power_RF_ref'</span>);
+0176         Power_RF_ref=[Power_RF_ref y1];
+0177 
+0178         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Power_drive'</span>);
+0179         Power_drive=[Power_drive y1];
+0180 
+0181         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'HV_setpoint'</span>);
+0182         HV_setpoint=[HV_setpoint y1];
+0183 
+0184         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Beam_volts'</span>);
+0185         Beam_volts=[Beam_volts y1];
+0186 
+0187         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Beam_current'</span>);
+0188         Beam_current=[Beam_current y1];
+0189 
+0190         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Bias_volts'</span>);
+0191         Bias_volts=[Bias_volts y1];
+0192 
+0193         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Bias_current'</span>);
+0194         Bias_current=[Bias_current y1];
+0195 
+0196         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Heater_Voltage'</span>);
+0197         Heater_Voltage=[Heater_Voltage y1];
+0198 
+0199         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Heater_current'</span>);
+0200         Heater_current=[Heater_current y1];
+0201 
+0202         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Focus_voltage'</span>);
+0203         Focus_voltage=[Focus_voltage y1];
+0204 
+0205         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Focus_current'</span>);
+0206         Focus_current=[Focus_current y1];
+0207 
+0208         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'VacIon_voltage'</span>);
+0209         VacIon_voltage=[VacIon_voltage y1];
+0210 
+0211         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'VacIon_current'</span>);
+0212         VacIon_current=[VacIon_current y1];
+0213 
+0214         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_Grid1_volts'</span>);
+0215         Thy_Grid1_volts=[Thy_Grid1_volts y1];
+0216 
+0217         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_Grid2_volts'</span>);
+0218         Thy_Grid2_volts=[Thy_Grid2_volts y1];
+0219 
+0220         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_heater_volts'</span>);
+0221         Thy_heater_volts=[Thy_heater_volts y1];
+0222 
+0223         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_heater_current'</span>);
+0224         Thy_heater_current=[Thy_heater_current y1];
+0225 
+0226         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Body_Current'</span>);
+0227         Body_Current=[Body_Current y1];
+0228 
+0229         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_HV_enclose'</span>);
+0230         Temp_HV_enclose=[Temp_HV_enclose y1];
+0231 
+0232         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_IOT_enclose'</span>);
+0233         Temp_IOT_enclose=[Temp_IOT_enclose y1];
+0234 
+0235         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_IOT_cooling'</span>);
+0236         Temp_IOT_cooling=[Temp_IOT_cooling y1];
+0237 
+0238         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_ceramic_output'</span>);
+0239         Temp_ceramic_output=[Temp_ceramic_output y1];
+0240 
+0241         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CLDFWD_AM00'</span>);
+0242        BR_CLDFWD=[BR_CLDFWD y1];
+0243 
+0244        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____WGREV__AM01'</span>);
+0245        BR_WGREV=[BR_WGREV y1];
+0246 
+0247        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____WGFWD__AM02'</span>);
+0248        BR_WGFWD=[BR_WGFWD y1];
+0249 
+0250        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____RFCONT_AM01'</span>);
+0251        BR_RFCONT=[BR_RFCONT y1];
+0252  
+0253        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____PHSCON_AM00'</span>);
+0254        BR_PHSCON_AM=[BR_PHSCON_AM y1];
+0255 
+0256        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____PHSCON_AC00'</span>);
+0257        BR_PHSCON_AC=[BR_PHSCON_AC y1];
+0258 
+0259        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____TUNPOS_AM00'</span>);
+0260        BR_TUNPOS=[BR_TUNPOS y1];
+0261 
+0262        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____TUNERR_AM02'</span>);
+0263        BR_TUNERR=[BR_TUNERR y1];
+0264 
+0265        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CAVTMP_AM03'</span>);
+0266        BR_CAVTMP=[BR_CAVTMP y1];
+0267 
+0268        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____LCWTMP_AM03'</span>);
+0269        BR_LCWTMP=[BR_LCWTMP y1];
+0270 
+0271        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CLDFLW_AM01'</span>);
+0272        BR_CLDFLW=[BR_CLDFLW y1];
+0273 
+0274        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CIRFLW_AM02'</span>);
+0275        BR_CIRFLW=[BR_CIRFLW y1];
+0276 
+0277        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____SLDTMP_AM01'</span>);
+0278        BR_SLDTMP=[BR_SLDTMP y1];
+0279 
+0280        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CIRTMP_AM03'</span>);
+0281        BR_CIRTMP=[BR_CIRTMP y1];
+0282 
+0283        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____SLDFLW_AM00'</span>);
+0284        BR_SLDFLW=[BR_SLDFLW y1];
+0285 
+0286        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CLDTMP_AM03'</span>);
+0287        BR_CLDTMP=[BR_CLDTMP y1];
+0288 
+0289        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CAVFLW_AM00'</span>);
+0290        BR_CAVFLW=[BR_CAVFLW y1];
+0291 
+0292        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____WINFLW_AM01'</span>);
+0293        BR_WINFLW=[BR_WINFLW y1];
+0294 
+0295        [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____TUNFLW_AM02'</span>);
+0296        BR_TUNFLW=[BR_TUNFLW y1];
+0297 
+0298         t = [t  ARt+(day-StartDay)*24*60*60]; 
+0299 
+0300 <span class="comment">%    catch</span>
+0301 <span class="comment">%       fprintf('  Error reading archived data file.\n');</span>
+0302 <span class="comment">%       fprintf('  %s will be ignored.\n', FileName);</span>
+0303 <span class="comment">%    end</span>
+0304    
+0305    disp(<span class="string">' '</span>);
+0306 <span class="keyword">end</span>
+0307 
+0308 
+0309 <span class="keyword">if</span> ~isempty(days2)
+0310    
+0311    StartDay = days2(1);
+0312    EndDay = days2(length(days2));
+0313    
+0314    <span class="keyword">for</span> day = days2
+0315       <span class="keyword">try</span>
+0316          year2str = num2str(year2);
+0317          <span class="keyword">if</span> year2 &lt; 2000
+0318             year2str = year2str(3:4);
+0319             FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month2, day);
+0320          <span class="keyword">else</span>
+0321             FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year2str, month2, day);
+0322          <span class="keyword">end</span>
+0323          <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName, FFFlag);
+0324          
+0325          [y1, igev] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'cmm:sr_energy'</span>);
+0326          gev = [gev y1];
+0327          
+0328          [y1, ilifetime] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05W___DCCT2__AM00'</span>);
+0329          lifetime = [lifetime  y1];
+0330          
+0331          <span class="comment">% ID vertical gap</span>
+0332          [y1, i, iNotFound] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(family2channel(<span class="string">'ID'</span>,<span class="string">'Monitor'</span>,IDlist));
+0333          y1(iNotFound,:) = [];
+0334          IDlist(iNotFound,:) = [];
+0335          IDgap = [IDgap  y1];
+0336 
+0337          <span class="keyword">if</span> FFFlag
+0338              GapEnable = [GapEnable <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(GapEnableNames)];
+0339 
+0340              [y1,i]=<a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'sr07u:FFEnable:bi'</span>);
+0341              FF7Enable =[FF7Enable  y1];
+0342          <span class="keyword">end</span>
+0343          
+0344             <span class="comment">% BR RF parameters</span>
+0345             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Power_RF_fwd'</span>);
+0346             Power_RF_fwd=[Power_RF_fwd y1];
+0347 
+0348             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Power_RF_ref'</span>);
+0349             Power_RF_ref=[Power_RF_ref y1];
+0350 
+0351             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Power_drive'</span>);
+0352             Power_drive=[Power_drive y1];
+0353 
+0354             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'HV_setpoint'</span>);
+0355             HV_setpoint=[HV_setpoint y1];
+0356 
+0357             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Beam_volts'</span>);
+0358             Beam_volts=[Beam_volts y1];
+0359 
+0360             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Beam_current'</span>);
+0361             Beam_current=[Beam_current y1];
+0362 
+0363             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Bias_volts'</span>);
+0364             Bias_volts=[Bias_volts y1];
+0365 
+0366             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Bias_current'</span>);
+0367             Bias_current=[Bias_current y1];
+0368 
+0369             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Heater_Voltage'</span>);
+0370             Heater_Voltage=[Heater_Voltage y1];
+0371 
+0372             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Heater_current'</span>);
+0373             Heater_current=[Heater_current y1];
+0374 
+0375             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Focus_voltage'</span>);
+0376             Focus_voltage=[Focus_voltage y1];
+0377 
+0378             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Focus_current'</span>);
+0379             Focus_current=[Focus_current y1];
+0380 
+0381             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'VacIon_voltage'</span>);
+0382             VacIon_voltage=[VacIon_voltage y1];
+0383 
+0384             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'VacIon_current'</span>);
+0385             VacIon_current=[VacIon_current y1];
+0386 
+0387             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_Grid1_volts'</span>);
+0388             Thy_Grid1_volts=[Thy_Grid1_volts y1];
+0389 
+0390             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_Grid2_volts'</span>);
+0391             Thy_Grid2_volts=[Thy_Grid2_volts y1];
+0392 
+0393             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_heater_volts'</span>);
+0394             Thy_heater_volts=[Thy_heater_volts y1];
+0395 
+0396             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Thy_heater_current'</span>);
+0397             Thy_heater_current=[Thy_heater_current y1];
+0398 
+0399             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Body_Current'</span>);
+0400             Body_Current=[Body_Current y1];
+0401 
+0402             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_HV_enclose'</span>);
+0403             Temp_HV_enclose=[Temp_HV_enclose y1];
+0404 
+0405             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_IOT_enclose'</span>);
+0406             Temp_IOT_enclose=[Temp_IOT_enclose y1];
+0407 
+0408             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_IOT_cooling'</span>);
+0409             Temp_IOT_cooling=[Temp_IOT_cooling y1];
+0410 
+0411             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'Temp_ceramic_output'</span>);
+0412             Temp_ceramic_output=[Temp_ceramic_output y1];
+0413 
+0414             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CLDFWD_AM00'</span>);
+0415             BR_CLDFWD=[BR_CLDFWD y1];
+0416 
+0417             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____WGREV__AM01'</span>);
+0418             BR_WGREV=[BR_WGREV y1];
+0419 
+0420             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____WGFWD__AM02'</span>);
+0421             BR_WGFWD=[BR_WGFWD y1];
+0422 
+0423             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____RFCONT_AM01'</span>);
+0424             BR_RFCONT=[BR_RFCONT y1];
+0425 
+0426             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____PHSCON_AM00'</span>);
+0427             BR_PHSCON_AM=[BR_PHSCON_AM y1];
+0428 
+0429             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____PHSCON_AC00'</span>);
+0430             BR_PHSCON_AC=[BR_PHSCON_AC y1];
+0431 
+0432             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____TUNPOS_AM00'</span>);
+0433             BR_TUNPOS=[BR_TUNPOS y1];
+0434 
+0435             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____TUNERR_AM02'</span>);
+0436             BR_TUNERR=[BR_TUNERR y1];
+0437 
+0438             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CAVTMP_AM03'</span>);
+0439             BR_CAVTMP=[BR_CAVTMP y1];
+0440 
+0441             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____LCWTMP_AM03'</span>);
+0442             BR_LCWTMP=[BR_LCWTMP y1];
+0443 
+0444             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CLDFLW_AM01'</span>);
+0445             BR_CLDFLW=[BR_CLDFLW y1];
+0446 
+0447             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CIRFLW_AM02'</span>);
+0448             BR_CIRFLW=[BR_CIRFLW y1];
+0449 
+0450             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____SLDTMP_AM01'</span>);
+0451             BR_SLDTMP=[BR_SLDTMP y1];
+0452 
+0453             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CIRTMP_AM03'</span>);
+0454             BR_CIRTMP=[BR_CIRTMP y1];
+0455 
+0456             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____SLDFLW_AM00'</span>);
+0457             BR_SLDFLW=[BR_SLDFLW y1];
+0458 
+0459             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CLDTMP_AM03'</span>);
+0460             BR_CLDTMP=[BR_CLDTMP y1];
+0461 
+0462             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____CAVFLW_AM00'</span>);
+0463             BR_CAVFLW=[BR_CAVFLW y1];
+0464 
+0465             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____WINFLW_AM01'</span>);
+0466             BR_WINFLW=[BR_WINFLW y1];
+0467 
+0468             [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'BR4_____TUNFLW_AM02'</span>);
+0469             BR_TUNFLW=[BR_TUNFLW y1];
+0470 
+0471          t = [t  ARt+(day-StartDay+(days(length(days))-days(1)+1))*24*60*60];
+0472          
+0473       <span class="keyword">catch</span>
+0474          fprintf(<span class="string">'  Error reading archived data file.\n'</span>);
+0475          fprintf(<span class="string">'  %s will be ignored.\n'</span>, FileName);
+0476       <span class="keyword">end</span>
+0477       
+0478       disp(<span class="string">' '</span>);
+0479    <span class="keyword">end</span>
+0480 <span class="keyword">end</span>
+0481 ar_functions_time = toc;
+0482 fprintf(<span class="string">'  %.1f seconds to arread and arselect data\n'</span>, ar_functions_time);
+0483 
+0484 tic;
+0485 <span class="comment">% condition data</span>
+0486 
+0487 dcct = 100*dcct;
+0488 
+0489 <span class="comment">% Remove points when current is below 1 mamps</span>
+0490 [y, i]=find(dcct&lt;1);
+0491 gev(i)=NaN*ones(size(i));
+0492 lifetime(i)=NaN*ones(size(i));
+0493 Power_RF_fwd(i)=NaN*ones(size(i));
+0494 Power_RF_ref(i)=NaN*ones(size(i));
+0495 Power_drive(i)=NaN*ones(size(i));
+0496 HV_setpoint(i)=NaN*ones(size(i));
+0497 Beam_volts(i)=NaN*ones(size(i));
+0498 Beam_current(i)=NaN*ones(size(i));
+0499 Bias_volts(i)=NaN*ones(size(i));
+0500 Bias_current(i)=NaN*ones(size(i));
+0501 Heater_Voltage(i)=NaN*ones(size(i));
+0502 Heater_current(i)=NaN*ones(size(i));
+0503 Focus_voltage(i)=NaN*ones(size(i));
+0504 Focus_current(i)=NaN*ones(size(i));
+0505 VacIon_voltage(i)=NaN*ones(size(i));
+0506 VacIon_current(i)=NaN*ones(size(i));
+0507 Thy_Grid1_volts(i)=NaN*ones(size(i));
+0508 Thy_Grid2_volts(i)=NaN*ones(size(i));
+0509 Thy_heater_volts(i)=NaN*ones(size(i));
+0510 Thy_heater_current(i)=NaN*ones(size(i));
+0511 Body_Current(i)=NaN*ones(size(i));
+0512 Temp_HV_enclose(i)=NaN*ones(size(i));
+0513 Temp_IOT_enclose(i)=NaN*ones(size(i));
+0514 Temp_IOT_cooling(i)=NaN*ones(size(i));
+0515 Temp_ceramic_output(i)=NaN*ones(size(i));
+0516 BR_CLDFWD(i)=NaN*ones(size(i));
+0517 BR_WGREV(i)=NaN*ones(size(i));
+0518 BR_WGFWD(i)=NaN*ones(size(i));
+0519 BR_RFCONT(i)=NaN*ones(size(i));
+0520 BR_PHSCON_AM(i)=NaN*ones(size(i));
+0521 BR_PHSCON_AC(i)=NaN*ones(size(i));
+0522 BR_TUNPOS(i)=NaN*ones(size(i));
+0523 BR_TUNERR(i)=NaN*ones(size(i));
+0524 BR_CAVTMP(i)=NaN*ones(size(i));
+0525 BR_LCWTMP(i)=NaN*ones(size(i));
+0526 BR_CLDFLW(i)=NaN*ones(size(i));
+0527 BR_CIRFLW(i)=NaN*ones(size(i));
+0528 BR_SLDTMP(i)=NaN*ones(size(i));
+0529 BR_CIRTMP(i)=NaN*ones(size(i));
+0530 BR_SLDFLW(i)=NaN*ones(size(i));
+0531 BR_CLDTMP(i)=NaN*ones(size(i));
+0532 BR_CAVFLW(i)=NaN*ones(size(i));
+0533 BR_WINFLW(i)=NaN*ones(size(i));
+0534 BR_TUNFLW(i)=NaN*ones(size(i));
+0535 
+0536 <span class="comment">% Remove points when FF is disabled</span>
+0537 <span class="keyword">if</span> FFFlag 
+0538    [y, i] = find(FF7Enable==0);
+0539    gev(i)=NaN*ones(size(i));
+0540    lifetime(i)=NaN*ones(size(i));
+0541 <span class="keyword">end</span>   
+0542 
+0543 <span class="comment">% Remove points when the gaps are open</span>
+0544 <span class="comment">% j = any([IDgap5;IDgap7;IDgap8;IDgap9;IDgap10;IDgap12] &lt; 80);</span>
+0545 <span class="comment">%j = any(IDgap &lt; 80); % was 80 before IVID</span>
+0546 j = any(IDgap &lt; 29); <span class="comment">%changed from 37 10-10-05 because we've been running IVID at 30mm pemanently</span>
+0547 i = 1:length(t);
+0548 i(j) = [];
+0549 gev(i)=NaN*ones(size(i));
+0550 lifetime(i)=NaN*ones(size(i));
+0551 
+0552 <span class="comment">% Remove points after a NaN</span>
+0553 [y, i]=find(isnan(dcct));
+0554 i = i + 1;
+0555 <span class="keyword">if</span> ~isempty(i)
+0556    <span class="keyword">if</span> i(end) &gt; length(dcct)
+0557       i = i(1:end-1);
+0558    <span class="keyword">end</span>
+0559 <span class="keyword">end</span>
+0560 gev(i)=NaN*ones(size(i));
+0561 lifetime(i)=NaN*ones(size(i));
+0562 Power_RF_fwd(i)=NaN*ones(size(i));
+0563 Power_RF_ref(i)=NaN*ones(size(i));
+0564 Power_drive(i)=NaN*ones(size(i));
+0565 HV_setpoint(i)=NaN*ones(size(i));
+0566 Beam_volts(i)=NaN*ones(size(i));
+0567 Beam_current(i)=NaN*ones(size(i));
+0568 Bias_volts(i)=NaN*ones(size(i));
+0569 Bias_current(i)=NaN*ones(size(i));
+0570 Heater_Voltage(i)=NaN*ones(size(i));
+0571 Heater_current(i)=NaN*ones(size(i));
+0572 Focus_voltage(i)=NaN*ones(size(i));
+0573 Focus_current(i)=NaN*ones(size(i));
+0574 VacIon_voltage(i)=NaN*ones(size(i));
+0575 VacIon_current(i)=NaN*ones(size(i));
+0576 Thy_Grid1_volts(i)=NaN*ones(size(i));
+0577 Thy_Grid2_volts(i)=NaN*ones(size(i));
+0578 Thy_heater_volts(i)=NaN*ones(size(i));
+0579 Thy_heater_current(i)=NaN*ones(size(i));
+0580 Body_Current(i)=NaN*ones(size(i));
+0581 Temp_HV_enclose(i)=NaN*ones(size(i));
+0582 Temp_IOT_enclose(i)=NaN*ones(size(i));
+0583 Temp_IOT_cooling(i)=NaN*ones(size(i));
+0584 Temp_ceramic_output(i)=NaN*ones(size(i));
+0585 BR_CLDFWD(i)=NaN*ones(size(i));
+0586 BR_WGREV(i)=NaN*ones(size(i));
+0587 BR_WGFWD(i)=NaN*ones(size(i));
+0588 BR_RFCONT(i)=NaN*ones(size(i));
+0589 BR_PHSCON_AM(i)=NaN*ones(size(i));
+0590 BR_PHSCON_AC(i)=NaN*ones(size(i));
+0591 BR_TUNPOS(i)=NaN*ones(size(i));
+0592 BR_TUNERR(i)=NaN*ones(size(i));
+0593 BR_CAVTMP(i)=NaN*ones(size(i));
+0594 BR_LCWTMP(i)=NaN*ones(size(i));
+0595 BR_CLDFLW(i)=NaN*ones(size(i));
+0596 BR_CIRFLW(i)=NaN*ones(size(i));
+0597 BR_SLDTMP(i)=NaN*ones(size(i));
+0598 BR_CIRTMP(i)=NaN*ones(size(i));
+0599 BR_SLDFLW(i)=NaN*ones(size(i));
+0600 BR_CLDTMP(i)=NaN*ones(size(i));
+0601 BR_CAVFLW(i)=NaN*ones(size(i));
+0602 BR_WINFLW(i)=NaN*ones(size(i));
+0603 BR_TUNFLW(i)=NaN*ones(size(i));
+0604 
+0605 <span class="keyword">if</span> 0
+0606    <span class="comment">% Remove points 2 after a NaN</span>
+0607    [y, i]=find(isnan(dcct));
+0608    i = i + 1;
+0609    <span class="keyword">if</span> ~isempty(i)
+0610       <span class="keyword">if</span> i(end) &gt; length(dcct)
+0611          i = i(1:end-1);
+0612       <span class="keyword">end</span>
+0613    <span class="keyword">end</span>
+0614    gev(i)=NaN*ones(size(i));
+0615    lifetime(i)=NaN*ones(size(i));
+0616     Power_RF_fwd(i)=NaN*ones(size(i));
+0617     Power_RF_ref(i)=NaN*ones(size(i));
+0618     Power_drive(i)=NaN*ones(size(i));
+0619     HV_setpoint(i)=NaN*ones(size(i));
+0620     Beam_volts(i)=NaN*ones(size(i));
+0621     Beam_current(i)=NaN*ones(size(i));
+0622     Bias_volts(i)=NaN*ones(size(i));
+0623     Bias_current(i)=NaN*ones(size(i));
+0624     Heater_Voltage(i)=NaN*ones(size(i));
+0625     Heater_current(i)=NaN*ones(size(i));
+0626     Focus_voltage(i)=NaN*ones(size(i));
+0627     Focus_current(i)=NaN*ones(size(i));
+0628     VacIon_voltage(i)=NaN*ones(size(i));
+0629     VacIon_current(i)=NaN*ones(size(i));
+0630     Thy_Grid1_volts(i)=NaN*ones(size(i));
+0631     Thy_Grid2_volts(i)=NaN*ones(size(i));
+0632     Thy_heater_volts(i)=NaN*ones(size(i));
+0633     Thy_heater_current(i)=NaN*ones(size(i));
+0634     Body_Current(i)=NaN*ones(size(i));
+0635     Temp_HV_enclose(i)=NaN*ones(size(i));
+0636     Temp_IOT_enclose(i)=NaN*ones(size(i));
+0637     Temp_IOT_cooling(i)=NaN*ones(size(i));
+0638     Temp_ceramic_output(i)=NaN*ones(size(i));
+0639     BR_CLDFWD(i)=NaN*ones(size(i));
+0640     BR_WGREV(i)=NaN*ones(size(i));
+0641     BR_WGFWD(i)=NaN*ones(size(i));
+0642     BR_RFCONT(i)=NaN*ones(size(i));
+0643     BR_PHSCON_AM(i)=NaN*ones(size(i));
+0644     BR_PHSCON_AC(i)=NaN*ones(size(i));
+0645     BR_TUNPOS(i)=NaN*ones(size(i));
+0646     BR_TUNERR(i)=NaN*ones(size(i));
+0647     BR_CAVTMP(i)=NaN*ones(size(i));
+0648     BR_LCWTMP(i)=NaN*ones(size(i));
+0649     BR_CLDFLW(i)=NaN*ones(size(i));
+0650     BR_CIRFLW(i)=NaN*ones(size(i));
+0651     BR_SLDTMP(i)=NaN*ones(size(i));
+0652     BR_CIRTMP(i)=NaN*ones(size(i));
+0653     BR_SLDFLW(i)=NaN*ones(size(i));
+0654     BR_CLDTMP(i)=NaN*ones(size(i));
+0655     BR_CAVFLW(i)=NaN*ones(size(i));
+0656     BR_WINFLW(i)=NaN*ones(size(i));
+0657     BR_TUNFLW(i)=NaN*ones(size(i));
+0658 <span class="keyword">end</span>
+0659 
+0660 <span class="comment">% Remove points before a NaN</span>
+0661 i = i - 2;
+0662 <span class="keyword">if</span> ~isempty(i)
+0663    <span class="keyword">if</span> i(1) &lt; 1
+0664       i = i(2:end);
+0665    <span class="keyword">end</span>
+0666 <span class="keyword">end</span>
+0667 gev(i)=NaN*ones(size(i));
+0668 lifetime(i)=NaN*ones(size(i));
+0669 Power_RF_fwd(i)=NaN*ones(size(i));
+0670 Power_RF_ref(i)=NaN*ones(size(i));
+0671 Power_drive(i)=NaN*ones(size(i));
+0672 HV_setpoint(i)=NaN*ones(size(i));
+0673 Beam_volts(i)=NaN*ones(size(i));
+0674 Beam_current(i)=NaN*ones(size(i));
+0675 Bias_volts(i)=NaN*ones(size(i));
+0676 Bias_current(i)=NaN*ones(size(i));
+0677 Heater_Voltage(i)=NaN*ones(size(i));
+0678 Heater_current(i)=NaN*ones(size(i));
+0679 Focus_voltage(i)=NaN*ones(size(i));
+0680 Focus_current(i)=NaN*ones(size(i));
+0681 VacIon_voltage(i)=NaN*ones(size(i));
+0682 VacIon_current(i)=NaN*ones(size(i));
+0683 Thy_Grid1_volts(i)=NaN*ones(size(i));
+0684 Thy_Grid2_volts(i)=NaN*ones(size(i));
+0685 Thy_heater_volts(i)=NaN*ones(size(i));
+0686 Thy_heater_current(i)=NaN*ones(size(i));
+0687 Body_Current(i)=NaN*ones(size(i));
+0688 Temp_HV_enclose(i)=NaN*ones(size(i));
+0689 Temp_IOT_enclose(i)=NaN*ones(size(i));
+0690 Temp_IOT_cooling(i)=NaN*ones(size(i));
+0691 Temp_ceramic_output(i)=NaN*ones(size(i));
+0692 BR_CLDFWD(i)=NaN*ones(size(i));
+0693 BR_WGREV(i)=NaN*ones(size(i));
+0694 BR_WGFWD(i)=NaN*ones(size(i));
+0695 BR_RFCONT(i)=NaN*ones(size(i));
+0696 BR_PHSCON_AM(i)=NaN*ones(size(i));
+0697 BR_PHSCON_AC(i)=NaN*ones(size(i));
+0698 BR_TUNPOS(i)=NaN*ones(size(i));
+0699 BR_TUNERR(i)=NaN*ones(size(i));
+0700 BR_CAVTMP(i)=NaN*ones(size(i));
+0701 BR_LCWTMP(i)=NaN*ones(size(i));
+0702 BR_CLDFLW(i)=NaN*ones(size(i));
+0703 BR_CIRFLW(i)=NaN*ones(size(i));
+0704 BR_SLDTMP(i)=NaN*ones(size(i));
+0705 BR_CIRTMP(i)=NaN*ones(size(i));
+0706 BR_SLDFLW(i)=NaN*ones(size(i));
+0707 BR_CLDTMP(i)=NaN*ones(size(i));
+0708 BR_CAVFLW(i)=NaN*ones(size(i));
+0709 BR_WINFLW(i)=NaN*ones(size(i));
+0710 BR_TUNFLW(i)=NaN*ones(size(i));
+0711 
+0712 <span class="comment">% Hours or days for the x-axis?</span>
+0713 <span class="keyword">if</span> t(end)/60/60/24 &gt; 3
+0714    t = t/60/60/24;
+0715    xlabelstring = [<span class="string">'Date since '</span>, StartDayStr, <span class="string">' [Days]'</span>];
+0716    DayFlag = 1;
+0717 <span class="keyword">else</span>
+0718    t = t/60/60;
+0719    xlabelstring = [<span class="string">'Time since '</span>, StartDayStr, <span class="string">' [Hours]'</span>];
+0720    DayFlag = 0;
+0721 <span class="keyword">end</span>
+0722 Days = [days days2];
+0723 xmax = max(t);
+0724 
+0725 
+0726 <span class="comment">% change data to NaN for plotting if archiver has stalled for more than 12minutes</span>
+0727 StalledArchFlag = [];
+0728 <span class="keyword">for</span> loop = 1:size(t,2)-1
+0729    StalledArchFlag(loop) = (t(loop+1)-t(loop)&gt;0.2);
+0730 <span class="keyword">end</span>
+0731 SANum = find(StalledArchFlag==1)+1;
+0732 dcct(SANum)=NaN;
+0733 
+0734 
+0735 <span class="comment">% Plotted during user time</span>
+0736 <span class="keyword">if</span> FFFlag
+0737     GapEnable(isnan(GapEnable)) = 0;
+0738     GapEnable(GapEnable==127) = 1;  <span class="comment">% Sometime 127 is the same as 1 (boolean???)</span>
+0739     i = find(sum(GapEnable) &lt; 3);   <span class="comment">% Why 3, just because sometimes 1 or 2 gaps are enabled for testing.</span>
+0740 <span class="keyword">else</span>
+0741     i = find(dcct &lt; 150)
+0742 <span class="keyword">end</span>
+0743 
+0744 filter_data_time = toc;
+0745 <span class="comment">%fprintf('  %.1f seconds to filter data\n', filter_data_time);</span>
+0746 
+0747 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0748 <span class="comment">% Plot BR RF Plots %</span>
+0749 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0750 FigNum = 0;
+0751 FigNum = FigNum + 1;
+0752 h = figure(FigNum);
+0753 subfig(1,1,1, h);
+0754 <span class="comment">%p = get(h, 'Position');</span>
+0755 <span class="comment">%set(h, 'Position', FigurePosition);</span>
+0756 clf reset;
+0757 
+0758 subplot(5,1,1);
+0759 [ax, h1, h2] = plotyy(t,[Power_RF_fwd; Power_RF_ref], t,Power_drive);
+0760 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, sprintf(<span class="string">'Fwd Pwr and Ref [%%]'</span>), <span class="string">'Color'</span>, LeftGraphColor);
+0761 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Pwr Drive [W]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+0762 set(ax(1), <span class="string">'YColor'</span>, LeftGraphColor);
+0763 set(h1, <span class="string">'Color'</span>, LeftGraphColor);
+0764 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0765 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0766 grid on
+0767 axes(ax(1));
+0768 aa = axis;
+0769 aa(1) = 0;
+0770 aa(2) = xmax;
+0771 axis(aa);
+0772 axes(ax(2));
+0773 aa = axis;
+0774 aa(1) = 0;
+0775 aa(2) = xmax;
+0776 axis(aa);
+0777 <span class="keyword">if</span> DayFlag
+0778    MaxDay = round(max(t));
+0779    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0780    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0781 <span class="keyword">end</span>
+0782 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0783 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0784 title([<span class="string">'Booster RF Plots: '</span>, titleStr]);
+0785 
+0786 subplot(5,1,2);
+0787 [ax, h1, h2] = plotyy(t,[HV_setpoint; Beam_volts], t,[Beam_current; Body_Current]);
+0788 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Beam HV SP and AM [kV]'</span>, <span class="string">'Color'</span>, LeftGraphColor);
+0789 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Beam and Body I [A]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+0790 set(ax(1), <span class="string">'YColor'</span>, LeftGraphColor);
+0791 set(h1, <span class="string">'Color'</span>, LeftGraphColor);
+0792 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0793 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0794 grid on
+0795 axes(ax(1));
+0796 aa = axis;
+0797 aa(1) = 0;
+0798 aa(2) = xmax;
+0799 axis(aa);
+0800 axes(ax(2));
+0801 aa = axis;
+0802 aa(1) = 0;
+0803 aa(2) = xmax;
+0804 axis(aa);
+0805 <span class="keyword">if</span> DayFlag
+0806    MaxDay = round(max(t));
+0807    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0808    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0809 <span class="keyword">end</span>
+0810 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0811 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0812 
+0813 subplot(5,1,3);
+0814 [ax, h1, h2] = plotyy(t,Bias_volts, t,Bias_current);
+0815 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Bias V [V]'</span>);
+0816 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Bias I [mA]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+0817 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0818 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0819 grid on
+0820 axes(ax(1));
+0821 aa = axis;
+0822 aa(1) = 0;
+0823 aa(2) = xmax;
+0824 axis(aa);
+0825 axes(ax(2));
+0826 aa = axis;
+0827 aa(1) = 0;
+0828 aa(2) = xmax;
+0829 axis(aa);
+0830 <span class="keyword">if</span> DayFlag
+0831    MaxDay = round(max(t));
+0832    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0833    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0834 <span class="keyword">end</span>
+0835 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0836 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0837 
+0838 subplot(5,1,4);
+0839 [ax, h1, h2] = plotyy(t,Heater_Voltage, t,Heater_current);
+0840 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Htr V [V]'</span>);
+0841 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Htr I [A]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+0842 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0843 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0844 grid on
+0845 axes(ax(1));
+0846 aa = axis;
+0847 aa(1) = 0;
+0848 aa(2) = xmax;
+0849 axis(aa);
+0850 axes(ax(2));
+0851 aa = axis;
+0852 aa(1) = 0;
+0853 aa(2) = xmax;
+0854 axis(aa);
+0855 <span class="keyword">if</span> DayFlag
+0856    MaxDay = round(max(t));
+0857    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0858    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0859 <span class="keyword">end</span>
+0860 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0861 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0862 
+0863 subplot(5,1,5);
+0864 [ax, h1, h2] = plotyy(t,Focus_voltage, t,Focus_current);
+0865 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Focus V [V]'</span>);
+0866 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Focus I [A]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+0867 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0868 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0869 grid on
+0870 axes(ax(1));
+0871 aa = axis;
+0872 aa(1) = 0;
+0873 aa(2) = xmax;
+0874 axis(aa);
+0875 axes(ax(2));
+0876 aa = axis;
+0877 aa(1) = 0;
+0878 aa(2) = xmax;
+0879 axis(aa);
+0880 <span class="keyword">if</span> DayFlag
+0881    MaxDay = round(max(t));
+0882    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0883    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0884 <span class="keyword">end</span>
+0885 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0886 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0887 
+0888 xlabel(xlabelstring);
+0889 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0890 
+0891 yaxesposition(1.15);
+0892 setappdata(FigNum, <span class="string">'ArchiveDate'</span>, DirectoryDate);
+0893 orient tall
+0894 
+0895 
+0896 FigNum = FigNum + 1;
+0897 h = figure(FigNum);
+0898 subfig(1,1,1, h);
+0899 <span class="comment">%p = get(h, 'Position');</span>
+0900 <span class="comment">%set(h, 'Position', FigurePosition);</span>
+0901 clf reset;
+0902 
+0903 subplot(4,1,1);
+0904 [ax, h1, h2] = plotyy(t,VacIon_voltage, t,VacIon_current);
+0905 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'IonPump V [kV]'</span>);
+0906 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, sprintf(<span class="string">'IonPump I [\muA]'</span>), <span class="string">'Color'</span>, RightGraphColor);
+0907 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0908 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0909 grid on
+0910 axes(ax(1));
+0911 aa = axis;
+0912 aa(1) = 0;
+0913 aa(2) = xmax;
+0914 axis(aa);
+0915 axes(ax(2));
+0916 aa = axis;
+0917 aa(1) = 0;
+0918 aa(2) = xmax;
+0919 axis(aa);
+0920 <span class="keyword">if</span> DayFlag
+0921    MaxDay = round(max(t));
+0922    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0923    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0924 <span class="keyword">end</span>
+0925 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0926 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0927 
+0928 subplot(4,1,2);
+0929 [ax, h1, h2] = plotyy(t,Thy_Grid1_volts, t,Thy_Grid2_volts);
+0930 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Thy Grid1 V [V]'</span>);
+0931 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Thy Grid2 V [V]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+0932 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0933 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0934 grid on
+0935 axes(ax(1));
+0936 aa = axis;
+0937 aa(1) = 0;
+0938 aa(2) = xmax;
+0939 axis(aa);
+0940 axes(ax(2));
+0941 aa = axis;
+0942 aa(1) = 0;
+0943 aa(2) = xmax;
+0944 axis(aa);
+0945 <span class="keyword">if</span> DayFlag
+0946    MaxDay = round(max(t));
+0947    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0948    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0949 <span class="keyword">end</span>
+0950 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0951 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0952 title([<span class="string">'Booster RF Plots: '</span>, titleStr]);
+0953 
+0954 subplot(4,1,3);
+0955 [ax, h1, h2] = plotyy(t,Thy_heater_volts, t,Thy_heater_current);
+0956 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Thy Htr V [V]'</span>);
+0957 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Thy Htr I [A]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+0958 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+0959 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+0960 grid on
+0961 axes(ax(1));
+0962 aa = axis;
+0963 aa(1) = 0;
+0964 aa(2) = xmax;
+0965 axis(aa);
+0966 axes(ax(2));
+0967 aa = axis;
+0968 aa(1) = 0;
+0969 aa(2) = xmax;
+0970 axis(aa);
+0971 <span class="keyword">if</span> DayFlag
+0972    MaxDay = round(max(t));
+0973    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+0974    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+0975 <span class="keyword">end</span>
+0976 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0977 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+0978 
+0979 subplot(4,1,4);
+0980 plot(t,Temp_HV_enclose,<span class="string">'b'</span>, t,Temp_IOT_enclose,<span class="string">'r'</span>, t,Temp_IOT_cooling, <span class="string">'g'</span>, t,Temp_ceramic_output,<span class="string">'m'</span>);
+0981 legend(<span class="string">'HV Enclosure Temp'</span>,<span class="string">'IOT Enclosure Temp'</span>,<span class="string">'IOT Cooling Temp'</span>,<span class="string">'Ceramic Output Temp'</span>);
+0982 set(get(gca,<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'[deg C]'</span>, <span class="string">'Color'</span>, LeftGraphColor);
+0983 set(gca,<span class="string">'YColor'</span>, LeftGraphColor);
+0984 grid on
+0985 xaxis([0 xmax]);
+0986 <span class="comment">%if DayFlag</span>
+0987 <span class="comment">%   MaxDay = round(max(t));</span>
+0988 <span class="comment">%  set(ax,'XTick',[0:MaxDay]');</span>
+0989 <span class="comment">%end</span>
+0990 <span class="comment">%set(ax,'XTickLabel','');</span>
+0991 
+0992 xlabel(xlabelstring);
+0993 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+0994 
+0995 yaxesposition(1.15);
+0996 setappdata(FigNum, <span class="string">'ArchiveDate'</span>, DirectoryDate);
+0997 orient tall
+0998 
+0999 
+1000 FigNum = FigNum + 1;
+1001 h = figure(FigNum);
+1002 subfig(1,1,1, h);
+1003 <span class="comment">%p = get(h, 'Position');</span>
+1004 <span class="comment">%set(h, 'Position', FigurePosition);</span>
+1005 clf reset;
+1006 
+1007 subplot(4,1,1);
+1008 [ax, h1, h2] = plotyy(t,BR_CLDFWD, t,BR_RFCONT);
+1009 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Circulator Load Fwd Pwr [kW]'</span>);
+1010 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'RF Amplitude AM [kW]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+1011 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+1012 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+1013 grid on
+1014 axes(ax(1));
+1015 aa = axis;
+1016 aa(1) = 0;
+1017 aa(2) = xmax;
+1018 axis(aa);
+1019 axes(ax(2));
+1020 aa = axis;
+1021 aa(1) = 0;
+1022 aa(2) = xmax;
+1023 axis(aa);
+1024 <span class="keyword">if</span> DayFlag
+1025    MaxDay = round(max(t));
+1026    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+1027    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+1028 <span class="keyword">end</span>
+1029 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1030 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1031 title([<span class="string">'Booster RF Plots: '</span>, titleStr]);
+1032 
+1033 subplot(4,1,2);
+1034 [ax, h1, h2] = plotyy(t,BR_WGREV, t,BR_WGFWD);
+1035 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Waveguide Rev Pwr [kW]'</span>);
+1036 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Waveguide Fwd Pwr [kW]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+1037 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+1038 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+1039 grid on
+1040 axes(ax(1));
+1041 aa = axis;
+1042 aa(1) = 0;
+1043 aa(2) = xmax;
+1044 axis(aa);
+1045 axes(ax(2));
+1046 aa = axis;
+1047 aa(1) = 0;
+1048 aa(2) = xmax;
+1049 axis(aa);
+1050 <span class="keyword">if</span> DayFlag
+1051    MaxDay = round(max(t));
+1052    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+1053    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+1054 <span class="keyword">end</span>
+1055 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1056 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1057 
+1058 subplot(4,1,3);
+1059 [ax, h1, h2] = plotyy(t,BR_PHSCON_AM, t,BR_PHSCON_AC);
+1060 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'RF Phase AM [deg]'</span>);
+1061 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'RF Phase AC [deg]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+1062 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+1063 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+1064 grid on
+1065 axes(ax(1));
+1066 aa = axis;
+1067 aa(1) = 0;
+1068 aa(2) = xmax;
+1069 axis(aa);
+1070 axes(ax(2));
+1071 aa = axis;
+1072 aa(1) = 0;
+1073 aa(2) = xmax;
+1074 axis(aa);
+1075 <span class="keyword">if</span> DayFlag
+1076    MaxDay = round(max(t));
+1077    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+1078    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+1079 <span class="keyword">end</span>
+1080 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1081 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1082 
+1083 subplot(4,1,4);
+1084 [ax, h1, h2] = plotyy(t,BR_TUNPOS, t,BR_TUNERR);
+1085 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Tuner Position AM [cm]'</span>);
+1086 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, sprintf(<span class="string">'Tuner Loop Error [%%]'</span>), <span class="string">'Color'</span>, RightGraphColor);
+1087 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+1088 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+1089 grid on
+1090 axes(ax(1));
+1091 aa = axis;
+1092 aa(1) = 0;
+1093 aa(2) = xmax;
+1094 axis(aa);
+1095 axes(ax(2));
+1096 aa = axis;
+1097 aa(1) = 0;
+1098 aa(2) = xmax;
+1099 axis(aa);
+1100 <span class="keyword">if</span> DayFlag
+1101    MaxDay = round(max(t));
+1102    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+1103    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+1104 <span class="keyword">end</span>
+1105 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1106 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1107 
+1108 xlabel(xlabelstring);
+1109 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1110 
+1111 yaxesposition(1.15);
+1112 setappdata(FigNum, <span class="string">'ArchiveDate'</span>, DirectoryDate);
+1113 orient tall
+1114 
+1115 
+1116 FigNum = FigNum + 1;
+1117 h = figure(FigNum);
+1118 subfig(1,1,1, h);
+1119 <span class="comment">%p = get(h, 'Position');</span>
+1120 <span class="comment">%set(h, 'Position', FigurePosition);</span>
+1121 clf reset;
+1122 
+1123 subplot(4,1,1);
+1124 plot(t,BR_CAVTMP);
+1125 set(get(gca,<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Cavity Temp [deg C]'</span>, <span class="string">'Color'</span>, LeftGraphColor);
+1126 set(gca,<span class="string">'YColor'</span>, LeftGraphColor);
+1127 grid on
+1128 xaxis([0 xmax]);
+1129 <span class="comment">%if DayFlag</span>
+1130 <span class="comment">%   MaxDay = round(max(t));</span>
+1131 <span class="comment">%   set(ax,'XTick',[0:MaxDay]');</span>
+1132 <span class="comment">%end</span>
+1133 <span class="comment">%set(ax,'XTickLabel','');</span>
+1134 title([<span class="string">'Booster RF Plots: '</span>, titleStr]);
+1135 
+1136 subplot(4,1,2);
+1137 plot(t,BR_LCWTMP,<span class="string">'b'</span>, t,BR_SLDTMP,<span class="string">'r'</span>, t,BR_CIRTMP,<span class="string">'g'</span>, t,BR_CLDTMP,<span class="string">'m'</span>);
+1138 legend(<span class="string">'LCW Inlet Temp'</span>,<span class="string">'Switch Load Temp'</span>,<span class="string">'Circulator Temp'</span>,<span class="string">'Circulator Load Temp'</span>);
+1139 set(get(gca,<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'[deg C]'</span>, <span class="string">'Color'</span>, LeftGraphColor);
+1140 set(gca,<span class="string">'YColor'</span>, LeftGraphColor);
+1141 grid on
+1142 xaxis([0 xmax]);
+1143 <span class="comment">%if DayFlag</span>
+1144 <span class="comment">%   MaxDay = round(max(t));</span>
+1145 <span class="comment">%   set(ax,'XTick',[0:MaxDay]');</span>
+1146 <span class="comment">%end</span>
+1147 <span class="comment">%set(ax,'XTickLabel','');</span>
+1148 
+1149 subplot(4,1,3);
+1150 plot(t,BR_CLDFLW,<span class="string">'b'</span>, t,BR_CIRFLW,<span class="string">'r'</span>, t,BR_SLDFLW,<span class="string">'g'</span>);
+1151 legend(<span class="string">'Circulator Load Flow'</span>,<span class="string">'Circulator Flow'</span>,<span class="string">'Switch Load Flow'</span>);
+1152 set(get(gca,<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'[GPM]'</span>, <span class="string">'Color'</span>, LeftGraphColor);
+1153 set(gca,<span class="string">'YColor'</span>, LeftGraphColor);
+1154 grid on
+1155 xaxis([0 xmax]);
+1156 <span class="comment">%if DayFlag</span>
+1157 <span class="comment">%   MaxDay = round(max(t));</span>
+1158 <span class="comment">%   set(ax,'XTick',[0:MaxDay]');</span>
+1159 <span class="comment">%end</span>
+1160 <span class="comment">%set(ax,'XTickLabel','');</span>
+1161 
+1162 subplot(4,1,4);
+1163 [ax, h1, h2] = plotyy(t,[BR_CAVFLW; BR_WINFLW], t,BR_TUNFLW);
+1164 set(get(ax(1),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Cavity &amp; RF Window Flow [GPM]'</span>, <span class="string">'Color'</span>, LeftGraphColor);
+1165 set(get(ax(2),<span class="string">'Ylabel'</span>), <span class="string">'String'</span>, <span class="string">'Tuner Flow [GPM]'</span>, <span class="string">'Color'</span>, RightGraphColor);
+1166 set(ax(1), <span class="string">'YColor'</span>, LeftGraphColor);
+1167 set(h1, <span class="string">'Color'</span>, LeftGraphColor);
+1168 set(ax(2), <span class="string">'YColor'</span>, RightGraphColor);
+1169 set(h2, <span class="string">'Color'</span>, RightGraphColor);
+1170 grid on
+1171 axes(ax(1));
+1172 aa = axis;
+1173 aa(1) = 0;
+1174 aa(2) = xmax;
+1175 axis(aa);
+1176 axes(ax(2));
+1177 aa = axis;
+1178 aa(1) = 0;
+1179 aa(2) = xmax;
+1180 axis(aa);
+1181 <span class="keyword">if</span> DayFlag
+1182    MaxDay = round(max(t));
+1183    set(ax(1),<span class="string">'XTick'</span>,[0:MaxDay]');
+1184    set(ax(2),<span class="string">'XTick'</span>,[0:MaxDay]');
+1185 <span class="keyword">end</span>
+1186 set(ax(1),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1187 set(ax(2),<span class="string">'XTickLabel'</span>,<span class="string">''</span>);
+1188 
+1189 xlabel(xlabelstring);
+1190 <a href="#_sub1" class="code" title="subfunction ChangeAxesLabel(t, Days, DayFlag)">ChangeAxesLabel</a>(t, Days, DayFlag);
+1191 
+1192 yaxesposition(1.15);
+1193 setappdata(FigNum, <span class="string">'ArchiveDate'</span>, DirectoryDate);
+1194 orient tall
+1195 
+1196 
+1197 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+1198 <a name="_sub1" href="#_subfunctions" class="code">function ChangeAxesLabel(t, Days, DayFlag)</a>
+1199 xaxis([0 max(t)]);
+1200 
+1201 <span class="keyword">if</span> DayFlag
+1202    <span class="keyword">if</span> size(Days,2) &gt; 1
+1203       Days = Days'; <span class="comment">% Make a column vector</span>
+1204    <span class="keyword">end</span>
+1205    
+1206    MaxDay = round(max(t));
+1207    set(gca,<span class="string">'XTick'</span>,[0:MaxDay]');
+1208    <span class="comment">%xaxis([0 MaxDay]);</span>
+1209 
+1210    <span class="keyword">if</span> length(Days) &lt; MaxDay-1
+1211       <span class="comment">% Days were skipped</span>
+1212       set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str([0:MaxDay-1]'+Days(1)),<span class="string">' '</span>));  
+1213    <span class="keyword">else</span>
+1214       <span class="comment">% All days plotted</span>
+1215       set(gca,<span class="string">'XTickLabel'</span>,strvcat(num2str(Days),<span class="string">' '</span>));  
+1216    <span class="keyword">end</span>
+1217    
+1218    XTickLabelString = get(gca,<span class="string">'XTickLabel'</span>);
+1219    <span class="keyword">if</span> MaxDay &lt; 20
+1220       <span class="comment">% ok</span>
+1221    <span class="keyword">elseif</span> MaxDay &lt; 40
+1222       set(gca,<span class="string">'XTick'</span>,[0:2:MaxDay]');       
+1223       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:2:MaxDay-1,:));       
+1224    <span class="keyword">elseif</span> MaxDay &lt; 63
+1225       set(gca,<span class="string">'XTick'</span>,[0:3:MaxDay]');       
+1226       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:3:MaxDay-1,:));       
+1227    <span class="keyword">elseif</span> MaxDay &lt; 80
+1228       set(gca,<span class="string">'XTick'</span>,[0:4:MaxDay]');       
+1229       set(gca,<span class="string">'XTickLabel'</span>,XTickLabelString(1:4:MaxDay-1,:));       
+1230    <span class="keyword">end</span>
+1231 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

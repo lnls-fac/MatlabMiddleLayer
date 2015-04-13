@@ -1,0 +1,583 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setorbitdefault</title>
+  <meta name="keywords" content="setorbitdefault">
+  <meta name="description" content="[OCS, RF, OCS0, RF0] = setorbitdefault(EVectors {1e-2}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setorbitdefault.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setorbitdefault
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[OCS, RF, OCS0, RF0] = setorbitdefault(EVectors {1e-2}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [OCS, RF, OCS0, RF0] = setorbitdefault(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [OCS, RF, OCS0, RF0] = setorbitdefault(EVectors {1e-2}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)
+
+ Keywords:  'Golden' or 'Offset'
+            'Display' or 'NoDisplay'
+            'x', 'Horizontal', 'y', 'Vertical'  {Default: both planes}
+            'zerocm' (only when correcting 1 plane)
+            or any keyword used by setorbit (eg. 'FitRF')</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>	GETBPMAVERAGES - Gets the BPM averages</li><li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li><li><a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>	GETBPMLIST - Return a corrector magnet list based on key words and sector numbers</li><li><a href="turnoff.html" class="code" title="function turnoff(Family, DeviceList, FractionOff)">turnoff</a>	TURNOFF - Scale the setpoint</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [OCS, RF, OCS0, RF0] = setorbitdefault(varargin)</a>
+0002 <span class="comment">% [OCS, RF, OCS0, RF0] = setorbitdefault(EVectors {1e-2}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Keywords:  'Golden' or 'Offset'</span>
+0005 <span class="comment">%            'Display' or 'NoDisplay'</span>
+0006 <span class="comment">%            'x', 'Horizontal', 'y', 'Vertical'  {Default: both planes}</span>
+0007 <span class="comment">%            'zerocm' (only when correcting 1 plane)</span>
+0008 <span class="comment">%            or any keyword used by setorbit (eg. 'FitRF')</span>
+0009 
+0010 
+0011 <span class="comment">% Defaults</span>
+0012 DisplayFlag = <span class="string">'Display'</span>;
+0013 ItersDefault = 3;
+0014 EVectorsDefault = 1e-2;
+0015 
+0016 RemoveBPMDeviceList = [];  <span class="comment">%[3 12; 5 4; 8 7; 9 7; 11 4;];  % used to remove [4 4; 7 9; 9 2;]</span>
+0017 RemoveHCMDeviceList = [];
+0018 RemoveVCMDeviceList = []; 
+0019 
+0020 <span class="comment">%RemoveBPMDeviceList = [3 11; 3 12; 5 11; 5 12; 8 7; 9 7;10 11; 10 12; 2 4; 5 4; 11 4];</span>
+0021 <span class="comment">%RemoveHCMDeviceList = [3 10; 5 10; 10 10];</span>
+0022 <span class="comment">%RemoveVCMDeviceList = [3 10; 5 10; 10 10];</span>
+0023 
+0024 <span class="comment">%RemoveHCMDeviceList = [10 8;11 1]  % to remove chicane for RF tests</span>
+0025 
+0026 
+0027 <span class="comment">% Defaults ([]-ask with a dialog menu)</span>
+0028 GoalOrbit = <span class="string">''</span>;
+0029 PlaneFlag = [];
+0030 BPMFlag = [];
+0031 CMFlag = [];
+0032 ZeroCorrectorsFlag = [];  <span class="comment">% 0-Don't zero first, 1-start from zero</span>
+0033 
+0034 OCSFlags = {};
+0035 SetRFString = <span class="string">'RF frequency NOT included in the correction'</span>;
+0036 
+0037 <span class="comment">%OCSFlags = {'FitRFHCM0'};</span>
+0038 <span class="comment">%SetRFString = 'Set the RF frequency (HCM energy constraint)';</span>
+0039 
+0040 
+0041 <span class="comment">% Input parsing</span>
+0042 EVectors = [];
+0043 Iters = [];
+0044 <span class="keyword">for</span> i = length(varargin):-1:1
+0045     <span class="keyword">if</span> isstruct(varargin{i})
+0046         <span class="comment">% Just remove</span>
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> iscell(varargin{i})
+0049         <span class="comment">% Just remove</span>
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0052         <span class="comment">% Just remove</span>
+0053         varargin(i) = [];
+0054     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0055         <span class="comment">% Just remove</span>
+0056         varargin(i) = [];
+0057     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Golden'</span>)
+0058         GoalOrbit = <span class="string">'Golden'</span>;
+0059         varargin(i) = [];
+0060     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Offset'</span>)
+0061         GoalOrbit = <span class="string">'Offset'</span>;
+0062         varargin(i) = [];
+0063     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'x'</span>,<span class="string">'h'</span>,<span class="string">'Horizontal'</span>, <span class="string">'HCM'</span>}))
+0064         PlaneFlag = 1;
+0065         varargin(i) = [];
+0066     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'y'</span>,<span class="string">'v'</span>,<span class="string">'Vertical'</span>,<span class="string">'VCM'</span>}))
+0067         PlaneFlag = 2;
+0068         varargin(i) = [];
+0069     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'zerocm'</span>,<span class="string">'zero correctors'</span>}))
+0070         ZeroCorrectorsFlag = 1;
+0071         varargin(i) = [];
+0072     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0073         DisplayFlag = <span class="string">'Display'</span>;
+0074         varargin(i) = [];
+0075     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>) | strcmpi(varargin{i},<span class="string">'No Display'</span>)
+0076         DisplayFlag = <span class="string">'NoDisplay'</span>;
+0077         varargin(i) = [];
+0078     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'ModelResp'</span>)
+0079         OCSFlags = [OCSFlags varargin(i)];
+0080         varargin(i) = [];
+0081 
+0082     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRF'</span>,<span class="string">'SetRF'</span>,<span class="string">'RFCorrector'</span>}))
+0083         SetRFString = <span class="string">'Set the RF frequency (Eta Column)'</span>;
+0084         <span class="comment">%FitRFFlag = 1;</span>
+0085         OCSFlags = [OCSFlags varargin(i)];
+0086         varargin(i) = [];
+0087     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFHCM0'</span>,<span class="string">'FitRFEnergy'</span>,<span class="string">'SetRFHCM0'</span>,<span class="string">'SetRFEnergy'</span>}))
+0088         SetRFString = <span class="string">'Set the RF frequency (HCM energy constraint)'</span>;
+0089         <span class="comment">%FitRFFlag = 2;</span>
+0090         OCSFlags = [OCSFlags varargin(i)];
+0091         varargin(i) = [];
+0092     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFDeltaHCM0'</span>,<span class="string">'SetRFDeltaHCM0'</span>}))
+0093         SetRFString = <span class="string">'Set the RF frequency (Delta HCM energy constraint)'</span>;
+0094         <span class="comment">%FitRFFlag = 3;</span>
+0095         OCSFlags = [OCSFlags varargin(i)];
+0096         varargin(i) = [];
+0097     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFDispersionOrbit'</span>,<span class="string">'SetRFDispersionOrbit'</span>}))
+0098         SetRFString = <span class="string">'Set the RF frequency (Dispersion orbit constraint)'</span>;
+0099         <span class="comment">%FitRFFlag = 4;</span>
+0100         OCSFlags = [OCSFlags varargin(i)];
+0101         varargin(i) = [];
+0102     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFDispersionHCM'</span>,<span class="string">'SetRFDispersionHCM'</span>}))
+0103         SetRFString = <span class="string">'Set the RF frequency (Dispersion correction constraint)'</span>;
+0104         <span class="comment">%FitRFFlag = 5;</span>
+0105         OCSFlags = [OCSFlags varargin(i)];
+0106         varargin(i) = [];
+0107 
+0108     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'ModelDisp'</span>)
+0109         OCSFlags = [OCSFlags varargin(i)];
+0110         varargin(i) = [];
+0111     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'MeasDisp'</span>)
+0112         OCSFlags = [OCSFlags varargin(i)];
+0113         varargin(i) = [];
+0114     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'GoldenDisp'</span>)
+0115         OCSFlags = [OCSFlags varargin(i)];
+0116         varargin(i) = [];
+0117 
+0118     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0119         OCSFlags = [OCSFlags varargin(i)];
+0120         varargin(i) = [];
+0121     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0122         OCSFlags = [OCSFlags varargin(i)];
+0123         varargin(i) = [];
+0124     <span class="keyword">end</span>
+0125 <span class="keyword">end</span>
+0126 
+0127 
+0128 <span class="keyword">if</span> length(varargin) &gt;= 1
+0129     <span class="keyword">if</span> isnumeric(varargin{1})
+0130         EVectors = varargin{1};
+0131         varargin(i) = [];
+0132     <span class="keyword">end</span>
+0133 <span class="keyword">end</span>
+0134 <span class="keyword">if</span> isempty(EVectors)
+0135     <span class="keyword">if</span> PlaneFlag == 0
+0136         EVectors = EVectorsDefault;
+0137     <span class="keyword">elseif</span> PlaneFlag == 1
+0138         EVectors = EVectorsDefault;
+0139     <span class="keyword">elseif</span> PlaneFlag == 2
+0140         EVectors = EVectorsDefault;
+0141     <span class="keyword">end</span>
+0142 <span class="keyword">end</span>
+0143 
+0144 <span class="keyword">if</span> length(varargin) &gt;= 1
+0145     <span class="keyword">if</span> isnumeric(varargin{1})
+0146         Iters = varargin{1};
+0147         varargin(i) = [];
+0148     <span class="keyword">end</span>
+0149 <span class="keyword">end</span>
+0150 <span class="keyword">if</span> isempty(Iters)
+0151     Iters = ItersDefault;
+0152 <span class="keyword">end</span>
+0153 
+0154 <span class="keyword">if</span> length(varargin) &gt;= 1
+0155     <span class="keyword">if</span> isnumeric(varargin{1})
+0156         RemoveBPMDeviceList = varargin{1};
+0157         varargin(i) = [];
+0158     <span class="keyword">end</span>
+0159 <span class="keyword">end</span>
+0160 
+0161 
+0162 <span class="comment">% Customize or not?</span>
+0163 <span class="keyword">if</span> isempty(GoalOrbit)
+0164     GoalString = <span class="string">'golden'</span>;
+0165 <span class="keyword">else</span>
+0166     GoalString = GoalOrbit;
+0167 <span class="keyword">end</span>
+0168 <span class="keyword">if</span> isempty(PlaneFlag)
+0169     PlaneString = <span class="string">'Both horizontal and vertical planes'</span>;
+0170 <span class="keyword">elseif</span> PlaneFlag == 1
+0171     PlaneString = <span class="string">'Horizontal plane only'</span>;
+0172 <span class="keyword">elseif</span> PlaneFlag == 2
+0173     PlaneString = <span class="string">'Vertical plane only'</span>;
+0174 <span class="keyword">end</span>
+0175 <span class="keyword">if</span> isempty(ZeroCorrectorsFlag) | ZeroCorrectorsFlag == 0
+0176     ZeroCorrectorsString = <span class="string">'Start from present corrector set'</span>;
+0177 <span class="keyword">else</span>
+0178     ZeroCorrectorsString = <span class="string">'Zero the correctors before correcting the orbit'</span>;
+0179 <span class="keyword">end</span>
+0180 
+0181 
+0182 <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0183     FastCorrection = questdlg( <span class="keyword">...</span>
+0184         strvcat(<span class="string">'Choose this correction method or customize it:'</span>, <span class="keyword">...</span>
+0185         strvcat(sprintf(<span class="string">'1. %s'</span>, PlaneString), <span class="keyword">...</span>
+0186         strvcat(sprintf(<span class="string">'2. Correction to the %s orbit'</span>, GoalString), <span class="keyword">...</span>
+0187         strvcat(<span class="string">'3. 96 BPMs (less bad BPMs)'</span>, <span class="keyword">...</span>
+0188         strvcat(<span class="string">'4. Corrector magnets [1 2 3 4 5 6 7 8]'</span>, <span class="keyword">...</span>
+0189         strvcat(sprintf(<span class="string">'5. %d iterations'</span>, Iters), <span class="keyword">...</span>
+0190         strvcat(sprintf(<span class="string">'6. %s'</span>, ZeroCorrectorsString), sprintf(<span class="string">'7. %s'</span>, SetRFString) ))))))), <span class="keyword">...</span>
+0191         <span class="string">'SETORBIT'</span>, <span class="keyword">...</span>
+0192         <span class="string">'Correct Orbit'</span>, <span class="keyword">...</span>
+0193         <span class="string">'Customize Orbit Correction'</span>, <span class="keyword">...</span>
+0194         <span class="string">'Cancel'</span>, <span class="keyword">...</span>
+0195         <span class="string">'Cancel'</span>);
+0196 
+0197     <span class="keyword">switch</span> FastCorrection
+0198         <span class="keyword">case</span> <span class="string">'Correct Orbit'</span>
+0199             BPMFlag = 2;
+0200             CMFlag = 2;
+0201             <span class="keyword">if</span> isempty(PlaneFlag)
+0202                 PlaneFlag = 0;
+0203             <span class="keyword">end</span>
+0204             <span class="keyword">if</span> isempty(ZeroCorrectorsFlag)
+0205                 ZeroCorrectorsFlag = 0;  <span class="comment">% 0-Don't zero first, 1-start from zero</span>
+0206             <span class="keyword">end</span>
+0207             <span class="keyword">if</span> isempty(GoalOrbit)
+0208                 GoalOrbit = <span class="string">'Golden'</span>;
+0209             <span class="keyword">end</span>
+0210         <span class="keyword">case</span> <span class="string">'Customize Orbit Correction'</span>
+0211         <span class="keyword">otherwise</span>
+0212             OCS=[]; RF=[]; OCS0=[]; RF0=[];
+0213             fprintf(<span class="string">'   Orbit correction canceled.\n'</span>);
+0214             <span class="keyword">return</span>;
+0215     <span class="keyword">end</span>
+0216 <span class="keyword">end</span>
+0217 
+0218 
+0219 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0220 <span class="comment">% Get the BPM DeviceList %</span>
+0221 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0222 <span class="keyword">if</span> isempty(BPMFlag)
+0223     BPMFlag = menu(<span class="string">'Which BPM set?'</span>,<span class="keyword">...</span>
+0224         sprintf(<span class="string">'All BPMs  (%d total)'</span>, size(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'All'</span>),1)), <span class="keyword">...</span>
+0225         sprintf(<span class="string">'[1  3  4  5  6  7  8  10] with [1 2],[2 9],[3 2],[12 9] (%d total)'</span>, size(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'1 3 4 5 6 7 8 10'</span>),1)+4), <span class="keyword">...</span>
+0226         sprintf(<span class="string">'[2  3  4  5  6  7  8  9]  (%d total)'</span>, size(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 4 5 6 7 8 9'</span>),1)), <span class="keyword">...</span>
+0227         sprintf(<span class="string">'All Bergoz BPMs  (%d total)'</span>, size(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>),1)), <span class="keyword">...</span>
+0228         sprintf(<span class="string">'[1  2  3  4  5  6  7  8  9 10]  (%d total)'</span>, size(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'1 2 3 4 5 6 7 8 9 10'</span>),1)), <span class="keyword">...</span>
+0229         sprintf(<span class="string">'[2  3  4  5  6  7  8  9] QF QD QFA BEND (%d total)'</span>, size(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 4 5 6 7 8 9'</span>),1)), <span class="keyword">...</span>
+0230         sprintf(<span class="string">'[2  3  4y  5BSC  6BSC  7y  8  9]  QF QD QFAy SBEND'</span>), <span class="keyword">...</span>
+0231         sprintf(<span class="string">'[2  3  8  9] QF and QD correction  (%d total)'</span>, size(<a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 8 9'</span>),1)), <span class="keyword">...</span>
+0232         <span class="string">'                   Exit                   '</span>);
+0233     drawnow;
+0234 <span class="keyword">end</span>
+0235 <span class="keyword">if</span> BPMFlag == 1
+0236     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'All'</span>);
+0237     BPMyList = BPMxList;
+0238 <span class="keyword">elseif</span> BPMFlag == 2
+0239     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'1 3 4 5 6 7 8 10'</span>);
+0240     BPMxList = [BPMxList; 1 2;2 9;3 2;12 9];
+0241 
+0242     DeviceListAll = family2dev(<span class="string">'BPMx'</span>,0);
+0243     IndexDeviceList = findrowindex(BPMxList, DeviceListAll);
+0244     IndexDeviceList = sort(IndexDeviceList);
+0245     BPMxList = DeviceListAll(IndexDeviceList, 1:2);
+0246 
+0247     BPMyList = BPMxList;
+0248 <span class="keyword">elseif</span> BPMFlag == 3
+0249     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 4 5 6 7 8 9'</span>);
+0250     BPMyList = BPMxList;
+0251 <span class="keyword">elseif</span> BPMFlag == 4
+0252     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>);
+0253     BPMyList = BPMxList;
+0254 <span class="keyword">elseif</span> BPMFlag == 5
+0255     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'1 2 3 4 5 6 7 8 9 10'</span>);
+0256     BPMyList = BPMxList;
+0257 <span class="keyword">elseif</span> BPMFlag == 6
+0258     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 4 5 6 7 8 9'</span>);
+0259     BPMyList = BPMxList;
+0260 <span class="keyword">elseif</span> BPMFlag == 7
+0261     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 5BSC 6BSC 8 9'</span>);
+0262     BPMyList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 4 5BSC 6BSC 7 8 9'</span>);
+0263 <span class="keyword">elseif</span> BPMFlag == 8
+0264     BPMxList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'2 3 8 9'</span>);
+0265     BPMyList = BPMxList;
+0266 <span class="keyword">else</span>
+0267     fprintf(<span class="string">'  Orbit correction canceled.\n'</span>);
+0268     <span class="keyword">return</span>
+0269 <span class="keyword">end</span>
+0270 
+0271 
+0272 <span class="keyword">if</span> isempty(GoalOrbit)
+0273     GoalOrbit = questdlg(<span class="string">'What is goal orbit?'</span>,<span class="string">'SETORBIT'</span>,<span class="string">'Golden'</span>,<span class="string">'Offset'</span>,<span class="string">'Golden'</span>);
+0274 <span class="keyword">end</span>
+0275 <span class="keyword">if</span> isempty(GoalOrbit)
+0276     fprintf(<span class="string">'  Orbit correction canceled.  Unknown goal orbit.\n'</span>);
+0277     <span class="keyword">return</span>
+0278 <span class="keyword">end</span>
+0279 
+0280 
+0281 <span class="keyword">if</span> isempty(PlaneFlag)
+0282     PlaneString = questdlg(<span class="string">'Which plane?'</span>,<span class="string">'SETORBIT'</span>,<span class="string">'Horizontal'</span>,<span class="string">'Vertical'</span>,<span class="string">'Both'</span>,<span class="string">'Both'</span>);
+0283     drawnow;
+0284     <span class="keyword">if</span> strcmpi(PlaneString, <span class="string">'Horizontal'</span>)
+0285         PlaneFlag = 1;
+0286     <span class="keyword">elseif</span> strcmpi(PlaneString, <span class="string">'Vertical'</span>)
+0287         PlaneFlag = 2;
+0288     <span class="keyword">else</span>
+0289         PlaneFlag = 0;
+0290     <span class="keyword">end</span>
+0291 <span class="keyword">end</span>
+0292 
+0293 <span class="keyword">if</span> PlaneFlag == 0
+0294     <span class="comment">%%%%%%%%%%%%%%%</span>
+0295     <span class="comment">% Both Planes %</span>
+0296     <span class="comment">%%%%%%%%%%%%%%%</span>
+0297     
+0298     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0299     <span class="comment">% Get the CM DeviceList %</span>
+0300     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0301     <span class="keyword">if</span> isempty(CMFlag)
+0302         CMFlag = menu(<span class="string">'Which corrector set?'</span>,<span class="keyword">...</span>
+0303             sprintf(<span class="string">'All Corrector Magnets  (%d horizontal, %d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>),1), size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>),1)), <span class="keyword">...</span>
+0304             sprintf(<span class="string">'[1 2 3 4 5 6 7 8]  (%d horizontal, %d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 3 4 5 6 7 8'</span>),1), size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 4 5 7 8'</span>),1)), <span class="keyword">...</span>
+0305             sprintf(<span class="string">'[1  2  7  8]  (%d horizontal, %d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 7 8'</span>),1), size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 7 8'</span>),1)), <span class="keyword">...</span>
+0306             sprintf(<span class="string">'[3x 4 5 6x]  (%d horizontal, %d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'3 4 5 6'</span>),1), size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'4 5'</span>),1)), <span class="keyword">...</span>
+0307             <span class="string">'                   Exit                   '</span>);
+0308         drawnow;
+0309     <span class="keyword">end</span>
+0310     <span class="keyword">if</span> CMFlag == 1
+0311         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>);
+0312         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>);
+0313         EVectors = [1:72];
+0314     <span class="keyword">elseif</span> CMFlag == 2
+0315         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 3 4 5 6 7 8'</span>);
+0316         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 4 5 7 8'</span>);
+0317         EVectors = [1:72];
+0318     <span class="keyword">elseif</span> CMFlag == 3
+0319         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 7 8'</span>);
+0320         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 7 8'</span>);
+0321     <span class="keyword">elseif</span> CMFlag == 4
+0322         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'3 4 5 6'</span>);
+0323         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'4 5'</span>);
+0324     <span class="keyword">else</span>
+0325         disp(<span class="string">'  Orbit correction canceled.'</span>);
+0326         <span class="keyword">return</span>
+0327     <span class="keyword">end</span>
+0328 
+0329     <span class="comment">% Get BPM and CM structures</span>
+0330     CM  = {family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList),  family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList)};
+0331     BPM = {family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, BPMxList), family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, BPMyList)};
+0332       
+0333     <span class="comment">% Remove devices</span>
+0334     <span class="comment">% HCM</span>
+0335     i = findrowindex(RemoveHCMDeviceList, CM{1}.DeviceList); 
+0336     CM{1}.DeviceList(i,:) = [];
+0337     CM{1}.Data(i,:) = [];
+0338     CM{1}.Status(i,:) = [];
+0339 
+0340     <span class="comment">% VCM</span>
+0341     i = findrowindex(RemoveVCMDeviceList, CM{2}.DeviceList); 
+0342     CM{2}.DeviceList(i,:) = [];
+0343     CM{2}.Data(i,:) = [];
+0344     CM{2}.Status(i,:) = [];
+0345 
+0346     <span class="comment">% BPMx and BPMy</span>
+0347     i = findrowindex(RemoveBPMDeviceList, BPM{1}.DeviceList); 
+0348     BPM{1}.DeviceList(i,:) = [];
+0349     BPM{1}.Data(i,:) = [];
+0350     BPM{1}.Status(i,:) = [];
+0351     
+0352     i = findrowindex(RemoveBPMDeviceList, BPM{2}.DeviceList); 
+0353     BPM{2}.DeviceList(i,:) = [];
+0354     BPM{2}.Data(i,:) = [];
+0355     BPM{2}.Status(i,:) = [];
+0356     
+0357     
+0358 <span class="keyword">elseif</span> PlaneFlag == 1
+0359     <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0360     <span class="comment">% Horizontal Only %</span>
+0361     <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0362     
+0363     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0364     <span class="comment">% Get the CM DeviceList %</span>
+0365     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0366     <span class="keyword">if</span> isempty(CMFlag)
+0367         CMFlag = menu(<span class="string">'Which corrector set?'</span>,<span class="keyword">...</span>
+0368             sprintf(<span class="string">'All Corrector Magnets  (%d horizontal)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>),1)), <span class="keyword">...</span>
+0369             sprintf(<span class="string">'[1 2 3 4 5 6 7 8]  (%d horizontal)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 3 4 5 6 7 8'</span>),1)), <span class="keyword">...</span>
+0370             sprintf(<span class="string">'[1  2  7  8]  (%d horizontal)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 7 8'</span>),1)), <span class="keyword">...</span>
+0371             sprintf(<span class="string">'[3 4 5 6]  (%d horizontal)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'3 4 5 6'</span>),1)), <span class="keyword">...</span>
+0372             sprintf(<span class="string">'[3 6]  (%d horizontal)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'3 6'</span>),1)), <span class="keyword">...</span>
+0373             sprintf(<span class="string">'[4 5]  (%d horizontal)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'4 5'</span>),1)), <span class="keyword">...</span>
+0374             <span class="string">'                   Exit                   '</span>);
+0375         drawnow;
+0376     <span class="keyword">end</span>
+0377     <span class="keyword">if</span> CMFlag == 1
+0378         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>);
+0379         EVectors = [1:47];
+0380     <span class="keyword">elseif</span> CMFlag == 2
+0381         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 3 4 5 6 7 8'</span>);
+0382         EVectors = [1:48];
+0383     <span class="keyword">elseif</span> CMFlag == 3
+0384         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'1 2 7 8'</span>);
+0385         EVectors = [1:24];
+0386     <span class="keyword">elseif</span> CMFlag == 4
+0387         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'3 4 5 6'</span>);
+0388         EVectors = [1:24];
+0389     <span class="keyword">elseif</span> CMFlag == 5
+0390         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'3 6'</span>);
+0391         EVectors = [1:12];
+0392     <span class="keyword">elseif</span> CMFlag == 6
+0393         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Horizontal'</span>, <span class="string">'4 5'</span>);
+0394         EVectors = [1:12];
+0395     <span class="keyword">else</span>
+0396         disp(<span class="string">'  Orbit correction canceled.'</span>);
+0397         <span class="keyword">return</span>
+0398     <span class="keyword">end</span>
+0399     
+0400     <span class="comment">% Get BPM and CM structures</span>
+0401     CM  = family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList);
+0402     BPM = family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, BPMxList);
+0403 
+0404     <span class="comment">% Remove devices</span>
+0405     <span class="comment">% HCM</span>
+0406     i = findrowindex(RemoveHCMDeviceList, CM.DeviceList);
+0407     CM.DeviceList(i,:) = [];
+0408     CM.Data(i,:) = [];
+0409     CM.Status(i,:) = [];
+0410 
+0411     <span class="comment">% BPMx</span>
+0412     i = findrowindex(RemoveBPMDeviceList, BPM.DeviceList);
+0413     BPM.DeviceList(i,:) = [];
+0414     BPM.Data(i,:) = [];
+0415     BPM.Status(i,:) = [];
+0416     
+0417 <span class="keyword">elseif</span> PlaneFlag == 2
+0418     <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0419     <span class="comment">% Vertical Only %</span>
+0420     <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0421 
+0422     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0423     <span class="comment">% Get the CM DeviceList %</span>
+0424     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0425     <span class="keyword">if</span> isempty(CMFlag)
+0426         CMFlag = menu(<span class="string">'Which corrector set?'</span>,<span class="keyword">...</span>
+0427             sprintf(<span class="string">'All Corrector Magnets  (%d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>),1)), <span class="keyword">...</span>
+0428             sprintf(<span class="string">'[1 2 4 5 7 8]  (%d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 4 5 7 8'</span>),1)), <span class="keyword">...</span>
+0429             sprintf(<span class="string">'[1  2  7  8]  (%d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 7 8'</span>),1)), <span class="keyword">...</span>
+0430             sprintf(<span class="string">'[4  5]  (%d vertical)'</span>, size(<a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'4 5'</span>),1)), <span class="keyword">...</span>
+0431             <span class="string">'                   Exit                   '</span>);
+0432         drawnow;
+0433     <span class="keyword">end</span>
+0434     <span class="keyword">if</span> CMFlag == 1
+0435         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>);
+0436         EVectors = [1:24];
+0437     <span class="keyword">elseif</span> CMFlag == 2
+0438         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 4 5 7 8'</span>);
+0439         EVectors = [1:48];
+0440     <span class="keyword">elseif</span> CMFlag == 3
+0441         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'1 2 7 8'</span>);
+0442         EVectors = [1:24];
+0443     <span class="keyword">elseif</span> CMFlag == 4
+0444         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'Vertical'</span>, <span class="string">'4 5'</span>);
+0445         EVectors = [1:12];
+0446     <span class="keyword">else</span>
+0447         disp(<span class="string">'  Orbit correction canceled.'</span>);
+0448         <span class="keyword">return</span>
+0449     <span class="keyword">end</span>
+0450 
+0451     <span class="comment">% Get BPM and CM structures</span>
+0452     CM  = family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList);
+0453     BPM = family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, BPMyList);
+0454         
+0455     <span class="comment">% Remove devices</span>
+0456     <span class="comment">% VCM</span>
+0457     i = findrowindex(RemoveVCMDeviceList, CM.DeviceList); 
+0458     CM.DeviceList(i,:) = [];
+0459     CM.Data(i,:) = [];
+0460     CM.Status(i,:) = [];
+0461     
+0462     <span class="comment">% BPMy</span>
+0463     i = findrowindex(RemoveBPMDeviceList, BPM.DeviceList); 
+0464     BPM.DeviceList(i,:) = [];
+0465     BPM.Data(i,:) = [];
+0466     BPM.Status(i,:) = [];    
+0467     
+0468 <span class="keyword">end</span>
+0469 
+0470 
+0471 <span class="comment">% Turn off question</span>
+0472 <span class="keyword">if</span> isempty(ZeroCorrectorsFlag) &amp; (PlaneFlag == 1 || PlaneFlag == 2)
+0473     ZeroCorrectorsFlag = questdlg(<span class="string">'Start from zero corrector strength?'</span>,<span class="string">'SETORBITDEFAULT'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>,<span class="string">'No'</span>);
+0474     drawnow;
+0475     <span class="keyword">switch</span> ZeroCorrectorsFlag
+0476         <span class="keyword">case</span> <span class="string">'Yes'</span>
+0477             ZeroCorrectorsFlag = 1;
+0478         <span class="keyword">case</span> <span class="string">'No'</span>
+0479             ZeroCorrectorsFlag = 0;
+0480         <span class="keyword">otherwise</span>
+0481             ZeroCorrectorsFlag = 0;
+0482     <span class="keyword">end</span>
+0483 <span class="keyword">end</span>
+0484 
+0485 <span class="comment">% Turn off corrector and make the first orbit correction</span>
+0486 <span class="keyword">if</span> ZeroCorrectorsFlag == 1 &amp;&amp; (PlaneFlag == 1 || PlaneFlag == 2)
+0487     <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0488         fprintf(<span class="string">'   Turning off corrector family %s\n'</span>, CM.FamilyName);
+0489     <span class="keyword">end</span>
+0490     
+0491     <span class="keyword">if</span> strcmp(CM.FamilyName,<span class="string">'VCM'</span>)
+0492         FractionOff = 0.30;
+0493         fprintf(<span class="string">'  Vertical correctors set to %.1f%% of nominal\n'</span>, 100*FractionOff);
+0494     <span class="keyword">else</span>
+0495         FractionOff = 0;
+0496     <span class="keyword">end</span>
+0497 
+0498     <a href="turnoff.html" class="code" title="function turnoff(Family, DeviceList, FractionOff)">turnoff</a>(CM.FamilyName, CM.DeviceList, FractionOff);
+0499     
+0500     [N, BPMDelay] = <a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>;
+0501     BPMDelay = 1.5*2.2*BPMDelay;
+0502     <span class="keyword">if</span> ~isempty(BPMDelay)
+0503         sleep(BPMDelay);
+0504     <span class="keyword">end</span>
+0505     
+0506     <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0507         fprintf(<span class="string">'   Applying 50%% of the correction before doing a full correction.\n'</span>);
+0508     <span class="keyword">end</span>
+0509     [OCS, RF, OCS0, RF0] = setorbit(<span class="string">'Golden'</span>, <span class="string">'NoSetSP'</span>, BPM, CM, 1, EVectors, DisplayFlag, OCSFlags{:});
+0510     drawnow;
+0511     DeltaCM = OCS.CM.Data - OCS0.CM.Data;
+0512     stepsp(OCS.CM.FamilyName, .25*DeltaCM, OCS.CM.DeviceList, -1);
+0513     stepsp(OCS.CM.FamilyName, .50*DeltaCM, OCS.CM.DeviceList, -2);
+0514 <span class="keyword">else</span>
+0515     <span class="keyword">if</span> ZeroCorrectorsFlag == 1
+0516         fprintf(<span class="string">'   Correctors can start from zero only for single plane correction.\n'</span>);
+0517     <span class="keyword">end</span>
+0518 <span class="keyword">end</span>
+0519 
+0520 
+0521 
+0522 <span class="comment">% Corrector orbit</span>
+0523 [OCS, RF, OCS0, RF0] = setorbit(GoalOrbit, BPM, CM, Iters, EVectors, DisplayFlag, OCSFlags{:});
+0524 
+0525 
+0526 
+0527 <span class="comment">% HCM Chicane correction</span>
+0528 <span class="comment">%setorbit('Golden', 'BPMx', getbpmlist('2 3 4 5 6 7 8 9'), 'HCM', [10 8;11 1], 1, [1 2], 'Display');</span>
+0529 <span class="comment">%setorbit('Golden', 'BPMx', getbpmlist('2 3 4 5 6 7 8 9'), 'HCM', [6 1], 1, [1 ], 'Display');</span>
+0530 
+0531</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

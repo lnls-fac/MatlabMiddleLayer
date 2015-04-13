@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of siglabgetpbpmcompare</title>
+  <meta name="keywords" content="siglabgetpbpmcompare">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; siglabgetpbpmcompare.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>siglabgetpbpmcompare
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 clear
+0002 fn = input(<span class="string">'  Input file name (no extension): '</span>,<span class="string">'s'</span>);
+0003 <span class="comment">% Time domain slow data capture, 4 channels</span>
+0004 
+0005 
+0006 <span class="comment">% Setup</span>
+0007 Iter = 50000;             <span class="comment">% Loop iterations</span>
+0008 NumBlk = 10;              <span class="comment">% Data array size</span>
+0009 LoopDelay = 20.4;           <span class="comment">% Loop delay in seconds</span>
+0010 BandWidth = 500;
+0011 NumAvg = 1;
+0012 ChannelVec = [1 2 3 4];
+0013 block_size = 4096;       <span class="comment">% Time domain block (must be a power of 2) 512, 1024, 2048, 4096, 8192</span>
+0014 Sclock= 51200;           <span class="comment">% always use 51200 for 20-22</span>
+0015 
+0016 
+0017 <span class="comment">% Initialize DSP, siglab.out is stored in the vbin subdirectory</span>
+0018 [drive, ppath] = pathfind(<span class="string">'vbin'</span>);
+0019 [In, Out, BW, Ver] = siglab(<span class="string">'IOinit'</span>,[drive,ppath,<span class="string">'\siglab.out'</span>]);
+0020 
+0021 
+0022 <span class="comment">% Create output signal</span>
+0023 Ochan=1;
+0024 OutLevel=1.9;
+0025 siglab(<span class="string">'outsine'</span>,1,10);
+0026 siglab(<span class="string">'OutLevel'</span>,Ochan,OutLevel,<span class="string">'Offset'</span>,0);
+0027 
+0028 
+0029 <span class="comment">% Input setup</span>
+0030 Dfac = siglab(<span class="string">'InpSet'</span>, ChannelVec,block_size,<span class="string">'Sclock'</span>,Sclock,<span class="string">'Cfreq'</span>,0,<span class="string">'BW'</span>,BandWidth,<span class="string">'Filt'</span>,<span class="string">'Overlap'</span>,0);
+0031 siglab(<span class="string">'InpGain'</span>,ChannelVec,10,<span class="string">'Offset'</span>,0,<span class="string">'DC'</span>,<span class="string">'Diff'</span>);              <span class="comment">% set to maxrange,  Diff???????</span>
+0032 siglab(<span class="string">'Trigger'</span>,ChannelVec,<span class="string">'FreeRun'</span>,<span class="string">'AutoArm'</span>);
+0033 <span class="comment">%siglab('Process',ChannelVec,'Add',NumAvg,'Window',WindowType);</span>
+0034 
+0035 
+0036 <span class="comment">% Effective bandwidth = Sclock/(2.56*Dfac)</span>
+0037 <span class="comment">% Sampling freq = Sclock/Dfac = 2.56*bandwidth</span>
+0038 BW_eff = Sclock/(2.56*Dfac);        <span class="comment">% Bandwidth</span>
+0039 Fs = Sclock/Dfac;                   <span class="comment">% Sampling frequency</span>
+0040 t = (0:block_size-1)/Fs;            <span class="comment">% Time vector</span>
+0041 T = block_size/Fs;                  <span class="comment">% Time buffer length</span>
+0042 f1 = 1/T;                           <span class="comment">% First harmonic [Hz]</span>
+0043 N_Freq = floor(block_size/2.56)+1;  <span class="comment">% Number of PSD points</span>
+0044 fvec = f1*(0:N_Freq-1)';
+0045 
+0046 
+0047 <span class="comment">% Output info</span>
+0048 fprintf(<span class="string">'  Bandwidth = %f Hz (Effective BW = %f)\n'</span>, BandWidth, BW_eff);
+0049 fprintf(<span class="string">'  Sampling Frequency = %f Hz \n'</span>, Fs);
+0050 fprintf(<span class="string">'  Number of Data Points = %d points \n'</span>, block_size);
+0051 fprintf(<span class="string">'  Time Record Length = %f Seconds \n'</span>, T);
+0052 fprintf(<span class="string">'  First harmonic = %f Hz \n'</span>, f1);
+0053 fprintf(<span class="string">'  Number of Averages = %d \n\n'</span>, NumAvg);
+0054 
+0055 
+0056 <span class="comment">% Clear out any previous pending requests</span>
+0057 MAXSLOTc = 10;
+0058 <span class="keyword">for</span> i=0:MAXSLOTc
+0059     <span class="keyword">if</span> siglab(<span class="string">'DataRdy'</span>,i) &gt;= 0
+0060         disp([<span class="string">'  Aborting request id:'</span>,num2str(i)]);
+0061         siglab(<span class="string">'DataAbort'</span>,i);
+0062     <span class="keyword">end</span>;
+0063 <span class="keyword">end</span>;
+0064 
+0065 Gain1 = 1/1.2;
+0066 Gain2 = 1/.64;
+0067 
+0068 iFile = 0;
+0069 <span class="keyword">for</span> ii = 1:Iter
+0070 
+0071     <span class="comment">% Main loop</span>
+0072     t00=clock;
+0073     <span class="keyword">for</span> i=1:NumBlk
+0074         c = clock;
+0075         fprintf(<span class="string">'  Trigger time is %d:%d:%.2f\n'</span>, c(4),c(5),c(6));
+0076 
+0077         ReqIDtime=siglab(<span class="string">'DataReq'</span>,block_size,ChannelVec,<span class="string">'TimeI'</span>,<span class="string">'First'</span>,0,<span class="string">'NoWait'</span>);
+0078         t0 = clock;
+0079 
+0080         <span class="comment">%siglab('compute',ChannelVec);</span>
+0081         <span class="comment">%siglab('event',ChannelVec,'AvgStart');</span>
+0082         <span class="comment">%siglab('event',ChannelVec,'AvgWait');   % hold off sending data over SCSI till averaging is complete</span>
+0083         <span class="comment">%ReqIDfreq = siglab('DataReq',block_size/2.56+1,ChannelVec,'AspecA','First',0,'NoWait');</span>
+0084 
+0085         Rdy = siglab(<span class="string">'DataRdy'</span>,ReqIDtime);
+0086         <span class="keyword">while</span>  Rdy &lt; 1
+0087             <span class="comment">%fprintf('  Waiting for data, T = %f.\n',etime(clock,t0));</span>
+0088             <span class="keyword">if</span> etime(clock,t0) &gt; 10*T
+0089                 fprintf(<span class="string">'  Time-out waiting for time domain DataRdy.\n'</span>);
+0090                 siglab(<span class="string">'DataAbort'</span>,ReqIDtime);
+0091                 <span class="keyword">return</span>
+0092             <span class="keyword">end</span>
+0093             Rdy = siglab(<span class="string">'DataRdy'</span>,ReqIDtime);
+0094         <span class="keyword">end</span>;   <span class="comment">% wait for data</span>
+0095         fprintf(<span class="string">'  Time domain data ready, T = %.3f, Rdy = %d\n'</span>, etime(clock,t00), Rdy);
+0096         [Data,ovld(i), seq, header]=siglab(<span class="string">'DataGet'</span>,ReqIDtime);
+0097         d1(:,i) = Data(:,1);
+0098         d2(:,i) = Data(:,2);
+0099         d3(:,i) = Data(:,3);
+0100         d4(:,i) = Data(:,4);
+0101 
+0102         
+0103         <span class="comment">% Vertical pBPM position</span>
+0104         y1(:,i) = (d1(:,i) - d3(:,i)) ./ (d1(:,i) + d3(:,i));
+0105         y1(:,i) = Gain1 * y1(:,i);
+0106 
+0107         
+0108         scaput(<span class="string">'Physics1'</span>, mean(d1(:,i)));  <span class="comment">% pBPM top inside voltage</span>
+0109         scaput(<span class="string">'Physics2'</span>, mean(d2(:,i)));  <span class="comment">% BPMx(7,5) average position</span>
+0110         scaput(<span class="string">'Physics3'</span>, mean(d3(:,i)));  <span class="comment">% pBPM bottom inside voltage</span>
+0111         scaput(<span class="string">'Physics4'</span>, mean(d4(:,i)));  <span class="comment">% BPMy(7,6) average position</span>
+0112         scaput(<span class="string">'Physics5'</span>, mean(y1(:,i)));  <span class="comment">% pBPM inside average position &quot;mm&quot;</span>
+0113         scaput(<span class="string">'Physics6'</span>, 0);
+0114         scaput(<span class="string">'Physics7'</span>, 0);
+0115         scaput(<span class="string">'Physics8'</span>, 0);
+0116         scaput(<span class="string">'Physics9'</span>, 0);
+0117         scaput(<span class="string">'Physics10'</span>,0);
+0118         
+0119          pause(.5);
+0120     <span class="keyword">end</span>
+0121 
+0122     TimeClock = clock;
+0123     siglab(<span class="string">'DataAbort'</span>,ReqIDtime);
+0124     <span class="comment">%siglab('DataAbort',ReqIDfreq);</span>
+0125 
+0126     c = TimeClock;
+0127 
+0128 
+0129     figure(1)
+0130     subplot(2,2,1);
+0131     plot(t, d1(:,1));
+0132     title(sprintf(<span class="string">'Time Series  %d Points (%d:%d:%.2f)'</span>,block_size, c(4),c(5),c(6)));
+0133     ylabel(<span class="string">'Blade 1, Top Inside [Volts]'</span>);
+0134     xlabel(<span class="string">'Time [Seconds]'</span>);
+0135     axis tight
+0136 
+0137     subplot(2,2,2);
+0138     plot(t, d2(:,1));
+0139     ylabel(<span class="string">'BPMy(7,5) [mm]'</span>);
+0140     title(sprintf(<span class="string">'Time Series  %d Points (%d:%d:%.2f)'</span>,block_size, c(4),c(5),c(6)));
+0141     xlabel(<span class="string">'Time [Seconds]'</span>);
+0142     axis tight
+0143 
+0144     subplot(2,2,3);
+0145     plot(t, d3(:,1));
+0146     title(sprintf(<span class="string">'Time Series  %d Points (%d:%d:%.2f)'</span>,block_size, c(4),c(5),c(6)));
+0147     ylabel(<span class="string">'Blade 3, Bottom Inside [Volts]'</span>);
+0148     xlabel(<span class="string">'Time [Seconds]'</span>);
+0149     axis tight
+0150 
+0151     subplot(2,2,4);
+0152     plot(t, d4(:,1));
+0153     title(sprintf(<span class="string">'Time Series  %d Points (%d:%d:%.2f)'</span>,block_size, c(4),c(5),c(6)));
+0154     ylabel(<span class="string">'BPMy(7,6) [mm]'</span>);
+0155     xlabel(<span class="string">'Time [Seconds]'</span>);
+0156     axis tight
+0157 
+0158 
+0159     N = block_size;
+0160     DCCT = getdcct;
+0161     <span class="keyword">if</span> mod(ii,20) == 1 &amp; DCCT &gt; 1
+0162         iFile = iFile + 1;
+0163         fprintf(<span class="string">'   Saving data to %s\n'</span>, [fn, num2str(iFile)]);
+0164         eval([<span class="string">'save '</span>,fn, num2str(iFile),<span class="string">' DCCT TimeClock Fs BandWidth BW_eff NumAvg LoopDelay N Dfac d1 d2 d3 d4'</span>]);
+0165         <span class="comment">%eval(['save ',fn, num2str(iFile),' DCCT TimeClock f1 Fs Fd1 Fd2 Fd3 Fd4 BandWidth BW_eff NumAvg LoopDelay WindowType block_size Uwindow Dfac Sclock d1 d2 d3 d4']);</span>
+0166     <span class="keyword">end</span>
+0167 
+0168     <span class="comment">%fprintf('  POWER SPECTRUM DATA, %d Points (%d:%d:%.2f)\n',block_size, c(4),c(5),c(6));</span>
+0169     <span class="comment">%fprintf('  %d. RMS = %.4f  Ch 1 (PSD computed from time series, mean, f(1) &amp; f(2) removed)\n', ii, sqrt(sum(Paa(3:end))/N));</span>
+0170     <span class="comment">%fprintf('  %d. RMS = %.4f  Ch 1 (time series data, mean removed)\n', ii, std(data-mean(data)));</span>
+0171     <span class="comment">%fprintf('  %d. RMS = %.4f  Ch 1 (Siglab PSD data, mean, f(1) &amp; f(2) removed)\n', ii, sqrt(sum(Fd1(3:end,1))*Uwindow));</span>
+0172     <span class="comment">%fprintf('  %d. RMS = %.4f  Ch 2 (Siglab PSD data, mean, f(1) &amp; f(2) removed)\n', ii, sqrt(sum(Fd2(3:end,1))*Uwindow));</span>
+0173     <span class="comment">%fprintf('  %d. RMS = %.4f  Ch 3 (Siglab PSD data, mean, f(1) &amp; f(2) removed)\n', ii, sqrt(sum(Fd3(3:end,1))*Uwindow));</span>
+0174     <span class="comment">%fprintf('  %d. RMS = %.4f  Ch 4 (Siglab PSD data, mean, f(1) &amp; f(2) removed)\n', ii, sqrt(sum(Fd4(3:end,1))*Uwindow));</span>
+0175     <span class="comment">%fprintf('  Data saved to %s.mat\n  DCCT=%.1f mAmps\n\n', [fn, num2str(ii)],DCCT);</span>
+0176     
+0177     
+0178     <span class="keyword">if</span> ii &lt; Iter
+0179         pause(LoopDelay);
+0180     <span class="keyword">end</span>
+0181 
+0182     drawnow
+0183 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

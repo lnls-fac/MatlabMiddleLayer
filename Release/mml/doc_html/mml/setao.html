@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setao</title>
+  <meta name="keywords" content="setao">
+  <meta name="description" content="SETAO - Set the MML Accelerator Object (AO)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setao.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setao
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETAO - Set the MML Accelerator Object (AO)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function  setao(AO) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETAO - Set the MML Accelerator Object (AO)
+  setao(AO)
+  setao(FileName)
+  setao('') to browse for a file
+
+  INPUTS
+  1. AO - Accelerator Object structure or a filename where one is stored
+
+  See also <a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>, <a href="setad.html" class="code" title="function  setad(AD)">setad</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="setad.html" class="code" title="function  setad(AD)">setad</a>	SETAD - Sets the MML AcceleratorData cell array to appdata</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="addaoprefix.html" class="code" title="function addAOprefix(prefix)">addaoprefix</a>	ADDAOPREFIX - Add a prefix to all AcceleratorObjects PV names</li><li><a href="aokeep.html" class="code" title="function  NEWAO = aokeep(KEEPLIST,varargin)">aokeep</a>	AOKEEP - Removes families from the Accelerator Families except those included in KEEPLIST</li><li><a href="loadao.html" class="code" title="function  FileName = loadao(FileName)">loadao</a>	LOADAO - Loads the AO and AD from a .mat file</li><li><a href="setfamilydata.html" class="code" title="function setfamilydata(Data, Family, Field1, Field2, DeviceList)">setfamilydata</a>	SETFAMILYDATA - Sets data associated with accelerator control</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function  setao(AO)</a>
+0002 <span class="comment">%SETAO - Set the MML Accelerator Object (AO)</span>
+0003 <span class="comment">%  setao(AO)</span>
+0004 <span class="comment">%  setao(FileName)</span>
+0005 <span class="comment">%  setao('') to browse for a file</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS</span>
+0008 <span class="comment">%  1. AO - Accelerator Object structure or a filename where one is stored</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  See also getao, setad</span>
+0011 
+0012 <span class="keyword">if</span> nargin &lt; 1
+0013     AO = <span class="string">''</span>;
+0014 <span class="keyword">end</span>
+0015 
+0016 <span class="comment">% Browse for filename and directory if using default FileName</span>
+0017 <span class="keyword">if</span> ischar(AO)
+0018     <span class="keyword">if</span> isempty(AO)
+0019         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'OpsData'</span>);
+0020         [FileName, DirectoryName] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select the desired mode file:'</span>, DirectoryName);
+0021         <span class="keyword">if</span> FileName == 0
+0022             fprintf(<span class="string">'   AO not changed\n'</span>);
+0023             <span class="keyword">return</span>
+0024         <span class="keyword">end</span>
+0025         
+0026         FileName = [DirectoryName FileName];
+0027     <span class="keyword">else</span>
+0028         FileName = AO;
+0029     <span class="keyword">end</span>
+0030     
+0031     <span class="keyword">try</span>
+0032         load(FileName);
+0033     <span class="keyword">catch</span>
+0034         <span class="keyword">try</span>
+0035             feval(FileName);
+0036         <span class="keyword">catch</span>
+0037             error(sprintf(<span class="string">'Could not load or feval %s'</span>,FileName));
+0038         <span class="keyword">end</span>
+0039     <span class="keyword">end</span>
+0040     
+0041     <span class="keyword">if</span> exist(<span class="string">'AcceleratorObjects'</span>,<span class="string">'var'</span>)
+0042         AO = AcceleratorObjects;
+0043     <span class="keyword">end</span>
+0044     <span class="keyword">if</span> exist(<span class="string">'AcceleratorData'</span>,<span class="string">'var'</span>)
+0045         AD = AcceleratorData;
+0046     <span class="keyword">end</span>
+0047     
+0048     <span class="keyword">if</span> exist(<span class="string">'AD'</span>,<span class="string">'var'</span>)
+0049         <span class="comment">%tmp = questdlg('Do you want to make the AD variable in this file active as well?','Accelerator Data (AD)','YES','NO','YES');</span>
+0050         <span class="comment">%if strcmp(tmp,'YES')</span>
+0051         <a href="setad.html" class="code" title="function  setad(AD)">setad</a>(AD);
+0052         <span class="comment">%end</span>
+0053     <span class="keyword">end</span>
+0054     
+0055     <span class="keyword">if</span> ~exist(<span class="string">'AO'</span>,<span class="string">'var'</span>)
+0056         fprintf(<span class="string">'   AO or AcceleratorObjects variable does not exist in the file: %s\n'</span>, [DirectoryName FileName]);
+0057         <span class="keyword">return</span>
+0058     <span class="keyword">end</span>
+0059 <span class="keyword">end</span>
+0060 
+0061 
+0062 <span class="keyword">if</span> iscell(AO)
+0063     AO = cell2field(AO);
+0064 <span class="keyword">end</span>
+0065 
+0066 setappdata(0, <span class="string">'AcceleratorObjects'</span>, AO);
+0067</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

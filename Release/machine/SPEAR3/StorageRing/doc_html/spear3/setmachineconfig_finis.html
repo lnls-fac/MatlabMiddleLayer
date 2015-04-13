@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setmachineconfig_finis</title>
+  <meta name="keywords" content="setmachineconfig_finis">
+  <meta name="description" content="setmachineconfig_finis">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; setmachineconfig_finis.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setmachineconfig_finis
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>setmachineconfig_finis</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  setmachineconfig_finis
+  additional instructions after setoperationalmode
+  NOTE: this program is a script (not a function) to inherit variables from setoperationalmode
+
+
+  update setpoints on correctors used for SPEAR 3 beamline feed forward system 
+  Setpoint = ConfigSetpoint.HCMCurrReference.Setpoint + delta(CurrReference)
+    where delta(CurrReference) = CurrReference(now)  CurrReference(config)
+
+   CurrReference(now) are the present CurrReference values in the ioc's
+   CurrReference(config) are the CurrReference values stored in ConfigMonitor
+
+   for further documentation see /machine/spear3/docs/setconfig_feedforward_code.doc
+
+   J. Corbett   May 17, 2006</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%  setmachineconfig_finis</span>
+0002 <span class="comment">%  additional instructions after setoperationalmode</span>
+0003 <span class="comment">%  NOTE: this program is a script (not a function) to inherit variables from setoperationalmode</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  update setpoints on correctors used for SPEAR 3 beamline feed forward system</span>
+0007 <span class="comment">%  Setpoint = ConfigSetpoint.HCMCurrReference.Setpoint + delta(CurrReference)</span>
+0008 <span class="comment">%    where delta(CurrReference) = CurrReference(now)  CurrReference(config)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   CurrReference(now) are the present CurrReference values in the ioc's</span>
+0011 <span class="comment">%   CurrReference(config) are the CurrReference values stored in ConfigMonitor</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   for further documentation see /machine/spear3/docs/setconfig_feedforward_code.doc</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%   J. Corbett   May 17, 2006</span>
+0016 
+0017 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0018 <span class="comment">%%%        Update Setpoints for CurrReference            %%%</span>
+0019 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0020 disp(<span class="string">'   Begin setmachineconfig_finis...'</span>)
+0021 ao=getao;
+0022 <span class="keyword">if</span> isfield(ao,<span class="string">'HCMCurrReference'</span>) &amp; isfield(ao,<span class="string">'VCMCurrReference'</span>)&amp; isfield(ConfigMonitor,<span class="string">'HCMCurrReference'</span>)&amp; isfield(ConfigMonitor,<span class="string">'VCMCurrReference'</span>) 
+0023 disp(<span class="string">'   Setting Horizontal and Vertical Corrector CurrReference values...'</span>)
+0024 <span class="comment">% HCM's</span>
+0025 <span class="comment">% acquire HCM setpoint values</span>
+0026 HCMSPData=getsp(<span class="string">'HCM'</span>,getlist(<span class="string">'HCMCurrReference'</span>));
+0027 <span class="comment">% acquire present CurrReference values (note: AO.HCMCurrReference.Monitor.ChannelNames contains Setpoint pv's)</span>
+0028 HCMCRData_now=getam(<span class="string">'HCMCurrReference'</span>);
+0029 <span class="comment">% extract CurrReference values from configuration file</span>
+0030 HCMCRData_cnf=ConfigMonitor.HCMCurrReference.Monitor.Data;
+0031 <span class="comment">% calculate new HCM setpoint</span>
+0032 Setpoint(:,1)=HCMSPData + HCMCRData_now - HCMCRData_cnf;
+0033 
+0034 <span class="comment">% VCM's</span>
+0035 <span class="comment">% acquire VCM setpoint values</span>
+0036 VCMSPData=getsp(<span class="string">'VCM'</span>,getlist(<span class="string">'VCMCurrReference'</span>));
+0037 <span class="comment">% acquire present CurrReference values (note: AO.VCMCurrReference.Monitor.ChannelNames contains Setpoint pv's)</span>
+0038 VCMCRData_now=getam(<span class="string">'VCMCurrReference'</span>);
+0039 <span class="comment">% extract CurrReference values from configuration file</span>
+0040 VCMCRData_cnf=ConfigMonitor.VCMCurrReference.Monitor.Data;
+0041 <span class="comment">% calculate new HCM setpoint</span>
+0042 Setpoint(:,2)=VCMSPData + VCMCRData_now - VCMCRData_cnf;
+0043 
+0044 <span class="comment">%update correctors for CurrReference values</span>
+0045 familynames={<span class="string">'HCM'</span> <span class="string">'VCM'</span>};
+0046 devlistnames={<span class="string">'HCMCurrReference'</span> <span class="string">'VCMCurrReference'</span>};
+0047 
+0048 <span class="comment">% Make the setpoint change w/o a WaitFlag</span>
+0049 <span class="keyword">for</span> k = 1:size(familynames,2)
+0050     <span class="keyword">try</span>
+0051         <span class="keyword">if</span> DisplayFlag 
+0052             Time = clock;
+0053             <span class="comment">%fprintf('   Setting family %s (%s %d:%d:%.2f)\n', familynames{k}, datestr(clock,1), Time(4), Time(5), Time(6));</span>
+0054             fprintf(<span class="string">'   %s %d:%d:%.2f Setting family %s.%s\n'</span>, datestr(clock,1), Time(4), Time(5), Time(6), familynames{k}, <span class="string">'Setpoint'</span>);
+0055             drawnow;
+0056         <span class="keyword">end</span>
+0057         disp(<span class="string">'   Updating corrector values to compensate CurrReference without wait flag'</span>)
+0058         setpv(familynames{k},<span class="string">'Setpoint'</span>, Setpoint(:,k), getlist(devlistnames{k}), 0, InputFlags{:});
+0059     <span class="keyword">catch</span>
+0060         fprintf(<span class="string">'%s\n'</span>, lasterr)
+0061         fprintf(<span class="string">'Trouble with setpv(''%s'',''%s''), hence ignored (setmachineconfig_currref)\n'</span>, familynames{k}, <span class="string">'Setpoint'</span>);
+0062     <span class="keyword">end</span>
+0063 <span class="keyword">end</span>
+0064 
+0065 
+0066 <span class="comment">% Make the setpoint change with a WaitFlag</span>
+0067 <span class="keyword">if</span> WaitFlag ~= 0 
+0068     <span class="keyword">try</span>
+0069         <span class="keyword">if</span> DisplayFlag 
+0070             fprintf(<span class="string">'   Waiting for Setpoint-Monitor to be within tolerance\n'</span>);
+0071             drawnow;
+0072         <span class="keyword">end</span>
+0073         <span class="keyword">for</span> k = 1:2
+0074             <span class="keyword">try</span>
+0075                 disp(<span class="string">'   Updating corrector values for CurrReference with wait flag'</span>)
+0076                 setpv(familynames{k},<span class="string">'Setpoint'</span>,Setpoint(:,k),getlist(devlistnames{k}), WaitFlag, InputFlags{:});
+0077             <span class="keyword">end</span>
+0078         <span class="keyword">end</span>
+0079         <span class="keyword">if</span> DisplayFlag 
+0080             Time = clock;
+0081             fprintf(<span class="string">'   %s %d:%d:%.2f CurrReference update complete (setmachineconfig_finis)\n\n'</span>, datestr(clock,1), Time(4), Time(5), Time(6));
+0082             drawnow;
+0083         <span class="keyword">end</span>
+0084     <span class="keyword">catch</span>
+0085         fprintf(<span class="string">'%s\n'</span>, lasterr)
+0086         fprintf(<span class="string">'Error occurred waiting for Setpoint-Monitor comparison in setmachineconfig_finis.\n'</span>);
+0087         fprintf(<span class="string">'Lattice is in an unknown state! (setmachineconfig_finis)\n\n'</span>);
+0088     <span class="keyword">end</span>
+0089 <span class="keyword">end</span>
+0090 
+0091 <span class="keyword">end</span>  <span class="comment">%end condition CurrReference Families exist in AO and in configuration</span>
+0092 
+0093 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0094 <span class="comment">%%%              IDTrims               %%%</span>
+0095 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0096 <span class="comment">%replace IDTrim setpoints with value in found in CurrReference</span>
+0097 <span class="comment">%NOTE: IDTrim setpoints are</span>
+0098 <span class="keyword">if</span> isfield(ao,<span class="string">'IDTrim'</span>) &amp; isfield(ConfigMonitor,<span class="string">'IDTrim'</span>)
+0099 disp(<span class="string">'   Setting IDTrim values...'</span>)
+0100 <span class="keyword">try</span>
+0101         IDTrimCurrRef=getpv(<span class="string">'IDTrim'</span>,<span class="string">'CurrRef'</span>);
+0102         setpv(<span class="string">'IDTrim'</span>,<span class="string">'SetpointName'</span>,IDTrimCurrRef);
+0103 <span class="keyword">catch</span>
+0104         fprintf(<span class="string">'%s\n'</span>, lasterr)
+0105         fprintf(<span class="string">'Error occurred trying to update ID Trims in setmachineconfig_currref.\n'</span>);
+0106         fprintf(<span class="string">'Lattice is in an unknown state! (setmachineconfig_currref)\n\n'</span>);
+0107 <span class="keyword">end</span>
+0108 <span class="keyword">end</span>
+0109 
+0110 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0111 <span class="comment">%%%         Load Setpoint into Des Fields             %%%</span>
+0112 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0113 <span class="comment">% % Make the setpoint change w/o a WaitFlag</span>
+0114 <span class="keyword">if</span> ~isempty(strfind(FileName,<span class="string">'GoldenConfig'</span>))
+0115     disp(<span class="string">'   *** GoldenConfig: Desired fields will be updated to Setpoint values...'</span>)
+0116  <span class="keyword">for</span> k = 1:length(SPcell)
+0117     <span class="keyword">if</span> isfield(ao.(SPcell{k}.FamilyName),<span class="string">'Desired'</span>)   <span class="comment">%look to see if family has 'Desired' field</span>
+0118         SPcell{k}.Field=<span class="string">'Desired'</span>;                    <span class="comment">%make 'Desired' the field to set. Don't need to update channelnames</span>
+0119      <span class="keyword">try</span>
+0120          <span class="keyword">if</span> DisplayFlag 
+0121              Time = clock;
+0122              <span class="comment">%fprintf('   Setting family %s (%s %d:%d:%.2f)\n', SPcell{k}.FamilyName, datestr(clock,1), Time(4), Time(5), Time(6));</span>
+0123              fprintf(<span class="string">'   %s %d:%d:%.2f Setting family %s.%s\n'</span>, datestr(clock,1), Time(4), Time(5), Time(6), SPcell{k}.FamilyName, SPcell{k}.Field);
+0124              drawnow;
+0125          <span class="keyword">end</span>
+0126          setpv(SPcell{k}, 0, InputFlags{:});
+0127      <span class="keyword">catch</span>
+0128          fprintf(<span class="string">'%s\n'</span>, lasterr)
+0129          fprintf(<span class="string">'Trouble with setpv(''%s'',''%s''), hence ignored (setmachineconfig)\n'</span>, SPcell{k}.FamilyName, SPcell{k}.Field);
+0130      <span class="keyword">end</span>
+0131     <span class="keyword">end</span>  <span class="comment">%end condition on Desired in AO Family</span>
+0132 <span class="keyword">end</span>   <span class="comment">%end for loop</span>
+0133 <span class="keyword">end</span> <span class="comment">%end GoldenConfig condition</span>
+0134 
+0135</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

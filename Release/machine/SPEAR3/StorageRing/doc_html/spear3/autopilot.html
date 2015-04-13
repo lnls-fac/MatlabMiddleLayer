@@ -1,0 +1,649 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of autopilot</title>
+  <meta name="keywords" content="autopilot">
+  <meta name="description" content="=============================================================">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; autopilot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>autopilot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>=============================================================</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function autopilot(action,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">=============================================================
+ Auto Pilot Automated bucket selection software
+
+ This routine automatically cycles through the current fill
+ pattern at 5 Hz.  Option to reset to 1st bucket when 96mA
+ SPEAR current is stored (for &quot;mondo&quot; bucket)
+                                           -Leif 23DEC2002
+ General clean-up of code.  Added option to have Buck-o-mat
+ run LTB B1 magnet to zero when SPEAR current reaches 100mA.
+                                           -Leif 19FEB2003
+ Modified timer to switch only when ~1mA has been added to
+ any given bucket.  Attempt to get cleaner fill pattern.
+ This comment added late (21JULY2003).
+                                           -Leif 20MAR2003
+=============================================================</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="screensizecm.html" class="code" title="function varargout = screensizecm">screensizecm</a>	==========================================================</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function injectslider_Callback(object,eventdata)</a></li><li><a href="#_sub2" class="code">function injectvalue_Callback(object,eventdata)</a></li><li><a href="#_sub3" class="code">function shutoffslider_Callback(object,eventdata)</a></li><li><a href="#_sub4" class="code">function shutoffvalue_Callback(object,eventdata)</a></li><li><a href="#_sub5" class="code">function bunchslider_Callback(object,eventdata)</a></li><li><a href="#_sub6" class="code">function bunchvalue_Callback(object,eventdata)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function autopilot(action,varargin)</a>
+0002 
+0003 <span class="comment">%=============================================================</span>
+0004 <span class="comment">% Auto Pilot Automated bucket selection software</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% This routine automatically cycles through the current fill</span>
+0007 <span class="comment">% pattern at 5 Hz.  Option to reset to 1st bucket when 96mA</span>
+0008 <span class="comment">% SPEAR current is stored (for &quot;mondo&quot; bucket)</span>
+0009 <span class="comment">%                                           -Leif 23DEC2002</span>
+0010 <span class="comment">% General clean-up of code.  Added option to have Buck-o-mat</span>
+0011 <span class="comment">% run LTB B1 magnet to zero when SPEAR current reaches 100mA.</span>
+0012 <span class="comment">%                                           -Leif 19FEB2003</span>
+0013 <span class="comment">% Modified timer to switch only when ~1mA has been added to</span>
+0014 <span class="comment">% any given bucket.  Attempt to get cleaner fill pattern.</span>
+0015 <span class="comment">% This comment added late (21JULY2003).</span>
+0016 <span class="comment">%                                           -Leif 20MAR2003</span>
+0017 <span class="comment">%=============================================================</span>
+0018 
+0019 <span class="comment">%**********************</span>
+0020 <span class="comment">%build graphics and initiate bucket filling</span>
+0021 <span class="comment">%switchyard construction for button controls</span>
+0022 <span class="comment">%retrieve timer from appdata every time function entered</span>
+0023 <span class="comment">%**********************</span>
+0024 
+0025 <span class="comment">%check to see if autopilot panel exists</span>
+0026 h=findobj(0,<span class="string">'tag'</span>,<span class="string">'autopilot'</span>);
+0027 <span class="keyword">if</span> ~isempty(h)
+0028     autopilottimer=getappdata(h,<span class="string">'autopilotTimer'</span>);
+0029     autopilotSYS=getappdata(h,<span class="string">'SystemParameters'</span>);
+0030     autopilotCTRL=getappdata(h,<span class="string">'SystemControl'</span>);
+0031 <span class="keyword">end</span>
+0032 
+0033 <span class="comment">%-----------------------------------------------------------------</span>
+0034 <span class="comment">% Initialize if no input arguement</span>
+0035 <span class="comment">%-----------------------------------------------------------------</span>
+0036 <span class="keyword">if</span> nargin==0
+0037     
+0038     <span class="comment">%check to see if autopilot timer already running</span>
+0039     t=timerfind(<span class="string">'Tag'</span>,<span class="string">'autopilottimer'</span>);    
+0040       <span class="keyword">if</span> ~isempty(t)
+0041         <span class="keyword">if</span> strcmp(t.Running,<span class="string">'on'</span>);
+0042         ts = datestr(now,0);
+0043         msgbox([ts <span class="string">': Warning - autopilot Already Active'</span>],<span class="string">'Error Message'</span>,<span class="string">'error'</span>);
+0044         <span class="keyword">return</span>
+0045         <span class="keyword">end</span>
+0046       <span class="keyword">end</span>
+0047     
+0048       
+0049 <span class="comment">%----------------------------------------------------------------</span>
+0050 <span class="comment">%  create initial figure</span>
+0051 <span class="comment">%----------------------------------------------------------------</span>
+0052     h = findobj(0,<span class="string">'tag'</span>,<span class="string">'autopilot'</span>);  
+0053     <span class="keyword">if</span> ~isempty(h) 
+0054         delete(h); 
+0055     <span class="keyword">end</span>
+0056     [screen_wide, screen_high]=<a href="screensizecm.html" class="code" title="function varargout = screensizecm">screensizecm</a>;
+0057     fig_start = [0.34*screen_wide 0.005*screen_high];
+0058     fig_size = [0.25*screen_wide 0.15*screen_high];
+0059 
+0060     <span class="comment">%----------------------------------------------------------------</span>
+0061     figh=figure(<span class="string">'units'</span>,<span class="string">'centimeters'</span>,<span class="keyword">...</span><span class="comment">                      %...Figure</span>
+0062            <span class="string">'Position'</span>,[fig_start fig_size],<span class="keyword">...</span>
+0063             <span class="string">'tag'</span>,<span class="string">'autopilot'</span>,<span class="keyword">...</span><span class="comment"> </span>
+0064             <span class="string">'NumberTitle'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+0065             <span class="string">'Doublebuffer'</span>,<span class="string">'on'</span>,<span class="keyword">...</span>
+0066             <span class="string">'Visible'</span>,<span class="string">'Off'</span>,<span class="keyword">...</span>
+0067             <span class="string">'Name'</span>,<span class="string">'-=AUTO PILOT=-'</span>,<span class="keyword">...</span>
+0068             <span class="string">'PaperPositionMode'</span>,<span class="string">'Auto'</span>);
+0069 
+0070     <span class="comment">%----------------------------------------------------------------</span>
+0071     
+0072     set(figh,<span class="string">'MenuBar'</span>,<span class="string">'None'</span>);
+0073     set(figh,<span class="string">'DeleteFcn'</span>,<span class="string">'autopilot(''killtimer'')'</span>);
+0074     
+0075 <span class="comment">%     %----------------------------------------------------------------</span>
+0076 <span class="comment">%     %Figure Title</span>
+0077 <span class="comment">%     %----------------------------------------------------------------</span>
+0078 <span class="comment">%     uicontrol('Style','text',...                   %...Title text</span>
+0079 <span class="comment">%            'units', 'normalize', ...</span>
+0080 <span class="comment">%            'Position', [.10 .82 .80 .16], ...</span>
+0081 <span class="comment">%            'ForeGroundColor','k',...</span>
+0082 <span class="comment">%            'String','Auto Pilot',...</span>
+0083 <span class="comment">%            'Value',0,...</span>
+0084 <span class="comment">%            'Tag','titletext',...</span>
+0085 <span class="comment">%            'ToolTipString','Auto Pilot',...</span>
+0086 <span class="comment">%            'Backgroundcolor','b',...</span>
+0087 <span class="comment">%            'Foregroundcolor','w',...</span>
+0088 <span class="comment">%            'FontSize',12,'FontWeight','demi');</span>
+0089 <span class="comment">%</span>
+0090     <span class="comment">%----------------------------------------------------------------</span>
+0091     <span class="comment">%Dynamic Text (DCCT value and Bucket number) Fields</span>
+0092     <span class="comment">%----------------------------------------------------------------</span>
+0093     uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span><span class="comment">                    %...Selected bucket display                          </span>
+0094            <span class="string">'units'</span>, <span class="string">'normalize'</span>, <span class="keyword">...</span>
+0095            <span class="string">'Position'</span>, [.10 .82 .40 .16], <span class="keyword">...</span>
+0096            <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0097            <span class="string">'BackGroundColor'</span>,[0.831373 0.815686 0.784314],<span class="keyword">...</span>
+0098            <span class="string">'String'</span>,<span class="string">''</span>,<span class="keyword">...</span>
+0099            <span class="string">'Tag'</span>,<span class="string">'bucket'</span>,<span class="keyword">...</span>
+0100            <span class="string">'ToolTipString'</span>,<span class="string">'Selected bucket display'</span>,<span class="keyword">...</span><span class="comment">    </span>
+0101            <span class="string">'FontSize'</span>,10,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>);
+0102        
+0103     uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span><span class="comment">                    %...SPEAR DCCT current display                          </span>
+0104            <span class="string">'units'</span>, <span class="string">'normalize'</span>, <span class="keyword">...</span>
+0105            <span class="string">'Position'</span>, [.50 .82 .40 .16], <span class="keyword">...</span>
+0106            <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0107            <span class="string">'BackGroundColor'</span>,[0.831373 0.815686 0.784314],<span class="keyword">...</span>
+0108            <span class="string">'String'</span>,<span class="string">''</span>,<span class="keyword">...</span>
+0109            <span class="string">'Tag'</span>,<span class="string">'dcct'</span>,<span class="keyword">...</span>
+0110            <span class="string">'ToolTipString'</span>,<span class="string">'SPEAR DCCT current display'</span>,<span class="keyword">...</span><span class="comment">    </span>
+0111            <span class="string">'FontSize'</span>,10,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>);
+0112             
+0113     <span class="comment">%----------------------------------------------------------------</span>
+0114     <span class="comment">% START/STOP and PAUSE/RESUME control pushButtons</span>
+0115     <span class="comment">%----------------------------------------------------------------</span>
+0116     uicontrol(<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="keyword">...</span><span class="comment">                      %...autopilotstart                    </span>
+0117            <span class="string">'units'</span>, <span class="string">'normalize'</span>, <span class="keyword">...</span>
+0118            <span class="string">'Position'</span>, [.10 .45 .4 .35], <span class="keyword">...</span>
+0119            <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0120            <span class="string">'String'</span>,<span class="string">'Start'</span>,<span class="string">'Enable'</span>,<span class="string">'on'</span>,<span class="keyword">...</span>
+0121            <span class="string">'Tag'</span>,<span class="string">'autopilotstart'</span>,<span class="keyword">...</span>
+0122            <span class="string">'Value'</span>,0,<span class="keyword">...</span>
+0123            <span class="string">'ToolTipString'</span>,<span class="string">'Start autopilot'</span>,<span class="keyword">...</span><span class="comment">    </span>
+0124            <span class="string">'FontSize'</span>,12,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>,<span class="keyword">...</span>
+0125            <span class="string">'Callback'</span>,<span class="string">'autopilot(''autopilotstart'')'</span>);  
+0126        
+0127     uicontrol(<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="keyword">...</span><span class="comment">                     %...autopilotpause        </span>
+0128            <span class="string">'units'</span>, <span class="string">'normalize'</span>, <span class="keyword">...</span>
+0129            <span class="string">'Position'</span>, [.50 .45 .4 .35], <span class="keyword">...</span>
+0130            <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0131            <span class="string">'String'</span>,<span class="string">'Pause'</span>,<span class="string">'Enable'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+0132            <span class="string">'Tag'</span>,<span class="string">'autopilotpause'</span>,<span class="keyword">...</span>
+0133            <span class="string">'ToolTipString'</span>,<span class="string">'Pause autopilot'</span>,<span class="keyword">...</span><span class="comment">    </span>
+0134            <span class="string">'FontSize'</span>,12,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>,<span class="keyword">...</span>
+0135            <span class="string">'Callback'</span>,<span class="string">'autopilot(''pauseflag'')'</span>);
+0136     
+0137     <span class="comment">%----------------------------------------------------------------</span>
+0138     <span class="comment">%Check-box: Automatic triggers for injection - default: NOT-active</span>
+0139     <span class="comment">%----------------------------------------------------------------</span>
+0140     uicontrol(<span class="string">'Style'</span>,<span class="string">'checkbox'</span>,<span class="keyword">...</span>
+0141             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0142             <span class="string">'Position'</span>, [.10 .30 .04 .12],<span class="keyword">...</span>
+0143             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0144             <span class="string">'ToolTipString'</span>,<span class="string">'Automatically turn on triggers?'</span>,<span class="keyword">...</span>
+0145             <span class="string">'Value'</span>,0,<span class="keyword">...</span>
+0146             <span class="string">'Tag'</span>,<span class="string">'inject'</span>);
+0147         
+0148     uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span><span class="comment">                    %...Auto Inject checkbox text</span>
+0149           <span class="string">'units'</span>, <span class="string">'normalize'</span>, <span class="keyword">...</span>
+0150            <span class="string">'Position'</span>, [.14 .30 .35 .12], <span class="keyword">...</span>
+0151            <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0152            <span class="string">'String'</span>,<span class="string">'Auto Inject'</span>,<span class="keyword">...</span>
+0153            <span class="string">'FontSize'</span>,9,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>);
+0154      
+0155     <span class="comment">%----------------------------------------------------------------</span>
+0156     <span class="comment">%Slider: Auto Inject DCCT level setpoint - default: 85mA</span>
+0157     <span class="comment">%----------------------------------------------------------------</span>
+0158     uicontrol(<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+0159             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0160             <span class="string">'Position'</span>,[.02 .18 .06 .80],<span class="keyword">...</span>
+0161             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0162             <span class="string">'ToolTipString'</span>,<span class="string">'DCCT level to start injection'</span>,<span class="keyword">...</span>
+0163             <span class="string">'Min'</span>,0,<span class="keyword">...</span>
+0164             <span class="string">'Max'</span>,500,<span class="keyword">...</span>
+0165             <span class="string">'Value'</span>,85,<span class="keyword">...</span>
+0166             <span class="string">'SliderStep'</span>,[.002 .01],<span class="keyword">...</span>
+0167             <span class="string">'Tag'</span>,<span class="string">'injectslider'</span>,<span class="keyword">...</span>
+0168             <span class="string">'Callback'</span>,@<a href="#_sub1" class="code" title="subfunction injectslider_Callback(object,eventdata)">injectslider_Callback</a>);
+0169         
+0170     uicontrol(<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="keyword">...</span>
+0171             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0172             <span class="string">'Position'</span>,[.01 .05 .13 .10],<span class="keyword">...</span>
+0173             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0174             <span class="string">'ToolTipString'</span>,<span class="string">'DCCT level to start injection'</span>,<span class="keyword">...</span>
+0175             <span class="string">'String'</span>,<span class="string">'85'</span>,<span class="keyword">...</span>
+0176             <span class="string">'Tag'</span>,<span class="string">'injectvalue'</span>,<span class="keyword">...</span>
+0177             <span class="string">'Callback'</span>,@<a href="#_sub2" class="code" title="subfunction injectvalue_Callback(object,eventdata)">injectvalue_Callback</a>,<span class="keyword">...</span>
+0178             <span class="string">'FontSize'</span>,9,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>);
+0179         
+0180     <span class="comment">%----------------------------------------------------------------</span>
+0181     <span class="comment">%Check-box: Automatic shut-off when filled - default: active</span>
+0182     <span class="comment">%----------------------------------------------------------------</span>
+0183     uicontrol(<span class="string">'Style'</span>,<span class="string">'checkbox'</span>,<span class="keyword">...</span>
+0184             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0185             <span class="string">'Position'</span>, [.50 .30 .04 .12],<span class="keyword">...</span>
+0186             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0187             <span class="string">'ToolTipString'</span>,<span class="string">'Automatically shut off triggers?'</span>,<span class="keyword">...</span>
+0188             <span class="string">'Value'</span>,1,<span class="keyword">...</span>
+0189             <span class="string">'Tag'</span>,<span class="string">'shutoff'</span>);
+0190         
+0191     uicontrol(<span class="string">'Style'</span>,<span class="string">'text'</span>,<span class="keyword">...</span><span class="comment">                    %...Auto Shut-Off checkbox text</span>
+0192            <span class="string">'units'</span>, <span class="string">'normalize'</span>, <span class="keyword">...</span>
+0193            <span class="string">'Position'</span>, [.55 .30 .35 .12], <span class="keyword">...</span>
+0194            <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0195            <span class="string">'String'</span>,<span class="string">'Auto Shut-Off'</span>,<span class="keyword">...</span>
+0196            <span class="string">'FontSize'</span>,9,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>);
+0197      
+0198     <span class="comment">%----------------------------------------------------------------</span>
+0199     <span class="comment">%Slider: Auto Shut-Off DCCT level setpoint - default: 100mA</span>
+0200     <span class="comment">%----------------------------------------------------------------</span>
+0201        uicontrol(<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+0202             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0203             <span class="string">'Position'</span>,[.92 .18 .06 .80],<span class="keyword">...</span>
+0204             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0205             <span class="string">'ToolTipString'</span>,<span class="string">'DCCT level to stop injection'</span>,<span class="keyword">...</span>
+0206             <span class="string">'Min'</span>,0,<span class="keyword">...</span>
+0207             <span class="string">'Max'</span>,500.,<span class="keyword">...</span>
+0208             <span class="string">'Value'</span>,100,<span class="keyword">...</span>
+0209             <span class="string">'SliderStep'</span>,[0.002 0.01],<span class="keyword">...</span>
+0210             <span class="string">'Tag'</span>,<span class="string">'shutoffslider'</span>,<span class="keyword">...</span>
+0211             <span class="string">'Callback'</span>,@<a href="#_sub3" class="code" title="subfunction shutoffslider_Callback(object,eventdata)">shutoffslider_Callback</a>);
+0212      
+0213     uicontrol(<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="keyword">...</span>
+0214             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0215             <span class="string">'Position'</span>,[.86 .05 .13 .10],<span class="keyword">...</span>
+0216             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0217             <span class="string">'ToolTipString'</span>,<span class="string">'DCCT level to stop injection'</span>,<span class="keyword">...</span>
+0218             <span class="string">'String'</span>,<span class="string">'100'</span>,<span class="keyword">...</span>
+0219             <span class="string">'Tag'</span>,<span class="string">'shutoffvalue'</span>,<span class="keyword">...</span>
+0220             <span class="string">'Callback'</span>,@<a href="#_sub4" class="code" title="subfunction shutoffvalue_Callback(object,eventdata)">shutoffvalue_Callback</a>,<span class="keyword">...</span>
+0221             <span class="string">'FontSize'</span>,9,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>);
+0222             
+0223     <span class="comment">%----------------------------------------------------------------</span>
+0224     <span class="comment">%Slider: Current per bunch - default: 0.1mA</span>
+0225     <span class="comment">%----------------------------------------------------------------</span>
+0226        uicontrol(<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+0227             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0228             <span class="string">'Position'</span>,[.10 .17 .80 .10],<span class="keyword">...</span>
+0229             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0230             <span class="string">'ToolTipString'</span>,<span class="string">'Current per bunch'</span>,<span class="keyword">...</span>
+0231             <span class="string">'Min'</span>,0,<span class="keyword">...</span>
+0232             <span class="string">'Max'</span>,25,<span class="keyword">...</span>
+0233             <span class="string">'Value'</span>,0.1,<span class="keyword">...</span>
+0234             <span class="string">'SliderStep'</span>,[0.004 0.04],<span class="keyword">...</span>
+0235             <span class="string">'Tag'</span>,<span class="string">'bunchslider'</span>,<span class="keyword">...</span>
+0236             <span class="string">'Callback'</span>,@<a href="#_sub5" class="code" title="subfunction bunchslider_Callback(object,eventdata)">bunchslider_Callback</a>);
+0237      
+0238     uicontrol(<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="keyword">...</span>
+0239             <span class="string">'units'</span>,<span class="string">'normalize'</span>,<span class="keyword">...</span>
+0240             <span class="string">'Position'</span>,[.43 .05 .14 .10],<span class="keyword">...</span>
+0241             <span class="string">'ForeGroundColor'</span>,<span class="string">'k'</span>,<span class="keyword">...</span>
+0242             <span class="string">'ToolTipString'</span>,<span class="string">'Current per bunch'</span>,<span class="keyword">...</span>
+0243             <span class="string">'String'</span>,<span class="string">'0.1'</span>,<span class="keyword">...</span>
+0244             <span class="string">'Tag'</span>,<span class="string">'bunchvalue'</span>,<span class="keyword">...</span>
+0245             <span class="string">'Callback'</span>,@<a href="#_sub6" class="code" title="subfunction bunchvalue_Callback(object,eventdata)">bunchvalue_Callback</a>,<span class="keyword">...</span>
+0246             <span class="string">'FontSize'</span>,9,<span class="string">'FontWeight'</span>,<span class="string">'demi'</span>);
+0247             
+0248     <span class="comment">%----------------------------------------------------------------</span>
+0249     <span class="comment">%Get handles for all necessary Channel Acces Process Variables</span>
+0250     <span class="comment">%----------------------------------------------------------------</span>
+0251     <span class="keyword">if</span> ~mcaisopen(<span class="string">'inj:spr_bucket.first_buck_sel_ds'</span>)
+0252     autopilotSYS.first_bucket = mcaopen(<span class="string">'inj:spr_bucket.first_buck_sel_ds'</span>);
+0253     <span class="keyword">end</span>
+0254     <span class="keyword">if</span> ~mcaisopen(<span class="string">'inj:spr_bucket.next_buck_sel_ds'</span>)
+0255     autopilotSYS.next_bucket  = mcaopen(<span class="string">'inj:spr_bucket.next_buck_sel_ds'</span>);
+0256     <span class="keyword">end</span>
+0257     <span class="keyword">if</span> ~mcaisopen(<span class="string">'inj:inj_timing.bucket_as'</span>)
+0258     autopilotSYS.inj_timing  = mcaopen(<span class="string">'inj:inj_timing.bucket_as'</span>);
+0259     <span class="keyword">end</span>
+0260     <span class="keyword">if</span> ~mcaisopen(<span class="string">'SPEAR:BeamCurrAvg'</span>)
+0261     autopilotSYS.dcct_handle= mcaopen(<span class="string">'SPEAR:BeamCurrAvg'</span>);
+0262     <span class="keyword">end</span>
+0263     <span class="keyword">if</span> ~mcaisopen(<span class="string">'LINAC:ChopStateSetpt'</span>)
+0264         autopilotSYS.chopper = mcaopen(<span class="string">'LINAC:ChopStateSetpt'</span>);
+0265     <span class="keyword">end</span>
+0266     <span class="keyword">if</span> ~mcaisopen(<span class="string">'118DG1:TrigModeSetpt'</span>)
+0267         autopilotSYS.kicker12 = mcaopen(<span class="string">'118-DG1:TrigModeSetpt'</span>);
+0268     <span class="keyword">end</span>
+0269     <span class="keyword">if</span> ~mcaisopen(<span class="string">'118DG2:TrigModeSetpt'</span>)
+0270         autopilotSYS.kicker3 = mcaopen(<span class="string">'118-DG2:TrigModeSetpt'</span>);
+0271     <span class="keyword">end</span>
+0272         
+0273     setappdata(figh,<span class="string">'SystemParameters'</span>,autopilotSYS);
+0274 
+0275     <span class="comment">%----------------------------------------------------------------</span>
+0276     <span class="comment">%INITIALIZE GENERAL autopilot PARAMETERS</span>
+0277     <span class="comment">%----------------------------------------------------------------</span>
+0278     disp(<span class="string">'   Initializing general autopilot parameters...'</span>);
+0279     autopilotCTRL.dcct_start=0;
+0280     autopilotCTRL.injection=0;
+0281 <span class="comment">%     autopilotCTRL.trigs=[autopilotSYS.kicker12;autopilotSYS.kicker3];</span>
+0282     autopilotCTRL.grey=[0.831373 0.815686 0.784314];   <span class="comment">%grey color</span>
+0283     setappdata(figh,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0284     
+0285     <span class="comment">%----------------------------------------------------------------</span>
+0286     <span class="comment">%initiate a single timer</span>
+0287     <span class="comment">%----------------------------------------------------------------</span>
+0288     autopilottimer=timer; 
+0289     autopilottimer.ExecutionMode = <span class="string">'fixedRate'</span>;
+0290     autopilottimer.Tag=<span class="string">'autopilottimer'</span>; 
+0291     autopilottimer.TasksToExecute = 100000000;
+0292     autopilottimer.period = .2;
+0293     setappdata(figh,<span class="string">'autopilotTimer'</span>,autopilottimer);
+0294     
+0295     <span class="comment">%----------------------------------------------------------------</span>
+0296     <span class="comment">%Make autopilot figure visible but protect from being overwritten</span>
+0297     <span class="comment">%----------------------------------------------------------------</span>
+0298     set(figh,<span class="string">'Visible'</span>,<span class="string">'On'</span>);
+0299     
+0300     <span class="keyword">return</span>                              <span class="comment">% End initialization (isempty(varargin))</span>
+0301 <span class="keyword">end</span>                                     <span class="comment">% Return and wait for b</span>
+0302 
+0303 
+0304 <span class="comment">%*************************************</span>
+0305 <span class="comment">%        begin main switchyard</span>
+0306 <span class="comment">%*************************************</span>
+0307 
+0308 handles=guihandles(findobj(0,<span class="string">'Tag'</span>,<span class="string">'autopilot'</span>));
+0309 autopilotSYS=getappdata(handles.autopilot,<span class="string">'SystemParameters'</span>);  <span class="comment">%reload autopilotSYS</span>
+0310 autopilotCTRL=getappdata(handles.autopilot,<span class="string">'SystemControl'</span>);    <span class="comment">%reload autopilotCTRL</span>
+0311 
+0312 <span class="keyword">switch</span> action
+0313 
+0314 <span class="comment">%**************************************************************</span>
+0315 <span class="keyword">case</span> <span class="string">'autopilotstart'</span>
+0316 <span class="comment">%**************************************************************</span>
+0317     <span class="comment">%callback of the START button for autopilot</span>
+0318     
+0319     <span class="comment">%enable pause/stop buttons</span>
+0320     set(handles.autopilotpause,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0321     set(handles.autopilotstart,<span class="string">'String'</span>,<span class="string">'Stop'</span>);
+0322     set(handles.autopilotstart,<span class="string">'ToolTipString'</span>,<span class="string">'Stop autopilot'</span>);
+0323     set(handles.autopilotstart,<span class="string">'Callback'</span>,<span class="string">'autopilot(''autopilotstop'')'</span>);
+0324     set(handles.autopilotpause,<span class="string">'String'</span>,<span class="string">'Pause'</span>);
+0325     set(handles.autopilotpause,<span class="string">'ToolTipString'</span>,<span class="string">'Pause autopilot'</span>);
+0326     set(handles.autopilotpause,<span class="string">'Callback'</span>,<span class="string">'autopilot(''autopilotpause'')'</span>);
+0327     
+0328     <span class="comment">%Get &amp; display initial DCCT reading &amp; set default starting parameters</span>
+0329     autopilotCTRL.dcct_start=mcaget(autopilotSYS.dcct_handle);
+0330     dcct_str=[<span class="string">'DCCT start current = '</span> num2str(autopilotCTRL.dcct_start)];
+0331     disp(dcct_str);
+0332     <span class="comment">%autopilotCTRL.pattern=1;</span>
+0333     <span class="comment">%autopilotCTRL.stop_str=['STOPPED'];</span>
+0334     <span class="comment">%autopilotCTRL.stop_color=[0.831373 0.815686 0.784314];   %grey</span>
+0335     setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0336     
+0337     <span class="comment">%Select first bucket in pattern</span>
+0338     mcaput(autopilotSYS.first_bucket,1);
+0339     
+0340     <span class="comment">%If auto-inject is selected, display &quot;ARMED&quot; warning in red</span>
+0341     <span class="keyword">if</span> (get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Value'</span>) == get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Max'</span>))
+0342         bucket_str=<span class="string">'ARMED!'</span>;
+0343         set(handles.bucket,<span class="string">'String'</span>,bucket_str,<span class="string">'BackGroundColor'</span>,<span class="string">'r'</span>);
+0344         autopilotCTRL.injection=0;
+0345         setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0346     <span class="keyword">else</span>
+0347         autopilotCTRL.injection=1;
+0348         setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0349     <span class="keyword">end</span>
+0350    
+0351     <span class="comment">%launch autopilot timer</span>
+0352     autopilottimer.TimerFcn = <span class="string">'autopilot(''addcurrent'')'</span>;
+0353     autopilotSYS.cycle=0;
+0354     
+0355     setappdata(handles.autopilot,<span class="string">'SystemParameters'</span>,autopilotSYS);
+0356     
+0357     start(autopilottimer);
+0358             
+0359 <span class="comment">%**************************************************************</span>
+0360 <span class="keyword">case</span> <span class="string">'addcurrent'</span>
+0361 <span class="comment">%**************************************************************</span>
+0362     <span class="comment">%Callback of the autopilottimer when running.</span>
+0363     
+0364     <span class="comment">%Check delta current to see if it's time to change buckets</span>
+0365     dcct=mcaget(autopilotSYS.dcct_handle);
+0366     <span class="keyword">if</span> dcct &gt;= (autopilotCTRL.dcct_start + get(handles.bunchslider,<span class="string">'Value'</span>)) &amp;&amp; autopilotCTRL.injection == 1
+0367         mcaput(autopilotSYS.next_bucket,1);  <span class="comment">%Then switch to the next bucket</span>
+0368         autopilotCTRL.dcct_start=dcct;     <span class="comment">%Set new dcct_start point</span>
+0369         setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0370         dcct_str=[<span class="string">'New DCCT start current = '</span> num2str(autopilotCTRL.dcct_start)];
+0371         disp(dcct_str);
+0372         <span class="comment">%Update the selected bucket display</span>
+0373         bucket_str=[<span class="string">'Bucket: '</span> num2str(mcaget(autopilotSYS.inj_timing))];
+0374         set(handles.bucket,<span class="string">'String'</span>,bucket_str,<span class="string">'BackGroundColor'</span>,<span class="string">'g'</span>);
+0375         disp(bucket_str);
+0376     <span class="keyword">end</span>
+0377     
+0378     <span class="comment">%If Auto Inject is selected and DCCT &lt; injectslider value</span>
+0379     <span class="comment">%Then turn on SPEAR kicker and linac chopper triggers</span>
+0380     <span class="keyword">if</span> (get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Value'</span>) == get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Max'</span>))
+0381         <span class="keyword">if</span> dcct &lt;= get(handles.injectslider,<span class="string">'Value'</span>) &amp;&amp; autopilotCTRL.injection == 0
+0382             <span class="comment">%First turn on the SPEAR kicker and linac chopper triggers</span>
+0383 <span class="comment">%              mcaput(autopilotCTRL.trigs,[1;1]); %Set chopper &amp; kickers to External mode</span>
+0384              mcaput(autopilotSYS.chopper,0); <span class="comment">%External mode</span>
+0385              mcaput(autopilotSYS.kicker12,1); <span class="comment">%External mode</span>
+0386              mcaput(autopilotSYS.kicker3,1); <span class="comment">%External mode</span>
+0387             <span class="comment">%Update the selected bucket display</span>
+0388             bucket_str=[<span class="string">'Bucket: '</span> num2str(mcaget(autopilotSYS.inj_timing))];
+0389             set(handles.bucket,<span class="string">'String'</span>,bucket_str,<span class="string">'BackGroundColor'</span>,<span class="string">'g'</span>);
+0390             <span class="comment">%Check if DCCT reading is below previous reference point</span>
+0391             <span class="keyword">if</span> dcct &lt; autopilotCTRL.dcct_start      <span class="comment">%If so, then set a</span>
+0392                 autopilotCTRL.dcct_start=dcct;      <span class="comment">%New dcct_start reference point</span>
+0393                 setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0394                 dcct_str=[<span class="string">'New DCCT start current = '</span> num2str(autopilotCTRL.dcct_start)];
+0395                 disp(dcct_str);
+0396             <span class="keyword">end</span>
+0397             autopilotCTRL.injection=1;
+0398             setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0399         <span class="keyword">end</span>
+0400     <span class="keyword">end</span>
+0401 
+0402     <span class="comment">%If Auto Shut-Off is selected and DCCT &gt; shutoffslider value</span>
+0403     <span class="comment">%Then shut off SPEAR kicker and linac chopper triggers</span>
+0404     <span class="keyword">if</span> (get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'shutoff'</span>),<span class="string">'Value'</span>) == get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'shutoff'</span>),<span class="string">'Max'</span>))
+0405         <span class="keyword">if</span> dcct &gt;= get(handles.shutoffslider,<span class="string">'Value'</span>) &amp;&amp; autopilotCTRL.injection == 1
+0406             <span class="comment">%Shut off SPEAR kicker and linac chopper triggers</span>
+0407 <span class="comment">%             mcaput(autopilotCTRL.trigs,[2;2]); %Set chopper &amp; kickers to One-shot mode</span>
+0408             mcaput(autopilotSYS.chopper,1); <span class="comment">%One-shot mode</span>
+0409             mcaput(autopilotSYS.kicker12,2); <span class="comment">%One-shot mode</span>
+0410             mcaput(autopilotSYS.kicker3,2); <span class="comment">%One-shot mode</span>
+0411             <span class="comment">%Then switch to the next bucket (for next injection cycle)</span>
+0412             mcaput(autopilotSYS.next_bucket,1);
+0413             <span class="comment">%If Auto Inject is selected, then re-display the &quot;ARMED!&quot; warning in red</span>
+0414             <span class="keyword">if</span> (get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Value'</span>) == get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Max'</span>))
+0415                 bucket_str=<span class="string">'ARMED!'</span>;    <span class="comment">%Display &quot;ARMED!&quot; warning in red</span>
+0416                 set(handles.bucket,<span class="string">'String'</span>,bucket_str,<span class="string">'BackGroundColor'</span>,<span class="string">'r'</span>);
+0417             <span class="keyword">end</span>
+0418             dcct_str=[<span class="string">'DCCT final current = '</span> num2str(autopilotCTRL.dcct_start)];
+0419             disp(dcct_str);
+0420             autopilotCTRL.injection=0;
+0421             setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0422         <span class="keyword">end</span>
+0423     <span class="keyword">end</span>
+0424 
+0425     <span class="comment">%Otherwise just update the DCCT current reading</span>
+0426     dcct_str=[<span class="string">'DCCT: '</span> num2str(dcct,5)];
+0427     set(handles.dcct,<span class="string">'String'</span>,dcct_str,<span class="string">'BackGroundColor'</span>,autopilotCTRL.grey);
+0428 
+0429 <span class="comment">%**************************************************************</span>
+0430 <span class="keyword">case</span> <span class="string">'autopilotstop'</span>
+0431 <span class="comment">%**************************************************************</span>
+0432     <span class="comment">%stop autopilot</span>
+0433     stop(autopilottimer);
+0434     
+0435     <span class="comment">%Turn off SPEAR kicker and linac chopper triggers</span>
+0436 <span class="comment">%     mcaput(autopilotCTRL.trigs,[2;2]); %Set chopper &amp; kickers to One-shot mode</span>
+0437     mcaput(autopilotSYS.chopper,1); <span class="comment">%Turn chopper triggers OFF (One shot)</span>
+0438     mcaput(autopilotSYS.kicker12,2); <span class="comment">%Turn kicker triggers OFF (One Shot)</span>
+0439     mcaput(autopilotSYS.kicker3,2); <span class="comment">%Turn kicker triggers OFF (One Shot)</span>
+0440    
+0441     dcct_str=[<span class="string">'DCCT final current = '</span> num2str(autopilotCTRL.dcct_start)];
+0442     disp(dcct_str);
+0443     bucket_str=[<span class="string">'Bucket: '</span> num2str(mcaget(autopilotSYS.inj_timing))];
+0444     disp(bucket_str);
+0445     set(handles.bucket,<span class="string">'String'</span>,<span class="string">''</span>,<span class="string">'BackGroundColor'</span>,autopilotCTRL.grey);
+0446     set(handles.dcct,<span class="string">'String'</span>,<span class="string">''</span>,<span class="string">'BackGroundColor'</span>,autopilotCTRL.grey);
+0447     set(handles.autopilotpause,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0448     set(handles.autopilotstart,<span class="string">'String'</span>,<span class="string">'Start'</span>);
+0449     set(handles.autopilotstart,<span class="string">'ToolTipString'</span>,<span class="string">'Start autopilot'</span>);
+0450     set(handles.autopilotstart,<span class="string">'Callback'</span>,<span class="string">'autopilot(''autopilotstart'')'</span>);
+0451     setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0452     autopilotCTRL.injection=0;
+0453     setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0454     autopilotSYS.cycle=0;
+0455     setappdata(handles.autopilot,<span class="string">'SystemParameters'</span>,autopilotSYS);
+0456     
+0457 <span class="comment">%**************************************************************</span>
+0458 <span class="keyword">case</span> <span class="string">'autopilotpause'</span>
+0459 <span class="comment">%**************************************************************</span>
+0460     <span class="comment">%pause autopilot</span>
+0461     
+0462     set(handles.dcct,<span class="string">'String'</span>,<span class="string">'PAUSED'</span>);
+0463     set(handles.dcct,<span class="string">'BackGroundColor'</span>,<span class="string">'y'</span>);
+0464     set(handles.bucket,<span class="string">'BackGroundColor'</span>,<span class="string">'y'</span>);
+0465     set(handles.autopilotpause,<span class="string">'String'</span>,<span class="string">'Resume'</span>);
+0466     set(handles.autopilotpause,<span class="string">'ToolTipString'</span>,<span class="string">'resume autopilot'</span>);
+0467     set(handles.autopilotpause,<span class="string">'Callback'</span>,<span class="string">'autopilot(''autopilotresume'')'</span>);
+0468     stop(autopilottimer);
+0469     
+0470     <span class="comment">%Turn off SPEAR kicker and linac chopper triggers</span>
+0471 <span class="comment">%     mcaput(autopilotCTRL.trigs,[2;2]); %Set chopper &amp; kickers to One-shot mode</span>
+0472     mcaput(autopilotSYS.chopper,1); <span class="comment">%Turn chopper triggers OFF (One shot)</span>
+0473     mcaput(autopilotSYS.kicker12,2); <span class="comment">%Turn kicker triggers OFF (One Shot)</span>
+0474     mcaput(autopilotSYS.kicker3,2); <span class="comment">%Turn kicker triggers OFF (One Shot)</span>
+0475   
+0476 <span class="comment">%**************************************************************</span>
+0477 <span class="keyword">case</span> <span class="string">'autopilotresume'</span>
+0478 <span class="comment">%**************************************************************</span>
+0479     <span class="comment">%return if timer is already running</span>
+0480     <span class="keyword">if</span> strcmp(autopilottimer.Running,<span class="string">'on'</span>);
+0481     <span class="keyword">return</span>
+0482     <span class="keyword">end</span>
+0483     dcct=mcaget(autopilotSYS.dcct_handle);
+0484     <span class="comment">%Check if DCCT reading is below previous reference point</span>
+0485     <span class="keyword">if</span> dcct &lt; autopilotCTRL.dcct_start      <span class="comment">%If so, then set a</span>
+0486         autopilotCTRL.dcct_start=dcct;      <span class="comment">%New dcct_start reference point</span>
+0487         setappdata(handles.autopilot,<span class="string">'SystemControl'</span>,autopilotCTRL);
+0488         dcct_str=[<span class="string">'New DCCT start current = '</span> num2str(autopilotCTRL.dcct_start)];
+0489         disp(dcct_str);
+0490     <span class="keyword">end</span>
+0491     <span class="comment">%If Auto Inject is selected, and injecting at less then the shut-off current</span>
+0492     <span class="comment">%Then turn on SPEAR kicker and linac chopper triggers</span>
+0493     <span class="keyword">if</span> (get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Value'</span>) == get(findobj(0,<span class="string">'Tag'</span>,<span class="string">'inject'</span>),<span class="string">'Max'</span>))
+0494         <span class="keyword">if</span> dcct &gt;= get(handles.shutoffslider,<span class="string">'Value'</span>) &amp;&amp; autopilotCTRL.injection == 1
+0495             <span class="comment">%First turn on the SPEAR kicker and linac chopper triggers</span>
+0496 <span class="comment">%             mcaput(autopilotCTRL.trigs,[1;1]); %Set chopper &amp; kickers to External mode</span>
+0497             mcaput(autopilotSYS.chopper,0); <span class="comment">%External mode</span>
+0498             mcaput(autopilotSYS.kicker12,1); <span class="comment">%External mode</span>
+0499             mcaput(autopilotSYS.kicker3,1); <span class="comment">%External mode</span>
+0500         <span class="keyword">end</span>
+0501     <span class="keyword">end</span>
+0502     set(handles.autopilotpause,<span class="string">'String'</span>,<span class="string">'Pause'</span>);
+0503     set(handles.autopilotpause,<span class="string">'ToolTipString'</span>,<span class="string">'Pause autopilot'</span>);
+0504     set(handles.autopilotpause,<span class="string">'Callback'</span>,<span class="string">'autopilot(''autopilotpause'')'</span>);
+0505     set(handles.bucket,<span class="string">'BackGroundColor'</span>,<span class="string">'g'</span>);
+0506     set(handles.dcct,<span class="string">'BackGroundColor'</span>,<span class="string">'g'</span>);
+0507     
+0508     start(autopilottimer)
+0509     
+0510 <span class="comment">%**************************************************************</span>
+0511 <span class="keyword">case</span> <span class="string">'killtimer'</span>
+0512 <span class="comment">%**************************************************************</span>
+0513     <span class="comment">%callback of main gui panel deletefcn</span>
+0514     
+0515     <span class="comment">%check to see if feedback timer exists and delete it</span>
+0516     t=timerfind(<span class="string">'Tag'</span>,<span class="string">'autopilottimer'</span>);    
+0517     <span class="keyword">if</span> ~isempty(t)  
+0518         h=findobj(0,<span class="string">'tag'</span>,<span class="string">'autopilot'</span>);
+0519         FDBKtimer=getappdata(h,<span class="string">'autopilotTimer'</span>);
+0520         stop(autopilottimer);
+0521         delete(autopilottimer);
+0522         clear  autopilottimer;
+0523     <span class="keyword">end</span>
+0524     
+0525     <span class="comment">%Clear handles from mca calls</span>
+0526     clearmcahandles;
+0527     
+0528 <span class="comment">%**************************************************************</span>
+0529 <span class="keyword">otherwise</span>
+0530 <span class="comment">%**************************************************************</span>
+0531     disp([<span class="string">'Warning: CASE not found in autopilot '</span> action]);
+0532 
+0533 <span class="keyword">end</span>  <span class="comment">%end switchyard</span>
+0534 
+0535 <a name="_sub1" href="#_subfunctions" class="code">function injectslider_Callback(object,eventdata)</a>
+0536 handles=guihandles(findobj(0,<span class="string">'Tag'</span>,<span class="string">'autopilot'</span>));
+0537 NewVal=num2str(get(handles.injectslider,<span class="string">'Value'</span>));
+0538 set(handles.injectvalue,<span class="string">'String'</span>,NewVal);
+0539 
+0540 <a name="_sub2" href="#_subfunctions" class="code">function injectvalue_Callback(object,eventdata)</a>
+0541 handles=guihandles(findobj(0,<span class="string">'Tag'</span>,<span class="string">'autopilot'</span>));
+0542 NewVal=str2num(get(handles.injectvalue,<span class="string">'String'</span>));
+0543 Min=get(handles.injectslider,<span class="string">'Min'</span>);
+0544 Max=get(handles.injectslider,<span class="string">'Max'</span>);
+0545 <span class="keyword">if</span> NewVal &lt; Min || NewVal &gt; Max
+0546     OldVal=num2str(get(handles.injectslider,<span class="string">'Value'</span>));
+0547     set(handles.injectvalue,<span class="string">'String'</span>,OldVal);
+0548     disp(<span class="string">'Warning: slider control can not have a Value outside of Min/Max range!'</span>);
+0549 <span class="keyword">else</span>
+0550     set(handles.injectslider,<span class="string">'Value'</span>,NewVal);
+0551 <span class="keyword">end</span>
+0552 
+0553 <a name="_sub3" href="#_subfunctions" class="code">function shutoffslider_Callback(object,eventdata)</a>
+0554 handles=guihandles(findobj(0,<span class="string">'Tag'</span>,<span class="string">'autopilot'</span>));
+0555 NewVal=num2str(get(handles.shutoffslider,<span class="string">'Value'</span>));
+0556 set(handles.shutoffvalue,<span class="string">'String'</span>,NewVal);
+0557 
+0558 <a name="_sub4" href="#_subfunctions" class="code">function shutoffvalue_Callback(object,eventdata)</a>
+0559 handles=guihandles(findobj(0,<span class="string">'Tag'</span>,<span class="string">'autopilot'</span>));
+0560 NewVal=str2num(get(handles.shutoffvalue,<span class="string">'String'</span>));
+0561 Min=get(handles.shutoffslider,<span class="string">'Min'</span>);
+0562 Max=get(handles.shutoffslider,<span class="string">'Max'</span>);
+0563 <span class="keyword">if</span> NewVal &lt; Min || NewVal &gt; Max
+0564     OldVal=num2str(get(handles.shutoffslider,<span class="string">'Value'</span>));
+0565     set(handles.shutoffvalue,<span class="string">'String'</span>,OldVal);
+0566     disp(<span class="string">'Warning: slider control can not have a Value outside of Min/Max range!'</span>);
+0567 <span class="keyword">else</span>
+0568     set(handles.shutoffslider,<span class="string">'Value'</span>,NewVal);
+0569 <span class="keyword">end</span>
+0570 
+0571 <a name="_sub5" href="#_subfunctions" class="code">function bunchslider_Callback(object,eventdata)</a>
+0572 handles=guihandles(findobj(0,<span class="string">'Tag'</span>,<span class="string">'autopilot'</span>));
+0573 NewVal=num2str(get(handles.bunchslider,<span class="string">'Value'</span>));
+0574 set(handles.bunchvalue,<span class="string">'String'</span>,NewVal);
+0575 
+0576 <a name="_sub6" href="#_subfunctions" class="code">function bunchvalue_Callback(object,eventdata)</a>
+0577 handles=guihandles(findobj(0,<span class="string">'Tag'</span>,<span class="string">'autopilot'</span>));
+0578 NewVal=str2num(get(handles.bunchvalue,<span class="string">'String'</span>));
+0579 Min=get(handles.bunchslider,<span class="string">'Min'</span>);
+0580 Max=get(handles.bunchslider,<span class="string">'Max'</span>);
+0581 <span class="keyword">if</span> NewVal &lt; Min || NewVal &gt; Max
+0582     OldVal=num2str(get(handles.bunchslider,<span class="string">'Value'</span>));
+0583     set(handles.bunchvalue,<span class="string">'String'</span>,OldVal);
+0584     disp(<span class="string">'Warning: slider control can not have a Value outside of Min/Max range!'</span>);
+0585 <span class="keyword">else</span>
+0586     set(handles.bunchslider,<span class="string">'Value'</span>,NewVal);
+0587 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

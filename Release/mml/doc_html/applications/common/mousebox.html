@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mousebox</title>
+  <meta name="keywords" content="mousebox">
+  <meta name="description" content="MOUSEBOX - Selects a box on a plot">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; mousebox.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>mousebox
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>MOUSEBOX - Selects a box on a plot</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [a, h] = mousebox(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MOUSEBOX - Selects a box on a plot
+  [AxisBox, h] = mousebox
+
+  INPUTS
+  1. 'Drawbox' - draws a box around the selected area {Default}
+     'NoDrawbox' - don't draw a box around the selected area
+  2. 'Rescale' - Rescale the axis to the selected area
+     'NoRescale' - Don't rescale the axis to the selected area {Default}
+
+  OUTPUTS
+  1. AxisBox - Coordinates of the selected box (as used by axis)
+  2. h - handle to the box plot (if there is one)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [a, h] = mousebox(varargin) </a>
+0002 <span class="comment">%MOUSEBOX - Selects a box on a plot</span>
+0003 <span class="comment">%  [AxisBox, h] = mousebox</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. 'Drawbox' - draws a box around the selected area {Default}</span>
+0007 <span class="comment">%     'NoDrawbox' - don't draw a box around the selected area</span>
+0008 <span class="comment">%  2. 'Rescale' - Rescale the axis to the selected area</span>
+0009 <span class="comment">%     'NoRescale' - Don't rescale the axis to the selected area {Default}</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  OUTPUTS</span>
+0012 <span class="comment">%  1. AxisBox - Coordinates of the selected box (as used by axis)</span>
+0013 <span class="comment">%  2. h - handle to the box plot (if there is one)</span>
+0014 <span class="comment">%</span>
+0015 
+0016 <span class="comment">%  Written by Greg Portmann</span>
+0017 
+0018 
+0019 <span class="comment">% Defaults</span>
+0020 DrawboxFlag = 1;
+0021 ChangeAxisFlag = 0;
+0022 
+0023 
+0024 <span class="comment">% Look for keywords</span>
+0025 <span class="keyword">for</span> i = length(varargin):-1:1
+0026     <span class="keyword">if</span> isstruct(varargin{i})
+0027         <span class="comment">% Ignor structures</span>
+0028     <span class="keyword">elseif</span> iscell(varargin{i})
+0029         <span class="comment">% Ignor cells</span>
+0030     <span class="keyword">elseif</span> ischar(varargin{i})
+0031         <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'Drawbox'</span>)
+0032             DrawboxFlag = 1;
+0033             varargin(i) = [];
+0034         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDrawbox'</span>)
+0035             DrawboxFlag = 0;
+0036             varargin(i) = [];
+0037         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Rescale'</span>)
+0038             ChangeAxisFlag = 1;
+0039             varargin(i) = [];
+0040         <span class="keyword">end</span>
+0041     <span class="keyword">end</span>
+0042 <span class="keyword">end</span>
+0043 
+0044 
+0045 hAxes = gca;
+0046 
+0047 k = waitforbuttonpress;
+0048 point1 = get(gca,<span class="string">'CurrentPoint'</span>);    <span class="comment">% button down detected</span>
+0049 finalRect = rbbox;                   <span class="comment">% return figure units</span>
+0050 point2 = get(gca,<span class="string">'CurrentPoint'</span>);    <span class="comment">% button up detected</span>
+0051 point1 = point1(1,1:2);              <span class="comment">% extract x and y</span>
+0052 point2 = point2(1,1:2);
+0053 pp1 = min(point1,point2);            <span class="comment">% calculate locations</span>
+0054 pp2 = max(point1,point2);            <span class="comment">% calculate locations</span>
+0055 offset = abs(point1-point2);         <span class="comment">% and dimensions</span>
+0056 xx = [pp1(1) pp1(1)+offset(1) pp1(1)+offset(1) pp1(1) pp1(1)];
+0057 yy = [pp1(2) pp1(2) pp1(2)+offset(2) pp1(2)+offset(2) pp1(2)];
+0058 
+0059 a = [pp1(1) pp2(1) pp1(2) pp2(2)];
+0060 
+0061 
+0062 <span class="keyword">if</span> DrawboxFlag
+0063     <span class="comment">% Draw a box</span>
+0064 
+0065     <span class="comment">% Remember the hold state then turn hold on</span>
+0066     HoldState = ishold(hAxes);
+0067     hold(hAxes, <span class="string">'on'</span>);
+0068 
+0069     h = plot(xx, yy);
+0070 
+0071     <span class="comment">% Remember the hold state then turn hold on</span>
+0072     HoldState = ishold(hAxes);
+0073     hold(hAxes, <span class="string">'on'</span>);
+0074 <span class="keyword">else</span>
+0075     h = [];
+0076 <span class="keyword">end</span>
+0077 
+0078     
+0079 <span class="keyword">if</span> ChangeAxisFlag
+0080     axis(a);
+0081 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

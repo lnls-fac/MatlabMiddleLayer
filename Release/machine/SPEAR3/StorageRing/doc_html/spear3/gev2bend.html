@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gev2bend</title>
+  <meta name="keywords" content="gev2bend">
+  <meta name="description" content="GEV2BEND - Compute the energy based on the ramp tables">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; gev2bend.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>gev2bend
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GEV2BEND - Compute the energy based on the ramp tables</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function Amps = gev2bend(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GEV2BEND - Compute the energy based on the ramp tables
+ Bend = gev2bend(Family, Field, GeV, DeviceList, BranchFlag)
+
+  INPUTS
+  1. Bend - Bend magnet family {Optional}
+  2. Field - Field {Optional}
+  3. GeV - Electron beam energy [GeV]
+  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}
+  5. BranchFlag - 1 -&gt; Lower branch
+                  2 -&gt; Upper branch {Default}
+                  Not working at Spear yet
+
+  OUTPUTS
+  1. Bend - Bend magnet current [Amps]
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Amps = gev2bend(varargin)</a>
+0002 <span class="comment">%GEV2BEND - Compute the energy based on the ramp tables</span>
+0003 <span class="comment">% Bend = gev2bend(Family, Field, GeV, DeviceList, BranchFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Bend - Bend magnet family {Optional}</span>
+0007 <span class="comment">%  2. Field - Field {Optional}</span>
+0008 <span class="comment">%  3. GeV - Electron beam energy [GeV]</span>
+0009 <span class="comment">%  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}</span>
+0010 <span class="comment">%  5. BranchFlag - 1 -&gt; Lower branch</span>
+0011 <span class="comment">%                  2 -&gt; Upper branch {Default}</span>
+0012 <span class="comment">%                  Not working at Spear yet</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1. Bend - Bend magnet current [Amps]</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  Written by Greg Portmann</span>
+0018 
+0019 
+0020 <span class="comment">% Default</span>
+0021 Family = <span class="string">''</span>;
+0022 Field = <span class="string">''</span>;
+0023 GeV = [];
+0024 DeviceList = [];
+0025 BranchFlag = [];
+0026 ModeFlag = <span class="string">''</span>;  <span class="comment">% model, online, manual</span>
+0027 UnitsFlag = <span class="string">''</span>; <span class="comment">% hardware, physics</span>
+0028 <span class="keyword">for</span> i = length(varargin):-1:1
+0029     <span class="keyword">if</span> isstruct(varargin{i})
+0030         <span class="comment">% Ignor structures</span>
+0031     <span class="keyword">elseif</span> iscell(varargin{i})
+0032         <span class="comment">% Ignor cells</span>
+0033     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0034         varargin(i) = [];
+0035     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0036         varargin(i) = [];
+0037     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0038         UnitsFlag = varargin{i};
+0039         varargin(i) = [];
+0040     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0041         UnitsFlag = varargin{i};
+0042         varargin(i) = [];
+0043     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>)
+0044         ModeFlag = varargin{i};
+0045         varargin(i) = [];
+0046     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0047         ModeFlag = varargin{i};
+0048         varargin(i) = [];
+0049     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0050         ModeFlag = varargin{i};
+0051         varargin(i) = [];
+0052     <span class="keyword">end</span>        
+0053 <span class="keyword">end</span>
+0054 
+0055 
+0056 <span class="keyword">if</span> length(varargin) &gt;= 1
+0057     <span class="keyword">if</span> ischar(varargin{1})
+0058         Family = varargin{1};
+0059         varargin(1) = [];
+0060     <span class="keyword">else</span>
+0061         GeV = varargin{1};
+0062         varargin(1) = [];
+0063         <span class="keyword">if</span> length(varargin) &gt;= 1
+0064             DeviceList = varargin{1};
+0065             varargin(1) = [];
+0066         <span class="keyword">end</span>
+0067         <span class="keyword">if</span> length(varargin) &gt;= 1
+0068             BranchFlag = varargin{1};
+0069             varargin(1:end) = [];
+0070         <span class="keyword">end</span>
+0071     <span class="keyword">end</span>
+0072 <span class="keyword">end</span>
+0073 <span class="keyword">if</span> length(varargin) &gt;= 1 &amp; ischar(varargin{1})
+0074     Field = varargin{1};
+0075     varargin(1) = [];
+0076 <span class="keyword">end</span>
+0077 <span class="keyword">if</span> length(varargin) &gt;= 1
+0078     GeV = varargin{1};
+0079     varargin(1) = [];
+0080 <span class="keyword">end</span>
+0081 <span class="keyword">if</span> length(varargin) &gt;= 1
+0082     DeviceList = varargin{1};
+0083     varargin(1) = [];
+0084 <span class="keyword">end</span>
+0085 <span class="keyword">if</span> length(varargin) &gt;= 1
+0086     BranchFlag = varargin{1};
+0087     varargin(1) = [];
+0088 <span class="keyword">end</span>
+0089 
+0090 
+0091 <span class="keyword">if</span> isempty(Family)
+0092     Family = <span class="string">'BEND'</span>;
+0093 <span class="keyword">end</span>
+0094 <span class="keyword">if</span> isempty(Field)
+0095     Field = <span class="string">'Setpoint'</span>;
+0096 <span class="keyword">end</span>
+0097 
+0098 <span class="keyword">if</span> isempty(UnitsFlag)
+0099     UnitsFlag = getunits(Family);
+0100 <span class="keyword">end</span>
+0101 
+0102 <span class="keyword">if</span> isempty(GeV)
+0103     <span class="keyword">if</span> isempty(ModeFlag)
+0104         ModeFlag = getmode(Family);
+0105     <span class="keyword">end</span>
+0106     <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'simulator'</span>) | strcmpi(ModeFlag,<span class="string">'model'</span>)
+0107         GeV = getenergymodel;
+0108     <span class="keyword">else</span>
+0109         error(<span class="string">'GeV input required'</span>);
+0110     <span class="keyword">end</span>
+0111 <span class="keyword">end</span>
+0112 
+0113 <span class="keyword">if</span> isempty(DeviceList)
+0114     DeviceList = family2dev(Family);
+0115     <span class="keyword">if</span> all(size(GeV)==[1 1])
+0116         DeviceList = DeviceList(1,:);
+0117     <span class="keyword">end</span>
+0118 <span class="keyword">end</span>
+0119 <span class="keyword">if</span> isempty(BranchFlag)
+0120     <span class="comment">% Default is upper branch</span>
+0121     BranchFlag = 2;
+0122 <span class="keyword">end</span>
+0123 
+0124 <span class="comment">% End of input checking</span>
+0125 <span class="comment">% Machine dependant stuff below</span>
+0126 
+0127 
+0128 <span class="keyword">for</span> ii = 1:size(DeviceList,1)
+0129     <span class="keyword">if</span> length(GeV) == 1
+0130         gev1 = GeV;
+0131     <span class="keyword">else</span>
+0132         gev1 = GeV(ii);
+0133     <span class="keyword">end</span>
+0134 
+0135     
+0136     <span class="comment">% Convert to BEND current</span>
+0137     brho = getbrho(gev1);
+0138     
+0139     C = getfamilydata(Family, Field, <span class="string">'HW2PhysicsParams'</span>, DeviceList(ii,:));
+0140     C = C{1};
+0141     <span class="comment">%[C, Leff, MagnetType, A] = magnetcoefficients('BDM');</span>
+0142     
+0143     <span class="comment">% k is fixed to be -0.31537858</span>
+0144     k = 0.31537858;
+0145     
+0146     <span class="comment">% Convert to BEND angle</span>
+0147     <span class="keyword">if</span> any(DeviceList(ii) == [1 9 10 18])
+0148         K2BendingAngle = 2.54842790129284 * -0.43947079695140;   <span class="comment">% BendAngle / K</span>
+0149     <span class="keyword">else</span>
+0150         K2BendingAngle = 2.54842790129284 * -0.58596106939159;  <span class="comment">% BendAngle / K</span>
+0151     <span class="keyword">end</span>
+0152     k = K2BendingAngle * k;
+0153 
+0154     bprime = k * brho;
+0155     b0 = bprime * 0.392348;
+0156     bl = b0;
+0157     k = -k;
+0158     
+0159     
+0160     <span class="comment">% Solve for roots based on polynomial coefficient (coefficients already divided by Leff)</span>
+0161     <span class="comment">% p = [C(1) C(2) C(3) C(4) C(5) C(6) C(7) C(8) C(9)-bl];</span>
+0162     <span class="comment">% C(9) = 0</span>
+0163     
+0164     p = C;
+0165     p(9) = bl;
+0166     <span class="comment">%p = [c7 c6 c5 c4 c3 c2 c1  c0 -bl];</span>
+0167     
+0168     
+0169     <span class="keyword">if</span> 0
+0170         <span class="comment">% Real and between 200-800 amps approach</span>
+0171         r = roots(p);
+0172         
+0173         pp = poly(r);
+0174         
+0175         <span class="keyword">for</span> i = 1:8
+0176             <span class="keyword">if</span> (imag(r(i))==0. &amp; real(r(i))&lt;800. &amp; real(r(i))&gt;200.);
+0177                 BEND = r(i);
+0178             <span class="keyword">end</span>
+0179         <span class="keyword">end</span>
+0180         
+0181         
+0182     <span class="keyword">else</span>
+0183         <span class="comment">% Closest to the linear line approach</span>
+0184         
+0185         r1inear = -bl / C(end-1);
+0186         
+0187         r = roots(p);    
+0188         
+0189         <span class="comment">% Choose the closest solution to the linear one</span>
+0190         BEND = inf;
+0191         <span class="keyword">for</span> i = 1:length(r)
+0192             <span class="keyword">if</span> isreal(r(i))
+0193                 <span class="comment">%if r(i)&gt;0 &amp; abs(r(i)) &lt; BEND(j,1)  % Smallest, positive</span>
+0194                 <span class="keyword">if</span> abs(r(i) - r1inear) &lt; abs(BEND - r1inear)  <span class="comment">% Closest to linear solution</span>
+0195                     BEND = r(i);
+0196                 <span class="keyword">end</span>
+0197             <span class="keyword">end</span>
+0198         <span class="keyword">end</span>
+0199         
+0200         <span class="keyword">if</span> isinf(BEND)
+0201             error(sprintf(<span class="string">'Solution for GeV=%.3f not found (all roots are complex)'</span>, gev1));
+0202         <span class="keyword">end</span>
+0203     <span class="keyword">end</span>
+0204     
+0205     <span class="keyword">if</span> size(GeV,2) == 1
+0206         Amps(ii,1) = BEND;
+0207     <span class="keyword">else</span>
+0208         Amps(1,ii) = BEND;
+0209     <span class="keyword">end</span>
+0210 <span class="keyword">end</span>
+0211 
+0212 
+0213 <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0214     Amps = hw2physics(Family, <span class="string">'Setpoint'</span>, Amps, DeviceList, GeV);
+0215 <span class="keyword">end</span>
+0216</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

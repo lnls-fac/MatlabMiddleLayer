@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getbtsconfig</title>
+  <meta name="keywords" content="getbtsconfig">
+  <meta name="description" content="GETBTSCONFIG - Gets a BTS magnet configuration">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; getbtsconfig.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getbtsconfig
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETBTSCONFIG - Gets a BTS magnet configuration</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [BTSConfig, FileName] = getbtsconfig(FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETBTSCONFIG - Gets a BTS magnet configuration
+  [BTSConfig, FileName] = getbtsconfig
+
+  INPUTS
+  1. FileName - File name to storage data (if necessary, include full path)
+                '' to browse for a directory and file
+                If FileName is not input, then the configuration will not be saved to file.
+
+  OUTPUTS
+  1. BTSConfig - Structure of setpoints
+  2. FileName - If data was archived, filename where the data was saved (including the path)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [BTSConfig, FileName] = getbtsconfig(FileName)</a>
+0002 <span class="comment">%GETBTSCONFIG - Gets a BTS magnet configuration</span>
+0003 <span class="comment">%  [BTSConfig, FileName] = getbtsconfig</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. FileName - File name to storage data (if necessary, include full path)</span>
+0007 <span class="comment">%                '' to browse for a directory and file</span>
+0008 <span class="comment">%                If FileName is not input, then the configuration will not be saved to file.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  OUTPUTS</span>
+0011 <span class="comment">%  1. BTSConfig - Structure of setpoints</span>
+0012 <span class="comment">%  2. FileName - If data was archived, filename where the data was saved (including the path)</span>
+0013 
+0014 
+0015 <span class="keyword">if</span> nargin == 0
+0016     <span class="keyword">if</span> nargout == 0
+0017         ArchiveFlag = 1;
+0018         FileName = <span class="string">''</span>;
+0019     <span class="keyword">else</span>
+0020         ArchiveFlag = 0;
+0021     <span class="keyword">end</span>
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="keyword">if</span> isempty(FileName)
+0025     [FileName, DirectoryName] = uiputfile(<span class="string">'*.mat'</span>, <span class="string">'Save BTS Magnets to ...'</span>, [getfamilydata(<span class="string">'Directory'</span>, <span class="string">'DataRoot'</span>), <span class="string">'BTS'</span>, filesep]);
+0026     <span class="keyword">if</span> FileName == 0
+0027         disp(<span class="string">'   BTS configuration not saved.'</span>);
+0028         <span class="keyword">return</span>
+0029     <span class="keyword">end</span>
+0030     FileName = [DirectoryName, FileName];
+0031     ArchiveFlag = 1;
+0032 <span class="keyword">end</span>
+0033 
+0034 
+0035 <span class="comment">% Present BTSsetpoints</span>
+0036 BTSConfig.Values.B7H = getpv(<span class="string">'BTS-B7H:CurrSetpt'</span>);
+0037 BTSConfig.Values.B8V = getpv(<span class="string">'BTS-B8V:CurrSetpt'</span>);
+0038 BTSConfig.Values.C8H = getpv(<span class="string">'BTS-C8H:CurrSetpt'</span>);  BTSConfig.Values.C8H = BTSConfig.Values.C8H(1);
+0039 BTSConfig.Values.B9V = getpv(<span class="string">'BTS-B9V:CurrSetpt'</span>);
+0040 BTSConfig.Values.Q8  = getpv(<span class="string">'BTS-Q8:CurrSetpt'</span>);
+0041 BTSConfig.Values.Q9  = getpv(<span class="string">'BTS-Q9:CurrSetpt'</span>);
+0042 
+0043 BTSConfig.TimeStamp = clock;
+0044 BTSConfig.Time = datestr(BTSConfig.TimeStamp);
+0045 BTSConfig.Desc = <span class="string">'BTS Setpoint'</span>;
+0046 
+0047 
+0048 <span class="keyword">if</span> ArchiveFlag
+0049     save(FileName, <span class="string">'BTSConfig'</span>);
+0050 <span class="keyword">end</span>
+0051 
+0052 
+0053</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

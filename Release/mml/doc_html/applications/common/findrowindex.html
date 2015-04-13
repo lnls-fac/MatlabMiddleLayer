@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of findrowindex</title>
+  <meta name="keywords" content="findrowindex">
+  <meta name="description" content="FINDROWINDEX">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; findrowindex.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>findrowindex
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>FINDROWINDEX</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [iFound, iNotFound, iFoundList1] = findrowindex(List1, List2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FINDROWINDEX
+  [iFound, iNotFound, iFoundList1] = findrowindex(List1, List2)
+
+  INPUTS
+  1. List1 and List2 are matrices with the same number of columns.
+     This function return the row indicies where each row of List1
+     is found in List2.
+
+  OUTPUTS
+  1. iFound are the row numbers of List2 where a row of List1 was found.
+     If there are multiple matches, then only the smallest index is used.
+  2. iNotFound are the row number of List1 which was not found in List2.
+  3. iFoundList1 are the indicies of List1 where List1 rows were found in List2 
+     length(iFoundList1) always equals the length(iFound), iFoundList1 just
+     references List1.
+
+  If all the rows of List1 are also in List2, then
+  List1 = List2(iFound,:)
+  If not, 
+  List1(iFoundList1,:) = List2(iFound,:)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [iFound, iNotFound, iFoundList1] = findrowindex(List1, List2)</a>
+0002 <span class="comment">%FINDROWINDEX</span>
+0003 <span class="comment">%  [iFound, iNotFound, iFoundList1] = findrowindex(List1, List2)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. List1 and List2 are matrices with the same number of columns.</span>
+0007 <span class="comment">%     This function return the row indicies where each row of List1</span>
+0008 <span class="comment">%     is found in List2.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  OUTPUTS</span>
+0011 <span class="comment">%  1. iFound are the row numbers of List2 where a row of List1 was found.</span>
+0012 <span class="comment">%     If there are multiple matches, then only the smallest index is used.</span>
+0013 <span class="comment">%  2. iNotFound are the row number of List1 which was not found in List2.</span>
+0014 <span class="comment">%  3. iFoundList1 are the indicies of List1 where List1 rows were found in List2</span>
+0015 <span class="comment">%     length(iFoundList1) always equals the length(iFound), iFoundList1 just</span>
+0016 <span class="comment">%     references List1.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  If all the rows of List1 are also in List2, then</span>
+0019 <span class="comment">%  List1 = List2(iFound,:)</span>
+0020 <span class="comment">%  If not,</span>
+0021 <span class="comment">%  List1(iFoundList1,:) = List2(iFound,:)</span>
+0022 
+0023 <span class="comment">%  Written by Greg Portmann</span>
+0024 
+0025 iFound = [];
+0026 iNotFound = [];
+0027 iFoundList1 = [];
+0028 
+0029 <span class="keyword">if</span> isempty(List1) || isempty(List2)
+0030     <span class="keyword">return</span>
+0031 <span class="keyword">end</span>
+0032 
+0033 N = size(List1,2);
+0034 
+0035 <span class="keyword">if</span> N ~= size(List2,2)
+0036     error(<span class="string">'List1 and List2 must have the same number of columns'</span>);    
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="keyword">for</span> i = 1:size(List1,1)
+0040     <span class="comment">% Make N = 1 or 2 a special case for speed reasons (this may not be true or required)</span>
+0041     <span class="keyword">if</span> N == 1
+0042         k = find(List1(i)==List2);
+0043     <span class="keyword">elseif</span> N == 2
+0044         k = find(List1(i,1)==List2(:,1) &amp; List1(i,2)==List2(:,2));
+0045     <span class="keyword">else</span>
+0046         k = (List1(i,1)==List2(:,1));
+0047         <span class="keyword">for</span> j = 2:N
+0048             k = k &amp; (List1(i,j)==List2(:,j));
+0049         <span class="keyword">end</span>
+0050         k = find(k);
+0051     <span class="keyword">end</span>
+0052     
+0053     <span class="keyword">if</span> isempty(k)
+0054         iNotFound = [iNotFound; i];
+0055     <span class="keyword">else</span>
+0056         iFound = [iFound; k(1)];        
+0057         iFoundList1 = [iFoundList1; i];
+0058     <span class="keyword">end</span>
+0059 <span class="keyword">end</span>
+0060 
+0061 
+0062 <span class="comment">% member = ismember(List2,List1,'rows');</span>
+0063 <span class="comment">% %DeviceListTotal(member,:);</span>
+0064 <span class="comment">% iFound = find(member);</span>
+0065 <span class="comment">% iNotFound = [];</span>
+0066 
+0067 
+0068 <span class="comment">% The unique and intersect method seems to be a little slower</span>
+0069 <span class="comment">%</span>
+0070 <span class="comment">% % Intersect removes duplicate devices so first store index of how to unsort in j_unique</span>
+0071 <span class="comment">% DeviceListOld = List1;</span>
+0072 <span class="comment">% [List1, i_unique, j_unique] = unique(List1, 'rows');</span>
+0073 <span class="comment">%</span>
+0074 <span class="comment">% % Find the indexes in the full device list (reorder and remove duplicates)</span>
+0075 <span class="comment">% [List1, ii, DeviceIndex] = intersect(List1, List2, 'rows');</span>
+0076 <span class="comment">% if size(List1,1) ~= size(DeviceListOld,1)</span>
+0077 <span class="comment">%     % All devices must exist (duplicate devices ok)</span>
+0078 <span class="comment">%     [DeviceListNotFound, iNotFound] = setdiff(DeviceListOld, List2, 'rows');</span>
+0079 <span class="comment">%     %if length(iNotFound) &gt; 0</span>
+0080 <span class="comment">%     %    % Device not found</span>
+0081 <span class="comment">%     %    for i = 1:length(iNotFound)</span>
+0082 <span class="comment">%     %        fprintf('   No devices to get for (%d,%d)\n', DeviceListNotFound(i,1), DeviceListNotFound(i,2));</span>
+0083 <span class="comment">%     %    end</span>
+0084 <span class="comment">%     %    error(sprintf('%d Devices not found', length(iNotFound)));</span>
+0085 <span class="comment">%     %end</span>
+0086 <span class="comment">% end</span>
+0087 <span class="comment">% iFound = DeviceIndex(j_unique);   % Reorder and add multiple elements back</span>
+0088</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

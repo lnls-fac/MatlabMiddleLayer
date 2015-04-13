@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of aokeep</title>
+  <meta name="keywords" content="aokeep">
+  <meta name="description" content="AOKEEP - Removes families from the Accelerator Families except those included in KEEPLIST">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; aokeep.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>aokeep
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>AOKEEP - Removes families from the Accelerator Families except those included in KEEPLIST</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function  NEWAO = aokeep(KEEPLIST,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">AOKEEP - Removes families from the Accelerator Families except those included in KEEPLIST
+  AOKEEP(KEEPLIST)
+  KEEPLIST is a cell array of strings of family names to keep.
+  The families are reordered according to their position in KEEPLIST
+  AOKEEP({'FAM1','FAM2',...})</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>	GETAO - returns the AcceleratorObject (AO)</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li><li><a href="setao.html" class="code" title="function  setao(AO)">setao</a>	SETAO - Set the MML Accelerator Object (AO)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function  NEWAO = aokeep(KEEPLIST,varargin)</a>
+0002 <span class="comment">%AOKEEP - Removes families from the Accelerator Families except those included in KEEPLIST</span>
+0003 <span class="comment">%  AOKEEP(KEEPLIST)</span>
+0004 <span class="comment">%  KEEPLIST is a cell array of strings of family names to keep.</span>
+0005 <span class="comment">%  The families are reordered according to their position in KEEPLIST</span>
+0006 <span class="comment">%  AOKEEP({'FAM1','FAM2',...})</span>
+0007 
+0008 <span class="comment">%  Written by Jeff Corbett</span>
+0009 
+0010 ACCELERATOR_FAMILIES = <a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>;
+0011 
+0012 <span class="keyword">if</span> isempty(ACCELERATOR_FAMILIES)
+0013     error(<span class="string">'ACCELERATOR_FAMILIES does not exist.  Initialization is needed.'</span>);
+0014 <span class="keyword">end</span>
+0015 
+0016 <span class="keyword">if</span> ischar(KEEPLIST)
+0017     KEEPLIST = cellstr(KEEPLIST);
+0018 <span class="keyword">elseif</span> ~iscellstr(KEEPLIST)
+0019     error(<span class="string">'KEEFAMILIES must be a char array or a cell array of strings'</span>);
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="comment">% Remove multiple ocurrances but keep the order</span>
+0023 [TEMP,INDEX] = unique(KEEPLIST);
+0024 KEEPLIST = KEEPLIST(sort(INDEX));
+0025 
+0026 
+0027 AO1 = cell(size(KEEPLIST));
+0028 
+0029 AOLIST = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0030 <span class="keyword">if</span> ischar(AOLIST)
+0031     AOLIST = cellstr(AOLIST);
+0032 <span class="keyword">end</span>
+0033 
+0034 <span class="keyword">for</span> k = 1:length(KEEPLIST)
+0035     
+0036     MATCH = find(strcmp(AOLIST,KEEPLIST{k}));
+0037     <span class="keyword">if</span> length(MATCH)&gt;1
+0038      warning([<span class="string">'Duplicate family name found in ACCELERATOR FAMILIES:'</span>, ACCELERATOR_FAMILIES.(KEEPLIST{k}).FamilyName]);
+0039     <span class="keyword">end</span>
+0040     
+0041     <span class="keyword">if</span> length(MATCH)&gt;=1
+0042         AO1{k}=ACCELERATOR_FAMILIES.(KEEPLIST{k});
+0043     <span class="keyword">else</span>
+0044         warning([<span class="string">'Family '</span>, KEEPLIST{k}, <span class="string">' not found in ACCELERATOR FAMILIES'</span>]);
+0045     <span class="keyword">end</span>
+0046     
+0047 <span class="keyword">end</span>
+0048 
+0049 
+0050 NEWAO={};
+0051 <span class="keyword">for</span> k = 1:length(AO1)
+0052     <span class="keyword">if</span> ~isempty(AO1{k})
+0053         NEWAO{end+1}=AO1{k};
+0054     <span class="keyword">end</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 <a href="setao.html" class="code" title="function  setao(AO)">setao</a>(NEWAO);</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

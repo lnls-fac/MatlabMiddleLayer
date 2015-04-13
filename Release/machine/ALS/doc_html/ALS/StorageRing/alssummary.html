@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of alssummary</title>
+  <meta name="keywords" content="alssummary">
+  <meta name="description" content="ALSSUMMARY - Prints out the paramters of the current AT lattice">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; alssummary.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>alssummary
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>ALSSUMMARY - Prints out the paramters of the current AT lattice</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function sum = alssummary </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">ALSSUMMARY - Prints out the paramters of the current AT lattice
+
+  See also atsummary</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function sum = alssummary</a>
+0002 <span class="comment">%ALSSUMMARY - Prints out the paramters of the current AT lattice</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  See also atsummary</span>
+0005 
+0006 
+0007 <span class="keyword">global</span> THERING
+0008 
+0009 <span class="comment">%</span>
+0010 sum = atsummary;
+0011 
+0012 
+0013 <span class="comment">% Add ALS structure</span>
+0014 [Tilt, Eta, EpsX, EpsY, EmittanceRatio, ENV, DP, DL, BeamSize] = calccoupling;
+0015 
+0016 
+0017 
+0018 <span class="comment">%              sum.DxB1 =</span>
+0019 <span class="comment">%              sum.DxB2 =</span>
+0020 <span class="comment">%        sum.DxStraight =</span>
+0021 <span class="comment">%               sum.MuX =</span>
+0022 <span class="comment">%               sum.MuY =</span>
+0023 
+0024 
+0025 sum.Emittance = sum.naturalEmittance;
+0026 sum = rmfield(sum, <span class="string">'naturalEmittance'</span>);
+0027 
+0028 sum.MCF = sum.compactionFactor;
+0029 sum = rmfield(sum, <span class="string">'compactionFactor'</span>);
+0030 
+0031 sum.QD  = getsp(<span class="string">'QF'</span>, <span class="string">'Physics'</span>,[1 1]);
+0032 sum.QF  = getsp(<span class="string">'QD'</span>, <span class="string">'Physics'</span>,[1 1]);
+0033 sum.QFA = getsp(<span class="string">'QFA'</span>,<span class="string">'Physics'</span>,[1 1]);
+0034 
+0035                
+0036 i = family2atindex(<span class="string">'BEND'</span>,[1 1]);
+0037 [bx, by] = modelbeta(<span class="string">'BEND'</span>);
+0038 N = size(i,2);
+0039 
+0040 <span class="keyword">if</span> rem(N,2) == 1
+0041     <span class="comment">% Odd</span>
+0042     sum.SigmaXB1 = (BeamSize(1,i(1,floor(N/2))) + BeamSize(1,i(1,ceil(N/2)))) / 2;
+0043     sum.BetaXB1  = (bx(i(1,floor(N/2))) + bx(i(1,ceil(N/2)))) / 2;
+0044     sum.BetaYB1  = (by(i(1,floor(N/2))) + by(i(1,ceil(N/2)))) / 2;
+0045 <span class="keyword">elseif</span> rem(N,2) == 0
+0046     <span class="comment">% Even</span>
+0047     sum.SigmaXB1 = BeamSize(1,i(1,N/2+1));
+0048     sum.BetaXB1  = bx(i(1,N/2+1));
+0049     sum.BetaYB1  = by(i(1,N/2+1));
+0050 <span class="keyword">end</span>
+0051 
+0052 i = family2atindex(<span class="string">'BEND'</span>,[1 2]);
+0053 [bx, by] = modelbeta(<span class="string">'BEND'</span>);
+0054 N = size(i,2);
+0055 <span class="keyword">if</span> rem(N,2) == 1
+0056     <span class="comment">% Odd</span>
+0057     sum.SigmaXB2 = (BeamSize(1,i(1,floor(N/2))) + BeamSize(1,i(1,ceil(N/2)))) / 2;
+0058     sum.BetaXB2  = (bx(i(1,floor(N/2))) + bx(i(1,ceil(N/2)))) / 2;
+0059     sum.BetaYB2  = (by(i(1,floor(N/2))) + by(i(1,ceil(N/2)))) / 2;
+0060 <span class="keyword">elseif</span> rem(N,2) == 0
+0061     <span class="comment">% Even</span>
+0062     sum.SigmaXB2 = BeamSize(1,i(1,N/2+1));
+0063     sum.BetaXB2  = bx(i(1,N/2+1));
+0064     sum.BetaYB2  = by(i(1,N/2+1));
+0065 <span class="keyword">end</span>
+0066 
+0067 sum.SigmaXStraight = BeamSize(1,1);
+0068 sum.BetaXStraight = bx(1);
+0069 sum.BetaYStraight = by(1);
+0070 
+0071 
+0072 <span class="keyword">if</span> nargout == 0
+0073     fprintf(<span class="string">'\n'</span>);
+0074     fprintf(<span class="string">'   ******** AT Lattice Summary ********\n'</span>);
+0075     fprintf(<span class="string">'   Energy: \t\t\t%4.5f [GeV]\n'</span>, sum.e0);
+0076     fprintf(<span class="string">'   Gamma: \t\t\t%4.5f \n'</span>, sum.gamma);
+0077     fprintf(<span class="string">'   Circumference: \t\t%4.5f [m]\n'</span>, sum.circumference);
+0078     fprintf(<span class="string">'   Revolution time: \t\t%4.5f [ns] (%4.5f [MHz]) \n'</span>, sum.revTime*1e9,sum.revFreq*1e-6);
+0079     fprintf(<span class="string">'   Betatron tune H: \t\t%4.5f (%4.5f [kHz])\n'</span>, sum.tunes(1),sum.tunes(1)/sum.revTime*1e-3);
+0080     fprintf(<span class="string">'                 V: \t\t%4.5f (%4.5f [kHz])\n'</span>, sum.tunes(2),sum.tunes(2)/sum.revTime*1e-3);
+0081     fprintf(<span class="string">'   Momentum Compaction Factor: \t%4.5f\n'</span>, sum.compactionFactor);
+0082     fprintf(<span class="string">'   Chromaticity H: \t\t%+4.5f\n'</span>, sum.chromaticity(1));
+0083     fprintf(<span class="string">'                V: \t\t%+4.5f\n'</span>, sum.chromaticity(2));
+0084     fprintf(<span class="string">'   Synchrotron Integral 1: \t%4.5f [m]\n'</span>, sum.integrals(1));
+0085     fprintf(<span class="string">'                        2: \t%4.5f [m^-1]\n'</span>, sum.integrals(2));
+0086     fprintf(<span class="string">'                        3: \t%4.5f [m^-2]\n'</span>, sum.integrals(3));
+0087     fprintf(<span class="string">'                        4: \t%4.5f [m^-1]\n'</span>, sum.integrals(4));
+0088     fprintf(<span class="string">'                        5: \t%4.5f [m^-1]\n'</span>, sum.integrals(5));
+0089     fprintf(<span class="string">'                        6: \t%4.5f [m^-1]\n'</span>, sum.integrals(6));
+0090     fprintf(<span class="string">'   Damping Partition H: \t%4.5f\n'</span>, sum.damping(1));
+0091     fprintf(<span class="string">'                     V: \t%4.5f\n'</span>, sum.damping(2));
+0092     fprintf(<span class="string">'                     E: \t%4.5f\n'</span>, sum.damping(3));
+0093     fprintf(<span class="string">'   Radiation Loss: \t\t%4.5f [keV]\n'</span>, sum.radiation*1e6);
+0094     fprintf(<span class="string">'   Natural Energy Spread: \t%4.5e\n'</span>, sum.naturalEnergySpread);
+0095     fprintf(<span class="string">'   Natural Emittance: \t\t%4.5e [mrad]\n'</span>, sum.naturalEmittance);
+0096     fprintf(<span class="string">'   Radiation Damping H: \t%4.5f [ms]\n'</span>, sum.radiationDamping(1)*1e3);
+0097     fprintf(<span class="string">'                     V: \t%4.5f [ms]\n'</span>, sum.radiationDamping(2)*1e3);
+0098     fprintf(<span class="string">'                     E: \t%4.5f [ms]\n'</span>, sum.radiationDamping(3)*1e3);
+0099     fprintf(<span class="string">'   Slip factor : \t%4.5f\n'</span>, sum.etac);
+0100     fprintf(<span class="string">'\n'</span>);
+0101     fprintf(<span class="string">'   Assuming cavities Voltage: %4.5f [kV]\n'</span>, v_cav/1e3);
+0102     fprintf(<span class="string">'                   Frequency: %4.5f [MHz]\n'</span>, freq/1e6);
+0103     fprintf(<span class="string">'             Harmonic Number: %4.5f\n'</span>, sum.harmon);
+0104     fprintf(<span class="string">'   Overvoltage factor: %4.5f\n'</span>, sum.overvoltage);
+0105     fprintf(<span class="string">'   Synchronous Phase:  %4.5f [rad] (%4.5f [deg])\n'</span>, sum.syncphase, sum.syncphase*180/pi);
+0106     fprintf(<span class="string">'   Linear Energy Acceptance:  %4.5f %%\n'</span>, sum.energyacceptance*100);
+0107     fprintf(<span class="string">'   Synchrotron Tune:   %4.5f (%4.5f kHz or %4.2f turns) \n'</span>, sum.synctune, sum.synctune/sum.revTime*1e-3, 1/sum.synctune);
+0108     fprintf(<span class="string">'   Bunch Length:       %4.5f [mm]\n'</span>, sum.bunchlength*1e3);
+0109 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of channel2dev</title>
+  <meta name="keywords" content="channel2dev">
+  <meta name="description" content="CHANNEL2DEV - Converts a channel name list to a device list">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; channel2dev.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>channel2dev
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>CHANNEL2DEV - Converts a channel name list to a device list</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [DeviceList, FamilyName, Field, ErrorFlag] = channel2dev(ChannelNames, FamilyList) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">CHANNEL2DEV - Converts a channel name list to a device list
+  [DeviceList, Family, Field, ErrorFlag] = channel2dev(ChannelNames, Family)
+
+  INPUTS
+  1. ChannelNames - List of channel names (string, matrix, cell array)
+  2. Family - Family Names to to limit search (string or cell of strings)
+              Accelerator Object
+              '' search all families {Default}
+
+  OUTPUTS
+  1. DeviceList - DeviceList corresponding to the common name
+                  If no common names are found, an empty matrix is returned 
+                  If only some common names are not found, [NaN NaN] will be 
+                  inserted into the device list where they are not found.
+  2. Family - Family Name (since input Family can be empty)
+              If the channel name cannot be found an empty strings 
+              (or a blank string for matrix inputs) is returned
+  3. Field - Field Name
+  4. ErrorFlag - Number of errors found
+
+  See also <a href="channel2family.html" class="code" title="function [FamilyName, Field, DeviceList, ErrorFlag] = channel2family(varargin)">channel2family</a>, <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>, <a href="common2channel.html" class="code" title="function [ChannelNames, FamilyName, Field, DeviceList, ErrorFlag] = common2channel(CommonNames, Field, Family)">common2channel</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="channel2dev.html" class="code" title="function [DeviceList, FamilyName, Field, ErrorFlag] = channel2dev(ChannelNames, FamilyList)">channel2dev</a>	CHANNEL2DEV - Converts a channel name list to a device list</li><li><a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>	GETAO - returns the AcceleratorObject (AO)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="channel2dev.html" class="code" title="function [DeviceList, FamilyName, Field, ErrorFlag] = channel2dev(ChannelNames, FamilyList)">channel2dev</a>	CHANNEL2DEV - Converts a channel name list to a device list</li><li><a href="channel2family.html" class="code" title="function [FamilyName, Field, DeviceList, ErrorFlag] = channel2family(varargin)">channel2family</a>	CHANNEL2FAMILY - Convert a channel name to a Family, Field, DeviceList</li><li><a href="family2status.html" class="code" title="function [S, IndexList] = family2status(Family, DeviceList)">family2status</a>	FAMILY2STATUS - Returns the device status</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DeviceList, FamilyName, Field, ErrorFlag] = channel2dev(ChannelNames, FamilyList)</a>
+0002 <span class="comment">%CHANNEL2DEV - Converts a channel name list to a device list</span>
+0003 <span class="comment">%  [DeviceList, Family, Field, ErrorFlag] = channel2dev(ChannelNames, Family)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. ChannelNames - List of channel names (string, matrix, cell array)</span>
+0007 <span class="comment">%  2. Family - Family Names to to limit search (string or cell of strings)</span>
+0008 <span class="comment">%              Accelerator Object</span>
+0009 <span class="comment">%              '' search all families {Default}</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  OUTPUTS</span>
+0012 <span class="comment">%  1. DeviceList - DeviceList corresponding to the common name</span>
+0013 <span class="comment">%                  If no common names are found, an empty matrix is returned</span>
+0014 <span class="comment">%                  If only some common names are not found, [NaN NaN] will be</span>
+0015 <span class="comment">%                  inserted into the device list where they are not found.</span>
+0016 <span class="comment">%  2. Family - Family Name (since input Family can be empty)</span>
+0017 <span class="comment">%              If the channel name cannot be found an empty strings</span>
+0018 <span class="comment">%              (or a blank string for matrix inputs) is returned</span>
+0019 <span class="comment">%  3. Field - Field Name</span>
+0020 <span class="comment">%  4. ErrorFlag - Number of errors found</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  See also channel2family, family2dev, common2channel</span>
+0023 
+0024 <span class="comment">%  Written by Greg Portmann</span>
+0025 
+0026 
+0027 ErrorFlag = 0;
+0028 
+0029 
+0030 <span class="keyword">if</span> nargin &lt; 1
+0031     error(<span class="string">'Must have 1 input (''ChannelNames'')'</span>);
+0032 <span class="keyword">end</span>
+0033 <span class="keyword">if</span> nargin &lt; 2
+0034     FamilyList = <span class="string">''</span>;
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="comment">% Cell inputs</span>
+0038 <span class="keyword">if</span> iscell(ChannelNames)
+0039     <span class="keyword">if</span> iscell(FamilyList)
+0040         <span class="keyword">if</span> length(FamilyList) ~= length(ChannelNames)
+0041             error(<span class="string">'Family and ChannelNames must be the same size cell arrays.'</span>);
+0042         <span class="keyword">end</span>
+0043     <span class="keyword">end</span>
+0044     
+0045     <span class="keyword">for</span> i = 1:length(ChannelNames)
+0046         <span class="keyword">if</span> iscell(FamilyList)
+0047             [DeviceList{i}, ErrorTmp] = <a href="channel2dev.html" class="code" title="function [DeviceList, FamilyName, Field, ErrorFlag] = channel2dev(ChannelNames, FamilyList)">channel2dev</a>(ChannelNames{i}, FamilyList{i});
+0048         <span class="keyword">else</span>
+0049             [DeviceList{i}, ErrorTmp] = <a href="channel2dev.html" class="code" title="function [DeviceList, FamilyName, Field, ErrorFlag] = channel2dev(ChannelNames, FamilyList)">channel2dev</a>(ChannelNames{i}, FamilyList);
+0050         <span class="keyword">end</span>
+0051         ErrorFlag = ErrorFlag | ErrorTmp;
+0052     <span class="keyword">end</span>
+0053     <span class="keyword">return</span>;
+0054 <span class="keyword">end</span>
+0055 <span class="comment">% End cell input</span>
+0056 
+0057 
+0058 
+0059 <span class="comment">% Determine what is in Input #2</span>
+0060 <span class="keyword">if</span> isstruct(FamilyList)
+0061     <span class="keyword">if</span> isfield(FamilyList,<span class="string">'FamilyName'</span>) &amp; isfield(FamilyList,<span class="string">'Field'</span>)
+0062         <span class="comment">% Data structure input - select the FamilyName from the structure</span>
+0063         AO = <a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>;
+0064         FamilyCell = {FamilyList.FamilyName};
+0065     <span class="keyword">else</span>
+0066         <span class="comment">% AO structure input</span>
+0067         FamilyCell = {FamilyList.FamilyName};
+0068         AO.(FamilyCell{1}) = FamilyList;
+0069     <span class="keyword">end</span>
+0070 <span class="keyword">elseif</span> isempty(FamilyList)
+0071     <span class="comment">% Search in all families</span>
+0072     AO = <a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>;
+0073     FamilyCell = fieldnames(AO);
+0074 <span class="keyword">elseif</span> iscell(FamilyList)
+0075     <span class="comment">% Search in all families in FamilyList</span>
+0076     AO = <a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>;
+0077 <span class="keyword">elseif</span> ischar(FamilyList)
+0078     <span class="comment">% Only search in one family</span>
+0079     AO = <a href="getao.html" class="code" title="function  AO = getao(FileName)">getao</a>;
+0080     FamilyCell = {FamilyList};
+0081 <span class="keyword">end</span>
+0082 
+0083 
+0084 
+0085 <span class="comment">% Start the search</span>
+0086 FamilyName = <span class="string">''</span>;
+0087 Field = <span class="string">''</span>;
+0088 DeviceList = [];
+0089 
+0090 
+0091 <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0092     Found = 0;
+0093     <span class="keyword">for</span> j = 1:length(FamilyCell)
+0094         FamilyTest = deblank(FamilyCell{j});
+0095         Fields = fieldnames(AO.(FamilyTest));
+0096         <span class="keyword">for</span> k = 1:length(Fields)
+0097             <span class="keyword">if</span> isfield(AO.(FamilyTest).(Fields{k}), <span class="string">'ChannelNames'</span>)
+0098                 ChannelNamesTotal = AO.(FamilyTest).(Fields{k}).ChannelNames;
+0099 
+0100                 Name = deblank(ChannelNames(i,:));
+0101                 [name,jj,n] = intersect(Name, ChannelNamesTotal, <span class="string">'rows'</span>);
+0102                 
+0103                 <span class="keyword">if</span> ~isempty(n)
+0104                     Found = 1;
+0105                     <span class="keyword">break</span>
+0106                 <span class="keyword">end</span>
+0107             <span class="keyword">end</span>
+0108         <span class="keyword">end</span>
+0109         <span class="keyword">if</span> Found
+0110             <span class="keyword">break</span>
+0111         <span class="keyword">end</span>
+0112     <span class="keyword">end</span>
+0113 
+0114     <span class="keyword">if</span> Found
+0115         FamilyName = strvcat(FamilyName, FamilyTest);
+0116         Field = strvcat(Field, Fields{k});
+0117         DeviceList = [DeviceList; AO.(FamilyTest).DeviceList(n,:)];
+0118     <span class="keyword">else</span>
+0119         FamilyName = strvcat(FamilyName, <span class="string">' '</span>);
+0120         Field = strvcat(Field, <span class="string">' '</span>);
+0121         DeviceList = [DeviceList; [NaN NaN]];
+0122         ErrorFlag = ErrorFlag + 1;
+0123     <span class="keyword">end</span>
+0124 <span class="keyword">end</span>
+0125 
+0126 
+0127 FamilyName = deblank(FamilyName);
+0128 Field = deblank(Field);
+0129 
+0130 <span class="keyword">if</span> all(isnan(DeviceList))
+0131     DeviceList = [];
+0132 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

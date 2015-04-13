@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of updateatindex</title>
+  <meta name="keywords" content="updateatindex">
+  <meta name="description" content="UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; updateatindex.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>updateatindex
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function updateatindex </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	setoperationalmode(ModeNumber)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function updateatindex</a>
+0002 <span class="comment">%UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</span>
+0003 
+0004 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0005 <span class="comment">% Append Accelerator Toolbox information %</span>
+0006 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0007 
+0008 <span class="comment">% Since changing the model (above) could change the AT indexes, etc,</span>
+0009 <span class="comment">% It's best to regenerate all the model parameters</span>
+0010 disp(<span class="string">'   Initializing Accelerator Toolbox information'</span>);
+0011 
+0012 AO = getao;    
+0013 
+0014 <span class="keyword">global</span> THERING FAMLIST
+0015 ATindx = atindex(THERING);  <span class="comment">%structure with fields containing indices</span>
+0016 s = findspos(THERING,1:length(THERING)+1)';
+0017 
+0018 
+0019 <span class="comment">%CORRECTORS</span>
+0020 AO.HCM.AT.ATType  = <span class="string">'HCM'</span>;
+0021 AO.HCM.AT.ATIndex = ATindx.COR(:);
+0022 AO.HCM.Position = s(AO.HCM.AT.ATIndex);
+0023 <span class="comment">%AO.HCM.Position = (s(AO.HCM.AT.ATIndex)+s(AO.HCM.AT.ATIndex+1))/2;</span>
+0024 
+0025 AO.VCM.AT.ATType  = <span class="string">'VCM'</span>;
+0026 AO.VCM.AT.ATIndex = ATindx.COR(:);
+0027 AO.VCM.Position   = s(AO.VCM.AT.ATIndex);
+0028 <span class="comment">%AO.VCM.Position = (s(AO.VCM.AT.ATIndex)+s(AO.VCM.AT.ATIndex+1))/2;</span>
+0029 
+0030 <span class="comment">%BPMS</span>
+0031 AO.BPMx.AT.ATType  = <span class="string">'BPMx'</span>;
+0032 AO.BPMx.AT.ATIndex = ATindx.BPM(:);
+0033 AO.BPMx.Position   = s(AO.BPMx.AT.ATIndex);
+0034 
+0035 AO.BPMy.AT.ATType  = <span class="string">'BPMy'</span>;
+0036 AO.BPMy.AT.ATIndex = ATindx.BPM(:);
+0037 AO.BPMy.Position   = s(AO.BPMy.AT.ATIndex);  <span class="comment">%for SPEAR 3 horizontal and vertical bpms at same s-position</span>
+0038 
+0039 <span class="comment">%SKEW QUADS</span>
+0040 AO.SkewQuad.AT.ATType  = <span class="string">'SkewQuad'</span>;
+0041 t=sort([ATindx.SF ATindx.SD ATindx.SFM ATindx.SDM]);
+0042 AO.SkewQuad.AT.ATIndex = t(:);
+0043 AO.SkewQuad.Position=s(AO.SkewQuad.AT.ATIndex);
+0044 <span class="comment">%AO.SkewQuad.Position = (s(AO.SkewQuad.AT.ATIndex)+s(AO.SkewQuad.AT.ATIndex+1))/2;</span>
+0045 
+0046 <span class="comment">%FULL BENDS</span>
+0047 AO.BEND.AT.ATType  = <span class="string">'BEND'</span>;
+0048 AO.BEND.AT.ATIndex = sort([ATindx.BEND(:); ATindx.BDM(:)]);   <span class="comment">%both 145D and 109D dipoles on main string</span>
+0049 AO.BEND.Position=s(AO.BEND.AT.ATIndex);
+0050 <span class="comment">%AO.BEND.Position = (s(AO.BEND.AT.ATIndex)+s(AO.BEND.AT.ATIndex+1))/2;</span>
+0051 <span class="comment">% for i = 1:length(AO.BEND.AT.ATIndex);</span>
+0052 <span class="comment">% ParameterGroupCell{i} = mkparamgroup(THERING,AO.BEND.AT.ATIndex(i),'K');</span>
+0053 <span class="comment">% end</span>
+0054 <span class="comment">% AO.BEND.AT.ATParameterGroup = ParameterGroupCell;</span>
+0055 
+0056 <span class="comment">%3/4 BENDS</span>
+0057 AO.BDM.AT.ATType  = <span class="string">'BEND'</span>;
+0058 AO.BDM.AT.ATIndex = ATindx.BDM(:);
+0059 AO.BDM.Position=s(AO.BDM.AT.ATIndex);
+0060 <span class="comment">%AO.BDM.Position = (s(AO.BDM.AT.ATIndex)+s(AO.BDM.AT.ATIndex+1))/2;</span>
+0061 <span class="comment">% for i = 1:length(AO.BDM.AT.ATIndex);</span>
+0062 <span class="comment">% ParameterGroupCell{i} = mkparamgroup(THERING,AO.BDM.AT.ATIndex(i),'K');</span>
+0063 <span class="comment">% end</span>
+0064 <span class="comment">% AO.BDM.AT.ATParameterGroup = ParameterGroupCell;</span>
+0065 
+0066 <span class="comment">%CD Chicane BENDS</span>
+0067 AO.CD.AT.ATType  = <span class="string">'BEND'</span>;
+0068 AO.CD.AT.ATIndex = ATindx.CD(:);
+0069 AO.CD.Position=s(AO.CD.AT.ATIndex);
+0070 
+0071 quadnames={<span class="string">'QF'</span> <span class="string">'QD'</span> <span class="string">'QFC'</span> <span class="string">'QDX'</span> <span class="string">'QFX'</span> <span class="string">'QDY'</span> <span class="string">'QFY'</span> <span class="string">'QDZ'</span> <span class="string">'QFZ'</span> <span class="string">'Q9S'</span>};
+0072 <span class="keyword">for</span> ii=1:length(quadnames)
+0073 <span class="keyword">if</span> isfield(AO,quadnames{ii})
+0074 AO.(quadnames{ii}).AT.ATType  = <span class="string">'QUAD'</span>;
+0075 AO.(quadnames{ii}).AT.ATIndex = ATindx.(quadnames{ii})(:);
+0076 AO.(quadnames{ii}).Position=s(AO.(quadnames{ii}).AT.ATIndex);
+0077 <span class="keyword">end</span>
+0078 <span class="keyword">end</span>
+0079 
+0080 
+0081 <span class="comment">%SEXTUPOLES</span>
+0082 AO.SF.AT.ATType  = <span class="string">'SEXT'</span>;
+0083 AO.SF.AT.ATIndex = ATindx.SF(:);
+0084 AO.SF.Position=s(AO.SF.AT.ATIndex);
+0085 <span class="comment">%AO.SF.Position = (s(AO.SF.AT.ATIndex)+s(AO.SF.AT.ATIndex+1))/2;</span>
+0086 <span class="comment">% for i = 1:length(AO.SF.AT.ATIndex);</span>
+0087 <span class="comment">% ParameterGroupCell{i} = mkparamgroup(THERING,AO.SF.AT.ATIndex(i),'K2');</span>
+0088 <span class="comment">% end</span>
+0089 <span class="comment">% AO.SF.AT.ATParameterGroup = ParameterGroupCell;</span>
+0090 
+0091 AO.SD.AT.ATType  = <span class="string">'SEXT'</span>;
+0092 AO.SD.AT.ATIndex = ATindx.SD(:);
+0093 AO.SD.Position=s(AO.SD.AT.ATIndex);
+0094 <span class="comment">%AO.SD.Position = (s(AO.SD.AT.ATIndex)+s(AO.SD.AT.ATIndex+1))/2;</span>
+0095 <span class="comment">% for i = 1:length(AO.SD.AT.ATIndex);</span>
+0096 <span class="comment">% ParameterGroupCell{i}  = mkparamgroup(THERING,AO.SD.AT.ATIndex(i),'K2');</span>
+0097 <span class="comment">% end</span>
+0098 <span class="comment">% AO.SD.AT.ATParameterGroup = ParameterGroupCell;</span>
+0099 
+0100 AO.SFM.AT.ATType  = <span class="string">'SEXT'</span>;
+0101 AO.SFM.AT.ATIndex = ATindx.SFM(:);
+0102 AO.SFM.Position=s(AO.SFM.AT.ATIndex);
+0103 <span class="comment">%AO.SFM.Position = (s(AO.SFM.AT.ATIndex)+s(AO.SFM.AT.ATIndex+1))/2;</span>
+0104 <span class="comment">% for i = 1:length(AO.SFM.AT.ATIndex);</span>
+0105 <span class="comment">% ParameterGroupCell{i} = mkparamgroup(THERING,AO.SFM.AT.ATIndex(i),'K2');</span>
+0106 <span class="comment">% end</span>
+0107 <span class="comment">% AO.SFM.AT.ATParameterGroup = ParameterGroupCell;</span>
+0108 
+0109 AO.SDM.AT.ATType  = <span class="string">'SEXT'</span>;
+0110 AO.SDM.AT.ATIndex = ATindx.SDM(:);
+0111 AO.SDM.Position=s(AO.SDM.AT.ATIndex);
+0112 <span class="comment">%AO.SDM.Position = (s(AO.SDM.AT.ATIndex)+s(AO.SDM.AT.ATIndex+1))/2;</span>
+0113 <span class="comment">% for i = 1:length(AO.SDM.AT.ATIndex);</span>
+0114 <span class="comment">% ParameterGroupCell{i} = mkparamgroup(THERING,AO.SDM.AT.ATIndex(i),'K2');</span>
+0115 <span class="comment">% end</span>
+0116 <span class="comment">% AO.SDM.AT.ATParameterGroup = ParameterGroupCell;</span>
+0117 
+0118 <span class="comment">%kickeramps</span>
+0119 AO.KickerAmp.AT.ATType  = <span class="string">'KickerAmp'</span>;
+0120 AO.KickerAmp.AT.ATIndex = ATindx.KICKER(:);
+0121 AO.KickerAmp.Position= s(AO.KickerAmp.AT.ATIndex);
+0122 
+0123 <span class="comment">%kickerdelay</span>
+0124 AO.KickerDelay.AT.ATType  = <span class="string">'Kicker'</span>;
+0125 AO.KickerDelay.AT.ATIndex = ATindx.KICKER(:);
+0126 AO.KickerDelay.Position= s(AO.KickerDelay.AT.ATIndex);
+0127 
+0128 <span class="comment">%septum</span>
+0129 AO.Septum.AT.ATType  = <span class="string">'Septum'</span>;
+0130 AO.Septum.AT.ATIndex = ATindx.SEPTUM(:);
+0131 AO.Septum.Position   = s(AO.Septum.AT.ATIndex);
+0132 
+0133 <span class="comment">%RF Cavity</span>
+0134 AO.RF.AT.ATType = <span class="string">'RF Cavity'</span>;
+0135 AO.RF.AT.ATIndex = findcells(THERING,<span class="string">'Frequency'</span>)';
+0136 AO.RF.Position   = s(AO.RF.AT.ATIndex);
+0137 
+0138 setao(AO); 
+0139</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

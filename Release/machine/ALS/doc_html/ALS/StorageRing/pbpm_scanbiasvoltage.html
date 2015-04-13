@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of pbpm_scanbiasvoltage</title>
+  <meta name="keywords" content="pbpm_scanbiasvoltage">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; pbpm_scanbiasvoltage.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>pbpm_scanbiasvoltage
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getpbpm.html" class="code" title="function p = getpbpm">getpbpm</a>	</li><li><a href="pbpm_plotbiasscan.html" class="code" title="">pbpm_plotbiasscan</a>	</li><li><a href="siglabgetpbpm.html" class="code" title="function [d1, d2, d3, d4, y1, y2, yy1, yy2, Gain, GainAvg] = siglabgetpbpm(Iter, NumBlk)">siglabgetpbpm</a>	clear</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 
+0002 clear
+0003 x = getx;
+0004 y = gety;
+0005 
+0006 
+0007 LocalFlag = 0;
+0008 
+0009 Range = 100e-6;  <span class="comment">%input('Input range? ');  %100e-06;</span>
+0010 RangeString = <span class="string">'100 uA'</span>;
+0011 
+0012 TimeStamp = clock;
+0013 DCCT = getdcct;
+0014 
+0015 BiasVoltage = [0 -2 -4 -8 -12 -16 -20 -25 -30 -35 -40 -50 -60 -70 -80 -100 -125 -150 -175 -200]
+0016 
+0017 
+0018 <span class="keyword">for</span> i = 1:length(BiasVoltage)
+0019 
+0020     fprintf(<span class="string">'\n\n   %2d.  Set the bias Voltage to %.1f volts then hit return\n\n'</span>, i, BiasVoltage(i));
+0021     pause;
+0022     pause(4);
+0023 
+0024     <span class="keyword">try</span>
+0025         <span class="comment">% Get data</span>
+0026         <span class="keyword">if</span> LocalFlag
+0027             [d1,d2,d3,d4] = <a href="siglabgetpbpm.html" class="code" title="function [d1, d2, d3, d4, y1, y2, yy1, yy2, Gain, GainAvg] = siglabgetpbpm(Iter, NumBlk)">siglabgetpbpm</a>(1,1);
+0028             pBPM(:,i) = [mean(d1); mean(d2); mean(d3); mean(d4);];
+0029         <span class="keyword">else</span>
+0030             pBPM(:,i) = <a href="getpbpm.html" class="code" title="function p = getpbpm">getpbpm</a>;
+0031         <span class="keyword">end</span>
+0032     <span class="keyword">catch</span>
+0033         <span class="comment">% Try 1 more time</span>
+0034         pause(.5);
+0035         <span class="keyword">if</span> LocalFlag
+0036             [d1,d2,d3,d4] = <a href="siglabgetpbpm.html" class="code" title="function [d1, d2, d3, d4, y1, y2, yy1, yy2, Gain, GainAvg] = siglabgetpbpm(Iter, NumBlk)">siglabgetpbpm</a>(1,1);
+0037             pBPM(:,i) = [mean(d1); mean(d2); mean(d3); mean(d4);];
+0038         <span class="keyword">else</span>
+0039             pBPM(:,i) = <a href="getpbpm.html" class="code" title="function p = getpbpm">getpbpm</a>;
+0040         <span class="keyword">end</span>
+0041     <span class="keyword">end</span>
+0042 <span class="keyword">end</span>
+0043 
+0044 
+0045 save biasvoltagescan_data1
+0046 
+0047 
+0048 <a href="pbpm_plotbiasscan.html" class="code" title="">pbpm_plotbiasscan</a>;
+0049 
+0050 
+0051 <span class="comment">%plot(BiasVoltage, pBPM, '.-');</span>
+0052 <span class="comment">%grid on;</span>
+0053 <span class="comment">%xlabel('Bias Voltage');</span>
+0054 <span class="comment">%ylabel('Blade Voltage');</span>
+0055 <span class="comment">%title('Bias Voltage Scan');</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

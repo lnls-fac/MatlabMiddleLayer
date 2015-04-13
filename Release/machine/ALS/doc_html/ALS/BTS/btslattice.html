@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of btslattice</title>
+  <meta name="keywords" content="btslattice">
+  <meta name="description" content="BTS lattice definition file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">BTS</a> &gt; btslattice.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\BTS&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>btslattice
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BTS lattice definition file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function varargout = btslattice(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> BTS lattice definition file</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = btslattice(varargin)</a>
+0002 <span class="comment">% BTS lattice definition file</span>
+0003 
+0004 
+0005 <span class="keyword">global</span> THERING 
+0006 
+0007 
+0008 <span class="comment">% Energy</span>
+0009 <span class="keyword">if</span> nargin &gt;=1 
+0010     Energy = varargin{1};
+0011 <span class="keyword">else</span>
+0012     Energy = 1.5e9;
+0013 <span class="keyword">end</span>
+0014 
+0015 
+0016 <span class="comment">% Aperture size ???</span>
+0017 <span class="comment">%AP =  aperture('AP',  [-0.2, 0.2, -0.1, 0.1], 'AperturePass');</span>
+0018 AP =  aperture(<span class="string">'AP'</span>,  [-10, 10, -10, 10], <span class="string">'AperturePass'</span>);
+0019 
+0020 START = marker(<span class="string">'START'</span>, <span class="string">'IdentityPass'</span>);
+0021 BPM   = marker(<span class="string">'BPM'</span>, <span class="string">'IdentityPass'</span>);
+0022 
+0023 
+0024 <span class="comment">% Correctors</span>
+0025 Lcm = 6*.0254;  <span class="comment">% 6 inches is the physical length of the iron core</span>
+0026 HCM = corrector(<span class="string">'HCM'</span>, Lcm, [0 0], <span class="string">'CorrectorPass'</span>);
+0027 VCM = corrector(<span class="string">'VCM'</span>, Lcm, [0 0], <span class="string">'CorrectorPass'</span>);
+0028 
+0029 
+0030 <span class="comment">% Last booster quad</span>
+0031 QD  = quadrupole(<span class="string">'QD'</span>, 1.0E-001,-2.3256700, <span class="string">'StrMPoleSymplectic4RadPass'</span>); 
+0032 
+0033 
+0034 <span class="comment">% Lattice in order without BPMs and correctors</span>
+0035 L1  = drift(<span class="string">'L1'</span>, 2.0048900E-001, <span class="string">'DriftPass'</span>);
+0036 SEN = rbend(<span class="string">'SEN'</span>, .6, 2.0*pi/180, 0*pi/180, 2.0*pi/180, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0037 <span class="comment">%SEN = rbend('SEN', .6, .0, 0.0, 0, 0, 'BndMPoleSymplectic4RadPass');</span>
+0038 L2  = drift(<span class="string">'L2'</span>, 2.0E-001, <span class="string">'DriftPass'</span>);
+0039 SEK = rbend(<span class="string">'SEK'</span>, .9, 10.0*pi/180, 5.0*pi/180, 5.0*pi/180, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0040 <span class="comment">%SEK = rbend('SEK', .9, 0, 0, 0, 0.0, 'BndMPoleSymplectic4RadPass');</span>
+0041 L3  = drift(<span class="string">'L3'</span>, .798989-Lcm/2, <span class="string">'DriftPass'</span>);
+0042 <span class="comment">% HCM</span>
+0043 L4  = drift(<span class="string">'L4'</span>, .648535-Lcm/2, <span class="string">'DriftPass'</span>);
+0044 <span class="comment">% BPM</span>
+0045 L5  = drift(<span class="string">'L5'</span>, .382917-Lcm/2, <span class="string">'DriftPass'</span>);
+0046 <span class="comment">% VCM</span>
+0047 L6  = drift(<span class="string">'L6'</span>, .300000-Lcm/2, <span class="string">'DriftPass'</span>);
+0048 TV1 = marker(<span class="string">'TV'</span>, <span class="string">'IdentityPass'</span>);
+0049 L7  = drift(<span class="string">'L7'</span>, .2, <span class="string">'DriftPass'</span>);
+0050 Q1  = quadrupole(<span class="string">'Q'</span>, .3, 1.3921, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0051 L8  = drift(<span class="string">'L8'</span>, .20-Lcm/2, <span class="string">'DriftPass'</span>);
+0052 <span class="comment">% HCM</span>
+0053 L9  = drift(<span class="string">'L9'</span>, .25-Lcm, <span class="string">'DriftPass'</span>);
+0054 <span class="comment">% VCM</span>
+0055 L10 = drift(<span class="string">'L10'</span>, 3.4095580-Lcm/2, <span class="string">'DriftPass'</span>);
+0056 TV2 = marker(<span class="string">'TV'</span>, <span class="string">'IdentityPass'</span>);
+0057 L11 = drift(<span class="string">'L11'</span>, 2.0E-001, <span class="string">'DriftPass'</span>);
+0058 Q21 = quadrupole(<span class="string">'Q'</span>, 3.0E-001,-6.1290000E-001, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0059 L12 = drift(<span class="string">'L12'</span>, 3.0E-001, <span class="string">'DriftPass'</span>);
+0060 Q22 = quadrupole(<span class="string">'Q'</span>, 3.0E-001,-2.9980000E-001, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0061 L13 = drift(<span class="string">'L13'</span>, .16-Lcm/2, <span class="string">'DriftPass'</span>);
+0062 <span class="comment">% HCM</span>
+0063 L14 = drift(<span class="string">'L14'</span>, .175-Lcm, <span class="string">'DriftPass'</span>);
+0064 <span class="comment">% VCM</span>
+0065 L15 = drift(<span class="string">'L15'</span>, .452-Lcm/2, <span class="string">'DriftPass'</span>);
+0066 B1  = rbend(<span class="string">'BEND'</span>, 1.4, 20*pi/180, 10*pi/180, 10*pi/180, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0067 L16 = drift(<span class="string">'L16'</span>, 1.6685430, <span class="string">'DriftPass'</span>);
+0068 <span class="comment">% BPM</span>
+0069 L17 = drift(<span class="string">'L17'</span>, 3.5642900E-001, <span class="string">'DriftPass'</span>);
+0070 Q31 = quadrupole(<span class="string">'Q'</span>, 3.0E-001,-3.9970000E-001, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0071 L18 = drift(<span class="string">'L18'</span>, 3.0E-001, <span class="string">'DriftPass'</span>);
+0072 Q32 = quadrupole(<span class="string">'Q'</span>, 3.0E-001, 1.6189000, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0073 L19 = drift(<span class="string">'L19'</span>, .15-Lcm/2, <span class="string">'DriftPass'</span>);
+0074 <span class="comment">% HCM</span>
+0075 L20 = drift(<span class="string">'L20'</span>, .175-Lcm, <span class="string">'DriftPass'</span>);
+0076 <span class="comment">% VCM</span>
+0077 L21 = drift(<span class="string">'L21'</span>, .20-Lcm/2, <span class="string">'DriftPass'</span>);
+0078 TV3 = marker(<span class="string">'TV'</span>, <span class="string">'IdentityPass'</span>);
+0079 L22 = drift(<span class="string">'L22'</span>, 1.1710280, <span class="string">'DriftPass'</span>);
+0080 B2  = rbend(<span class="string">'BEND'</span>, 1.4, 20*pi/180, 10*pi/180, 10*pi/180, 0.0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0081 L23 = drift(<span class="string">'L23'</span>, 6.0719400E-001, <span class="string">'DriftPass'</span>);
+0082 Q4  = quadrupole(<span class="string">'Q'</span>, 3.0E-001, 2.2984000, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0083 L24 = drift(<span class="string">'L24'</span>, 3.0359400E-001, <span class="string">'DriftPass'</span>);
+0084 TV4 = marker(<span class="string">'TV'</span>, <span class="string">'IdentityPass'</span>);
+0085 L25 = drift(<span class="string">'L25'</span>, 1.1918470-Lcm/2, <span class="string">'DriftPass'</span>);
+0086 <span class="comment">% HCM</span>
+0087 L26 = drift(<span class="string">'L26'</span>, .175-Lcm, <span class="string">'DriftPass'</span>);
+0088 <span class="comment">% VCM</span>
+0089 L27 = drift(<span class="string">'L27'</span>, .15-Lcm/2, <span class="string">'DriftPass'</span>);
+0090 Q51 = quadrupole(<span class="string">'Q'</span>, 3.0E-001,-2.9246000, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0091 L28 = drift(<span class="string">'L28'</span>, 3.0E-001, <span class="string">'DriftPass'</span>);
+0092 Q52 = quadrupole(<span class="string">'Q'</span>, 3.0E-001, 2.7048000, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0093 L29 = drift(<span class="string">'L29'</span>, 2.0426500E-001, <span class="string">'DriftPass'</span>);
+0094 <span class="comment">% BPM</span>
+0095 L30 = drift(<span class="string">'L30'</span>, 9.1510000E-001, <span class="string">'DriftPass'</span>);
+0096 B3  = rbend(<span class="string">'BEND'</span>, 1.4, 20*pi/180, 10*pi/180, 10*pi/180, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0097 L31 = drift(<span class="string">'L31'</span>, .579682-Lcm/2, <span class="string">'DriftPass'</span>);
+0098 <span class="comment">% HCM</span>
+0099 L32 = drift(<span class="string">'L32'</span>, .175-Lcm, <span class="string">'DriftPass'</span>);
+0100 <span class="comment">% VCM</span>
+0101 L33 = drift(<span class="string">'L33'</span>, 2.3067730-Lcm/2, <span class="string">'DriftPass'</span>);
+0102 <span class="comment">% BPM</span>
+0103 L34 = drift(<span class="string">'L34'</span>, 3.5634900E-001, <span class="string">'DriftPass'</span>);
+0104 Q61 = quadrupole(<span class="string">'Q'</span>, 3.0E-001, 2.1585000, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0105 L35 = drift(<span class="string">'L35'</span>, 3.0E-001, <span class="string">'DriftPass'</span>);
+0106 Q62 = quadrupole(<span class="string">'Q'</span>, 3.0E-001,-2.0719000, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0107 L36 = drift(<span class="string">'L36'</span>, .149446-Lcm/2, <span class="string">'DriftPass'</span>);
+0108 <span class="comment">% HCM</span>
+0109 L37 = drift(<span class="string">'L37'</span>, .175-Lcm, <span class="string">'DriftPass'</span>);
+0110 <span class="comment">% VCM</span>
+0111 L38 = drift(<span class="string">'L38'</span>, .87103-Lcm/2, <span class="string">'DriftPass'</span>);
+0112 B4  = rbend(<span class="string">'BEND'</span>, 1.3989, 18.4*pi/180, 9.2*pi/180, 9.2*pi/180, 0.0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0113 L39 = drift(<span class="string">'L39'</span>, 6.8926600E-001, <span class="string">'DriftPass'</span>);
+0114 TV5 = marker(<span class="string">'TV'</span>, <span class="string">'IdentityPass'</span>);
+0115 L40 = drift(<span class="string">'L40'</span>, 1.3422340, <span class="string">'DriftPass'</span>);
+0116 <span class="comment">% BPM</span>
+0117 L41 = drift(<span class="string">'L41'</span>, 3.5634900E-001, <span class="string">'DriftPass'</span>);
+0118 Q7  = quadrupole(<span class="string">'Q'</span>, 3.0E-001, 1.7455000, <span class="string">'StrMPoleSymplectic4RadPass'</span>);
+0119 L42 = drift(<span class="string">'L42'</span>, .20-Lcm/2, <span class="string">'DriftPass'</span>);
+0120 <span class="comment">% HCM</span>
+0121 L43 = drift(<span class="string">'L43'</span>, .25-Lcm, <span class="string">'DriftPass'</span>);
+0122 <span class="comment">% VCM</span>
+0123 L44 = drift(<span class="string">'L44'</span>, 1.3856790-Lcm/2, <span class="string">'DriftPass'</span>);
+0124 <span class="comment">% BPM</span>
+0125 L45 = drift(<span class="string">'L45'</span>, .955427-Lcm/2, <span class="string">'DriftPass'</span>);
+0126 <span class="comment">% HCM</span>
+0127 L46 = drift(<span class="string">'L46'</span>, .24727900-Lcm, <span class="string">'DriftPass'</span>);
+0128 <span class="comment">% VCM</span>
+0129 L47 = drift(<span class="string">'L47'</span>, .392873-Lcm/2, <span class="string">'DriftPass'</span>);
+0130 TV6 = marker(<span class="string">'TV'</span>, <span class="string">'IdentityPass'</span>);
+0131 L48 = drift(<span class="string">'L48'</span>, 8.0712800E-001, <span class="string">'DriftPass'</span>);
+0132 SIK = rbend(<span class="string">'SIK'</span>, 9.0E-1, 10.07*pi/180, 10.07*pi/180, 0.0*pi/180, 0.0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0133 L49 = drift(<span class="string">'L49'</span>, 2.7700000E-001, <span class="string">'DriftPass'</span>);
+0134 SIN = rbend(<span class="string">'SIN'</span>, .6, 2.0*pi/180, 2.0*pi/180, 0.0*pi/180, 0.0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0135 L50 = drift(<span class="string">'L50'</span>, 2.2743000E-001, <span class="string">'DriftPass'</span>);
+0136 SRBMP3 = rbend(<span class="string">'SRBMP3'</span>, .7, 0, 0, 0, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0137 SRBMP4 = rbend(<span class="string">'SRBMP4'</span>, .7, 0, 0, 0, 0, <span class="string">'BndMPoleSymplectic4RadPass'</span>);
+0138 L51 = drift(<span class="string">'L51'</span>, 3.0E-001, <span class="string">'DriftPass'</span>);
+0139 CTR_SRQF = marker(<span class="string">'CTR_SRQF'</span>, <span class="string">'IdentityPass'</span>);
+0140 
+0141 <span class="comment">% QF?</span>
+0142 BTS = [START AP L1 SEN L2 SEK L3 HCM L4 BPM L5 VCM L6 TV1 L7 Q1 L8 HCM L9 VCM <span class="keyword">...</span>
+0143 L10 TV2 L11 Q21 L12 Q22 L13 HCM L14 VCM L15 B1 L16 BPM L17 Q31 L18 Q32 <span class="keyword">...</span>
+0144 L19 HCM L20 VCM L21 TV3 L22 B2 L23 Q4 L24 TV4 L25 HCM L26 VCM L27 Q51 L28 Q52 <span class="keyword">...</span>
+0145 L29 BPM L30 B3 L31 HCM L32 VCM L33 BPM L34 Q61 L35 Q62 L36 HCM L37 VCM L38 B4 <span class="keyword">...</span>
+0146 L39 TV5 L40 BPM L41 Q7 L42 HCM L43 VCM L44 BPM L45 HCM L46 VCM L47 TV6 L48 SIK L49 SIN <span class="keyword">...</span><span class="comment"> </span>
+0147 L50 SRBMP3 L50 SRBMP4 L51 CTR_SRQF];
+0148 
+0149 
+0150 buildlat(BTS);
+0151 THERING = setcellstruct(THERING, <span class="string">'Energy'</span>, 1:length(THERING), Energy);
+0152 
+0153 <span class="comment">% L0_tot=0;</span>
+0154 <span class="comment">% for i=1:length(THERING)</span>
+0155 <span class="comment">%     L0_tot=L0_tot+THERING{i}.Length;</span>
+0156 <span class="comment">%     fprintf('%d.  %f   %s  \n', i, L0_tot, THERING{i}.FamName);</span>
+0157 <span class="comment">% end</span>
+0158 
+0159 
+0160 L0 = findspos(THERING, length(THERING)+1);
+0161 fprintf(<span class="string">'   BTS Length = %.6f meters  \n'</span>, L0)
+0162 
+0163</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getbpmpsd</title>
+  <meta name="keywords" content="getbpmpsd">
+  <meta name="description" content="GETBPMPSD - Program to analyze BPM power spectrum">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getbpmpsd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getbpmpsd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GETBPMPSD - Program to analyze BPM power spectrum</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Pxx, fx, Xrms, Pxx_Int, Pyy, fy, Yrms, Pyy_Int, TimeStart] = getbpmpsd(DeviceList, Navg, FileName, LineColor) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETBPMPSD - Program to analyze BPM power spectrum
+  [Pxx, fx, Xrms, PxxInt, Pyy, fy, Yrms, PyyInt, TimeStart] = getbpmpsd(DeviceList, Navg, FileName, LineColor) 
+
+  INPUTS
+  1. DeviceList
+  2. Navg {Default: 10}
+  3. FileName - Filename (automatic creates a file if there is no output variables)
+  4. LineColor - {Default: 'b'}
+     If input 3 exists or no output exists, then data will be plotted to the screen
+
+  OUTPUT
+  1. Pxx    - Horizontal power spectrum  [(m)^2/Hz]
+  2. fx     - Frequency vector [Hz]
+  3. Xrms   - Horizontal RMS deplacement [m]
+  4. PxxInt - Horizontal integrated RMS deplacement squared [m^2]
+  5-8. Vertical
+
+  NOTES
+  1. If no output exist, a file is automatically created in the current directory named according to the BPM device list
+  2. Uses function bpm_psd to compute the PSD
+  2. Uses function getbpm4k to get the 4 KHz BPM data in millimeters 
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmbuffer.html" class="code" title="function [bpmdataX, bpmdataY, T, TimeStamp] = getbpmbuffer(DeviceList);">getbpmbuffer</a>	BPM = getbpmbuffer(DeviceList)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Pxx, fx, Xrms, Pxx_Int, Pyy, fy, Yrms, Pyy_Int, TimeStart] = getbpmpsd(DeviceList, Navg, FileName, LineColor)</a>
+0002 <span class="comment">%GETBPMPSD - Program to analyze BPM power spectrum</span>
+0003 <span class="comment">%  [Pxx, fx, Xrms, PxxInt, Pyy, fy, Yrms, PyyInt, TimeStart] = getbpmpsd(DeviceList, Navg, FileName, LineColor)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. DeviceList</span>
+0007 <span class="comment">%  2. Navg {Default: 10}</span>
+0008 <span class="comment">%  3. FileName - Filename (automatic creates a file if there is no output variables)</span>
+0009 <span class="comment">%  4. LineColor - {Default: 'b'}</span>
+0010 <span class="comment">%     If input 3 exists or no output exists, then data will be plotted to the screen</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  OUTPUT</span>
+0013 <span class="comment">%  1. Pxx    - Horizontal power spectrum  [(m)^2/Hz]</span>
+0014 <span class="comment">%  2. fx     - Frequency vector [Hz]</span>
+0015 <span class="comment">%  3. Xrms   - Horizontal RMS deplacement [m]</span>
+0016 <span class="comment">%  4. PxxInt - Horizontal integrated RMS deplacement squared [m^2]</span>
+0017 <span class="comment">%  5-8. Vertical</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  NOTES</span>
+0020 <span class="comment">%  1. If no output exist, a file is automatically created in the current directory named according to the BPM device list</span>
+0021 <span class="comment">%  2. Uses function bpm_psd to compute the PSD</span>
+0022 <span class="comment">%  2. Uses function getbpm4k to get the 4 KHz BPM data in millimeters</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  Written by Greg Portmann</span>
+0025 
+0026 
+0027 <span class="keyword">if</span> nargin &lt; 1
+0028     DeviceList = [];
+0029 <span class="keyword">end</span>
+0030 <span class="keyword">if</span> isempty(DeviceList)
+0031     <span class="comment">%DeviceList = family2dev('BPMx');</span>
+0032     DeviceList = [
+0033     12 9
+0034     1 2
+0035     1 10
+0036     2 1
+0037     2 9
+0038     3 2
+0039     3 10
+0040     3 11
+0041     3 12
+0042     4 1 
+0043     4 10
+0044     5 1
+0045     5 10
+0046     6 1
+0047     6 10
+0048     7 1
+0049     7 10
+0050     8 1
+0051     8 10
+0052     9 1
+0053     9 10
+0054     10 1
+0055     10 10
+0056     10 11
+0057     10 12
+0058     11 1
+0059     11 10
+0060     12 1
+0061     ];
+0062 <span class="keyword">end</span>
+0063 <span class="keyword">if</span> nargin &lt; 2
+0064     Navg = 1;
+0065 <span class="keyword">end</span>
+0066 
+0067 <span class="keyword">if</span> nargin &lt; 3
+0068     <span class="keyword">if</span> size(DeviceList,1)
+0069         FileName =  sprintf(<span class="string">'PSD_BPM%d_%d'</span>, DeviceList(1,:));
+0070     <span class="keyword">else</span>
+0071         FileName =  sprintf(<span class="string">'PSD_BPM%d_%d_thru_%d_%d'</span>, DeviceList(1,:), DeviceList(<span class="keyword">end</span>,:));
+0072     <span class="keyword">end</span>
+0073     FileName = appendtimestamp(FileName);
+0074 <span class="keyword">end</span>
+0075 
+0076 <span class="keyword">if</span> nargin &lt; 4
+0077     LineColor = <span class="string">'b'</span>;
+0078 <span class="keyword">end</span>
+0079 
+0080 <span class="keyword">if</span> nargout == 0
+0081     PlotFlag = 1;
+0082 <span class="keyword">else</span>
+0083     PlotFlag = 0;
+0084 <span class="keyword">end</span>
+0085 <span class="keyword">if</span> nargin &gt;= 4
+0086     PlotFlag = 1;
+0087 <span class="keyword">end</span>
+0088 
+0089 NumFreqRemove = 2;
+0090 RF = getrf;
+0091 
+0092 
+0093 <span class="comment">% Setup figures</span>
+0094 <span class="keyword">if</span> PlotFlag
+0095     h_fig1 = subfig(2,2,1, 1);
+0096     clf reset
+0097     h_fig2 = subfig(2,2,3, 2);
+0098     clf reset
+0099     h_fig3 = subfig(2,2,2, 3);
+0100     p = get(h_fig3, <span class="string">'Position'</span>);
+0101     set(h_fig3, <span class="string">'Position'</span>, [p(1) p(2)-.3*p(4) p(3) p(4)+.3*p(4)]);
+0102     clear p
+0103     clf reset
+0104     drawnow;
+0105 <span class="keyword">end</span>
+0106 
+0107 TimeStart = clock;
+0108 <span class="keyword">for</span> i = 1:Navg
+0109     [x, y, T1, TimeStamp] = <a href="getbpmbuffer.html" class="code" title="function [bpmdataX, bpmdataY, T, TimeStamp] = getbpmbuffer(DeviceList);">getbpmbuffer</a>(DeviceList);
+0110     
+0111     <span class="comment">% Must be an even integer</span>
+0112     N = size(x,2);
+0113     <span class="keyword">if</span> rem(N,2) ~= 0
+0114         N = N - 1;
+0115         x = x(:,1:end-1);
+0116         y = y(:,1:end-1);
+0117     <span class="keyword">end</span>
+0118     
+0119     <span class="keyword">for</span> j = 1:size(DeviceList,1)
+0120         <span class="keyword">if</span> PlotFlag
+0121             figure(h_fig1);
+0122             [Pxx1, fx, x1rms, Pxx1_Int] = bpm_psd(x(j,:), T1, <span class="string">'r'</span>);
+0123             Pxx1 = Pxx1(:)';
+0124         <span class="keyword">else</span>
+0125             [Pxx1, fx, x1rms, Pxx1_Int] = bpm_psd(x(j,:), T1);
+0126             Pxx1 = Pxx1(:)';
+0127         <span class="keyword">end</span>
+0128         <span class="keyword">if</span> PlotFlag
+0129             drawnow;
+0130             figure(h_fig2);
+0131             [Pyy1, fy, y1rms, Pyy1_Int] = bpm_psd(y(j,:), T1, <span class="string">'r'</span>);
+0132             Pyy1 = Pyy1(:)';
+0133             drawnow;
+0134         <span class="keyword">else</span>
+0135             [Pyy1, fy, y1rms, Pyy1_Int] = bpm_psd(y(j,:), T1);
+0136             Pyy1 = Pyy1(:)';
+0137         <span class="keyword">end</span>
+0138         
+0139         <span class="keyword">if</span> i == 1
+0140             Pxx(j,:) = Pxx1;
+0141             Pyy(j,:) = Pyy1;
+0142         <span class="keyword">else</span>
+0143             Pxx(j,:) = ((i-1)*Pxx(j,:) + Pxx1) / i;
+0144             Pyy(j,:) = ((i-1)*Pyy(j,:) + Pyy1) / i;
+0145         <span class="keyword">end</span>
+0146         
+0147         <span class="keyword">for</span> k = 1:NumFreqRemove
+0148             Pxx1(k) = 0;
+0149             Pyy1(k) = 0;
+0150             Pxx(j,k) = 0;
+0151             Pyy(j,k) = 0;
+0152         <span class="keyword">end</span>
+0153         
+0154         Pxx_Int(j,:) = cumsum(Pxx(j,:)) / N / T1;
+0155         Pyy_Int(j,:) = cumsum(Pyy(j,:)) / N / T1;
+0156         
+0157         Xrms(j,1) = sqrt(max(Pxx_Int(j,:)));
+0158         Yrms(j,1) = sqrt(max(Pyy_Int(j,:)));
+0159         
+0160         DCCT(1,i) = getdcct;
+0161         
+0162         
+0163         <span class="keyword">if</span> PlotFlag
+0164             fprintf(<span class="string">'   %d.  Xrms(%d,%d) = %.4f    Yrms(%d,%d) = %.4f microns\n'</span>, i , DeviceList(j,:), 1e6*Xrms(j,1), DeviceList(j,:), 1e6*Yrms(j,1));
+0165             drawnow;
+0166         <span class="keyword">end</span>
+0167         
+0168         <span class="keyword">if</span> nargout == 0
+0169             TimeEnd = clock;
+0170             save(FileName, <span class="string">'Pxx'</span>, <span class="string">'fx'</span>, <span class="string">'Xrms'</span>, <span class="string">'Pxx_Int'</span>, <span class="string">'Pyy'</span>, <span class="string">'fy'</span>, <span class="string">'Yrms'</span>, <span class="string">'Pyy_Int'</span>, <span class="string">'DCCT'</span>, <span class="string">'DeviceList'</span>, <span class="string">'TimeStart'</span>);
+0171         <span class="keyword">end</span>
+0172         
+0173         <span class="comment">% Plot the power spectrum</span>
+0174         <span class="keyword">if</span> PlotFlag
+0175             figure(h_fig3);
+0176             subplot(2,2,1);
+0177             <span class="keyword">if</span> i ~= Navg
+0178                 loglog(fx(NumFreqRemove+1:N/2), 1e12*Pxx1(NumFreqRemove+1:N/2),<span class="string">'r'</span>); 
+0179                 hold on
+0180             <span class="keyword">end</span>
+0181             loglog(fx(NumFreqRemove+1:N/2), 1e12*Pxx(j,NumFreqRemove+1:N/2), LineColor); 
+0182             hold off
+0183             title(sprintf(<span class="string">'BPMx(%d,%d) POWER SPECTRUM (%d points)'</span>,DeviceList(j,:),N));
+0184             xlabel(<span class="string">'Frequency [Hz]'</span>);
+0185             ylabel(<span class="string">'BPMx PSD [\mum^2/Hz]'</span>);
+0186             grid on;
+0187             legend off;
+0188             <span class="comment">%aa=axis;</span>
+0189             <span class="comment">%axis([1 2000 1e-3 10]);</span>
+0190             <span class="comment">%axis([1 2000 aa(3) aa(4)]);</span>
+0191             <span class="comment">%yaxis([1e-4 1])</span>
+0192             xaxis([1 2000]);
+0193             
+0194             <span class="comment">% Position spectrum</span>
+0195             subplot(2,2,3);
+0196             <span class="keyword">if</span> i ~= Navg
+0197                 semilogx(fx(NumFreqRemove:N/2), 1e12*Pxx1_Int(NumFreqRemove:N/2), <span class="string">'r'</span>); 
+0198                 hold on
+0199             <span class="keyword">end</span>
+0200             semilogx(fx(NumFreqRemove:N/2), 1e12*Pxx_Int(j,NumFreqRemove:N/2), LineColor); 
+0201             hold off
+0202             title(sprintf(<span class="string">'BPMx(%d,%d) Integrated PSD (RMS=%.1f \\mum)'</span>, DeviceList(j,:), 1e6*Xrms(j)));
+0203             xlabel(<span class="string">'Frequency [Hz]'</span>);
+0204             ylabel(<span class="string">'Mean Square Displacement [\mum^2]'</span>);
+0205             grid on;
+0206             legend off;
+0207             <span class="comment">%aa=axis;</span>
+0208             <span class="comment">%axis([1 2000 aa(3) aa(4)]);</span>
+0209             xaxis([1 2000]);
+0210             
+0211             subplot(2,2,2);
+0212             <span class="keyword">if</span> i ~= Navg
+0213                 loglog(fy(NumFreqRemove+1:N/2), 1e12*Pyy1(NumFreqRemove+1:N/2),<span class="string">'r'</span>); 
+0214                 hold on
+0215             <span class="keyword">end</span>
+0216             loglog(fy(NumFreqRemove+1:N/2), 1e12*Pyy(j,NumFreqRemove+1:N/2), LineColor); 
+0217             hold off
+0218             title(sprintf(<span class="string">'BPMy(%d,%d) POWER SPECTRUM (%d points)'</span>,DeviceList(j,:),N));
+0219             xlabel(<span class="string">'Frequency [Hz]'</span>);
+0220             ylabel(<span class="string">'BPMy PSD [\mum^2/Hz]'</span>);
+0221             grid on;
+0222             legend off;
+0223             <span class="comment">%aa=axis;</span>
+0224             <span class="comment">%axis([1 2000 aa(3) aa(4)]);</span>
+0225             <span class="comment">%axis([1 2000 1e-3 10]);</span>
+0226             <span class="comment">%yaxis([1e-4 1])</span>
+0227             xaxis([1 2000]);
+0228             
+0229             <span class="comment">% Position spectrum</span>
+0230             subplot(2,2,4);
+0231             <span class="keyword">if</span> i ~= Navg
+0232                 semilogx(fy(NumFreqRemove:N/2), 1e12*Pyy1_Int(NumFreqRemove:N/2), <span class="string">'r'</span>); 
+0233                 hold on
+0234             <span class="keyword">end</span>
+0235             semilogx(fy(NumFreqRemove:N/2), 1e12*Pyy_Int(j,NumFreqRemove:N/2), LineColor); 
+0236             hold off
+0237             title(sprintf(<span class="string">'BPMy(%d,%d) Integrated PSD (RMS=%.1f \\mum)'</span>,DeviceList(j,:),1e6*Yrms(j)));
+0238             xlabel(<span class="string">'Frequency [Hz]'</span>);
+0239             ylabel(<span class="string">'Mean Square Displacement [\mum^2]'</span>);
+0240             grid on;
+0241             legend off;
+0242             <span class="comment">%aa=axis;</span>
+0243             <span class="comment">%axis([1 2000 aa(3) aa(4)]);</span>
+0244             xaxis([1 2000]);
+0245             
+0246             drawnow;
+0247         <span class="keyword">end</span>
+0248     <span class="keyword">end</span>
+0249 <span class="keyword">end</span>
+0250 
+0251 
+0252 
+0253 <span class="comment">%semilogx(fx(NumFreqRemove:N/2), sqrt(Pxx_Int(NumFreqRemove:N/2)), LineColor);</span>
+0254 <span class="comment">%semilogx(fy(NumFreqRemove:N/2), sqrt(Pyy_Int(NumFreqRemove:N/2)), LineColor);</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of updateatindex</title>
+  <meta name="keywords" content="updateatindex">
+  <meta name="description" content="UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; updateatindex.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>updateatindex
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function updateatindex </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="ALSUniverseExample1.html" class="code" title="">ALSUniverseExample1</a>	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</li><li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li><li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function updateatindex</a>
+0002 <span class="comment">%UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</span>
+0003 
+0004 
+0005 <span class="keyword">global</span> THERING
+0006 
+0007 
+0008 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0009 <span class="comment">% Append Accelerator Toolbox information %</span>
+0010 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0011 
+0012 <span class="comment">% Since changes in the AT model could change the AT indexes, etc,</span>
+0013 <span class="comment">% It's best to regenerate all the model indices whenever a model is loaded</span>
+0014 
+0015 <span class="comment">% Sort by family first (findcells is linear and slow)</span>
+0016 Indices = atindex(THERING);
+0017 spos = findspos(THERING,1:length(THERING));
+0018 
+0019 AO = getao;
+0020 
+0021 
+0022 <span class="comment">% BPMS</span>
+0023 <span class="keyword">try</span>
+0024     AO.BPMx.AT.ATType = <span class="string">'X'</span>;
+0025     AO.BPMx.AT.ATIndex = Indices.BPM(:); <span class="comment">% findcells(THERING,'FamName','BPM')';</span>
+0026     AO.BPMx.Position = spos(AO.BPMx.AT.ATIndex)';
+0027 
+0028     AO.BPMy.AT.ATType = <span class="string">'Y'</span>;
+0029     AO.BPMy.AT.ATIndex = Indices.BPM(:); <span class="comment">% findcells(THERING,'FamName','BPM')';</span>
+0030     AO.BPMy.Position = spos(AO.BPMy.AT.ATIndex)';
+0031 <span class="keyword">catch</span>
+0032     warning(<span class="string">'BPM family not found in the model.'</span>);
+0033 <span class="keyword">end</span>
+0034 
+0035 
+0036 <span class="comment">% CORRECTORS</span>
+0037 <span class="keyword">try</span>
+0038     <span class="comment">% Horizontal correctors are at every AT corrector</span>
+0039     AO.HCM.AT.ATType = <span class="string">'HCM'</span>;
+0040     AO.HCM.AT.ATIndex = buildatindex(AO.HCM.FamilyName, Indices.COR);
+0041     AO.HCM.Position = spos(AO.HCM.AT.ATIndex(:,1))';
+0042 
+0043     <span class="comment">% Not all correctors are vertical correctors</span>
+0044     AO.VCM.AT.ATType = <span class="string">'VCM'</span>;
+0045     i = findrowindex(AO.VCM.DeviceList, AO.HCM.DeviceList);
+0046     AO.VCM.AT.ATIndex = AO.HCM.AT.ATIndex(i);
+0047     AO.VCM.Position = spos(AO.VCM.AT.ATIndex(:,1))';
+0048 <span class="keyword">catch</span>
+0049     warning(<span class="string">'Corrector family not found in the model.'</span>);
+0050 <span class="keyword">end</span>
+0051 
+0052 <span class="keyword">try</span>
+0053     <span class="comment">%AO.VCBSC.AT.ATType = 'VCM';</span>
+0054     <span class="comment">%AO.VCBSC.AT.ATIndex = buildatindex(AO.VCBSC.FamilyName, Indices.VCBSC);</span>
+0055     AO.VCBSC.Position = spos(Indices.BS(:,1))';
+0056 <span class="keyword">catch</span>
+0057     <span class="comment">%warning('VCBSC family not found in the model.');</span>
+0058 <span class="keyword">end</span>
+0059 
+0060 
+0061 <span class="comment">% QUADRUPOLES</span>
+0062 <span class="keyword">try</span>
+0063     AO.QF.AT.ATType = <span class="string">'QUAD'</span>;
+0064     AO.QF.AT.ATIndex = buildatindex(AO.QF.FamilyName, Indices.QF);
+0065     AO.QF.Position = spos(AO.QF.AT.ATIndex(:,1))';
+0066 
+0067     AO.QD.AT.ATType = <span class="string">'QUAD'</span>;
+0068     AO.QD.AT.ATIndex = buildatindex(AO.QD.FamilyName, Indices.QD);
+0069     AO.QD.Position = spos(AO.QD.AT.ATIndex(:,1))';
+0070 <span class="keyword">catch</span>
+0071     warning(<span class="string">'QF or QD family not found in the model.'</span>);
+0072 <span class="keyword">end</span>
+0073 
+0074 <span class="keyword">try</span>
+0075     AO.QFA.AT.ATType = <span class="string">'QUAD'</span>;
+0076     AO.QFA.AT.ATIndex = buildatindex(AO.QFA.FamilyName, Indices.QFA);
+0077     AO.QFA.Position = spos(AO.QFA.AT.ATIndex)';
+0078 <span class="keyword">catch</span>
+0079     warning(<span class="string">'QFA family not found in the model.'</span>);
+0080 <span class="keyword">end</span>
+0081 
+0082 <span class="keyword">try</span>
+0083     AO.QDA.AT.ATType = <span class="string">'QUAD'</span>;
+0084     AO.QDA.AT.ATIndex = buildatindex(AO.QDA.FamilyName, Indices.QDA);
+0085     AO.QDA.Position = spos(AO.QDA.AT.ATIndex(:,1))';
+0086 <span class="keyword">catch</span>
+0087     warning(<span class="string">'QDA family not found in the model.'</span>);
+0088 <span class="keyword">end</span>
+0089 
+0090 
+0091 <span class="comment">% SEXTUPOLES</span>
+0092 <span class="keyword">try</span>
+0093     AO.SF.AT.ATType = <span class="string">'SEXT'</span>;
+0094     AO.SF.AT.ATIndex = buildatindex(AO.SF.FamilyName, Indices.SFF);
+0095     AO.SF.Position = spos(AO.SF.AT.ATIndex(:,1))';
+0096 
+0097     AO.SD.AT.ATType = <span class="string">'SEXT'</span>;
+0098     AO.SD.AT.ATIndex = buildatindex(AO.SD.FamilyName, Indices.SDD);
+0099     AO.SD.Position = spos(AO.SD.AT.ATIndex(:,1))';
+0100 
+0101     AO.SQSF.AT.ATType = <span class="string">'SkewQuad'</span>;
+0102     AO.SQSF.AT.ATIndex = buildatindex(AO.SQSF.FamilyName, Indices.SFF);
+0103     AO.SQSF.Position = spos(AO.SQSF.AT.ATIndex(:,1))';
+0104 
+0105     AO.SQSD.AT.ATType = <span class="string">'SkewQuad'</span>;
+0106     AO.SQSD.AT.ATIndex = buildatindex(AO.SQSD.FamilyName, Indices.SDD);
+0107     AO.SQSD.Position = spos(AO.SQSD.AT.ATIndex(:,1))';
+0108 <span class="keyword">catch</span>
+0109     warning(<span class="string">'Sextupole families not found in the model.'</span>);
+0110 <span class="keyword">end</span>
+0111 
+0112 
+0113 <span class="comment">% BEND</span>
+0114 <span class="keyword">try</span>
+0115     AO.BSC.AT.ATType = <span class="string">'BEND'</span>;
+0116     <span class="comment">%AO.BSC.AT.ATIndex = Indices.BS(:); %findcells(THERING,'FamName','BS')';</span>
+0117     AO.BSC.AT.ATIndex = buildatindex(AO.BSC.FamilyName, Indices.BS(:));
+0118     AO.BSC.Position = spos(AO.BSC.AT.ATIndex(:,1))';
+0119 <span class="keyword">catch</span>
+0120     Indices.BS = [];
+0121     warning(<span class="string">'BS family not found in the model.'</span>);
+0122 <span class="keyword">end</span>
+0123 
+0124 <span class="keyword">try</span>
+0125     <span class="comment">% Combine BEND and BSC</span>
+0126     AO.BEND.AT.ATType = <span class="string">'BEND'</span>;
+0127     ATIndex = [Indices.BEND(:); Indices.BS(:)];   <span class="comment">%[findcells(THERING,'FamName','BEND')'; findcells(THERING,'FamName','BS')'];</span>
+0128     AO.BEND.AT.ATIndex = buildatindex(AO.BEND.FamilyName, sort(ATIndex));
+0129     AO.BEND.Position = spos(AO.BEND.AT.ATIndex(:,1))';
+0130 <span class="keyword">catch</span>
+0131     warning(<span class="string">'BEND family not found in the model.'</span>);
+0132 <span class="keyword">end</span>
+0133 
+0134 
+0135 <span class="comment">% HCMCHICANE</span>
+0136 <span class="keyword">try</span>
+0137     ATDeviceList = [
+0138         4     1
+0139         4     2
+0140         4     3
+0141         6     1
+0142         6     2
+0143         11    1];
+0144     AO.HCMCHICANE.AT.ATType = <span class="string">'HCM'</span>;
+0145     i = findrowindex(AO.HCMCHICANE.DeviceList, ATDeviceList);
+0146     AO.HCMCHICANE.AT.ATIndex = buildatindex(AO.HCMCHICANE.FamilyName, Indices.CHICANE(i));
+0147     AO.HCMCHICANE.Position = spos(AO.HCMCHICANE.AT.ATIndex(:,1))';
+0148 <span class="keyword">catch</span>
+0149     warning(<span class="string">'HCMCHICANE family not found in the model.'</span>);
+0150 <span class="keyword">end</span>
+0151 
+0152 <span class="comment">% HCMCHICANEM</span>
+0153 <span class="keyword">try</span>
+0154     <span class="comment">% Motor chicane position (this is not right but it will do for now)</span>
+0155     AO.HCMCHICANEM.Position = [];
+0156     <span class="keyword">for</span> i = 1:size(AO.HCMCHICANEM.DeviceList,1)
+0157         Sector = sprintf(<span class="string">'SECT%d'</span>, AO.HCMCHICANEM.DeviceList(i,1));
+0158         AO.HCMCHICANEM.Position(i,1) = spos(Indices.(Sector));
+0159     <span class="keyword">end</span>
+0160 <span class="keyword">catch</span>
+0161     warning(<span class="string">'Trouble with HCMCHICANEM family setup.'</span>);
+0162 <span class="keyword">end</span>
+0163 
+0164 
+0165 <span class="comment">% VCMCHICANE</span>
+0166 <span class="comment">% try</span>
+0167 <span class="comment">%     AO.VCMCHICANE.AT.ATType = 'VCM';</span>
+0168 <span class="comment">%     i = findrowindex(AO.VCMCHICANE.DeviceList, AO.HCMCHICANE.DeviceList);</span>
+0169 <span class="comment">%     AO.VCMCHICANE.AT.ATIndex = AO.HCMCHICANE.AT.ATIndex(i);</span>
+0170 <span class="comment">%     AO.VCMCHICANE.AT.ATIndex = buildatindex(AO.VCMCHICANE.FamilyName, Indices.CHICANE);</span>
+0171 <span class="comment">%     AO.VCMCHICANE.Position = findspos(THERING, AO.VCMCHICANE.AT.ATIndex)';</span>
+0172 <span class="comment">% catch</span>
+0173 <span class="comment">%     warning('VCMCHICANE family not found in the model.');</span>
+0174 <span class="comment">% end</span>
+0175 
+0176 
+0177 <span class="comment">% RF CAVITY</span>
+0178 <span class="keyword">try</span>
+0179     AO.RF.AT.ATType = <span class="string">'RF Cavity'</span>;
+0180     AO.RF.AT.ATIndex = findcells(THERING,<span class="string">'Frequency'</span>)';
+0181     AO.RF.Position = spos(AO.RF.AT.ATIndex(:,1))';
+0182 <span class="keyword">catch</span>
+0183     warning(<span class="string">'RF cavity not found in the model.'</span>);
+0184 <span class="keyword">end</span>
+0185 
+0186 
+0187 setao(AO);
+0188 
+0189 
+0190 
+0191 <span class="comment">% Set TwissData at the start of the storage ring</span>
+0192 <span class="keyword">try</span>   
+0193     <span class="comment">% BTS twiss parameters at the input</span>
+0194     TwissData.alpha = [0 0]';
+0195     TwissData.beta  = [13.8467 2.2582]';
+0196     TwissData.mu    = [0 0]';
+0197     TwissData.ClosedOrbit = [0 0 0 0]';
+0198     TwissData.dP = 0;
+0199     TwissData.dL = 0;
+0200     TwissData.Dispersion  = [.06 0 0 0]';
+0201     
+0202     setpvmodel(<span class="string">'TwissData'</span>, <span class="string">''</span>, TwissData);  <span class="comment">% Same as, THERING{1}.TwissData = TwissData;</span>
+0203 <span class="keyword">catch</span>
+0204      warning(<span class="string">'Setting the twiss data parameters in the MML failed.'</span>);
+0205 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

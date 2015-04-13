@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of vuvatlat</title>
+  <meta name="keywords" content="vuvatlat">
+  <meta name="description" content="VUVATLAT - VUV storage ring AT lattice">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">machine</a> &gt; <a href="#">VUV</a> &gt; <a href="index.html">800MeV</a> &gt; vuvatlat.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for machine\VUV\800MeV&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>vuvatlat
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>VUVATLAT - VUV storage ring AT lattice</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function vuvatlat </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">VUVATLAT - VUV storage ring AT lattice</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(OperationalMode)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function vuvatlat</a>
+0002 <span class="comment">%VUVATLAT - VUV storage ring AT lattice</span>
+0003 
+0004 <span class="keyword">global</span> FAMLIST GLOBVAL
+0005 
+0006 GLOBVAL.E0 = 0.808e9;
+0007 GLOBVAL.LatticeFile = <span class="string">'vuvatlat'</span>;
+0008 FAMLIST = cell(0);
+0009 
+0010 
+0011 disp(<span class="string">'   Loading VUV Ring lattice in vuvatlat.m'</span>);
+0012 
+0013 
+0014 <span class="comment">% AP = aperture('AP', [-0.04, 0.04, -0.02, 0.02], 'AperturePass');</span>
+0015 
+0016 C       = 51.024;    <span class="comment">% circumference [m]</span>
+0017 c0      = 299792458; <span class="comment">% speed of light in vacuum [m/s]</span>
+0018 Har_Num = 9;
+0019 CAV = rfcavity(<span class="string">'RF'</span>, 0.0, 5e4, Har_Num*c0/C, Har_Num, <span class="string">'ThinCavityPass'</span>);
+0020 
+0021 <span class="comment">% Main magnets</span>
+0022 
+0023 <span class="comment">% Dipoles</span>
+0024 
+0025 <span class="comment">%bend_int_meth = 'BendLinearPass';</span>
+0026 bend_int_meth = <span class="string">'BndMPoleSymplectic4Pass'</span>;
+0027 <span class="comment">%bend_int_meth = 'BndMPoleSymplectic4RadPass';</span>
+0028 
+0029 BD = rbend(<span class="string">'BEND'</span>, 1.50, pi/4.0, pi/8.0, pi/8.0, -0.026784, bend_int_meth);
+0030 
+0031 <span class="comment">% Quadrupoles</span>
+0032 
+0033 quad_int_meth = <span class="string">'QuadLinearPass'</span>;
+0034 <span class="comment">%quad_int_meth = 'StrMPoleSymplectic4Pass';</span>
+0035 <span class="comment">%quad_int_meth = 'StrMPoleSymplectic4RadPass';</span>
+0036 
+0037 Q1 = quadrupole(<span class="string">'Q1'</span>, 0.300,  1.8681, quad_int_meth);
+0038 Q2 = quadrupole(<span class="string">'Q2'</span>, 0.300, -1.1964, quad_int_meth);
+0039 Q3 = quadrupole(<span class="string">'Q3'</span>, 0.300,  1.8696, quad_int_meth);
+0040 Q4 = quadrupole(<span class="string">'Q4'</span>, 0.300, -1.3031, quad_int_meth);
+0041 Q5 = quadrupole(<span class="string">'Q5'</span>, 0.300,  1.9396, quad_int_meth);
+0042 Q6 = quadrupole(<span class="string">'Q6'</span>, 0.300, -1.1645, quad_int_meth);
+0043 Q7 = quadrupole(<span class="string">'Q7'</span>, 0.300,  1.8917, quad_int_meth);
+0044 
+0045 <span class="comment">% Skew Quadrupoles</span>
+0046 
+0047 SQ1 = quadrupole(<span class="string">'SQ1'</span>, 0.00,  0.0, <span class="string">'ThinMPolePass'</span>);
+0048 <span class="comment">%SQ2 = quadrupole('SQ2', 0.00,  0.0, 'ThinMPolePass');</span>
+0049 
+0050 <span class="comment">% Sextupoles</span>
+0051 
+0052 SF =  sextupole(<span class="string">'SF'</span>, 0.20,  28.03, <span class="string">'StrMPoleSymplectic4Pass'</span>);
+0053 SD =  sextupole(<span class="string">'SD'</span>, 0.20, -15.66, <span class="string">'StrMPoleSymplectic4Pass'</span>);
+0054 
+0055 
+0056 <span class="comment">% Injection hardware</span>
+0057 
+0058 BUISH  =  drift(<span class="string">'BUISH'</span>,  0.75, <span class="string">'DriftPass'</span>);
+0059 BUIFB1 =  drift(<span class="string">'BUIFB1'</span>, 0.10, <span class="string">'DriftPass'</span>);
+0060 BUIFB2 =  drift(<span class="string">'BUIFB2'</span>, 0.10, <span class="string">'DriftPass'</span>);
+0061 BUIFB3 =  drift(<span class="string">'BUIFB3'</span>, 0.10, <span class="string">'DriftPass'</span>);
+0062 
+0063 <span class="comment">% Correctors</span>
+0064 
+0065 U1HS1   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0066 U1HS2   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0067 U1HS3   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0068 U1HS4   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0069 U2HS5   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0070 U2HS6   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0071 U2HS7   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0072 U2HS8   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0073 U3HS9   = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0074 U3HS10  = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0075 U3HS11  = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0076 U3HS12  = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0077 U4HS13  = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0078 U4HS14  = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0079 U4HS15  = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Backleg</span>
+0080 U4HS16  = corrector(<span class="string">'HCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0081 
+0082 U1VS1   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0083 U1VS2   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0084 U1VS3   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0085 U1VS4   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0086 U2VS5   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0087 U2VS6   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0088 U2VS7   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0089 U2VS8   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0090 U3VS9   = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0091 U3VS10  = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0092 U3VS11  = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0093 U3VS12  = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0094 U4VS13  = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0095 U4VS14  = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0096 U4VS15  = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>); <span class="comment">% Air core</span>
+0097 U4VS16  = corrector(<span class="string">'VCOR'</span>, 0.0, [0.0 0.0], <span class="string">'CorrectorPass'</span>);
+0098 
+0099 <span class="comment">% Drifts</span>
+0100 
+0101 INJD1   = drift(<span class="string">'INJD1'</span>, 0.97, <span class="string">'DriftPass'</span>);
+0102 INJD2   = drift(<span class="string">'INJD2'</span>, 0.78, <span class="string">'DriftPass'</span>);
+0103 INJD3   = drift(<span class="string">'INJD3'</span>, 0.35, <span class="string">'DriftPass'</span>);
+0104 
+0105 U1D1   = drift(<span class="string">'U1D1'</span>,  0.102, <span class="string">'DriftPass'</span>);
+0106 U1D2   = drift(<span class="string">'U1D2'</span>,  0.051, <span class="string">'DriftPass'</span>);
+0107 U1D3   = drift(<span class="string">'U1D3'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0108 U1D4   = drift(<span class="string">'U1D4'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0109 U1D5   = drift(<span class="string">'U1D5'</span>,  0.025, <span class="string">'DriftPass'</span>);
+0110 U1D6   = drift(<span class="string">'U1D6'</span>,  0.625, <span class="string">'DriftPass'</span>);
+0111 U1D7   = drift(<span class="string">'U1D7'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0112 U1D8   = drift(<span class="string">'U1D8'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0113 U1D9   = drift(<span class="string">'U1D9'</span>,  0.037, <span class="string">'DriftPass'</span>);
+0114 U1D10  = drift(<span class="string">'U1D10'</span>, 0.173, <span class="string">'DriftPass'</span>);
+0115 U1D11  = drift(<span class="string">'U1D11'</span>, 0.180, <span class="string">'DriftPass'</span>);
+0116 U1D12  = drift(<span class="string">'U1D12'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0117 U1D13  = drift(<span class="string">'U1D13'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0118 U1D14  = drift(<span class="string">'U1D14'</span>, 0.035, <span class="string">'DriftPass'</span>);
+0119 U1D15  = drift(<span class="string">'U1D15'</span>, 0.455, <span class="string">'DriftPass'</span>);
+0120 U1D16  = drift(<span class="string">'U1D16'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0121 U1D17  = drift(<span class="string">'U1D17'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0122 U1D18  = drift(<span class="string">'U1D18'</span>, 0.625, <span class="string">'DriftPass'</span>);
+0123 U1D19  = drift(<span class="string">'U1D19'</span>, 0.025, <span class="string">'DriftPass'</span>);
+0124 U1D20  = drift(<span class="string">'U1D20'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0125 U1D21  = drift(<span class="string">'U1D21'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0126 U1D22  = drift(<span class="string">'U1D22'</span>, 0.048, <span class="string">'DriftPass'</span>);
+0127 U1D23  = drift(<span class="string">'U1D23'</span>, 0.105, <span class="string">'DriftPass'</span>);
+0128 
+0129 U5D    = drift(<span class="string">'U5D'</span>,   2.950, <span class="string">'DriftPass'</span>);
+0130 
+0131 U2D1   = drift(<span class="string">'U2D1'</span>,  0.102, <span class="string">'DriftPass'</span>);
+0132 U2D2   = drift(<span class="string">'U2D2'</span>,  0.051, <span class="string">'DriftPass'</span>);
+0133 U2D3   = drift(<span class="string">'U2D3'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0134 U2D4   = drift(<span class="string">'U2D4'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0135 U2D5   = drift(<span class="string">'U2D5'</span>,  0.025, <span class="string">'DriftPass'</span>);
+0136 U2D6   = drift(<span class="string">'U2D6'</span>,  0.625, <span class="string">'DriftPass'</span>);
+0137 U2D7   = drift(<span class="string">'U2D7'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0138 U2D8   = drift(<span class="string">'U2D8'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0139 U2D9   = drift(<span class="string">'U2D9'</span>,  0.454, <span class="string">'DriftPass'</span>);
+0140 U2D10  = drift(<span class="string">'U2D10'</span>, 0.036, <span class="string">'DriftPass'</span>);
+0141 U2D11  = drift(<span class="string">'U2D11'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0142 U2D12  = drift(<span class="string">'U2D12'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0143 U2D13  = drift(<span class="string">'U2D13'</span>, 0.040, <span class="string">'DriftPass'</span>);
+0144 U2D14  = drift(<span class="string">'U2D14'</span>, 0.450, <span class="string">'DriftPass'</span>);
+0145 U2D15  = drift(<span class="string">'U2D15'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0146 U2D16  = drift(<span class="string">'U2D16'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0147 U2D17  = drift(<span class="string">'U2D17'</span>, 0.612, <span class="string">'DriftPass'</span>);
+0148 U2D18  = drift(<span class="string">'U2D18'</span>, 0.038, <span class="string">'DriftPass'</span>);
+0149 U2D19  = drift(<span class="string">'U2D19'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0150 U2D20  = drift(<span class="string">'U2D20'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0151 U2D21  = drift(<span class="string">'U2D21'</span>, 0.038, <span class="string">'DriftPass'</span>);
+0152 U2D22  = drift(<span class="string">'U2D22'</span>, 0.115, <span class="string">'DriftPass'</span>);
+0153 
+0154 RFD1   = drift(<span class="string">'RFD1'</span>,  1.445, <span class="string">'DriftPass'</span>);
+0155 RFD2   = drift(<span class="string">'RFD2'</span>,  1.505, <span class="string">'DriftPass'</span>);
+0156 
+0157 U3D1   = drift(<span class="string">'U3D1'</span>,  0.115, <span class="string">'DriftPass'</span>);
+0158 U3D2   = drift(<span class="string">'U3D2'</span>,  0.038, <span class="string">'DriftPass'</span>);
+0159 U3D3   = drift(<span class="string">'U3D3'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0160 U3D4   = drift(<span class="string">'U3D4'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0161 U3D5   = drift(<span class="string">'U3D5'</span>,  0.038, <span class="string">'DriftPass'</span>);
+0162 U3D6   = drift(<span class="string">'U3D6'</span>,  0.612, <span class="string">'DriftPass'</span>);
+0163 U3D7   = drift(<span class="string">'U3D7'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0164 U3D8   = drift(<span class="string">'U3D8'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0165 U3D9   = drift(<span class="string">'U3D9'</span>,  0.450, <span class="string">'DriftPass'</span>);
+0166 U3D10  = drift(<span class="string">'U3D10'</span>, 0.040, <span class="string">'DriftPass'</span>);
+0167 U3D11  = drift(<span class="string">'U3D11'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0168 U3D12  = drift(<span class="string">'U3D12'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0169 U3D13  = drift(<span class="string">'U3D13'</span>, 0.038, <span class="string">'DriftPass'</span>);
+0170 U3D14  = drift(<span class="string">'U3D14'</span>, 0.452, <span class="string">'DriftPass'</span>);
+0171 U3D15  = drift(<span class="string">'U3D15'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0172 U3D16  = drift(<span class="string">'U3D16'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0173 U3D17  = drift(<span class="string">'U3D17'</span>, 0.629, <span class="string">'DriftPass'</span>);
+0174 U3D18  = drift(<span class="string">'U3D18'</span>, 0.021, <span class="string">'DriftPass'</span>);
+0175 U3D19  = drift(<span class="string">'U3D19'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0176 U3D20  = drift(<span class="string">'U3D20'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0177 U3D21  = drift(<span class="string">'U3D21'</span>, 0.053, <span class="string">'DriftPass'</span>);
+0178 U3D22  = drift(<span class="string">'U3D22'</span>, 0.100, <span class="string">'DriftPass'</span>);
+0179 
+0180 U13D   = drift(<span class="string">'U13D'</span>,  2.950, <span class="string">'DriftPass'</span>);
+0181 
+0182 U4D1   = drift(<span class="string">'U4D1'</span>,  0.102, <span class="string">'DriftPass'</span>);
+0183 U4D2   = drift(<span class="string">'U4D2'</span>,  0.051, <span class="string">'DriftPass'</span>);
+0184 U4D3   = drift(<span class="string">'U4D3'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0185 U4D4   = drift(<span class="string">'U4D4'</span>,  0.175, <span class="string">'DriftPass'</span>);
+0186 U4D5   = drift(<span class="string">'U4D5'</span>,  0.021, <span class="string">'DriftPass'</span>);
+0187 U4D6   = drift(<span class="string">'U4D6'</span>,  0.629, <span class="string">'DriftPass'</span>);
+0188 U4D7   = drift(<span class="string">'U4D7'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0189 U4D8   = drift(<span class="string">'U4D8'</span>,  0.155, <span class="string">'DriftPass'</span>);
+0190 U4D9   = drift(<span class="string">'U4D9'</span>,  0.455, <span class="string">'DriftPass'</span>);
+0191 U4D10  = drift(<span class="string">'U4D10'</span>, 0.035, <span class="string">'DriftPass'</span>);
+0192 U4D11  = drift(<span class="string">'U4D11'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0193 U4D12  = drift(<span class="string">'U4D12'</span>, 0.250, <span class="string">'DriftPass'</span>);
+0194 U4D13  = drift(<span class="string">'U4D13'</span>, 0.180, <span class="string">'DriftPass'</span>);
+0195 U4D14  = drift(<span class="string">'U4D14'</span>, 0.177, <span class="string">'DriftPass'</span>);
+0196 U4D15  = drift(<span class="string">'U4D15'</span>, 0.033, <span class="string">'DriftPass'</span>);
+0197 U4D16  = drift(<span class="string">'U4D16'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0198 U4D17  = drift(<span class="string">'U4D17'</span>, 0.155, <span class="string">'DriftPass'</span>);
+0199 U4D18  = drift(<span class="string">'U4D18'</span>, 0.612, <span class="string">'DriftPass'</span>);
+0200 U4D19  = drift(<span class="string">'U4D19'</span>, 0.038, <span class="string">'DriftPass'</span>);
+0201 U4D20  = drift(<span class="string">'U4D20'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0202 U4D21  = drift(<span class="string">'U4D21'</span>, 0.175, <span class="string">'DriftPass'</span>);
+0203 U4D22  = drift(<span class="string">'U4D22'</span>, 0.038, <span class="string">'DriftPass'</span>);
+0204 U4D23  = drift(<span class="string">'U4D23'</span>, 0.115, <span class="string">'DriftPass'</span>);
+0205 
+0206 <span class="comment">% Pick-ups</span>
+0207 
+0208 BPM   = marker(<span class="string">'BPM'</span>,  <span class="string">'IdentityPass'</span>);
+0209 
+0210 
+0211 <span class="comment">% Lattice description</span>
+0212 
+0213 <span class="comment">% Injection Straight Section</span>
+0214 
+0215 INJSTRT = [INJD1,BUIFB2,INJD2,BUISH,INJD3];
+0216 
+0217 <span class="comment">% Quadrant #1</span>
+0218 
+0219 SEC1 = [U1D1, BPM, U1D2, Q1, U1D3, U1HS1, U1VS1, SQ1, U1D4, <span class="keyword">...</span>
+0220         Q2, U1D5, BPM, U1D6, U1HS2, BD, U1D7, U1VS2, U1D8, SD, U1D9, <span class="keyword">...</span>
+0221         BPM, U1D10, BUIFB3, U1D11, Q3, U1D12, SF, U1D13, Q3, <span class="keyword">...</span>
+0222         U1D14, BPM, U1D15, SD, U1D16, U1VS3, U1D17, BD, U1HS3, U1D18, <span class="keyword">...</span>
+0223         BPM, U1D19, Q4, U1D20, U1VS4, U1HS4, U1D21, Q5, <span class="keyword">...</span>
+0224         U1D22, BPM, U1D23];
+0225                                                                 
+0226 <span class="comment">% U5 Undulator Straight Section</span>
+0227 
+0228 U5STRT = U5D;
+0229 
+0230 
+0231 <span class="comment">% Quadrant #2</span>
+0232 
+0233 SEC2 = [U2D1, BPM, U2D2, Q5, U2D3, U2HS5, U2VS5, SQ1, U2D4, <span class="keyword">...</span>
+0234         Q4, U2D5, BPM, U2D6, U2HS6, BD, U2D7, U2VS6, U2D8, SD, U2D9, <span class="keyword">...</span>
+0235         BPM, U2D10, Q3, U2D11, SF, U2D12, Q3, U2D13, BPM, <span class="keyword">...</span>
+0236         U2D14, SD, U2D15, U2VS7, U2D16, BD, U2HS7, U2D17, BPM, <span class="keyword">...</span>
+0237         U2D18, Q2, U2D19, U2VS8, U2HS8, U2D20, Q1, <span class="keyword">...</span>
+0238         U2D21, BPM, U2D22];
+0239 
+0240 <span class="comment">% RF Straight Section</span>
+0241 
+0242 RFSTRT = [RFD1,CAV,RFD2];
+0243 
+0244 
+0245 <span class="comment">% Quadrant #3</span>
+0246 
+0247 SEC3 = [U3D1, BPM, U3D2, Q1, U3D3, U3HS9, U3VS9, SQ1, U3D4, <span class="keyword">...</span>
+0248         Q2, U3D5, BPM, U3D6, U3HS10, BD, U3D7, U3VS10, U3D8, SD, <span class="keyword">...</span>
+0249         U3D9, BPM, U3D10, Q3, U3D11, SF, U3D12, Q3, U3D13, <span class="keyword">...</span>
+0250         BPM, U3D14, SD, U3D15, U3VS11, U3D16, BD, U3HS11, U3D17, <span class="keyword">...</span>
+0251         BPM, U3D18, Q6, U3D19, U3VS12, U3HS12, U3D20, Q7, <span class="keyword">...</span>
+0252         U3D21, BPM, U3D22];
+0253 
+0254 <span class="comment">% Undulator U13 Straight Section</span>
+0255 
+0256 U13STRT = U13D;
+0257 
+0258 <span class="comment">% Quadrant #4</span>
+0259 
+0260 SEC4 = [U4D1, BPM, U4D2, Q7, U4D3, U4HS13, U4VS13, SQ1, U4D4, <span class="keyword">...</span>
+0261         Q6, U4D5, BPM, U4D6, U4HS14, BD, U4D7, U4VS14, U4D8, SD, <span class="keyword">...</span>
+0262         U4D9,BPM,U4D10,Q3,U4D11,SF, U4D12, Q3, U4D13, BUIFB1, <span class="keyword">...</span>
+0263         U4D14, BPM, U4D15, SD, U4D16, U4VS15, U4D17, BD, U4HS15, U4D18, <span class="keyword">...</span>
+0264         BPM, U4D19, Q2, U4D20, U4VS16, U4HS16, U4D21, Q1, <span class="keyword">...</span>
+0265         U4D22, BPM, U4D23];
+0266 
+0267 
+0268 RING = [INJSTRT, SEC1, U5STRT, SEC2, RFSTRT, SEC3, U13STRT, SEC4];
+0269 
+0270 buildlat(RING);
+0271 
+0272 
+0273 <span class="comment">%evalin('caller', 'global THERING FAMLIST GLOBVAL');</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

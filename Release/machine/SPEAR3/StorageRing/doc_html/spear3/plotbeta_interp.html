@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotbeta_interp</title>
+  <meta name="keywords" content="plotbeta_interp">
+  <meta name="description" content="this routine computes interpolated ring betafunctions">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; plotbeta_interp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plotbeta_interp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>this routine computes interpolated ring betafunctions</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">this routine computes interpolated ring betafunctions</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%this routine computes interpolated ring betafunctions</span>
+0002 
+0003 sp3v81resp_interp;
+0004 
+0005 <span class="comment">%load optics</span>
+0006 Optics=gettwiss(THERING,0.0);
+0007 
+0008 s=Optics.s;
+0009 bx=Optics.betax;
+0010 by=Optics.betay;
+0011 ex=Optics.etax;
+0012 exp=Optics.etapx;
+0013 
+0014 <span class="comment">%eliminate adjacent points for interpolation</span>
+0015 sok=[];   nok=0;
+0016   <span class="keyword">for</span> ii=1:size(s)-1
+0017     <span class="keyword">if</span>(s(ii+1)-s(ii)~=0)
+0018      nok=nok+1;
+0019      sok=[sok;ii];
+0020     <span class="keyword">end</span>
+0021   <span class="keyword">end</span>
+0022 
+0023 nok=nok+1;
+0024 sok=[sok;ii+1];
+0025 sp=s(sok);        <span class="comment">%make s column</span>
+0026 si=0:0.05:s(nok);   <span class="comment">%uniform s-grid</span>
+0027 
+0028 <span class="comment">%interpolations</span>
+0029 bxi=spline(sp,[0; bx(sok); 0],si);
+0030 byi=spline(sp,[0; by(sok); 0],si);
+0031 exi=spline(sp,[0; ex(sok); 0],si);
+0032 expi=spline(sp,[0; exp(sok); 0],si);
+0033 
+0034 <span class="comment">%interpolated plot for 1/4 of ring</span>
+0035 pts=1:round(length(si)/4);
+0036 plot(si(pts),bxi(pts),<span class="string">'r'</span>);
+0037 hold on
+0038 plot(si(pts),byi(pts),<span class="string">'b'</span>);
+0039 plot(si(pts),10*exi(pts),<span class="string">'k'</span>);
+0040 
+0041 title(<span class="string">'\beta-functions'</span>);
+0042 ylabel([<span class="string">'\beta [m]     10*eta [m]'</span>]);
+0043 xlabel(<span class="string">'s - position [m]'</span>);
+0044 
+0045 <span class="comment">%plot the vertical aperture for 4.5 mm-mrad</span>
+0046 Ay=4.5e-6;
+0047 y=sqrt(Ay*byi);
+0048 figure
+0049 pts=1:round(length(si)/40);
+0050 plot(si(pts),1000*y(pts),<span class="string">'b'</span>);
+0051 title(<span class="string">'vertical aperture through racetrack straight for 4.5 mm-mrad'</span>);
+0052 ylabel([<span class="string">'aperture [mm]'</span>]);
+0053 xlabel(<span class="string">'s - position [m]'</span>);
+0054 
+0055 close all
+0056 figure
+0057 len=round(length(si)/40); len=300;
+0058 half=round(length(si)/2);
+0059 pts=[(half-len):(half+len)];
+0060 plot(si(pts),1000*y(pts),<span class="string">'b'</span>);
+0061 
+0062 
+0063</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

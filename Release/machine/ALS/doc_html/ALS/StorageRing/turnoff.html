@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of turnoff</title>
+  <meta name="keywords" content="turnoff">
+  <meta name="description" content="TURNOFF - Scale the setpoint">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; turnoff.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>turnoff
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>TURNOFF - Scale the setpoint</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function turnoff(Family, DeviceList, FractionOff) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">TURNOFF - Scale the setpoint
+  turnoff(Family, DeviceList, FractionToChange)
+
+  Slowly turns change a given family (usually a magnet family)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setorbitdefault.html" class="code" title="function [OCS, RF, OCS0, RF0] = setorbitdefault(varargin)">setorbitdefault</a>	[OCS, RF, OCS0, RF0] = setorbitdefault(EVectors {1e-2}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function turnoff(Family, DeviceList, FractionOff)</a>
+0002 <span class="comment">%TURNOFF - Scale the setpoint</span>
+0003 <span class="comment">%  turnoff(Family, DeviceList, FractionToChange)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Slowly turns change a given family (usually a magnet family)</span>
+0006 <span class="comment">%</span>
+0007 
+0008 
+0009 <span class="comment">% To do:</span>
+0010 <span class="comment">% 1. Add field input</span>
+0011 <span class="comment">% 2. Add cell array input</span>
+0012 
+0013 
+0014 <span class="keyword">if</span> nargin &lt; 1
+0015     FamilyNum = menu1(<span class="string">'Which magnet family do you want to turn off?'</span>,<span class="string">'HCM'</span>,<span class="string">'VCM'</span>,<span class="string">'QF'</span>,<span class="string">'QD'</span>,<span class="string">'QFA'</span>,<span class="string">'SD'</span>,<span class="string">'SF'</span>,<span class="string">'BEND'</span>,<span class="string">'Exit'</span>);
+0016 
+0017     <span class="keyword">if</span> FamilyNum == 1
+0018         Family = <span class="string">'HCM'</span>;
+0019     <span class="keyword">elseif</span> FamilyNum == 2
+0020         Family = <span class="string">'VCM'</span>;
+0021     <span class="keyword">elseif</span> FamilyNum == 3
+0022         Family = <span class="string">'QF'</span>;
+0023     <span class="keyword">elseif</span> FamilyNum == 4
+0024         Family = <span class="string">'QD'</span>;
+0025     <span class="keyword">elseif</span> FamilyNum == 5
+0026         Family = <span class="string">'QFA'</span>;
+0027     <span class="keyword">elseif</span> FamilyNum == 6
+0028         Family = <span class="string">'SF'</span>;
+0029     <span class="keyword">elseif</span> FamilyNum == 7
+0030         Family = <span class="string">'SD'</span>;
+0031     <span class="keyword">elseif</span> FamilyNum == 8
+0032         Family = <span class="string">'BEND'</span>;
+0033     <span class="keyword">elseif</span> FamilyNum == 9
+0034         <span class="keyword">return</span>;
+0035     <span class="keyword">else</span>
+0036         error([Family,<span class="string">' not defined.'</span>]);
+0037     <span class="keyword">end</span>
+0038 <span class="keyword">end</span>
+0039 
+0040 
+0041 <span class="keyword">if</span> nargin &lt; 2
+0042     DeviceList = [];
+0043 <span class="keyword">end</span>
+0044 <span class="keyword">if</span> isempty(DeviceList)
+0045     DeviceList = getlist(Family);
+0046 <span class="keyword">end</span>
+0047 <span class="keyword">if</span> size(DeviceList,2) == 1
+0048     DeviceList = elem2dev(Family, DeviceList);
+0049 <span class="keyword">end</span>
+0050 
+0051 
+0052 <span class="comment">% Motor chicane magnets</span>
+0053 <span class="keyword">if</span> strcmp(Family, <span class="string">'HCMCHINCANEM'</span>)
+0054     SPzero = 80;
+0055 <span class="keyword">else</span>
+0056     SPzero = 0;
+0057 <span class="keyword">end</span>
+0058 
+0059 
+0060 <span class="comment">% Set HCMs functioning as chicanes to their nominal chicane value</span>
+0061 <span class="keyword">if</span> strcmp(Family, <span class="string">'HCM'</span>)
+0062     <span class="keyword">if</span> ~strcmpi(getmode(<span class="string">'HCM'</span>), <span class="string">'Simulator'</span>)
+0063         <span class="comment">% HCM being used as chicane magnets get removed</span>
+0064         <span class="comment">% (Only because turning off the motor chicanes is more difficult.)</span>
+0065         HCMRemoveList = [];
+0066 
+0067         
+0068         <span class="comment">% Sector 4 chicanes are all independent magnets</span>
+0069         <span class="comment">%                   Off    1.9 GeV   1.5 GeV</span>
+0070         <span class="comment">% HCMCHICANEM(4,1)  80.0    26.7      43.0</span>
+0071         <span class="comment">% HCMCHICANEM(4,1)  80.0     7.3      24.0</span>
+0072 
+0073         
+0074         <span class="comment">% Sector 6</span>
+0075         <span class="comment">%                   Off    1.9 GeV   1.5 GeV</span>
+0076         <span class="comment">% HCMCHICANEM(6,1)  80.0    18.0       ?</span>
+0077         <span class="comment">% HCMCHICANEM(6,1)  80.0    20.0       ?</span>
+0078         <span class="comment">% HCM(6,1)           0.0    18.8       ?</span>
+0079         <span class="keyword">if</span> ~isempty(findrowindex([6 1], DeviceList))
+0080             <span class="keyword">try</span>
+0081                 <span class="keyword">if</span> getsp(<span class="string">'HCMCHICANEM'</span>,[6 1]) &lt; 70
+0082                     <span class="comment">% Assume sector 6 chicane is on</span>
+0083                     HCMRemoveList = [HCMRemoveList; 6 1];
+0084                 <span class="keyword">end</span>
+0085             <span class="keyword">catch</span>
+0086                 fprintf(<span class="string">'%s\n'</span>, lasterr);
+0087                 fprintf(<span class="string">'Problem reading HCMCHICANEM(6,1), HCM(6,1) will be zeroed.\n\n'</span>);
+0088             <span class="keyword">end</span>
+0089         <span class="keyword">end</span>
+0090 
+0091         
+0092         <span class="comment">% Sector 11</span>
+0093         <span class="comment">%                    Off    1.9 GeV   1.5 GeV</span>
+0094         <span class="comment">% HCMCHICANEM(11,1)  80.0    40.5      52.0</span>
+0095         <span class="comment">% HCMCHICANEM(11,1)  80.0    40.5      52.0</span>
+0096         <span class="comment">% HCM(10,8)           0.0   -17.0     -14.0</span>
+0097         <span class="comment">% HCM(11,1)           0.0   -17.0     -14.0</span>
+0098         <span class="keyword">if</span> ~isempty(findrowindex([10 8], DeviceList))
+0099             <span class="keyword">try</span>
+0100                 <span class="keyword">if</span> getsp(<span class="string">'HCMCHICANEM'</span>,[11 1]) &lt; 60
+0101                     <span class="comment">% Assume sector 11 chicane is on</span>
+0102                     HCMRemoveList = [HCMRemoveList; 10 8];
+0103                 <span class="keyword">end</span>
+0104             <span class="keyword">catch</span>
+0105                 fprintf(<span class="string">'%s\n'</span>, lasterr);
+0106                 fprintf(<span class="string">'Problem reading HCMCHICANEM(11,1), HCM(10,8) will be zeroed.\n\n'</span>);
+0107             <span class="keyword">end</span>
+0108         <span class="keyword">end</span>
+0109         <span class="keyword">if</span> ~isempty(findrowindex([11 1], DeviceList))
+0110             <span class="keyword">try</span>
+0111                 <span class="keyword">if</span> getsp(<span class="string">'HCMCHICANEM'</span>,[11 1]) &lt; 60
+0112                     <span class="comment">% Assume sector 11 chicane is on</span>
+0113                     HCMRemoveList = [HCMRemoveList; 11 1];
+0114                 <span class="keyword">end</span>
+0115             <span class="keyword">catch</span>
+0116                 fprintf(<span class="string">'%s\n'</span>, lasterr);
+0117                 fprintf(<span class="string">'Problem reading HCMCHICANEM(11,1), HCM(11,1) will be zeroed.\n\n'</span>);
+0118             <span class="keyword">end</span>
+0119         <span class="keyword">end</span>
+0120 
+0121 
+0122         i = findrowindex(HCMRemoveList, DeviceList);
+0123         <span class="keyword">if</span> ~isempty(i)
+0124             <span class="keyword">if</span> getfamilydata(<span class="string">'Energy'</span>) &gt; 1.8
+0125                 disp(<span class="string">'   HCMs functioning as chicane magnets are not set to zero (turnoff.m)'</span>);
+0126                 <span class="keyword">if</span> ~isempty(findrowindex([6 1], HCMRemoveList))
+0127                     disp(<span class="string">'   HCM[ 6 1] =  18.8'</span>);
+0128                     setsp(<span class="string">'HCM'</span>, 18.8, [6 1]);
+0129                 <span class="keyword">end</span>
+0130                 <span class="keyword">if</span> ~isempty(findrowindex([10 8], HCMRemoveList))
+0131                     setsp(<span class="string">'HCM'</span>, -17, [10 8]);
+0132                     disp(<span class="string">'   HCM[10 8] = -17.0'</span>);
+0133                 <span class="keyword">end</span>
+0134                 <span class="keyword">if</span> ~isempty(findrowindex([11 1], HCMRemoveList))
+0135                     setsp(<span class="string">'HCM'</span>, -17, [11 1]);
+0136                     disp(<span class="string">'   HCM[11 1] = -17.0'</span>);
+0137                 <span class="keyword">end</span>
+0138             <span class="keyword">else</span>
+0139                 <span class="keyword">if</span> ~isempty(findrowindex([6 1], HCMRemoveList))
+0140                     disp(<span class="string">'   HCM[ 6 1] =  18.8*1.5/1.9'</span>);
+0141                     setsp(<span class="string">'HCM'</span>, 18.8*1.5/1.9, [6 1]);
+0142                 <span class="keyword">end</span>
+0143                 <span class="keyword">if</span> ~isempty(findrowindex([10 8], HCMRemoveList))
+0144                     setsp(<span class="string">'HCM'</span>, -14, [10 8]);
+0145                     disp(<span class="string">'   HCM[10 8] = -14.0'</span>);
+0146                 <span class="keyword">end</span>
+0147                 <span class="keyword">if</span> ~isempty(findrowindex([11 1], HCMRemoveList))
+0148                     setsp(<span class="string">'HCM'</span>, -14, [11 1]);
+0149                     disp(<span class="string">'   HCM[11 1] = -14.0'</span>);
+0150                 <span class="keyword">end</span>
+0151             <span class="keyword">end</span>
+0152 
+0153             
+0154             <span class="comment">% Remove the HCM acting as chicane magnets from the turnoff list</span>
+0155             <span class="comment">% since they have already been set.</span>
+0156             DeviceList(i,:) = [];
+0157         <span class="keyword">end</span>
+0158     <span class="keyword">end</span>
+0159 <span class="keyword">end</span>
+0160 
+0161 
+0162 <span class="comment">% Get setpoints</span>
+0163 sp = getsp(Family, DeviceList);
+0164 
+0165 
+0166 <span class="comment">%if strcmp(computer, 'PCWIN') &amp; (strcmp(Family,'HCM') | strcmp(Family,'VCM'))</span>
+0167 <span class="comment">%  RampFlag = getramp(Family, DeviceList);      % save ramp flags</span>
+0168 <span class="comment">%  setramp(Family, 0, DeviceList);              % slow mode</span>
+0169 <span class="comment">%end</span>
+0170 
+0171 
+0172 <span class="comment">% Slowly turn off the correctors</span>
+0173 <span class="keyword">if</span> nargin &lt; 3
+0174     FractionOff = 0;
+0175 
+0176     <span class="comment">%if strcmp(Family,'HCM')</span>
+0177     <span class="comment">%   FractionOff = 0;</span>
+0178     <span class="comment">%   fprintf('  Horizontal correctors set to %f%% of nominal\n', 100*FractionOff);</span>
+0179     <span class="comment">%end</span>
+0180 
+0181     <span class="comment">%if strcmp(Family,'VCM')</span>
+0182     <span class="comment">%   FractionOff = 0.30;</span>
+0183     <span class="comment">%   fprintf('  Vertical correctors set to %.1f%% of nominal\n', 100*FractionOff);</span>
+0184     <span class="comment">%end</span>
+0185 <span class="keyword">end</span>
+0186 
+0187 
+0188 
+0189 <span class="comment">% Slowly turn off the magnets</span>
+0190 <span class="keyword">for</span> i = 1:-.1:FractionOff
+0191     t0 = clock;
+0192     
+0193     setsp(Family, i*(sp-SPzero)+SPzero, DeviceList);
+0194 
+0195     <span class="keyword">if</span> ~strcmpi(getmode(<span class="string">'HCM'</span>), <span class="string">'Simulator'</span>)
+0196         sleep(0.25);
+0197     <span class="keyword">end</span>
+0198     <span class="comment">%deltime = etime(clock,t0);</span>
+0199 <span class="keyword">end</span>
+0200 
+0201 setsp(Family, FractionOff*(sp-SPzero)+SPzero, DeviceList);
+0202 
+0203 
+0204 
+0205 
+0206 <span class="comment">%if strcmp(computer, 'PCWIN') &amp; (strcmp(Family,'HCM') | strcmp(Family,'VCM'))</span>
+0207 <span class="comment">%  setramp(Family, RampFlag, DeviceList);       % restore ramp flags</span>
+0208 <span class="comment">%end</span>
+0209 
+0210 
+0211 <span class="comment">% if size(DeviceList,1) == size(family2dev(Family),1)</span>
+0212 <span class="comment">%     disp(['  The ', Family,' family has been set to zero.']);</span>
+0213 <span class="comment">% else</span>
+0214 <span class="comment">%     disp(['  Part of the ', Family,' family has been set to zero.']);</span>
+0215 <span class="comment">% end</span>
+0216</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

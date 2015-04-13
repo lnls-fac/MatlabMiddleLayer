@@ -1,0 +1,547 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of goldenpage</title>
+  <meta name="keywords" content="goldenpage">
+  <meta name="description" content="[RFdata, BUMPdata, TFBdata, LFBdata] = goldenpage(FileName)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; goldenpage.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>goldenpage
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[RFdata, BUMPdata, TFBdata, LFBdata] = goldenpage(FileName)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [RFData, BUMPdata, TFBdata, LFBdata] = goldenpage(FileName); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [RFdata, BUMPdata, TFBdata, LFBdata] = goldenpage(FileName)
+
+  FileName = goldenpage filename (no file extension, .txt assumed)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [RFData, BUMPdata, TFBdata, LFBdata] = goldenpage(FileName);</a>
+0002 <span class="comment">% [RFdata, BUMPdata, TFBdata, LFBdata] = goldenpage(FileName)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  FileName = goldenpage filename (no file extension, .txt assumed)</span>
+0005 <span class="comment">%</span>
+0006 
+0007 OpsDirectory = getfamilydata(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0008 
+0009 <span class="keyword">if</span> nargin &lt; 1
+0010     [fid, err] = fopen([OpsDirectory,<span class="string">'GoldenPage.txt'</span>],<span class="string">'rt'</span>);
+0011 <span class="keyword">else</span>
+0012     <span class="keyword">if</span> strcmp(FileName(end-3:end),<span class="string">'.txt'</span>) == 0
+0013         FileName = [FileName,<span class="string">'.txt'</span>];
+0014     <span class="keyword">end</span>
+0015     [fid, err] = fopen(FileName,<span class="string">'rt'</span>);
+0016 <span class="keyword">end</span>
+0017 
+0018 <span class="keyword">if</span> fid &lt; 0
+0019     fprintf(<span class="string">'  \n%s\n  ALSVARS canceled due to SR mode file problem.\n\n'</span>, err);
+0020     <span class="keyword">return</span>
+0021 <span class="keyword">end</span>
+0022 
+0023 
+0024 <span class="keyword">while</span> ~feof(fid)
+0025     tline = fgets(fid);
+0026         
+0027     <span class="keyword">if</span> isempty(tline)
+0028         <span class="comment">% blank</span>
+0029     <span class="keyword">elseif</span> tline(1) == <span class="string">'#'</span>
+0030         <span class="comment">% Comment</span>
+0031     <span class="keyword">elseif</span> findstr(<span class="string">'ASLFileName'</span>,tline)
+0032         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0033         tline(1:length(tmp)) = [];
+0034         ASLFileName = sscanf(tline,<span class="string">'%s'</span>,1);
+0035     <span class="keyword">elseif</span> findstr(<span class="string">'BTSFileName'</span>,tline)
+0036         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0037         tline(1:length(tmp)) = [];
+0038         BTSFileName = sscanf(tline,<span class="string">'%s'</span>,1);
+0039     <span class="keyword">elseif</span> findstr(<span class="string">'PulseMagnetFileName'</span>,tline)
+0040         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0041         tline(1:length(tmp)) = [];
+0042         PulseMagnetFileName = sscanf(tline,<span class="string">'%s'</span>,1);
+0043     
+0044     <span class="keyword">elseif</span> findstr(<span class="string">'RFdata.C1TempFBoffAC'</span>,tline)
+0045         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0046         tline(1:length(tmp)) = [];
+0047         RFdata.C1TempFBoffAC = sscanf(tline,<span class="string">'%f'</span>,1);
+0048     <span class="keyword">elseif</span> findstr(<span class="string">'RFdata.C2TempFBoffAC'</span>,tline)
+0049         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0050         tline(1:length(tmp)) = [];
+0051         RFdata.C2TempFBoffAC = sscanf(tline,<span class="string">'%f'</span>,1);
+0052     <span class="keyword">elseif</span> findstr(<span class="string">'RFdata.C1TempFBonAC'</span>,tline)
+0053         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0054         tline(1:length(tmp)) = [];
+0055         RFdata.C1TempFBonAC = sscanf(tline,<span class="string">'%f'</span>,1);
+0056     <span class="keyword">elseif</span> findstr(<span class="string">'RFdata.C1TempFBonAM'</span>,tline)
+0057         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0058         tline(1:length(tmp)) = [];
+0059         RFdata.C1TempFBonAM = sscanf(tline,<span class="string">'%f'</span>,1);
+0060     <span class="keyword">elseif</span> findstr(<span class="string">'RFdata.C2TempFBonAC'</span>,tline)
+0061         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0062         tline(1:length(tmp)) = [];
+0063         RFdata.C2TempFBonAC = sscanf(tline,<span class="string">'%f'</span>,1);
+0064     <span class="keyword">elseif</span> findstr(<span class="string">'RFdata.C2TempFBonAM'</span>,tline)
+0065         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0066         tline(1:length(tmp)) = [];
+0067         RFdata.C2TempFBonAM = sscanf(tline,<span class="string">'%f'</span>,1);
+0068     <span class="keyword">elseif</span> findstr(<span class="string">'RFdata.Power'</span>,tline)
+0069         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0070         tline(1:length(tmp)) = [];
+0071         RFdata.Power = sscanf(tline,<span class="string">'%f'</span>,1);
+0072     
+0073     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BRBump1'</span>,tline)
+0074         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0075         tline(1:length(tmp)) = [];
+0076         BUMPdata.BRBump1 = sscanf(tline,<span class="string">'%f'</span>,1);
+0077     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BRBump2'</span>,tline)
+0078         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0079         tline(1:length(tmp)) = [];
+0080         BUMPdata.BRBump2 = sscanf(tline,<span class="string">'%f'</span>,1);
+0081     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BRBump3'</span>,tline)
+0082         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0083         tline(1:length(tmp)) = [];
+0084         BUMPdata.BRBump3 = sscanf(tline,<span class="string">'%f'</span>,1);
+0085     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BR2SENTiming'</span>,tline)
+0086         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0087         tline(1:length(tmp)) = [];
+0088         BUMPdata.BR2SENTiming = sscanf(tline,<span class="string">'%f'</span>,1);
+0089     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BR2SEKTiming'</span>,tline)
+0090         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0091         tline(1:length(tmp)) = [];
+0092         BUMPdata.BR2SEKTiming = sscanf(tline,<span class="string">'%f'</span>,1);
+0093     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BR2SEN'</span>,tline)
+0094         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0095         tline(1:length(tmp)) = [];
+0096         BUMPdata.BR2SEN = sscanf(tline,<span class="string">'%f'</span>,1);
+0097     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BR2SEK'</span>,tline)
+0098         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0099         tline(1:length(tmp)) = [];
+0100         BUMPdata.BR2SEK = sscanf(tline,<span class="string">'%f'</span>,1);
+0101     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BR2KETiming'</span>,tline)
+0102         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0103         tline(1:length(tmp)) = [];
+0104         BUMPdata.BR2KETiming = sscanf(tline,<span class="string">'%f'</span>,1);
+0105     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BR2KE'</span>,tline)
+0106         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0107         tline(1:length(tmp)) = [];
+0108         BUMPdata.BR2KE = sscanf(tline,<span class="string">'%f'</span>,1);
+0109     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.ExtFldTrigTiming'</span>,tline)
+0110         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0111         tline(1:length(tmp)) = [];
+0112         BUMPdata.ExtFldTrigTiming = sscanf(tline,<span class="string">'%f'</span>,1);
+0113     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.BRBumpTrigTiming'</span>,tline)
+0114         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0115         tline(1:length(tmp)) = [];
+0116         BUMPdata.BRBumpTrigTiming = sscanf(tline,<span class="string">'%f'</span>,1);
+0117     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.SRSEKTiming'</span>,tline)
+0118         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0119         tline(1:length(tmp)) = [];
+0120         BUMPdata.SRSEKTiming = sscanf(tline,<span class="string">'%f'</span>,1);
+0121     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.SRSEK'</span>,tline)
+0122         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0123         tline(1:length(tmp)) = [];
+0124         BUMPdata.SRSEK = sscanf(tline,<span class="string">'%f'</span>,1);
+0125     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.SRSENTiming'</span>,tline)
+0126         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0127         tline(1:length(tmp)) = [];
+0128         BUMPdata.SRSENTiming = sscanf(tline,<span class="string">'%f'</span>,1);
+0129     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.SRSEN'</span>,tline)
+0130         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0131         tline(1:length(tmp)) = [];
+0132         BUMPdata.SRSEN = sscanf(tline,<span class="string">'%f'</span>,1);
+0133     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.SRBUMP1Timing'</span>,tline)
+0134         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0135         tline(1:length(tmp)) = [];
+0136         BUMPdata.SRBUMP1Timing = sscanf(tline,<span class="string">'%f'</span>,1);
+0137     <span class="keyword">elseif</span> findstr(<span class="string">'BUMPdata.SRBUMP1'</span>,tline)
+0138         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0139         tline(1:length(tmp)) = [];
+0140         BUMPdata.SRBUMP1 = sscanf(tline,<span class="string">'%f'</span>,1);
+0141     
+0142     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.X1Bias'</span>,tline)
+0143         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0144         tline(1:length(tmp)) = [];
+0145         TFBdata.X1Bias = sscanf(tline,<span class="string">'%f'</span>,1);
+0146     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.Y1Bias'</span>,tline)
+0147         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0148         tline(1:length(tmp)) = [];
+0149         TFBdata.Y1Bias = sscanf(tline,<span class="string">'%f'</span>,1);
+0150     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.X2Bias'</span>,tline)
+0151         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0152         tline(1:length(tmp)) = [];
+0153         TFBdata.X2Bias = sscanf(tline,<span class="string">'%f'</span>,1);
+0154     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.Y2Bias'</span>,tline)
+0155         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0156         tline(1:length(tmp)) = [];
+0157         TFBdata.Y2Bias = sscanf(tline,<span class="string">'%f'</span>,1);
+0158     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.XAtten'</span>,tline)
+0159         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0160         tline(1:length(tmp)) = [];
+0161         TFBdata.XAtten = sscanf(tline,<span class="string">'%f'</span>,1);
+0162     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.YAtten'</span>,tline)
+0163         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0164         tline(1:length(tmp)) = [];
+0165         TFBdata.YAtten = sscanf(tline,<span class="string">'%f'</span>,1);
+0166     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.XDelay'</span>,tline)
+0167         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0168         tline(1:length(tmp)) = [];
+0169         TFBdata.XDelay = sscanf(tline,<span class="string">'%f'</span>,1);
+0170     <span class="keyword">elseif</span> findstr(<span class="string">'TFBdata.YDelay'</span>,tline)
+0171         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0172         tline(1:length(tmp)) = [];
+0173         TFBdata.YDelay = sscanf(tline,<span class="string">'%f'</span>,1);
+0174     
+0175     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.FrontEndDelay'</span>,tline)
+0176         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0177         tline(1:length(tmp)) = [];
+0178         LFBdata.FrontEndDelay = sscanf(tline,<span class="string">'%f'</span>,1);
+0179     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.FEPhaseOffset'</span>,tline)
+0180         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0181         tline(1:length(tmp)) = [];
+0182         LFBdata.FEPhaseOffset = sscanf(tline,<span class="string">'%f'</span>,1);
+0183     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.FEPhaseShift'</span>,tline)
+0184         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0185         tline(1:length(tmp)) = [];
+0186         LFBdata.FEPhaseShift = sscanf(tline,<span class="string">'%f'</span>,1);
+0187     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.FEGainSign'</span>,tline)
+0188         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0189         tline(1:length(tmp)) = [];
+0190         LFBdata.FEGainSign = sscanf(tline,<span class="string">'%s'</span>,1);
+0191     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.BackEndDelay'</span>,tline)
+0192         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0193         tline(1:length(tmp)) = [];
+0194         LFBdata.BackEndDelay = sscanf(tline,<span class="string">'%f'</span>,1);
+0195     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.QPSKAtten'</span>,tline)
+0196         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0197         tline(1:length(tmp)) = [];
+0198         LFBdata.QPSKAtten = sscanf(tline,<span class="string">'%f'</span>,1);     
+0199     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.FillPattern'</span>,tline)
+0200         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0201         tline(1:length(tmp)) = [];
+0202         LFBdata.FillPattern = sscanf(tline,<span class="string">'%s'</span>,1);     
+0203     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.SynchrotronFreq'</span>,tline)
+0204         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0205         tline(1:length(tmp)) = [];
+0206         LFBdata.SynchrotronFreq = sscanf(tline,<span class="string">'%f'</span>,1);
+0207     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.CalculatedSynchrotronFreq'</span>,tline)
+0208         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0209         tline(1:length(tmp)) = [];
+0210         LFBdata.CalculatedSynchrotronFreq = sscanf(tline,<span class="string">'%f'</span>,1);
+0211     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.RingShift'</span>,tline)
+0212         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0213         tline(1:length(tmp)) = [];
+0214         LFBdata.RingShift = sscanf(tline,<span class="string">'%f'</span>,1);     
+0215     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.HoldBufferOffset'</span>,tline)
+0216         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0217         tline(1:length(tmp)) = [];
+0218         LFBdata.HoldBufferOffset = sscanf(tline,<span class="string">'%f'</span>,1);
+0219     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.MinDSPTime'</span>,tline)
+0220         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0221         tline(1:length(tmp)) = [];
+0222         LFBdata.MinDSPTime = sscanf(tline,<span class="string">'%f'</span>,1);
+0223     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.ShiftGain'</span>,tline)
+0224         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0225         tline(1:length(tmp)) = [];
+0226         LFBdata.ShiftGain = sscanf(tline,<span class="string">'%f'</span>,1);
+0227     <span class="keyword">elseif</span> findstr(<span class="string">'LFBdata.FilterPhase'</span>,tline)
+0228         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0229         tline(1:length(tmp)) = [];
+0230         LFBdata.FilterPhase = sscanf(tline,<span class="string">'%f'</span>,1);    
+0231 
+0232     <span class="keyword">elseif</span> findstr(<span class="string">'THCdata.THC1MainAC'</span>,tline)
+0233         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0234         tline(1:length(tmp)) = [];
+0235         THCdata.THC1MainAC = sscanf(tline,<span class="string">'%f'</span>,1);    
+0236     <span class="keyword">elseif</span> findstr(<span class="string">'THCdata.THC1MainAM'</span>,tline)
+0237         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0238         tline(1:length(tmp)) = [];
+0239         THCdata.THC1MainAM = sscanf(tline,<span class="string">'%f'</span>,1);    
+0240 <span class="comment">%    elseif findstr('THCdata.THC1AuxAC',tline)</span>
+0241 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0242 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0243 <span class="comment">%        THCdata.THC1AuxAC = sscanf(tline,'%f',1);</span>
+0244 <span class="comment">%    elseif findstr('THCdata.THC1AuxAM',tline)</span>
+0245 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0246 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0247 <span class="comment">%        THCdata.THC1AuxAM = sscanf(tline,'%f',1);</span>
+0248     <span class="keyword">elseif</span> findstr(<span class="string">'THCdata.THC2MainAC'</span>,tline)
+0249         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0250         tline(1:length(tmp)) = [];
+0251         THCdata.THC2MainAC = sscanf(tline,<span class="string">'%f'</span>,1);    
+0252     <span class="keyword">elseif</span> findstr(<span class="string">'THCdata.THC2MainAM'</span>,tline)
+0253         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0254         tline(1:length(tmp)) = [];
+0255         THCdata.THC2MainAM = sscanf(tline,<span class="string">'%f'</span>,1);    
+0256 <span class="comment">%    elseif findstr('THCdata.THC2AuxAC',tline)</span>
+0257 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0258 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0259 <span class="comment">%        THCdata.THC2AuxAC = sscanf(tline,'%f',1);</span>
+0260 <span class="comment">%    elseif findstr('THCdata.THC2AuxAM',tline)</span>
+0261 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0262 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0263 <span class="comment">%        THCdata.THC2AuxAM = sscanf(tline,'%f',1);</span>
+0264     <span class="keyword">elseif</span> findstr(<span class="string">'THCdata.THC3MainAC'</span>,tline)
+0265         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0266         tline(1:length(tmp)) = [];
+0267         THCdata.THC3MainAC = sscanf(tline,<span class="string">'%f'</span>,1);    
+0268     <span class="keyword">elseif</span> findstr(<span class="string">'THCdata.THC3MainAM'</span>,tline)
+0269         tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0270         tline(1:length(tmp)) = [];
+0271         THCdata.THC3MainAM = sscanf(tline,<span class="string">'%f'</span>,1);    
+0272 <span class="comment">%    elseif findstr('THCdata.THC3AuxAC',tline)</span>
+0273 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0274 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0275 <span class="comment">%        THCdata.THC3AuxAC = sscanf(tline,'%f',1);</span>
+0276 <span class="comment">%    elseif findstr('THCdata.THC3AuxAM',tline)</span>
+0277 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0278 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0279 <span class="comment">%        THCdata.THC3AuxAM = sscanf(tline,'%f',1);</span>
+0280 <span class="comment">%    elseif findstr('THCdata.THC4MainAC',tline)</span>
+0281 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0282 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0283 <span class="comment">%        THCdata.THC4MainAC = sscanf(tline,'%f',1);</span>
+0284 <span class="comment">%    elseif findstr('THCdata.THC4MainAM',tline)</span>
+0285 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0286 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0287 <span class="comment">%        THCdata.THC4MainAM = sscanf(tline,'%f',1);</span>
+0288 <span class="comment">%    elseif findstr('THCdata.THC4AuxAC',tline)</span>
+0289 <span class="comment">%        tmp = sscanf(tline,'%s',1);</span>
+0290 <span class="comment">%        tline(1:length(tmp)) = [];</span>
+0291 <span class="comment">%        THCdata.THC4AuxAC = sscanf(tline,'%f',1);</span>
+0292 <span class="comment">%   elseif findstr('THCdata.THC4AuxAM',tline)</span>
+0293 <span class="comment">%      tmp = sscanf(tline,'%s',1);</span>
+0294 <span class="comment">%      tline(1:length(tmp)) = [];</span>
+0295 <span class="comment">%      THCdata.THC4AuxAM = sscanf(tline,'%f',1);</span>
+0296 <span class="comment">%   elseif findstr('THCdata.THC5MainAC',tline)</span>
+0297 <span class="comment">%      tmp = sscanf(tline,'%s',1);</span>
+0298 <span class="comment">%      tline(1:length(tmp)) = [];</span>
+0299 <span class="comment">%      THCdata.THC5MainAC = sscanf(tline,'%f',1);</span>
+0300 <span class="comment">%   elseif findstr('THCdata.THC5MainAM',tline)</span>
+0301 <span class="comment">%      tmp = sscanf(tline,'%s',1);</span>
+0302 <span class="comment">%      tline(1:length(tmp)) = [];</span>
+0303 <span class="comment">%      THCdata.THC5MainAM = sscanf(tline,'%f',1);</span>
+0304 <span class="comment">%   elseif findstr('THCdata.THC5AuxAC',tline)</span>
+0305 <span class="comment">%      tmp = sscanf(tline,'%s',1);</span>
+0306 <span class="comment">%      tline(1:length(tmp)) = [];</span>
+0307 <span class="comment">%      THCdata.THC5AuxAC = sscanf(tline,'%f',1);</span>
+0308 <span class="comment">%   elseif findstr('THCdata.THC5AuxAM',tline)</span>
+0309 <span class="comment">%      tmp = sscanf(tline,'%s',1);</span>
+0310 <span class="comment">%      tline(1:length(tmp)) = [];</span>
+0311 <span class="comment">%      THCdata.THC5AuxAM = sscanf(tline,'%f',1);</span>
+0312    <span class="keyword">elseif</span> findstr(<span class="string">'beamcurrent'</span>,tline)
+0313       tmp = sscanf(tline,<span class="string">'%s'</span>,1);
+0314       tline(1:length(tmp)) = [];
+0315       beamcurrent = sscanf(tline,<span class="string">'%f'</span>,1);
+0316    <span class="keyword">end</span>
+0317    
+0318 <span class="keyword">end</span>    
+0319 
+0320 fclose(fid);
+0321 
+0322 
+0323 <span class="comment">% Printing section</span>
+0324 fid = 1;
+0325 fprintf(fid,<span class="string">'  ** GOLDEN PAGE for: %s   **\n\n'</span>, getfamilydata(<span class="string">'OperationalMode'</span>));
+0326 fprintf(fid,<span class="string">'  Physics Parameters:\n'</span>);
+0327 fprintf(fid,<span class="string">'                Tune     Chromaticity \n'</span>);
+0328 GoldenTune = getgolden(<span class="string">'TUNE'</span>);
+0329 GoldenChromaticity = getgolden(<span class="string">'Chromaticity'</span>);
+0330 fprintf(fid,<span class="string">'  Horizontal:  %.3f       %.2f \n'</span>,    GoldenTune(1), GoldenChromaticity(1));
+0331 fprintf(fid,<span class="string">'    Vertical:   %.3f       %.2f \n\n'</span>, GoldenTune(2), GoldenChromaticity(2));
+0332 
+0333 [SP, AM]= getproductionlattice;
+0334 BENDspp = SP.BEND.Setpoint.Data(1);
+0335 i = findrowindex([4 2;8 2;12 2],SP.BEND.Setpoint.DeviceList);
+0336 BSCspp = SP.BEND.Setpoint.Data(i);
+0337 i = findrowindex([1 1;4 2;8 2;12 2],SP.QFA.Setpoint.DeviceList);
+0338 QFAspp = SP.QFA.Setpoint.Data(i);
+0339 QDAspp = SP.QDA.Setpoint.Data;
+0340 SFspp = SP.SF.Setpoint.Data(1);
+0341 SDspp = SP.SD.Setpoint.Data(1);
+0342 QFspp = SP.QF.Setpoint.Data;
+0343 QDspp = SP.QD.Setpoint.Data;
+0344 HCMspp = SP.HCM.Setpoint.Data;
+0345 VCMspp = SP.VCM.Setpoint.Data;
+0346 HCMCHICANEspp = SP.HCMCHICANE.Setpoint.Data;
+0347 <span class="comment">%VCMCHICANEspp = VCMCHICANEsp;</span>
+0348 HCMCHICANEMspp = SP.HCMCHICANEM.Setpoint.Data;
+0349 SQSFspp = SP.SQSF.Setpoint.Data;;
+0350 SQSDspp = SP.SQSD.Setpoint.Data;
+0351 RFdata.FreqProd = SP.RF.Setpoint.Data;
+0352 
+0353 
+0354 [SP, AM]= getinjectionlattice;
+0355 BENDsp = SP.BEND.Setpoint.Data(1);
+0356 i = findrowindex([4 2;8 2;12 2],SP.BEND.Setpoint.DeviceList);
+0357 BSCsp = SP.BEND.Setpoint.Data(i);
+0358 i = findrowindex([1 1;4 2;8 2;12 2],SP.QFA.Setpoint.DeviceList);
+0359 QFAsp = SP.QFA.Setpoint.Data(i);
+0360 QDAsp = SP.QDA.Setpoint.Data;
+0361 SFsp = SP.SF.Setpoint.Data(1);
+0362 SDsp = SP.SD.Setpoint.Data(1);
+0363 QFsp = SP.QF.Setpoint.Data;
+0364 QDsp = SP.QD.Setpoint.Data;
+0365 HCMsp = SP.HCM.Setpoint.Data;
+0366 VCMsp = SP.VCM.Setpoint.Data;
+0367 HCMCHICANEsp = SP.HCMCHICANE.Setpoint.Data;
+0368 <span class="comment">%VCMCHICANEsp = VCMCHICANEsp;</span>
+0369 HCMCHICANEMsp = SP.HCMCHICANEM.Setpoint.Data;
+0370 SQSFsp = SP.SQSF.Setpoint.Data;;
+0371 SQSDsp = SP.SQSD.Setpoint.Data;
+0372 RFdata.FreqInj = SP.RF.Setpoint.Data;
+0373 
+0374 
+0375 fprintf(fid,<span class="string">'  Lattice Parameters:\n'</span>);
+0376 fprintf(fid,<span class="string">'             ACL magnet filename:  %s\n'</span>, ASLFileName);
+0377 fprintf(fid,<span class="string">'             BTS magnet filename:  %s\n'</span>, BTSFileName);
+0378 fprintf(fid,<span class="string">'          Pulsed magnet filename:  %s\n'</span>, PulseMagnetFileName);
+0379 fprintf(fid,<span class="string">'  SR injection  lattice filename:  %s%s\n'</span>,   OpsDirectory, getfamilydata(<span class="string">'OpsData'</span>, <span class="string">'InjectionFile'</span>));
+0380 fprintf(fid,<span class="string">'  SR production lattice filename:  %s%s\n'</span>,   OpsDirectory, getfamilydata(<span class="string">'OpsData'</span>, <span class="string">'LatticeFile'</span>));
+0381 fprintf(fid,<span class="string">'             Goldenpage filename:  %s%s\n\n'</span>, OpsDirectory, <span class="string">'GoldenPage.txt'</span>);
+0382 
+0383 
+0384 fprintf(fid,<span class="string">'         Setpoints:  Production                                  Injection\n'</span>);
+0385 fprintf(fid,<span class="string">'              BEND:  %7.3f                                     %7.3f  Amps \n'</span>, BENDspp, BENDsp);
+0386 fprintf(fid,<span class="string">' SUPERBEND(4,8,12):  %5.2f, %5.2f, %5.2f                      %5.2f, %5.2f, %5.2f  Amps \n'</span>, BSCspp(1),BSCspp(2),BSCspp(3),BSCsp(1),BSCsp(2),BSCsp(3));
+0387 <span class="comment">%fprintf(fid,'              QFA1:  %7.3f                                     %7.3f  Amps \n', QFAspp(1), QFAsp(1));</span>
+0388 <span class="comment">%fprintf(fid,'       QFA(4,8,12):  %7.3f                                     %7.3f  Amps (average)\n', mean(QFAspp(2:4)), mean(QFAsp(2:4)));</span>
+0389 <span class="comment">%fprintf(fid,'       QDA(4,8,12):  %7.3f                                     %7.3f  Amps (average)\n', mean(QDAspp), mean(QDAsp));</span>
+0390 fprintf(fid,<span class="string">'     QFA(1,4,8,12):  %7.3f, %7.3f, %7.3f, %7.3f          %7.3f, %7.3f, %7.3f, %7.3f  Amps\n'</span>, QFAspp(1),QFAspp(2),QFAspp(3),QFAspp(4),QFAsp(1),QFAsp(2),QFAsp(3),QFAsp(4));
+0391 fprintf(fid,<span class="string">'       QDA(4,8,12):  %7.3f,%7.3f,%7.3f                    %7.3f,%7.3f,%7.3f  Amps\n'</span>, QDAspp(1), QDAspp(2), QDAspp(3), QDAsp(1), QDAsp(2), QDAsp(3));
+0392 fprintf(fid,<span class="string">'                SF:  %7.3f                                     %7.3f  Amps \n'</span>, SFspp, SFsp);
+0393 fprintf(fid,<span class="string">'                SD:  %7.3f                                     %7.3f  Amps \n'</span>, SDspp, SDsp);
+0394 fprintf(fid,<span class="string">'                QF:  %7.3f                                    %7.3f  Amps (average)\n'</span>, mean(QFspp), mean(QFsp));
+0395 fprintf(fid,<span class="string">'                QD:  %7.3f                                    %7.3f  Amps (average)\n'</span>, mean(QDspp), mean(QDsp));
+0396 fprintf(fid,<span class="string">'               HCM:  %7.3f                                   %7.3f  Amps (max)\n'</span>, max(abs(HCMspp([1:78 81:end]))), max(abs(HCMsp([1:78 81:end])))); <span class="comment">% don't include chicanes</span>
+0397 fprintf(fid,<span class="string">'               VCM:  %7.3f                                   %7.3f  Amps (max)\n'</span>, max(abs(VCMspp)), max(abs(VCMsp)));
+0398 i = findrowindex([4 1;4 3],SP.HCMCHICANE.Setpoint.DeviceList);
+0399 fprintf(fid,<span class="string">'   SR04 HCMCHICANE: %5.2f       %5.2f                         %5.2f       %5.2f  Amps \n'</span>, HCMCHICANEspp(i(1)),HCMCHICANEspp(i(2)), HCMCHICANEsp(i(1)),HCMCHICANEsp(i(2)));
+0400 i = findrowindex([6 1],SP.HCMCHICANE.Setpoint.DeviceList);
+0401 fprintf(fid,<span class="string">'   SR06 HCMCHICANE:  %5.2f                                       %5.2f               Amps \n'</span>, HCMCHICANEspp(i(1)), HCMCHICANEsp(i(1)));
+0402 <span class="comment">%fprintf(fid,'      SR04 HCMCHIC: %5.2f,%5.2f,%5.2f                         %5.2f,%5.2f,%5.2f  Amps \n', HCMCHICANEspp(1),HCMCHICANEspp(2),HCMCHICANEspp(3),HCMCHICANEsp(1),HCMCHICANEsp(2),HCMCHICANEsp(3));</span>
+0403 <span class="comment">%fprintf(fid,'      SR11 HCMCHIC: %5.2f,%5.2f,%5.2f                         %5.2f,%5.2f,%5.2f  Amps \n', HCMspp(79),HCMCHICANEspp(4),HCMspp(80),HCMsp(79),HCMCHICANEsp(4),HCMsp(80));</span>
+0404 <span class="comment">%fprintf(fid,'   4&amp;11 VCMCHICANE: %5.2f,%5.2f,%5.2f,%5.2f                     %5.2f,%5.2f,%5.2f,%5.2f  Amps \n', VCMCHICANEspp(1),VCMCHICANEspp(2),VCMCHICANEspp(3),VCMCHICANEspp(4),VCMCHICANEsp(1),VCMCHICANEsp(2),VCMCHICANEsp(3),VCMCHICANEsp(4));</span>
+0405 i = findrowindex([4 1;4 2;4 3],SP.HCMCHICANEM.Setpoint.DeviceList);
+0406 fprintf(fid,<span class="string">' SR04 MotorCHICANE: %6.2f,%6.2f,%5.2f                         %6.2f,%6.2f,%5.2f  [Degrees,Degrees,mm] \n'</span>, HCMCHICANEMspp(i(1)),HCMCHICANEMspp(i(2)),HCMCHICANEMspp(i(3)),HCMCHICANEMsp(i(1)),HCMCHICANEMsp(i(2)),HCMCHICANEMsp(i(3)));
+0407 i = findrowindex([6 1;6 2;],SP.HCMCHICANEM.Setpoint.DeviceList);
+0408 fprintf(fid,<span class="string">' SR06 MotorCHICANE: %6.2f,%6.2f                               %6.2f,%6.2f        [Degrees,Degrees,mm] \n'</span>, HCMCHICANEMspp(i(1)),HCMCHICANEMspp(i(2)), HCMCHICANEMsp(i(1)),HCMCHICANEMsp(i(2)));
+0409 i = findrowindex([11 1;11 2;11 3],SP.HCMCHICANEM.Setpoint.DeviceList);
+0410 fprintf(fid,<span class="string">' SR11 MotorCHICANE: %6.2f,%6.2f,%5.2f                         %6.2f,%6.2f,%5.2f  [Degrees,Degrees,mm] \n'</span>, HCMCHICANEMspp(i(1)),HCMCHICANEMspp(i(2)),HCMCHICANEMspp(i(3)),HCMCHICANEMsp(i(1)),HCMCHICANEMsp(i(2)),HCMCHICANEMsp(i(3)));
+0411 
+0412 <span class="comment">% fprintf(fid,'              SQSF: %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f,              %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f, Amps\n', SQSFspp(1),SQSFspp(2),SQSFspp(3),SQSFspp(4),SQSFspp(5),SQSFspp(6),SQSFsp(1),SQSFsp(2),SQSFsp(3),SQSFsp(4),SQSFsp(5),SQSFsp(6));</span>
+0413 <span class="comment">% fprintf(fid,'                    %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f               %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f  Amps\n', SQSFspp(7),SQSFspp(8),SQSFspp(9),SQSFspp(10),SQSFspp(11),SQSFspp(12),SQSFsp(7),SQSFsp(8),SQSFsp(9),SQSFsp(10),SQSFsp(11),SQSFsp(12));</span>
+0414 <span class="comment">% fprintf(fid,'              SQSD: %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f,              %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f, Amps\n', SQSDspp(1),SQSDspp(2),SQSDspp(3),SQSDspp(4),SQSDspp(5),SQSDspp(6),SQSDsp(1),SQSDsp(2),SQSDsp(3),SQSDsp(4),SQSDsp(5),SQSDsp(6));</span>
+0415 <span class="comment">% fprintf(fid,'                    %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f               %4.1f,%4.1f,%4.1f,%4.1f,%4.1f,%4.1f  Amps\n', SQSDspp(7),SQSDspp(8),SQSDspp(9),SQSDspp(10),SQSDspp(11),SQSDspp(12),SQSDsp(7),SQSDsp(8),SQSDsp(9),SQSDsp(10),SQSDsp(11),SQSDsp(12));</span>
+0416 
+0417 <span class="comment">%fprintf(fid,'          RF Freq:  %9.7f                %9.7f MHz  (Synthesizer AC)\n', RFdata.RFSynthesizerACProd, RFdata.RFSynthesizerACProd);</span>
+0418 <span class="comment">%fprintf(fid,'          RF Freq:  %9.7f                %9.7f MHz  (Synthesizer AM)\n', RFdata.RFSynthesizerAMProd, RFdata.RFSynthesizerAMProd);</span>
+0419 fprintf(fid,<span class="string">'           RF Freq:  %12.8f                                %12.8f MHz \n\n'</span>, RFdata.FreqProd, RFdata.FreqInj);
+0420 
+0421 fprintf(fid,<span class="string">'  SR RF parameters:     FB on setpoints   FB on monitors     FB off setpoints\n'</span>)
+0422 fprintf(fid,<span class="string">'     Cavity 1 Temp:       %5.1f             %6.2f             %5.1f            Celsius\n'</span>, RFdata.C1TempFBonAC, RFdata.C1TempFBonAM, RFdata.C1TempFBoffAC);
+0423 fprintf(fid,<span class="string">'     Cavity 2 Temp:       %5.1f             %6.2f             %5.1f            Celsius\n'</span>, RFdata.C2TempFBonAC, RFdata.C2TempFBonAM, RFdata.C2TempFBoffAC);
+0424 fprintf(fid,<span class="string">'          RF Power:  %5.1f kWatts (PRO VAL in Ctlplay)\n\n'</span>, RFdata.Power);
+0425 
+0426 fprintf(fid,<span class="string">'  Transverse Feedback Parameters:\n'</span>);
+0427 fprintf(fid,<span class="string">'  X1-Bias  Y1-Bias  X2-Bias  Y2-Bias  X-Atten  Y-Atten  X-Delay  Y-Delay\n'</span>);
+0428 fprintf(fid,<span class="string">'  %6.2f   %6.2f   %6.2f   %6.2f   %5d    %5d    %5d    %5d\n\n'</span>, TFBdata.X1Bias, TFBdata.Y1Bias, TFBdata.X2Bias, TFBdata.Y2Bias, TFBdata.XAtten, TFBdata.YAtten, TFBdata.XDelay, TFBdata.YDelay);
+0429 
+0430 fprintf(fid,<span class="string">'  Longitudinal Feedback Parameters:\n'</span>);
+0431 fprintf(fid,<span class="string">'  Front-End-Delay  Front-End-Phase-Offset  Front-End-Phase-Shift  Front-End-Gain-Sign  Back-End-Delay  QPSK-Attenuation\n'</span>);
+0432 fprintf(fid,<span class="string">'   %6d              %6.0f                   %6.0f                 %6s             %6d         %6d\n'</span>, <span class="keyword">...</span>
+0433                     LFBdata.FrontEndDelay, LFBdata.FEPhaseOffset, LFBdata.FEPhaseShift, LFBdata.FEGainSign, LFBdata.BackEndDelay, LFBdata.QPSKAtten);
+0434 fprintf(fid,<span class="string">'  Fill-Pattern  Synchrotron-Frequency  Ring-Shift  Hold-Buffer-Offset  Min-DSP-Processing-Time  Shift-Gain\n'</span>);
+0435 fprintf(fid,<span class="string">'     %5s            %d Hz         %6d         %6d                  %6d           %6d\n\n'</span>, <span class="keyword">...</span>
+0436                LFBdata.FillPattern, LFBdata.SynchrotronFreq, LFBdata.RingShift, LFBdata.HoldBufferOffset, LFBdata.MinDSPTime, LFBdata.ShiftGain);
+0437 
+0438 <span class="comment">%fprintf(fid,'  Calculated Synchrotron Frequency = %d Hz   (coming soon...)\n\n', LFBdata.CalculatedSynchrotronFreq);</span>
+0439 
+0440 fprintf(fid,<span class="string">'  Pulsed Magnet Parameters:\n'</span>);
+0441 fprintf(fid,<span class="string">'            BR-BUMP1   BR-BUMP1   BR-BUMP1  \n'</span>);
+0442 fprintf(fid,<span class="string">'  Setpoint: %7.1f    %7.1f   %7.1f \n\n'</span>, BUMPdata.BRBump1, BUMPdata.BRBump2, BUMPdata.BRBump3);
+0443 
+0444 
+0445 fprintf(fid,<span class="string">'            BR2-SEN   BR2-SEK   BR2-KE   ExtFldTrig   BR-BumpTrig   SR-SEK   SR-SEN   SR-BUMP\n'</span>);
+0446 fprintf(fid,<span class="string">'  Setpoint: %7.1f   %7.1f %7.1f                              %7.1f  %7.1f  %7.1f\n'</span>, <span class="keyword">...</span>
+0447     BUMPdata.BR2SEN, BUMPdata.BR2SEK, BUMPdata.BR2KE, BUMPdata.SRSEK, BUMPdata.SRSEN, BUMPdata.SRBUMP1);
+0448 fprintf(fid,<span class="string">'    Timing: %6d  %6d      %6d  %9d     %9d %8d  %8d %9d\n\n'</span>, <span class="keyword">...</span>
+0449     BUMPdata.BR2SENTiming, BUMPdata.BR2SEKTiming, BUMPdata.BR2KETiming, BUMPdata.ExtFldTrigTiming, <span class="keyword">...</span>
+0450     BUMPdata.BRBumpTrigTiming, BUMPdata.SRSEKTiming, BUMPdata.SRSENTiming, BUMPdata.SRBUMP1Timing);
+0451 
+0452 fprintf(fid,<span class="string">'  Third Harmonic Cavities Tuner Parameters:\n'</span>);
+0453 fprintf(fid,<span class="string">'            CAV1 Tuner1  CAV2 Tuner1  CAV3 Tuner1\n'</span>);
+0454 fprintf(fid,<span class="string">'  Setpoint:    %5.3f        %5.3f        %5.3f \n'</span>, <span class="keyword">...</span>
+0455    THCdata.THC1MainAC, THCdata.THC2MainAC, THCdata.THC3MainAC);
+0456 fprintf(fid,<span class="string">'   Monitor:    %5.3f        %5.3f        %5.3f        (monitors read at %3.0f mA)\n'</span>, <span class="keyword">...</span>
+0457    THCdata.THC1MainAM, THCdata.THC2MainAM, THCdata.THC3MainAM, beamcurrent);
+0458 
+0459 
+0460 
+0461 <span class="comment">% % Comment line</span>
+0462 <span class="comment">% line = fgetl(fid);</span>
+0463 <span class="comment">%</span>
+0464 <span class="comment">% VariableName = fscanf(fid,'%s',1);</span>
+0465 <span class="comment">% ValueStr = fscanf(fid,'%s\n',1);</span>
+0466 <span class="comment">% eval([VariableName,'=''',ValueStr,''';']);</span>
+0467 <span class="comment">%</span>
+0468 <span class="comment">% VariableName = fscanf(fid,'%s',1);</span>
+0469 <span class="comment">% ValueStr = fscanf(fid,'%s\n',1);</span>
+0470 <span class="comment">% eval([VariableName,'=''',ValueStr,''';']);</span>
+0471 <span class="comment">%</span>
+0472 <span class="comment">% VariableName = fscanf(fid,'%s',1);</span>
+0473 <span class="comment">% ValueStr = fscanf(fid,'%s\n',1);</span>
+0474 <span class="comment">% eval([VariableName,'=''',ValueStr,''';']);</span>
+0475 <span class="comment">%</span>
+0476 <span class="comment">% for i = 1:37</span>
+0477 <span class="comment">%    VariableName = fscanf(fid,'%s',1);</span>
+0478 <span class="comment">%    Value = fscanf(fid,'%g\n',1);</span>
+0479 <span class="comment">%    eval([VariableName,'=',num2str(Value),';']);</span>
+0480 <span class="comment">% end</span>
+0481 <span class="comment">%</span>
+0482 <span class="comment">% % 3 File Names</span>
+0483 <span class="comment">% % VariableName = fscanf(fid,'%s',1);</span>
+0484 <span class="comment">% % ValueStr = fscanf(fid,'%s\n',1);</span>
+0485 <span class="comment">% % assignin('base',VariableName,ValueStr);</span>
+0486 <span class="comment">% %</span>
+0487 <span class="comment">% % VariableName = fscanf(fid,'%s',1);</span>
+0488 <span class="comment">% % ValueStr = fscanf(fid,'%s\n',1);</span>
+0489 <span class="comment">% % assignin('base',VariableName,ValueStr);</span>
+0490 <span class="comment">% %</span>
+0491 <span class="comment">% % VariableName = fscanf(fid,'%s',1);</span>
+0492 <span class="comment">% % ValueStr = fscanf(fid,'%s\n',1);</span>
+0493 <span class="comment">% % assignin('base',VariableName,ValueStr);</span>
+0494 <span class="comment">% %</span>
+0495 <span class="comment">% % for i = 1:37</span>
+0496 <span class="comment">% %    VariableName = fscanf(fid,'%s',1);</span>
+0497 <span class="comment">% %    Value = fscanf(fid,'%g\n',1);</span>
+0498 <span class="comment">% %    assignin('base',VariableName,num2str(Value));</span>
+0499 <span class="comment">% % end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

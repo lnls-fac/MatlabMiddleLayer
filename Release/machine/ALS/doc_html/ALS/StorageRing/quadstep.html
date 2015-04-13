@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of quadstep</title>
+  <meta name="keywords" content="quadstep">
+  <meta name="description" content="QUAD Step">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; quadstep.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>quadstep
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>QUAD Step</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> QUAD Step</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% QUAD Step</span>
+0002 BPMxFamily = <span class="string">'BPMx'</span>;
+0003 BPMxDevList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'BPMx'</span>); <span class="comment">%[2 1;2 2;2 3;2 4;2 5];</span>
+0004 BPMyFamily = <span class="string">'BPMy'</span>;
+0005 BPMyDevList = BPMxDevList;        <span class="comment">%[2 1;2 2;2 3;2 4;2 5];</span>
+0006 t = 0:.1:.9;
+0007 
+0008 
+0009 DeltaAmps = 1.5; .75;
+0010 CMFamily = <span class="string">'QF'</span>;
+0011 CMDevList = [3 1];
+0012 t = 0:.1:2.9*9;
+0013 
+0014 
+0015 AM0 = getam(CMFamily, CMDevList);
+0016 BPMx0 = getx(BPMxDevList);
+0017 BPMy0 = gety(BPMxDevList);
+0018 
+0019 
+0020 <span class="comment">% Ramprate</span>
+0021 RampRateStart = getpv(CMFamily, <span class="string">'RampRate'</span>, CMDevList);
+0022 setpv(CMFamily, <span class="string">'RampRate'</span>, .25, CMDevList, 0);
+0023 pause(.1);  <span class="comment">% No good reason</span>
+0024 
+0025 
+0026 t0 = gettime;
+0027 
+0028 tic;
+0029 stepsp(CMFamily, DeltaAmps, CMDevList, 0);
+0030 T0 = toc;
+0031 [am, tout] = getam({BPMxFamily, BPMyFamily, CMFamily}, {BPMxDevList, BPMyDevList, CMDevList}, t);
+0032 
+0033 
+0034 <span class="comment">% Return the current</span>
+0035 stepsp(CMFamily,-DeltaAmps, CMDevList, -1);
+0036 
+0037 <span class="comment">% Restore the quad ramprate</span>
+0038 setpv(CMFamily, <span class="string">'RampRate'</span>, RampRateStart, CMDevList, 0);
+0039 
+0040 
+0041 
+0042 x = am{1};
+0043 y = am{2};
+0044 cm = am{3};
+0045 
+0046 <span class="keyword">for</span> i = 1:size(BPMxDevList,1)
+0047     x(i,:) = x(i,:) - x(i,1);
+0048 <span class="keyword">end</span>
+0049 <span class="keyword">for</span> i = 1:size(BPMyDevList,1)
+0050     y(i,:) = y(i,:) - y(i,1);
+0051 <span class="keyword">end</span>
+0052 
+0053 
+0054 <span class="comment">% Display</span>
+0055 clf reset
+0056 subplot(3,1,1);
+0057 
+0058 plot(tout,x,<span class="string">'.-b'</span>);
+0059 grid on;
+0060 <span class="keyword">if</span> size(BPMxDevList,1) == 1
+0061     ylabel(sprintf(<span class="string">'%s(%d,%d) [mm]'</span>, BPMxFamily, BPMxDevList));
+0062 <span class="keyword">elseif</span> size(BPMxDevList,1) &lt; 10
+0063     ylabel(sprintf(<span class="string">'BPM Data [mm]'</span>));
+0064     <span class="keyword">for</span> i = 1:size(BPMxDevList,1)
+0065         LabelCell{i} = sprintf(<span class="string">'%s(%d,%d)'</span>, BPMxFamily, BPMxDevList(i,:));
+0066     <span class="keyword">end</span>
+0067 <span class="keyword">else</span>
+0068     ylabel(sprintf(<span class="string">'BPMx Data [mm]'</span>));
+0069 <span class="keyword">end</span>
+0070 
+0071 subplot(3,1,2);
+0072 <span class="comment">%hold on</span>
+0073 plot(tout,y,<span class="string">'.-b'</span>);
+0074 <span class="comment">%hold off;</span>
+0075 <span class="keyword">if</span> size(BPMyDevList,1) == 1
+0076     ylabel(sprintf(<span class="string">'%s(%d,%d) [mm]'</span>, BPMyFamily, BPMyDevList));
+0077 <span class="keyword">elseif</span> size(BPMyDevList,1) &lt; 10
+0078     ylabel(sprintf(<span class="string">'BPM Data [mm]'</span>));
+0079     <span class="keyword">for</span> i = 1:size(BPMyDevList,1)
+0080         LabelCell{i+size(BPMxDevList,1)} = sprintf(<span class="string">'%s(%d,%d)'</span>, BPMyFamily, BPMyDevList(i,:));
+0081     <span class="keyword">end</span>
+0082     legend(LabelCell,1);
+0083 <span class="keyword">else</span>
+0084     ylabel(sprintf(<span class="string">'BPMy Data [mm]'</span>));
+0085 <span class="keyword">end</span>
+0086 
+0087 xlabel(<span class="string">'Time [Seconds]'</span>);
+0088 title(sprintf(<span class="string">'%s(%d,%d):  Delta Amps = %.3f'</span>, CMFamily, CMDevList, DeltaAmps));
+0089 grid on;
+0090 
+0091 subplot(3,1,3);
+0092 plot(tout,cm,<span class="string">'.-b'</span>); 
+0093 grid on;
+0094 ylabel(sprintf(<span class="string">'%s(%d,%d) [Amps]'</span>, CMFamily, CMDevList));
+0095 xlabel(<span class="string">'Time [Seconds]'</span>);
+0096 grid on;
+0097 
+0098 orient tall</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

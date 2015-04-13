@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getmysqldata</title>
+  <meta name="keywords" content="getmysqldata">
+  <meta name="description" content="GETMYSQLDA - Returns data from a mysql database">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getmysqldata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getmysqldata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GETMYSQLDA - Returns data from a mysql database</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [data, t, StartTime, EndTime] = getmysqldata(ColumnNames, StartTime, EndTime, Table, User, DataBaseName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETMYSQLDA - Returns data from a mysql database
+  [Data, t, StartTime, EndTime] = getmysqldata(ColumnNames, StartTime, EndTime, Table, User, DataBaseName)
+
+  INPUTS
+  1.   ColumnNames
+  2-3. StartTime and EndTime can be a string in the Oracle format,
+       yyyy-mm-dd hh:mm:ss like 2002-06-18 16:56:00
+       or something that datastr recognized, like a date serial 
+       number (see help datenum) or a vector with [y m d h m s] format.
+  4-5. User and Table are the database name and table name (like, 'SRLOG2007b')
+                       
+
+  OUTPUTS
+  1. Data is a matrix of history data where each column is a different point in time. 
+  2. t is time as returned by datenum (days).  Convert to other formats using datestr or datevec.
+     datetick converts a plot axis to more reasonable text.
+
+  EXAMPES  
+  1. Get and plot one hour and six minutes of beam current data on Feb. 12, 2006
+     [d, t, StartTime, EndTime] = getmysqldata(family2archive('BPMx'), '2006-03-07 16:50:00', '2006-03-08 17:50:06');
+                     or
+     [d, t, StartTime, EndTime] = getmysqldata(family2archive('BPMx'), [2006 2 12 16 50 00], [2006 2 12 17 56 00]);
+
+     plot(t,d); datetick('x');
+        or
+     plot(24*(t-floor(t(1))), d); xlabel(sprintf('Time in Hours Starting at %s', StartTime));
+
+  2. Get all the BPMx and DCCT data in the table
+     Note: if the start and end time is not included in the second call 
+           the data and time vectors may not match.
+     [d, t, StartTime, EndTime] = getmysqldata(family2channel('BPMx'));
+     [d, t] = getmysqldata('DCCT', StartTime, EndTime);
+
+  3. For data valid only during user beam  
+     [i,t] = getmysqldata('UserBeam', StartTime, EndTime);
+     d(:,find(i==0)) = NaN;
+
+  See also <a href="archive_sr.html" class="code" title="function archive_sr(DropTableFlag)">archive_sr</a>, <a href="archive_size.html" class="code" title="function archive_size">archive_size</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="plotmysqlorbit.html" class="code" title="">plotmysqlorbit</a>	function arplotorbit</li><li><a href="plotsofb.html" class="code" title="">plotsofb</a>	function plotsofb</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [data, t, StartTime, EndTime] = getmysqldata(ColumnNames, StartTime, EndTime, Table, User, DataBaseName)</a>
+0002 <span class="comment">%GETMYSQLDA - Returns data from a mysql database</span>
+0003 <span class="comment">%  [Data, t, StartTime, EndTime] = getmysqldata(ColumnNames, StartTime, EndTime, Table, User, DataBaseName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1.   ColumnNames</span>
+0007 <span class="comment">%  2-3. StartTime and EndTime can be a string in the Oracle format,</span>
+0008 <span class="comment">%       yyyy-mm-dd hh:mm:ss like 2002-06-18 16:56:00</span>
+0009 <span class="comment">%       or something that datastr recognized, like a date serial</span>
+0010 <span class="comment">%       number (see help datenum) or a vector with [y m d h m s] format.</span>
+0011 <span class="comment">%  4-5. User and Table are the database name and table name (like, 'SRLOG2007b')</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1. Data is a matrix of history data where each column is a different point in time.</span>
+0016 <span class="comment">%  2. t is time as returned by datenum (days).  Convert to other formats using datestr or datevec.</span>
+0017 <span class="comment">%     datetick converts a plot axis to more reasonable text.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  EXAMPES</span>
+0020 <span class="comment">%  1. Get and plot one hour and six minutes of beam current data on Feb. 12, 2006</span>
+0021 <span class="comment">%     [d, t, StartTime, EndTime] = getmysqldata(family2archive('BPMx'), '2006-03-07 16:50:00', '2006-03-08 17:50:06');</span>
+0022 <span class="comment">%                     or</span>
+0023 <span class="comment">%     [d, t, StartTime, EndTime] = getmysqldata(family2archive('BPMx'), [2006 2 12 16 50 00], [2006 2 12 17 56 00]);</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%     plot(t,d); datetick('x');</span>
+0026 <span class="comment">%        or</span>
+0027 <span class="comment">%     plot(24*(t-floor(t(1))), d); xlabel(sprintf('Time in Hours Starting at %s', StartTime));</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%  2. Get all the BPMx and DCCT data in the table</span>
+0030 <span class="comment">%     Note: if the start and end time is not included in the second call</span>
+0031 <span class="comment">%           the data and time vectors may not match.</span>
+0032 <span class="comment">%     [d, t, StartTime, EndTime] = getmysqldata(family2channel('BPMx'));</span>
+0033 <span class="comment">%     [d, t] = getmysqldata('DCCT', StartTime, EndTime);</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%  3. For data valid only during user beam</span>
+0036 <span class="comment">%     [i,t] = getmysqldata('UserBeam', StartTime, EndTime);</span>
+0037 <span class="comment">%     d(:,find(i==0)) = NaN;</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">%  See also archive_sr, archive_size</span>
+0040 
+0041 <span class="comment">%  Written by Greg Portmann</span>
+0042 
+0043 
+0044 
+0045 <span class="comment">% Input checking</span>
+0046 <span class="keyword">if</span> nargin &lt; 1
+0047     Family = <span class="string">'DCCT'</span>;
+0048 <span class="keyword">end</span>
+0049 <span class="keyword">if</span> nargin &lt; 2
+0050     StartTime = <span class="string">''</span>; <span class="comment">% '2006-02-10 10:56:53';</span>
+0051 <span class="keyword">end</span>
+0052 <span class="keyword">if</span> nargin &lt; 3
+0053     EndTime   = <span class="string">''</span>; <span class="comment">% '2006-02-10 10:56:58';</span>
+0054 <span class="keyword">end</span>
+0055 <span class="keyword">if</span> nargin &lt; 4
+0056     Table = <span class="string">'SRLOG2007b'</span>;
+0057 <span class="keyword">end</span>
+0058 <span class="keyword">if</span> nargin &lt; 5
+0059     <span class="comment">%User = 'crdev';</span>
+0060     <span class="comment">%User = 'cgsrv';</span>
+0061     <span class="comment">%User = 'croper';</span>
+0062     <span class="comment">%User = 'crdev';</span>
+0063     <span class="comment">%User = 'physdata';</span>
+0064     <span class="keyword">if</span> strcmpi(getenv(<span class="string">'LOGNAME'</span>), <span class="string">'alsoper'</span>)
+0065         User = <span class="string">'physdata'</span>;
+0066     <span class="keyword">else</span>
+0067         User = <span class="string">'root'</span>;
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">end</span>
+0070 <span class="keyword">if</span> nargin &lt; 6
+0071     <span class="comment">%mym('use Hiroshi');</span>
+0072     <span class="comment">%mym('use controls');</span>
+0073     <span class="comment">%mym('use phys');</span>
+0074     DataBaseName = <span class="string">'physlogs'</span>;
+0075 <span class="keyword">end</span>
+0076 
+0077 
+0078 <span class="comment">% Fix start/end time formats</span>
+0079 <span class="keyword">if</span> ~isempty(StartTime) <span class="comment">%~isstr(StartTime)</span>
+0080     <span class="keyword">try</span>
+0081         StartTime = datestr(StartTime,31);
+0082     <span class="keyword">catch</span>
+0083     <span class="keyword">end</span>
+0084 <span class="keyword">end</span>
+0085 <span class="keyword">if</span> ~isempty(EndTime) <span class="comment">%~isstr(EndTime)</span>
+0086     <span class="keyword">try</span>
+0087         EndTime = datestr(EndTime,31);
+0088     <span class="keyword">catch</span>
+0089     <span class="keyword">end</span>
+0090 <span class="keyword">end</span>
+0091 
+0092 
+0093 
+0094 
+0095 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0096 <span class="comment">% Open a connection %</span>
+0097 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0098 
+0099 <span class="comment">% Host = 'thor.als.lbl.gov';</span>
+0100 <span class="comment">%</span>
+0101 <span class="comment">% if strcmp(User, 'physdata')</span>
+0102 <span class="comment">%     PassWord = 'EightBall';</span>
+0103 <span class="comment">% elseif strcmp(User, 'root')</span>
+0104 <span class="comment">%     PassWord = 'EightBall';</span>
+0105 <span class="comment">% else</span>
+0106 <span class="comment">%     [User, PassWord] = logindlg('MySQL Connection', User);</span>
+0107 <span class="comment">% end</span>
+0108 
+0109 Host = <span class="string">'ps3.als.lbl.gov'</span>;
+0110 User = <span class="string">'physdata'</span>; 
+0111 PassWord = <span class="string">'jjDeP9821&amp;'</span>;
+0112 
+0113 
+0114 <span class="keyword">if</span> ~isempty(User)
+0115     OpenResult = mym(<span class="string">'open'</span>, Host, User, PassWord);
+0116 <span class="keyword">else</span>
+0117     fprintf
+0118     <span class="keyword">return</span>
+0119 <span class="keyword">end</span>
+0120 clear PassWord
+0121 
+0122 
+0123 
+0124 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0125 <span class="comment">% Select a database %</span>
+0126 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0127 
+0128 UseResult = mym([<span class="string">'use '</span>, DataBaseName]);
+0129 
+0130 
+0131 <span class="comment">% There can only be one table</span>
+0132 Table = deblank(Table(1,:));
+0133 
+0134 
+0135 <span class="comment">% % Build a common separated list of names</span>
+0136 <span class="comment">% NameList = [];</span>
+0137 <span class="comment">% for i = 1:size(ColumnNames,1)</span>
+0138 <span class="comment">%     NameList = [NameList, ',', deblank(ColumnNames(i,:))];</span>
+0139 <span class="comment">% end</span>
+0140 
+0141 <span class="comment">% SQLcommand = [</span>
+0142 <span class="comment">%     'select Time', NameList, ...</span>
+0143 <span class="comment">%     ' from ', Table, ...</span>
+0144 <span class="comment">%     ' where Time between cast(&quot;', StartTime, '&quot; as timestamp)', ...</span>
+0145 <span class="comment">%     ' and cast(&quot;', EndTime, '&quot; as timestamp) order by TableIndex;'];</span>
+0146 
+0147 
+0148 NameList = <span class="string">''</span>;
+0149 <span class="keyword">for</span> i = 1:size(ColumnNames,1)
+0150     NameList = [NameList, deblank(ColumnNames(i,:)), <span class="string">', '</span>];
+0151 <span class="keyword">end</span>
+0152 NameList(end-1:end) = [];
+0153 
+0154 <span class="keyword">if</span> isempty(StartTime)
+0155     SQLcommand = [<span class="string">'select Time, '</span>, NameList, <span class="string">' from '</span>, Table, <span class="string">' order by Time;'</span>];
+0156 <span class="keyword">else</span>
+0157     <span class="keyword">if</span> isempty(EndTime)
+0158         <span class="comment">% No end time</span>
+0159         SQLcommand = [<span class="string">'select Time, '</span>, NameList, <span class="string">' from '</span>, Table, <span class="keyword">...</span>
+0160             <span class="string">' where Time &gt;= &quot;'</span>, StartTime, <span class="string">'&quot; order by Time;'</span>];
+0161     <span class="keyword">else</span>
+0162         <span class="comment">% Both start and end time is input</span>
+0163         SQLcommand = [<span class="string">'select Time, '</span>, NameList, <span class="string">' from '</span>, Table, <span class="keyword">...</span>
+0164             <span class="string">' where Time between &quot;'</span>, StartTime, <span class="string">'&quot;'</span>, <span class="keyword">...</span>
+0165             <span class="string">' and &quot;'</span>, EndTime, <span class="string">'&quot; order by Time;'</span>];
+0166     <span class="keyword">end</span>
+0167 <span class="keyword">end</span>
+0168 
+0169 
+0170 <span class="comment">% Get all the data at once</span>
+0171 d = mym(SQLcommand);
+0172 
+0173 
+0174 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0175 <span class="comment">% Close the database %</span>
+0176 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0177 mym(<span class="string">'close'</span>);
+0178 
+0179 
+0180 <span class="keyword">if</span> isempty(d.Time)
+0181     fprintf(<span class="string">'   No data found.\n'</span>);
+0182     data = [];
+0183     StartTime = <span class="string">''</span>;
+0184     EndTime   = <span class="string">''</span>;
+0185     t = [];
+0186     <span class="keyword">return</span>;
+0187 <span class="keyword">end</span>
+0188 
+0189 
+0190 <span class="comment">% d.Time is a string</span>
+0191 StartTime = d.Time{1};
+0192 EndTime   = d.Time{end};
+0193 t = datenum(d.Time,<span class="string">'yyyy-mm-dd HH:MM:SS'</span>);
+0194 
+0195 
+0196 <span class="comment">% Build the output in columns</span>
+0197 data = [];
+0198 <span class="keyword">for</span> i = 1:size(ColumnNames,1)
+0199     data = [data;  d.(deblank(ColumnNames(i,:)))'];
+0200 <span class="keyword">end</span>
+0201 
+0202 
+0203</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

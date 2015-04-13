@@ -1,0 +1,514 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of tablegui</title>
+  <meta name="keywords" content="tablegui">
+  <meta name="description" content="TABLEGUI - Spreadsheet like display and edition of a generic 2D array. By generic it is">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; tablegui.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>tablegui
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>TABLEGUI - Spreadsheet like display and edition of a generic 2D array. By generic it is</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function out = tableGUI(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">   TABLEGUI - Spreadsheet like display and edition of a generic 2D array. By generic it is
+   mean that the array can be a numeric MxN matrix or a MxN cell array (with mixed
+   number and text strings). This function imitates the table cells with edit boxes
+   which may become slow if the number of elements required is large. However, it
+   works fast for small matrices. If the default number of rows is exceeded a vertical
+   slider is created. The slider works by changing the position of the table elements,
+   which again may become slow if the default number of visible rows is large. Otherwise
+   it works pretty fast.
+
+   USAGE:
+       OUT = TABLEGUI(varargin)
+
+   Inputs are in property/value pairs. All properties are strings but the values are
+   of different types depending on the case.
+
+   PROPERTY                        VALUE                                       TYPE
+
+   'array'         It can be either an numeric matrix or a MxN                 numeric or cell array
+                   cell array. 
+   'NumRows'       Total number of rows to create. Use this when the           integer
+                   'array' option is not used, or when you want to
+                   create extra empty rows.
+   'NumCol'        Total number of columns to create. Use this when            integer
+                   the 'array' option is not used, but ignored if it was.
+   'MAX_ROWS'      Number of visible rows. If NumRows &gt; MAX_ROWS               integer
+                   a vertical slider is created (DEF = 10)
+   'RowHeight'     editboxes height in pixels (DEF = 20)                       integer
+   'ColWidth'      editboxes width in pixels (DEF = 60)                        scalar or row vector
+                   If a vector is transmited, it must contains NumCol
+                   elements which set individual column widths.
+   'bd_size'       space between editboxes width in pixels (DEF = 0)           integer
+   'HorAlin'       editboxes 'HorizontalAlignment' property. It can            string
+                   be either 'left', 'center' or 'right' (DEF = 'center')
+   'HdrButtons'    create a first row of buttons to hold column                string - either '' or 'y'
+                   names. Give an empty string ('') if you don't want
+                   column names (DEF = 'Y').
+   'ColNames'      Cell array of strings for column names. If not              1xN cell array of strings
+                   provided the columns are named 'A', 'B', ...
+   'RowNumbers'    Add a first column with row numbers. Note that this         string - either '' or 'y'
+                   column is set to 'inactive' and its not transmited
+                   on the output (DEF = '').
+   'checks'        If = 'Y' it creates a vertical line of checkboxes           string - either '' or 'y'
+                   This affects what is send as output. Only rows that
+                   have it's checkbox checked will be returned.
+   'FigName'       Name that appears in the title bar (DEF = 'Table').         string
+   'position'      Screen location to be used in the call to MOVEGUI           string
+                   See doc of that function for valid position
+                   strings (DEF = 'east').
+   'modal'         By default the window works in MODAL mode. Give an          string - either '' or 'y'
+                   empty string ('') if you don't want it to be MODAL.
+                   In this later case the output OUT, if requested, will
+                   contain the figure handle but see more about this below.
+
+   OUT - the output - contains different things depending whether or not the
+       figure works in MODAL mode. If yes, OUT is a MxN cell array with the
+       elements retrived from the contents of the edit boxes. Otherwise, OUT
+       will contain the figure's handle. This handle has the 'UserData' property
+       filled with a structure (called hand) which contains the handles of all
+       uicontrols. Use this option if you want to interact with the TABLEGUI
+       figure inside your own code.
+
+   Examples:
+     - Display a 12x6 numeric matrix with two extra blank rows appended to the end
+       out = tableGUI('array',rand(12,6),'ColNames',{'1' '2' '3' '4' '5' '6'},'NumRows',14);
+
+     - Create a cell array with the first column filled with the row number and use
+       columns with different widths. Create also check boxes.
+       zz=cell(4,5);   zz(:,1) = num2cell(1:4)';
+       out = tableGUI('array',zz,'ColNames',{'N','A','B','C','D'},'ColWidth',[20 60 60 60 60],'checks','y');
+
+     - Create a similar table as in the previous example but with the row numbers option.
+       out = tableGUI('array',cell(4,5),'RowNumbers','y','checks','y');
+
+     - Display the Control Points of the Image Processing Toolbox example
+       &quot;Registering an Aerial Photo to an Orthophoto&quot;
+       load westconcordpoints  % load some points that were already picked
+       gcp = [base_points input_points];
+       out = tableGUI('array',gcp,'RowNumbers','y','ColNames',{'Base Points - X','Base Points - Y',...
+               'Input Points - X','Input Points - Y'},'ColWidth',110,'FigName','GCP Table');
+
+     - Create an empty 12x6 empty table
+       out = tableGUI;
+
+   Acknowledgment
+       This function uses the parse_pv_pairs of John d'Errico
+
+   AUTHOR
+       Joaquim Luis (jluis@ualg.pt)   17-Feb-2006</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function slider_Callback(obj,event,hand)</a></li><li><a href="#_sub2" class="code">function params = parse_pv_pairs(params,pv_pairs)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function out = tableGUI(varargin)</a>
+0002 <span class="comment">%   TABLEGUI - Spreadsheet like display and edition of a generic 2D array. By generic it is</span>
+0003 <span class="comment">%   mean that the array can be a numeric MxN matrix or a MxN cell array (with mixed</span>
+0004 <span class="comment">%   number and text strings). This function imitates the table cells with edit boxes</span>
+0005 <span class="comment">%   which may become slow if the number of elements required is large. However, it</span>
+0006 <span class="comment">%   works fast for small matrices. If the default number of rows is exceeded a vertical</span>
+0007 <span class="comment">%   slider is created. The slider works by changing the position of the table elements,</span>
+0008 <span class="comment">%   which again may become slow if the default number of visible rows is large. Otherwise</span>
+0009 <span class="comment">%   it works pretty fast.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%   USAGE:</span>
+0012 <span class="comment">%       OUT = TABLEGUI(varargin)</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%   Inputs are in property/value pairs. All properties are strings but the values are</span>
+0015 <span class="comment">%   of different types depending on the case.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%   PROPERTY                        VALUE                                       TYPE</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%   'array'         It can be either an numeric matrix or a MxN                 numeric or cell array</span>
+0020 <span class="comment">%                   cell array.</span>
+0021 <span class="comment">%   'NumRows'       Total number of rows to create. Use this when the           integer</span>
+0022 <span class="comment">%                   'array' option is not used, or when you want to</span>
+0023 <span class="comment">%                   create extra empty rows.</span>
+0024 <span class="comment">%   'NumCol'        Total number of columns to create. Use this when            integer</span>
+0025 <span class="comment">%                   the 'array' option is not used, but ignored if it was.</span>
+0026 <span class="comment">%   'MAX_ROWS'      Number of visible rows. If NumRows &gt; MAX_ROWS               integer</span>
+0027 <span class="comment">%                   a vertical slider is created (DEF = 10)</span>
+0028 <span class="comment">%   'RowHeight'     editboxes height in pixels (DEF = 20)                       integer</span>
+0029 <span class="comment">%   'ColWidth'      editboxes width in pixels (DEF = 60)                        scalar or row vector</span>
+0030 <span class="comment">%                   If a vector is transmited, it must contains NumCol</span>
+0031 <span class="comment">%                   elements which set individual column widths.</span>
+0032 <span class="comment">%   'bd_size'       space between editboxes width in pixels (DEF = 0)           integer</span>
+0033 <span class="comment">%   'HorAlin'       editboxes 'HorizontalAlignment' property. It can            string</span>
+0034 <span class="comment">%                   be either 'left', 'center' or 'right' (DEF = 'center')</span>
+0035 <span class="comment">%   'HdrButtons'    create a first row of buttons to hold column                string - either '' or 'y'</span>
+0036 <span class="comment">%                   names. Give an empty string ('') if you don't want</span>
+0037 <span class="comment">%                   column names (DEF = 'Y').</span>
+0038 <span class="comment">%   'ColNames'      Cell array of strings for column names. If not              1xN cell array of strings</span>
+0039 <span class="comment">%                   provided the columns are named 'A', 'B', ...</span>
+0040 <span class="comment">%   'RowNumbers'    Add a first column with row numbers. Note that this         string - either '' or 'y'</span>
+0041 <span class="comment">%                   column is set to 'inactive' and its not transmited</span>
+0042 <span class="comment">%                   on the output (DEF = '').</span>
+0043 <span class="comment">%   'checks'        If = 'Y' it creates a vertical line of checkboxes           string - either '' or 'y'</span>
+0044 <span class="comment">%                   This affects what is send as output. Only rows that</span>
+0045 <span class="comment">%                   have it's checkbox checked will be returned.</span>
+0046 <span class="comment">%   'FigName'       Name that appears in the title bar (DEF = 'Table').         string</span>
+0047 <span class="comment">%   'position'      Screen location to be used in the call to MOVEGUI           string</span>
+0048 <span class="comment">%                   See doc of that function for valid position</span>
+0049 <span class="comment">%                   strings (DEF = 'east').</span>
+0050 <span class="comment">%   'modal'         By default the window works in MODAL mode. Give an          string - either '' or 'y'</span>
+0051 <span class="comment">%                   empty string ('') if you don't want it to be MODAL.</span>
+0052 <span class="comment">%                   In this later case the output OUT, if requested, will</span>
+0053 <span class="comment">%                   contain the figure handle but see more about this below.</span>
+0054 <span class="comment">%</span>
+0055 <span class="comment">%   OUT - the output - contains different things depending whether or not the</span>
+0056 <span class="comment">%       figure works in MODAL mode. If yes, OUT is a MxN cell array with the</span>
+0057 <span class="comment">%       elements retrived from the contents of the edit boxes. Otherwise, OUT</span>
+0058 <span class="comment">%       will contain the figure's handle. This handle has the 'UserData' property</span>
+0059 <span class="comment">%       filled with a structure (called hand) which contains the handles of all</span>
+0060 <span class="comment">%       uicontrols. Use this option if you want to interact with the TABLEGUI</span>
+0061 <span class="comment">%       figure inside your own code.</span>
+0062 <span class="comment">%</span>
+0063 <span class="comment">%   Examples:</span>
+0064 <span class="comment">%     - Display a 12x6 numeric matrix with two extra blank rows appended to the end</span>
+0065 <span class="comment">%       out = tableGUI('array',rand(12,6),'ColNames',{'1' '2' '3' '4' '5' '6'},'NumRows',14);</span>
+0066 <span class="comment">%</span>
+0067 <span class="comment">%     - Create a cell array with the first column filled with the row number and use</span>
+0068 <span class="comment">%       columns with different widths. Create also check boxes.</span>
+0069 <span class="comment">%       zz=cell(4,5);   zz(:,1) = num2cell(1:4)';</span>
+0070 <span class="comment">%       out = tableGUI('array',zz,'ColNames',{'N','A','B','C','D'},'ColWidth',[20 60 60 60 60],'checks','y');</span>
+0071 <span class="comment">%</span>
+0072 <span class="comment">%     - Create a similar table as in the previous example but with the row numbers option.</span>
+0073 <span class="comment">%       out = tableGUI('array',cell(4,5),'RowNumbers','y','checks','y');</span>
+0074 <span class="comment">%</span>
+0075 <span class="comment">%     - Display the Control Points of the Image Processing Toolbox example</span>
+0076 <span class="comment">%       &quot;Registering an Aerial Photo to an Orthophoto&quot;</span>
+0077 <span class="comment">%       load westconcordpoints  % load some points that were already picked</span>
+0078 <span class="comment">%       gcp = [base_points input_points];</span>
+0079 <span class="comment">%       out = tableGUI('array',gcp,'RowNumbers','y','ColNames',{'Base Points - X','Base Points - Y',...</span>
+0080 <span class="comment">%               'Input Points - X','Input Points - Y'},'ColWidth',110,'FigName','GCP Table');</span>
+0081 <span class="comment">%</span>
+0082 <span class="comment">%     - Create an empty 12x6 empty table</span>
+0083 <span class="comment">%       out = tableGUI;</span>
+0084 <span class="comment">%</span>
+0085 <span class="comment">%   Acknowledgment</span>
+0086 <span class="comment">%       This function uses the parse_pv_pairs of John d'Errico</span>
+0087 <span class="comment">%</span>
+0088 <span class="comment">%   AUTHOR</span>
+0089 <span class="comment">%       Joaquim Luis (jluis@ualg.pt)   17-Feb-2006</span>
+0090 
+0091 hand.NumRows = 12;          hand.NumCol = 6;
+0092 hand.MAX_ROWS = 10;         hand.left_marg = 10;
+0093 hand.RowHeight = 20;        hand.bd_size = 0;
+0094 hand.checks = <span class="string">''</span>;           hand.HdrButtons = <span class="string">'Y'</span>;
+0095 hand.HorAlin = <span class="string">'center'</span>;    hand.FigName = <span class="string">'Table'</span>;
+0096 hand.array = cell(hand.NumRows,hand.NumCol);
+0097 hand.modal = <span class="string">'y'</span>;           hand.position = <span class="string">'east'</span>;
+0098 hand.RowNumbers = <span class="string">''</span>;       d_col = 0;
+0099 
+0100 <span class="keyword">if</span> (nargin == 0)        <span class="comment">% Demo</span>
+0101     hand.ColNames = {<span class="string">'A'</span> <span class="string">'B'</span> <span class="string">'C'</span> <span class="string">'D'</span> <span class="string">'E'</span> <span class="string">'F'</span>};
+0102     hand.ColWidth = [50 80 80 80 80 50];
+0103 <span class="keyword">else</span>
+0104     hand.ColNames = <span class="string">''</span>;        hand.ColWidth = [];
+0105     hand.array = [];        def_NumRows = hand.NumRows;
+0106     hand = <a href="#_sub2" class="code" title="subfunction params = parse_pv_pairs(params,pv_pairs)">parse_pv_pairs</a>(hand,varargin);
+0107     <span class="keyword">if</span> (~isempty(hand.array))
+0108         <span class="keyword">if</span> (numel(hand.array) == 1 &amp;&amp; numel(hand.array{1}) ~= 1)
+0109             error(<span class="string">'The &quot;array&quot; argument must be a MxN cell array and not a {MxN} cell'</span>)
+0110         <span class="keyword">end</span>
+0111         [NumRows,hand.NumCol] = size(hand.array);
+0112         <span class="keyword">if</span> (~iscell(hand.array))    <span class="comment">% We need as a cell array to be more general</span>
+0113             hand.array = num2cell(hand.array);
+0114         <span class="keyword">end</span>
+0115         <span class="keyword">if</span> (NumRows &lt; hand.NumRows &amp;&amp; hand.NumRows ~= def_NumRows)     <span class="comment">% Extra rows requested</span>
+0116             hand.array = [hand.array; cell(hand.NumRows-NumRows,hand.NumCol)];
+0117         <span class="keyword">else</span>
+0118             hand.NumRows = NumRows;
+0119         <span class="keyword">end</span>
+0120         <span class="keyword">if</span> (hand.NumRows &lt; hand.MAX_ROWS),    hand.MAX_ROWS = hand.NumRows;     <span class="keyword">end</span>
+0121         
+0122     <span class="keyword">else</span>                <span class="comment">% 'array' not transmited</span>
+0123         hand.array = cell(hand.NumRows,hand.NumCol);
+0124     <span class="keyword">end</span>
+0125     
+0126     <span class="keyword">if</span> (isempty(hand.ColNames) &amp;&amp; ~isempty(hand.HdrButtons))      <span class="comment">% By default columns are labeled 'A','B',...</span>
+0127         hand.ColNames = cell(1,hand.NumCol);
+0128         <span class="keyword">for</span> (i = 1:hand.NumCol),     hand.ColNames{1,i} = char(i+64);  <span class="keyword">end</span>
+0129     <span class="keyword">end</span>
+0130     <span class="keyword">if</span> (size(hand.array,2) &gt; size(hand.ColNames,2))
+0131         error(<span class="string">'&quot;ColNames&quot; argument has less elements than the number of columns is &quot;array&quot;'</span>)
+0132     <span class="keyword">end</span>
+0133     <span class="keyword">if</span> (isempty(hand.ColWidth))                    <span class="comment">% Use default value for button width</span>
+0134         hand.ColWidth = repmat(60,1,hand.NumCol);
+0135     <span class="keyword">elseif</span> (numel(hand.ColWidth) == 1)             <span class="comment">% 'ColWidth' was a scalar</span>
+0136         hand.ColWidth = repmat(hand.ColWidth,1,hand.NumCol);
+0137     <span class="keyword">end</span>
+0138     
+0139     <span class="keyword">if</span> (~isempty(hand.RowNumbers))                 <span class="comment">% Row numbering was requested</span>
+0140         hand.ColWidth = [35 hand.ColWidth];
+0141         hand.NumCol = hand.NumCol + 1;
+0142         hand.array = [cell(hand.NumRows,1) hand.array];
+0143         d_col = 1;
+0144     <span class="keyword">end</span>
+0145 <span class="keyword">end</span>
+0146 
+0147 arr_pos_xi = [hand.left_marg + [0 (cumsum(hand.ColWidth+hand.bd_size))]];
+0148 arr_pos_xi(end) = [];      <span class="comment">% We don't want the last element</span>
+0149 arr_pos_xw = hand.ColWidth;
+0150 
+0151 <span class="comment">% ---------------- Create the figure ----------------------------------</span>
+0152 fig_height = min(hand.NumRows,hand.MAX_ROWS) * (hand.RowHeight+hand.bd_size);
+0153 <span class="keyword">if</span> (~isempty(hand.HdrButtons)),    fig_height = fig_height + 22;   <span class="keyword">end</span>     <span class="comment">% Make room for header buttons</span>
+0154 <span class="keyword">if</span> (~isempty(hand.modal)),          fig_height = fig_height + 30;   <span class="keyword">end</span>     <span class="comment">% Make room for OK,Cancel buttons</span>
+0155 pos = [5 75 sum(arr_pos_xw)+hand.left_marg+(hand.NumCol-1)*hand.bd_size+15 fig_height];  <span class="comment">% The 15 is for the slider</span>
+0156 <span class="keyword">if</span> (~isempty(hand.checks)),     pos(3) = pos(3) + 15;   <span class="keyword">end</span>         <span class="comment">% Account for checkboxes size</span>
+0157 hand.hFig = figure(<span class="string">'unit'</span>,<span class="string">'pixels'</span>,<span class="string">'NumberTitle'</span>,<span class="string">'off'</span>,<span class="string">'Menubar'</span>,<span class="string">'none'</span>,<span class="string">'resize'</span>,<span class="string">'on'</span>,<span class="string">'position'</span>, <span class="keyword">...</span>
+0158     pos,<span class="string">'Name'</span>,hand.FigName,<span class="string">'Resize'</span>,<span class="string">'off'</span>,<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0159 movegui(hand.hFig,hand.position)
+0160 
+0161 hand.arr_pos_y = (fig_height-hand.RowHeight-hand.bd_size - (0:hand.NumRows-1)*(hand.RowHeight+hand.bd_size))';
+0162 <span class="keyword">if</span> (~isempty(hand.HdrButtons)),     hand.arr_pos_y = hand.arr_pos_y - 22;   <span class="keyword">end</span>
+0163 
+0164 <span class="keyword">if</span> (~isempty(hand.checks))              <span class="comment">% Create the checkboxes uicontrols</span>
+0165     arr_pos_xi = arr_pos_xi + 15;       <span class="comment">% Make room for them</span>
+0166     hand.hChecks = zeros(hand.NumRows,1);
+0167     hand.Checks_pos_orig = [ones(hand.NumRows,1)*7 (hand.arr_pos_y+3) ones(hand.NumRows,1)*15 ones(hand.NumRows,1)*15];
+0168 <span class="keyword">end</span>
+0169 hand.hEdits = zeros(hand.NumRows,hand.NumCol);
+0170 hand.Edits_pos_orig = cell(hand.NumRows,hand.NumCol);
+0171 
+0172 <span class="comment">% ---------------- Create the edit uicontrols ---------------------------</span>
+0173 <span class="keyword">for</span> (i = 1:hand.NumRows)
+0174     <span class="keyword">if</span> (~isempty(hand.checks))
+0175         hand.hChecks(i) = uicontrol(<span class="string">'Style'</span>,<span class="string">'checkbox'</span>,<span class="string">'unit'</span>,<span class="string">'pixels'</span>,<span class="string">'position'</span>, <span class="keyword">...</span>
+0176             hand.Checks_pos_orig(i,:),<span class="string">'Value'</span>,1);
+0177     <span class="keyword">end</span>
+0178     <span class="keyword">for</span> (j = 1:hand.NumCol)
+0179         hand.Edits_pos_orig{i,j} = [arr_pos_xi(j) hand.arr_pos_y(i) arr_pos_xw(j) 20];
+0180         hand.hEdits(i,j) = uicontrol(<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="string">'unit'</span>,<span class="string">'pixels'</span>,<span class="string">'backgroundcolor'</span>,<span class="string">'w'</span>,<span class="string">'position'</span>, <span class="keyword">...</span>
+0181             [arr_pos_xi(j) hand.arr_pos_y(i) arr_pos_xw(j) 20],<span class="string">'String'</span>,hand.array{i,j},<span class="keyword">...</span>
+0182             <span class="string">'HorizontalAlignment'</span>,hand.HorAlin);
+0183     <span class="keyword">end</span>
+0184     <span class="keyword">if</span> (~isempty(hand.RowNumbers))
+0185         set(hand.hEdits(i,1),<span class="string">'String'</span>,i,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>,<span class="string">'Background'</span>,[200 200 145]/255,<span class="string">'UserData'</span>,i)
+0186     <span class="keyword">else</span>
+0187         set(hand.hEdits(i,1),<span class="string">'UserData'</span>,i)
+0188     <span class="keyword">end</span>
+0189 <span class="keyword">end</span>
+0190 <span class="keyword">if</span> (~isempty(hand.HdrButtons))         <span class="comment">% Create the header pushbutton uicontrols</span>
+0191     <span class="keyword">for</span> (j = 1:hand.NumCol-d_col)        <span class="comment">% The d_col is to account for an eventual 'RowNumbers' option</span>
+0192         uicontrol(<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'unit'</span>,<span class="string">'pixels'</span>,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>,<span class="string">'position'</span>, <span class="keyword">...</span>
+0193             [arr_pos_xi(j+d_col) hand.arr_pos_y(1)+hand.RowHeight hand.ColWidth(j+d_col) 20],<span class="string">'String'</span>,hand.ColNames{j})
+0194     <span class="keyword">end</span>
+0195 <span class="keyword">end</span>
+0196 
+0197 <span class="comment">% ---------------- See if we need a slider ---------------------------</span>
+0198 pos_t = get(hand.hEdits(1,hand.NumCol),<span class="string">'pos'</span>);       <span class="comment">% Get top right edit position</span>
+0199 pos_b = get(hand.hEdits(hand.MAX_ROWS,1),<span class="string">'pos'</span>);    <span class="comment">% Get last visible edit position</span>
+0200 <span class="keyword">if</span> (hand.NumRows &gt; hand.MAX_ROWS)
+0201     set(hand.hEdits(hand.MAX_ROWS+1:hand.NumRows,1:hand.NumCol),<span class="string">'Visible'</span>,<span class="string">'off'</span>)    <span class="comment">% Hide those who are out of view</span>
+0202     <span class="keyword">if</span> (~isempty(hand.checks))
+0203         set(hand.hChecks(hand.MAX_ROWS+1:hand.NumRows),<span class="string">'Visible'</span>,<span class="string">'off'</span>)
+0204     <span class="keyword">end</span>
+0205     pos = [pos_t(1)+pos_t(3) pos_b(2) 15 pos_t(2)+pos_t(4)-pos_b(2)];
+0206     sld_step = 1 / (hand.NumRows-1);
+0207     sld_step(2) = 5 * sld_step(1);
+0208     hand.hSlid = uicontrol(<span class="string">'style'</span>,<span class="string">'slider'</span>,<span class="string">'units'</span>,<span class="string">'pixels'</span>,<span class="string">'position'</span>,pos,<span class="keyword">...</span>
+0209         <span class="string">'min'</span>,1,<span class="string">'max'</span>,hand.NumRows,<span class="string">'Value'</span>,hand.NumRows,<span class="string">'SliderStep'</span>,sld_step);
+0210     set(hand.hSlid,<span class="string">'callback'</span>,{@<a href="#_sub1" class="code" title="subfunction slider_Callback(obj,event,hand)">slider_Callback</a>,hand})
+0211     set(hand.hSlid,<span class="string">'UserData'</span>,hand.NumRows)    <span class="comment">% Store current value</span>
+0212 <span class="keyword">end</span>
+0213 
+0214 <span class="comment">% ---------------- See if the window is MODAL ---------------------------</span>
+0215 <span class="keyword">if</span> (~isempty(hand.modal))
+0216     uicontrol(<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'unit'</span>,<span class="string">'pixels'</span>,<span class="string">'String'</span>,<span class="string">'OK'</span>,<span class="string">'position'</span>,<span class="keyword">...</span>
+0217         [pos_t(1)+pos_t(3)-110 5 40 20],<span class="string">'FontName'</span>,<span class="string">'Helvetica'</span>,<span class="string">'FontSize'</span>,9,<span class="keyword">...</span>
+0218         <span class="string">'callback'</span>,<span class="string">'uiresume'</span>,<span class="string">'tag'</span>,<span class="string">'OK'</span>);
+0219     uicontrol(<span class="string">'Style'</span>,<span class="string">'pushbutton'</span>,<span class="string">'unit'</span>,<span class="string">'pixels'</span>,<span class="string">'String'</span>,<span class="string">'Cancel'</span>,<span class="string">'position'</span>, <span class="keyword">...</span>
+0220         [pos_t(1)+pos_t(3)-60 5 60 20],<span class="string">'FontName'</span>,<span class="string">'Helvetica'</span>,<span class="string">'FontSize'</span>,9,<span class="keyword">...</span>
+0221         <span class="string">'callback'</span>,<span class="string">'uiresume'</span>,<span class="string">'tag'</span>,<span class="string">'cancel'</span>);
+0222     uiwait(hand.hFig)       <span class="comment">% It also sets the Figure's visibility 'on'</span>
+0223     but = gco;
+0224     <span class="keyword">if</span> strcmp(get(but,<span class="string">'tag'</span>),<span class="string">'OK'</span>)
+0225         out = reshape(get(hand.hEdits,<span class="string">'String'</span>),hand.NumRows,hand.NumCol);
+0226         <span class="keyword">if</span> (~isempty(hand.checks))
+0227             unchecked = (cell2mat(get(hand.hChecks,<span class="string">'Value'</span>)) == 0);
+0228             out(unchecked,:) = [];      <span class="comment">% Remove unchecked rows</span>
+0229         <span class="keyword">end</span>
+0230         <span class="keyword">if</span> (~isempty(hand.RowNumbers)) <span class="comment">% Do not output the row numbers</span>
+0231             out = out(:,2:end);
+0232         <span class="keyword">end</span>
+0233         delete(hand.hFig)
+0234     <span class="keyword">elseif</span> strcmp(get(but,<span class="string">'tag'</span>),<span class="string">'cancel'</span>)
+0235         out = [];   delete(hand.hFig)
+0236     <span class="keyword">else</span>        <span class="comment">% Figure was killed</span>
+0237         out = [];
+0238     <span class="keyword">end</span>
+0239 <span class="keyword">else</span>
+0240     set(hand.hFig,<span class="string">'Visible'</span>,<span class="string">'on'</span>,<span class="string">'UserData'</span>,hand)
+0241     <span class="keyword">if</span> (nargout),   out = hand.hFig;    <span class="keyword">end</span>
+0242 <span class="keyword">end</span>
+0243 
+0244 <span class="comment">% ---------------------------------------------------------------------------</span>
+0245 <a name="_sub1" href="#_subfunctions" class="code">function slider_Callback(obj,event,hand)</a>
+0246 
+0247 val = round(get(hand.hSlid,<span class="string">'Value'</span>));
+0248 old_val = get(hand.hSlid,<span class="string">'UserData'</span>);
+0249 ds = val - old_val;
+0250 
+0251 <span class="keyword">if</span> (ds &lt; 0)                                         <span class="comment">% Slider moved down</span>
+0252     n = hand.NumRows - val + 1;    d_col = hand.NumRows - val;
+0253     <span class="keyword">if</span> (n+hand.MAX_ROWS-1 &gt; hand.NumRows)             <span class="comment">% Case we jumped into the midle zone</span>
+0254         adj = (n+hand.MAX_ROWS-1 - hand.NumRows);
+0255         n = n - adj;    d_col = d_col - adj;
+0256     <span class="keyword">end</span>
+0257     <span class="keyword">for</span> (i = n:min(n+hand.MAX_ROWS-1,hand.NumRows))   <span class="comment">% Update positions</span>
+0258         <span class="keyword">for</span> (j = 1:hand.NumCol)
+0259             pos = hand.Edits_pos_orig{i,j};
+0260             set(hand.hEdits(i,j),<span class="string">'pos'</span>,[pos(1) hand.arr_pos_y(i-d_col) pos(3:4)],<span class="string">'Visible'</span>,<span class="string">'on'</span>)
+0261         <span class="keyword">end</span>
+0262         <span class="keyword">if</span> (~isempty(hand.checks))                  <span class="comment">% If we have checkboxes</span>
+0263             pos = hand.Checks_pos_orig(i,:);
+0264             set(hand.hChecks(i),<span class="string">'pos'</span>,[pos(1) hand.arr_pos_y(i-d_col)+3 pos(3:4)],<span class="string">'Visible'</span>,<span class="string">'on'</span>)            
+0265         <span class="keyword">end</span>
+0266     <span class="keyword">end</span>
+0267     <span class="keyword">if</span> (i == get(hand.hEdits(hand.NumRows,1),<span class="string">'UserData'</span>)) <span class="comment">% Bottom reached. Jump to there</span>
+0268         val = 1;    set(hand.hSlid,<span class="string">'Value'</span>,val)         <span class="comment">% This also avoids useless UIs repositioning</span>
+0269     <span class="keyword">end</span>
+0270 <span class="keyword">elseif</span> (ds &gt; 0)                                     <span class="comment">% Slider moved up</span>
+0271     n = hand.NumRows - val + 1;    k = hand.MAX_ROWS;
+0272     <span class="keyword">if</span> (n &lt; hand.MAX_ROWS)                          <span class="comment">% Case we jumped into the midle zone</span>
+0273         adj = (hand.MAX_ROWS - n - 0);
+0274         n = n + adj;
+0275     <span class="keyword">end</span>
+0276     <span class="keyword">for</span> (i = n:-1:max(n-hand.MAX_ROWS+1,1))         <span class="comment">% Update positions</span>
+0277         <span class="keyword">for</span> (j = 1:hand.NumCol)
+0278             pos = hand.Edits_pos_orig{i,j};
+0279             set(hand.hEdits(i,j),<span class="string">'pos'</span>,[pos(1) hand.arr_pos_y(k) pos(3:4)],<span class="string">'Visible'</span>,<span class="string">'on'</span>)        
+0280         <span class="keyword">end</span>
+0281         <span class="keyword">if</span> (~isempty(hand.checks))                  <span class="comment">% If we have checkboxes</span>
+0282             pos = hand.Checks_pos_orig(i,:);
+0283             set(hand.hChecks(i),<span class="string">'pos'</span>,[pos(1) hand.arr_pos_y(k)+3 pos(3:4)],<span class="string">'Visible'</span>,<span class="string">'on'</span>)            
+0284         <span class="keyword">end</span>
+0285         k = k - 1;
+0286     <span class="keyword">end</span>
+0287     set(hand.hEdits(n+1:<span class="keyword">end</span>,1:end),<span class="string">'Visible'</span>,<span class="string">'off'</span>)
+0288     <span class="keyword">if</span> (~isempty(hand.checks)),     set(hand.hChecks(n+1:end),<span class="string">'Visible'</span>,<span class="string">'off'</span>);    <span class="keyword">end</span>
+0289     <span class="keyword">if</span> (i == get(hand.hEdits(1,1),<span class="string">'UserData'</span>))      <span class="comment">% Reached Top. Jump to there</span>
+0290         set(hand.hSlid,<span class="string">'Value'</span>,hand.NumRows)          <span class="comment">% This also avoids useless UIs repositioning</span>
+0291         val = hand.NumRows;
+0292     <span class="keyword">end</span>
+0293 <span class="keyword">end</span>
+0294 set(hand.hSlid,<span class="string">'UserData'</span>,val)                      <span class="comment">% Save old 'Value'</span>
+0295 
+0296 <span class="comment">% ----------------------------------------------------------------------------</span>
+0297 <a name="_sub2" href="#_subfunctions" class="code">function params = parse_pv_pairs(params,pv_pairs)</a>
+0298 <span class="comment">% parse_pv_pairs: parses sets of property value pairs, allows defaults</span>
+0299 <span class="comment">% usage: params=parse_pv_pairs(default_params,pv_pairs)</span>
+0300 <span class="comment">%</span>
+0301 <span class="comment">% arguments: (input)</span>
+0302 <span class="comment">%  default_params - structure, with one field for every potential</span>
+0303 <span class="comment">%             property/value pair. Each field will contain the default</span>
+0304 <span class="comment">%             value for that property. If no default is supplied for a</span>
+0305 <span class="comment">%             given property, then that field must be empty.</span>
+0306 <span class="comment">%</span>
+0307 <span class="comment">%  pv_array - cell array of property/value pairs.</span>
+0308 <span class="comment">%             Case is ignored when comparing properties to the list</span>
+0309 <span class="comment">%             of field names. Also, any unambiguous shortening of a</span>
+0310 <span class="comment">%             field/property name is allowed.</span>
+0311 <span class="comment">%</span>
+0312 <span class="comment">% arguments: (output)</span>
+0313 <span class="comment">%  params   - parameter struct that reflects any updated property/value</span>
+0314 <span class="comment">%             pairs in the pv_array.</span>
+0315 <span class="comment">%</span>
+0316 <span class="comment">% Example usage:</span>
+0317 <span class="comment">% First, set default values for the parameters. Assume we have four</span>
+0318 <span class="comment">% parameters that we wish to use optionally in the function examplefun.</span>
+0319 <span class="comment">%</span>
+0320 <span class="comment">%  - 'viscosity', which will have a default value of 1</span>
+0321 <span class="comment">%  - 'volume', which will default to 1</span>
+0322 <span class="comment">%  - 'pie' - which will have default value 3.141592653589793</span>
+0323 <span class="comment">%  - 'description' - a text field, left empty by default</span>
+0324 <span class="comment">%</span>
+0325 <span class="comment">% The first argument to examplefun is one which will always be supplied.</span>
+0326 <span class="comment">%</span>
+0327 <span class="comment">%   function examplefun(dummyarg1,varargin)</span>
+0328 <span class="comment">%   params.Viscosity = 1;</span>
+0329 <span class="comment">%   params.Volume = 1;</span>
+0330 <span class="comment">%   params.Pie = 3.141592653589793</span>
+0331 <span class="comment">%</span>
+0332 <span class="comment">%   params.Description = '';</span>
+0333 <span class="comment">%   params=parse_pv_pairs(params,varargin);</span>
+0334 <span class="comment">%   params</span>
+0335 <span class="comment">%</span>
+0336 <span class="comment">% Use examplefun, overriding the defaults for 'pie', 'viscosity'</span>
+0337 <span class="comment">% and 'description'. The 'volume' parameter is left at its default.</span>
+0338 <span class="comment">%</span>
+0339 <span class="comment">%   examplefun(rand(10),'vis',10,'pie',3,'Description','Hello world')</span>
+0340 <span class="comment">%</span>
+0341 <span class="comment">% params =</span>
+0342 <span class="comment">%     Viscosity: 10</span>
+0343 <span class="comment">%        Volume: 1</span>
+0344 <span class="comment">%           Pie: 3</span>
+0345 <span class="comment">%   Description: 'Hello world'</span>
+0346 <span class="comment">%</span>
+0347 <span class="comment">% Note that capitalization was ignored, and the property 'viscosity' was truncated</span>
+0348 <span class="comment">% as supplied. Also note that the order the pairs were supplied was arbitrary.</span>
+0349 
+0350 n = length(pv_pairs) / 2;
+0351 
+0352 <span class="keyword">if</span> n ~= floor(n)
+0353     error <span class="string">'Property/value pairs must come in PAIRS.'</span>
+0354 <span class="keyword">end</span>
+0355 <span class="keyword">if</span> (n &lt;= 0),    <span class="keyword">return</span>;     <span class="keyword">end</span>     <span class="comment">% just return the defaults</span>
+0356 
+0357 <span class="keyword">if</span> ~isstruct(params)
+0358     error <span class="string">'No structure for defaults was supplied'</span>
+0359 <span class="keyword">end</span>
+0360 
+0361 <span class="comment">% there was at least one pv pair. process any supplied</span>
+0362 propnames = fieldnames(params);
+0363 lpropnames = lower(propnames);
+0364 <span class="keyword">for</span> i=1:n
+0365     p_i = lower(pv_pairs{2*i-1});
+0366     v_i = pv_pairs{2*i};
+0367     
+0368     ind = strmatch(p_i,lpropnames,<span class="string">'exact'</span>);
+0369     <span class="keyword">if</span> isempty(ind)
+0370         ind = find(strncmp(p_i,lpropnames,length(p_i)));
+0371         <span class="keyword">if</span> isempty(ind)
+0372             error([<span class="string">'No matching property found for: '</span>,pv_pairs{2*i-1}])
+0373         <span class="keyword">elseif</span> (length(ind) &gt; 1)
+0374             error([<span class="string">'Ambiguous property name: '</span>,pv_pairs{2*i-1}])
+0375         <span class="keyword">end</span>
+0376     <span class="keyword">end</span>
+0377     p_i = propnames{ind};
+0378     params = setfield(params,p_i,v_i);      <span class="comment">% override the corresponding default in params</span>
+0379 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

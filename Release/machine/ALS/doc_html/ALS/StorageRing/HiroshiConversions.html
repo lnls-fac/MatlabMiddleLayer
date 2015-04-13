@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of HiroshiConversions</title>
+  <meta name="keywords" content="HiroshiConversions">
+  <meta name="description" content="Order Number">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; HiroshiConversions.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>HiroshiConversions
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Order Number</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function HiroshiConversions </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Order Number
+ Element Number (Ie, for BPMs: 12/Sector or 12*12 total slots)
+ Position
+ Channel name
+ Family(Sector, Element)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function HiroshiConversions</a>
+0002 
+0003 <span class="comment">% Order Number</span>
+0004 <span class="comment">% Element Number (Ie, for BPMs: 12/Sector or 12*12 total slots)</span>
+0005 <span class="comment">% Position</span>
+0006 <span class="comment">% Channel name</span>
+0007 <span class="comment">% Family(Sector, Element)</span>
+0008 
+0009 
+0010 DirectoryName = getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>);
+0011 DirectoryName = [DirectoryName, <span class="string">'Database'</span>, filesep];
+0012 DirStart = pwd;
+0013 [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0014 <span class="keyword">if</span> ErrorFlag
+0015     fprintf(<span class="string">'   Problem creating target directory.  Function failed.\n'</span>);
+0016     <span class="keyword">return</span>;
+0017 <span class="keyword">end</span>
+0018 cd(DirStart);
+0019 
+0020 
+0021 
+0022 <span class="comment">% Setpoint and monitor</span>
+0023 fid = fopen([DirectoryName, <span class="string">'SRMagnets.txt'</span>], <span class="string">'w'</span>);
+0024 Family = {<span class="string">'HCM'</span>, <span class="string">'VCM'</span>, <span class="string">'QF'</span>, <span class="string">'QD'</span>, <span class="string">'QDA'</span>, <span class="string">'SQSF'</span>, <span class="string">'SQSD'</span>, <span class="string">'SF'</span>, <span class="string">'SD'</span>, <span class="string">'BEND'</span>, <span class="string">'ID'</span>, <span class="string">'EPU'</span>};
+0025 <span class="keyword">for</span> j = 1:length(Family)
+0026     Dev = family2dev(Family{j}, 0);
+0027     Elem = dev2elem(Family{j}, Dev);
+0028     Pos = getspos(Family{j}, Dev);
+0029     SetChanName = family2channel(Family{j}, <span class="string">'Setpoint'</span>, Dev);
+0030     MonChanName = family2channel(Family{j}, <span class="string">'Monitor'</span>, Dev);
+0031     <span class="comment">%Num = (1:length(Elem))';</span>
+0032 
+0033     <span class="keyword">for</span> i = 1:length(Elem)
+0034         fprintf(fid, <span class="string">'%2d %2d %7.3f %s %s %s(%d,%d)\n'</span>, i, Elem(i), Pos(i), SetChanName(i,:), MonChanName(i,:), Family{j}, Dev(i,:));
+0035         <span class="comment">%fprintf(fid, '%2d %7.3f %s %s %s(%d,%d)\n', Elem(i), Pos(i), SetChanName(i,:), MonChanName(i,:), Family{j}, Dev(i,:));</span>
+0036     <span class="keyword">end</span>
+0037     fprintf(fid, <span class="string">'\n'</span>);
+0038 <span class="keyword">end</span>
+0039 fclose(fid);
+0040 fprintf(<span class="string">'   Data written to %s\n'</span>,[DirectoryName, <span class="string">'SRMagnets.txt'</span>]);
+0041 
+0042 
+0043 <span class="comment">% Monitor Only</span>
+0044 fid = fopen([DirectoryName, <span class="string">'SRBPM.txt'</span>], <span class="string">'w'</span>);
+0045 Family = {<span class="string">'BPMx'</span>, <span class="string">'BPMy'</span>};   
+0046 <span class="keyword">for</span> j = 1:length(Family)
+0047     Dev = family2dev(Family{j}, 0);
+0048     Elem = dev2elem(Family{j}, Dev);
+0049     Pos = getspos(Family{j}, Dev);
+0050     MonChanName = family2channel(Family{j}, <span class="string">'Monitor'</span>, Dev);
+0051     <span class="comment">%Num = (1:length(Elem))';</span>
+0052 
+0053     <span class="keyword">for</span> i = 1:length(Elem)
+0054         fprintf(fid, <span class="string">'%2d %2d %7.3f %s %s(%d,%d)\n'</span>, i, Elem(i), Pos(i), MonChanName(i,:), Family{j}, Dev(i,:));
+0055         <span class="comment">%fprintf(fid, '%2d %7.3f %s %s(%d,%d)\n', i, Pos(i), MonChanName(i,:), Family{j}, Dev(i,:));</span>
+0056     <span class="keyword">end</span>
+0057     fprintf(fid, <span class="string">'\n'</span>);
+0058 <span class="keyword">end</span>
+0059 fclose(fid);
+0060 fprintf(<span class="string">'   Data written to %s\n'</span>,[DirectoryName, <span class="string">'SRBPM.txt'</span>]);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

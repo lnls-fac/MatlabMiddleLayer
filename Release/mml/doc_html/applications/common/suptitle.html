@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of suptitle</title>
+  <meta name="keywords" content="suptitle">
+  <meta name="description" content="SUPTITLE -Puts a title above all subplots.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; suptitle.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>suptitle
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>SUPTITLE -Puts a title above all subplots.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function hout=suptitle(str) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SUPTITLE -Puts a title above all subplots.
+ suptitle('text') adds text to the top of the figure
+ above all subplots (a &quot;super title&quot;). Use this function
+ after all subplot commands.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function hout=suptitle(str)</a>
+0002 <span class="comment">%SUPTITLE -Puts a title above all subplots.</span>
+0003 <span class="comment">% suptitle('text') adds text to the top of the figure</span>
+0004 <span class="comment">% above all subplots (a &quot;super title&quot;). Use this function</span>
+0005 <span class="comment">% after all subplot commands.</span>
+0006 
+0007 <span class="comment">% Drea Thomas 6/15/95 drea@mathworks.com</span>
+0008 
+0009 <span class="comment">% John Cristion 12/13/00 modified</span>
+0010 
+0011 <span class="comment">% Warning: If the figure or axis units are non-default, this</span>
+0012 <span class="comment">% will break.</span>
+0013 
+0014 
+0015 
+0016 <span class="comment">% This will disable sub- and super-scripts (JAC)</span>
+0017 
+0018 set(0,<span class="string">'DefaultTextInterpreter'</span>,<span class="string">'none'</span>);
+0019 
+0020 <span class="comment">% Parameters used to position the supertitle.</span>
+0021 
+0022 <span class="comment">% Amount of the figure window devoted to subplots</span>
+0023 plotregion = .92;
+0024 
+0025 <span class="comment">% Y position of title in normalized coordinates</span>
+0026 titleypos  = .95;
+0027 
+0028 <span class="comment">% Fontsize for supertitle</span>
+0029 <span class="comment">%fs = get(gcf,'defaultaxesfontsize')+4;</span>
+0030 
+0031 fs = get(gcf,<span class="string">'defaultaxesfontsize'</span>);
+0032 
+0033 <span class="comment">% Fudge factor to adjust y spacing between subplots</span>
+0034 fudge=1;
+0035 
+0036 haold = gca;
+0037 figunits = get(gcf,<span class="string">'units'</span>);
+0038 
+0039 <span class="comment">% Get the (approximate) difference between full height (plot + title</span>
+0040 <span class="comment">% + xlabel) and bounding rectangle.</span>
+0041 
+0042  <span class="keyword">if</span> (~strcmp(figunits,<span class="string">'pixels'</span>)),
+0043   set(gcf,<span class="string">'units'</span>,<span class="string">'pixels'</span>);
+0044   pos = get(gcf,<span class="string">'position'</span>);
+0045   set(gcf,<span class="string">'units'</span>,figunits);
+0046  <span class="keyword">else</span>,
+0047   pos = get(gcf,<span class="string">'position'</span>);
+0048  <span class="keyword">end</span>
+0049  ff = (fs-4)*1.27*5/pos(4)*fudge;
+0050 
+0051         <span class="comment">% The 5 here reflects about 3 characters of height below</span>
+0052         <span class="comment">% an axis and 2 above. 1.27 is pixels per point.</span>
+0053 
+0054 <span class="comment">% Determine the bounding rectange for all the plots</span>
+0055 
+0056 <span class="comment">% h = findobj('Type','axes');</span>
+0057 
+0058 <span class="comment">% findobj is a 4.2 thing.. if you don't have 4.2 comment out</span>
+0059 <span class="comment">% the next line and uncomment the following block.</span>
+0060  
+0061 h = findobj(gcf,<span class="string">'Type'</span>,<span class="string">'axes'</span>);  <span class="comment">% Change suggested by Stacy J. Hills</span>
+0062 
+0063 <span class="comment">% If you don't have 4.2, use this code instead</span>
+0064 <span class="comment">%ch = get(gcf,'children');</span>
+0065 <span class="comment">%h=[];</span>
+0066 <span class="comment">%for i=1:length(ch),</span>
+0067 <span class="comment">%  if strcmp(get(ch(i),'type'),'axes'),</span>
+0068 <span class="comment">%    h=[h,ch(i)];</span>
+0069 <span class="comment">%  end</span>
+0070 <span class="comment">%end</span>
+0071 
+0072  
+0073 
+0074 
+0075 max_y=0;
+0076 min_y=1;
+0077 
+0078 oldtitle =0;
+0079 <span class="keyword">for</span> i=1:length(h),
+0080  <span class="keyword">if</span> (~strcmp(get(h(i),<span class="string">'Tag'</span>),<span class="string">'suptitle'</span>)),
+0081   pos=get(h(i),<span class="string">'pos'</span>);
+0082   <span class="keyword">if</span> (pos(2) &lt; min_y), min_y=pos(2)-ff/5*3;<span class="keyword">end</span>;
+0083   <span class="keyword">if</span> (pos(4)+pos(2) &gt; max_y), max_y=pos(4)+pos(2)+ff/5*2;<span class="keyword">end</span>;
+0084  <span class="keyword">else</span>,
+0085   oldtitle = h(i);
+0086  <span class="keyword">end</span>
+0087 <span class="keyword">end</span>
+0088 
+0089 <span class="keyword">if</span> max_y &gt; plotregion,
+0090  scale = (plotregion-min_y)/(max_y-min_y);
+0091  <span class="keyword">for</span> i=1:length(h),
+0092   pos = get(h(i),<span class="string">'position'</span>);
+0093   pos(2) = (pos(2)-min_y)*scale+min_y;
+0094   pos(4) = pos(4)*scale-(1-scale)*ff/5*3;
+0095   set(h(i),<span class="string">'position'</span>,pos);
+0096  <span class="keyword">end</span>
+0097 <span class="keyword">end</span>
+0098 
+0099 np = get(gcf,<span class="string">'nextplot'</span>);
+0100 set(gcf,<span class="string">'nextplot'</span>,<span class="string">'add'</span>);
+0101 <span class="keyword">if</span> (oldtitle),
+0102  delete(oldtitle);
+0103 <span class="keyword">end</span>
+0104 ha=axes(<span class="string">'pos'</span>,[0 1 1 1],<span class="string">'visible'</span>,<span class="string">'off'</span>,<span class="string">'Tag'</span>,<span class="string">'suptitle'</span>);
+0105 ht=text(.5,titleypos-1,str);set(ht,<span class="string">'horizontalalignment'</span>,<span class="string">'center'</span>,<span class="string">'fontsize'</span>,fs);
+0106 set(gcf,<span class="string">'nextplot'</span>,np);
+0107 axes(haold);
+0108 <span class="keyword">if</span> nargout,
+0109  hout=ht;
+0110 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

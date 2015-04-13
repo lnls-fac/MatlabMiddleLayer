@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotlocochi2</title>
+  <meta name="keywords" content="plotlocochi2">
+  <meta name="description" content="PLOTLOCOCHI2 - Calculate the contribution to chi2 of each fit parameter in LOCO">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; plotlocochi2.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>plotlocochi2
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>PLOTLOCOCHI2 - Calculate the contribution to chi2 of each fit parameter in LOCO</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [dchi2quad, chi2_par, chi2_bpm, chi2_cm, chi2_min, chi2_0] = plotlocochi2(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTLOCOCHI2 - Calculate the contribution to chi2 of each fit parameter in LOCO
+
+  [dchi2quad, chi2_par, chi2_bpm, chi2_cm, chi2_min, chi2_0] = plotlocochi2(LOCOFileName, Niter, ParameterCombination)
+  [dchi2quad, chi2_par, chi2_bpm, chi2_cm, chi2_min, chi2_0] = plotlocochi2(BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData, Niter, ParameterCombination)
+ 
+   INPUTS
+   1. LOCOFileName - LOCO file name
+   2. Niter - LOCO iteration number (0,1, ...) {Default: last iteration}
+   Optional Inputs
+   3. ParameterCombination - Index of a particular combination of parameters to analyze 
+                             Only a scale output will be given when using this input. 
+                             {Default: Don't use this input.  Analyze all parameters individually.}
+   4. DisplayFlag - 'Display' or 'Plot'     - Plot the data {Default if no outputs exist}
+                    'NoDisplay' or 'NoPlot' - Output only   {Default if outputs exist}
+
+   OUTPUTS
+   1. dchi2quad - change of chi^2 if each quadrupole is set to initial value
+   2. chi2_par  - chi^2 of the last  iteration with the fit parameters set to the first iteration
+   3. chi2_bpm  - chi^2 of the last  iteration with the BPMs fits set to the first iteration
+   4. chi2_cm   - chi^2 of the last  iteration with the CMs  fits set to the first iteration
+   5. chi2_min  - chi^2 of the last  iteration
+   6. chi2_0    - chi^2 of the first iteration
+
+   Note: &quot;fit parameters&quot; refer to just what is in the FitParameter structure
+   
+   dChi^2 for all Fit Parameters  = chi2_par - chi2_min  (not including BPMs or corrector magnets)
+   dChi^2 for all BPMs            = chi2_bpm - chi2_min
+   dChi^2 for all CMs             = chi2_cm  - chi2_min</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>	CALCLOCOCHI2 - Calculate the contribution to chi^2 of each fit parameter in LOCO</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [dchi2quad, chi2_par, chi2_bpm, chi2_cm, chi2_min, chi2_0] = plotlocochi2(varargin)</a>
+0002 <span class="comment">%PLOTLOCOCHI2 - Calculate the contribution to chi2 of each fit parameter in LOCO</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  [dchi2quad, chi2_par, chi2_bpm, chi2_cm, chi2_min, chi2_0] = plotlocochi2(LOCOFileName, Niter, ParameterCombination)</span>
+0005 <span class="comment">%  [dchi2quad, chi2_par, chi2_bpm, chi2_cm, chi2_min, chi2_0] = plotlocochi2(BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData, Niter, ParameterCombination)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%   INPUTS</span>
+0008 <span class="comment">%   1. LOCOFileName - LOCO file name</span>
+0009 <span class="comment">%   2. Niter - LOCO iteration number (0,1, ...) {Default: last iteration}</span>
+0010 <span class="comment">%   Optional Inputs</span>
+0011 <span class="comment">%   3. ParameterCombination - Index of a particular combination of parameters to analyze</span>
+0012 <span class="comment">%                             Only a scale output will be given when using this input.</span>
+0013 <span class="comment">%                             {Default: Don't use this input.  Analyze all parameters individually.}</span>
+0014 <span class="comment">%   4. DisplayFlag - 'Display' or 'Plot'     - Plot the data {Default if no outputs exist}</span>
+0015 <span class="comment">%                    'NoDisplay' or 'NoPlot' - Output only   {Default if outputs exist}</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%   OUTPUTS</span>
+0018 <span class="comment">%   1. dchi2quad - change of chi^2 if each quadrupole is set to initial value</span>
+0019 <span class="comment">%   2. chi2_par  - chi^2 of the last  iteration with the fit parameters set to the first iteration</span>
+0020 <span class="comment">%   3. chi2_bpm  - chi^2 of the last  iteration with the BPMs fits set to the first iteration</span>
+0021 <span class="comment">%   4. chi2_cm   - chi^2 of the last  iteration with the CMs  fits set to the first iteration</span>
+0022 <span class="comment">%   5. chi2_min  - chi^2 of the last  iteration</span>
+0023 <span class="comment">%   6. chi2_0    - chi^2 of the first iteration</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%   Note: &quot;fit parameters&quot; refer to just what is in the FitParameter structure</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%   dChi^2 for all Fit Parameters  = chi2_par - chi2_min  (not including BPMs or corrector magnets)</span>
+0028 <span class="comment">%   dChi^2 for all BPMs            = chi2_bpm - chi2_min</span>
+0029 <span class="comment">%   dChi^2 for all CMs             = chi2_cm  - chi2_min</span>
+0030 
+0031 
+0032 <span class="comment">% Start from itereration</span>
+0033 i0 = 1;
+0034 
+0035 
+0036 <span class="comment">% Parse input</span>
+0037 LOCOFileName = <span class="string">''</span>;
+0038 Niter = [];
+0039 DisplayFlag = <span class="string">''</span>;
+0040 
+0041 <span class="comment">% First strip out the strings</span>
+0042 <span class="keyword">for</span> i = length(varargin):-1:1
+0043     <span class="keyword">if</span> ischar(varargin{i})
+0044         <span class="keyword">if</span> any(strcmpi(varargin{i},{<span class="string">'NoDisplay'</span>,<span class="string">'NoPlot'</span>}))
+0045             DisplayFlag = <span class="string">'NoDisplay'</span>;
+0046             varargin(i) = [];
+0047         <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'Display'</span>,<span class="string">'Plot'</span>}))
+0048             DisplayFlag = <span class="string">'Display'</span>;
+0049             varargin(i) = [];
+0050         <span class="keyword">else</span>
+0051             LOCOFileName = varargin{i};
+0052             varargin(i) = [];
+0053         <span class="keyword">end</span>
+0054     <span class="keyword">end</span>
+0055 <span class="keyword">end</span>
+0056 
+0057 <span class="keyword">if</span> length(varargin) == 7 || length(varargin) == 8
+0058     BPMData       = varargin{1};
+0059     CMData        = varargin{2};
+0060     LocoMeasData  = varargin{3};
+0061     LocoModel     = varargin{4};
+0062     FitParameters = varargin{5};
+0063     LocoFlags     = varargin{6};
+0064     RINGData      = varargin{7};
+0065     varargin(1:7) = [];
+0066 <span class="keyword">else</span>
+0067     <span class="comment">% LOCO file</span>
+0068     <span class="keyword">if</span> isempty(LOCOFileName)
+0069         [FileName, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select A LOCO File'</span>, [getfamilydata(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep]);
+0070 
+0071         <span class="keyword">if</span> isequal(FileName,0) || isequal(PathName,0)
+0072             <span class="keyword">return</span>
+0073         <span class="keyword">end</span>
+0074         LOCOFileName= [PathName, FileName];
+0075     <span class="keyword">end</span>
+0076 
+0077     load(LOCOFileName);
+0078 <span class="keyword">end</span>
+0079 
+0080 <span class="keyword">if</span> ~isempty(varargin)
+0081     Niter = varargin{1};
+0082     varargin(1) = [];
+0083 <span class="keyword">end</span>
+0084 <span class="keyword">if</span> ~isempty(varargin)
+0085     ParameterCombination = varargin{1};
+0086     varargin(1) = [];
+0087 <span class="keyword">else</span>
+0088     ParameterCombination = [];
+0089 <span class="keyword">end</span>
+0090 
+0091 
+0092 <span class="comment">% Display flag</span>
+0093 <span class="keyword">if</span> isempty(DisplayFlag)
+0094     <span class="keyword">if</span> nargout == 0
+0095         DisplayFlag = <span class="string">'Display'</span>;
+0096     <span class="keyword">else</span>
+0097         DisplayFlag = <span class="string">'NoDisplay'</span>;
+0098     <span class="keyword">end</span>
+0099 <span class="keyword">end</span>
+0100 
+0101 
+0102 <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>) &amp;&amp; isempty(ParameterCombination)
+0103     d = .08;
+0104     <span class="comment">%h_fig = gcf;</span>
+0105     h_axes = gca;
+0106     <span class="comment">%clf reset;</span>
+0107     plot([0 1],[0 1],<span class="string">'w'</span>); 
+0108     set(gca,<span class="string">'XTick'</span>,[]); 
+0109     set(gca,<span class="string">'YTick'</span>,[]); 
+0110     cla; 
+0111     title(<span class="string">' '</span>); xlabel(<span class="string">' '</span>); ylabel(<span class="string">' '</span>);
+0112     set(gca,<span class="string">'box'</span>,<span class="string">'on'</span>);
+0113     text(.03,.6-0*d, sprintf(<span class="string">'   Please wait ...'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>);
+0114     text(.03,.6-1*d, sprintf(<span class="string">'   Computing \\Delta \\chi^2 verses fit parameter'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>);
+0115     drawnow;
+0116 
+0117     hbar = waitbar(0, sprintf(<span class="string">'Computing \\Delta \\chi^2.  Close waitbar to stop calculation.'</span>));
+0118 <span class="keyword">end</span>
+0119 
+0120 
+0121 <span class="comment">% Iterations</span>
+0122 <span class="keyword">if</span> isempty(Niter)
+0123     Niter = length(FitParameters)-1;
+0124 <span class="keyword">end</span>
+0125 <span class="keyword">if</span> Niter&lt;0 || Niter&gt;(length(FitParameters)-1)
+0126     error(<span class="string">'Iteration number must be between 0 and %d'</span>, length(FitParameters)-1);
+0127 <span class="keyword">end</span>
+0128 
+0129 i1 = Niter + 1;
+0130 
+0131 
+0132 <span class="keyword">if</span> nargout &gt;= 6
+0133 chi2_0   = <a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>(LocoModel(i0), LocoMeasData, BPMData(i0), CMData(i0), FitParameters(i0), LocoFlags(i0), RINGData);
+0134 <span class="keyword">end</span>
+0135 chi2_bpm = <a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>(LocoModel(i1), LocoMeasData, BPMData(i0), CMData(i1), FitParameters(i1), LocoFlags(i1), RINGData);
+0136 chi2_cm  = <a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>(LocoModel(i1), LocoMeasData, BPMData(i1), CMData(i0), FitParameters(i1), LocoFlags(i1), RINGData);
+0137 chi2_par = <a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>(LocoModel(i1), LocoMeasData, BPMData(i1), CMData(i1), FitParameters(i0), LocoFlags(i1), RINGData);
+0138 chi2_min = <a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>(LocoModel(i1), LocoMeasData, BPMData(i1), CMData(i1), FitParameters(i1), LocoFlags(i1), RINGData);
+0139 
+0140 
+0141 <span class="keyword">if</span> isempty(ParameterCombination)
+0142     
+0143     <span class="comment">% Compute all fit parameters</span>
+0144     <span class="keyword">for</span> ii = 1:length(FitParameters(i1).Values)
+0145         FitParameters_m = FitParameters(i1);
+0146         FitParameters_m.Values(ii) = FitParameters(i0).Values(ii);
+0147         chi2_qii = <a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>(LocoModel(i1),LocoMeasData, BPMData(i1), CMData(i1), FitParameters_m, LocoFlags(i1), RINGData);
+0148         dchi2quad(ii,1) = chi2_qii - chi2_min;
+0149 
+0150         <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0151             drawnow;
+0152             <span class="keyword">try</span>
+0153                 waitbar(ii/length(FitParameters(i1).Values), hbar);
+0154             <span class="keyword">catch</span>
+0155                 axes(h_axes);
+0156                 plot([0 1],[0 1],<span class="string">'w'</span>);
+0157                 set(gca,<span class="string">'XTick'</span>,[]);
+0158                 set(gca,<span class="string">'YTick'</span>,[]);
+0159                 text(.1,.6-1*d, sprintf(<span class="string">'   \\Delta \\chi^2 computation stopped!'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>);
+0160                 <span class="comment">%fprintf('   calclocochi2 stopped\n');</span>
+0161                 <span class="keyword">return</span>;
+0162             <span class="keyword">end</span>
+0163         <span class="keyword">end</span>
+0164     <span class="keyword">end</span>
+0165     
+0166 <span class="keyword">else</span>
+0167     
+0168     <span class="comment">% Compute 1 delta chi^2 for a particular combination of fit parameters</span>
+0169     FitParameters_m = FitParameters(i1);
+0170 
+0171     <span class="keyword">for</span> jj=1:length(ParameterCombination)
+0172         ii = ParameterCombination(jj);
+0173         <span class="keyword">if</span> ii&gt;0 &amp;&amp; ii&lt;=length(FitParameters(i0).Values)
+0174             FitParameters_m.Values(ii) = FitParameters(i0).Values(ii);
+0175         <span class="keyword">end</span>
+0176     <span class="keyword">end</span>
+0177     chi2_qii = <a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>(LocoModel(i1),LocoMeasData, BPMData(i1), CMData(i1), FitParameters_m, LocoFlags(i1), RINGData);
+0178     dchi2quad = chi2_qii - chi2_min;
+0179 
+0180     <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>)
+0181         fprintf(<span class="string">'   Chi^2 at iteration %d = %f\n'</span>, Niter, chi2_min);
+0182         fprintf(<span class="string">'   Delta Chi^2 = %f\n'</span>, dchi2quad);
+0183     <span class="keyword">end</span>
+0184 <span class="keyword">end</span>
+0185 
+0186 
+0187 <span class="keyword">if</span> strcmpi(DisplayFlag, <span class="string">'Display'</span>) &amp;&amp; isempty(ParameterCombination)
+0188     <span class="comment">%disp(chi2_0)</span>
+0189     <span class="comment">%disp(['   final chi2 ' num2str(chi2_min)])</span>
+0190     <span class="comment">%disp(['   contribution (all quads) ' num2str(chi2_par - chi2_min)])</span>
+0191     <span class="comment">%disp(['   contribution (all bpms) ' num2str(chi2_bpm - chi2_min)])</span>
+0192 
+0193     <span class="keyword">try</span>
+0194         close(hbar);
+0195     <span class="keyword">catch</span>
+0196     <span class="keyword">end</span>
+0197 
+0198     axes(h_axes);
+0199     plot(1:length(dchi2quad), dchi2quad,<span class="string">'.-'</span>);
+0200     <span class="comment">%set(h_fig, 'linewidth',1)</span>
+0201     title(<span class="string">''</span>);
+0202     xlabel(<span class="string">'Fit Parameter Index'</span>, <span class="string">'FontSize'</span>, 10);
+0203     ylabel(<span class="string">'\Delta \chi^2'</span>, <span class="string">'FontSize'</span>, 14);
+0204     title(<span class="string">'\Delta \chi^2 vs Fit Parameter'</span>, <span class="string">'FontSize'</span>, 10);
+0205     <span class="comment">%grid  on;</span>
+0206     axis tight;
+0207      
+0208     <span class="comment">%text(.03,.9-0*d, sprintf('   \\chi^2 for iteration %d = %.1f', Niter, chi2_min),            'FontSize', 10, 'Units','Normalized');</span>
+0209     text(.03,.9-0*d, sprintf(<span class="string">'\\Delta \\chi^2(All BPMs) = %.1f'</span>,          chi2_bpm - chi2_min), <span class="string">'FontSize'</span>, 10, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>);
+0210     text(.03,.9-1*d, sprintf(<span class="string">'\\Delta \\chi^2(All CMs)  = %.1f'</span>,          chi2_cm  - chi2_min), <span class="string">'FontSize'</span>, 10, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>);
+0211     text(.03,.9-2*d, sprintf(<span class="string">'\\Delta \\chi^2(All FitParameters) = %.1f'</span>, chi2_par - chi2_min), <span class="string">'FontSize'</span>, 10, <span class="string">'Units'</span>,<span class="string">'Normalized'</span>);
+0212         
+0213     <span class="comment">%addlabel(0, 0, sprintf('\\chi^2(0) = %.1f   \\chi^2(%d) = %.1f', chi2_0, i1, chi2_min), 10);</span>
+0214     <span class="comment">%addlabel(1, 0, sprintf('\\Delta \\chi^2(BPM) = %.1f   \\Delta \\chi^2(FitParameters) = %.1f', chi2_bpm - chi2_min, chi2_par - chi2_min), 10);</span>
+0215 <span class="keyword">end</span>
+0216 
+0217</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

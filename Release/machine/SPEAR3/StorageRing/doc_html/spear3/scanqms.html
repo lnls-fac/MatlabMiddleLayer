@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of scanqms</title>
+  <meta name="keywords" content="scanqms">
+  <meta name="description" content="shunt quads around ring and record rms values">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; scanqms.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>scanqms
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>shunt quads around ring and record rms values</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">shunt quads around ring and record rms values</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setorbitdefault.html" class="code" title="function setorbitdefault(varargin)">setorbitdefault</a>	setorbitdefault(Evectors {1e-4}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%shunt quads around ring and record rms values</span>
+0002 
+0003 xdata=[];
+0004 ydata=[];
+0005 
+0006 qmsinit;
+0007 QMSData = getappdata(0,<span class="string">'QMSData'</span>);
+0008 names = QMSData.FamilyDeviceChannelTbl(:,1);
+0009 
+0010 index = sort([find(strcmp(names,<span class="string">'QF'</span>)); find(strcmp(names,<span class="string">'QFC'</span>));<span class="keyword">...</span>
+0011               find(strcmp(names,<span class="string">'QDX'</span>));find(strcmp(names,<span class="string">'QFY'</span>));find(strcmp(names,<span class="string">'QFZ'</span>))]);
+0012 
+0013 <span class="comment">%index=index([1:24]);</span>
+0014 <span class="comment">%measure initial orbit</span>
+0015 xref=getam(<span class="string">'BPMx'</span>);
+0016 yref=getam(<span class="string">'BPMy'</span>);
+0017 
+0018 <span class="comment">%loop through quad shunts</span>
+0019 
+0020 ExtraDelay=0.1;
+0021 QuadDelta=8;
+0022 NumQuads = length(index);
+0023 
+0024 stdvectx=zeros(NumQuads,1);
+0025 stdvecty=zeros(NumQuads,1);
+0026 
+0027 devlist=getlist(<span class="string">'BPMx'</span>);
+0028 <span class="keyword">for</span> k=1:NumQuads
+0029     <a href="setorbitdefault.html" class="code" title="function setorbitdefault(varargin)">setorbitdefault</a>(<span class="string">'Fitrf'</span>);
+0030     disp([<span class="string">'   shunting quadrupole number '</span> num2str(k) <span class="string">' of '</span> num2str(NumQuads)]);
+0031     <span class="comment">%extract quad data</span>
+0032     iqms=index(k);
+0033     QMS.QuadFamily=QMSData.FamilyDeviceChannelTbl{iqms,1};
+0034     QMS.QuadDev=QMSData.FamilyDeviceChannelTbl{iqms,2};
+0035     
+0036     <span class="comment">%shunt quad</span>
+0037     setqms(QMS.QuadFamily, QuadDelta, QMS.QuadDev);
+0038     sleep(ExtraDelay);
+0039     
+0040     <span class="comment">%measure orbit shift</span>
+0041     x=getam(<span class="string">'BPMx'</span>);
+0042     y=getam(<span class="string">'BPMy'</span>);
+0043     setqms(QMS.QuadFamily, 0, QMS.QuadDev);
+0044 
+0045     <span class="comment">%remove bad bpms</span>
+0046     <span class="comment">%eliminate bad bpms [10 4] and [12 4]</span>
+0047     indx=(1:size(devlist,1))';
+0048     [iFound,iNotFound]=findrowindex([10 4; 12 4],devlist);
+0049     indx(iFound)=[];
+0050 
+0051     deltax=x-xref;
+0052     deltax=deltax(indx);
+0053     deltay=y-yref;
+0054     deltay=deltay(indx);
+0055     
+0056     stdx=1000*std(deltax);
+0057     stdy=1000*std(deltay);
+0058     maxx=1000*max(abs(deltax));
+0059     maxy=1000*max(abs(deltay));
+0060     
+0061     <span class="comment">%display rms value</span>
+0062     disp(<span class="string">'   Warning: STD computed without BPMs [10 4], [12 4]'</span>)
+0063     disp([<span class="string">'  Quadrupole: '</span> QMS.QuadFamily <span class="string">' ['</span> num2str(QMS.QuadDev(1)) <span class="string">' '</span> num2str(QMS.QuadDev(2)) <span class="string">']'</span><span class="keyword">...</span>
+0064          <span class="string">'   Horizontal rms: '</span> num2str(stdx) <span class="string">'   Vertical rms: '</span> num2str(stdy)]);
+0065     disp(<span class="string">' '</span>);
+0066     
+0067     QMS.QuadFamily=char(QMS.QuadFamily,<span class="string">'abc'</span>);
+0068     xdata.quad(k,:)=QMS.QuadFamily(1,:);
+0069     xdata.devlist(k,:)=QMS.QuadDev;
+0070     xdata.std(k)=stdx;
+0071     xdata.max(k)=maxx;
+0072 
+0073     ydata.quad(k,:)=QMS.QuadFamily(1,:);
+0074     ydata.devlist(k,:)=QMS.QuadDev;
+0075     ydata.std(k)=stdy;
+0076     ydata.max(k)=maxy;
+0077 <span class="keyword">end</span>
+0078 
+0079 figure
+0080 subplot(2,1,1)
+0081 stem(xdata.std)
+0082 title(<span class="string">'horizontal std due to shunts: BPM [10 4] and [12 4] excluded'</span>)
+0083 xlabel(<span class="string">'Quadrupole index'</span>)
+0084 ylabel(<span class="string">'std orbit shift (micron)'</span>)
+0085 subplot(2,1,2)
+0086 stem(ydata.std)
+0087 title(<span class="string">'vertical std due to shunts: BPM [10 4] and [12 4] excluded'</span>)
+0088 xlabel(<span class="string">'Quadrupole index'</span>)
+0089 ylabel(<span class="string">'std orbit shift (micron)'</span>)</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gtrack</title>
+  <meta name="keywords" content="gtrack">
+  <meta name="description" content="GTRACK Track mouse position and show coordinates in figure title.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; gtrack.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>gtrack
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GTRACK Track mouse position and show coordinates in figure title.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function gtrack(select) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GTRACK Track mouse position and show coordinates in figure title.
+
+    GTRACK Activates GTRACK. Once it is active the mouse position is
+    constantly tracked and printed on the figure title. A left-click will
+    print the coordinates in the command line and store them in clickData.
+    GTRACK OFF or clicking the mouse's right button deactivates GTRACK.
+
+
+ 2007 Jose F. Pina, Portugal
+ 
+ REVISION 
+    23-May-2007 - created
+
+ CREDITS
+    based on GTRACE
+    http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=3832&amp;objectType=file
+     Furi Andi Karnapi and Lee Kong Aik
+     DSP Lab, School of EEE, Nanyang Technological University
+     Singapore, March 2002</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function GTrack_OnMouseMove</a></li><li><a href="#_sub2" class="code">function GTrack_OnMouseDown</a></li><li><a href="#_sub3" class="code">function GTrack_Off</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function gtrack(select)</a>
+0002 <span class="comment">%GTRACK Track mouse position and show coordinates in figure title.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%    GTRACK Activates GTRACK. Once it is active the mouse position is</span>
+0005 <span class="comment">%    constantly tracked and printed on the figure title. A left-click will</span>
+0006 <span class="comment">%    print the coordinates in the command line and store them in clickData.</span>
+0007 <span class="comment">%    GTRACK OFF or clicking the mouse's right button deactivates GTRACK.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% 2007 Jose F. Pina, Portugal</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% REVISION</span>
+0013 <span class="comment">%    23-May-2007 - created</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% CREDITS</span>
+0016 <span class="comment">%    based on GTRACE</span>
+0017 <span class="comment">%    http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=3832&amp;objectType=file</span>
+0018 <span class="comment">%     Furi Andi Karnapi and Lee Kong Aik</span>
+0019 <span class="comment">%     DSP Lab, School of EEE, Nanyang Technological University</span>
+0020 <span class="comment">%     Singapore, March 2002</span>
+0021 
+0022 <span class="keyword">if</span> nargin==0;
+0023     
+0024     currFcn = get(gcf, <span class="string">'windowbuttonmotionfcn'</span>);
+0025     currFcn2 = get(gcf, <span class="string">'windowbuttondownfcn'</span>);
+0026     currTitle = get(get(gca, <span class="string">'Title'</span>), <span class="string">'String'</span>);
+0027 
+0028     handles = guidata(gca);
+0029     <span class="keyword">if</span> (isfield(handles,<span class="string">'ID'</span>) &amp; handles.ID==1)
+0030         disp(<span class="string">'GTrack is already active.'</span>);
+0031         <span class="keyword">return</span>;
+0032     <span class="keyword">else</span>
+0033         handles.ID = 1;
+0034         <span class="comment">%disp('GTrack started.');</span>
+0035     <span class="keyword">end</span>
+0036 
+0037     handles.currFcn = currFcn;
+0038     handles.currFcn2 = currFcn2;
+0039     handles.currTitle = currTitle;
+0040     handles.theState = uisuspend(gcf);
+0041     guidata(gca, handles);
+0042 
+0043     set(gcf,<span class="string">'Pointer'</span>,<span class="string">'crosshair'</span>);
+0044     set(gcf, <span class="string">'windowbuttonmotionfcn'</span>, <span class="string">'GTrack(''OnMouseMove'')'</span>);        
+0045     set(gcf, <span class="string">'windowbuttondownfcn'</span>, <span class="string">'GTrack(''OnMouseDown'')'</span>);          
+0046     
+0047 <span class="keyword">else</span>
+0048    <span class="keyword">switch</span> select
+0049    <span class="keyword">case</span> <span class="string">'OnMouseMove'</span>
+0050        <a href="#_sub1" class="code" title="subfunction GTrack_OnMouseMove">GTrack_OnMouseMove</a>;
+0051    <span class="keyword">case</span> <span class="string">'OnMouseDown'</span>
+0052        <a href="#_sub2" class="code" title="subfunction GTrack_OnMouseDown">GTrack_OnMouseDown</a>;
+0053    <span class="keyword">case</span> <span class="string">'off'</span>
+0054        <a href="#_sub3" class="code" title="subfunction GTrack_Off">GTrack_Off</a>
+0055    <span class="keyword">end</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 <span class="comment">%---------------------------------------------------------------------------------------</span>
+0059 <a name="_sub1" href="#_subfunctions" class="code">function GTrack_OnMouseMove</a>
+0060 
+0061 <span class="keyword">global</span> xInd yInd;
+0062 
+0063 pt = get(gca, <span class="string">'CurrentPoint'</span>);
+0064 xInd = pt(1, 1);
+0065 yInd = pt(1, 2);
+0066 xLim = get(gca, <span class="string">'XLim'</span>);
+0067 yLim = get(gca, <span class="string">'YLim'</span>);
+0068 
+0069 <span class="keyword">if</span> xInd &lt; xLim(1) | xInd &gt; xLim(2)
+0070     title(<span class="string">'Out of X limit'</span>);
+0071     <span class="keyword">return</span>;
+0072 <span class="keyword">end</span>
+0073 <span class="keyword">if</span> yInd &lt; yLim(1) | yInd &gt; yLim(2)
+0074     title(<span class="string">'Out of Y limit'</span>);
+0075     <span class="keyword">return</span>;
+0076 <span class="keyword">end</span>
+0077 
+0078 title([<span class="string">'X = '</span> num2str(xInd) <span class="string">', Y = '</span> num2str(yInd)]);
+0079 
+0080 <span class="comment">%---------------------------------------------------------------------------------------</span>
+0081 <a name="_sub2" href="#_subfunctions" class="code">function GTrack_OnMouseDown</a>
+0082 
+0083 <span class="keyword">global</span> xInd yInd clickData
+0084 
+0085 <span class="keyword">if</span> strcmp(get(gcf,<span class="string">'SelectionType'</span>),<span class="string">'alt'</span>)
+0086     <a href="#_sub3" class="code" title="subfunction GTrack_Off">GTrack_Off</a>
+0087     <span class="keyword">return</span>
+0088 <span class="keyword">end</span>
+0089 
+0090 clickData(end+1).x = xInd;
+0091 clickData(end).y = yInd;
+0092 fprintf(<span class="string">'clickData(%d): X = %f   Y = %f\n'</span>,length(clickData),xInd,yInd);
+0093 
+0094 
+0095 
+0096 <span class="comment">%--------------------------------------------------------------------------</span>
+0097 <a name="_sub3" href="#_subfunctions" class="code">function GTrack_Off</a>
+0098 
+0099 <span class="keyword">global</span> xInd yInd clickData
+0100 
+0101 handles = guidata(gca);
+0102 set(gcf, <span class="string">'windowbuttonmotionfcn'</span>, handles.currFcn);
+0103 set(gcf, <span class="string">'windowbuttondownfcn'</span>, handles.currFcn2);
+0104 set(gcf,<span class="string">'Pointer'</span>,<span class="string">'arrow'</span>);
+0105 title(handles.currTitle);
+0106 uirestore(handles.theState);
+0107 handles.ID=0;
+0108 guidata(gca,handles);
+0109 assignin(<span class="string">'base'</span>,<span class="string">'clickData'</span>,clickData);
+0110 clear <span class="keyword">global</span> clickData xInd yInd</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

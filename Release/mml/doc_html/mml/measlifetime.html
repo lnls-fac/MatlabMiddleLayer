@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measlifetime</title>
+  <meta name="keywords" content="measlifetime">
+  <meta name="description" content="MEASLIFETIME - Measures the lifetime using an exponential least squares fit to beam current">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measlifetime.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measlifetime
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASLIFETIME - Measures the lifetime using an exponential least squares fit to beam current</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Tau, I0, t, DCCT] = measlifetime(t, DCCT, Tmin, Nmin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MEASLIFETIME - Measures the lifetime using an exponential least squares fit to beam current
+  [Tau, I0, t, DCCT] = measlifetime(t, DCCT)
+  [Tau, I0, t, DCCT] = measlifetime(t)
+  [Tau, I0, t, DCCT] = measlifetime
+
+  INPUTS #1 - t is a vector or positive scalar
+  1. t    = a.  If vector, time [seconds] (vector input)
+            b.  If scalar and t &gt; 0, length of time in seconds to measure current
+                Default sample period is .5 seconds.
+  2. DCCT = current vector [mAmps]
+            if the DCCT vector is empty then this function will
+            get the current using getdcct at the times defined in t
+
+     or
+
+  [Tau, I0, t, DCCT] = measlifetime(DCCT_Drop, Tmax, Tmin, Nmin)
+
+  INPUTS #2 - &quot;t&quot; is negative
+  1. DCCT_Drop - If DCCT_Drop is scalar and DCCT_Drop &lt;= 0, then the beam current will be
+                 monitored until the current is DCCT_Drop.  Default sample period is .5 seconds.
+                 Default:  Monitor the beam current until current drops 60 uA
+                           (At Spear sigma(DCCT) = 0.001 mA)
+  2. Tmax - Maximum time to measure DCCT {Default: inf}
+  3. Tmin - Minimum time to measure DCCT {Default: 0}
+  4. Nmin - Minimum number of unique data points when monitoring DCCT drop {Default: 6}
+  
+     The goal is to measure the current until a current drop of DCCT_Drop is achived.  However, the
+     time that takes will never goes above Tmax.  And if DCCT_Drop is achived then the measurement will
+     continue until Tmin or Nmin points is achieved (but not exceeding Tmax).
+
+
+  OUTPUTS
+  DCCTfit = I0 * exp(-t/Tau); 
+  1. Tau  - Computed lifetime   [hours]
+  2. I0   - Computed            [mAmps]
+  3. DCCT - Beam current vector [mAmps]
+  4. t    - Actual time         [Seconds]
+
+
+  NOTE
+  1. If no output exists, the beam current and fit will be plotted to the screen
+     as well as the residual of the DCCT.
+  2. DCCT is assumed to be in mAmps</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Tau, I0, t, DCCT] = measlifetime(t, DCCT, Tmin, Nmin) </a>
+0002 <span class="comment">%MEASLIFETIME - Measures the lifetime using an exponential least squares fit to beam current</span>
+0003 <span class="comment">%  [Tau, I0, t, DCCT] = measlifetime(t, DCCT)</span>
+0004 <span class="comment">%  [Tau, I0, t, DCCT] = measlifetime(t)</span>
+0005 <span class="comment">%  [Tau, I0, t, DCCT] = measlifetime</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS #1 - t is a vector or positive scalar</span>
+0008 <span class="comment">%  1. t    = a.  If vector, time [seconds] (vector input)</span>
+0009 <span class="comment">%            b.  If scalar and t &gt; 0, length of time in seconds to measure current</span>
+0010 <span class="comment">%                Default sample period is .5 seconds.</span>
+0011 <span class="comment">%  2. DCCT = current vector [mAmps]</span>
+0012 <span class="comment">%            if the DCCT vector is empty then this function will</span>
+0013 <span class="comment">%            get the current using getdcct at the times defined in t</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%     or</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  [Tau, I0, t, DCCT] = measlifetime(DCCT_Drop, Tmax, Tmin, Nmin)</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  INPUTS #2 - &quot;t&quot; is negative</span>
+0020 <span class="comment">%  1. DCCT_Drop - If DCCT_Drop is scalar and DCCT_Drop &lt;= 0, then the beam current will be</span>
+0021 <span class="comment">%                 monitored until the current is DCCT_Drop.  Default sample period is .5 seconds.</span>
+0022 <span class="comment">%                 Default:  Monitor the beam current until current drops 60 uA</span>
+0023 <span class="comment">%                           (At Spear sigma(DCCT) = 0.001 mA)</span>
+0024 <span class="comment">%  2. Tmax - Maximum time to measure DCCT {Default: inf}</span>
+0025 <span class="comment">%  3. Tmin - Minimum time to measure DCCT {Default: 0}</span>
+0026 <span class="comment">%  4. Nmin - Minimum number of unique data points when monitoring DCCT drop {Default: 6}</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%     The goal is to measure the current until a current drop of DCCT_Drop is achived.  However, the</span>
+0029 <span class="comment">%     time that takes will never goes above Tmax.  And if DCCT_Drop is achived then the measurement will</span>
+0030 <span class="comment">%     continue until Tmin or Nmin points is achieved (but not exceeding Tmax).</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%  OUTPUTS</span>
+0034 <span class="comment">%  DCCTfit = I0 * exp(-t/Tau);</span>
+0035 <span class="comment">%  1. Tau  - Computed lifetime   [hours]</span>
+0036 <span class="comment">%  2. I0   - Computed            [mAmps]</span>
+0037 <span class="comment">%  3. DCCT - Beam current vector [mAmps]</span>
+0038 <span class="comment">%  4. t    - Actual time         [Seconds]</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%  NOTE</span>
+0042 <span class="comment">%  1. If no output exists, the beam current and fit will be plotted to the screen</span>
+0043 <span class="comment">%     as well as the residual of the DCCT.</span>
+0044 <span class="comment">%  2. DCCT is assumed to be in mAmps</span>
+0045 
+0046 <span class="comment">%  Written by Greg Portmann</span>
+0047 
+0048 
+0049 T_Seconds = .5;     <span class="comment">% Default sample period [Seconds]</span>
+0050 TmaxDefault = inf;  <span class="comment">% Maximum time</span>
+0051 TminDefault = 0;    <span class="comment">% Minimum time</span>
+0052 NminDefault = 6;    <span class="comment">% Minimum number of data points</span>
+0053 
+0054 
+0055 <span class="comment">% Input parsing</span>
+0056 Tmax = [];
+0057 <span class="keyword">if</span> nargin == 0
+0058     MonitorFlag = 2;
+0059     deltaDCCT = 60 * 0.001;
+0060     Tmin = TminDefault;
+0061     Tmax = TmaxDefault;
+0062     Nmin = NminDefault;
+0063     
+0064 <span class="keyword">elseif</span> nargin &gt;= 1
+0065     <span class="keyword">if</span> all(size(t)==[1 1])
+0066         <span class="keyword">if</span> t &gt; 0
+0067             MonitorFlag = 1;
+0068             t = 0:T_Seconds:t;
+0069             Tmax = TmaxDefault;
+0070         <span class="keyword">else</span>
+0071             MonitorFlag = 2;
+0072             deltaDCCT = abs(t);
+0073             <span class="keyword">if</span> nargin &gt;= 2
+0074                 Tmax = DCCT;
+0075             <span class="keyword">else</span>
+0076                 Tmax = [];
+0077             <span class="keyword">end</span>
+0078         <span class="keyword">end</span>
+0079         <span class="keyword">if</span> nargin &lt; 3
+0080             Tmin = [];
+0081         <span class="keyword">end</span>
+0082         <span class="keyword">if</span> nargin &lt; 4
+0083             Nmin = [];
+0084         <span class="keyword">end</span>
+0085         <span class="keyword">if</span> isempty(Tmax)
+0086             Tmax = TmaxDefault;
+0087         <span class="keyword">end</span>
+0088         <span class="keyword">if</span> isempty(Tmin)
+0089             Tmin = TminDefault;
+0090         <span class="keyword">end</span>
+0091         <span class="keyword">if</span> isempty(Nmin)
+0092             Nmin = NminDefault;
+0093         <span class="keyword">end</span>
+0094     <span class="keyword">else</span>
+0095         <span class="comment">% Time vector input</span>
+0096         <span class="keyword">if</span> nargin &lt; 2
+0097             MonitorFlag = 1;
+0098         <span class="keyword">else</span>
+0099             MonitorFlag = 0;
+0100         <span class="keyword">end</span>
+0101     <span class="keyword">end</span>
+0102 <span class="keyword">end</span>
+0103 
+0104 
+0105 <span class="keyword">if</span> MonitorFlag == 1
+0106     
+0107     <span class="comment">% Get DCCT data at a fix interval determined by the input vector t</span>
+0108     <span class="comment">%disp(['   Monitoring beam current for ', num2str(t(length(t))), ' seconds.']);</span>
+0109     t0 = gettime;
+0110     <span class="keyword">for</span> j = 1:length(t)
+0111         T = t(j) - (gettime-t0);
+0112         <span class="keyword">if</span> T &gt; 0
+0113             pause(T);
+0114         <span class="keyword">end</span>
+0115         tout(j,1) = gettime - t0;    
+0116         DCCT(j,1) = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>;
+0117     <span class="keyword">end</span>
+0118     
+0119 <span class="keyword">elseif</span> MonitorFlag == 2
+0120     
+0121     <span class="comment">% Monitor for a fixed DCCT drop</span>
+0122     <span class="comment">%disp(['   Monitoring beam current until current drops by more than ', num2str(deltaDCCT), ' mA.']);</span>
+0123     j = 1;
+0124     n = 1;
+0125     tout(n,1) = 0;
+0126     DCCT(n,1) = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>;
+0127     t0 = gettime;
+0128     t0_Display = 0;
+0129     <span class="keyword">while</span> ((abs(DCCT(<span class="keyword">end</span>,1)-DCCT(1,1)) &lt; deltaDCCT) &amp;&amp; (DCCT(<span class="keyword">end</span>,1) &gt; 0.1)) || n &lt; Nmin || (gettime-t0) &lt; Tmin
+0130         j = j+1;
+0131         T = (j-1)*T_Seconds - (gettime-t0);
+0132         <span class="keyword">if</span> T &gt; 0
+0133             pause(T);
+0134         <span class="keyword">end</span>
+0135         DCCTnew = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>;
+0136         <span class="keyword">if</span> DCCTnew ~= DCCT(n)
+0137             n = n + 1;
+0138             tout(n,1) = gettime - t0;
+0139             DCCT(n,1) = DCCTnew;
+0140         <span class="keyword">end</span>
+0141         <span class="keyword">if</span> gettime-t0 &gt; Tmax
+0142             <span class="keyword">break</span>;
+0143         <span class="keyword">end</span>
+0144         <span class="keyword">if</span> gettime-t0_Display &gt; 10    
+0145             fprintf(<span class="string">'   Monitoring DCCT for lifetime measurement (%s)\n'</span>, datestr(clock,0));
+0146             t0_Display = gettime;
+0147         <span class="keyword">end</span>
+0148     <span class="keyword">end</span>
+0149     t = tout;
+0150 
+0151 <span class="keyword">end</span>
+0152 
+0153 
+0154 <span class="comment">% Column vectors</span>
+0155 DCCT = DCCT(:);
+0156 t = t(:);
+0157 
+0158 
+0159 <span class="comment">% Lookfor identical data in DCCT.  Some machine don't update at T_Sample and</span>
+0160 <span class="comment">% having the same reading twice is probably not so good for the LS fit.</span>
+0161 iExtra = find(diff(DCCT)==0);
+0162 DCCT(iExtra) = [];
+0163 t(iExtra) = [];
+0164 
+0165 <span class="keyword">if</span> length(DCCT) &lt; 2
+0166     Tau = NaN;
+0167     I0 = NaN;
+0168     fprintf(<span class="string">'   Only 1 unique DCCT reading, hence Tau is set to NaN.\n'</span>);
+0169     <span class="comment">%error('There must be at least 2 unique point to fit a lifetime.');</span>
+0170     <span class="keyword">return</span>
+0171 <span class="keyword">end</span>
+0172     
+0173     
+0174 <span class="comment">% LS fit</span>
+0175 y = log(DCCT);
+0176 X = [ones(size(t)) t];
+0177 
+0178 
+0179 <span class="comment">% yfit = exp(B(1))*exp(B(2)*tfit);</span>
+0180 B = inv(X'*X)*X'*y;     <span class="comment">% Least squares fit</span>
+0181 I0 = exp(B(1));  
+0182 Tau = -1/B(2)/60/60;    <span class="comment">% In hours</span>
+0183 
+0184 
+0185 <span class="keyword">if</span> isnan(Tau)
+0186     fprintf(<span class="string">'   Life time measurement is inaccurate!\n'</span>);
+0187 <span class="keyword">end</span>
+0188 
+0189 
+0190 <span class="keyword">if</span> nargout == 0
+0191     <span class="comment">%disp(['   Lifetime is ', num2str(Tau),' hours.']);</span>
+0192     
+0193     tfit = linspace(t(1),t(size(t,1)),500);
+0194     tfit = t;
+0195     yfit = exp(B(1))*exp(B(2)*tfit); 
+0196     
+0197     clf reset
+0198     subplot(2,1,1)
+0199     plot(t,DCCT,<span class="string">'o-b'</span>, tfit,yfit,<span class="string">'--r'</span>);
+0200     title([<span class="string">'Beam Current vs Time: Lifetime='</span>, num2str(Tau),<span class="string">' hours.'</span>])
+0201     xlabel(<span class="string">'Time [seconds]'</span>); 
+0202     ylabel(<span class="string">'Beam Current [mAmps]'</span>);
+0203     legend(<span class="string">'Measured Beam Current'</span>,<span class="string">'Least Squares Fit'</span>,0);
+0204 
+0205     subplot(2,1,2)
+0206     plot(t,(DCCT-yfit));
+0207     title([<span class="string">'Residual Error (RMS = '</span> num2str(std(DCCT-yfit),<span class="string">'%.2g'</span>) <span class="string">' mA)'</span>]);
+0208     xlabel(<span class="string">'Time [seconds]'</span>); 
+0209     ylabel(<span class="string">'Lifetime Corrected Beam Current Variation'</span>);
+0210     
+0211     addlabel(1,0, datestr(clock,0));
+0212 <span class="keyword">end</span>
+0213 
+0214 
+0215 <span class="comment">%N = max(size(DCCT));</span>
+0216 <span class="comment">%slope=(DCCT(N)-DCCT(1))/(t(N)-t(1));</span>
+0217 <span class="comment">%Tau2=-DCCT(1)/slope/60/60</span>
+0218 <span class="comment">%Tau3=-DCCT(N)/slope/60/60</span>
+0219</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gev2bend</title>
+  <meta name="keywords" content="gev2bend">
+  <meta name="description" content="GEV2BEND - Compute the energy based on the ramp tables">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; gev2bend.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>gev2bend
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GEV2BEND - Compute the energy based on the ramp tables</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function Amps = gev2bend(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GEV2BEND - Compute the energy based on the ramp tables
+ Bend = gev2bend(Family, Field, GeV, DeviceList, BranchFlag)
+
+  INPUTS
+  1. Bend - Bend magnet family {Optional}
+  2. Field - Field {Optional}
+  3. GeV - Electron beam energy [GeV]
+  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}
+  5. BranchFlag - 1 -&gt; Lower branch
+                  2 -&gt; Upper branch {Default}
+
+  OUTPUTS
+  1. Bend - Bend magnet current [Amps]
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Amps = gev2bend(varargin)</a>
+0002 <span class="comment">%GEV2BEND - Compute the energy based on the ramp tables</span>
+0003 <span class="comment">% Bend = gev2bend(Family, Field, GeV, DeviceList, BranchFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Bend - Bend magnet family {Optional}</span>
+0007 <span class="comment">%  2. Field - Field {Optional}</span>
+0008 <span class="comment">%  3. GeV - Electron beam energy [GeV]</span>
+0009 <span class="comment">%  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}</span>
+0010 <span class="comment">%  5. BranchFlag - 1 -&gt; Lower branch</span>
+0011 <span class="comment">%                  2 -&gt; Upper branch {Default}</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  OUTPUTS</span>
+0014 <span class="comment">%  1. Bend - Bend magnet current [Amps]</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  Written by Greg Portmann</span>
+0017 
+0018 
+0019 <span class="comment">% Default</span>
+0020 Family = <span class="string">''</span>;
+0021 Field = <span class="string">''</span>;
+0022 GeV = [];
+0023 DeviceList = [];
+0024 BranchFlag = [];
+0025 ModeFlag = <span class="string">''</span>;  <span class="comment">% model, online, manual</span>
+0026 UnitsFlag = <span class="string">''</span>; <span class="comment">% hardware, physics</span>
+0027 <span class="keyword">for</span> i = length(varargin):-1:1
+0028     <span class="keyword">if</span> isstruct(varargin{i})
+0029         <span class="comment">% Ignor structures</span>
+0030     <span class="keyword">elseif</span> iscell(varargin{i})
+0031         <span class="comment">% Ignor cells</span>
+0032     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0033         varargin(i) = [];
+0034     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0035         varargin(i) = [];
+0036     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0037         UnitsFlag = varargin{i};
+0038         varargin(i) = [];
+0039     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0040         UnitsFlag = varargin{i};
+0041         varargin(i) = [];
+0042     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>)
+0043         ModeFlag = varargin{i};
+0044         varargin(i) = [];
+0045     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0046         ModeFlag = varargin{i};
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0049         ModeFlag = varargin{i};
+0050         varargin(i) = [];
+0051     <span class="keyword">end</span>        
+0052 <span class="keyword">end</span>
+0053 
+0054 
+0055 <span class="keyword">if</span> length(varargin) &gt;= 1
+0056     <span class="keyword">if</span> ischar(varargin{1})
+0057         Family = varargin{1};
+0058         varargin(1) = [];
+0059     <span class="keyword">else</span>
+0060         GeV = varargin{1};
+0061         varargin(1) = [];
+0062         <span class="keyword">if</span> length(varargin) &gt;= 1
+0063             DeviceList = varargin{1};
+0064             varargin(1) = [];
+0065         <span class="keyword">end</span>
+0066         <span class="keyword">if</span> length(varargin) &gt;= 1
+0067             BranchFlag = varargin{1};
+0068             varargin(1:end) = [];
+0069         <span class="keyword">end</span>
+0070     <span class="keyword">end</span>
+0071 <span class="keyword">end</span>
+0072 <span class="keyword">if</span> length(varargin) &gt;= 1 &amp; ischar(varargin{1})
+0073     Field = varargin{1};
+0074     varargin(1) = [];
+0075 <span class="keyword">end</span>
+0076 <span class="keyword">if</span> length(varargin) &gt;= 1
+0077     GeV = varargin{1};
+0078     varargin(1) = [];
+0079 <span class="keyword">end</span>
+0080 <span class="keyword">if</span> length(varargin) &gt;= 1
+0081     DeviceList = varargin{1};
+0082     varargin(1) = [];
+0083 <span class="keyword">end</span>
+0084 <span class="keyword">if</span> length(varargin) &gt;= 1
+0085     BranchFlag = varargin{1};
+0086     varargin(1) = [];
+0087 <span class="keyword">end</span>
+0088 
+0089 
+0090 <span class="keyword">if</span> isempty(Family)
+0091     Family = <span class="string">'BEND'</span>;
+0092 <span class="keyword">end</span>
+0093 <span class="keyword">if</span> isempty(Field)
+0094     Field = <span class="string">'Setpoint'</span>;
+0095 <span class="keyword">end</span>
+0096 
+0097 <span class="keyword">if</span> isempty(UnitsFlag)
+0098     UnitsFlag = getunits(Family);
+0099 <span class="keyword">end</span>
+0100 
+0101 <span class="keyword">if</span> isempty(GeV)
+0102     <span class="keyword">if</span> isempty(ModeFlag)
+0103         ModeFlag = getmode(Family);
+0104     <span class="keyword">end</span>
+0105     <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'simulator'</span>) | strcmpi(ModeFlag,<span class="string">'model'</span>)
+0106         GeV = getenergymodel;
+0107     <span class="keyword">else</span>
+0108         error(<span class="string">'GeV input required'</span>);
+0109     <span class="keyword">end</span>
+0110 <span class="keyword">end</span>
+0111 
+0112 <span class="keyword">if</span> isempty(DeviceList)
+0113     DeviceList = family2dev(Family);
+0114     <span class="keyword">if</span> all(size(GeV)==[1 1])
+0115         DeviceList = DeviceList(1,:);
+0116     <span class="keyword">end</span>
+0117 <span class="keyword">end</span>
+0118 
+0119 
+0120 <span class="comment">% Hysteresis branch</span>
+0121 <span class="keyword">if</span> isempty(BranchFlag)
+0122     <span class="keyword">if</span> strcmpi(getfamilydata(<span class="string">'HysteresisBranch'</span>),<span class="string">'Lower'</span>)
+0123         <span class="comment">% Lower branch</span>
+0124         BranchFlag = 1;
+0125     <span class="keyword">else</span>
+0126         <span class="comment">% Upper branch (default)</span>
+0127         BranchFlag = 2;
+0128     <span class="keyword">end</span>
+0129 <span class="keyword">else</span>
+0130     <span class="keyword">if</span> char(BranchFlag)
+0131         <span class="keyword">if</span> strcmpi(BranchFlag, <span class="string">'Lower'</span>)
+0132             <span class="comment">% Lower branch</span>
+0133             BranchFlag = 1;
+0134         <span class="keyword">elseif</span> strcmpi(BranchFlag, <span class="string">'Upper'</span>)
+0135             <span class="comment">% Upper branch</span>
+0136             BranchFlag = 2;
+0137         <span class="keyword">end</span>
+0138     <span class="keyword">end</span>
+0139 <span class="keyword">end</span>
+0140 
+0141 <span class="comment">% End of input checking</span>
+0142 <span class="comment">% Machine dependant stuff below</span>
+0143 
+0144 
+0145 <span class="comment">% Get the proper table</span>
+0146 <span class="comment">% The tables are normalized:  Setpoints = RampTable * (Upper-Lower) + Lower</span>
+0147 DirectoryName = getfamilydata(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0148 <span class="keyword">if</span> BranchFlag == 1
+0149     <span class="comment">% Lower branch</span>
+0150     load([DirectoryName <span class="string">'alsrampup'</span>]);
+0151 <span class="keyword">else</span>
+0152     <span class="comment">% Upper branch</span>
+0153     load([DirectoryName <span class="string">'alsrampdown'</span>]);
+0154 <span class="keyword">end</span>
+0155 
+0156 
+0157 <span class="comment">% % Get the initial and final lattices</span>
+0158 <span class="comment">% FileName = getfamilydata('OpsData', 'LatticeFile');</span>
+0159 <span class="comment">% DirectoryName = getfamilydata('Directory', 'OpsData');</span>
+0160 <span class="comment">% load([DirectoryName FileName]);</span>
+0161 <span class="comment">% if strcmpi(Field, 'Monitor')</span>
+0162 <span class="comment">%     SPProduction = ConfigMonitor;</span>
+0163 <span class="comment">% else</span>
+0164 <span class="comment">%     SPProduction = ConfigSetpoint;</span>
+0165 <span class="comment">% end</span>
+0166 <span class="comment">%</span>
+0167 <span class="comment">% FileName = getfamilydata('OpsData', 'InjectionFile');</span>
+0168 <span class="comment">% DirectoryName = getfamilydata('Directory', 'OpsData');</span>
+0169 <span class="comment">% load([DirectoryName FileName]);</span>
+0170 <span class="comment">% if strcmpi(Field, 'Monitor')</span>
+0171 <span class="comment">%     SPInjection = ConfigMonitor;</span>
+0172 <span class="comment">% else</span>
+0173 <span class="comment">%     SPInjection = ConfigSetpoint;</span>
+0174 <span class="comment">% end</span>
+0175 
+0176 
+0177 <span class="comment">% Setpoints = RampTable * (Upper-Lower) + Lower</span>
+0178 UpperLattice = RampTable.UpperLattice.(Field).(Family).(Field).Data;
+0179 LowerLattice = RampTable.LowerLattice.(Field).(Family).(Field).Data;
+0180 iDevUpper = findrowindex(DeviceList, RampTable.UpperLattice.(Field).(Family).(Field).DeviceList);
+0181 iDevLower = findrowindex(DeviceList, RampTable.LowerLattice.(Field).(Family).(Field).DeviceList);
+0182 
+0183 <span class="comment">% Convert to a absolute table</span>
+0184 MagnetTable = RampTable.(Family).(Field);
+0185 MagnetTable = (UpperLattice(iDevUpper) - LowerLattice(iDevLower)) * MagnetTable;
+0186 <span class="keyword">for</span> j = 1:size(MagnetTable,1)
+0187     MagnetTable(j,:) = MagnetTable(j,:) + LowerLattice(iDevLower(j));
+0188 <span class="keyword">end</span>
+0189 
+0190 iDevTotal      = findrowindex(DeviceList, family2dev(Family,0));
+0191 iDevInjection  = findrowindex(DeviceList, RampTable.LowerLattice.(Field).(Family).(Field).DeviceList);
+0192 iDevProduction = findrowindex(DeviceList, RampTable.UpperLattice.(Field).(Family).(Field).DeviceList);
+0193 
+0194 
+0195 <span class="keyword">for</span> i = 1:size(GeV,1)   <span class="comment">%length(iDevTotal)</span>
+0196     <span class="keyword">for</span> j = 1:size(GeV,2) 
+0197         
+0198         <span class="comment">%% Cubic if outside the table (just because cubic extends outside the table)</span>
+0199         <span class="comment">%if min(RampTable.GeV) &gt; GeV(i,j) | max(RampTable.GeV) &lt; GeV(i,j)</span>
+0200         <span class="comment">%    Amps(i,j) = interp1(RampTable.GeV, MagnetTable(i,:), GeV(i,j), 'cubic');</span>
+0201         <span class="comment">%else</span>
+0202         <span class="comment">%    Amps(i,j) = interp1(RampTable.GeV, MagnetTable(i,:), GeV(i,j));</span>
+0203         <span class="comment">%end</span>
+0204         
+0205         
+0206         <span class="comment">% Linear interpolation</span>
+0207         Amps(i,j) = interp1(RampTable.GeV, MagnetTable(i,:), GeV(i,j));
+0208         
+0209         <span class="keyword">if</span> isnan(Amps(i,j))
+0210             <span class="comment">% Linear interpolate by hand outside the table</span>
+0211             [AmpTbl,iSort] = sort(MagnetTable(i,:));
+0212             GeVTbl = RampTable.GeV(iSort);
+0213             
+0214             <span class="keyword">if</span> GeV(i,j) &gt; GeVTbl(end)
+0215                 <span class="comment">% Energy greater than table max</span>
+0216                 m = (AmpTbl(end)-AmpTbl(end-3)) / (GeVTbl(end) - GeVTbl(end-3));
+0217                 Amps(i,j) = m * (GeV(i,j) - GeVTbl(end)) + AmpTbl(end);
+0218             <span class="keyword">else</span>
+0219                 <span class="comment">% Energy less than table min</span>
+0220                 m = (AmpTbl(3)-AmpTbl(1)) / (GeVTbl(3) - GeVTbl(1));
+0221                 Amps(i,j) = m * (GeV(i,j) - GeVTbl(1)) + AmpTbl(1);                    
+0222             <span class="keyword">end</span>
+0223         <span class="keyword">end</span>
+0224                 
+0225         <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0226             Amps(i,j) = hw2physics(Family, <span class="string">'Setpoint'</span>, Amps(i,j), DeviceList, GeV(i,j));
+0227         <span class="keyword">end</span>
+0228     <span class="keyword">end</span>
+0229 <span class="keyword">end</span>
+0230</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

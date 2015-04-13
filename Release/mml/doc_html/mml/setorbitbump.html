@@ -1,0 +1,622 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setorbitbump</title>
+  <meta name="keywords" content="setorbitbump">
+  <meta name="description" content="SETORBITBUMP - Local bump program (uses setorbit)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setorbitbump.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setorbitbump
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETORBITBUMP - Local bump program (uses setorbit)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [OCS, OCS0, V, S, ErrorFlag] = setorbitbump(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETORBITBUMP - Local bump program (uses setorbit)
+  [OCS, OCS0, V, S] = setorbitbump(BPMFamily, BPMDeviceList, GoalOrbit, CMFamily, CMIncrementList, NIter, SVDIndex, BPMWeight)
+  [OCS, OCS0, V, S] = setorbitbump(OCS, GoalOrbit, CMIncrementList, NIter, SVDIndex, BPMWeight)
+
+  INPUTS
+  1. BPMFamily - BPM family
+  2. BPMDeviceList - BPM device list
+  3. GoalOrbit - Goal orbit position (Referenced to an absolute or incremental orbit 
+                                      depending on 'Incremental' or 'Absolute' flag)
+  4. CMFamily - Corrector magnet family
+  5. CMIncrementList - Magnet list upstream and downstream of the BPMs
+                       For instance, [-2 1 3] uses the 2nd correctors upstream and
+                       1st and 3rd corrector downstream from the BPMs in the bump.
+          or
+     CMIncrementList can be an ordinary device list used for specifying correctors.
+  6. NIter - Number of iterations  {Default: 3}
+            (set NIter to 0 if no BPMs are functioning, see setorbit)
+  7. SVDIndex - vector, maximum number, 'All', or
+                base on a threshold of min/max singular value {Default: see setorbit}
+  8. BPMWeight - Weight applied to the BPMs inside the bump (GoalOrbit).  BPM weighting
+                 should only be required when the corrector are in a region of dispersion
+                 and the RF frequency is not used in the orbit correction.
+                {Default BPMWeight is to weight the leakage twice as much as the GoalOrbit}
+  9. Optional flags (any flags used in setorbit can also be used here)
+     'Incremental' {Default} or 'Absolute' - Type of orbit change
+     'Display' - Display bump characteristics  (no display is the default)
+     'SetPV'   or 'SetSP'   - Make the setpoint change {Default}
+     'NoSetPV' or 'NoSetSP' - Don't set the magnets, just return the OCS
+     'FitRF' or 'SetRF' - Flag to include the RF frequency as part of orbit correction.
+     'LeakageCorrection' - Option to try to clean up the leakage after the bump is applied.
+                           Note: 1. NIter for leakage correction is the same for the bump
+                                 2. It's just like setting the weight to zero for a second set of iterations. 
+                                 3. For the horizontal plane, usually one should include the RF frequency
+                                    along with leakage correction.  Otherwise, the goal orbit may not be attained.
+     'Tolerance', Tol - Quit correction if the std(error) &lt; Tol {Tol: 0}
+     'RampSteps', NSteps - Number of steps to ramp in the correction {NSteps: 1}
+                                    This is used to avoid a large transient between setpoint changes.
+
+  OUTPUTS (same as setorbit)
+  1. OCS    - Orbit correction structure (OCS) usable by setorbit
+  2. OCS0   - Starting OCS
+  3. V      - Corrector magnet singular vectors
+  4. Svalue - Singular values (vector)
+
+  NOTES
+  1. setorbitbump creates an OCS structure and uses setorbit to actually change the orbit.
+
+  EXAMPLES
+  1. 4 magnet horizontal incremental bump at BPM(6,6) and BPM(7,1) including the RF frequency
+     OCS = setorbitbump('BPMx',[6 6;7 1],[1;-1],'HCM',[-2 -1 1 2],'FitRF', 'Display');
+     On 12-16-2003, [-2 -1 1 2] corresponded to HCM(6,3), HCM(6,4), HCM(7,1), HCM(7,3)
+     Display plots information before applying the bump.
+
+  2. If the response matrix is not perfect, a clean (minimal rms orbit error) bump can be created
+     by increasing the iteration (note: in regions of dispersion, all bumps will have leakage unless
+     the RF frequency is included).  
+     [OCS, OCS0] = setorbitbump('BPMx',[6 6;7 1],[1;-1],'HCM',[-2 -1 1 2], 4, 'Display');
+     DeltaHCM = OCS.CM.Data - OCS0.CM.Data;
+     BPMxDeviceList = OCS.BPM.DeviceList;
+     HCMDeviceList  = OCS.CM.DeviceList;
+
+  See also <a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>, <a href="orbitcorrectionmethods.html" class="code" title="function [OCS, SmatNoWeights, S, U, V] = orbitcorrectionmethods(OCS, Smat, S, U, V)">orbitcorrectionmethods</a>, <a href="setorbitgui.html" class="code" title="function varargout = setorbitgui(varargin)">setorbitgui</a>, <a href="rmdisp.html" class="code" title="function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)">rmdisp</a>, <a href="plotcm.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)">plotcm</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>	FAMILY2DATASTRUCTURE</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>	GETGOLDEN - Returns the golden values for a family</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>	GETMODE - Returns the present family mode ('Online', 'Simulator', 'Manual', 'Special', etc)</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li><li><a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>	GETVCMFAMILY - Returns the default vertical corrector family</li><li><a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>	SETORBIT - Orbit correction function</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="meascmhysteresis.html" class="code" title="function meascmhysteresis(BPMList, CMFamily, CMList, MaxChange, NSteps)">meascmhysteresis</a>	MEASCMHYSTERESIS - Measure corrector magnet hysteresis</li><li><a href="quadcenterfit.html" class="code" title="function [XOffset, YOffset] = quadcenterfit(varargin)">quadcenterfit</a>	QUADCENTERFIT OR BBASEARCH - Model search method to find a quarupole center</li><li><a href="setorbitbumpgui.html" class="code" title="function varargout = setorbitbumpgui(varargin)">setorbitbumpgui</a>	SETORBITBUMPGUI M-file for setorbitbumpgui.fig</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [OCS, OCS0, V, S, ErrorFlag] = setorbitbump(varargin)</a>
+0002 <span class="comment">%SETORBITBUMP - Local bump program (uses setorbit)</span>
+0003 <span class="comment">%  [OCS, OCS0, V, S] = setorbitbump(BPMFamily, BPMDeviceList, GoalOrbit, CMFamily, CMIncrementList, NIter, SVDIndex, BPMWeight)</span>
+0004 <span class="comment">%  [OCS, OCS0, V, S] = setorbitbump(OCS, GoalOrbit, CMIncrementList, NIter, SVDIndex, BPMWeight)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. BPMFamily - BPM family</span>
+0008 <span class="comment">%  2. BPMDeviceList - BPM device list</span>
+0009 <span class="comment">%  3. GoalOrbit - Goal orbit position (Referenced to an absolute or incremental orbit</span>
+0010 <span class="comment">%                                      depending on 'Incremental' or 'Absolute' flag)</span>
+0011 <span class="comment">%  4. CMFamily - Corrector magnet family</span>
+0012 <span class="comment">%  5. CMIncrementList - Magnet list upstream and downstream of the BPMs</span>
+0013 <span class="comment">%                       For instance, [-2 1 3] uses the 2nd correctors upstream and</span>
+0014 <span class="comment">%                       1st and 3rd corrector downstream from the BPMs in the bump.</span>
+0015 <span class="comment">%          or</span>
+0016 <span class="comment">%     CMIncrementList can be an ordinary device list used for specifying correctors.</span>
+0017 <span class="comment">%  6. NIter - Number of iterations  {Default: 3}</span>
+0018 <span class="comment">%            (set NIter to 0 if no BPMs are functioning, see setorbit)</span>
+0019 <span class="comment">%  7. SVDIndex - vector, maximum number, 'All', or</span>
+0020 <span class="comment">%                base on a threshold of min/max singular value {Default: see setorbit}</span>
+0021 <span class="comment">%  8. BPMWeight - Weight applied to the BPMs inside the bump (GoalOrbit).  BPM weighting</span>
+0022 <span class="comment">%                 should only be required when the corrector are in a region of dispersion</span>
+0023 <span class="comment">%                 and the RF frequency is not used in the orbit correction.</span>
+0024 <span class="comment">%                {Default BPMWeight is to weight the leakage twice as much as the GoalOrbit}</span>
+0025 <span class="comment">%  9. Optional flags (any flags used in setorbit can also be used here)</span>
+0026 <span class="comment">%     'Incremental' {Default} or 'Absolute' - Type of orbit change</span>
+0027 <span class="comment">%     'Display' - Display bump characteristics  (no display is the default)</span>
+0028 <span class="comment">%     'SetPV'   or 'SetSP'   - Make the setpoint change {Default}</span>
+0029 <span class="comment">%     'NoSetPV' or 'NoSetSP' - Don't set the magnets, just return the OCS</span>
+0030 <span class="comment">%     'FitRF' or 'SetRF' - Flag to include the RF frequency as part of orbit correction.</span>
+0031 <span class="comment">%     'LeakageCorrection' - Option to try to clean up the leakage after the bump is applied.</span>
+0032 <span class="comment">%                           Note: 1. NIter for leakage correction is the same for the bump</span>
+0033 <span class="comment">%                                 2. It's just like setting the weight to zero for a second set of iterations.</span>
+0034 <span class="comment">%                                 3. For the horizontal plane, usually one should include the RF frequency</span>
+0035 <span class="comment">%                                    along with leakage correction.  Otherwise, the goal orbit may not be attained.</span>
+0036 <span class="comment">%     'Tolerance', Tol - Quit correction if the std(error) &lt; Tol {Tol: 0}</span>
+0037 <span class="comment">%     'RampSteps', NSteps - Number of steps to ramp in the correction {NSteps: 1}</span>
+0038 <span class="comment">%                                    This is used to avoid a large transient between setpoint changes.</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">%  OUTPUTS (same as setorbit)</span>
+0041 <span class="comment">%  1. OCS    - Orbit correction structure (OCS) usable by setorbit</span>
+0042 <span class="comment">%  2. OCS0   - Starting OCS</span>
+0043 <span class="comment">%  3. V      - Corrector magnet singular vectors</span>
+0044 <span class="comment">%  4. Svalue - Singular values (vector)</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">%  NOTES</span>
+0047 <span class="comment">%  1. setorbitbump creates an OCS structure and uses setorbit to actually change the orbit.</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">%  EXAMPLES</span>
+0050 <span class="comment">%  1. 4 magnet horizontal incremental bump at BPM(6,6) and BPM(7,1) including the RF frequency</span>
+0051 <span class="comment">%     OCS = setorbitbump('BPMx',[6 6;7 1],[1;-1],'HCM',[-2 -1 1 2],'FitRF', 'Display');</span>
+0052 <span class="comment">%     On 12-16-2003, [-2 -1 1 2] corresponded to HCM(6,3), HCM(6,4), HCM(7,1), HCM(7,3)</span>
+0053 <span class="comment">%     Display plots information before applying the bump.</span>
+0054 <span class="comment">%</span>
+0055 <span class="comment">%  2. If the response matrix is not perfect, a clean (minimal rms orbit error) bump can be created</span>
+0056 <span class="comment">%     by increasing the iteration (note: in regions of dispersion, all bumps will have leakage unless</span>
+0057 <span class="comment">%     the RF frequency is included).</span>
+0058 <span class="comment">%     [OCS, OCS0] = setorbitbump('BPMx',[6 6;7 1],[1;-1],'HCM',[-2 -1 1 2], 4, 'Display');</span>
+0059 <span class="comment">%     DeltaHCM = OCS.CM.Data - OCS0.CM.Data;</span>
+0060 <span class="comment">%     BPMxDeviceList = OCS.BPM.DeviceList;</span>
+0061 <span class="comment">%     HCMDeviceList  = OCS.CM.DeviceList;</span>
+0062 <span class="comment">%</span>
+0063 <span class="comment">%  See also setorbit, orbitcorrectionmethods, setorbitgui, rmdisp, plotcm</span>
+0064 
+0065 <span class="comment">%  Written by Greg Portmann</span>
+0066 
+0067 
+0068 <span class="comment">%%%%%%%%%%%%</span>
+0069 <span class="comment">% Defaults %</span>
+0070 <span class="comment">%%%%%%%%%%%%</span>
+0071 OCS.BPM.FamilyName = [];
+0072 OCS.BPM.DeviceList = [];
+0073 GoalOrbit = [];
+0074 OCS.CM.FamilyName = [];
+0075 OCS.CM.DeviceList = [];
+0076 CMIncrementList = [];
+0077 OCS.NIter = 3;
+0078 BPMWeight = [];
+0079 OCS.Incremental = 1;
+0080 DisplayFlag = 0;
+0081 SetSPFlag = 1;
+0082 NoLeakageFlag = 0;
+0083 UnitsFlag = <span class="string">''</span>;
+0084 ModeFlag = <span class="string">''</span>;
+0085 
+0086 L = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0087 
+0088 
+0089 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0090 <span class="comment">% Input parsing and checking %</span>
+0091 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0092 Flags = {};
+0093 <span class="keyword">for</span> i = length(varargin):-1:1
+0094     <span class="keyword">if</span> isstruct(varargin{i})
+0095         <span class="comment">% Ignor structures</span>
+0096     <span class="keyword">elseif</span> iscell(varargin{i})
+0097         <span class="comment">% Ignor cells</span>
+0098     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Golden'</span>)
+0099         <span class="comment">% Use the golden orbit</span>
+0100         <span class="comment">%GoalOrbit = 'Golden';</span>
+0101         <span class="comment">%varargin(i) = [];</span>
+0102     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Offset'</span>)
+0103         <span class="comment">% Use the offset orbit</span>
+0104         <span class="comment">%GoalOrbit = 'Offset';</span>
+0105         <span class="comment">%varargin(i) = [];</span>
+0106     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0107         Flags = [Flags varargin(i)];
+0108         DisplayFlag = 1;
+0109         varargin(i) = [];
+0110     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0111         Flags = [Flags varargin(i)];
+0112         DisplayFlag = 0;
+0113         varargin(i) = [];
+0114     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Inc'</span>) || strcmpi(varargin{i},<span class="string">'Incremental'</span>)
+0115         OCS.Incremental = 1;
+0116         varargin(i) = [];
+0117     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Abs'</span>) || strcmpi(varargin{i},<span class="string">'Absolute'</span>)
+0118         OCS.Incremental = 0;
+0119         varargin(i) = [];
+0120     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>)
+0121         ModeFlag = <span class="string">'SIMULATOR'</span>;
+0122         varargin(i) = [];
+0123     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0124         ModeFlag = <span class="string">'Online'</span>;
+0125         varargin(i) = [];
+0126     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0127         ModeFlag = <span class="string">'Manual'</span>;
+0128         varargin(i) = [];
+0129     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0130         UnitsFlag = <span class="string">'Physics'</span>;
+0131         varargin(i) = [];
+0132     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0133         UnitsFlag = <span class="string">'Hardware'</span>;
+0134         varargin(i) = [];
+0135     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'SetPV'</span>,<span class="string">'SetSP'</span>}))
+0136         SetSPFlag = 1;
+0137         varargin(i) = [];
+0138     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'NoSetPV'</span>,<span class="string">'NoSetSP'</span>}))
+0139         SetSPFlag = 0;
+0140         Flags = [Flags varargin(i)];
+0141         varargin(i) = [];
+0142     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'LeakageCorrection'</span>)        
+0143         NoLeakageFlag = 1;
+0144         varargin(i) = [];
+0145         
+0146     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'archive'</span>) || strcmpi(varargin{i},<span class="string">'noarchive'</span>)
+0147         <span class="comment">% Just remove</span>
+0148         varargin(i) = [];
+0149     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>) || strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0150         <span class="comment">% Just remove</span>
+0151         varargin(i) = [];
+0152 
+0153     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'CorrectorGain'</span>)
+0154         Flags = [Flags varargin(i) varargin(i+1)];
+0155         varargin(i+1) = [];
+0156         varargin(i)   = [];
+0157 
+0158     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Tolerance'</span>)
+0159         Flags = [Flags varargin(i) varargin(i+1)];
+0160         varargin(i+1) = [];
+0161         varargin(i)   = [];
+0162 
+0163     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'RampSteps'</span>)
+0164         Flags = [Flags varargin(i) varargin(i+1)];
+0165         varargin(i+1) = [];
+0166         varargin(i)   = [];
+0167 
+0168     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'ModelResp'</span>)
+0169         Flags = [Flags varargin(i)];
+0170         varargin(i) = [];
+0171     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'ModelDisp'</span>)
+0172         Flags = [Flags varargin(i)];
+0173         varargin(i) = [];
+0174     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'MeasDisp'</span>)
+0175         Flags = [Flags varargin(i)];
+0176         varargin(i) = [];
+0177     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'GoldenDisp'</span>)
+0178         Flags = [Flags varargin(i)];
+0179         varargin(i) = [];
+0180         
+0181     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRF'</span>,<span class="string">'SetRF'</span>,<span class="string">'RFCorrector'</span>}))
+0182         Flags = [Flags varargin(i)];
+0183         varargin(i) = [];
+0184     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFHCM0'</span>,<span class="string">'FitRFEnergy'</span>,<span class="string">'SetRFHCM0'</span>,<span class="string">'SetRFEnergy'</span>}))
+0185         Flags = [Flags varargin(i)];
+0186         varargin(i) = [];
+0187     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFDeltaHCM0'</span>,<span class="string">'SetRFDeltaHCM0'</span>}))
+0188         Flags = [Flags varargin(i)];
+0189         varargin(i) = [];
+0190     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFDispersionOrbit'</span>,<span class="string">'SetRFDispersionOrbit'</span>}))
+0191         Flags = [Flags varargin(i)];
+0192         varargin(i) = [];
+0193     <span class="keyword">elseif</span> any(strcmpi(varargin{i},{<span class="string">'FitRFDispersionHCM'</span>,<span class="string">'SetRFDispersionHCM'</span>}))
+0194         Flags = [Flags varargin(i)];
+0195         varargin(i) = [];
+0196 
+0197     <span class="keyword">end</span>
+0198 <span class="keyword">end</span>
+0199 
+0200 
+0201 <span class="keyword">if</span> length(varargin) &gt;= 1
+0202     <span class="keyword">if</span> isstruct(varargin{1})
+0203         OCS = varargin{1};
+0204         varargin(1) = [];
+0205         <span class="keyword">if</span> length(varargin) &lt; 2
+0206             error(<span class="string">'An OCS plus at least 2 inputs are required'</span>);
+0207         <span class="keyword">end</span>
+0208         <span class="keyword">if</span> length(varargin) &gt;= 1
+0209             GoalOrbit = varargin{1};
+0210             varargin(1) = [];
+0211         <span class="keyword">end</span>
+0212         <span class="keyword">if</span> length(varargin) &gt;= 1
+0213             CMIncrementList = varargin{1};
+0214             varargin(1) = [];
+0215         <span class="keyword">end</span>
+0216     <span class="keyword">else</span>
+0217         OCS.BPM.FamilyName = varargin{1};
+0218         varargin(1) = [];
+0219         <span class="keyword">if</span> length(varargin) &gt;= 1
+0220             OCS.BPM.DeviceList = varargin{1};
+0221             varargin(1) = [];
+0222         <span class="keyword">end</span>
+0223         <span class="keyword">if</span> length(varargin) &gt;= 1
+0224             GoalOrbit = varargin{1};
+0225             varargin(1) = [];
+0226         <span class="keyword">end</span>
+0227         <span class="keyword">if</span> length(varargin) &gt;= 1
+0228             OCS.CM.FamilyName = varargin{1};
+0229             varargin(1) = [];
+0230         <span class="keyword">end</span>
+0231         <span class="keyword">if</span> length(varargin) &gt;= 1
+0232             CMIncrementList = varargin{1};
+0233             varargin(1) = [];
+0234         <span class="keyword">end</span>
+0235     <span class="keyword">end</span>
+0236     
+0237     <span class="comment">% Get NIter</span>
+0238     <span class="keyword">if</span> length(varargin) &gt;= 1
+0239         <span class="keyword">if</span> isnumeric(varargin{1})
+0240             OCS.NIter = varargin{1};
+0241             varargin(1) = [];
+0242         <span class="keyword">end</span>
+0243     <span class="keyword">end</span>
+0244     
+0245     <span class="comment">% Get SVDIndex (can be a fractional number, vector, or 'All')</span>
+0246     <span class="keyword">if</span> length(varargin) &gt;= 1
+0247         <span class="comment">%if isnumeric(varargin{1})</span>
+0248             OCS.SVDIndex = varargin{1};
+0249             varargin(1) = [];
+0250         <span class="comment">%end</span>
+0251     <span class="keyword">end</span>
+0252 
+0253     <span class="comment">% Get BPMWeight</span>
+0254     <span class="keyword">if</span> length(varargin) &gt;= 1
+0255         <span class="keyword">if</span> isnumeric(varargin{1})
+0256             BPMWeight = varargin{1};
+0257             varargin(1) = [];
+0258         <span class="keyword">end</span>
+0259     <span class="keyword">end</span>
+0260 <span class="keyword">end</span>
+0261 
+0262 
+0263 <span class="comment">% Pass the extra inputs on</span>
+0264 <span class="keyword">if</span> length(varargin) &gt;= 1
+0265     Flags = [Flags varargin];
+0266 <span class="keyword">end</span>
+0267 
+0268 
+0269 <span class="comment">% Fill the empty fields</span>
+0270 <span class="keyword">if</span> isempty(OCS.BPM.FamilyName)
+0271     i = menu(<span class="string">'Select a plane'</span>,<span class="string">'Horizontal'</span>,<span class="string">'Vertical'</span>);
+0272     <span class="keyword">if</span> i == 1
+0273         OCS.BPM.FamilyName = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>;
+0274         OCS.CM.FamilyName  = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0275     <span class="keyword">elseif</span> i == 2
+0276         OCS.BPM.FamilyName = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;
+0277         OCS.CM.FamilyName  = <a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>;
+0278     <span class="keyword">end</span>
+0279 <span class="keyword">end</span>
+0280 <span class="keyword">if</span> isempty(OCS.BPM.DeviceList)
+0281     OCS.BPM.DeviceList = editlist(<a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(OCS.BPM.FamilyName), OCS.BPM.FamilyName, 0);
+0282     <span class="comment">% Getting a list can messes up the order for bumps going from the last sector to the first</span>
+0283     <span class="keyword">for</span> i = 2:length(OCS.BPM.DeviceList)
+0284         <span class="keyword">if</span> <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.BPM.FamilyName,OCS.BPM.DeviceList(i,:))-<a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.BPM.FamilyName,OCS.BPM.DeviceList(i-1,:)) &gt; L/2
+0285             <span class="keyword">break</span>;
+0286         <span class="keyword">end</span>
+0287     <span class="keyword">end</span>
+0288     <span class="keyword">if</span> i &lt; length(OCS.BPM.DeviceList)
+0289         OCS.BPM.DeviceList = [OCS.BPM.DeviceList(i:<span class="keyword">end</span>,:); OCS.BPM.DeviceList(1:i-1,:)]; 
+0290     <span class="keyword">end</span>
+0291 <span class="keyword">end</span>
+0292 <span class="keyword">if</span> isempty(OCS.CM.FamilyName)
+0293     <span class="keyword">if</span> strcmpi(OCS.BPM.FamilyName, <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>)
+0294         OCS.CM.FamilyName = <a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>;
+0295     <span class="keyword">else</span>
+0296         OCS.CM.FamilyName = <a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>;
+0297     <span class="keyword">end</span>
+0298 <span class="keyword">end</span>
+0299 
+0300 <span class="keyword">if</span> isempty(UnitsFlag)
+0301     UnitsFlag = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(OCS.BPM.FamilyName);
+0302 <span class="keyword">end</span>
+0303 
+0304 <span class="keyword">if</span> isempty(ModeFlag)
+0305     ModeFlag = <a href="getmode.html" class="code" title="function Mode = getmode(Family, Field)">getmode</a>(OCS.BPM.FamilyName);
+0306 <span class="keyword">end</span>
+0307 
+0308 <span class="keyword">if</span> NoLeakageFlag &amp;&amp; OCS.NIter==0
+0309     error(<span class="string">'Leakage cleanup flag cannot be used with zero iterations.'</span>);
+0310 <span class="keyword">end</span>
+0311 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0312 <span class="comment">% End of input parsing %</span>
+0313 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0314 
+0315 
+0316 <span class="comment">% Possibly convert the GoalOrbit</span>
+0317 <span class="keyword">if</span> any(isnan(GoalOrbit))
+0318     error(<span class="string">'Goal orbit has a NaN'</span>);
+0319 <span class="keyword">end</span>
+0320 <span class="keyword">if</span> isempty(GoalOrbit)
+0321     <span class="comment">% Input the goal orbit</span>
+0322     <span class="keyword">for</span> i = 1:size(OCS.BPM.DeviceList,1)
+0323         labels{i} = sprintf(<span class="string">'Input the goal orbit at %s(%d,%d)'</span>,OCS.BPM.FamilyName, OCS.BPM.DeviceList(i,1), OCS.BPM.DeviceList(i,2));
+0324         StartingPoint{i} = <span class="string">'0'</span>; 
+0325     <span class="keyword">end</span>
+0326     answer = inputdlg(labels,<span class="string">'Local Bump'</span>,1,StartingPoint);
+0327     <span class="keyword">if</span> isempty(answer)
+0328         fprintf(<span class="string">'   Local bump cancelled'</span>);
+0329         <span class="keyword">return</span>
+0330     <span class="keyword">end</span>
+0331     <span class="keyword">for</span> i = 1:size(OCS.BPM.DeviceList,1)
+0332         GoalOrbit(i,1) = str2num(answer{i});
+0333     <span class="keyword">end</span>
+0334 <span class="keyword">end</span>
+0335 <span class="keyword">if</span> ischar(GoalOrbit)
+0336     <span class="keyword">if</span> strcmpi(GoalOrbit, <span class="string">'Golden'</span>)
+0337         GoalOrbit = <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>(OCS.BPM.FamilyName, OCS.BPM.DeviceList);
+0338     <span class="keyword">elseif</span> strcmpi(GoalOrbit, <span class="string">'Offset'</span>)
+0339         GoalOrbit = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(OCS.BPM.FamilyName, OCS.BPM.DeviceList);
+0340     <span class="keyword">else</span>
+0341         error(<span class="string">'Goal unknown'</span>);
+0342     <span class="keyword">end</span>
+0343 <span class="keyword">end</span>
+0344 GoalOrbit = GoalOrbit(:);
+0345 
+0346 <span class="comment">% Check the length</span>
+0347 <span class="keyword">if</span> length(GoalOrbit) ~= size(OCS.BPM.DeviceList,1)
+0348     error(<span class="string">'Length of the GoalOrbit must equal the number of devices in BPMList'</span>);
+0349 <span class="keyword">end</span>
+0350 
+0351 
+0352 <span class="comment">% CMIncrementList must be a vector, no zeros, no repeats</span>
+0353 CheckCM = 0;
+0354 <span class="keyword">if</span> isempty(CMIncrementList)
+0355     CheckCM = 1;
+0356     Ncm = size(OCS.BPM.DeviceList,1)+2;
+0357     <span class="keyword">if</span> rem(Ncm,2) == 0
+0358         NcmDiv2 = Ncm / 2;
+0359         CMIncrementList = [-(Ncm/2):-1 1:(Ncm/2)];
+0360     <span class="keyword">else</span>
+0361         NcmDiv2 = Ncm / 2;
+0362         CMIncrementList = [-floor(Ncm/2):-1 1:(floor(Ncm/2)+1)];
+0363     <span class="keyword">end</span>
+0364 <span class="keyword">end</span>
+0365 
+0366 <span class="comment">% Check for a device list input</span>
+0367 <span class="keyword">if</span> ~(size(CMIncrementList,2) == 2 &amp;&amp; size(CMIncrementList,1) &gt; 1)
+0368     CMIncrementList = CMIncrementList(:);
+0369     CMIncrementList = sort(CMIncrementList);
+0370     CMIncrementList(find(CMIncrementList==0)) = [];
+0371     CMIncrementList(find(diff(CMIncrementList)==0)) = [];
+0372 <span class="keyword">end</span>
+0373 
+0374 <span class="comment">% Get BPM positions</span>
+0375 BPMListTotal = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(OCS.BPM.FamilyName, 1);
+0376 BPMsposTotal = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.BPM.FamilyName, BPMListTotal);
+0377 BPMspos      = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.BPM.FamilyName, OCS.BPM.DeviceList);
+0378 
+0379 
+0380 <span class="comment">% Stack 3 rings so you you don't have to worry about the L to 0 transition</span>
+0381 CMListTotal = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(OCS.CM.FamilyName, 1);
+0382 CMsposTotal = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.CM.FamilyName, CMListTotal);
+0383 CMListTotal = [CMListTotal; CMListTotal; CMListTotal];
+0384 CMsposTotal = [CMsposTotal-L; CMsposTotal; CMsposTotal+L];
+0385 
+0386 
+0387 <span class="comment">% Find the correctors</span>
+0388 <span class="comment">% Check for a device list input</span>
+0389 <span class="keyword">if</span> size(CMIncrementList,2) == 2 &amp;&amp; size(CMIncrementList,1) &gt; 1
+0390     <span class="comment">% DeviceList</span>
+0391     OCS.CM.DeviceList = CMIncrementList;
+0392 <span class="keyword">else</span>
+0393     <span class="keyword">for</span> i = 1:length(CMIncrementList)
+0394         <span class="keyword">if</span> CMIncrementList(i) &lt;= 0
+0395             j = find(CMsposTotal &lt;= BPMspos(1));
+0396             OCS.CM.DeviceList(i,:) = CMListTotal(j(end)+CMIncrementList(i)+1,:);
+0397         <span class="keyword">else</span>
+0398             j = find(CMsposTotal &gt;= BPMspos(end));
+0399             OCS.CM.DeviceList(i,:) = CMListTotal(j(1)+CMIncrementList(i)-1,:);
+0400         <span class="keyword">end</span>
+0401     <span class="keyword">end</span>
+0402 <span class="keyword">end</span>
+0403 
+0404 <span class="keyword">if</span> CheckCM
+0405     DevTotal = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(OCS.CM.FamilyName);
+0406     checkvec = zeros(size(DevTotal,1),1);
+0407     checkvec(findrowindex(OCS.CM.DeviceList, DevTotal)) = 1;
+0408     OCS.CM.DeviceList = editlist(DevTotal, OCS.CM.FamilyName, checkvec);
+0409 
+0410     <span class="comment">% Getting a list can messes up the order for bumps going from the last sector to the first</span>
+0411     <span class="keyword">for</span> i = 2:length(OCS.CM.DeviceList)
+0412         <span class="keyword">if</span> <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.CM.FamilyName,OCS.CM.DeviceList(i,:)) - <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.CM.FamilyName,OCS.CM.DeviceList(i-1,:)) &gt; L/2
+0413             <span class="keyword">break</span>;
+0414         <span class="keyword">end</span>
+0415     <span class="keyword">end</span>
+0416     <span class="keyword">if</span> i &lt; length(OCS.CM.DeviceList)
+0417         OCS.CM.DeviceList = [OCS.CM.DeviceList(i:<span class="keyword">end</span>,:); OCS.CM.DeviceList(1:i-1,:)]; 
+0418     <span class="keyword">end</span>
+0419 <span class="keyword">end</span>
+0420 
+0421 
+0422 <span class="comment">% Find all BPMs outside the bump (leakage control BPMs)</span>
+0423 CMspos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(OCS.CM.FamilyName, OCS.CM.DeviceList);
+0424 <span class="keyword">if</span> CMspos(1) &gt; CMspos(end)
+0425     j1 = intersect(find(BPMsposTotal &lt; CMspos(1)), find(BPMsposTotal &gt; CMspos(end)));
+0426     j2 = [];
+0427 <span class="keyword">else</span>
+0428     j1 = find(BPMsposTotal &lt; CMspos(1));
+0429     j2 = find(BPMsposTotal &gt; CMspos(end));
+0430 <span class="keyword">end</span>
+0431 <span class="keyword">if</span> isempty(j1) &amp;&amp; isempty(j2)
+0432     error(<span class="string">'Cound not find any leakage control BPMs'</span>);
+0433 <span class="keyword">end</span>
+0434 OCS.BPM.DeviceList   = [BPMListTotal(j1,:); OCS.BPM.DeviceList; BPMListTotal(j2,:);];
+0435 BPMDeviceListLeakage = [BPMListTotal(j1,:);                     BPMListTotal(j2,:);];
+0436 
+0437 
+0438 <span class="keyword">if</span> OCS.Incremental
+0439     <span class="comment">% Incremental</span>
+0440     OCS.GoalOrbit = [zeros(length(j1),1); GoalOrbit; zeros(length(j2),1)];
+0441 
+0442     <span class="keyword">if</span> OCS.NIter == 0
+0443         LeakageGoalOrbit = zeros(size(BPMDeviceListLeakage,1),1);
+0444     <span class="keyword">else</span>
+0445         <span class="keyword">if</span> isempty(j1)
+0446             LeakageOrbit1 = [];
+0447         <span class="keyword">else</span>
+0448             LeakageOrbit1 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(OCS.BPM.FamilyName,BPMListTotal(j1,:), UnitsFlag, ModeFlag);
+0449         <span class="keyword">end</span>
+0450         <span class="keyword">if</span> isempty(j2)
+0451             LeakageOrbit2 = [];
+0452         <span class="keyword">else</span>
+0453             LeakageOrbit2 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(OCS.BPM.FamilyName,BPMListTotal(j2,:), UnitsFlag, ModeFlag);
+0454         <span class="keyword">end</span>
+0455         LeakageGoalOrbit = [LeakageOrbit1; LeakageOrbit2];
+0456     <span class="keyword">end</span>
+0457 <span class="keyword">elseif</span> ~OCS.Incremental
+0458     <span class="comment">% Absolute</span>
+0459     <span class="keyword">if</span> isempty(j1)
+0460         LeakageOrbit1 = [];
+0461     <span class="keyword">else</span>
+0462         LeakageOrbit1 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(OCS.BPM.FamilyName,BPMListTotal(j1,:), UnitsFlag, ModeFlag);
+0463     <span class="keyword">end</span>
+0464     <span class="keyword">if</span> isempty(j2)
+0465         LeakageOrbit2 = [];
+0466     <span class="keyword">else</span>
+0467         LeakageOrbit2 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(OCS.BPM.FamilyName,BPMListTotal(j2,:), UnitsFlag, ModeFlag);
+0468     <span class="keyword">end</span>
+0469     OCS.GoalOrbit    = [LeakageOrbit1; GoalOrbit; LeakageOrbit2];
+0470     LeakageGoalOrbit = [LeakageOrbit1; LeakageOrbit2];
+0471 <span class="keyword">else</span>
+0472     error(<span class="string">'Absolute or incremental input unknown.'</span>);
+0473 <span class="keyword">end</span>
+0474 
+0475 
+0476 <span class="comment">% Add a weight</span>
+0477 <span class="keyword">if</span> isempty(BPMWeight)
+0478     <span class="comment">% Default BPMWeight is to weight the leakage twice as much as the bump goal</span>
+0479     BPMWeight = .5 * (length(j1) + length(j2)) / length(GoalOrbit);
+0480     OCS.BPMWeight = [ones(length(j1),1); BPMWeight .* ones(length(GoalOrbit),1); ones(length(j2),1)];
+0481 <span class="keyword">else</span>
+0482     OCS.BPMWeight = [ones(length(j1),1); BPMWeight .* ones(length(GoalOrbit),1); ones(length(j2),1)];
+0483 <span class="keyword">end</span>
+0484 
+0485 
+0486 <span class="comment">% Just to fill the data structure fields</span>
+0487 OCS.BPM = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(OCS.BPM.FamilyName, <span class="string">'Monitor'</span>,  OCS.BPM.DeviceList, UnitsFlag, ModeFlag);
+0488 OCS.CM  = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(OCS.CM.FamilyName,  <span class="string">'Setpoint'</span>, OCS.CM.DeviceList,  UnitsFlag, ModeFlag);
+0489 
+0490 
+0491 <span class="comment">% Bumps stats</span>
+0492 <span class="keyword">if</span> DisplayFlag
+0493     <span class="comment">% Corrector strength (meters/radian) and (mm/amp)</span>
+0494     <span class="comment">% Warn on when to add RF frequency (generated dispersion is greater</span>
+0495     <span class="comment">% than mm per amp or % of mm/amp bump)</span>
+0496 <span class="keyword">end</span>
+0497 
+0498 
+0499 <span class="comment">% Set the bump</span>
+0500 [OCS, OCS0, V, S, ErrorFlag] = <a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>(OCS, UnitsFlag, ModeFlag, Flags{:});
+0501 
+0502 
+0503 <span class="comment">% Clean up the leakage</span>
+0504 <span class="keyword">if</span> NoLeakageFlag
+0505     <span class="keyword">if</span> DisplayFlag
+0506         fprintf(<span class="string">'   Correcting the leakage\n'</span>);
+0507     <span class="keyword">end</span>
+0508     OCS1 = OCS;
+0509     OCS1.GoalOrbit = LeakageGoalOrbit;
+0510     OCS1.BPM = <a href="family2datastruct.html" class="code" title="function [DataStruct, ErrorFlag] = family2datastruct(varargin)">family2datastruct</a>(OCS.BPM.FamilyName, <span class="string">'Monitor'</span>, BPMDeviceListLeakage);
+0511     OCS1.BPMWeight = [];
+0512     OCS1.Incremental = 0;
+0513     OCS1 = <a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>(OCS1, UnitsFlag, ModeFlag);
+0514 <span class="keyword">end</span>
+0515</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

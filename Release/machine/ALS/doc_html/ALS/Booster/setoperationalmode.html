@@ -1,0 +1,393 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setoperationalmode</title>
+  <meta name="keywords" content="setoperationalmode">
+  <meta name="description" content="SETOPERATIONALMODE - Switches between the various operational modes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; setoperationalmode.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setoperationalmode
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>SETOPERATIONALMODE - Switches between the various operational modes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function setoperationalmode(ModeNumber) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETOPERATIONALMODE - Switches between the various operational modes
+  setoperationalmode(ModeNumber)
+
+  ModeNumber = 1. '1.9 GeV Injection'
+               2. '1.5 GeV Injection
+             999. 'Greg's Mode'
+
+  See also <a href="aoinit.html" class="code" title="function aoinit(SubMachineName)">aoinit</a>, <a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>, alsinit</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="boosterlattice.html" class="code" title="function varargout = boosterlattice(varargin)">boosterlattice</a>	BOOSTERLATTICE - Booster lattice definition function</li><li><a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>	UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice (THERING)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="boosterinit.html" class="code" title="function boosterinit(OperationalMode)">boosterinit</a>	BOOSTERINIT - Initialization function of the ALS booster</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function BuildOffsetAndGoldenOrbits</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setoperationalmode(ModeNumber)</a>
+0002 <span class="comment">%SETOPERATIONALMODE - Switches between the various operational modes</span>
+0003 <span class="comment">%  setoperationalmode(ModeNumber)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  ModeNumber = 1. '1.9 GeV Injection'</span>
+0006 <span class="comment">%               2. '1.5 GeV Injection</span>
+0007 <span class="comment">%             999. 'Greg's Mode'</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%  See also aoinit, updateatindex, alsinit</span>
+0010 
+0011 
+0012 <span class="keyword">global</span> THERING
+0013 
+0014 <span class="comment">% Check if the AO exists</span>
+0015 checkforao;
+0016 
+0017 
+0018 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0019 <span class="comment">% Accelerator Dependent Modes %</span>
+0020 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0021 <span class="keyword">if</span> nargin &lt; 1
+0022     ModeNumber = [];
+0023 <span class="keyword">end</span>
+0024 <span class="keyword">if</span> isempty(ModeNumber)
+0025     ModeCell = {<span class="string">'1.9 GeV Injection'</span>, <span class="string">'1.23 GeV Injection'</span>, <span class="string">'1.522 GeV Injection'</span>, <span class="string">'Greg''s Mode'</span>};
+0026     [ModeNumber, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'ALS'</span>,<span class="string">'PromptString'</span>,<span class="string">'Select the Operational Mode:'</span>, <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell, <span class="string">'ListSize'</span>, [450 200]);
+0027     <span class="keyword">if</span> OKFlag ~= 1
+0028         fprintf(<span class="string">'   Operational mode not changed\n'</span>);
+0029         <span class="keyword">return</span>
+0030     <span class="keyword">end</span>
+0031     <span class="keyword">if</span> ModeNumber == 4
+0032         ModeNumber = 101;  <span class="comment">% Model</span>
+0033     <span class="keyword">elseif</span> ModeNumber == 5
+0034         ModeNumber = 999;  <span class="comment">% Greg</span>
+0035     <span class="keyword">end</span>
+0036 <span class="keyword">end</span>
+0037 
+0038 
+0039 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0040 <span class="comment">% Accelerator Data Structure %</span>
+0041 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0042 AD = getad;
+0043 AD.Machine = <span class="string">'ALS'</span>;              <span class="comment">% Will already be defined if setpathmml was used</span>
+0044 AD.MachineType = <span class="string">'StorageRing'</span>;  <span class="comment">% Will already be defined if setpathmml was used</span>
+0045 AD.SubMachine = <span class="string">'Booster'</span>;       <span class="comment">% Will already be defined if setpathmml was used</span>
+0046 AD.OperationalMode = <span class="string">''</span>;         <span class="comment">% Gets filled in later</span>
+0047 AD.HarmonicNumber = [];
+0048 
+0049 
+0050 <span class="comment">% Defaults RF for disperion and chromaticity measurements (must be in Hardware units)</span>
+0051 AD.DeltaRFDisp = 1000e-6;
+0052 AD.DeltaRFChro = [-2000 -1000 0 1000 2000] * 1e-6;
+0053 
+0054 
+0055 <span class="comment">% Tune processor delay: delay required to wait</span>
+0056 <span class="comment">% to have a fresh tune measurement after changing</span>
+0057 <span class="comment">% a variable like the RF frequency.</span>
+0058 AD.TuneDelay = 20.0;
+0059 
+0060 
+0061 <span class="comment">% The offset and golden orbits are stored at the end of this file</span>
+0062 <a href="#_sub1" class="code" title="subfunction BuildOffsetAndGoldenOrbits">BuildOffsetAndGoldenOrbits</a>;  <span class="comment">% Local function</span>
+0063 
+0064 
+0065 <span class="comment">% SP-AM Error level</span>
+0066 <span class="comment">% AD.ErrorWarningLevel = 0 -&gt; SP-AM errors are Matlab errors {Default}</span>
+0067 <span class="comment">%                       -1 -&gt; SP-AM errors are Matlab warnings</span>
+0068 <span class="comment">%                       -2 -&gt; SP-AM errors prompt a dialog box</span>
+0069 <span class="comment">%                       -3 -&gt; SP-AM errors are ignored (ErrorFlag=-1 is returned)</span>
+0070 AD.ErrorWarningLevel = 0;
+0071 
+0072 
+0073 <span class="comment">% BPM [2 4] gets CA errors</span>
+0074 setfamilydata(0,<span class="string">'BPMx'</span>,<span class="string">'Status'</span>,[2 4]);
+0075 setfamilydata(0,<span class="string">'BPMy'</span>,<span class="string">'Status'</span>,[2 4]);
+0076 fprintf(<span class="string">'   BPM(2,4) removed due to CA errors.\n'</span>);
+0077 
+0078 
+0079 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0080 <span class="comment">% Operational Modes %</span>
+0081 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0082 
+0083 <span class="comment">% Mode setup variables (mostly path and file names)</span>
+0084 <span class="comment">% AD.OperationalMode - String used in titles</span>
+0085 <span class="comment">% ModeName - String used for mode directory name off DataRoot/MachineName</span>
+0086 <span class="comment">% OpsFileExtension - string add to default file names</span>
+0087 MachineName = lower(AD.Machine);
+0088 <span class="keyword">if</span> ModeNumber == 1
+0089     <span class="comment">% 1.9 GeV Injection</span>
+0090     AD.OperationalMode = <span class="string">'1.9 GeV Injection'</span>;
+0091     ModeName = <span class="string">'19INJ'</span>;
+0092     OpsFileExtension = <span class="string">'_Booster'</span>;
+0093     
+0094     AD.Energy          = 1.89086196873342;  <span class="comment">% make sure this is the same as bend2gev at the production lattice!</span>
+0095     AD.InjectionEnergy = 1.89086196873342;
+0096     
+0097     <span class="comment">% AT lattice</span>
+0098     AD.ATModel = <span class="string">'boosterlattice'</span>;
+0099     <a href="boosterlattice.html" class="code" title="function varargout = boosterlattice(varargin)">boosterlattice</a>(AD.Energy*1e9);
+0100     
+0101 <span class="keyword">elseif</span> ModeNumber == 2
+0102     <span class="comment">% 1.5 GeV Injection</span>
+0103     AD.OperationalMode = <span class="string">'1.23 GeV Injection'</span>;
+0104     ModeName = <span class="string">'123INJ'</span>;
+0105     OpsFileExtension = <span class="string">'_Booster'</span>;
+0106     
+0107     AD.Energy          = 1.23;  <span class="comment">% make sure this is the same as bend2gev at the production lattice!</span>
+0108     AD.InjectionEnergy = 1.23;
+0109 
+0110     <span class="comment">% AT lattice</span>
+0111     AD.ATModel = <span class="string">'boosterlattice'</span>;
+0112     <a href="boosterlattice.html" class="code" title="function varargout = boosterlattice(varargin)">boosterlattice</a>(AD.Energy*1e9);
+0113     
+0114 <span class="keyword">elseif</span> ModeNumber == 3
+0115     <span class="comment">% 1.5 GeV Injection</span>
+0116     AD.OperationalMode = <span class="string">'1.5 GeV Injection'</span>;
+0117     ModeName = <span class="string">'15INJ'</span>;
+0118     OpsFileExtension = <span class="string">'_Booster'</span>;
+0119     
+0120     AD.Energy          = 1.522;  <span class="comment">% make sure this is the same as bend2gev at the production lattice!</span>
+0121     AD.InjectionEnergy = 1.522;
+0122 
+0123     <span class="comment">% AT lattice</span>
+0124     AD.ATModel = <span class="string">'boosterlattice'</span>;
+0125     <a href="boosterlattice.html" class="code" title="function varargout = boosterlattice(varargin)">boosterlattice</a>(AD.Energy*1e9);
+0126 
+0127 <span class="keyword">elseif</span> 999
+0128     
+0129     <span class="comment">% Greg's mode</span>
+0130     AD.OperationalMode = <span class="string">'Greg''s Booster Mode'</span>;
+0131     ModeName = <span class="string">'Greg'</span>;
+0132     OpsFileExtension = <span class="string">'_Booster'</span>;
+0133     
+0134     AD.Energy          = 1.89086196873342;  <span class="comment">% make sure this is the same as bend2gev at the production lattice!</span>
+0135     AD.InjectionEnergy = 1.89086196873342;
+0136 
+0137     <span class="comment">% AT lattice</span>
+0138     AD.ATModel = <span class="string">'boosterlattice'</span>;
+0139     <a href="boosterlattice.html" class="code" title="function varargout = boosterlattice(varargin)">boosterlattice</a>(AD.Energy*1e9);
+0140     
+0141 <span class="keyword">else</span>
+0142     
+0143     <span class="comment">% Test mode</span>
+0144     AD.OperationalMode = <span class="string">'Booster Test Mode'</span>;
+0145     ModeName = <span class="string">'Test'</span>;
+0146     OpsFileExtension = <span class="string">'_Booster'</span>;
+0147     
+0148     AD.Energy          = 1.89086196873342;  <span class="comment">% make sure this is the same as bend2gev at the production lattice!</span>
+0149     AD.InjectionEnergy = 1.89086196873342;
+0150 
+0151     <span class="comment">% AT lattice</span>
+0152     AD.ATModel = <span class="string">'boosterlattice'</span>;
+0153     <a href="boosterlattice.html" class="code" title="function varargout = boosterlattice(varargin)">boosterlattice</a>(AD.Energy*1e9);
+0154 <span class="keyword">end</span>
+0155 
+0156 
+0157 
+0158 <span class="comment">% Set the AD directory path</span>
+0159 setad(AD);
+0160 MMLROOT = setmmldirectories(AD.Machine, AD.SubMachine, ModeName, OpsFileExtension);
+0161 AD = getad;
+0162 
+0163 
+0164 <span class="comment">% ALS specific path changes</span>
+0165 
+0166 <span class="comment">% DataRoot Location</span>
+0167 <span class="comment">% This is a bit of a cluge to know if the user is on the ALS filer</span>
+0168 <span class="comment">% If so, the location of DataRoot will be different from the middle layer default</span>
+0169 <span class="keyword">if</span> isempty(findstr(lower(MMLROOT),<span class="string">'physbase'</span>)) &amp; isempty(findstr(lower(MMLROOT),<span class="string">'n:\'</span>))
+0170     <span class="comment">% Keep the normal middle layer directory structure</span>
+0171     switch2sim;
+0172     
+0173 <span class="keyword">else</span>
+0174     <span class="comment">% Use MMLROOT and DataRoot on the ALS filer</span>
+0175     <span class="keyword">if</span> strcmp(computer,<span class="string">'PCWIN'</span>) == 1
+0176         AD.Directory.DataRoot = [<span class="string">'\\Als-filer\physdata\matlab\'</span>, AD.SubMachine, <span class="string">'Data'</span>, filesep, ModeName, filesep];
+0177     <span class="keyword">else</span>
+0178         AD.Directory.DataRoot = [<span class="string">'/home/als/physdata/matlab/'</span>, AD.SubMachine, <span class="string">'Data'</span>, filesep, ModeName, filesep];
+0179     <span class="keyword">end</span>
+0180     
+0181     <span class="comment">% Data Archive Directories</span>
+0182     AD.Directory.BPMData        = [AD.Directory.DataRoot <span class="string">'BPM'</span>, filesep];
+0183     AD.Directory.TuneData       = [AD.Directory.DataRoot <span class="string">'Tune'</span>, filesep];
+0184     AD.Directory.ChroData       = [AD.Directory.DataRoot <span class="string">'Chromaticity'</span>, filesep];
+0185     AD.Directory.DispData       = [AD.Directory.DataRoot <span class="string">'Dispersion'</span>, filesep];
+0186     AD.Directory.ConfigData     = [AD.Directory.DataRoot <span class="string">'MachineConfig'</span>, filesep];
+0187     
+0188     <span class="comment">% Response Matrix Directories</span>
+0189     AD.Directory.BPMResponse    = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'BPM'</span>, filesep];
+0190     AD.Directory.TuneResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Tune'</span>, filesep];
+0191     AD.Directory.ChroResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Chromaticity'</span>, filesep];
+0192     AD.Directory.DispResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Dispersion'</span>, filesep];
+0193     AD.Directory.SkewResponse   = [AD.Directory.DataRoot <span class="string">'Response'</span>, filesep, <span class="string">'Skew'</span>, filesep];
+0194     
+0195     <span class="comment">% If using the ALS filer, I'm assuming you want to be online</span>
+0196     switch2online;
+0197     
+0198     <span class="comment">% Change defaults for LabCA if using it</span>
+0199     <span class="keyword">try</span>
+0200         <span class="keyword">if</span> exist(<span class="string">'lcaSetRetryCount'</span>,<span class="string">'file'</span>)
+0201             <span class="comment">% read dummy pv to initialize labca</span>
+0202             <span class="comment">% ChannelName = family2channel('BPMx');</span>
+0203             <span class="comment">% lcaGet(family2channel(ChannelName(1,:));</span>
+0204 
+0205             <span class="comment">% Retry count</span>
+0206             RetryCountNew = 1000;  <span class="comment">% Default: 599-old labca, 299-labca_2_1_beta</span>
+0207             RetryCount = lcaGetRetryCount;
+0208             lcaSetRetryCount(RetryCountNew);
+0209             <span class="keyword">if</span> RetryCount ~= RetryCountNew
+0210                 fprintf(<span class="string">'   Setting LabCA retry count to %d (was %d)\n'</span>, RetryCountNew, RetryCount);
+0211             <span class="keyword">end</span>
+0212 
+0213             <span class="comment">% Timeout</span>
+0214             TimeoutNew = .005;  <span class="comment">% Defaul: .05-old labca, .1-labca_2_1_beta</span>
+0215             Timeout = lcaGetTimeout;
+0216             lcaSetTimeout(TimeoutNew);
+0217             <span class="keyword">if</span> abs(Timeout - TimeoutNew) &gt; 1e-5
+0218                 fprintf(<span class="string">'   Setting LabCA TimeOut to %f (was %f)\n'</span>, TimeoutNew, Timeout);
+0219             <span class="keyword">end</span>
+0220             
+0221             <span class="comment">% To avoid UDF errors, set the WarnLevel to 4 (Default is 3)</span>
+0222             lcaSetSeverityWarnLevel(4);
+0223             fprintf(<span class="string">'   Setting lcaSetSeverityWarnLevel to 4 to avoid annoying UDF errors.\n'</span>);
+0224         <span class="keyword">end</span>
+0225     <span class="keyword">catch</span>
+0226         fprintf(<span class="string">'   LabCA Timeout not set, need to run lcaSetRetryCount(1000), lcaSetTimeout(.01).\n'</span>);
+0227     <span class="keyword">end</span>
+0228 <span class="keyword">end</span>
+0229 
+0230 
+0231 
+0232 <span class="comment">% Circumference</span>
+0233 AD.Circumference = findspos(THERING,length(THERING)+1);
+0234 setad(AD);
+0235 
+0236 
+0237 <span class="comment">% Updates the AT indices in the MiddleLayer with the present AT lattice</span>
+0238 <a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>;
+0239 
+0240 
+0241 <span class="comment">% Set the model energy</span>
+0242 setenergymodel(AD.Energy);
+0243 
+0244 
+0245 <span class="comment">% Cavity and radiation</span>
+0246 setcavity off;
+0247 setradiation off;
+0248 fprintf(<span class="string">'   Radiation and cavities are off.  Use setradiation / setcavity to modify. \n'</span>); 
+0249 
+0250 
+0251 <span class="comment">% Momentum compaction factor</span>
+0252 AD.MCF = [];
+0253 <span class="comment">% MCF = getmcf('Model');</span>
+0254 <span class="comment">% if isnan(MCF)</span>
+0255 <span class="comment">%     AD.MCF = [];</span>
+0256 <span class="comment">%     fprintf('   Model alpha calculation failed, middlelayer alpha set to  %f\n', AD.MCF);</span>
+0257 <span class="comment">% else</span>
+0258 <span class="comment">%     AD.MCF = MCF;</span>
+0259 <span class="comment">%     fprintf('   Middlelayer alpha set to %f (AT model).\n', AD.MCF);</span>
+0260 <span class="comment">% end</span>
+0261 setad(AD);
+0262 
+0263 
+0264 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0265 <span class="comment">% Final mode changes %</span>
+0266 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0267 <span class="keyword">if</span> ModeNumber == 1
+0268     <span class="comment">% User mode - 1.9 GeV Injection</span>
+0269 <span class="keyword">else</span>
+0270 <span class="keyword">end</span>
+0271 
+0272 
+0273 
+0274 fprintf(<span class="string">'   Middlelayer setup for operational mode: %s\n'</span>, AD.OperationalMode);
+0275 
+0276 
+0277 
+0278 
+0279 <a name="_sub1" href="#_subfunctions" class="code">function BuildOffsetAndGoldenOrbits</a>
+0280 
+0281 
+0282 AO = getao;
+0283 
+0284 
+0285 Offset = [AO.BPMx.DeviceList zeros(size(AO.BPMx.DeviceList,1),1) zeros(size(AO.BPMx.DeviceList,1),1)];
+0286 
+0287 
+0288 Golden = [AO.BPMx.DeviceList zeros(size(AO.BPMx.DeviceList,1),1) zeros(size(AO.BPMx.DeviceList,1),1)];
+0289 
+0290 
+0291 <span class="comment">% Save the data</span>
+0292 AO = getao;
+0293 
+0294 
+0295 <span class="comment">% Offset orbits</span>
+0296 [i, iNotFound, iFoundList] = findrowindex(Offset(:,1:2), AO.BPMx.DeviceList);
+0297 <span class="keyword">if</span> ~isempty(iNotFound)
+0298     fprintf(<span class="string">'\n   Warning:  BPMx offsets are specified that are not in the family (setoperationalmode)\n'</span>);
+0299 <span class="keyword">end</span>
+0300 <span class="keyword">if</span> size(AO.BPMx.DeviceList,1) ~= length(i)
+0301     fprintf(<span class="string">'\n   Warning:  Not all the offsets in the BPMx family are being specified (setoperationalmode)\n'</span>);
+0302 <span class="keyword">end</span>
+0303 AO.BPMx.Offset = zeros(size(AO.BPMx.DeviceList,1),1);
+0304 AO.BPMx.Offset(i) = Offset(iFoundList,3);
+0305 
+0306 [i, iNotFound, iFoundList] = findrowindex(Offset(:,1:2), AO.BPMy.DeviceList);
+0307 <span class="keyword">if</span> ~isempty(iNotFound)
+0308     fprintf(<span class="string">'\n   Warning:  BPMy offsets are specified that are not in the family (setoperationalmode)\n'</span>);
+0309 <span class="keyword">end</span>
+0310 <span class="keyword">if</span> size(AO.BPMy.DeviceList,1) ~= length(i)
+0311     fprintf(<span class="string">'\n   Warning:  Not all the offsets in the BPMy family are being specified (setoperationalmode)\n'</span>);
+0312 <span class="keyword">end</span>
+0313 AO.BPMy.Offset = zeros(size(AO.BPMy.DeviceList,1),1);
+0314 AO.BPMy.Offset(i) = Offset(iFoundList,4);
+0315 
+0316 
+0317 <span class="comment">% Golden orbits</span>
+0318 [i, iNotFound, iFoundList] = findrowindex(Golden(:,1:2), AO.BPMx.DeviceList);
+0319 <span class="keyword">if</span> ~isempty(iNotFound)
+0320     fprintf(<span class="string">'\n   Warning:  BPMx golden values are specified that are not in the family (setoperationalmode)\n'</span>);
+0321 <span class="keyword">end</span>
+0322 <span class="keyword">if</span> size(AO.BPMx.DeviceList,1) ~= length(i)
+0323     fprintf(<span class="string">'\n   Warning:  Not all the golden orbits in the BPMx family are being specified (setoperationalmode)\n'</span>);
+0324 <span class="keyword">end</span>
+0325 AO.BPMx.Golden = zeros(size(AO.BPMx.DeviceList,1),1);
+0326 AO.BPMx.Golden(i) = Golden(iFoundList,3);
+0327 
+0328 [i, iNotFound, iFoundList] = findrowindex(Golden(:,1:2), AO.BPMy.DeviceList);
+0329 <span class="keyword">if</span> ~isempty(iNotFound)
+0330     fprintf(<span class="string">'\n   Warning:  BPMy golden values are specified that are not in the family (setoperationalmode)\n'</span>);
+0331 <span class="keyword">end</span>
+0332 <span class="keyword">if</span> size(AO.BPMy.DeviceList,1) ~= length(i)
+0333     fprintf(<span class="string">'\n   Warning:  Not all the golden orbits in the BPMy family are being specified (setoperationalmode)\n'</span>);
+0334 <span class="keyword">end</span>
+0335 AO.BPMy.Golden = zeros(size(AO.BPMy.DeviceList,1),1);
+0336 AO.BPMy.Golden(i) = Golden(iFoundList,4);
+0337 
+0338 setao(AO);</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

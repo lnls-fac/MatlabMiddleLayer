@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of channel2common</title>
+  <meta name="keywords" content="channel2common">
+  <meta name="description" content="CHANNEL2COMMON - Convert a channel name to a common name">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; channel2common.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>channel2common
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>CHANNEL2COMMON - Convert a channel name to a common name</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">CHANNEL2COMMON - Convert a channel name to a common name
+  [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)
+
+  INPUTS
+  1. ChannelNames - List of channel names (string, matrix, cell array)
+  2. Field = Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor'}
+  3. Family - Family Name 
+              Data Structure
+              Accelerator Object
+
+  OUTPUTS
+  1. CommonNames - Common names corresponding to the common name
+                   If the common name cannot be found an empty strings 
+                   (or a blank string for matrix inputs) is returned
+  2. ErrorFlag - Number of errors found
+
+  NOTES
+  1. For DataType='vector' only the first common names is returned (DeviceList would be needed as an input)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="channel2common.html" class="code" title="function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)">channel2common</a>	CHANNEL2COMMON - Convert a channel name to a common name</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>	GETFAMILYLIST - Returns a list of all the family names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="channel2common.html" class="code" title="function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)">channel2common</a>	CHANNEL2COMMON - Convert a channel name to a common name</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)</a>
+0002 <span class="comment">%CHANNEL2COMMON - Convert a channel name to a common name</span>
+0003 <span class="comment">%  [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. ChannelNames - List of channel names (string, matrix, cell array)</span>
+0007 <span class="comment">%  2. Field = Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor'}</span>
+0008 <span class="comment">%  3. Family - Family Name</span>
+0009 <span class="comment">%              Data Structure</span>
+0010 <span class="comment">%              Accelerator Object</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  OUTPUTS</span>
+0013 <span class="comment">%  1. CommonNames - Common names corresponding to the common name</span>
+0014 <span class="comment">%                   If the common name cannot be found an empty strings</span>
+0015 <span class="comment">%                   (or a blank string for matrix inputs) is returned</span>
+0016 <span class="comment">%  2. ErrorFlag - Number of errors found</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  NOTES</span>
+0019 <span class="comment">%  1. For DataType='vector' only the first common names is returned (DeviceList would be needed as an input)</span>
+0020 
+0021 <span class="comment">%  Written by Greg Portmann</span>
+0022 
+0023 
+0024 <span class="keyword">if</span> nargin &lt; 1
+0025     error(<span class="string">'Must have at least 1 input (''CommonNames'')'</span>);
+0026 <span class="keyword">end</span>
+0027 <span class="keyword">if</span> nargin &lt; 2
+0028     Field = <span class="string">''</span>;
+0029 <span class="keyword">end</span>
+0030 <span class="keyword">if</span> isempty(Field)
+0031     Field = <span class="string">'Monitor'</span>;
+0032 <span class="keyword">end</span>
+0033 <span class="keyword">if</span> nargin &lt; 3
+0034     Family = <span class="string">''</span>;
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="comment">% Cell inputs</span>
+0038 <span class="keyword">if</span> iscell(ChannelNames)
+0039     <span class="keyword">if</span> iscell(Family)
+0040         <span class="keyword">if</span> length(Family) ~= length(ChannelNames)
+0041             error(<span class="string">'Family and ChannelNames must be the same size cell arrays.'</span>);
+0042         <span class="keyword">end</span>
+0043     <span class="keyword">end</span>
+0044     <span class="keyword">if</span> iscell(Field)
+0045         <span class="keyword">if</span> length(Field) ~= length(ChannelNames)
+0046             error(<span class="string">'Field and ChannelNames must be the same size cell arrays.'</span>);
+0047         <span class="keyword">end</span>
+0048     <span class="keyword">end</span>
+0049     
+0050     ErrorFlag = 0;
+0051     <span class="keyword">for</span> i = 1:length(ChannelNames)
+0052         <span class="keyword">if</span> iscell(Family)
+0053             <span class="keyword">if</span> iscell(Field)
+0054                 [CommonNames{i}, ErrorTmp] = <a href="channel2common.html" class="code" title="function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)">channel2common</a>(ChannelNames{i}, Field{i}, Family{i});
+0055             <span class="keyword">else</span>
+0056                 [CommonNames{i}, ErrorTmp] = <a href="channel2common.html" class="code" title="function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)">channel2common</a>(ChannelNames{i}, Field, Family{i});
+0057             <span class="keyword">end</span>
+0058         <span class="keyword">else</span>
+0059             <span class="keyword">if</span> iscell(Field)
+0060                 [CommonNames{i}, ErrorTmp] = <a href="channel2common.html" class="code" title="function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)">channel2common</a>(ChannelNames{i}, Field{i}, Family);
+0061             <span class="keyword">else</span>
+0062                 [CommonNames{i}, ErrorTmp] = <a href="channel2common.html" class="code" title="function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)">channel2common</a>(ChannelNames{i}, Field, Family);
+0063             <span class="keyword">end</span>
+0064         <span class="keyword">end</span>
+0065         ErrorFlag = ErrorFlag | ErrorTmp;
+0066     <span class="keyword">end</span>
+0067     <span class="keyword">return</span>    
+0068 <span class="keyword">end</span>
+0069 <span class="comment">% End cell input</span>
+0070 
+0071 
+0072 
+0073 
+0074 <span class="comment">% Search all families</span>
+0075 <span class="keyword">if</span> isempty(Family)
+0076     CommonNames = [];
+0077     ErrorFlag = 0;
+0078     FamilyList = <a href="getfamilylist.html" class="code" title="function  [Families, AO] = getfamilylist(OutputFlag)">getfamilylist</a>;
+0079     
+0080     <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0081         Name = deblank(ChannelNames(i,:));
+0082         Found = 0;
+0083         <span class="keyword">for</span> j = 1:size(FamilyList, 1)
+0084             CommonName = <a href="channel2common.html" class="code" title="function [CommonNames, ErrorFlag] = channel2common(ChannelNames, Field, Family)">channel2common</a>(Name, Field, deblank(FamilyList(j,:)));
+0085             <span class="keyword">if</span> ~isempty(CommonName)
+0086                 Found = 1;
+0087                 <span class="keyword">break</span>
+0088             <span class="keyword">end</span>
+0089         <span class="keyword">end</span>
+0090         <span class="keyword">if</span> Found
+0091             NewCommonName = CommonName;
+0092         <span class="keyword">else</span>
+0093             NewCommonName = <span class="string">' '</span>;
+0094             ErrorFlag = ErrorFlag + 1;
+0095         <span class="keyword">end</span>
+0096         CommonNames = strvcat(CommonNames, NewCommonName);
+0097     <span class="keyword">end</span>
+0098     CommonNames = deblank(CommonNames);
+0099     <span class="keyword">return</span>
+0100 <span class="keyword">end</span>
+0101 
+0102 
+0103 <span class="comment">% CommonNames can be a matrix</span>
+0104 CommonNames = [];
+0105 ErrorFlag = 0;
+0106 <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0107     Name = deblank(ChannelNames(i,:));
+0108     
+0109     ChannelNamesTotal = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'ChannelNames'</span>);
+0110     
+0111     [name,j,k] = intersect(Name, ChannelNamesTotal, <span class="string">'rows'</span>);
+0112     
+0113     <span class="keyword">if</span> isempty(name) &amp; length(Name)~=size(ChannelNamesTotal)
+0114         Name = [repmat(<span class="string">' '</span>,size(Name,1),size(ChannelNamesTotal,2)-size(Name,2)) Name];
+0115         [name,j,k] = intersect(Name, ChannelNamesTotal, <span class="string">'rows'</span>);
+0116     <span class="keyword">end</span>
+0117     
+0118     <span class="keyword">if</span> isempty(name)
+0119         Name = deblank(ChannelNames(i,:));
+0120         <span class="keyword">if</span> length(Name)~=size(ChannelNamesTotal)
+0121             Name = [Name repmat(<span class="string">' '</span>,size(Name,1),size(ChannelNamesTotal,2)-size(Name,2))];
+0122             [name,j,k] = intersect(Name, ChannelNamesTotal, <span class="string">'rows'</span>);
+0123         <span class="keyword">end</span>
+0124     <span class="keyword">end</span>
+0125 
+0126     <span class="keyword">if</span> ~isempty(k)
+0127         CommonNamesTotal = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, <span class="string">'CommonNames'</span>);
+0128         
+0129         <span class="keyword">if</span> isempty(CommonNamesTotal)
+0130             NewCommonName = <span class="string">' '</span>;
+0131             ErrorFlag = ErrorFlag + 1;
+0132         <span class="keyword">else</span>
+0133             NewCommonName = CommonNamesTotal(k,:);
+0134         <span class="keyword">end</span>
+0135     <span class="keyword">else</span>
+0136         NewCommonName = <span class="string">' '</span>;
+0137         ErrorFlag = ErrorFlag + 1;
+0138     <span class="keyword">end</span>
+0139     CommonNames = strvcat(CommonNames, NewCommonName);
+0140 <span class="keyword">end</span>
+0141 
+0142 CommonNames = deblank(CommonNames);</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

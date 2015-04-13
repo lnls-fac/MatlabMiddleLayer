@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of family2archive</title>
+  <meta name="keywords" content="family2archive">
+  <meta name="description" content="FAMILY2ARCHIVE - Converts the family name to a database column name in the archiver">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; family2archive.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>family2archive
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>FAMILY2ARCHIVE - Converts the family name to a database column name in the archiver</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [ColumnName, ErrorFlag] = family2archive(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FAMILY2ARCHIVE - Converts the family name to a database column name in the archiver
+  ColumnName = family2archive(Family, Field, DeviceList)
+  ColumnName = family2archive(Family, DeviceList)
+
+  INPUTS
+  1. Family - Family Name 
+              Data Structure
+              Accelerator Object
+              or Cell Array of Families
+  2. Field = Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor'}
+  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}
+
+  OUTPUTS
+  1. ColumnName - database column name corresponding to the Family, Field, and DeviceList
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>	FAMILY2ARCHIVE - Converts the family name to a database column name in the archiver</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>	FAMILY2ARCHIVE - Converts the family name to a database column name in the archiver</li><li><a href="plotmysqlorbit.html" class="code" title="">plotmysqlorbit</a>	function arplotorbit</li><li><a href="plotsofb.html" class="code" title="">plotsofb</a>	function plotsofb</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ColumnName, ErrorFlag] = family2archive(varargin)</a>
+0002 <span class="comment">%FAMILY2ARCHIVE - Converts the family name to a database column name in the archiver</span>
+0003 <span class="comment">%  ColumnName = family2archive(Family, Field, DeviceList)</span>
+0004 <span class="comment">%  ColumnName = family2archive(Family, DeviceList)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. Family - Family Name</span>
+0008 <span class="comment">%              Data Structure</span>
+0009 <span class="comment">%              Accelerator Object</span>
+0010 <span class="comment">%              or Cell Array of Families</span>
+0011 <span class="comment">%  2. Field = Accelerator Object field name ('Monitor', 'Setpoint', etc) {Default: 'Monitor'}</span>
+0012 <span class="comment">%  3. DeviceList ([Sector Device #] or [element #]) {Default: whole family}</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1. ColumnName - database column name corresponding to the Family, Field, and DeviceList</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  Written by Greg Portmann</span>
+0018 
+0019 
+0020 <span class="keyword">if</span> nargin == 0
+0021     error(<span class="string">'Must have at least one input (''Family'')!'</span>);
+0022 <span class="keyword">end</span>
+0023 
+0024 
+0025 ErrorFlag = 0;
+0026 
+0027     
+0028 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0029 <span class="comment">% Cell Array Inputs %</span>
+0030 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0031 <span class="keyword">if</span> iscell(varargin{1})
+0032     <span class="keyword">if</span> length(varargin) &gt;= 3 &amp;&amp; iscell(varargin{3})
+0033         <span class="keyword">if</span> length(varargin{1}) ~= length(varargin{3})
+0034             error(<span class="string">'Family and DeviceList must be the same size cell arrays.'</span>);
+0035         <span class="keyword">end</span>
+0036     <span class="keyword">end</span>
+0037     <span class="keyword">if</span> length(varargin) &gt;= 2 &amp;&amp; iscell(varargin{2})
+0038         <span class="keyword">if</span> length(varargin{1}) ~= length(varargin{2})
+0039             error(<span class="string">'If Field is a cell array, then must be the same size as Family.'</span>);
+0040         <span class="keyword">end</span>
+0041     <span class="keyword">end</span>
+0042     
+0043     <span class="keyword">for</span> i = 1:length(varargin{1})
+0044         <span class="keyword">if</span> length(varargin) == 1
+0045             [ColumnName{i}, ErrorTmp] = <a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>(varargin{1}{i});
+0046         <span class="keyword">elseif</span> length(varargin) == 2
+0047             <span class="keyword">if</span> iscell(varargin{2})
+0048                 [ColumnName{i}, ErrorTmp] = <a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>(varargin{1}{i}, varargin{2}{i});
+0049             <span class="keyword">else</span>
+0050                 [ColumnName{i}, ErrorTmp] = <a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>(varargin{1}{i}, varargin{2});
+0051             <span class="keyword">end</span>
+0052         <span class="keyword">else</span>            
+0053             <span class="keyword">if</span> iscell(varargin{2})
+0054                 <span class="keyword">if</span> iscell(varargin{3})
+0055                     [ColumnName{i}, ErrorTmp] = <a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i});
+0056                 <span class="keyword">else</span>
+0057                     [ColumnName{i}, ErrorTmp] = <a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>(varargin{1}{i}, varargin{2}{i}, varargin{3});
+0058                 <span class="keyword">end</span>
+0059             <span class="keyword">else</span>
+0060                 <span class="keyword">if</span> iscell(varargin{3})
+0061                     [ColumnName{i}, ErrorTmp] = <a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>(varargin{1}{i}, varargin{2}, varargin{3}{i});
+0062                 <span class="keyword">else</span>
+0063                     [ColumnName{i}, ErrorTmp] = <a href="family2archive.html" class="code" title="function [ColumnName, ErrorFlag] = family2archive(varargin)">family2archive</a>(varargin{1}{i}, varargin{2}, varargin{3});
+0064                 <span class="keyword">end</span>
+0065             <span class="keyword">end</span>
+0066         <span class="keyword">end</span>
+0067         ErrorFlag = ErrorFlag | ErrorTmp;
+0068     <span class="keyword">end</span>
+0069     <span class="keyword">return</span>    
+0070 <span class="keyword">end</span>
+0071 
+0072 
+0073 
+0074 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0075 <span class="comment">% Family or data structure inputs beyond this point %</span>
+0076 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0077 <span class="keyword">if</span> isstruct(varargin{1})
+0078     <span class="keyword">if</span> isfield(varargin{1},<span class="string">'FamilyName'</span>) &amp;&amp; isfield(varargin{1},<span class="string">'Field'</span>)
+0079         <span class="comment">% Data structure inputs</span>
+0080         Family = varargin{1}.FamilyName;
+0081 
+0082         Field = varargin{1}.Field;
+0083         <span class="keyword">if</span> length(varargin) &gt;= 2
+0084             <span class="keyword">if</span> ischar(varargin{2})
+0085                 Field = varargin{2};
+0086                 varargin(2) = [];
+0087             <span class="keyword">end</span>
+0088         <span class="keyword">end</span>
+0089         <span class="keyword">if</span> length(varargin) &gt;= 2
+0090             DeviceList = varargin{2};
+0091         <span class="keyword">else</span>
+0092             DeviceList = varargin{1}.DeviceList;
+0093         <span class="keyword">end</span>
+0094     <span class="keyword">else</span>
+0095         <span class="comment">% AO input</span>
+0096         Family = varargin(1).FamilyName;
+0097         Field = <span class="string">''</span>;
+0098         <span class="keyword">if</span> length(varargin) &gt;= 2
+0099             <span class="keyword">if</span> ischar(varargin{2})
+0100                 Field = varargin{2};
+0101                 varargin(2) = [];
+0102             <span class="keyword">end</span>
+0103         <span class="keyword">end</span>
+0104         <span class="keyword">if</span> length(varargin) &gt;= 2
+0105             DeviceList = varargin{2};
+0106         <span class="keyword">else</span>
+0107             DeviceList = varargin{1}.DeviceList;
+0108         <span class="keyword">end</span>
+0109         
+0110         <span class="keyword">if</span> isempty(Field)
+0111             Field = <span class="string">'Monitor'</span>;
+0112         <span class="keyword">end</span>
+0113         <span class="keyword">if</span> isempty(DeviceList)
+0114             DeviceList = varargin{1}.DeviceList;
+0115         <span class="keyword">end</span>
+0116         <span class="keyword">if</span> isempty(DeviceList)
+0117             DeviceList = family2dev(Family);
+0118         <span class="keyword">end</span>
+0119 
+0120         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0121         <span class="comment">% CommonName Input:  Convert common names to a varargin{3} %</span>
+0122         <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0123         <span class="keyword">if</span> ischar(DeviceList) &amp;&amp; ~isempty(DeviceList)
+0124             DeviceList = common2dev(DeviceList, Family);
+0125             <span class="keyword">if</span> isempty(DeviceList)
+0126                 error(<span class="string">'DeviceList was a string but common names could not be found.'</span>);
+0127             <span class="keyword">end</span>
+0128         <span class="keyword">end</span>
+0129 
+0130         [i,iNotFound] = findrowindex(DeviceList, varargin{1}.DeviceList);
+0131         <span class="keyword">if</span> ~isempty(iNotFound)
+0132             error(<span class="string">'Device at found in the input structure'</span>);
+0133         <span class="keyword">end</span>
+0134         ColumnName = varargin{1}.(Field).ColumnName(i,:);
+0135         ErrorFlag = 0;
+0136 
+0137         <span class="keyword">return</span>;
+0138     <span class="keyword">end</span>
+0139 
+0140 <span class="keyword">else</span>
+0141     
+0142     <span class="comment">% Family input</span>
+0143     Family = varargin{1};
+0144     
+0145     Field = <span class="string">''</span>;
+0146     <span class="keyword">if</span> length(varargin) &gt;= 2
+0147         <span class="keyword">if</span> ischar(varargin{2})
+0148             Field = varargin{2};
+0149             varargin(2) = [];
+0150         <span class="keyword">end</span>
+0151     <span class="keyword">end</span>
+0152     <span class="keyword">if</span> length(varargin) &gt;= 2
+0153         DeviceList = varargin{2};
+0154     <span class="keyword">else</span>
+0155         DeviceList = [];
+0156     <span class="keyword">end</span>
+0157 
+0158     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0159     <span class="comment">% Check DeviceList or Family is a common name list %</span>
+0160     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0161     [Family, DeviceList] = checkforcommonnames(Family, DeviceList);
+0162 
+0163 <span class="keyword">end</span>
+0164 
+0165 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0166 <span class="comment">% Special cases %</span>
+0167 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0168 <span class="keyword">switch</span> Family
+0169     <span class="keyword">case</span> <span class="string">'LCW'</span>
+0170         ColumnName = <span class="string">'LCW'</span>;
+0171         
+0172     <span class="keyword">case</span> <span class="string">'DCCT'</span>
+0173         ColumnName = <span class="string">'DCCT'</span>;
+0174         
+0175     <span class="keyword">case</span> {<span class="string">'Energy'</span>, <span class="string">'ENERGY'</span>}
+0176         ColumnName = <span class="string">'Energy'</span>;
+0177         
+0178     <span class="keyword">case</span> {<span class="string">'UserBeam'</span>, <span class="string">'UserBeam'</span>}
+0179         ColumnName = <span class="string">'UserBeam'</span>;
+0180         
+0181     <span class="keyword">otherwise</span>
+0182         <span class="comment">% Use the channel name</span>
+0183 
+0184         <span class="keyword">if</span> isempty(Field)
+0185             Field = <span class="string">'Monitor'</span>;
+0186         <span class="keyword">end</span>
+0187         <span class="keyword">if</span> isempty(DeviceList)
+0188             DeviceList = family2dev(Family);
+0189         <span class="keyword">end</span>
+0190         
+0191         [ColumnName, ErrorFlag] = getfamilydata(Family, Field, <span class="string">'ChannelNames'</span>, DeviceList);
+0192 
+0193         <span class="comment">% Convert '.' to '_'</span>
+0194         [i,j] = find(ColumnName == <span class="string">'.'</span>);
+0195         ColumnName(i,j) = <span class="string">'_'</span>;
+0196 <span class="keyword">end</span>
+0197</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

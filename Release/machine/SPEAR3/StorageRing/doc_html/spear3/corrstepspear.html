@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of corrstepspear</title>
+  <meta name="keywords" content="corrstepspear">
+  <meta name="description" content="[BPM, CMam, t116, t132, Error] = corrstepspear(CMFamily, CMDeviceList, BPMDeviceList)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; corrstepspear.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>corrstepspear
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>[BPM, CMam, t116, t132, Error] = corrstepspear(CMFamily, CMDeviceList, BPMDeviceList)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [BPM, CMam, t116, t132, Error] = corrstepspear(CMFamily, CMDeviceList, BPMDeviceList) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  [BPM, CMam, t116, t132, Error] = corrstepspear(CMFamily, CMDeviceList, BPMDeviceList)
+
+  Spear BPM channels
+  |   West pit    |     East pit    |     West pit     |
+  |   1  to  26   |   27  to    82  |    83  to   112  |
+  |[1 1] to [5 1] | [5 2] to [14 1] | [14 2] to [18 7] |</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [BPM, CMam, t116, t132, Error] = corrstepspear(CMFamily, CMDeviceList, BPMDeviceList)</a>
+0002 <span class="comment">%  [BPM, CMam, t116, t132, Error] = corrstepspear(CMFamily, CMDeviceList, BPMDeviceList)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  Spear BPM channels</span>
+0005 <span class="comment">%  |   West pit    |     East pit    |     West pit     |</span>
+0006 <span class="comment">%  |   1  to  26   |   27  to    82  |    83  to   112  |</span>
+0007 <span class="comment">%  |[1 1] to [5 1] | [5 2] to [14 1] | [14 2] to [18 7] |</span>
+0008 
+0009 
+0010 Error = 0;
+0011 <span class="keyword">if</span> nargin &lt; 1
+0012     CMFamily = <span class="string">'HCM'</span>;
+0013 <span class="keyword">end</span>
+0014 <span class="keyword">if</span> nargin &lt; 2
+0015     CMDeviceList = [1 1];
+0016 <span class="keyword">end</span>
+0017 CMDeviceList = CMDeviceList(1,:);
+0018 <span class="keyword">if</span> nargin &lt; 3
+0019     BPMDeviceList = family2dev(<span class="string">'BPMx'</span>);
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="comment">% Reset the setpoint so that the first point is the buffer is the setpoint</span>
+0023 sp0=getsp(CMFamily, CMDeviceList);
+0024 setsp(CMFamily, sp0, CMDeviceList);
+0025 
+0026 ChannelStr = family2channel(CMFamily, CMDeviceList);
+0027 i = findstr(ChannelStr,<span class="string">':'</span>);
+0028 ChannelStr = ChannelStr(1:i(end));
+0029 
+0030             
+0031 TimeOut = lcaGetTimeOut;
+0032 RetryCount = lcaGetRetryCount;
+0033 
+0034 
+0035 <span class="comment">% lcaPut('18G-COR1V:ControlState','HALT');</span>
+0036 <span class="comment">%lcaPut({[ChannelStr, 'ControlState']},'HALT');</span>
+0037 lcaPut([ChannelStr, <span class="string">'ControlState'</span>],0);            <span class="comment">% 'HALT'=0, 'ARM'=1</span>
+0038 <span class="comment">%setpv(CMFamily, 'ControlState', 'HALT', CMDeviceList);</span>
+0039 
+0040 
+0041 <span class="comment">% SP = lcaGet('18G-COR1V:CurrSetpt');</span>
+0042 SP = lcaGet([ChannelStr, <span class="string">'CurrSetpt'</span>]);
+0043 Delta = .05 * [ones(1,1999) 0];
+0044 <span class="comment">%Delta = [zeros(1,500) .4*ones(1,1500)];</span>
+0045 <span class="comment">%Delta = [zeros(1,1000) .4*ones(1,1000)];</span>
+0046 <span class="comment">%Delta = .4 * sin(2*pi*(1:2000)/2000);</span>
+0047 <span class="comment">%Delta = [.1 * sin(2*pi*(1:400)/400) zeros(1,1600)];</span>
+0048  
+0049 <span class="comment">% lcaPut('18G-COR1V:CurrSetpt', SP(1)+Delta);</span>
+0050 <span class="comment">% lcaPut('18G-COR1V:CurrInterSteps', 0);</span>
+0051 <span class="comment">% lcaPut('18G-COR1V:LoopIter', 1);</span>
+0052 <span class="comment">% lcaPut('18G-COR1V:ControlState', 'EVENT2');</span>
+0053 <span class="comment">% lcaPut('18G-COR1V:Curr1MuxADCTbl.RARM',2);</span>
+0054 
+0055 lcaPut([ChannelStr,<span class="string">'CurrSetpt'</span>], SP(1)+Delta);
+0056 lcaPut([ChannelStr,<span class="string">'CurrInterSteps'</span>], 0);
+0057 lcaPut([ChannelStr,<span class="string">'LoopIter'</span>], 1);
+0058 <span class="comment">%lcaPut([ChannelStr,'ControlState'], 'EVENT2');</span>
+0059 lcaPut([ChannelStr,<span class="string">'ControlState'</span>], 5);         <span class="comment">% 'EVENT2'=5, 'EVENT1'=4</span>
+0060 lcaPut([ChannelStr,<span class="string">'Curr1MuxADCTbl.RARM'</span>],2);
+0061 
+0062 
+0063 <span class="comment">% Trigger on event timer 2</span>
+0064 lcaPutNoWait(<span class="string">'116-BPM:history.RARM'</span>, 0+2);
+0065 lcaPutNoWait(<span class="string">'132-BPM:history.RARM'</span>, 0+2);
+0066 pause(.1);
+0067 
+0068 
+0069 tmp = lcaGet(<span class="string">'116-BPM:history.RARM'</span>);
+0070 <span class="keyword">if</span> tmp ~= 2
+0071     error(<span class="string">'116-BPM:history.RARM = 2'</span>);
+0072 <span class="keyword">end</span>
+0073 tmp = lcaGet(<span class="string">'132-BPM:history.RARM'</span>); 
+0074 <span class="keyword">if</span> tmp ~= 2
+0075     error(<span class="string">'132-BPM:history.RARM = 2'</span>);
+0076 <span class="keyword">end</span>
+0077 
+0078 
+0079 <span class="comment">% Trigger on event timer 2</span>
+0080 lcaPut(<span class="string">'Spear:Event2'</span>,1);
+0081 
+0082 tic;
+0083 Event  = lcaGet(<span class="string">'Spear:Event2'</span>,0,<span class="string">'Char'</span>);
+0084 N116 = lcaGet(<span class="string">'116-BPM:history.NORD'</span>);
+0085 N132 = lcaGet(<span class="string">'132-BPM:history.NORD'</span>);
+0086 <span class="keyword">while</span> N116 ~= 896000 | N132 ~= 896000
+0087     fprintf(<span class="string">'   %f seconds after setting 116-BPM:history.RARM = 2 and Spear:Event2=%s\n'</span>, toc, Event{1});
+0088     fprintf(<span class="string">'   116-BPM:history.NORD = %d\n'</span>, N116);
+0089     fprintf(<span class="string">'   132-BPM:history.NORD = %d\n\n'</span>, N132);
+0090     <span class="keyword">if</span> toc &gt; 5
+0091         fprintf(<span class="string">'   BPM Timeout\n'</span>);
+0092         error(<span class="string">'NORD problem'</span>);
+0093     <span class="keyword">end</span>
+0094     pause(.25);
+0095     Event  = lcaGet(<span class="string">'Spear:Event2'</span>,0,<span class="string">'Char'</span>);
+0096     N116 = lcaGet(<span class="string">'116-BPM:history.NORD'</span>);
+0097     N132 = lcaGet(<span class="string">'132-BPM:history.NORD'</span>);
+0098 <span class="keyword">end</span>
+0099 
+0100 lcaSetTimeOut(.05);
+0101 lcaSetRetryCount(100);
+0102 
+0103 tmp = lcaGet(<span class="string">'116-BPM:history.RARM'</span>);
+0104 <span class="keyword">if</span> tmp ~= 0
+0105     error(<span class="string">'116-BPM:history.RARM = 0'</span>);
+0106 <span class="keyword">end</span>
+0107 tmp = lcaGet(<span class="string">'132-BPM:history.RARM'</span>); 
+0108 <span class="keyword">if</span> tmp ~= 0
+0109     error(<span class="string">'132-BPM:history.RARM = 0'</span>);
+0110 <span class="keyword">end</span>
+0111 
+0112 
+0113 <span class="comment">%CMam = lcaGet('18G-COR1V:Curr1MuxADCTbl');</span>
+0114 CMam = lcaGet([ChannelStr,<span class="string">'Curr1MuxADCTbl'</span>]);
+0115 
+0116     
+0117 <span class="comment">% 116 East Pit</span>
+0118 [BPM1, t116] = lcaGet(<span class="string">'116-BPM:history'</span>);
+0119 <span class="comment">%BPM1 = getpv('116-BPM:history');</span>
+0120 BPM1 = reshape(BPM1, [4 56 4000]);
+0121 
+0122 <span class="comment">% 132 West Pit</span>
+0123 [BPM2, t132] = lcaGet(<span class="string">'132-BPM:history'</span>);
+0124 <span class="comment">%BPM2 = getpv('132-BPM:history');</span>
+0125 BPM2 = reshape(BPM2, [4 56 4000]);
+0126 
+0127 <span class="comment">%BPM = [BPM2(:,1:26,:)  BPM1(:,1:end,:) BPM2(:,27:56,:)];</span>
+0128 BPM = [BPM2(:,31:56,:)  BPM1(:,1:<span class="keyword">end</span>,:) BPM2(:,1:30,:)];
+0129 
+0130 <span class="comment">% % BPM(12,4) and BPM(12,5) got swapped (change back 2-11-2004)</span>
+0131 <span class="comment">% BPM(:,[73 74],:) = BPM(:,[74 73],:);</span>
+0132 
+0133 i = findrowindex(BPMDeviceList, family2dev(<span class="string">'BPMx'</span>,0));
+0134 BPM = BPM(:,i,:);
+0135 
+0136 
+0137 lcaSetTimeOut(TimeOut);
+0138 lcaSetRetryCount(RetryCount)
+0139</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

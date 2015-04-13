@@ -1,0 +1,1046 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of arplot_orbitfb4</title>
+  <meta name="keywords" content="arplot_orbitfb4">
+  <meta name="description" content="arplot_orbitfb4(Month1 String, Days1, Year1, Month2 String, Days2, Year2)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; arplot_orbitfb4.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>arplot_orbitfb4
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>arplot_orbitfb4(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function arplot_orbitfb4(monthStr, days, year1, month2Str, days2, year2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> arplot_orbitfb4(Month1 String, Days1, Year1, Month2 String, Days2, Year2)
+
+ Plots archived data about the orbit feedback: plots the corrector
+       trim AM values (e.g., SR04C___VCM1T__AM00)
+       (this routine is compatible with the new Matlab ML)
+
+ Example:  arplots_orbitfb4('January',22:24, 2007);
+           plots data from 1/22, 1/23, and 1/24 in 2007
+
+ C. Steier, May 2002; updated to work with new ML 4-25-07, T.Scarvie</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arglobal.html" class="code" title="">arglobal</a>	Just used to make archived variables global</li><li><a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>	ARREAD - Loads one day of archived data into matlab global memory</li><li><a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>	ARSELECT - Return the archived data for a group on channel names</li><li><a href="switch2bergoz.html" class="code" title="function switch2bergoz(DisplayFlag)">switch2bergoz</a>	SWITCH2BERGOZ - Turn off the status of the non-Bergoz BPMs</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function arplot_orbitfb4(monthStr, days, year1, month2Str, days2, year2)</a>
+0002 <span class="comment">% arplot_orbitfb4(Month1 String, Days1, Year1, Month2 String, Days2, Year2)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% Plots archived data about the orbit feedback: plots the corrector</span>
+0005 <span class="comment">%       trim AM values (e.g., SR04C___VCM1T__AM00)</span>
+0006 <span class="comment">%       (this routine is compatible with the new Matlab ML)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% Example:  arplots_orbitfb4('January',22:24, 2007);</span>
+0009 <span class="comment">%           plots data from 1/22, 1/23, and 1/24 in 2007</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% C. Steier, May 2002; updated to work with new ML 4-25-07, T.Scarvie</span>
+0012 
+0013 tightaxis = 1; <span class="comment">% change to 1 if you want the vertical axis auto-scaled</span>
+0014 
+0015 <a href="switch2bergoz.html" class="code" title="function switch2bergoz(DisplayFlag)">switch2bergoz</a>
+0016 
+0017 BPMlist = getlist(<span class="string">'BPMx'</span>);
+0018 
+0019 HCMlist = [1 2;1 8;2 1;2 8;3 1;3 8;3 10;4 1;4 8;5 1;5 8;5 10;6 1;6 8; <span class="keyword">...</span>
+0020     7 1;7 8;8 1;8 8;9 1;9 8;10 1;10 8;10 10;11 1;11 8;12 1;12 7];
+0021 
+0022 VCMlist = [1 2;1 7;1 8;2 1;2 2;2 7;2 8;3 1;3 2;3 7;3 8;3 10;4 1;4 2;4 7;4 8;5 1;5 2;5 7;5 8;5 10;6 1;6 2;6 7;6 8; <span class="keyword">...</span>
+0023     7 1;7 2;7 7;7 8;8 1;8 2;8 7;8 8;9 1;9 2;9 7;9 8;10 1;10 2;10 7;10 8;10 10;11 1;11 2;11 7;11 8;12 1;12 2;12 7];
+0024 
+0025 <span class="comment">% HCMlist = [1 2;1 7;1 8;2 1;2 2;2 7;2 8;3 1;3 2;3 7;3 8;3 10;4 1;4 2;4 7;4 8;5 1;5 2;5 7;5 8;5 10;6 1;6 2;6 7;6 8; ...</span>
+0026 <span class="comment">%     7 1;7 2;7 7;7 8;8 1;8 2;8 8;8 8;9 1;9 2;9 7;9 8;10 1;10 2;10 7;10 8;10 10;11 1;11 2;11 7;11 8;12 1;12 2;12 7];</span>
+0027 
+0028 <span class="comment">% VCMlist = [1 2;1 4;1 5;1 7;1 8;2 1;2 2;2 4;2 5;2 7;2 8;3 1;3 2;3 4;3 5;3 7;3 8;3 10;4 1;4 2;4 4;4 5;4 7;4 8;5 1;5 2;5 4;5 5;5 7;5 8;5 10;6 1;6 2;6 4;6 5;6 7;6 8; ...</span>
+0029 <span class="comment">%     7 1;7 2;7 4;7 5;7 7;7 8;8 1;8 2;8 4;8 5;8 7;8 8;9 1;9 2;9 4;9 5;9 7;9 8;10 1;10 2;10 4;10 5;10 7;10 8;10 10;11 1;11 2;11 4;11 5;11 7;11 8;12 1;12 2;12 4;12 5;12 7];</span>
+0030 
+0031 <span class="comment">%VCMlist = getlist('VCM','Trim');</span>
+0032 
+0033 Sx = getrespmat(<span class="string">'BPMx'</span>,BPMlist,<span class="string">'HCM'</span>,HCMlist);
+0034 Sy = getrespmat(<span class="string">'BPMy'</span>,BPMlist,<span class="string">'VCM'</span>,VCMlist);
+0035 
+0036 
+0037 <span class="comment">% Inputs</span>
+0038 <span class="keyword">if</span> nargin &lt; 2
+0039     error(<span class="string">'ARPLOTS:  You need at least two input arguments.'</span>);
+0040 <span class="keyword">elseif</span> nargin == 2
+0041     tmp = clock;
+0042     year1 = tmp(1);
+0043     monthStr2 = [];
+0044     days2 = [];
+0045     year2 = [];
+0046 <span class="keyword">elseif</span> nargin == 3
+0047     monthStr2 = [];
+0048     days2 = [];
+0049     year2 = [];
+0050 <span class="keyword">elseif</span> nargin == 4
+0051     error(<span class="string">'ARPLOTS:  You need 2, 3, 5, or 6 input arguments.'</span>);
+0052 <span class="keyword">elseif</span> nargin == 5
+0053     tmp = clock;
+0054     year2 = tmp(1);
+0055 <span class="keyword">elseif</span> nargin == 6
+0056 <span class="keyword">else</span>
+0057     error(<span class="string">'ARPLOTS:  Inputs incorrect.'</span>);
+0058 <span class="keyword">end</span>
+0059 
+0060 <a href="arglobal.html" class="code" title="">arglobal</a>
+0061 
+0062 t=[];
+0063 
+0064 hcm12 = []; hcm18 = []; hcm21 = []; hcm28 = []; hcm31 = []; hcm38 = []; hcmu310 = []; hcm41 = [];  hcm48 = [];
+0065 hcm51 = []; hcm58 = []; hcmu510 = []; hcm61 = []; hcm68 = []; hcm71 = []; hcm78 = []; hcm81 = []; hcm88 = [];
+0066 hcm91 = []; hcm98 = []; hcm101 = []; hcm108 = []; hcmu1010 = []; hcm111 = []; hcm118 = []; hcm121 = []; hcm127 = [];
+0067 
+0068 vcm12 = []; vcm14 = []; vcm15 = []; vcm17 = []; vcm18 = []; vcm21 = []; vcm22 = []; vcm24 = []; vcm25 = []; vcm27 = []; vcm28 = [];
+0069 vcm31 = []; vcm34 = []; vcm35 = []; vcm32 = []; vcm37 = []; vcm38 = []; vcmu310 = []; vcm41 = []; vcm42 = []; vcm44 = []; vcm45 = []; vcm47 = []; vcm48 = [];
+0070 vcm51 = []; vcm52 = []; vcm54 = []; vcm55 = []; vcm57 = []; vcm58 = []; vcmu510 = []; vcm61 = []; vcm62 = []; vcm64 = []; vcm65 = []; vcm67 = []; vcm68 = [];
+0071 vcm71 = []; vcm72 = []; vcm74 = []; vcm75 = []; vcm77 = []; vcm78 = []; vcm81 = []; vcm82 = []; vcm84 = []; vcm85 = []; vcm87 = []; vcm88 = [];
+0072 vcm91 = []; vcm92 = []; vcm94 = []; vcm95 = []; vcm97 = []; vcm98 = []; vcm101 = []; vcm102 = []; vcm104 = []; vcm105 = []; vcm107 = []; vcm108 = []; vcmu1010 = [];
+0073 vcm111 = []; vcm112 = []; vcm114 = []; vcm115 = []; vcm117 = []; vcm118 = []; vcm121 = []; vcm122 = []; vcm124 = []; vcm125 = []; vcm127 = [];
+0074 
+0075 <span class="keyword">if</span> isempty(days2)
+0076     <span class="keyword">if</span> length(days) == [1]
+0077         month  = mon2num(monthStr);
+0078         NumDays = length(days);
+0079         StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0080         EndDayStr =   [<span class="string">''</span>];
+0081         titleStr = [StartDayStr];
+0082     <span class="keyword">else</span>
+0083         month  = mon2num(monthStr);
+0084         NumDays = length(days);
+0085         StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0086         EndDayStr =   [monthStr, <span class="string">' '</span>, num2str(days(length(days))),<span class="string">', '</span>, num2str(year1)];
+0087         titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0088     <span class="keyword">end</span>
+0089 <span class="keyword">else</span>
+0090     month  = mon2num(monthStr);
+0091     month2 = mon2num(month2Str);
+0092     NumDays = length(days) + length(days2);
+0093     StartDayStr = [monthStr, <span class="string">' '</span>, num2str(days(1)),<span class="string">', '</span>, num2str(year1)];
+0094     EndDayStr =   [month2Str, <span class="string">' '</span>, num2str(days2(length(days2))),<span class="string">', '</span>, num2str(year2)];
+0095 
+0096     titleStr = [StartDayStr,<span class="string">' to '</span>, EndDayStr,<span class="string">' ('</span>, num2str(NumDays),<span class="string">' days)'</span>];
+0097 <span class="keyword">end</span>
+0098 
+0099 
+0100 StartDay = days(1);
+0101 EndDay = days(length(days));
+0102 N=0;
+0103 
+0104 <span class="keyword">for</span> day = days
+0105     <span class="comment">%day;</span>
+0106     <span class="comment">%t0=clock;</span>
+0107     year1str = num2str(year1);
+0108     <span class="keyword">if</span> year1 &lt; 2000
+0109         year1str = year1str(3:4);
+0110         FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0111     <span class="keyword">else</span>
+0112         FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year1str, month, day);
+0113     <span class="keyword">end</span>
+0114     FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year1str, month, day);
+0115     <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName);
+0116     <span class="comment">%readtime = etime(clock, t0)</span>
+0117 
+0118     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___HCM2T__AM'</span>);
+0119     hcm12 = [hcm12 y1];
+0120 
+0121     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___HCM4T__AM'</span>);
+0122     hcm18 = [hcm18 y1];
+0123 
+0124     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___HCM1T__AM'</span>);
+0125     hcm21 = [hcm21 y1];
+0126 
+0127     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___HCM4T__AM'</span>);
+0128     hcm28 = [hcm28 y1];
+0129 
+0130     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___HCM1T__AM'</span>);
+0131     hcm31 = [hcm31 y1];
+0132 
+0133     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___HCM4T__AM'</span>);
+0134     hcm38 = [hcm38 y1];
+0135 
+0136     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04U___HCM2___AM'</span>);
+0137     hcmu310 = [hcmu310 y1];
+0138 
+0139     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___HCM1T__AM'</span>);
+0140     hcm41 = [hcm41 y1];
+0141 
+0142     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___HCM4T__AM'</span>);
+0143     hcm48 = [hcm48 y1];
+0144 
+0145     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___HCM1T__AM'</span>);
+0146     hcm51 = [hcm51 y1];
+0147 
+0148     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___HCM4T__AM'</span>);
+0149     hcm58 = [hcm58 y1];
+0150 
+0151     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06U___HCM2___AM'</span>);
+0152     hcmu510 = [hcmu510 y1];
+0153 
+0154     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___HCM1T__AM'</span>);
+0155     hcm61 = [hcm61 y1];
+0156 
+0157     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___HCM4T__AM'</span>);
+0158     hcm68 = [hcm68 y1];
+0159 
+0160     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___HCM1T__AM'</span>);
+0161     hcm71 = [hcm71 y1];
+0162 
+0163     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___HCM4T__AM'</span>);
+0164     hcm78 = [hcm78 y1];
+0165 
+0166     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___HCM1T__AM'</span>);
+0167     hcm81 = [hcm81 y1];
+0168 
+0169     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___HCM4T__AM'</span>);
+0170     hcm88 = [hcm88 y1];
+0171 
+0172     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___HCM1T__AM'</span>);
+0173     hcm91 = [hcm91 y1];
+0174 
+0175     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___HCM4T__AM'</span>);
+0176     hcm98 = [hcm98 y1];
+0177 
+0178     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___HCM1T__AM'</span>);
+0179     hcm101 = [hcm101 y1];
+0180 
+0181     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___HCM4T__AM'</span>);
+0182     hcm108 = [hcm108 y1];
+0183 
+0184     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11U___HCM2___AM'</span>);
+0185     hcmu1010 = [hcmu1010 y1];
+0186 
+0187     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___HCM1T__AM'</span>);
+0188     hcm111 = [hcm111 y1];
+0189 
+0190     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___HCM4T__AM'</span>);
+0191     hcm118 = [hcm118 y1];
+0192 
+0193     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___HCM1T__AM'</span>);
+0194     hcm121 = [hcm121 y1];
+0195 
+0196     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___HCM3T__AM'</span>);
+0197     hcm127 = [hcm127 y1];
+0198 
+0199     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___VCM2T__AM'</span>);
+0200     vcm12 = [vcm12 y1];
+0201 
+0202     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___VCM3T__AM'</span>);
+0203     vcm17 = [vcm17 y1];
+0204 
+0205     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___VCM4T__AM'</span>);
+0206     vcm18 = [vcm18 y1];
+0207 
+0208     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM1T__AM'</span>);
+0209     vcm21 = [vcm21 y1];
+0210 
+0211     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM2T__AM'</span>);
+0212     vcm22 = [vcm22 y1];
+0213 
+0214     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM3T__AM'</span>);
+0215     vcm27 = [vcm27 y1];
+0216 
+0217     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM4T__AM'</span>);
+0218     vcm28 = [vcm28 y1];
+0219 
+0220     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM1T__AM'</span>);
+0221     vcm31 = [vcm31 y1];
+0222 
+0223     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM2T__AM'</span>);
+0224     vcm32 = [vcm32 y1];
+0225 
+0226     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM3T__AM'</span>);
+0227     vcm37 = [vcm37 y1];
+0228 
+0229     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM4T__AM'</span>);
+0230     vcm38 = [vcm38 y1];
+0231 
+0232     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04U___VCM2___AM'</span>);
+0233     vcmu310 = [vcmu310 y1];
+0234 
+0235     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM1T__AM'</span>);
+0236     vcm41 = [vcm41 y1];
+0237 
+0238     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM2T__AM'</span>);
+0239     vcm42 = [vcm42 y1];
+0240 
+0241     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM3T__AM'</span>);
+0242     vcm47 = [vcm47 y1];
+0243 
+0244     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM4T__AM'</span>);
+0245     vcm48 = [vcm48 y1];
+0246 
+0247     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06U___VCM2___AM'</span>);
+0248     vcmu510 = [vcmu510 y1];
+0249 
+0250     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM1T__AM'</span>);
+0251     vcm51 = [vcm51 y1];
+0252 
+0253     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM2T__AM'</span>);
+0254     vcm52 = [vcm52 y1];
+0255 
+0256     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM3T__AM'</span>);
+0257     vcm57 = [vcm57 y1];
+0258 
+0259     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM4T__AM'</span>);
+0260     vcm58 = [vcm58 y1];
+0261 
+0262     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM1T__AM'</span>);
+0263     vcm61 = [vcm61 y1];
+0264 
+0265     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM2T__AM'</span>);
+0266     vcm62 = [vcm62 y1];
+0267 
+0268     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM3T__AM'</span>);
+0269     vcm67 = [vcm67 y1];
+0270 
+0271     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM4T__AM'</span>);
+0272     vcm68 = [vcm68 y1];
+0273 
+0274     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM1T__AM'</span>);
+0275     vcm71 = [vcm71 y1];
+0276 
+0277     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM2T__AM'</span>);
+0278     vcm72 = [vcm72 y1];
+0279 
+0280     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM3T__AM'</span>);
+0281     vcm77 = [vcm77 y1];
+0282 
+0283     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM4T__AM'</span>);
+0284     vcm78 = [vcm78 y1];
+0285 
+0286     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM1T__AM'</span>);
+0287     vcm81 = [vcm81 y1];
+0288 
+0289     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM2T__AM'</span>);
+0290     vcm82 = [vcm82 y1];
+0291 
+0292     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM3T__AM'</span>);
+0293     vcm87 = [vcm87 y1];
+0294 
+0295     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM4T__AM'</span>);
+0296     vcm88 = [vcm88 y1];
+0297 
+0298     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM1T__AM'</span>);
+0299     vcm91 = [vcm91 y1];
+0300 
+0301     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM2T__AM'</span>);
+0302     vcm92 = [vcm92 y1];
+0303 
+0304     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM3T__AM'</span>);
+0305     vcm97 = [vcm97 y1];
+0306 
+0307     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM4T__AM'</span>);
+0308     vcm98 = [vcm98 y1];
+0309 
+0310     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM1T__AM'</span>);
+0311     vcm101 = [vcm101 y1];
+0312 
+0313     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM2T__AM'</span>);
+0314     vcm102 = [vcm102 y1];
+0315 
+0316     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM3T__AM'</span>);
+0317     vcm107 = [vcm107 y1];
+0318 
+0319     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM4T__AM'</span>);
+0320     vcm108 = [vcm108 y1];
+0321 
+0322     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11U___VCM2___AM'</span>);
+0323     vcmu1010 = [vcmu1010 y1];
+0324 
+0325     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM1T__AM'</span>);
+0326     vcm111 = [vcm111 y1];
+0327 
+0328     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM2T__AM'</span>);
+0329     vcm112 = [vcm112 y1];
+0330 
+0331     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM3T__AM'</span>);
+0332     vcm117 = [vcm117 y1];
+0333 
+0334     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM4T__AM'</span>);
+0335     vcm118 = [vcm118 y1];
+0336 
+0337     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___VCM1T__AM'</span>);
+0338     vcm121 = [vcm121 y1];
+0339 
+0340     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___VCM2T__AM'</span>);
+0341     vcm122 = [vcm122 y1];
+0342 
+0343     [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___VCM3T__AM'</span>);
+0344     vcm127 = [vcm127 y1];
+0345 
+0346 
+0347     t    = [t  ARt+(day-StartDay)*24*60*60];
+0348 
+0349     disp(<span class="string">' '</span>);
+0350 <span class="keyword">end</span>
+0351 
+0352 
+0353 <span class="keyword">if</span> ~isempty(days2)
+0354 
+0355     StartDay = days2(1);
+0356     EndDay = days2(length(days2));
+0357 
+0358     <span class="keyword">for</span> day = days2
+0359 
+0360         year2str = num2str(year2);
+0361 
+0362         <span class="keyword">if</span> year2 &lt; 2000
+0363             year2str = year2str(3:4);
+0364             FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month2, day);
+0365         <span class="keyword">else</span>
+0366             FileName = sprintf(<span class="string">'%4s%02d%02d'</span>, year2str, month2, day);
+0367         <span class="keyword">end</span>
+0368 
+0369         FileName = sprintf(<span class="string">'%2s%02d%02d'</span>, year2str, month2, day);
+0370 
+0371         <a href="arread.html" class="code" title="function arread(InputDate, BooleanFlag)">arread</a>(FileName);
+0372         <span class="comment">%readtime = etime(clock, t0)</span>
+0373 
+0374         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___HCM2T__AM'</span>);
+0375         hcm12 = [hcm12 y1];
+0376 
+0377         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___HCM4T__AM'</span>);
+0378         hcm18 = [hcm18 y1];
+0379 
+0380         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___HCM1T__AM'</span>);
+0381         hcm21 = [hcm21 y1];
+0382 
+0383         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___HCM4T__AM'</span>);
+0384         hcm28 = [hcm28 y1];
+0385 
+0386         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___HCM1T__AM'</span>);
+0387         hcm31 = [hcm31 y1];
+0388 
+0389         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___HCM4T__AM'</span>);
+0390         hcm38 = [hcm38 y1];
+0391 
+0392         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04U___HCM2___AM'</span>);
+0393         hcmu310 = [hcmu310 y1];
+0394 
+0395         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___HCM1T__AM'</span>);
+0396         hcm41 = [hcm41 y1];
+0397 
+0398         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___HCM4T__AM'</span>);
+0399         hcm48 = [hcm48 y1];
+0400 
+0401         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___HCM1T__AM'</span>);
+0402         hcm51 = [hcm51 y1];
+0403 
+0404         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___HCM4T__AM'</span>);
+0405         hcm58 = [hcm58 y1];
+0406 
+0407         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06U___HCM2___AM'</span>);
+0408         hcmu510 = [hcmu510 y1];
+0409 
+0410         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___HCM1T__AM'</span>);
+0411         hcm61 = [hcm61 y1];
+0412 
+0413         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___HCM4T__AM'</span>);
+0414         hcm68 = [hcm68 y1];
+0415 
+0416         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___HCM1T__AM'</span>);
+0417         hcm71 = [hcm71 y1];
+0418 
+0419         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___HCM4T__AM'</span>);
+0420         hcm78 = [hcm78 y1];
+0421 
+0422         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___HCM1T__AM'</span>);
+0423         hcm81 = [hcm81 y1];
+0424 
+0425         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___HCM4T__AM'</span>);
+0426         hcm88 = [hcm88 y1];
+0427 
+0428         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___HCM1T__AM'</span>);
+0429         hcm91 = [hcm91 y1];
+0430 
+0431         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___HCM4T__AM'</span>);
+0432         hcm98 = [hcm98 y1];
+0433 
+0434         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___HCM1T__AM'</span>);
+0435         hcm101 = [hcm101 y1];
+0436 
+0437         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___HCM4T__AM'</span>);
+0438         hcm108 = [hcm108 y1];
+0439 
+0440         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11U___HCM2___AM'</span>);
+0441         hcmu1010 = [hcmu1010 y1];
+0442 
+0443         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___HCM1T__AM'</span>);
+0444         hcm111 = [hcm111 y1];
+0445 
+0446         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___HCM4T__AM'</span>);
+0447         hcm118 = [hcm118 y1];
+0448 
+0449         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___HCM1T__AM'</span>);
+0450         hcm121 = [hcm121 y1];
+0451 
+0452         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___HCM3T__AM'</span>);
+0453         hcm127 = [hcm127 y1];
+0454 
+0455         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___VCM2T__AM'</span>);
+0456         vcm12 = [vcm12 y1];
+0457 
+0458         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___VCM3T__AM'</span>);
+0459         vcm17 = [vcm17 y1];
+0460 
+0461         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR01C___VCM4T__AM'</span>);
+0462         vcm18 = [vcm18 y1];
+0463 
+0464         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM1T__AM'</span>);
+0465         vcm21 = [vcm21 y1];
+0466 
+0467         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM2T__AM'</span>);
+0468         vcm22 = [vcm22 y1];
+0469 
+0470         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM3T__AM'</span>);
+0471         vcm27 = [vcm27 y1];
+0472 
+0473         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR02C___VCM4T__AM'</span>);
+0474         vcm28 = [vcm28 y1];
+0475 
+0476         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM1T__AM'</span>);
+0477         vcm31 = [vcm31 y1];
+0478 
+0479         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM2T__AM'</span>);
+0480         vcm32 = [vcm32 y1];
+0481 
+0482         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM3T__AM'</span>);
+0483         vcm37 = [vcm37 y1];
+0484 
+0485         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR03C___VCM4T__AM'</span>);
+0486         vcm38 = [vcm38 y1];
+0487 
+0488         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04U___VCM2___AM'</span>);
+0489         vcmu310 = [vcmu310 y1];
+0490 
+0491         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM1T__AM'</span>);
+0492         vcm41 = [vcm41 y1];
+0493 
+0494         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM2T__AM'</span>);
+0495         vcm42 = [vcm42 y1];
+0496 
+0497         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM3T__AM'</span>);
+0498         vcm47 = [vcm47 y1];
+0499 
+0500         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR04C___VCM4T__AM'</span>);
+0501         vcm48 = [vcm48 y1];
+0502 
+0503         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM1T__AM'</span>);
+0504         vcm51 = [vcm51 y1];
+0505 
+0506         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM2T__AM'</span>);
+0507         vcm52 = [vcm52 y1];
+0508 
+0509         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM3T__AM'</span>);
+0510         vcm57 = [vcm57 y1];
+0511 
+0512         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR05C___VCM4T__AM'</span>);
+0513         vcm58 = [vcm58 y1];
+0514 
+0515         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06U___VCM2___AM'</span>);
+0516         vcmu510 = [vcmu510 y1];
+0517 
+0518         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM1T__AM'</span>);
+0519         vcm61 = [vcm61 y1];
+0520 
+0521         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM2T__AM'</span>);
+0522         vcm62 = [vcm62 y1];
+0523 
+0524         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM3T__AM'</span>);
+0525         vcm67 = [vcm67 y1];
+0526 
+0527         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR06C___VCM4T__AM'</span>);
+0528         vcm68 = [vcm68 y1];
+0529 
+0530         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM1T__AM'</span>);
+0531         vcm71 = [vcm71 y1];
+0532 
+0533         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM2T__AM'</span>);
+0534         vcm72 = [vcm72 y1];
+0535 
+0536         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM3T__AM'</span>);
+0537         vcm77 = [vcm77 y1];
+0538 
+0539         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR07C___VCM4T__AM'</span>);
+0540         vcm78 = [vcm78 y1];
+0541 
+0542         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM1T__AM'</span>);
+0543         vcm81 = [vcm81 y1];
+0544 
+0545         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM2T__AM'</span>);
+0546         vcm82 = [vcm82 y1];
+0547 
+0548         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM3T__AM'</span>);
+0549         vcm87 = [vcm87 y1];
+0550 
+0551         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR08C___VCM4T__AM'</span>);
+0552         vcm88 = [vcm88 y1];
+0553 
+0554         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM1T__AM'</span>);
+0555         vcm91 = [vcm91 y1];
+0556 
+0557         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM2T__AM'</span>);
+0558         vcm92 = [vcm92 y1];
+0559 
+0560         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM3T__AM'</span>);
+0561         vcm97 = [vcm97 y1];
+0562 
+0563         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR09C___VCM4T__AM'</span>);
+0564         vcm98 = [vcm98 y1];
+0565 
+0566         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM1T__AM'</span>);
+0567         vcm101 = [vcm101 y1];
+0568 
+0569         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM2T__AM'</span>);
+0570         vcm102 = [vcm102 y1];
+0571 
+0572         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM3T__AM'</span>);
+0573         vcm107 = [vcm107 y1];
+0574 
+0575         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR10C___VCM4T__AM'</span>);
+0576         vcm108 = [vcm108 y1];
+0577 
+0578         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11U___VCM2___AM'</span>);
+0579         vcmu1010 = [vcmu1010 y1];
+0580 
+0581         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM1T__AM'</span>);
+0582         vcm111 = [vcm111 y1];
+0583 
+0584         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM2T__AM'</span>);
+0585         vcm112 = [vcm112 y1];
+0586 
+0587         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM3T__AM'</span>);
+0588         vcm117 = [vcm117 y1];
+0589 
+0590         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR11C___VCM4T__AM'</span>);
+0591         vcm118 = [vcm118 y1];
+0592 
+0593         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___VCM1T__AM'</span>);
+0594         vcm121 = [vcm121 y1];
+0595 
+0596         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___VCM2T__AM'</span>);
+0597         vcm122 = [vcm122 y1];
+0598 
+0599         [y1, i] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(<span class="string">'SR12C___VCM3T__AM'</span>);
+0600         vcm127 = [vcm127 y1];
+0601 
+0602         t = [t  ARt+(day-StartDay+(days(length(days))-days(1)+1))*24*60*60];
+0603 
+0604         disp(<span class="string">' '</span>);
+0605 
+0606     <span class="keyword">end</span>
+0607 <span class="keyword">end</span>
+0608 
+0609 
+0610 <span class="comment">% Hours or days for the x-axis?</span>
+0611 <span class="keyword">if</span> t(end)/60/60/24 &gt; 3
+0612     t = t/60/60/24;
+0613     xlabelstring = [<span class="string">'Date since '</span>, StartDayStr, <span class="string">' [Days]'</span>];
+0614     DayFlag = 1;
+0615 <span class="keyword">else</span>
+0616     t = t/60/60;
+0617     xlabelstring = [<span class="string">'Time since '</span>, StartDayStr, <span class="string">' [Hours]'</span>];
+0618     DayFlag = 0;
+0619 <span class="keyword">end</span>
+0620 Days = [days days2];
+0621 xmax = max(t);
+0622 
+0623 
+0624 figure
+0625 
+0626 subplot(4,1,1)
+0627 plot(t,hcm12,t,hcm18);
+0628 legend(<span class="string">'HCM 1.2'</span>,<span class="string">'HCM 1.8'</span>);
+0629 ylabel(<span class="string">'I [A]'</span>);
+0630 grid;
+0631 <span class="keyword">if</span> tightaxis
+0632     axis tight;
+0633     xaxis([min(t) max(t)]);
+0634 <span class="keyword">else</span>
+0635     axis([min(t) max(t) -1 1]);
+0636 <span class="keyword">end</span>
+0637 title([<span class="string">'HCM trim AMs '</span>,titleStr]);
+0638 
+0639 subplot(4,1,2)
+0640 plot(t,hcm21,t,hcm28);
+0641 legend(<span class="string">'HCM 2.1'</span>,<span class="string">'HCM 2.8'</span>);
+0642 ylabel(<span class="string">'I [A]'</span>);
+0643 grid;
+0644 <span class="keyword">if</span> tightaxis
+0645     axis tight;
+0646     xaxis([min(t) max(t)]);
+0647 <span class="keyword">else</span>
+0648     axis([min(t) max(t) -1 1]);
+0649 <span class="keyword">end</span>
+0650 
+0651 subplot(4,1,3)
+0652 plot(t,hcm31,t,hcm38);
+0653 legend(<span class="string">'HCM 3.1'</span>,<span class="string">'HCM 3.8'</span>);
+0654 ylabel(<span class="string">'I [A]'</span>);
+0655 grid;
+0656 <span class="keyword">if</span> tightaxis
+0657     axis tight;
+0658     xaxis([min(t) max(t)]);
+0659 <span class="keyword">else</span>
+0660     axis([min(t) max(t) -1 1]);
+0661 <span class="keyword">end</span>
+0662 
+0663 subplot(4,1,4)
+0664 plot(t,hcm41,t,hcm48,t,hcmu310/10);
+0665 legend(<span class="string">'HCM 4.1'</span>,<span class="string">'HCM 4.8'</span>,<span class="string">'HCMCHIC 3.10/10'</span>);
+0666 ylabel(<span class="string">'I [A]'</span>);
+0667 grid;
+0668 <span class="keyword">if</span> tightaxis
+0669     axis tight;
+0670     xaxis([min(t) max(t)]);
+0671 <span class="keyword">else</span>
+0672     axis([min(t) max(t) -1 1]);
+0673 <span class="keyword">end</span>
+0674 xlabel(xlabelstring);
+0675 orient tall;
+0676 
+0677 
+0678 
+0679 
+0680 figure
+0681 
+0682 subplot(4,1,1)
+0683 plot(t,hcm51,t,hcm58);
+0684 legend(<span class="string">'HCM 5.1'</span>,<span class="string">'HCM 5.8'</span>);
+0685 ylabel(<span class="string">'I [A]'</span>);
+0686 grid;
+0687 <span class="keyword">if</span> tightaxis
+0688     axis tight;
+0689     xaxis([min(t) max(t)]);
+0690 <span class="keyword">else</span>
+0691     axis([min(t) max(t) -1 1]);
+0692 <span class="keyword">end</span>
+0693 title([<span class="string">'HCM trim AMs '</span>,titleStr]);
+0694 
+0695 subplot(4,1,2)
+0696 plot(t,hcm61,t,hcm68,t,hcmu510/10);
+0697 legend(<span class="string">'HCM 6.1'</span>,<span class="string">'HCM 6.8'</span>,<span class="string">'HCMCHIC 5.10/10'</span>);
+0698 ylabel(<span class="string">'I [A]'</span>);
+0699 grid;
+0700 <span class="keyword">if</span> tightaxis
+0701     axis tight;
+0702     xaxis([min(t) max(t)]);
+0703 <span class="keyword">else</span>
+0704     axis([min(t) max(t) -1 1]);
+0705 <span class="keyword">end</span>
+0706 
+0707 subplot(4,1,3)
+0708 plot(t,hcm71,t,hcm78);
+0709 legend(<span class="string">'HCM 7.1'</span>,<span class="string">'HCM 7.8'</span>);
+0710 ylabel(<span class="string">'I [A]'</span>);
+0711 grid;
+0712 <span class="keyword">if</span> tightaxis
+0713     axis tight;
+0714     xaxis([min(t) max(t)]);
+0715 <span class="keyword">else</span>
+0716     axis([min(t) max(t) -1 1]);
+0717 <span class="keyword">end</span>
+0718 
+0719 subplot(4,1,4)
+0720 plot(t,hcm81,t,hcm88);
+0721 legend(<span class="string">'HCM 8.1'</span>,<span class="string">'HCM 8.8'</span>);
+0722 ylabel(<span class="string">'I [A]'</span>);
+0723 grid;
+0724 <span class="keyword">if</span> tightaxis
+0725     axis tight;
+0726     xaxis([min(t) max(t)]);
+0727 <span class="keyword">else</span>
+0728     axis([min(t) max(t) -1 1]);
+0729 <span class="keyword">end</span>
+0730 xlabel(xlabelstring);
+0731 orient tall;
+0732 
+0733 
+0734 figure
+0735 
+0736 subplot(4,1,1)
+0737 plot(t,hcm91,t,hcm98);
+0738 legend(<span class="string">'HCM 9.1'</span>,<span class="string">'HCM 9.8'</span>);
+0739 ylabel(<span class="string">'I [A]'</span>);
+0740 grid;
+0741 <span class="keyword">if</span> tightaxis
+0742     axis tight;
+0743     xaxis([min(t) max(t)]);
+0744 <span class="keyword">else</span>
+0745     axis([min(t) max(t) -1 1]);
+0746 <span class="keyword">end</span>
+0747 title([<span class="string">'HCM trim AMs '</span>,titleStr]);
+0748 
+0749 subplot(4,1,2)
+0750 plot(t,hcm101,t,hcm108);
+0751 legend(<span class="string">'HCM 10.1'</span>,<span class="string">'HCM 10.8'</span>);
+0752 ylabel(<span class="string">'I [A]'</span>);
+0753 grid;
+0754 <span class="keyword">if</span> tightaxis
+0755     axis tight;
+0756     xaxis([min(t) max(t)]);
+0757 <span class="keyword">else</span>
+0758     axis([min(t) max(t) -1 1]);
+0759 <span class="keyword">end</span>
+0760 
+0761 subplot(4,1,3)
+0762 plot(t,hcm111,t,hcm118,t,hcmu1010/10);
+0763 legend(<span class="string">'HCM 11.1'</span>,<span class="string">'HCM 11.8'</span>,<span class="string">'HCMCHIC 10.10/10'</span>);
+0764 ylabel(<span class="string">'I [A]'</span>);
+0765 grid;
+0766 <span class="keyword">if</span> tightaxis
+0767     axis tight;
+0768     xaxis([min(t) max(t)]);
+0769 <span class="keyword">else</span>
+0770     axis([min(t) max(t) -1 1]);
+0771 <span class="keyword">end</span>
+0772 
+0773 subplot(4,1,4)
+0774 plot(t,hcm121,t,hcm127);
+0775 legend(<span class="string">'HCM 12.1'</span>,<span class="string">'HCM 12.7'</span>);
+0776 ylabel(<span class="string">'I [A]'</span>);
+0777 grid;
+0778 <span class="keyword">if</span> tightaxis
+0779     axis tight;
+0780     xaxis([min(t) max(t)]);
+0781 <span class="keyword">else</span>
+0782     axis([min(t) max(t) -1 1]);
+0783 <span class="keyword">end</span>
+0784 xlabel(xlabelstring);
+0785 orient tall;
+0786 
+0787 figure
+0788 
+0789 subplot(4,1,1)
+0790 plot(t,vcm12,t,vcm18,t,vcm17);
+0791 legend(<span class="string">'VCM 1.2'</span>,<span class="string">'VCM 1.8'</span>,<span class="string">'VCM 1.7'</span>);
+0792 ylabel(<span class="string">'I [A]'</span>);
+0793 grid;
+0794 <span class="keyword">if</span> tightaxis
+0795     axis tight;
+0796     xaxis([min(t) max(t)]);
+0797 <span class="keyword">else</span>
+0798     axis([min(t) max(t) -2 2]);
+0799 <span class="keyword">end</span>
+0800 title([<span class="string">'VCM trim AMs '</span>,titleStr]);
+0801 
+0802 subplot(4,1,2)
+0803 plot(t,vcm21,t,vcm28,t,vcm22,t,vcm27);
+0804 legend(<span class="string">'VCM 2.1'</span>,<span class="string">'VCM 2.8'</span>,<span class="string">'VCM 2.2'</span>,<span class="string">'VCM 2.7'</span>);
+0805 ylabel(<span class="string">'I [A]'</span>);
+0806 grid;
+0807 <span class="keyword">if</span> tightaxis
+0808     axis tight;
+0809     xaxis([min(t) max(t)]);
+0810 <span class="keyword">else</span>
+0811     axis([min(t) max(t) -2 2]);
+0812 <span class="keyword">end</span>
+0813 
+0814 subplot(4,1,3)
+0815 plot(t,vcm31,t,vcm38,t,vcm32,t,vcm37);
+0816 legend(<span class="string">'VCM 3.1'</span>,<span class="string">'VCM 3.8'</span>,<span class="string">'VCM 3.2'</span>,<span class="string">'VCM 3.7'</span>);
+0817 ylabel(<span class="string">'I [A]'</span>);
+0818 grid;
+0819 <span class="keyword">if</span> tightaxis
+0820     axis tight;
+0821     xaxis([min(t) max(t)]);
+0822 <span class="keyword">else</span>
+0823     axis([min(t) max(t) -2 2]);
+0824 <span class="keyword">end</span>
+0825 
+0826 subplot(4,1,4)
+0827 plot(t,vcm41,t,vcm48,t,vcmu310/10,t,vcm42,t,vcm47);
+0828 legend(<span class="string">'VCM 4.1'</span>,<span class="string">'VCM 4.8'</span>,<span class="string">'VCMCHIC 3.10/10'</span>,<span class="string">'VCM 4.2'</span>,<span class="string">'VCM 4.7'</span>);
+0829 ylabel(<span class="string">'I [A]'</span>);
+0830 grid;
+0831 <span class="keyword">if</span> tightaxis
+0832     axis tight;
+0833     xaxis([min(t) max(t)]);
+0834 <span class="keyword">else</span>
+0835     axis([min(t) max(t) -2 2]);
+0836 <span class="keyword">end</span>
+0837 xlabel(xlabelstring);
+0838 orient tall;
+0839 
+0840 
+0841 
+0842 
+0843 figure
+0844 
+0845 subplot(4,1,1)
+0846 plot(t,vcm51,t,vcm58,t,vcm52,t,vcm57);
+0847 legend(<span class="string">'VCM 5.1'</span>,<span class="string">'VCM 5.8'</span>,<span class="string">'VCM 5.2'</span>,<span class="string">'VCM 5.7'</span>);
+0848 ylabel(<span class="string">'I [A]'</span>);
+0849 grid;
+0850 <span class="keyword">if</span> tightaxis
+0851     axis tight;
+0852     xaxis([min(t) max(t)]);
+0853 <span class="keyword">else</span>
+0854     axis([min(t) max(t) -2 2]);
+0855 <span class="keyword">end</span>
+0856 title([<span class="string">'VCM trim AMs '</span>,titleStr]);
+0857 
+0858 subplot(4,1,2)
+0859 plot(t,vcm61,t,vcm68,t,vcmu510/10,t,vcm62,t,vcm67);
+0860 legend(<span class="string">'VCM 6.1'</span>,<span class="string">'VCM 6.8'</span>,<span class="string">'VCMCHIC 5.10/10'</span>,<span class="string">'VCM 6.2'</span>,<span class="string">'VCM 6.7'</span>);
+0861 ylabel(<span class="string">'I [A]'</span>);
+0862 grid;
+0863 <span class="keyword">if</span> tightaxis
+0864     axis tight;
+0865     xaxis([min(t) max(t)]);
+0866 <span class="keyword">else</span>
+0867     axis([min(t) max(t) -2 2]);
+0868 <span class="keyword">end</span>
+0869 
+0870 subplot(4,1,3)
+0871 plot(t,vcm71,t,vcm78,t,vcm72,t,vcm77);
+0872 legend(<span class="string">'VCM 7.1'</span>,<span class="string">'VCM 7.8'</span>,<span class="string">'VCM 7.2'</span>,<span class="string">'VCM 7.7'</span>);
+0873 ylabel(<span class="string">'I [A]'</span>);
+0874 grid;
+0875 <span class="keyword">if</span> tightaxis
+0876     axis tight;
+0877     xaxis([min(t) max(t)]);
+0878 <span class="keyword">else</span>
+0879     axis([min(t) max(t) -2 2]);
+0880 <span class="keyword">end</span>
+0881 
+0882 subplot(4,1,4)
+0883 plot(t,vcm81,t,vcm88,t,vcm82,t,vcm87);
+0884 legend(<span class="string">'VCM 8.1'</span>,<span class="string">'VCM 8.8'</span>,<span class="string">'VCM 8.2'</span>,<span class="string">'VCM 8.7'</span>);
+0885 ylabel(<span class="string">'I [A]'</span>);
+0886 grid;
+0887 <span class="keyword">if</span> tightaxis
+0888     axis tight;
+0889     xaxis([min(t) max(t)]);
+0890 <span class="keyword">else</span>
+0891     axis([min(t) max(t) -2 2]);
+0892 <span class="keyword">end</span>
+0893 xlabel(xlabelstring);
+0894 orient tall;
+0895 
+0896 
+0897 figure
+0898 
+0899 subplot(4,1,1)
+0900 plot(t,vcm91,t,vcm98,t,vcm92,t,vcm97);
+0901 legend(<span class="string">'VCM 9.1'</span>,<span class="string">'VCM 9.8'</span>,<span class="string">'VCM 9.2'</span>,<span class="string">'VCM 9.7'</span>);
+0902 ylabel(<span class="string">'I [A]'</span>);
+0903 grid;
+0904 <span class="keyword">if</span> tightaxis
+0905     axis tight;
+0906     xaxis([min(t) max(t)]);
+0907 <span class="keyword">else</span>
+0908     axis([min(t) max(t) -2 2]);
+0909 <span class="keyword">end</span>
+0910 title([<span class="string">'VCM trim AMs '</span>,titleStr]);
+0911 
+0912 subplot(4,1,2)
+0913 plot(t,vcm101,t,vcm108,t,vcm102,t,vcm107);
+0914 legend(<span class="string">'VCM 10.1'</span>,<span class="string">'VCM 10.8'</span>,<span class="string">'VCM 10.2'</span>,<span class="string">'VCM 10.7'</span>);
+0915 ylabel(<span class="string">'I [A]'</span>);
+0916 grid;
+0917 <span class="keyword">if</span> tightaxis
+0918     axis tight;
+0919     xaxis([min(t) max(t)]);
+0920 <span class="keyword">else</span>
+0921     axis([min(t) max(t) -2 2]);
+0922 <span class="keyword">end</span>
+0923 
+0924 subplot(4,1,3)
+0925 plot(t,vcm111,t,vcm118,t,vcmu1010/10,t,vcm112,t,vcm117);
+0926 legend(<span class="string">'VCM 11.1'</span>,<span class="string">'VCM 11.8'</span>,<span class="string">'VCMCHIC 10.10/10'</span>,<span class="string">'VCM 11.2'</span>,<span class="string">'VCM 11.7'</span>);
+0927 ylabel(<span class="string">'I [A]'</span>);
+0928 grid;
+0929 <span class="keyword">if</span> tightaxis
+0930     axis tight;
+0931     xaxis([min(t) max(t)]);
+0932 <span class="keyword">else</span>
+0933     axis([min(t) max(t) -2 2]);
+0934 <span class="keyword">end</span>
+0935 
+0936 subplot(4,1,4)
+0937 plot(t,vcm121,t,vcm127,t,vcm122);
+0938 legend(<span class="string">'VCM 12.1'</span>,<span class="string">'VCM 12.7'</span>,<span class="string">'VCM 12.2'</span>);
+0939 ylabel(<span class="string">'I [A]'</span>);
+0940 grid;
+0941 <span class="keyword">if</span> tightaxis
+0942     axis tight;
+0943     xaxis([min(t) max(t)]);
+0944 <span class="keyword">else</span>
+0945     axis([min(t) max(t) -2 2]);
+0946 <span class="keyword">end</span>
+0947 xlabel(xlabelstring);
+0948 orient tall;
+0949 
+0950 
+0951 <span class="keyword">if</span> 0
+0952     HCM = [hcm12;hcm18;hcm21;hcm28;hcm31;hcm38;hcm41;hcm48;hcm51;hcm58;hcm61;hcm68; <span class="keyword">...</span>
+0953         hcm71;hcm78;hcm81;hcm88;hcm91;hcm98;hcm101;hcm108;hcm111;hcm118;hcm121;hcm127;hcmu310;hcmu510;hcmu1010];
+0954     VCM = [vcm12;vcm17;vcm18;vcm21;vcm22;vcm27;vcm28;vcm31;vcm32;vcm37;vcm38; <span class="keyword">...</span>
+0955         vcm41;vcm42;vcm47;vcm48;vcm51;vcm52;vcm57;vcm58;vcm61;vcm62;vcm67;vcm68; <span class="keyword">...</span>
+0956         vcm71;vcm72;vcm77;vcm78;vcm81;vcm82;vcm87;vcm88;vcm91;vcm92;vcm97;vcm98; <span class="keyword">...</span>
+0957         vcm101;vcm102;vcm107;vcm108;vcm111;vcm112;vcm117;vcm118;vcm121;vcm122;vcm127;vcmu310;vcmu510;vcmu1010];
+0958     <span class="comment">% VCM = [vcm12;vcm14;vcm15;vcm17;vcm18;vcm21;vcm22;vcm24;vcm25;vcm27;vcm28;vcm31;vcm32;vcm34;vcm35;vcm37;vcm38; ...</span>
+0959     <span class="comment">%     vcm41;vcm42;vcm44;vcm45;vcm47;vcm48;vcm51;vcm52;vcm54;vcm55;vcm57;vcm58;vcm61;vcm62;vcm64;vcm65;vcm67;vcm68; ...</span>
+0960     <span class="comment">%     vcm71;vcm72;vcm74;vcm75;vcm77;vcm78;vcm81;vcm82;vcm84;vcm85;vcm87;vcm88;vcm91;vcm92;vcm94;vcm95;vcm97;vcm98; ...</span>
+0961     <span class="comment">%     vcm101;vcm102;vcm104;vcm105;vcm107;vcm108;vcm111;vcm112;vcm114;vcm115;vcm117;vcm118;vcm121;vcm122;vcm124;vcm125;vcm127;vcmu310;vcmu510;vcmu1010];</span>
+0962 
+0963     <span class="comment">%  size(Sx)</span>
+0964     <span class="comment">%  size(HCM)</span>
+0965     <span class="comment">%  size(Sy)</span>
+0966     <span class="comment">%  size(VCM)</span>
+0967 
+0968     BPMx = Sx*HCM;
+0969     BPMy = Sy*VCM;
+0970 
+0971     <span class="keyword">for</span> loop=1:size(BPMx,1)
+0972         figure;
+0973         plot(t,BPMx(loop,:))
+0974         legend(getname(<span class="string">'BPMx'</span>,BPMlist(loop,:)))
+0975         axis tight
+0976         aa=axis;
+0977         xaxis([min(t) max(t)]);
+0978         yaxis([aa(3) aa(4)]);
+0979         xlabel(xlabelstring);
+0980     <span class="keyword">end</span>
+0981     <span class="keyword">for</span> loop=1:size(BPMy,1)
+0982         figure;
+0983         plot(t,BPMy(loop,:))
+0984         legend(getname(<span class="string">'BPMy'</span>,BPMlist(loop,:)))
+0985         axis tight
+0986         aa=axis;
+0987         xaxis([min(t) max(t)]);
+0988         yaxis([aa(3) aa(4)]);
+0989         xlabel(xlabelstring);
+0990     <span class="keyword">end</span>
+0991 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:41:01 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

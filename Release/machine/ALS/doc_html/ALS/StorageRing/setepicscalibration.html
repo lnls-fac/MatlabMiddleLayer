@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setepicscalibration</title>
+  <meta name="keywords" content="setepicscalibration">
+  <meta name="description" content="">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setepicscalibration.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setepicscalibration
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong></strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function setepicscalibration(Family, Field, DeviceList, DisplayFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setepicscalibration(Family, Field, DeviceList, DisplayFlag)</a>
+0002 
+0003 
+0004 <span class="keyword">if</span> nargin &lt; 1
+0005     Family = <span class="string">'QF'</span>;
+0006 <span class="keyword">end</span>
+0007 
+0008 <span class="keyword">if</span> nargin &lt; 2
+0009     Field = <span class="string">'Monitor'</span>;
+0010 <span class="keyword">end</span>
+0011 
+0012 <span class="keyword">if</span> nargin &lt; 3
+0013     DeviceList = [1 1];
+0014 <span class="keyword">end</span>
+0015 
+0016 <span class="keyword">if</span> nargin &lt; 4
+0017     DisplayFlag = <span class="string">'Display'</span>;
+0018 <span class="keyword">end</span>
+0019 
+0020 
+0021 ChannelName = family2channel(Family, Field, DeviceList);
+0022 
+0023 VAL  = getpv(ChannelName, <span class="string">'VAL'</span>);
+0024 RVAL = getpv(ChannelName, <span class="string">'RVAL'</span>);
+0025 ASLO = getpv(ChannelName, <span class="string">'ASLO'</span>);
+0026 AOFF = getpv(ChannelName, <span class="string">'AOFF'</span>);
+0027 LINR = getpv(ChannelName, <span class="string">'LINR'</span>);
+0028 ESLO = getpv(ChannelName, <span class="string">'ESLO'</span>);
+0029 EOFF = getpv(ChannelName, <span class="string">'EOFF'</span>);
+0030 
+0031 EGUL = getpv(ChannelName, <span class="string">'EGUL'</span>);
+0032 EGUF = getpv(ChannelName, <span class="string">'EGUF'</span>);
+0033 
+0034 fprintf(<span class="string">'   %s\n'</span>, ChannelName);
+0035 fprintf(<span class="string">'   VAL  = %f\n'</span>, VAL);
+0036 fprintf(<span class="string">'   RVAL = %f\n'</span>, RVAL);
+0037 fprintf(<span class="string">'   ASLO = %f\n'</span>, ASLO);
+0038 fprintf(<span class="string">'   AOFF = %f\n'</span>, AOFF);
+0039 fprintf(<span class="string">'   LINR = %d\n'</span>, LINR);
+0040 fprintf(<span class="string">'   ESLO = %f\n'</span>, ESLO);
+0041 fprintf(<span class="string">'   EOFF = %f\n'</span>, EOFF);
+0042 fprintf(<span class="string">'   EGUL = %f\n'</span>, EGUL);
+0043 fprintf(<span class="string">'   EGUF = %f\n'</span>, EGUF);
+0044 
+0045 <span class="keyword">if</span> strcmpi(Field, <span class="string">'Monitor'</span>)
+0046     SMOO = getpv(ChannelName, <span class="string">'SMOO'</span>);
+0047     fprintf(<span class="string">'   SMOO = %d\n'</span>, SMOO);
+0048 <span class="keyword">end</span>
+0049 fprintf(<span class="string">'\n'</span>);
+0050 
+0051 
+0052 VAL = RVAL;
+0053 fprintf(<span class="string">'   VAL1 = RVAL = %f\n'</span>, VAL);
+0054 
+0055 VAL = VAL * ASLO + AOFF;
+0056 fprintf(<span class="string">'   VAL2 = VAL1 * ASLO + AOFF = %f\n'</span>, VAL);
+0057 
+0058 <span class="keyword">if</span> LINR 
+0059 <span class="comment">%VAL = VAL * ESLO + EOFF;</span>
+0060 VAL = VAL * ESLO + EGUL;  <span class="comment">% Seems like it should be EOFF</span>
+0061 fprintf(<span class="string">'   VAL3 = VAL2 * ESLO + EGUL = %f\n'</span>, VAL);
+0062 <span class="keyword">end</span>
+0063 
+0064 <span class="comment">%VAL = VAL * (EGUF - EGUL) + EGUL;</span>
+0065 <span class="comment">%fprintf('   VAL4 = VAL3 * (EGUF - EGUL) + EGUL = %f\n', VAL);</span>
+0066 
+0067 
+0068</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

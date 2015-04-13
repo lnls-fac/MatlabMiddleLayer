@@ -1,0 +1,272 @@
+function r = sirius_lattice_girder3(varargin)
+% 2012-08-28 Nova rede - Ximenes.
+
+global THERING;
+
+
+%% global parameters 
+%  =================
+
+% --- system parameters ---
+energy = 3e9;
+mode   = 'AC20';
+const  = lnls_constants;
+harmonic_number = 864;
+
+% processamento de input (energia e modo de operação)
+for i=1:length(varargin)
+    if ischar(varargin{i})
+        mode = varargin{i};
+    else
+        energy = varargin{i} * 1e9;
+    end;
+end
+
+fprintf(['   Loading lattice SIRIUS_V200 - ' mode ' - ' num2str(energy/1e9) ' GeV' '\n']);
+
+
+% carrega forï¿½as dos imï¿½s de acordo com modo de operação
+if strcmpi(mode, 'AC20')
+    set_magnet_strengths_AC20;
+elseif strcmpi(mode, 'AC10')
+    set_magnet_strengths_AC10;
+end
+
+
+%% passmethods
+%  ===========
+
+bend_pass_method = 'BndMPoleSymplectic4Pass';
+quad_pass_method = 'StrMPoleSymplectic4Pass';
+%quad_pass_method = 'QuadLinearPass';
+sext_pass_method = 'StrMPoleSymplectic4Pass';
+
+
+%% elements
+%  ========
+
+% --- drift spaces ---
+lia2     = drift('lia2', 3.379200, 'DriftPass');
+lia1     = drift('lia1', 0.170000, 'DriftPass');
+lib      = drift('lib',  2.959200, 'DriftPass');
+l32      = drift('l32',  0.280000, 'DriftPass');
+l31      = drift('l31',  0.170000, 'DriftPass');
+l2       = drift('l2',   0.115000, 'DriftPass');
+l12      = drift('l12',  0.170000, 'DriftPass');
+l11      = drift('l11',  0.170000, 'DriftPass');
+lc11     = drift('lc11', 0.240000, 'DriftPass');
+lc12     = drift('lc12', 0.170000, 'DriftPass');
+lc21     = drift('lc21', 0.170000, 'DriftPass');
+lc22     = drift('lc22', 0.170000, 'DriftPass');
+lc31     = drift('lc31', 0.240000, 'DriftPass');
+lc32     = drift('lc32', 0.170000, 'DriftPass');
+lc4      = drift('lc4',  0.560000, 'DriftPass');
+lq       = drift('lq',   0.215000, 'DriftPass');
+lq1      = drift('lq1',  0.107500, 'DriftPass');
+lq2      = drift('lq2',  0.107500, 'DriftPass');
+lb       = drift('lb',   0.080000, 'DriftPass');
+lbpm     = drift('lbpm', 0.050000, 'DriftPass');
+lcor     = drift('lcor', 0.150000, 'DriftPass');
+
+% --- markers ---
+mc       = marker('mc',     'IdentityPass');
+mia      = marker('mia',    'IdentityPass');
+mib      = marker('mib',    'IdentityPass');
+inicio   = marker('inicio', 'IdentityPass');
+fim      = marker('fim',    'IdentityPass');
+girderA    = marker('girder_A',  'IdentityPass');
+girderB    = marker('girder_B',  'IdentityPass');
+girderB2   = marker('girder_B2',  'IdentityPass');
+girderB3   = marker('girder_B3',  'IdentityPass');
+girderBC   = marker('girder_BC',  'IdentityPass');
+
+
+% --- beam position monitors ---
+mon      = marker('bpm', 'IdentityPass');
+
+% --- quadrupoles ---
+qaf      = quadrupole('qaf',  0.340000, qaf_strength,  quad_pass_method);
+qad      = quadrupole('qad',  0.140000, qad_strength,  quad_pass_method);
+qbd2     = quadrupole('qbd2', 0.140000, qbd2_strength, quad_pass_method);
+qbf      = quadrupole('qbf',  0.340000, qbf_strength,  quad_pass_method);
+qbd1     = quadrupole('qbd1', 0.140000, qbd1_strength, quad_pass_method);
+qf1      = quadrupole('qf1',  0.250000, qf1_strength,  quad_pass_method);
+qf2      = quadrupole('qf2',  0.250000, qf2_strength,  quad_pass_method);
+qf3      = quadrupole('qf3',  0.250000, qf3_strength,  quad_pass_method);
+qf4      = quadrupole('qf4',  0.250000, qf4_strength,  quad_pass_method);
+
+
+% --- bending magnets --- 
+deg_2_rad = (pi/180);
+
+
+% -- b1 --
+dip_nam =  'b1';
+dip_len =  0.828080;
+dip_ang =  2.766540 * deg_2_rad;
+dip_K   = -0.78;
+dip_S   =  0.00;
+h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+mdip    = marker(['m' dip_nam], 'IdentityPass');
+h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+%b1      = [h1 mdip h2];
+b1      = rbend_sirius(dip_nam, dip_len, dip_ang, 1*dip_ang/2, 1*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+
+% -- b2 --
+dip_nam =  'b2';
+dip_len =  1.228262;
+dip_ang =  4.103510 * deg_2_rad;
+dip_K   = -0.78;
+dip_S   =  0.00;
+h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+mdip    = marker(['m' dip_nam], 'IdentityPass');
+h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+%b2      = [h1 mdip h2];
+b2      = rbend_sirius(dip_nam, dip_len, dip_ang, 1*dip_ang/2, 1*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+
+% -- b3 --
+dip_nam =  'b3';
+dip_len =  0.428011;
+dip_ang =  1.429950 * deg_2_rad;
+dip_K   = -0.78;
+dip_S   =  0.00;
+h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+mdip    = marker(['m' dip_nam], 'IdentityPass');
+h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+b3      = [h1 mdip h2];
+b3      = rbend_sirius(dip_nam, dip_len, dip_ang, 1*dip_ang/2, 1*dip_ang/2, 0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);                    
+
+% -- bc --
+bce      = rbend_sirius('bc', 0.062697, 0.700000 * deg_2_rad, 1 * 0.700000 * deg_2_rad, ...
+    0 * 0.700000 * deg_2_rad, 0, 0, 0, [0 0 0], [0 0 -18.93], bend_pass_method);
+bcs      = rbend_sirius('bc', 0.062697, 0.700000 * deg_2_rad, 0 * 0.700000 * deg_2_rad, ...
+                        1 * 0.700000 * deg_2_rad, 0, 0, 0, [0 0 0], [0 0 -18.93], bend_pass_method);
+           
+           
+% --- correctors ---
+%cor     = corrector('cm',   0, [0 0], 'CorrectorPass');
+ch     = corrector('hcm',  0, [0 0], 'CorrectorPass');
+cv     = corrector('vcm',  0, [0 0], 'CorrectorPass');
+
+% --- sextupoles ---    
+sa1      = sextupole('sa1', 0.150000, sa1_strength, sext_pass_method);
+sa2      = sextupole('sa2', 0.150000, sa2_strength, sext_pass_method);
+sb1      = sextupole('sb1', 0.150000, sb1_strength, sext_pass_method);
+sb2      = sextupole('sb2', 0.150000, sb2_strength, sext_pass_method);
+sd1      = sextupole('sd1', 0.150000, sd1_strength, sext_pass_method);
+sf1      = sextupole('sf1', 0.150000, sf1_strength, sext_pass_method);
+sd2      = sextupole('sd2', 0.150000, sd2_strength, sext_pass_method);
+sd3      = sextupole('sd3', 0.150000, sd3_strength, sext_pass_method);
+sf2      = sextupole('sf2', 0.150000, sf2_strength, sext_pass_method);
+           
+% --- rf cavity ---
+cav = rfcavity('cav', 0, 2.5e6, 500e6, harmonic_number, 'CavityPass');
+
+
+%% transport lines
+% dispi  = [b1, girderA, girderB2, lcor, cv, lc11, ch, lcor, mon, lbpm, sd1, lc12, qf1, lq1, mon, lq2, sf1, lq, qf2, lc21, sd2, lcor, ch, lc22, b2, girderB2, ...
+%           girderB3, lcor, cv, lc31, mon, lbpm, sd3, lc32, qf3, lq1, lq2, sf2, lq, qf4, lcor, ch, lc4, ...
+%           b3, girderB3, girderBC, lb, mon, lbpm, bce ];
+% dispc  = [ bcs, lbpm, lb, girderBC, girderB3, b3, lc4, ch, lcor, qf4, lq, sf2, lq2, lq1, qf3, lc32, sd3, lbpm, mon, lc31, cv, lcor, girderB3, ...
+%            girderB2, b2, lc22, ch, lcor, sd2, lc21, qf2, lq, sf1, lq2, mon, lq1, qf1, lc12, sd1, lbpm, mon, lcor, ch, lc11, cv, lcor, girderB2, girderB, b1];   
+% insa   = [lia2, girderA, mon, lbpm, cv, lcor, sa2, lia1, qaf, l2, ch, l2, qad, l12, sa1, l11];
+% insb   = [lib,  girderB, mon, lbpm, qbd2, l32, cv, lcor, sb2, l31, qbf, l2, ch, l2, qbd1, l12, sb1, l11];
+% hsupia = [insa, dispi];
+% hsupca = [dispc, fliplr(insa)];
+% hsupib = [insb, dispi];
+% hsupcb = [dispc, fliplr(insb)];
+% supab  = [hsupia, mc, hsupcb];
+% supba  = [hsupib, mc, hsupca];
+% anelab = [mia, supab, mib, supba];
+% anel   = [inicio, repmat(anelab, 1, 10), cav, fim];
+
+
+G_A  = [girderA, mon, lbpm, cv, lcor, sa2, lia1, qaf, l2, ch, l2, qad, l12, sa1, l11, b1, girderA];
+G_B2 = [girderB2, lcor, cv, lc11, ch, lcor, mon, lbpm, sd1, lc12, qf1, lq1, mon, lq2, sf1, lq, qf2, lc21, sd2, lcor, ch, lc22, b2, girderB2];
+G_B3 = [girderB3, lcor, cv, lc31, mon, lbpm, sd3, lc32, qf3, lq1, lq2, sf2, lq, qf4, lcor, ch, lc4, b3, girderB3];
+G_BC = [girderBC, lb, mon, lbpm, bce, mc, bcs, lbpm, lb, girderBC];
+G_B  = [girderB, mon, lbpm, qbd2, l32, cv, lcor, sb2, l31, qbf, l2, ch, l2, qbd1, l12, sb1, l11, b1, girderB];
+
+girders = [G_A, G_B2, G_B3, G_BC, fliplr(G_B3), fliplr(G_B2), fliplr(G_B)];
+anelab  = [mia, lia2, girders, lib, mib, lib, fliplr(girders), lia2];
+anel    = [inicio, repmat(anelab, 1, 10), cav, fim];
+ 
+
+
+
+%% finalization 
+
+elist = anel;
+THERING = buildlat(elist);
+THERING = setcellstruct(THERING, 'Energy', 1:length(THERING), energy);
+
+% checa se hï¿½ elementos com comprimentos negativos
+lens = getcellstruct(THERING, 'Length', 1:length(THERING));
+if any(lens < 0)
+    error(['AT model with negative drift in ' mfilename ' !\n']);
+end
+
+% Ajuste de frequï¿½ncia de RF de acordo com comprimento total e nï¿½mero harmï¿½nico
+L0_tot = findspos(THERING, length(THERING)+1);
+rev_freq    = const.c / L0_tot;
+rf_idx      = findcells(THERING, 'FamName', 'cav');
+THERING{rf_idx}.Frequency = rev_freq * harmonic_number;
+setcavity('on'); 
+setradiation('off');
+
+% Ajusta NumIntSteps
+THERING = set_num_integ_steps(THERING);
+
+% Define Cï¿½mara de Vï¿½cuo
+THERING = set_vacuum_chamber(THERING);
+
+
+% prï¿½-carrega passmethods de forma a evitar problema com bibliotecas recï¿½m-compiladas
+lnls_preload_passmethods;
+
+
+r = THERING;
+
+
+function the_ring = set_vacuum_chamber(the_ring0)
+
+% y = +/- y_lim * sqrt(1 - (x/x_lim)^n);
+
+the_ring = the_ring0;
+bends_vchamber = [0.014 0.014 100]; % n = 100: ~rectangular
+other_vchamber = [0.014 0.014 1];   % n = 1;   circular/eliptica
+ivu_vchamber   = [0.014 0.014 1];   
+
+bends = findcells(the_ring, 'BendingAngle');
+ivu   = findcells(the_ring, 'FamName', 'lia2');
+other = setdiff(1:length(the_ring), [bends ivu]);
+
+for i=1:length(bends)
+    the_ring{bends(i)}.VChamber = bends_vchamber;
+end
+for i=1:length(ivu)
+    the_ring{ivu(i)}.VChamber = ivu_vchamber;
+end
+for i=1:length(other)
+    the_ring{other(i)}.VChamber = other_vchamber;
+end
+
+
+function the_ring = set_num_integ_steps(the_ring0)
+
+the_ring = the_ring0;
+
+bends = findcells(the_ring, 'BendingAngle');
+quads = setdiff(findcells(the_ring, 'K'), bends);
+sexts = setdiff(findcells(the_ring, 'PolynomB'), [bends quads]);
+kicks = findcells(the_ring, 'XGrid');
+
+dl = 0.035;
+
+bends_len = getcellstruct(the_ring, 'Length', bends);
+bends_nis = ceil(bends_len / dl);
+bends_nis = max([bends_nis'; 10 * ones(size(bends_nis'))]);
+the_ring = setcellstruct(the_ring, 'NumIntSteps', bends, bends_nis);
+the_ring = setcellstruct(the_ring, 'NumIntSteps', quads, 10);
+the_ring = setcellstruct(the_ring, 'NumIntSteps', sexts, 5);
+the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);

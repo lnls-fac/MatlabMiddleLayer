@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setquad</title>
+  <meta name="keywords" content="setquad">
+  <meta name="description" content="setquad(QMS, QuadSetpoint, WaitFlag, ModeFlag)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setquad.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setquad
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>setquad(QMS, QuadSetpoint, WaitFlag, ModeFlag)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function setquad(QMS, QuadSetpoint, WaitFlag, ModeFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  setquad(QMS, QuadSetpoint, WaitFlag, ModeFlag)
+  Used by quadcenter
+
+  See also <a href="getquad.html" class="code" title="function [SP, AM] = getquad(QMS, ModeFlag)">getquad</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>	SETQFASHUNT - Sets the QFA shunts</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setquad(QMS, QuadSetpoint, WaitFlag, ModeFlag)</a>
+0002 <span class="comment">%  setquad(QMS, QuadSetpoint, WaitFlag, ModeFlag)</span>
+0003 <span class="comment">%  Used by quadcenter</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  See also getquad</span>
+0006 
+0007 
+0008 <span class="keyword">if</span> nargin &lt; 2
+0009     error(<span class="string">'At least 2 inputs required'</span>);
+0010 <span class="keyword">end</span>
+0011 <span class="keyword">if</span> nargin &lt; 3
+0012     WaitFlag = -2;
+0013 <span class="keyword">end</span>
+0014 
+0015 
+0016 QuadFamily = QMS.QuadFamily;
+0017 QuadDev = QMS.QuadDev;
+0018 
+0019 
+0020 <span class="keyword">if</span> nargin &lt; 4
+0021     ModeFlag = getfamilydata(QuadFamily, <span class="string">'Setpoint'</span>, <span class="string">'Mode'</span>, QuadDev);
+0022 <span class="keyword">end</span>
+0023 
+0024 <span class="keyword">if</span> any(strcmpi(ModeFlag, {<span class="string">'Simulator'</span>, <span class="string">'Model'</span>}))
+0025     
+0026     <span class="comment">% Set the quadrupole</span>
+0027     <span class="comment">%Tune0 = gettune('Model');</span>
+0028         
+0029     setsp(QuadFamily, QuadSetpoint, QuadDev, 0, <span class="string">'Simulator'</span>);
+0030         
+0031     <span class="comment">%Tune1 = gettune('Model');</span>
+0032     <span class="comment">%fprintf('\n   Tune0 = %f/%f   Tune1 = %f/%f  DiffTune = %f/%f\n\n', Tune0, Tune1, Tune1-Tune0);</span>
+0033 
+0034 <span class="keyword">else</span>
+0035     
+0036     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0037     <span class="comment">% Set the quadrupole %</span>
+0038     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0039     <span class="keyword">if</span> strcmpi(QuadFamily,<span class="string">'QFA'</span>)
+0040         
+0041         <span class="comment">% QFA Shunt</span>
+0042         <span class="keyword">if</span> QuadSetpoint == 0
+0043             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 0, QuadDev, 0);
+0044             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(2, 0, QuadDev, WaitFlag);
+0045             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 0, QuadDev, WaitFlag);
+0046         <span class="keyword">elseif</span> QuadSetpoint == 1
+0047             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 1, QuadDev, 0);
+0048             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(2, 0, QuadDev, WaitFlag);
+0049             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 1, QuadDev, WaitFlag);
+0050         <span class="keyword">elseif</span> QuadSetpoint == 2
+0051             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 1, QuadDev, 0);
+0052             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(2, 1, QuadDev, WaitFlag);
+0053             <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 1, QuadDev, WaitFlag);
+0054         <span class="keyword">end</span>
+0055         
+0056         <span class="comment">%setqfashunt(1, QuadSetpoint, QuadDev, 0);</span>
+0057         <span class="comment">%setqfashunt(2, QuadSetpoint, QuadDev, WaitFlag);</span>
+0058         <span class="comment">%setqfashunt(1, QuadSetpoint, QuadDev, WaitFlag);</span>
+0059         <span class="comment">%setpv(QuadFamily, 'Shunt1Control', QuadSetpoint, QuadDev, WaitFlag);</span>
+0060         <span class="comment">%setpv(QuadFamily, 'Shunt2Control', QuadSetpoint, QuadDev, WaitFlag);</span>
+0061 
+0062     <span class="keyword">else</span>
+0063         <span class="keyword">if</span> 0
+0064             <span class="comment">% Ramp just like SR ramping does</span>
+0065             MinPeriod = 0.2037;
+0066             SP = getsp(QuadFamily, QuadDev);
+0067             Delta = (QuadSetpoint - SP);
+0068 
+0069             N = fix(Delta * 554 / 19);
+0070 
+0071             <span class="keyword">if</span> N &gt; 1
+0072                 Delta = Delta / N;
+0073 
+0074                 <span class="keyword">for</span> i = 1:N
+0075                     t0 = gettime;
+0076 
+0077                     stepsp(QuadFamily, Delta, QuadDev, 0);
+0078 
+0079                     <span class="comment">% Delay for magnet ramping</span>
+0080                     WaitTime = MinPeriod - (gettime-t0);
+0081                     <span class="keyword">if</span> WaitTime &lt; .025
+0082                         WaitTime = .025;  <span class="comment">% Minimum sleep after sets</span>
+0083                     <span class="keyword">end</span>
+0084                     pause(WaitTime);
+0085                 <span class="keyword">end</span>
+0086 
+0087                 <span class="comment">%SPend = getsp(QuadFamily, QuadDev);</span>
+0088             <span class="keyword">end</span>
+0089 
+0090             setsp(QuadFamily, QuadSetpoint, QuadDev, WaitFlag);
+0091 
+0092         <span class="keyword">else</span>
+0093             <span class="comment">% Set the quad ramprate</span>
+0094 
+0095             <span class="comment">%pause(3);</span>
+0096             <span class="comment">%Tune0 = gettune;</span>
+0097             
+0098             
+0099             <span class="keyword">if</span> WaitFlag == -2
+0100                 RampRateStart = getpv(QuadFamily, <span class="string">'RampRate'</span>, QuadDev);
+0101                 setpv(QuadFamily, <span class="string">'RampRate'</span>, .2, QuadDev, 0);
+0102                 pause(.1);  <span class="comment">% No good reason</span>
+0103             <span class="keyword">end</span>
+0104 
+0105             setsp(QuadFamily, QuadSetpoint, QuadDev, WaitFlag);
+0106 
+0107 
+0108             <span class="comment">% Restore the quad ramprate</span>
+0109             <span class="keyword">if</span> WaitFlag == -2
+0110                 setpv(QuadFamily, <span class="string">'RampRate'</span>, RampRateStart, QuadDev, 0);
+0111             <span class="keyword">end</span>
+0112         <span class="keyword">end</span>
+0113     <span class="keyword">end</span>
+0114 
+0115     <span class="keyword">if</span> WaitFlag == -2
+0116         <span class="comment">% Add an extra delay for eddy current settling</span>
+0117         pause(3);
+0118     <span class="keyword">end</span>
+0119 
+0120     <span class="comment">%pause(3);</span>
+0121     <span class="comment">%Tune1 = gettune;</span>
+0122     <span class="comment">%fprintf('\n   Tune0 = %f/%f   Tune1 = %f/%f  DiffTune = %f/%f\n\n', Tune0, Tune1, Tune1-Tune0);</span>
+0123 
+0124 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

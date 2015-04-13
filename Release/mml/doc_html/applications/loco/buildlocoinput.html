@@ -1,0 +1,723 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of buildlocoinput</title>
+  <meta name="keywords" content="buildlocoinput">
+  <meta name="description" content="BUILDLOCOINPUT - Matlab Middlelayer (MML) method for building a LOCO input file.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; buildlocoinput.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>buildlocoinput
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BUILDLOCOINPUT - Matlab Middlelayer (MML) method for building a LOCO input file.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(OutputFileName, GuessIt) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BUILDLOCOINPUT - Matlab Middlelayer (MML) method for building a LOCO input file.
+                 Combines response matrix, BPM standard deviation, and 
+                 dispersion files (or measurements) into a LOCO input file.
+                 The fit parameters are added if a buildlocofitparameters file is on the path.
+
+  [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(OutputFileName)
+  [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(Directory, 1)
+  If only 1 output, it will be the filename.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="locofilecheck.html" class="code" title="function [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck(FileName)">locofilecheck</a>	LOCOFILECHECK - Consistence check for the LOCO input file</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(OutputFileName, GuessIt)</a>
+0002 <span class="comment">%BUILDLOCOINPUT - Matlab Middlelayer (MML) method for building a LOCO input file.</span>
+0003 <span class="comment">%                 Combines response matrix, BPM standard deviation, and</span>
+0004 <span class="comment">%                 dispersion files (or measurements) into a LOCO input file.</span>
+0005 <span class="comment">%                 The fit parameters are added if a buildlocofitparameters file is on the path.</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(OutputFileName)</span>
+0008 <span class="comment">%  [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(Directory, 1)</span>
+0009 <span class="comment">%  If only 1 output, it will be the filename.</span>
+0010 
+0011 <span class="comment">%  Written by Greg Portmann</span>
+0012 
+0013 
+0014 <span class="comment">% % In order to iterate loco uses arrays of structures all the fields in the structure must be present</span>
+0015 <span class="comment">% LocoFlags = struct('SVmethod',[], 'Dispersion',[], 'Coupling',[], 'Normalize',[], 'Linear',[], 'SVDDataFileName',[]);</span>
+0016 <span class="comment">% LocoModel = struct('M',[], 'OutlierIndex',[], 'Eta',[], 'EtaOutlierIndex',[], 'SValues',[], 'SValuesIndex',[], 'ChiSquare',[]);</span>
+0017 <span class="comment">% BPMData = struct('FamName',[], 'BPMIndex',[], 'HBPMIndex',[], 'VBPMIndex',[], 'HBPMGoodDataIndex',[], 'VBPMGoodDataIndex',[], 'HBPMGain',[], 'VBPMGain',[], 'HBPMCoupling',[], 'VBPMCoupling',[], 'HBPMGainSTD',[], 'VBPMGainSTD',[],'HBPMCouplingSTD',[],'VBPMCouplingSTD',[],'FitGains',[],'FitCoupling',[]);</span>
+0018 <span class="comment">% CMData = struct('FamName',[], 'HCMIndex',[], 'VCMIndex',[], 'HCMGoodDataIndex',[], 'VCMGoodDataIndex',[], 'HCMKicks',[], 'VCMKicks',[], 'HCMCoupling',[], 'VCMCoupling',[], 'HCMKicksSTD',[], 'VCMKicksSTD',[],'HCMCouplingSTD',[],'VCMCouplingSTD',[],'FitKicks',[],'FitCoupling',[]);</span>
+0019 <span class="comment">% FitParameters = struct('Params',[], 'Values',[], 'ValuesSTD',[], 'Deltas',[], 'DeltaRF',[], 'FitRFFrequency',[], 'DeltaRFSTD',[]);</span>
+0020 
+0021 FitParameters = [];
+0022 
+0023 <span class="keyword">if</span> nargin &lt; 2
+0024     GuessIt = 0;
+0025 <span class="keyword">end</span>
+0026 
+0027 
+0028 <span class="comment">% Family Setup</span>
+0029 BPMxFamily = gethbpmfamily;
+0030 BPMyFamily = getvbpmfamily;
+0031 
+0032 HCMFamily = gethcmfamily; 
+0033 VCMFamily = getvcmfamily; 
+0034 
+0035 
+0036 <span class="comment">% Should probably get these from the response matrix???</span>
+0037 <span class="keyword">if</span> isempty(BPMxFamily)
+0038     BPMxFamily = <span class="string">'BPMx'</span>;   
+0039 <span class="keyword">end</span>
+0040 <span class="keyword">if</span> isempty(BPMyFamily)
+0041     BPMyFamily = <span class="string">'BPMy'</span>;   
+0042 <span class="keyword">end</span>
+0043 <span class="keyword">if</span> isempty(HCMFamily)
+0044     HCMFamily = <span class="string">'HCM'</span>;   
+0045 <span class="keyword">end</span>
+0046 <span class="keyword">if</span> isempty(VCMFamily)
+0047     VCMFamily = <span class="string">'VCM'</span>;   
+0048 <span class="keyword">end</span>
+0049 
+0050 
+0051 
+0052 <span class="comment">% BPMs to remove</span>
+0053 RemoveBPMDeviceList = [];
+0054 RemoveHCMDeviceList = [];
+0055 RemoveVCMDeviceList = [];
+0056 
+0057 
+0058 <span class="keyword">if</span> nargin == 0 &amp;&amp; ~GuessIt
+0059     [OutputFileName, DirectoryName] = uiputfile(<span class="string">'*.mat'</span>, <span class="string">'New LOCO Input File Name?'</span>);
+0060     <span class="keyword">if</span> OutputFileName == 0
+0061         <span class="keyword">return</span>
+0062     <span class="keyword">end</span>
+0063     OutputFileName = [DirectoryName OutputFileName];
+0064 <span class="keyword">else</span>
+0065     <span class="keyword">if</span> isdir(OutputFileName)
+0066         <span class="comment">% OutputFileName is a directory</span>
+0067         DirectoryName = OutputFileName;
+0068         <span class="keyword">if</span> DirectoryName(end) ~= filesep
+0069             DirectoryName(end+1) = filesep;
+0070         <span class="keyword">end</span>
+0071         OutputFileName = fullfile(DirectoryName, <span class="string">'LOCODataFileSLM'</span>);
+0072         LocoFlags.Method.Name = <span class="string">'Scaled Levenberg-Marquardt'</span>;
+0073         <span class="comment">%OutputFileName = fullfile(DirectoryName, 'LOCODataFile');</span>
+0074         <span class="comment">%LocoFlags.Method.Name = 'Gauss-Newton';</span>
+0075     <span class="keyword">else</span>
+0076         error(<span class="string">'Input must be a file or directory name'</span>);
+0077     <span class="keyword">end</span>
+0078 <span class="keyword">end</span>
+0079 
+0080 DirStart = [getfamilydata(<span class="string">'Directory'</span>, <span class="string">'DataRoot'</span>), <span class="string">'LOCO'</span>, filesep];
+0081 
+0082 
+0083 <span class="comment">% To start with nominal gains (1) and coupling (0)</span>
+0084 <span class="comment">%ButtonName = questdlg('Gains and Coupling?','LOCO STARTING POINT','Use Present Setting','Nominal Gain=1, Coupling=0','Use Present Setting');</span>
+0085 <span class="comment">%switch ButtonName,</span>
+0086 <span class="comment">%    case 'Nominal Gain=1, Coupling=0'</span>
+0087         setlocodata(<span class="string">'Nominal'</span>);
+0088         fprintf(<span class="string">'   May need to run setoperationmode (or aoinit) to restore the proper gains &amp; rolls.\n'</span>);
+0089 <span class="comment">%end</span>
+0090 
+0091 
+0092 
+0093 
+0094 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0095 <span class="comment">% 1. Build the AT MODEL %</span>
+0096 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0097 LocoModel = [];
+0098 
+0099 <span class="comment">% Save THERING and restore on exit so that this function does not change the model</span>
+0100 <span class="keyword">global</span> THERING
+0101 THERINGsave = THERING;
+0102 
+0103 <span class="keyword">if</span> GuessIt
+0104     ATModel = 1;
+0105     AO_ATModel = getfamilydata(<span class="string">'ATModel'</span>);
+0106     [ATDirectoryName, ATModel, Ext] = fileparts(which(AO_ATModel));
+0107 <span class="keyword">else</span>
+0108     AO_ATModel = getfamilydata(<span class="string">'ATModel'</span>);
+0109     [ATDirectoryName, ATModel, Ext] = fileparts(which(AO_ATModel));
+0110     [ATModel, ATDirectoryName] = uigetfile(<span class="string">'*.*'</span>, <span class="string">'AT Model (Cancel to use the present model)?'</span>, [ATDirectoryName, filesep, ATModel, Ext]);
+0111 <span class="keyword">end</span>
+0112 <span class="keyword">if</span> ATModel == 0
+0113     <span class="keyword">if</span> isempty(THERING)
+0114         fprintf(<span class="string">'   No AT model found.  Buildlocoinput canceled.\n'</span>);
+0115         <span class="keyword">return</span>;
+0116     <span class="keyword">end</span>
+0117 <span class="keyword">else</span>
+0118     run(fullfile(ATDirectoryName, ATModel));
+0119     updateatindex;
+0120 <span class="keyword">end</span>
+0121 
+0122 <span class="comment">% Cavity and radiation should be off for response and dispersion generation</span>
+0123 setcavity off;
+0124 setradiation off;
+0125 
+0126 <span class="comment">% Set the model energy</span>
+0127 setenergymodel(getfamilydata(<span class="string">'Energy'</span>));
+0128 
+0129 RINGData.Lattice = THERING;
+0130 RINGData.CavityFrequency  = getrf(<span class="string">'Model'</span>, <span class="string">'Physics'</span>);
+0131 RINGData.CavityHarmNumber = getharmonicnumber; 
+0132 
+0133 
+0134 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0135 <span class="comment">% 2. MEASURED DATA STRUCTURE                        %</span>
+0136 <span class="comment">% LocoMeasData.M         [mm]                       %</span>
+0137 <span class="comment">% LocoMeasData.BPMSTD    [mm]                       %</span>
+0138 <span class="comment">% LocoMeasData.DeltaAmps [Hardare Units] (Optional) %</span>
+0139 <span class="comment">% LocoMeasData.Eta       [mm]                       %</span>
+0140 <span class="comment">% LocoMeasData.RF        [Hz]                       %</span>
+0141 <span class="comment">% LocoMeasData.DeltaRF   [Hz]                       %</span>
+0142 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0143 
+0144 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0145 <span class="comment">% BPM Response Matrix %</span>
+0146 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0147 <span class="comment">% Rmat(BPM,COR)</span>
+0148 <span class="comment">% Rmat(1,1).Data=xx;  %Kick x, look x</span>
+0149 <span class="comment">% Rmat(2,1).Data=yx;  %Kick x, look y</span>
+0150 <span class="comment">% Rmat(1,2).Data=xy;  %Kick y, look x</span>
+0151 <span class="comment">% Rmat(2,2).Data=yy;  %Kick y, look y</span>
+0152 
+0153 <span class="keyword">if</span> GuessIt
+0154     DirStruct = dir(DirectoryName);
+0155     <span class="keyword">for</span> i = 1:length(DirStruct)
+0156         <span class="keyword">if</span> ~DirStruct(i).isdir
+0157             <span class="keyword">if</span> strncmp(DirStruct(i).name, <span class="string">'BPMRespMat'</span>, 10);
+0158                 Found = 1;
+0159                 <span class="keyword">break</span>;
+0160             <span class="keyword">else</span>
+0161                 Found = 0;
+0162             <span class="keyword">end</span>
+0163         <span class="keyword">end</span>
+0164     <span class="keyword">end</span>
+0165     <span class="keyword">if</span> Found
+0166         BPMRespFile = DirStruct(i).name;
+0167     <span class="keyword">else</span>
+0168         error(<span class="string">'Response matrix file not found.'</span>);
+0169     <span class="keyword">end</span>
+0170     
+0171     <span class="keyword">try</span>
+0172         load([DirectoryName BPMRespFile], <span class="string">'MachineConfig'</span>);
+0173     <span class="keyword">catch</span>
+0174         fprintf(<span class="string">'   Lattice configuration not found in the response matrix file.  You don''t need it but it''s nice to have.\n'</span>);
+0175     <span class="keyword">end</span>
+0176 
+0177     Rmat(1,1) = getrespmat(BPMxFamily, [], HCMFamily, [], [DirectoryName BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0178     Rmat(1,2) = getrespmat(BPMxFamily, [], VCMFamily, [], [DirectoryName BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0179     Rmat(2,1) = getrespmat(BPMyFamily, [], HCMFamily, [], [DirectoryName BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0180     Rmat(2,2) = getrespmat(BPMyFamily, [], VCMFamily, [], [DirectoryName BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0181 <span class="keyword">else</span>
+0182     ButtonName = questdlg(<span class="string">'LOCO response matrix?'</span>,<span class="string">'RESPONSE MATRIX'</span>,<span class="string">'Use Default'</span>,<span class="string">'Measure'</span>,<span class="string">'Get From File'</span>,<span class="string">'Get From File'</span>);
+0183     drawnow;
+0184     <span class="keyword">switch</span> ButtonName,
+0185         <span class="keyword">case</span> <span class="string">'Get From File'</span>
+0186             [BPMRespFile, BPMRespDirectory] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select a BPM Response Matrix File'</span>, DirStart);
+0187             <span class="keyword">if</span> BPMRespFile == 0
+0188                 fprintf(<span class="string">'   buildlocoinput canceled.\n'</span>);
+0189                 <span class="keyword">return</span>
+0190             <span class="keyword">end</span>
+0191             DirStart = BPMRespDirectory;
+0192 
+0193             <span class="comment">% Variable MachineConfig is the lattice at the time when the response matrix was generated</span>
+0194             <span class="keyword">try</span>
+0195                 load([BPMRespDirectory BPMRespFile], <span class="string">'MachineConfig'</span>);
+0196             <span class="keyword">catch</span>
+0197                 fprintf(<span class="string">'   Lattice configuration not found in the response matrix file.  You don''t need it but it''s nice to have.\n'</span>);
+0198             <span class="keyword">end</span>
+0199 
+0200             Rmat(1,1) = getrespmat(BPMxFamily, [], HCMFamily, [], [BPMRespDirectory BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0201             Rmat(1,2) = getrespmat(BPMxFamily, [], VCMFamily, [], [BPMRespDirectory BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0202             Rmat(2,1) = getrespmat(BPMyFamily, [], HCMFamily, [], [BPMRespDirectory BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0203             Rmat(2,2) = getrespmat(BPMyFamily, [], VCMFamily, [], [BPMRespDirectory BPMRespFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0204 
+0205         <span class="keyword">case</span> <span class="string">'Use Default'</span>
+0206             Rmat(1,1) = getrespmat(BPMxFamily, [], HCMFamily, [], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0207             Rmat(1,2) = getrespmat(BPMxFamily, [], VCMFamily, [], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0208             Rmat(2,1) = getrespmat(BPMyFamily, [], HCMFamily, [], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0209             [Rmat(2,2), FileName] = getrespmat(BPMyFamily, [], VCMFamily, [], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0210 
+0211             <span class="comment">% Variable MachineConfig is the lattice at the time when the response matrix was generated</span>
+0212             load(FileName,<span class="string">'MachineConfig'</span>);
+0213 
+0214         <span class="keyword">case</span> <span class="string">'Measure'</span>
+0215             Rmat = measbpmresp(<span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0216 
+0217             <span class="comment">% Variable MachineConfig is the lattice at the time when the response matrix was generated</span>
+0218             MachineConfig = getmachineconfig;
+0219 
+0220         <span class="keyword">otherwise</span>
+0221             fprintf(<span class="string">'   LOCO build canceled.\n'</span>);
+0222             <span class="keyword">return</span>
+0223     <span class="keyword">end</span>
+0224 <span class="keyword">end</span>
+0225 
+0226 <span class="keyword">if</span> exist(<span class="string">'MachineConfig'</span>,<span class="string">'var'</span>)
+0227     LocoMeasData.MachineConfig = MachineConfig;  <span class="comment">% Extra (not needed by LOCO but it's often nice to have it)</span>
+0228 <span class="keyword">end</span>
+0229 
+0230 
+0231 <span class="comment">% BPM remove list</span>
+0232 i = findrowindex(RemoveBPMDeviceList, Rmat(1,1).Monitor.DeviceList);
+0233 Rmat(1,1).Data(i,:) = [];
+0234 Rmat(1,1).Monitor1(i,:) = [];
+0235 Rmat(1,1).Monitor2(i,:) = [];
+0236 Rmat(1,1).Monitor.DeviceList(i,:) = [];
+0237 Rmat(1,1).Monitor.Data(i,:) = [];
+0238 Rmat(1,1).Monitor.Status(i,:) = [];
+0239 
+0240 i = findrowindex(RemoveBPMDeviceList, Rmat(1,2).Monitor.DeviceList);
+0241 Rmat(1,2).Data(i,:) = [];
+0242 Rmat(1,2).Monitor1(i,:) = [];
+0243 Rmat(1,2).Monitor2(i,:) = [];
+0244 Rmat(1,2).Monitor.DeviceList(i,:) = [];
+0245 Rmat(1,2).Monitor.Data(i,:) = [];
+0246 Rmat(1,2).Monitor.Status(i,:) = [];
+0247 
+0248 i = findrowindex(RemoveBPMDeviceList, Rmat(2,1).Monitor.DeviceList);
+0249 Rmat(2,1).Data(i,:) = [];
+0250 Rmat(2,1).Monitor1(i,:) = [];
+0251 Rmat(2,1).Monitor2(i,:) = [];
+0252 Rmat(2,1).Monitor.DeviceList(i,:) = [];
+0253 Rmat(2,1).Monitor.Data(i,:) = [];
+0254 Rmat(2,1).Monitor.Status(i,:) = [];
+0255 
+0256 i = findrowindex(RemoveBPMDeviceList, Rmat(2,2).Monitor.DeviceList);
+0257 Rmat(2,2).Data(i,:) = [];
+0258 Rmat(2,2).Monitor1(i,:) = [];
+0259 Rmat(2,2).Monitor2(i,:) = [];
+0260 Rmat(2,2).Monitor.DeviceList(i,:) = [];
+0261 Rmat(2,2).Monitor.Data(i,:) = [];
+0262 Rmat(2,2).Monitor.Status(i,:) = [];
+0263 
+0264 
+0265 <span class="comment">% CM remove list</span>
+0266 i = findrowindex(RemoveHCMDeviceList, Rmat(1,1).Actuator.DeviceList);
+0267 Rmat(1,1).Data(:,i) = [];
+0268 Rmat(1,1).ActuatorDelta(i,:) = [];
+0269 Rmat(1,1).Actuator.DeviceList(i,:) = [];
+0270 Rmat(1,1).Actuator.Data(i,:) = [];
+0271 Rmat(1,1).Actuator.Status(i,:) = [];
+0272 
+0273 i = findrowindex(RemoveVCMDeviceList, Rmat(1,2).Actuator.DeviceList);
+0274 Rmat(1,2).Data(:,i) = [];
+0275 Rmat(1,2).ActuatorDelta(i,:) = [];
+0276 Rmat(1,2).Actuator.DeviceList(i,:) = [];
+0277 Rmat(1,2).Actuator.Data(i,:) = [];
+0278 Rmat(1,2).Actuator.Status(i,:) = [];
+0279 
+0280 i = findrowindex(RemoveHCMDeviceList, Rmat(2,1).Actuator.DeviceList);
+0281 Rmat(2,1).Data(:,i) = [];
+0282 Rmat(2,1).ActuatorDelta(i,:) = [];
+0283 Rmat(2,1).Actuator.DeviceList(i,:) = [];
+0284 Rmat(2,1).Actuator.Data(i,:) = [];
+0285 Rmat(2,1).Actuator.Status(i,:) = [];
+0286 
+0287 i = findrowindex(RemoveVCMDeviceList, Rmat(2,2).Actuator.DeviceList);
+0288 Rmat(2,2).Data(:,i) = [];
+0289 Rmat(2,2).ActuatorDelta(i,:) = [];
+0290 Rmat(2,2).Actuator.DeviceList(i,:) = [];
+0291 Rmat(2,2).Actuator.Data(i,:) = [];
+0292 Rmat(2,2).Actuator.Status(i,:) = [];
+0293 
+0294 
+0295 <span class="comment">% LOCO uses mm, not meters/radian</span>
+0296 R11 = 1000 * (ones(size(Rmat(1,1).Data,1),1) * Rmat(1,1).ActuatorDelta(:)') .* Rmat(1,1).Data;
+0297 R12 = 1000 * (ones(size(Rmat(1,2).Data,1),1) * Rmat(1,2).ActuatorDelta(:)') .* Rmat(1,2).Data;
+0298 R21 = 1000 * (ones(size(Rmat(2,1).Data,1),1) * Rmat(2,1).ActuatorDelta(:)') .* Rmat(2,1).Data;
+0299 R22 = 1000 * (ones(size(Rmat(2,2).Data,1),1) * Rmat(2,2).ActuatorDelta(:)') .* Rmat(2,2).Data;
+0300 
+0301 
+0302 <span class="comment">% Add energy to the RINGData (not needed for LOCO)</span>
+0303 RINGData.Energy = Rmat(1,1).GeV;  <span class="comment">% units?</span>
+0304 
+0305 <span class="comment">% Build non-structure response matrix</span>
+0306 LocoMeasData.M = [R11 R12; R21 R22];   <span class="comment">% [mm]</span>
+0307 
+0308 <span class="comment">% Extra variables to add to the measured structure</span>
+0309 LocoMeasData.HBPM = Rmat(1,1).Monitor;
+0310 LocoMeasData.VBPM = Rmat(2,2).Monitor;
+0311 LocoMeasData.HCM  = Rmat(1,1).Actuator;
+0312 LocoMeasData.VCM  = Rmat(2,2).Actuator;
+0313 
+0314 <span class="comment">% Needed for computing the new gain</span>
+0315 <span class="keyword">try</span>
+0316     LocoMeasData.HCMGain = getgain(HCMFamily, Rmat(1,1).Actuator.DeviceList);
+0317     LocoMeasData.VCMGain = getgain(VCMFamily, Rmat(2,2).Actuator.DeviceList);
+0318     LocoMeasData.HCMRoll = getroll(HCMFamily, Rmat(1,1).Actuator.DeviceList);
+0319     LocoMeasData.VCMRoll = getroll(VCMFamily, Rmat(2,2).Actuator.DeviceList);
+0320     LocoMeasData.HCMOffset = getoffset(HCMFamily, Rmat(1,1).Actuator.DeviceList);
+0321     LocoMeasData.VCMOffset = getoffset(VCMFamily, Rmat(2,2).Actuator.DeviceList);
+0322 <span class="keyword">catch</span>
+0323 <span class="keyword">end</span>
+0324 
+0325 <span class="comment">% Corrector delta (hardware units)</span>
+0326 <span class="comment">% LocoMeasData.DeltaAmps = [</span>
+0327 <span class="comment">%     physics2hw(Rmat(1,1).Actuator.FamilyName, Rmat(1,1).Actuator.Field, Rmat(1,1).ActuatorDelta(:)); ...</span>
+0328 <span class="comment">%     physics2hw(Rmat(2,2).Actuator.FamilyName, Rmat(2,2).Actuator.Field, Rmat(2,2).ActuatorDelta(:));];</span>
+0329 LocoMeasData.DeltaHCMHardware = physics2hw(Rmat(1,1).Actuator.FamilyName, Rmat(1,1).Actuator.Field, Rmat(1,1).ActuatorDelta(:));
+0330 LocoMeasData.DeltaVCMHardware = physics2hw(Rmat(2,2).Actuator.FamilyName, Rmat(2,2).Actuator.Field, Rmat(2,2).ActuatorDelta(:));
+0331 
+0332 <span class="keyword">if</span> ~exist(<span class="string">'RINGData'</span>,<span class="string">'var'</span>)
+0333     <span class="comment">% Kick strength in milliradian</span>
+0334     <span class="comment">%HCMKicks = 1000 * hw2physics(HCMFamily, 'Setpoint', Rmat(1,1).ActuatorDelta, Rmat(1,1).Actuator.DeviceList);</span>
+0335     <span class="comment">%VCMKicks = 1000 * hw2physics(VCMFamily, 'Setpoint', Rmat(2,2).ActuatorDelta, Rmat(2,2).Actuator.DeviceList);</span>
+0336     HCMKicks = 1000 * Rmat(1,1).ActuatorDelta;
+0337     VCMKicks = 1000 * Rmat(2,2).ActuatorDelta;
+0338     fprintf(<span class="string">'   Note: Without an AT model BPMData and CMData variables cannot be determined.\n'</span>);
+0339     fprintf(<span class="string">'         Variables HCMKicks and VCMKicks will be saved to the data file.\n'</span>);
+0340     save(OutputFileName, <span class="string">'LocoMeasData'</span>, <span class="string">'LocoModel'</span>, <span class="string">'HCMKicks'</span>, <span class="string">'VCMKicks'</span>);
+0341     <span class="keyword">return</span>
+0342 <span class="keyword">end</span>
+0343 
+0344 
+0345 
+0346 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0347 <span class="comment">% GET DISPERSION INFO %</span>
+0348 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0349 <span class="keyword">if</span> GuessIt
+0350     DirStruct = dir(DirectoryName);
+0351     <span class="keyword">for</span> i = 1:length(DirStruct)
+0352         <span class="keyword">if</span> ~DirStruct(i).isdir
+0353             <span class="keyword">if</span> strncmp(DirStruct(i).name, <span class="string">'Disp'</span>,4);
+0354                 Found = 1;
+0355                 <span class="keyword">break</span>;
+0356             <span class="keyword">else</span>
+0357                 Found = 0;
+0358             <span class="keyword">end</span>
+0359         <span class="keyword">end</span>
+0360     <span class="keyword">end</span>
+0361     <span class="keyword">if</span> Found
+0362         DISPFile = DirStruct(i).name;
+0363         ButtonName = <span class="string">'Get From File'</span>;
+0364     <span class="keyword">else</span>
+0365         error(<span class="string">'Dispersion file not found.'</span>);
+0366     <span class="keyword">end</span>
+0367 
+0368     Dx = getrespmat(BPMxFamily, Rmat(1,1).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DirectoryName DISPFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0369     Dy = getrespmat(BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DirectoryName DISPFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0370 
+0371     Dxh = getrespmat(BPMxFamily, Rmat(1,1).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DirectoryName DISPFile], <span class="string">'Struct'</span>, <span class="string">'Hardhare'</span>, <span class="string">'NoEnergyScaling'</span>);
+0372     Dyh = getrespmat(BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DirectoryName DISPFile], <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>, <span class="string">'NoEnergyScaling'</span>);
+0373 <span class="keyword">else</span>
+0374     ButtonName = questdlg({<span class="string">'LOCO Dispersion &amp; RF Frequency?'</span>,<span class="string">'(Close dialog box to not include dispersion)'</span>},<span class="string">'DISPERSION'</span>,<span class="string">'Use Default'</span>,<span class="string">'Measure'</span>,<span class="string">'Get From File'</span>,<span class="string">'Get From File'</span>);
+0375     drawnow;
+0376     <span class="keyword">switch</span> ButtonName
+0377         <span class="keyword">case</span> <span class="string">'Use Default'</span>
+0378             Dx = getdisp(BPMxFamily, Rmat(1,1).Monitor.DeviceList, <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0379             Dy = getdisp(BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'Struct'</span>, <span class="string">'Physics'</span>);
+0380 
+0381         <span class="keyword">case</span> <span class="string">'Get From File'</span>
+0382             [DISPFile, DISPDirectory] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select a Dispersion File'</span>, DirStart);
+0383             <span class="keyword">if</span> DISPFile == 0
+0384                 fprintf(<span class="string">'   buildlocoinput canceled.\n'</span>);
+0385                 <span class="keyword">return</span>
+0386             <span class="keyword">end</span>
+0387             DirStart = DISPDirectory;
+0388             Dx = getrespmat(BPMxFamily, Rmat(1,1).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DISPDirectory DISPFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0389             Dy = getrespmat(BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DISPDirectory DISPFile], <span class="string">'Struct'</span>, <span class="string">'Physics'</span>, <span class="string">'NoEnergyScaling'</span>);
+0390 
+0391             Dxh = getrespmat(BPMxFamily, Rmat(1,1).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DISPDirectory DISPFile], <span class="string">'Struct'</span>, <span class="string">'Hardhare'</span>, <span class="string">'NoEnergyScaling'</span>);
+0392             Dyh = getrespmat(BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'RF'</span>, [], [DISPDirectory DISPFile], <span class="string">'Struct'</span>, <span class="string">'Hardware'</span>, <span class="string">'NoEnergyScaling'</span>);
+0393 
+0394         <span class="keyword">case</span> <span class="string">'Measure'</span>
+0395             [Dx, Dy] = measdisp(BPMxFamily, Rmat(1,1).Monitor.DeviceList, BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'Struct'</span>, <span class="string">'Archive'</span>, <span class="string">'Physics'</span>);
+0396 
+0397         <span class="keyword">case</span> <span class="string">''</span>
+0398             fprintf(<span class="string">'   Dispersion will not be included in the LOCO file.\n'</span>);
+0399     <span class="keyword">end</span>
+0400 <span class="keyword">end</span>
+0401 
+0402 <span class="keyword">if</span> isempty(ButtonName)
+0403     LocoMeasData.DeltaRF = [];
+0404     LocoMeasData.RF      = [];
+0405     LocoMeasData.Eta = [];
+0406 <span class="keyword">else</span>
+0407     <span class="comment">% RF -&gt; Hz,  Eta -&gt; mm</span>
+0408 
+0409     <span class="comment">% Convert to meter/(dp/p) to mm</span>
+0410     DeltaRF = Dx.ActuatorDelta(1);
+0411     RF      = Dx.Actuator.Data(1);
+0412     MCF     = Dx.MCF;
+0413     Dx.Data = 1000 * DeltaRF * -1 * Dx.Data / RF / MCF;
+0414     Dy.Data = 1000 * DeltaRF * -1 * Dy.Data / RF / MCF;
+0415 
+0416     LocoMeasData.DeltaRF = DeltaRF;
+0417     LocoMeasData.RF = RF;
+0418     LocoMeasData.Eta = [Dx.Data(:); Dy.Data(:)];
+0419 <span class="keyword">end</span>
+0420 
+0421 
+0422 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0423 <span class="comment">% GET BPM STANDARD DEVIATION INFO %</span>
+0424 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0425 <span class="keyword">if</span> GuessIt
+0426     DirStruct = dir(DirectoryName);
+0427     <span class="keyword">for</span> i = 1:length(DirStruct)
+0428         <span class="keyword">if</span> ~DirStruct(i).isdir
+0429             <span class="keyword">if</span> strncmp(DirStruct(i).name, <span class="string">'BPMData'</span>, 7);
+0430                 Found = 1;
+0431                 <span class="keyword">break</span>;
+0432             <span class="keyword">else</span>
+0433                 Found = 0;
+0434             <span class="keyword">end</span>
+0435         <span class="keyword">end</span>
+0436     <span class="keyword">end</span>
+0437     <span class="keyword">if</span> Found
+0438         BPMSigmaFile = DirStruct(i).name;
+0439         BPMxSTD = getsigma(BPMxFamily, Rmat(1,1).Monitor.DeviceList, [], [DirectoryName BPMSigmaFile], <span class="string">'Physics'</span>);
+0440         BPMySTD = getsigma(BPMyFamily, Rmat(2,2).Monitor.DeviceList, [], [DirectoryName BPMSigmaFile], <span class="string">'Physics'</span>);
+0441     <span class="keyword">else</span>
+0442         error(<span class="string">'BPM sigma data file not found.'</span>);
+0443     <span class="keyword">end</span>
+0444 <span class="keyword">else</span>
+0445     ButtonName = questdlg(<span class="string">'LOCO BPM Sigma?'</span>,<span class="string">'BPM SIGMA'</span>,<span class="string">'Use Default'</span>,<span class="string">'Measure'</span>,<span class="string">'Get From File'</span>,<span class="string">'Get From File'</span>);
+0446     drawnow;
+0447     <span class="keyword">switch</span> ButtonName,
+0448         <span class="keyword">case</span> <span class="string">'Get From File'</span>
+0449             [BPMSigmaFile, BPMSigmaDirectory] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select a BPM Sigma File'</span>, DirStart);
+0450             drawnow;
+0451             <span class="keyword">if</span> BPMSigmaFile == 0
+0452                 fprintf(<span class="string">'   buildlocoinput canceled.\n'</span>);
+0453                 <span class="keyword">return</span>
+0454             <span class="keyword">end</span>
+0455             DirStart = BPMSigmaDirectory;
+0456 
+0457             BPMxSTD = getsigma(BPMxFamily, Rmat(1,1).Monitor.DeviceList, [], [BPMSigmaDirectory BPMSigmaFile], <span class="string">'Physics'</span>);
+0458             BPMySTD = getsigma(BPMyFamily, Rmat(2,2).Monitor.DeviceList, [], [BPMSigmaDirectory BPMSigmaFile], <span class="string">'Physics'</span>);
+0459 
+0460             <span class="comment">%BPMxSTD1 = getsigma(BPMxFamily, Rmat(1,1).Monitor.DeviceList, [], [BPMSigmaDirectory BPMSigmaFile])/1000;</span>
+0461             <span class="comment">%BPMySTD1 = getsigma(BPMyFamily, Rmat(2,2).Monitor.DeviceList, [], [BPMSigmaDirectory BPMSigmaFile])/1000;</span>
+0462 
+0463         <span class="keyword">case</span> <span class="string">'Use Default'</span>
+0464             BPMxSTD = getsigma(BPMxFamily, Rmat(1,1).Monitor.DeviceList, <span class="string">'Physics'</span>);
+0465             BPMySTD = getsigma(BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'Physics'</span>);
+0466 
+0467         <span class="keyword">case</span> <span class="string">'Measure'</span>
+0468             [BPMx, BPMy, tout, DCCT, BPMxSTD, BPMySTD] = monbpm(0:.5:60*3, BPMxFamily, Rmat(1,1).Monitor.DeviceList, BPMyFamily, Rmat(2,2).Monitor.DeviceList, <span class="string">'Physics'</span>, <span class="string">'Archive'</span>);
+0469     <span class="keyword">end</span>
+0470 <span class="keyword">end</span>
+0471 
+0472 <span class="comment">% sqrt(2) is needed because LOCO standard deviation is for difference orbits</span>
+0473 LocoMeasData.BPMSTD = 1000 * sqrt(2) * [BPMxSTD(:); BPMySTD(:)];    <span class="comment">% [mm]</span>
+0474 <span class="comment">%LocoMeasData.HBPM.STD = sqrt(2) * BPMxSTD(:);  % [meters]</span>
+0475 <span class="comment">%LocoMeasData.VBPM.STD = sqrt(2) * BPMySTD(:);  % [meters]</span>
+0476 
+0477 
+0478 <span class="comment">% % Check for a zero standard deviation (this is done in lococheckfile)</span>
+0479 <span class="comment">% i = find(BPMxSTD==0);</span>
+0480 <span class="comment">% if ~isempty(i)</span>
+0481 <span class="comment">%     for k = 1:length(i)</span>
+0482 <span class="comment">%         fprintf('   %s(%d,%d) or %s(%d) has a zero standard deviation\n', BPMxFamily, Rmat(1,1).Monitor.DeviceList(i(k),:), BPMxFamily, i(k));</span>
+0483 <span class="comment">%     end</span>
+0484 <span class="comment">% end</span>
+0485 <span class="comment">%</span>
+0486 <span class="comment">% % Check for a zero standard deviation</span>
+0487 <span class="comment">% j = find(BPMySTD==0);</span>
+0488 <span class="comment">% if ~isempty(j)</span>
+0489 <span class="comment">%     for k = 1:length(j)</span>
+0490 <span class="comment">%         fprintf('   %s(%d,%d) or %s(%d) has a zero standard deviation\n', BPMyFamily, Rmat(2,2).Monitor.DeviceList(j(k),:), BPMyFamily, j(k));</span>
+0491 <span class="comment">%     end</span>
+0492 <span class="comment">% end</span>
+0493 <span class="comment">% if ~isempty(i) || ~isempty(j)</span>
+0494 <span class="comment">%     fprintf('   WARNING:  LOCO can''t handle zero standard deviations.\n');</span>
+0495 <span class="comment">% end</span>
+0496 
+0497 
+0498 
+0499 <span class="comment">% 3. BPM AND CORRECTOR MAGNET STRUCTURES</span>
+0500 <span class="comment">% FamName and BPMIndex tells the findorbitrespm function which BPMs are needed in the response matrix</span>
+0501 <span class="comment">% HBPMIndex/VBPMIndex is the sub-index of BPMIndex which correspond to the measured response matrix</span>
+0502 <span class="comment">% BPMData.HBPMGain = starting value for the horizontal BPM gains (default: ones)</span>
+0503 <span class="comment">% BPMData.VBPMGain = starting value for the vertical   BPM gains (default: ones)</span>
+0504 <span class="comment">% BPMData.HBPMCoupling = starting value for the horizontal BPM coupling (default: zeros)</span>
+0505 <span class="comment">% BPMData.VBPMCoupling = starting value for the vertical   BPM coupling (default: zeros)</span>
+0506 <span class="comment">% BPMData.FitGains    = 'Yes'/'No' to fitting the BPM gain     (set in locogui)</span>
+0507 <span class="comment">% BPMData.FitCoupling = 'Yes'/'No' to fitting the BPM coupling (set in locogui)</span>
+0508 <span class="comment">% Note that gains and coupling are used all the time (fit or not!)</span>
+0509 
+0510 BPMData.FamName     = <span class="string">'BPM'</span>;
+0511 BPMData.FitGains    = <span class="string">'Yes'</span>;
+0512 BPMData.FitCoupling = <span class="string">'Yes'</span>;
+0513 
+0514 <span class="keyword">if</span> 1
+0515     <span class="comment">% Get the AT indexes from the AT model</span>
+0516     <span class="comment">% The model should have the same number of devices as the total device list in the AO.</span>
+0517     <span class="comment">% Then index based on the DeviceList saved with the response matrix</span>
+0518     BPMData.BPMIndex = findcells(THERING, <span class="string">'FamName'</span>, BPMData.FamName)';
+0519     tempindex = BPMData.BPMIndex;
+0520 
+0521     BPMxListTotal0 = family2dev(Rmat(1,1).Monitor.FamilyName,0);
+0522     <span class="comment">%BPMxListTotal = getlist(Rmat(1,1).Monitor.FamilyName);</span>
+0523     BPMxListTotal = Rmat(1,1).Monitor.DeviceList;
+0524     subindex = findrowindex([BPMxListTotal; zeros(length(BPMxListTotal0)-length(BPMxListTotal),2)],BPMxListTotal0);
+0525         
+0526     BPMData.BPMIndex = BPMData.BPMIndex(subindex);    
+0527     <span class="keyword">if</span> length(BPMData.BPMIndex) == size(BPMxListTotal,1)
+0528         <span class="comment">%BPMData.HBPMIndex = 1:length(BPMData.BPMIndex);</span>
+0529         
+0530         <span class="comment">% Only include the good BPMs (Status = 1)</span>
+0531         BPMData.HBPMIndex = findrowindex(Rmat(1,1).Monitor.DeviceList, BPMxListTotal); 
+0532     <span class="keyword">else</span>
+0533         error(<span class="string">'BPM family in the AT model has more BPMs then the actual accelerator (horizontally)'</span>);
+0534     <span class="keyword">end</span>     
+0535     
+0536     BPMyListTotal = Rmat(2,2).Monitor.DeviceList;
+0537     
+0538     <span class="keyword">if</span> length(BPMData.BPMIndex) == size(BPMyListTotal,1)
+0539         <span class="comment">% Only include the good BPMs (Status = 1)</span>
+0540         BPMData.VBPMIndex = findrowindex(Rmat(2,2).Monitor.DeviceList, BPMyListTotal); 
+0541     <span class="keyword">else</span>
+0542         error(<span class="string">'BPM family in the AT model has more BPMs then the actual accelerator (vertically)'</span>);
+0543     <span class="keyword">end</span>     
+0544     
+0545 <span class="keyword">else</span>
+0546     <span class="comment">% Get the AT indexes from the AO</span>
+0547     BPM1Index = family2atindex(Rmat(1,1).Monitor.FamilyName, Rmat(1,1).Monitor.DeviceList);    <span class="comment">% Must match the response matrix</span>
+0548     BPM2Index = family2atindex(Rmat(2,2).Monitor.FamilyName, Rmat(2,2).Monitor.DeviceList);    <span class="comment">% Must match the response matrix</span>
+0549     BPMData.FamName = THERING{BPM1Index(1)};
+0550     
+0551     BPMData.BPMIndex = unique([BPM1Index(:); BPM2Index(:)]);
+0552     BPMData.HBPMIndex = findrowindex(BPM1Index, BPMData.BPMIndex);          <span class="comment">% Must match the response matrix</span>
+0553     BPMData.VBPMIndex = findrowindex(BPM2Index, BPMData.BPMIndex);          <span class="comment">% Must match the response matrix</span>
+0554 <span class="keyword">end</span>
+0555 
+0556 <span class="keyword">if</span> 1
+0557     <span class="comment">% Starting with the present GCR</span>
+0558     <span class="keyword">for</span> i = 1:length(Rmat(1,1).Monitor.DeviceList)
+0559         m = gcr2loco(getgain(BPMxFamily, Rmat(1,1).Monitor.DeviceList(i,:)), getgain(BPMyFamily, Rmat(1,1).Monitor.DeviceList(i,:)), getcrunch(BPMxFamily, Rmat(1,1).Monitor.DeviceList(i,:)), getroll(BPMxFamily, Rmat(1,1).Monitor.DeviceList(i,:)));
+0560         BPMData.HBPMGain(i,1) = m(1,1);
+0561         BPMData.HBPMCoupling(i,1) = m(1,2);
+0562     <span class="keyword">end</span>
+0563 
+0564     <span class="keyword">for</span> i = 1:length(Rmat(2,2).Monitor.DeviceList)
+0565         m = gcr2loco(getgain(BPMxFamily, Rmat(2,2).Monitor.DeviceList(i,:)), getgain(BPMyFamily, Rmat(2,2).Monitor.DeviceList(i,:)), getcrunch(BPMyFamily, Rmat(2,2).Monitor.DeviceList(i,:)), getroll(BPMyFamily, Rmat(2,2).Monitor.DeviceList(i,:)));
+0566         BPMData.VBPMGain(i,1) = m(2,2);
+0567         BPMData.VBPMCoupling(i,1) = m(2,1);
+0568     <span class="keyword">end</span>
+0569 <span class="keyword">else</span>
+0570     <span class="comment">% Starting with nominal gains</span>
+0571     BPMData.HBPMGain = ones(length(BPMData.HBPMIndex), 1);
+0572     BPMData.VBPMGain = ones(length(BPMData.VBPMIndex), 1);
+0573 <span class="keyword">end</span>
+0574 
+0575 
+0576 
+0577 <span class="comment">% FamName and HCMIndex/VCMIndex tells the findorbitrespm function which corrector magnets are in the response matrix</span>
+0578 <span class="comment">% CMData.FitKicks = 'Yes'/'No' to fitting the corrector magnet gain (set in locogui)</span>
+0579 <span class="comment">% CMData.FitCoupling = 'Yes'/'No' to fitting the corrector magnet coupling (set in locogui)</span>
+0580 <span class="comment">% CMData.HCMKicks = starting value for the horizontal kicks in milliradian</span>
+0581 <span class="comment">% CMData.VCMKicks = starting value for the vertical   kicks in milliradian</span>
+0582 <span class="comment">% CMData.HCMCoupling = starting value for the horizontal coupling (default: zeros)</span>
+0583 <span class="comment">% CMData.VCMCoupling = starting value for the vertical   coupling (default: zeros)</span>
+0584 <span class="comment">% Note:  The kick strength should match the measured response matrix as best as possible</span>
+0585 <span class="comment">% Note:  The kicks and Coupling are used all the time (fit or not!)</span>
+0586 
+0587 <span class="comment">% Get the AT indexes from the AT model</span>
+0588 CMData.FitKicks    = <span class="string">'Yes'</span>;
+0589 CMData.FitCoupling = <span class="string">'Yes'</span>;
+0590 CMData.FitHCMEnergyShift = <span class="string">'No'</span>;
+0591 CMData.FitVCMEnergyShift = <span class="string">'No'</span>;
+0592 
+0593 <span class="comment">% Get the AT indexes from the AO</span>
+0594 CMData.HCMIndex = family2atindex(Rmat(1,1).Actuator.FamilyName, Rmat(1,1).Actuator.DeviceList);    <span class="comment">% Must match the response matrix</span>
+0595 CMData.VCMIndex = family2atindex(Rmat(2,2).Actuator.FamilyName, Rmat(2,2).Actuator.DeviceList);    <span class="comment">% Must match the response matrix</span>
+0596 CMData.FamName = THERING{CMData.HCMIndex(1)}.FamName;
+0597 
+0598 <span class="comment">% Kick strength in milliradian</span>
+0599 <span class="comment">%CMData.HCMKicks = 1000 * hw2physics(HCMFamily, 'Setpoint', Rmat(1,1).ActuatorDelta, Rmat(1,1).Actuator.DeviceList);</span>
+0600 <span class="comment">%CMData.VCMKicks = 1000 * hw2physics(VCMFamily, 'Setpoint', Rmat(2,2).ActuatorDelta, Rmat(2,2).Actuator.DeviceList);</span>
+0601 CMData.HCMKicks = 1000 * Rmat(1,1).ActuatorDelta;
+0602 CMData.VCMKicks = 1000 * Rmat(2,2).ActuatorDelta;
+0603 
+0604 <span class="comment">% The kicks need to be adjusted for roll (model coordinates)</span>
+0605 CMData.HCMKicks = CMData.HCMKicks .* cos(getroll(HCMFamily,Rmat(1,1).Actuator.DeviceList));
+0606 CMData.VCMKicks = CMData.VCMKicks .* cos(getroll(VCMFamily,Rmat(2,2).Actuator.DeviceList));
+0607 
+0608 <span class="comment">% Coupling term: Cloco/Gloco  = gain(ML)*sin(Roll)/(gain(ML)*cos(Roll)) = tan(Roll)</span>
+0609 <span class="comment">%CMData.HCMCoupling =  getgain(HCMFamily, Rmat(1,1).Actuator.DeviceList) .* sin(getroll(HCMFamily,Rmat(1,1).Actuator.DeviceList));</span>
+0610 <span class="comment">%CMData.VCMCoupling = -getgain(VCMFamily, Rmat(2,2).Actuator.DeviceList) .* sin(getroll(VCMFamily,Rmat(2,2).Actuator.DeviceList));</span>
+0611 CMData.HCMCoupling =  tan(getroll(HCMFamily,Rmat(1,1).Actuator.DeviceList));
+0612 CMData.VCMCoupling = -tan(getroll(VCMFamily,Rmat(2,2).Actuator.DeviceList));
+0613 
+0614 
+0615 
+0616 <span class="comment">%%%%%%%%%%%%%</span>
+0617 <span class="comment">% LocoFlags %</span>
+0618 <span class="comment">%%%%%%%%%%%%%</span>
+0619 <span class="comment">% LocoFlags can be created or just take the defaults with locogui (or locofilecheck)</span>
+0620 <span class="comment">% LocoFlags = [];</span>
+0621 LocoFlags.Threshold = 1e-006;
+0622 LocoFlags.OutlierFactor = 10;
+0623 LocoFlags.SVmethod = 1e-005;
+0624 LocoFlags.HorizontalDispersionWeight = 12.5;
+0625 LocoFlags.VerticalDispersionWeight = 12.5;
+0626 LocoFlags.AutoCorrectDelta = <span class="string">'Yes'</span>;
+0627 LocoFlags.Coupling = <span class="string">'Yes'</span>;
+0628 LocoFlags.Normalization.Flag = <span class="string">'Yes'</span>;
+0629 LocoFlags.Dispersion = <span class="string">'Yes'</span>;
+0630 LocoFlags.ResponseMatrixCalculatorFlag1 = <span class="string">'Linear'</span>;
+0631 LocoFlags.ResponseMatrixCalculatorFlag2 = <span class="string">'FixedPathLength'</span>;
+0632 LocoFlags.CalculateSigma = <span class="string">'No'</span>;
+0633 
+0634 
+0635 LocoFlags.Dispersion = <span class="string">'Yes'</span>;
+0636 
+0637 
+0638 <span class="comment">%%%%%%%%%%%%%</span>
+0639 <span class="comment">% Save file %</span>
+0640 <span class="comment">%%%%%%%%%%%%%</span>
+0641 
+0642 <span class="comment">% File check</span>
+0643 [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = <a href="locofilecheck.html" class="code" title="function [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck(FileName)">locofilecheck</a>({BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData});
+0644 
+0645 
+0646 <span class="comment">% Save</span>
+0647 save(OutputFileName, <span class="string">'LocoModel'</span>, <span class="string">'FitParameters'</span>, <span class="string">'BPMData'</span>, <span class="string">'CMData'</span>, <span class="string">'RINGData'</span>, <span class="string">'LocoMeasData'</span>, <span class="string">'LocoFlags'</span>);
+0648 
+0649 
+0650 <span class="comment">% Restore the old AT model</span>
+0651 THERING = THERINGsave;
+0652 
+0653 
+0654 
+0655 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0656 <span class="comment">% Add the machine dependent stuff %</span>
+0657 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0658 
+0659 <span class="keyword">if</span> ~GuessIt
+0660     <span class="keyword">if</span> exist(<span class="string">'buildlocofitparameters'</span>, <span class="string">'file'</span>)
+0661         buildlocofitparameters(OutputFileName);
+0662     <span class="keyword">else</span>
+0663         fprintf(<span class="string">'   buildlocofitparameters.m was not found so the FitParameters variable still needs to be created.\n'</span>);
+0664     <span class="keyword">end</span>
+0665 <span class="keyword">end</span>
+0666 
+0667 <span class="keyword">if</span> nargout == 1
+0668     LocoMeasData = OutputFileName;
+0669 <span class="keyword">end</span>
+0670</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

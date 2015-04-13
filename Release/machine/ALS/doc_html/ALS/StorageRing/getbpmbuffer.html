@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getbpmbuffer</title>
+  <meta name="keywords" content="getbpmbuffer">
+  <meta name="description" content="BPM = getbpmbuffer(DeviceList)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getbpmbuffer.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getbpmbuffer
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BPM = getbpmbuffer(DeviceList)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [bpmdataX, bpmdataY, T, TimeStamp] = getbpmbuffer(DeviceList); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  BPM = getbpmbuffer(DeviceList)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmpsd.html" class="code" title="function [Pxx, fx, Xrms, Pxx_Int, Pyy, fy, Yrms, Pyy_Int, TimeStart] = getbpmpsd(DeviceList, Navg, FileName, LineColor)">getbpmpsd</a>	GETBPMPSD - Program to analyze BPM power spectrum</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [bpmdataX, bpmdataY, T, TimeStamp] = getbpmbuffer(DeviceList);</a>
+0002 <span class="comment">%  BPM = getbpmbuffer(DeviceList)</span>
+0003 <span class="comment">%</span>
+0004 
+0005 <span class="keyword">if</span> nargin &lt; 1
+0006     <span class="comment">%DeviceList = family2dev('BPMx');</span>
+0007     DeviceList = [
+0008     12 9
+0009     1 2
+0010     1 10
+0011     2 1
+0012     2 9
+0013     3 2
+0014     3 10
+0015     3 11
+0016     3 12
+0017     4 1 
+0018     4 10
+0019     5 1
+0020     5 10
+0021     6 1
+0022     6 10
+0023     7 1
+0024     7 10
+0025     8 1
+0026     8 10
+0027     9 1
+0028     9 10
+0029     10 1
+0030     10 10
+0031     10 11
+0032     10 12
+0033     11 1
+0034     11 10
+0035     12 1
+0036     ];
+0037 <span class="keyword">end</span>
+0038 T = 1/1111;
+0039 TimeStamp = clock;
+0040 
+0041 Error = 0;
+0042 <span class="keyword">if</span> nargin == 0
+0043     DeviceList = family2dev(<span class="string">'BPMx'</span>);
+0044 <span class="keyword">end</span>
+0045 
+0046 
+0047 <span class="comment">% Check if on or open</span>
+0048 FFBON = getpv(<span class="string">'SR01____FFBON__BM00'</span>);
+0049 <span class="keyword">if</span> FFBON==0
+0050     error(<span class="string">'FFB is off.  Set to open or on.'</span>);
+0051 <span class="keyword">end</span>
+0052 
+0053 <span class="comment">% Trigger BPMs to get fresh data</span>
+0054 setpv(<span class="string">'SR01____FFBLOG_BC00'</span>, 1);
+0055 
+0056 FileName = <span class="string">'/home/physdata/matlab/srdata/orbitfeedback_fast/log/SR12bpm.log'</span>;
+0057 
+0058 fprintf(<span class="string">'Hit return when FFB data is ready...\n'</span>);
+0059 pause
+0060 
+0061 d = importdata(FileName);
+0062 bpmdata = d.data;
+0063 bpmdataX = bpmdata(:,2:2:end-1)';
+0064 bpmdataY = bpmdata(:,3:2:end-1)';
+0065 
+0066 
+0067</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

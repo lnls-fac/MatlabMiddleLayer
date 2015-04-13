@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calceta</title>
+  <meta name="keywords" content="calceta">
+  <meta name="description" content="CALCETA - Calculates the dispersion function in physics or hardware units">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; calceta.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>calceta
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>CALCETA - Calculates the dispersion function in physics or hardware units</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [d, Dy] = calceta(d, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">CALCETA - Calculates the dispersion function in physics or hardware units 
+  d = calceta(d,'Hardware')     Calculates dispersion in hardware units (converts if necessary)
+  d = calceta(d,'Physics')      Calculates dispersion in physics  units (converts if necessary)
+
+  When not using structure inputs, assumptions have to be made about the units
+  This function assumes that hardware units are mm/MHz and physics units are meters/Hz
+  [Dx,Dy] = calceta(Dx,Dy,'Physics',mcf,rf)  Converts Dx,Dy from mm/MHz to m/(dp/p)
+                                             ie, was measured using [Dx, Dy] = measdisp('Hardware')
+  [Dx,Dy] = calceta(Dx,Dy,'Hardware',mcf,rf) Converts Dx,Dy from m/(dp/p) to mm/MHz
+                                             ie, was measured using [Dx, Dy] = measdisp('Physics')
+
+  INPUTS
+  1. d (dispersion structure) or Dx and Dy (vectors) as measure by measdisp
+  2. 'Physics'  is a flag to plot dispersion function in physics units
+     'Hardware' is a flag to plot dispersion function in hardware units
+     ('Eta' can be used instead of 'Physics')
+  3. mcf = momentum compaction factor (linear)
+  4. rf  = rf frequency (MHz)
+     rf and mcf input are only for nonstructure inputs when using the 'Physics' flag
+  5. 'Hardware' or 'Physics' - Optional units flags 
+
+  OUTPUTS
+  1. d or [Dx, Dy] is dispersion function with new units
+
+  NOTES
+  1. 'Hardware' and 'Physics' are not case sensitive
+
+  See also <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>, <a href="plotdisp.html" class="code" title="function [DxOut, DyOut, FileName] = plotdisp(varargin)">plotdisp</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>	PHYSICS2HW - Converts from 'Physics' units to 'Hardware' units</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [d, Dy] = calceta(d, varargin)</a>
+0002 <span class="comment">%CALCETA - Calculates the dispersion function in physics or hardware units</span>
+0003 <span class="comment">%  d = calceta(d,'Hardware')     Calculates dispersion in hardware units (converts if necessary)</span>
+0004 <span class="comment">%  d = calceta(d,'Physics')      Calculates dispersion in physics  units (converts if necessary)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  When not using structure inputs, assumptions have to be made about the units</span>
+0007 <span class="comment">%  This function assumes that hardware units are mm/MHz and physics units are meters/Hz</span>
+0008 <span class="comment">%  [Dx,Dy] = calceta(Dx,Dy,'Physics',mcf,rf)  Converts Dx,Dy from mm/MHz to m/(dp/p)</span>
+0009 <span class="comment">%                                             ie, was measured using [Dx, Dy] = measdisp('Hardware')</span>
+0010 <span class="comment">%  [Dx,Dy] = calceta(Dx,Dy,'Hardware',mcf,rf) Converts Dx,Dy from m/(dp/p) to mm/MHz</span>
+0011 <span class="comment">%                                             ie, was measured using [Dx, Dy] = measdisp('Physics')</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  INPUTS</span>
+0014 <span class="comment">%  1. d (dispersion structure) or Dx and Dy (vectors) as measure by measdisp</span>
+0015 <span class="comment">%  2. 'Physics'  is a flag to plot dispersion function in physics units</span>
+0016 <span class="comment">%     'Hardware' is a flag to plot dispersion function in hardware units</span>
+0017 <span class="comment">%     ('Eta' can be used instead of 'Physics')</span>
+0018 <span class="comment">%  3. mcf = momentum compaction factor (linear)</span>
+0019 <span class="comment">%  4. rf  = rf frequency (MHz)</span>
+0020 <span class="comment">%     rf and mcf input are only for nonstructure inputs when using the 'Physics' flag</span>
+0021 <span class="comment">%  5. 'Hardware' or 'Physics' - Optional units flags</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  OUTPUTS</span>
+0024 <span class="comment">%  1. d or [Dx, Dy] is dispersion function with new units</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%  NOTES</span>
+0027 <span class="comment">%  1. 'Hardware' and 'Physics' are not case sensitive</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%  See also measdisp, plotdisp</span>
+0030 
+0031 <span class="comment">%  J. Corbett and G. Portmann (August 2003)</span>
+0032 
+0033 
+0034 UnitsFlag = <span class="string">''</span>;
+0035 MCF = [];
+0036 RF0 = [];
+0037 <span class="keyword">if</span> nargin &gt; 1
+0038     <span class="comment">% Look if 'physics' or 'eta' are on the input line</span>
+0039     <span class="keyword">for</span> i = length(varargin):-1:1
+0040         <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'eta'</span>) || strcmpi(varargin{i},<span class="string">'physics'</span>)
+0041             UnitsFlag = <span class="string">'Physics'</span>;
+0042             <span class="keyword">if</span> length(varargin) &gt;= i+1
+0043                 <span class="keyword">if</span> isnumeric(varargin{i+1})
+0044                     MCF = varargin{i+1};
+0045                     <span class="keyword">if</span> length(varargin) &gt;= i+2
+0046                         <span class="keyword">if</span> isnumeric(varargin{i+2})
+0047                             RF0 = varargin{i+2};
+0048                         <span class="keyword">end</span>
+0049                     <span class="keyword">end</span>
+0050                 <span class="keyword">end</span>
+0051             <span class="keyword">end</span>
+0052         <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0053             UnitsFlag = <span class="string">'Hardware'</span>;
+0054             varargin(i) = [];    
+0055         <span class="keyword">elseif</span> isempty(varargin{i})
+0056             <span class="comment">% Remove empty</span>
+0057             varargin(i) = [];    
+0058         <span class="keyword">else</span>
+0059             <span class="keyword">if</span> ischar(varargin{i})  
+0060                 <span class="comment">% Unknown string input</span>
+0061                 fprintf(<span class="string">'   WARNING:  Unknown input ''%s''ignored\n'</span>, varargin{i});
+0062                 varargin(i) = [];
+0063             <span class="keyword">end</span>
+0064         <span class="keyword">end</span>
+0065     <span class="keyword">end</span>
+0066 <span class="keyword">end</span>
+0067 
+0068 <span class="keyword">if</span> isempty(UnitsFlag)
+0069     <span class="comment">%error('No units string input (Hardware or Physics)');</span>
+0070     UnitsFlag = <span class="string">'Physics'</span>;
+0071 <span class="keyword">end</span>
+0072 
+0073 <span class="comment">% Check if the input is a structure</span>
+0074 <span class="keyword">if</span> isstruct(d)
+0075     <span class="keyword">if</span> length(d) ~= 2
+0076         error(<span class="string">'Supply proper structure array to calceta'</span>);
+0077     <span class="keyword">end</span>
+0078     
+0079     MCF = d(1).MCF;
+0080     
+0081     <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>) &amp;&amp; strcmpi(d(1).Units,<span class="string">'Hardware'</span>)
+0082         <span class="comment">% Change to physics units</span>
+0083         d = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(d);
+0084         
+0085         <span class="comment">% Change to denominator to energy shift (dp/p)</span>
+0086         RF0 = d(1).Actuator.Data;    
+0087         RF0 = RF0(1);  <span class="comment">% Just in case someone has a vector for multiple cavities</span>
+0088         d(1).Data = -RF0 * MCF * d(1).Data;
+0089         d(2).Data = -RF0 * MCF * d(2).Data;
+0090         
+0091         d(1).UnitsString = [d(1).Monitor.UnitsString,<span class="string">'/(dp/p)'</span>];
+0092         d(2).UnitsString = [d(2).Monitor.UnitsString,<span class="string">'/(dp/p)'</span>];
+0093     <span class="keyword">end</span>
+0094     
+0095     <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Hardware'</span>) &amp;&amp; strcmpi(d(1).Units,<span class="string">'Physics'</span>)
+0096         <span class="comment">% Change to denominator to RF change</span>
+0097         RF0 = d(1).Actuator.Data;    
+0098         RF0 = RF0(1);  <span class="comment">% Just in case someone has a vector for multiple cavities</span>
+0099         d(1).Data = d(1).Data / (-RF0 * MCF);
+0100         d(2).Data = d(2).Data / (-RF0 * MCF);
+0101         
+0102         <span class="comment">% Change to hardware units</span>
+0103         d = <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>(d);
+0104         
+0105         d(1).UnitsString = [d(1).Monitor.UnitsString,<span class="string">'/'</span>,d(1).Actuator.UnitsString];
+0106         d(2).UnitsString = [d(2).Monitor.UnitsString,<span class="string">'/'</span>,d(2).Actuator.UnitsString];
+0107     <span class="keyword">end</span>
+0108     Dy = d(2).Data;
+0109     
+0110 <span class="keyword">else</span>
+0111     <span class="comment">% Non structure inputs</span>
+0112     Dx = d;
+0113     Dy = varargin{1};
+0114     
+0115     <span class="keyword">if</span> strcmpi(UnitsFlag,<span class="string">'Physics'</span>)
+0116         <span class="comment">% Convert to physics units</span>
+0117         <span class="keyword">if</span> ~isempty(RF0) &amp;&amp; ~isempty(MCF)
+0118             <span class="comment">% Change units to meters/(dp/p)</span>
+0119             Dx = -RF0(1) * MCF * Dx / 1000;
+0120             Dy = -RF0(1) * MCF * Dy / 1000;
+0121         <span class="keyword">else</span>
+0122             error(<span class="string">'MCF and RF frequency not input'</span>);
+0123         <span class="keyword">end</span>     
+0124     <span class="keyword">elseif</span> strcmpi(UnitsFlag,<span class="string">'Hardware'</span>)
+0125         <span class="comment">% Convert to hardware units</span>
+0126         <span class="keyword">if</span> ~isempty(RF0) &amp;&amp; ~isempty(MCF)
+0127             <span class="comment">% Change units to mm/MHz</span>
+0128             Dx = 1000 * Dx / (-RF0(1) * MCF);
+0129             Dy = 1000 * Dy / (-RF0(1) * MCF);
+0130         <span class="keyword">else</span>
+0131             error(<span class="string">'MCF and RF frequency not input'</span>);
+0132         <span class="keyword">end</span>     
+0133     <span class="keyword">else</span>
+0134         error(<span class="string">'Output units unknown'</span>);
+0135     <span class="keyword">end</span>
+0136     
+0137     d = Dx;
+0138 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

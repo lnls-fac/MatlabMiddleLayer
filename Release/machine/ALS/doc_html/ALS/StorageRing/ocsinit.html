@@ -1,0 +1,482 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of ocsinit</title>
+  <meta name="keywords" content="ocsinit">
+  <meta name="description" content="OCSINIT - Corrector and BPM">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; ocsinit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>ocsinit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>OCSINIT - Corrector and BPM</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [HBPM, VBPM, HCM, VCM, HSV, VSV] = ocsinit(MethodName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">OCSINIT - Corrector and BPM
+ [HBPM, VBPM, HCM, VCM, HSV, VSV] = ocsinit(MethodName)
+
+  INPUTS
+  1. MethodName = 'TopOfFill'
+                  'SOFB'
+                  'FOFB'
+                  'Injection_TopOfFill'
+                  'Offset Orbit'
+
+  NOTE
+  1. This is a user operational file
+
+  See also setorbit, setorbitgui, <a href="setorbitsetup.html" class="code" title="function [BPM, CM, Flags, EVectors] = setorbitsetup(varargin)">setorbitsetup</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>	GETBPMLIST - Return a BPM list based on key words and sector numbers</li><li><a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>	GETBPMLIST - Return a corrector magnet list based on key words and sector numbers</li><li><a href="ocsinit.html" class="code" title="function [HBPM, VBPM, HCM, VCM, HSV, VSV] = ocsinit(MethodName)">ocsinit</a>	OCSINIT - Corrector and BPM</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="ocsinit.html" class="code" title="function [HBPM, VBPM, HCM, VCM, HSV, VSV] = ocsinit(MethodName)">ocsinit</a>	OCSINIT - Corrector and BPM</li><li><a href="setorbitsetup.html" class="code" title="function [BPM, CM, Flags, EVectors] = setorbitsetup(varargin)">setorbitsetup</a>	SETORBITSETUP - BPM & CM setup function for setorbitgui</li><li><a href="srcontrol5.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5</a>	srcontrol5</li><li><a href="srcontrol5_new_but_broken_EPUtuneFF_20070723.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5_new_but_broken_EPUtuneFF_20070723</a>	srcontrol5</li><li><a href="srcontrol5_with_chicane_checks.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5_with_chicane_checks</a>	srcontrol5</li><li><a href="srcontrol5_without_chicane_trim_checks_pre20070730.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5_without_chicane_trim_checks_pre20070730</a>	srcontrol5</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [HBPM, VBPM, HCM, VCM, HSV, VSV] = ocsinit(MethodName)</a>
+0002 <span class="comment">%OCSINIT - Corrector and BPM</span>
+0003 <span class="comment">% [HBPM, VBPM, HCM, VCM, HSV, VSV] = ocsinit(MethodName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. MethodName = 'TopOfFill'</span>
+0007 <span class="comment">%                  'SOFB'</span>
+0008 <span class="comment">%                  'FOFB'</span>
+0009 <span class="comment">%                  'Injection_TopOfFill'</span>
+0010 <span class="comment">%                  'Offset Orbit'</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  NOTE</span>
+0013 <span class="comment">%  1. This is a user operational file</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  See also setorbit, setorbitgui, setorbitsetup</span>
+0016 
+0017 
+0018 <span class="keyword">if</span> nargin == 0
+0019     MethodName = <span class="string">'TopOfFill'</span>;
+0020 <span class="keyword">end</span>
+0021 
+0022 <span class="keyword">switch</span>(MethodName)
+0023 
+0024     <span class="keyword">case</span> <span class="string">'TopOfFill'</span>
+0025 
+0026         <span class="comment">% RemoveHBPMDeviceList = [];</span>
+0027         RemoveHBPMDeviceList = [
+0028             9 5;    <span class="comment">% this BPM showed strange jumps/drifts on 2007-07-14</span>
+0029         <span class="comment">%    3 6;   % this BPM has not been used in old ML OC for a while - suspect it's drifting</span>
+0030         <span class="comment">%    3 12;  % this BPM broke during the 11/28-29 maintenance - there was maintenance on the motor chicane...</span>
+0031             ];
+0032         RemoveVBPMDeviceList = RemoveHBPMDeviceList;
+0033 
+0034         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>, <span class="string">'2 3 6 7 10'</span>);
+0035         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>, <span class="string">'1 4 5 8 10'</span>);
+0036         VCMList = [1 2; VCMList; 12 7];  <span class="comment">% Replacement for missing magnets in sectors 1 &amp; 12</span>
+0037         
+0038         HBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>);
+0039         VBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>);
+0040 
+0041         i = findrowindex(RemoveHBPMDeviceList, HBPMList);
+0042         <span class="keyword">if</span> ~isempty(i)
+0043             HBPMList(i,:) = [];
+0044         <span class="keyword">end</span>
+0045 
+0046         i = findrowindex(RemoveVBPMDeviceList, VBPMList);
+0047         <span class="keyword">if</span> ~isempty(i)
+0048             VBPMList(i,:) = [];
+0049         <span class="keyword">end</span>
+0050 
+0051 
+0052         HBPM = family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, HBPMList);
+0053         VBPM = family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, VBPMList);
+0054 
+0055         HCM = family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList);
+0056         VCM = family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList);
+0057         
+0058 
+0059         <span class="comment">% SVD orbit correction</span>
+0060         HSV = min([size(HCMList,1) size(HBPMList,1)])-4;
+0061         VSV = min([size(VCMList,1) size(VBPMList,1)]);
+0062 
+0063 
+0064     <span class="keyword">case</span> <span class="string">'SOFB'</span>
+0065 
+0066         RemoveHBPMDeviceList = [];
+0067         RemoveHBPMDeviceList = [            
+0068         <span class="comment">%    3 6;   % this BPM has not been used in old ML OC for a while - suspect it's drifting</span>
+0069         <span class="comment">%    3 12;  % this BPM broke during the 11/28-29 maintenance - there was maintenance on the motor chicane...</span>
+0070         1 6;
+0071         2 6;
+0072         6 5;   <span class="comment">% BPM showed larger (1 mum rms with FFB on) noise than other ones 7/16/2007</span>
+0073         9 5;   <span class="comment">% BPM showed stranged drift behavior on 7/15/2007</span>
+0074             ];
+0075         
+0076         <span class="comment">% Remove Bergoz BPMs in SR01 and SR03 for 2-bunch (noisy at low currents) and drop singular values</span>
+0077         <span class="keyword">if</span> strcmp(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.9 GeV, Two-Bunch'</span>)
+0078             RemoveHBPMDeviceList = [RemoveHBPMDeviceList;
+0079                 1 2
+0080                 2 9
+0081                 3 2
+0082                 12 9];
+0083         <span class="keyword">end</span>
+0084         
+0085         RemoveVBPMDeviceList = RemoveHBPMDeviceList;
+0086 
+0087         
+0088         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>, <span class="string">'1 8 10'</span>);
+0089         HCMList = [1 2; HCMList; 12 7];  <span class="comment">% Replacement for missing magnets in sectors 1 &amp; 12</span>
+0090         
+0091         <span class="comment">%VCMList = getcmlist('VCM', '1 8 10');</span>
+0092         <span class="comment">%VCMList = [1 2; VCMList; 12 7];  % Replacement for missing magnets in sectors 1 &amp; 12</span>
+0093 
+0094         VCMList = [
+0095             1 2;
+0096             1 8;
+0097             2 1;
+0098             2 8;
+0099             3 1;
+0100             3 7;
+0101             3 8;
+0102             3 10; <span class="comment">%SR04U_VHCM2 (chicane trim)</span>
+0103             4 1;
+0104             4 7;
+0105             4 8;
+0106             5 1;
+0107             5 8;
+0108             5 10; <span class="comment">%SR06U_VHCM2 (chicane trim)</span>
+0109             6 1;
+0110             6 8;
+0111             7 1;
+0112             7 8;
+0113             8 1;
+0114             8 8;
+0115             9 1;
+0116             9 8;
+0117             10 1;
+0118             10 2;
+0119             10 7;
+0120             10 8;
+0121             10 10; <span class="comment">%SR11U_VHCM2 (chicane trim)</span>
+0122             11 1;
+0123             11 7;
+0124             11 8;
+0125             12 1;
+0126             12 7];
+0127             
+0128 
+0129         <span class="comment">% BPMs</span>
+0130 <span class="comment">%         HBPMList = getbpmlist('Bergoz', '1 2 5 6 9 10 11 12');  % Don't use new Bergoz for now</span>
+0131 <span class="comment">%         VBPMList = getbpmlist('Bergoz', '1 2 5 6 9 10 11 12');  % Don't use new Bergoz for now</span>
+0132         HBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>);  <span class="comment">% 2007-07-16 - start including new bergoz BPMs</span>
+0133         VBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'Bergoz'</span>);  <span class="comment">% looked overall fine on archivewr data</span>
+0134 
+0135 
+0136         i = findrowindex(RemoveHBPMDeviceList, HBPMList);
+0137         <span class="keyword">if</span> ~isempty(i)
+0138             HBPMList(i,:) = [];
+0139         <span class="keyword">end</span>
+0140 
+0141 
+0142         i = findrowindex(RemoveVBPMDeviceList, VBPMList);
+0143         <span class="keyword">if</span> ~isempty(i)
+0144             VBPMList(i,:) = [];
+0145         <span class="keyword">end</span>
+0146 
+0147 
+0148         HBPM = family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, HBPMList);
+0149         VBPM = family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, VBPMList);
+0150 
+0151         HCM = family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList);
+0152         VCM = family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList);
+0153 
+0154 
+0155         <span class="comment">% SVD orbit correction</span>
+0156         <span class="keyword">if</span> size(HBPMList,1) &lt; 78
+0157             HSV = 27;
+0158         <span class="keyword">else</span>
+0159             HSV = 28;
+0160         <span class="keyword">end</span>
+0161         VSV = 32;
+0162 
+0163 
+0164         <span class="comment">% Remove Bergoz BPMs in SR01 and SR03 for 2-bunch (noisy at low currents) and drop singular values</span>
+0165         <span class="keyword">if</span> strcmp(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.9 GeV, Two-Bunch'</span>)
+0166             HBPMList = HBPMList(find(HBPMList(:,1)~=1),:);
+0167             HBPMList = HBPMList(find(HBPMList(:,1)~=3),:);
+0168             Xivec = HSV - 4;
+0169 
+0170             VBPMList = VBPMList(find(VBPMList(:,1)~=1),:);
+0171             VBPMList = VBPMList(find(VBPMList(:,1)~=3),:);
+0172             Yivec = VSV - 4;
+0173         <span class="keyword">end</span>
+0174 
+0175 
+0176 
+0177     <span class="keyword">case</span> <span class="string">'FOFB'</span>
+0178 
+0179         RemoveHBPMDeviceList = [
+0180             6 5;   <span class="comment">% BPM showed larger (1 mum rms with FFB on) noise than other ones 7/16/2007</span>
+0181                 9 5;   <span class="comment">% BPM showed stranged drift behavior on 7/15/2007</span>
+0182                 ];
+0183           <span class="comment">%RemoveHBPMDeviceList = [</span>
+0184         <span class="comment">%    3 6;   % this BPM has not been used in old ML OC for a while - suspect it's drifting</span>
+0185         <span class="comment">%    3 12;  % this BPM broke during the 11/28-29 maintenance - there was maintenance on the motor chicane...</span>
+0186         <span class="comment">%    ];</span>
+0187         RemoveVBPMDeviceList = RemoveHBPMDeviceList;
+0188 
+0189 
+0190         <span class="comment">% Corrector magnets</span>
+0191         HCMList = [
+0192             1 8;
+0193             2 1;
+0194             2 8;
+0195             3 1;
+0196             3 8;
+0197             4 1;
+0198             4 8;
+0199             5 1;
+0200             5 8;
+0201             6 1;
+0202             6 8;
+0203             7 1;
+0204             7 8;
+0205             8 1;
+0206             8 8;
+0207             9 1;
+0208             9 8;
+0209             10 1;
+0210             10 8;
+0211             11 1;
+0212             11 8;
+0213             12 1];
+0214 
+0215         VCMList = [
+0216             1 8;
+0217             2 1;
+0218             2 8;
+0219             3 1;
+0220             3 8;
+0221             4 1;
+0222             4 8;
+0223             5 1;
+0224             5 8;
+0225             6 1;
+0226             6 8;
+0227             7 1;
+0228             7 8;
+0229             8 1;
+0230             8 8;
+0231             9 1;
+0232             9 8;
+0233             10 1;
+0234             10 8;
+0235             11 1;
+0236             11 8;
+0237             12 1];
+0238 
+0239 
+0240         <span class="comment">% BPMs</span>
+0241         HBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'OldBergoz'</span>);
+0242         VBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'OldBergoz'</span>);
+0243 
+0244 
+0245         i = findrowindex(RemoveHBPMDeviceList, HBPMList);
+0246         <span class="keyword">if</span> ~isempty(i)
+0247             HBPMList(i,:) = [];
+0248         <span class="keyword">end</span>
+0249 
+0250 
+0251         i = findrowindex(RemoveVBPMDeviceList, VBPMList);
+0252         <span class="keyword">if</span> ~isempty(i)
+0253             VBPMList(i,:) = [];
+0254         <span class="keyword">end</span>
+0255 
+0256 
+0257         HBPM = family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, HBPMList);
+0258         VBPM = family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, VBPMList);
+0259 
+0260         HCM = family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList);
+0261         VCM = family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList);
+0262 
+0263 
+0264         <span class="comment">% SVD orbit correction</span>
+0265         HSV = 11;
+0266         VSV = 12;
+0267 
+0268 
+0269         <span class="comment">% Remove Bergoz BPMs in SR01 and SR03 for 2-bunch (noisy at low currents) and drop singular values</span>
+0270         <span class="keyword">if</span> strcmp(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.9 GeV, Two-Bunch'</span>)
+0271             HBPMList = HBPMList(find(HBPMList(:,1)~=1),:);
+0272             HBPMList = HBPMList(find(HBPMList(:,1)~=3),:);
+0273             Xivec = HSV - 4;
+0274 
+0275             VBPMList = VBPMList(find(VBPMList(:,1)~=1),:);
+0276             VBPMList = VBPMList(find(VBPMList(:,1)~=3),:);
+0277             Yivec = VSV - 4;
+0278         <span class="keyword">end</span>
+0279 
+0280 
+0281         HBPM = family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, HBPMList);
+0282         VBPM = family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, VBPMList);
+0283 
+0284         HCM = family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList);
+0285         VCM = family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList);
+0286 
+0287 
+0288     <span class="keyword">case</span> <span class="string">'Measured Offsets'</span>
+0289 
+0290         HBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'HOffset'</span>);
+0291         VBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'VOffset'</span>);
+0292 
+0293         HBPM = family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, HBPMList);
+0294         VBPM = family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, VBPMList);
+0295 
+0296 
+0297         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>,<span class="string">'1 2 3 4 5 6 7 8'</span>);
+0298         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>,<span class="string">'1 2 3 4 5 6 7 8'</span>);
+0299 
+0300         HCM = family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList);
+0301         VCM = family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList);
+0302 
+0303 
+0304         <span class="comment">% SVD orbit correction</span>
+0305         HSV = 24;
+0306         VSV = 24;
+0307 
+0308         
+0309     <span class="keyword">case</span> <span class="string">'Injection'</span>
+0310         <span class="comment">% Remove BPMs inside chicane (except a few)</span>
+0311         RemoveHBPMDeviceList = [
+0312             3 11;
+0313             3 12;
+0314             5 11;
+0315             5 12;
+0316             6 1;
+0317             10 10;
+0318             10 11;
+0319             10 12;
+0320             11  1;
+0321             ];
+0322         RemoveVBPMDeviceList = RemoveHBPMDeviceList;
+0323 
+0324         HBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'BPMx'</span>);
+0325         VBPMList = <a href="getbpmlist.html" class="code" title="function [DeviceList, Index] = getbpmlist(varargin)">getbpmlist</a>(<span class="string">'BPMy'</span>);
+0326 
+0327         i = findrowindex(RemoveHBPMDeviceList, HBPMList);
+0328         <span class="keyword">if</span> ~isempty(i)
+0329             HBPMList(i,:) = [];
+0330         <span class="keyword">end</span>
+0331 
+0332         i = findrowindex(RemoveVBPMDeviceList, VBPMList);
+0333         <span class="keyword">if</span> ~isempty(i)
+0334             VBPMList(i,:) = [];
+0335         <span class="keyword">end</span>
+0336 
+0337         HBPM = family2datastruct(<span class="string">'BPMx'</span>, <span class="string">'Monitor'</span>, HBPMList);
+0338         VBPM = family2datastruct(<span class="string">'BPMy'</span>, <span class="string">'Monitor'</span>, VBPMList);
+0339 
+0340 
+0341         HCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'HCM'</span>,<span class="string">'1 2 3 4 5 6 7 8'</span>);
+0342         VCMList = <a href="getcmlist.html" class="code" title="function [DeviceList, Index] = getcmlist(varargin)">getcmlist</a>(<span class="string">'VCM'</span>,<span class="string">'1 2 3 4 5 6 7 8'</span>);
+0343 
+0344         HCM = family2datastruct(<span class="string">'HCM'</span>, <span class="string">'Setpoint'</span>, HCMList);
+0345         VCM = family2datastruct(<span class="string">'VCM'</span>, <span class="string">'Setpoint'</span>, VCMList);
+0346 
+0347         <span class="comment">% SVD orbit correction</span>
+0348         HSV = 24;
+0349         VSV = 24;
+0350 
+0351 
+0352     <span class="keyword">case</span> <span class="string">'Injection_TopOfFill'</span>
+0353         <span class="comment">% Remove BPMs inside chicane (except a few)</span>
+0354         RemoveHBPMDeviceList = [
+0355             3 11;
+0356             3 12;
+0357             5 11;
+0358             5 12;
+0359             6 1;
+0360             10 10;
+0361             10 11;
+0362             10 12;
+0363             11  1;
+0364             ];
+0365         RemoveVBPMDeviceList = RemoveHBPMDeviceList;
+0366 
+0367 
+0368         [HBPM, VBPM, HCM, VCM, HSV, VSV] = <a href="ocsinit.html" class="code" title="function [HBPM, VBPM, HCM, VCM, HSV, VSV] = ocsinit(MethodName)">ocsinit</a>(<span class="string">'TopOfFill'</span>);
+0369         
+0370         
+0371         i = findrowindex(RemoveHBPMDeviceList, HBPM.DeviceList);
+0372         <span class="keyword">if</span> ~isempty(i)
+0373             HBPM.Data(i,:) = [];
+0374             HBPM.DeviceList(i,:) = [];
+0375             HBPM.Status(i,:) = [];
+0376         <span class="keyword">end</span>
+0377 
+0378         i = findrowindex(RemoveVBPMDeviceList, VBPM.DeviceList);
+0379         <span class="keyword">if</span> ~isempty(i)
+0380             VBPM.Data(i,:) = [];
+0381             VBPM.DeviceList(i,:) = [];
+0382             VBPM.Status(i,:) = [];
+0383         <span class="keyword">end</span>
+0384         
+0385         <span class="comment">% SVD orbit correction</span>
+0386         HSV = HSV - 8;
+0387         VSV = VSV - 8;
+0388 
+0389         
+0390     <span class="keyword">otherwise</span>
+0391         fprintf(<span class="string">'   Orbit correction set unknown.\n'</span>);
+0392 <span class="keyword">end</span>
+0393 
+0394 
+0395 
+0396 
+0397 
+0398 
+0399 
+0400 
+0401 <span class="comment">% HCMList = [];</span>
+0402 <span class="comment">% VCMList = [];</span>
+0403 <span class="comment">% for Sector = 1:12</span>
+0404 <span class="comment">%     if Sector == 1</span>
+0405 <span class="comment">%         VCMList = [VCMList;Sector 2;Sector 4;Sector 5;Sector 8];</span>
+0406 <span class="comment">%         HCMList = [HCMList;Sector 2;Sector 7];</span>
+0407 <span class="comment">%     elseif Sector == 3</span>
+0408 <span class="comment">%         VCMList = [VCMList;Sector 1;Sector 4;Sector 5;Sector 8;Sector 10];</span>
+0409 <span class="comment">%         HCMList = [HCMList;Sector 2;Sector 7;Sector 10];</span>
+0410 <span class="comment">%     elseif Sector == 5</span>
+0411 <span class="comment">%         VCMList = [VCMList;Sector 1;Sector 4;Sector 5;Sector 8;Sector 10];</span>
+0412 <span class="comment">%         HCMList = [HCMList;Sector 2;Sector 7;Sector 10];</span>
+0413 <span class="comment">%     elseif Sector == 10</span>
+0414 <span class="comment">%         VCMList = [VCMList;Sector 1;Sector 4;Sector 5;Sector 8;Sector 10];</span>
+0415 <span class="comment">%         HCMList = [HCMList;Sector 2;Sector 7;Sector 10];</span>
+0416 <span class="comment">%     elseif Sector == 12</span>
+0417 <span class="comment">%         VCMList = [VCMList;Sector 1;Sector 4;Sector 5;Sector 7];</span>
+0418 <span class="comment">%         HCMList = [HCMList;Sector 2;Sector 7];</span>
+0419 <span class="comment">%     else</span>
+0420 <span class="comment">%         VCMList = [VCMList;Sector 1;Sector 4;Sector 5;Sector 8];</span>
+0421 <span class="comment">%         HCMList = [HCMList;Sector 2;Sector 7];</span>
+0422 <span class="comment">%     end</span>
+0423 <span class="comment">% end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

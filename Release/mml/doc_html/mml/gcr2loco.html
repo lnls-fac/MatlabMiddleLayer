@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gcr2loco</title>
+  <meta name="keywords" content="gcr2loco">
+  <meta name="description" content="LOCO2GCR - Converts the LOCO BPM output to gain, crunch, and roll parameterization">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; gcr2loco.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>gcr2loco
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>LOCO2GCR - Converts the LOCO BPM output to gain, crunch, and roll parameterization</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function m = gcr2loco(gx, gy, c, r) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOCO2GCR - Converts the LOCO BPM output to gain, crunch, and roll parameterization
+  M = gcr2loco(Gx, Gy, C, R)
+
+  INPUTS
+  1. Gx - Horizontal gain
+  2. Gy - Vertical gain
+  3. C - Crunch
+  4. R - Roll [radians]
+
+  OUTPUTS
+  1. M - LOCO output matrix (gain/coupling) 
+     Note: for vector inputs the output will have rows [Gx Gy C R]
+
+  ALGORITHM
+  The LOCO matrix for a BPM converts the model BPM data to the
+  coordinate system of the actual BPM measurement.  The new BPM is   
+  is defined as the calibrated BPM data.  The middle layer applies
+  the coordinate conversion from the measured data to the model gcr2loco splits this matrix up
+  into a Gain, Crunch, and Roll term.
+
+  [Measured Coordinate System] = LOCO Matrix * [Model]                          (LOCO coordinate transform)
+  [Calibrated to Model Coordinate System] = inv(LOCO Matrix) * [Measured Data]  (Middle layer coordinate transform)
+
+  The middle layer stores the coordinate transform in terms of gain, crunch, and roll.
+  The gain terms are use in real2raw/raw2real (hence hw2physics/physics2hw) and the 
+  crunch and roll are used in programs like getpvmodel/setpvmodel.  That is, hw2physics/physics2hw
+  does not make a coordinate rotation, it just corrects the gain.
+
+  inv(LOCO Matrix) = Rotation Matrix  *  Crunch Matrix        *  Gain Matrix
+                    | cos(R) sin(R) |   | 1  C |                 | Gx  0  |
+                    |-sin(R) cos(R) |   | C  1 | / sqrt(1-C^2)   | 0   Gy |
+
+  See also <a href="loco2gcr.html" class="code" title="function [gx, gy, c, r] = loco2gcr(m)">loco2gcr</a>, <a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>, <a href="getroll.html" class="code" title="function Data = getroll(varargin)">getroll</a>, <a href="getcrunch.html" class="code" title="function Data = getcrunch(varargin)">getcrunch</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>	LOCO2GCR - Converts the LOCO BPM output to gain, crunch, and roll parameterization</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>	LOCO2GCR - Converts the LOCO BPM output to gain, crunch, and roll parameterization</li><li><a href="quadplot.html" class="code" title="function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM)">quadplot</a>	QUADPLOT - Plots quadrupole centering data</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function m = gcr2loco(gx, gy, c, r)</a>
+0002 <span class="comment">%LOCO2GCR - Converts the LOCO BPM output to gain, crunch, and roll parameterization</span>
+0003 <span class="comment">%  M = gcr2loco(Gx, Gy, C, R)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Gx - Horizontal gain</span>
+0007 <span class="comment">%  2. Gy - Vertical gain</span>
+0008 <span class="comment">%  3. C - Crunch</span>
+0009 <span class="comment">%  4. R - Roll [radians]</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  OUTPUTS</span>
+0012 <span class="comment">%  1. M - LOCO output matrix (gain/coupling)</span>
+0013 <span class="comment">%     Note: for vector inputs the output will have rows [Gx Gy C R]</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  ALGORITHM</span>
+0016 <span class="comment">%  The LOCO matrix for a BPM converts the model BPM data to the</span>
+0017 <span class="comment">%  coordinate system of the actual BPM measurement.  The new BPM is</span>
+0018 <span class="comment">%  is defined as the calibrated BPM data.  The middle layer applies</span>
+0019 <span class="comment">%  the coordinate conversion from the measured data to the model gcr2loco splits this matrix up</span>
+0020 <span class="comment">%  into a Gain, Crunch, and Roll term.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  [Measured Coordinate System] = LOCO Matrix * [Model]                          (LOCO coordinate transform)</span>
+0023 <span class="comment">%  [Calibrated to Model Coordinate System] = inv(LOCO Matrix) * [Measured Data]  (Middle layer coordinate transform)</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%  The middle layer stores the coordinate transform in terms of gain, crunch, and roll.</span>
+0026 <span class="comment">%  The gain terms are use in real2raw/raw2real (hence hw2physics/physics2hw) and the</span>
+0027 <span class="comment">%  crunch and roll are used in programs like getpvmodel/setpvmodel.  That is, hw2physics/physics2hw</span>
+0028 <span class="comment">%  does not make a coordinate rotation, it just corrects the gain.</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  inv(LOCO Matrix) = Rotation Matrix  *  Crunch Matrix        *  Gain Matrix</span>
+0031 <span class="comment">%                    | cos(R) sin(R) |   | 1  C |                 | Gx  0  |</span>
+0032 <span class="comment">%                    |-sin(R) cos(R) |   | C  1 | / sqrt(1-C^2)   | 0   Gy |</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">%  See also loco2gcr, getgain, getroll, getcrunch</span>
+0035 
+0036 <span class="comment">%  Written by Greg Portmann</span>
+0037 
+0038 
+0039 <span class="keyword">if</span> nargin == 0
+0040     error(<span class="string">'At least one input required.'</span>);
+0041 <span class="keyword">end</span>
+0042 
+0043 
+0044 <span class="keyword">if</span> length(gx) &gt; 1
+0045     <span class="keyword">for</span> i = 1:size(gx,1)
+0046         <span class="keyword">if</span> nargin &lt; 2
+0047             mm = <a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>(gx(i));
+0048         <span class="keyword">elseif</span> nargin &lt; 3
+0049             mm = <a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>(gx(i), gy(i));
+0050         <span class="keyword">elseif</span> nargin &lt; 4
+0051             mm = <a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>(gx(i), gy(i), c(i));
+0052         <span class="keyword">else</span>
+0053             mm = <a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>(gx(i), gy(i), c(i), r(i));
+0054         <span class="keyword">end</span>
+0055         m(i,:) = [mm(1) mm(2) mm(3) mm(4)];
+0056     <span class="keyword">end</span>
+0057     <span class="keyword">return</span>
+0058 <span class="keyword">end</span>
+0059 
+0060 
+0061 <span class="comment">% Roll term</span>
+0062 <span class="keyword">if</span> nargin == 1
+0063     m = [1/gx 0; 0 0];
+0064     <span class="keyword">return</span>
+0065 <span class="keyword">else</span>
+0066     m = [1/gx 0; 0 1/gy];
+0067 <span class="keyword">end</span>
+0068 
+0069 
+0070 <span class="comment">% Crunch term</span>
+0071 <span class="keyword">if</span> nargin &gt;= 3
+0072     m = m * [1 -c; -c 1] / sqrt(1-c^2);
+0073 <span class="keyword">end</span>
+0074 
+0075 
+0076 <span class="comment">% Roll term</span>
+0077 <span class="keyword">if</span> nargin &gt;= 4
+0078     m = m * [cos(r) sin(r); -sin(r) cos(r)];
+0079 <span class="keyword">end</span>
+0080</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

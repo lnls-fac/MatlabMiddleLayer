@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of quadplotall</title>
+  <meta name="keywords" content="quadplotall">
+  <meta name="description" content="QUADPLOTALL - Collect the date from a quadrupole center run.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; quadplotall.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>quadplotall
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>QUADPLOTALL - Collect the date from a quadrupole center run.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Xnew, Ynew, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadplotall(DirName, PlotFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">QUADPLOTALL - Collect the date from a quadrupole center run.
+              When all the quadrupole center data files are stored in a directory this function
+              will go through all the files and pull out and plot some of the important information.
+              Note: if more than one quadrupole center file for the same quadrupole is in the directory
+                    then only the latter file will be returned.  Use quadgetdata to get all the data.
+
+  [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, XfileDate, YfilesDate] = quadplotall(DirName, PlotFlag)
+
+  INPUTS
+  1. DirName - Directory name to look for quadrupole center files  
+               [] to browse {Default}
+  2. PlotFlag - 0 to just get data without plotting results, else, plot results
+  
+  OUTPUTS
+  1. X - Horizontal output matrix (format below)
+  2. Y - Vertical output matrix (format below)
+
+             1&amp;2     3       4        5     6       7         8         9      10       11      12       13
+  Output = [BPMDev Center CenterSTD BPMpos DCCT BPMATIndex Quadpos QuadATIndex BPMBeta BPMPhi QuadBeta QuadPhi]
+
+  3-6. BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily - Family name for each center measurement
+  7-8. XfileDate, YfilesDate - Date string for the file name</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="quadgetdata.html" class="code" title="function [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadgetdata(DirName, PlotFlag)">quadgetdata</a>	QUADGETDATA - Collect the date from a quadrupole center run.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Xnew, Ynew, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadplotall(DirName, PlotFlag)</a>
+0002 <span class="comment">%QUADPLOTALL - Collect the date from a quadrupole center run.</span>
+0003 <span class="comment">%              When all the quadrupole center data files are stored in a directory this function</span>
+0004 <span class="comment">%              will go through all the files and pull out and plot some of the important information.</span>
+0005 <span class="comment">%              Note: if more than one quadrupole center file for the same quadrupole is in the directory</span>
+0006 <span class="comment">%                    then only the latter file will be returned.  Use quadgetdata to get all the data.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, XfileDate, YfilesDate] = quadplotall(DirName, PlotFlag)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  INPUTS</span>
+0011 <span class="comment">%  1. DirName - Directory name to look for quadrupole center files</span>
+0012 <span class="comment">%               [] to browse {Default}</span>
+0013 <span class="comment">%  2. PlotFlag - 0 to just get data without plotting results, else, plot results</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  OUTPUTS</span>
+0016 <span class="comment">%  1. X - Horizontal output matrix (format below)</span>
+0017 <span class="comment">%  2. Y - Vertical output matrix (format below)</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%             1&amp;2     3       4        5     6       7         8         9      10       11      12       13</span>
+0020 <span class="comment">%  Output = [BPMDev Center CenterSTD BPMpos DCCT BPMATIndex Quadpos QuadATIndex BPMBeta BPMPhi QuadBeta QuadPhi]</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  3-6. BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily - Family name for each center measurement</span>
+0023 <span class="comment">%  7-8. XfileDate, YfilesDate - Date string for the file name</span>
+0024 
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="keyword">if</span> nargin == 0
+0029     DirName = <span class="string">''</span>;
+0030 <span class="keyword">end</span>
+0031 
+0032 <span class="keyword">if</span> nargin &lt; 2
+0033     PlotFlag = 1;
+0034 <span class="keyword">end</span>
+0035 
+0036 
+0037 [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = <a href="quadgetdata.html" class="code" title="function [X, Y, BPMxFamily, QUADxFamily, BPMyFamily, QUADyFamily, DateMatX, DateMatY] = quadgetdata(DirName, PlotFlag)">quadgetdata</a>(DirName, PlotFlag);
+0038 
+0039 
+0040 dx = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(<span class="string">'BPMx'</span>,0);
+0041 Xnew = NaN * ones(size(dx,1),size(X,2));
+0042 Xnew(:,1:2) = dx;
+0043 i = findrowindex(X(:,1:2), dx);
+0044 Xnew(i,:) = X; 
+0045 
+0046 
+0047 dy = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(<span class="string">'BPMy'</span>,0);
+0048 Ynew = NaN * ones(size(dy,1),size(Y,2));
+0049 Ynew(:,1:2) = dy;
+0050 j = findrowindex(Y(:,1:2), dy);
+0051 Ynew(j,:) = Y; 
+0052 
+0053 
+0054 <span class="comment">% Add to quadgetdata output</span>
+0055 
+0056 
+0057 <span class="comment">% Get the average Beta and Phi at all AT indicies</span>
+0058 [BetaX, BetaY] = modeltwiss(<span class="string">'Beta'</span>);  
+0059 BetaX = [(BetaX(1:end-1)+BetaX(2:end))/2; BetaX(end)];
+0060 BetaY = [(BetaY(1:end-1)+BetaY(2:end))/2; BetaY(end)];
+0061 
+0062 [PhiX,  PhiY]  = modeltwiss(<span class="string">'Phase'</span>);  
+0063 PhiX = [(PhiX(1:end-1)+PhiX(2:end))/2; PhiX(end)];
+0064 PhiY = [(PhiY(1:end-1)+PhiY(2:end))/2; PhiY(end)];
+0065 
+0066 i = findrowindex(X(:,1:2), dx);
+0067 j = findrowindex(Y(:,1:2), dy);
+0068 Xnew = [Xnew NaN*ones(size(Xnew,1),4)];
+0069 Xnew(i,end-3:end) = [BetaX(Xnew(i,7)) PhiX(Xnew(i,7)) BetaX(Xnew(i,9)) PhiX(Xnew(i,9))];
+0070 Ynew = [Ynew NaN*ones(size(Ynew,1),4)];
+0071 Ynew(j,end-3:end) = [BetaY(Ynew(j,7)) PhiY(Ynew(j,7)) BetaY(Ynew(j,9)) PhiY(Ynew(j,9))];
+0072 
+0073 
+0074 
+0075 <span class="keyword">if</span> PlotFlag
+0076     L = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Circumference'</span>);
+0077 
+0078     XOffset = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(<span class="string">'BPMx'</span>, Xnew(:,1:2));
+0079     YOffset = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(<span class="string">'BPMy'</span>, Ynew(:,1:2));
+0080 
+0081 
+0082     figure;
+0083     subplot(2,1,1);
+0084     plot(Xnew(:,5), Xnew(:,3)-XOffset, <span class="string">'.b'</span>);
+0085     ylabel(<span class="string">'Horizontal [mm]'</span>);
+0086     xaxis([0 L]);
+0087     title(<span class="string">'New BPM Offsets Relative to the Present Offset Orbit'</span>);
+0088 
+0089     subplot(2,1,2);
+0090     plot(Ynew(:,5), Ynew(:,3)-YOffset, <span class="string">'.b'</span>);
+0091     xlabel(<span class="string">'BPM Position [meters]'</span>);
+0092     ylabel(<span class="string">'Vertical [mm]'</span>);
+0093     xaxis([0 L]);
+0094 
+0095 
+0096     figure;
+0097     subplot(2,1,1);
+0098     plot(Xnew(:,5),360*(Xnew(:,11)-Xnew(:,13))/2/pi,<span class="string">'.r'</span>);
+0099     xaxis([0 L]);
+0100     ylabel(<span class="string">'Horizontal [degrees]'</span>);
+0101     title(<span class="string">'Phase Advance Between the BPM and Quadrupole'</span>);
+0102 
+0103     subplot(2,1,2);
+0104     plot(Ynew(:,5),360*(Ynew(:,11)-Ynew(:,13))/2/pi,<span class="string">'.r'</span>);
+0105     xaxis([0 L]);
+0106     xlabel(<span class="string">'BPM Position [meters]'</span>);
+0107     ylabel(<span class="string">'Vertical [degrees]'</span>);
+0108 
+0109     
+0110     figure;
+0111     subplot(2,1,1);
+0112     plot(Xnew(:,5),Xnew(:,10),<span class="string">'.b'</span>, Xnew(:,8),Xnew(:,12),<span class="string">'.r'</span>);
+0113     xaxis([0 L]);
+0114     ylabel(<span class="string">'Horizontal [meters]'</span>);
+0115     legend(<span class="string">'BPM'</span>, <span class="string">'Quadrupole'</span>);
+0116     title(<span class="string">'Beta Function at the BPM and Quadrupole'</span>);
+0117 
+0118     subplot(2,1,2);
+0119     plot(Ynew(:,5),Ynew(:,10),<span class="string">'.b'</span>, Ynew(:,8),Ynew(:,12),<span class="string">'.r'</span>);
+0120     xaxis([0 L]);
+0121     xlabel(<span class="string">'Position [meters]'</span>);
+0122     ylabel(<span class="string">'Vertical [meters]'</span>);
+0123     legend(<span class="string">'BPM'</span>, <span class="string">'Quadrupole'</span>);
+0124 
+0125 
+0126     figure;
+0127     subplot(2,1,1);
+0128     plot(Xnew(:,5),Xnew(:,6),<span class="string">'.'</span>);
+0129     xaxis([0 L]);
+0130     xlabel(<span class="string">'Position [meters]'</span>);
+0131     ylabel(<span class="string">'DCCT [mamps]'</span>);
+0132     title(<span class="string">'Beam Current During the Horizontal Measurement'</span>);
+0133 
+0134     subplot(2,1,2);
+0135     plot(Ynew(:,5),Ynew(:,6),<span class="string">'.'</span>);
+0136     xaxis([0 L]);
+0137     xlabel(<span class="string">'Position [meters]'</span>);
+0138     ylabel(<span class="string">'DCCT [mamps]'</span>);
+0139     title(<span class="string">'Beam Current During the Vertical Measurement'</span>);
+0140 
+0141 
+0142     <span class="comment">% Only return the measure centers</span>
+0143     i = find(~isnan(Xnew(:,3)));
+0144     Xnew = Xnew(i,:);
+0145 
+0146     i = find(~isnan(Ynew(:,3)));
+0147     Ynew = Ynew(i,:);
+0148 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

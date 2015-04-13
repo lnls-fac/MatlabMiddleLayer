@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of findrf1</title>
+  <meta name="keywords" content="findrf1">
+  <meta name="description" content="FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; findrf1.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>findrf1
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion
+  [DeltaRF, RFnew, frf] = findrf1(DeltaRFvec, BPMFamily, BPMList, FileName)
+
+  INPUTS
+  1. DeltaRFvec - Vector of RF changes {Default or empty: [-.2% -.1% 0% .1% .2%] energy change}
+  2. BPMFamily - Family name {Default or empty: 'BPMx'}
+  3. BPMList - Device or element list of BPMs  {Default or empty: all}
+  4. FileName to save data (data in structure 'frf') {Default or empty: don't save data}
+
+  OUTPUTS
+  1. DeltaRF - Change in RF
+  2. RFnew - Zero crossing of the fit
+  3. frf - RF structure containing all the measurement data
+
+  NOTES
+  1. The RF frequency that minimized the dispersion maybe not be the
+     optimal RF frequency.  The ALS found that choosing an RF frequency which
+     minimizes the energy shift due to the horizontal corrector magnets
+     to be a more robust and repeatable solution.
+  2. This function measures the dispersion, hence changes the RF frequency!
+     rmdisp will basically do the same thing as findrf1 without changing the 
+     RF frequency.  However, findrf1 gives more control over the fit range for
+     the RF change and allows for more noise reduction in the fit.  That said,
+     rmdisp is usually just fine to use.
+  3. Beware of the magnitude of DeltaRFvec for nonlinear accelerators.
+
+  See also <a href="findrf.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = findrf(varargin)">findrf</a>, <a href="rmdisp.html" class="code" title="function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)">rmdisp</a>, <a href="plotcm.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)">plotcm</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>	GETGOLDEN - Returns the golden values for a family</li><li><a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>	GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>	MEASDISP - Measures the dispersion function</li><li><a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>	SETRF - Sets the RF frequency</li><li><a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a>	STEPRF - Increment change in the RF frequency</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName)</a>
+0002 <span class="comment">%FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion</span>
+0003 <span class="comment">%  [DeltaRF, RFnew, frf] = findrf1(DeltaRFvec, BPMFamily, BPMList, FileName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. DeltaRFvec - Vector of RF changes {Default or empty: [-.2% -.1% 0% .1% .2%] energy change}</span>
+0007 <span class="comment">%  2. BPMFamily - Family name {Default or empty: 'BPMx'}</span>
+0008 <span class="comment">%  3. BPMList - Device or element list of BPMs  {Default or empty: all}</span>
+0009 <span class="comment">%  4. FileName to save data (data in structure 'frf') {Default or empty: don't save data}</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  OUTPUTS</span>
+0012 <span class="comment">%  1. DeltaRF - Change in RF</span>
+0013 <span class="comment">%  2. RFnew - Zero crossing of the fit</span>
+0014 <span class="comment">%  3. frf - RF structure containing all the measurement data</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  NOTES</span>
+0017 <span class="comment">%  1. The RF frequency that minimized the dispersion maybe not be the</span>
+0018 <span class="comment">%     optimal RF frequency.  The ALS found that choosing an RF frequency which</span>
+0019 <span class="comment">%     minimizes the energy shift due to the horizontal corrector magnets</span>
+0020 <span class="comment">%     to be a more robust and repeatable solution.</span>
+0021 <span class="comment">%  2. This function measures the dispersion, hence changes the RF frequency!</span>
+0022 <span class="comment">%     rmdisp will basically do the same thing as findrf1 without changing the</span>
+0023 <span class="comment">%     RF frequency.  However, findrf1 gives more control over the fit range for</span>
+0024 <span class="comment">%     the RF change and allows for more noise reduction in the fit.  That said,</span>
+0025 <span class="comment">%     rmdisp is usually just fine to use.</span>
+0026 <span class="comment">%  3. Beware of the magnitude of DeltaRFvec for nonlinear accelerators.</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%  See also findrf, rmdisp, plotcm</span>
+0029 
+0030 <span class="comment">%  Written by Greg Portmann</span>
+0031 
+0032 
+0033 ChangeRFFlag = 1;
+0034 DisplayFlag = 1;
+0035 
+0036 
+0037 <span class="comment">% Starting Point</span>
+0038 RF0 = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Struct'</span>);
+0039 
+0040 
+0041 <span class="keyword">if</span> nargin &lt; 1
+0042     DeltaRF = [];
+0043 <span class="keyword">end</span>
+0044 <span class="keyword">if</span> isempty(DeltaRF)
+0045     <span class="comment">%DeltaRF = getfamilydata('DeltaRFChro');</span>
+0046     <span class="keyword">if</span> isempty(DeltaRF)
+0047         DeltaRF = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a> * <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> * [-.002 -.001 0 .001 .002];  <span class="comment">% .2% energy change</span>
+0048         <span class="comment">%DeltaRF = getrf * getmcf * [-.006 -.003 0 .003 .006];  % .6% energy change</span>
+0049         <span class="comment">%DeltaRF = [-400 -200 0 200 400];  % Hz</span>
+0050         <span class="comment">%if strcmpi(RF0.UnitsString, 'Hz')</span>
+0051         <span class="comment">%elseif strcmpi(RF0.UnitsString, 'MHz')</span>
+0052         <span class="comment">%    DeltaRF = DeltaRF * 1e-6;  % MHz</span>
+0053         <span class="comment">%else</span>
+0054         <span class="comment">%    error('RF units unknown, hence default input frequency cannot be choosen.');</span>
+0055         <span class="comment">%end</span>
+0056     <span class="keyword">end</span>
+0057 <span class="keyword">end</span>
+0058 <span class="keyword">if</span> nargin &lt; 2
+0059     BPMFamily = <span class="string">''</span>;
+0060 <span class="keyword">end</span>
+0061 <span class="keyword">if</span> isempty(BPMFamily)
+0062     BPMFamily = <span class="string">'BPMx'</span>;
+0063 <span class="keyword">end</span>
+0064 <span class="keyword">if</span> nargin &lt; 3
+0065     BPMList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMFamily);
+0066 <span class="keyword">end</span>
+0067 <span class="keyword">if</span> isempty(BPMList)
+0068     BPMList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(BPMFamily);
+0069 <span class="keyword">end</span>
+0070 <span class="keyword">if</span> nargin &lt; 4
+0071     FileName = [];
+0072 <span class="keyword">end</span>
+0073 
+0074 
+0075 BPMDelay = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'BPMDelay'</span>);
+0076 <span class="keyword">if</span> isempty(BPMDelay)
+0077     BPMDelay = 0;
+0078 <span class="keyword">end</span>
+0079 
+0080 
+0081 Xoffset = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(BPMFamily, BPMList);
+0082 Xgolden = <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>(BPMFamily, BPMList);
+0083 
+0084 
+0085 <span class="comment">% Get Dispersion</span>
+0086 Dx = <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>([], BPMFamily, BPMList);
+0087 
+0088 
+0089 <span class="keyword">for</span> i = 1:length(DeltaRF)
+0090     fprintf(<span class="string">'   %d. Setting RF to %f [%s] \n'</span>, i, RF0.Data + DeltaRF(i), RF0.UnitsString);
+0091     <a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>(RF0.Data + DeltaRF(i));
+0092     sleep(BPMDelay);
+0093     x(:,i) = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPMFamily, BPMList) - Xoffset;
+0094     rf(1,i) = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>;
+0095 <span class="keyword">end</span>
+0096 
+0097 
+0098 <span class="comment">% Set RF back to starting point</span>
+0099 <a href="setrf.html" class="code" title="function setrf(RF, varargin)">setrf</a>(RF0);
+0100 
+0101 
+0102 <span class="comment">% Find LS fit to the line</span>
+0103 y = x' * Dx;           <span class="comment">% Dot product of Dx and the X orbit</span>
+0104 X = [ones(max(size(rf)),1) rf'];
+0105 <span class="comment">%b = inv(X'*X)*X'*y;</span>
+0106 b = X \ y;
+0107 RFnew = -b(1) / b(2);
+0108 
+0109 
+0110 rf1 = linspace(rf(1),rf(max(size(rf))),100);
+0111 yfit = b(1) + b(2)*rf1;
+0112 
+0113 DeltaRF = RFnew - RF0.Data;
+0114 
+0115 
+0116 <span class="comment">%figure</span>
+0117 clf reset
+0118 plot(rf1,yfit, <span class="string">'b'</span>, rf,y,<span class="string">'og'</span>, RFnew,0,<span class="string">'xr'</span>); 
+0119 grid on
+0120 xlabel(<span class="string">'RF Frequency [MHz]'</span>);
+0121 ylabel(<span class="string">'Dot product of Dx and Hor. Orbit'</span>);
+0122 title(sprintf(<span class="string">'FIT: %g + %g * RF,  \\DeltaRF = %g'</span>, b(1), b(2), DeltaRF));
+0123 
+0124 
+0125 
+0126 <span class="comment">% Set the RF frequency</span>
+0127 <span class="keyword">if</span> ChangeRFFlag
+0128     <span class="comment">% fprintf('\n               Starting RF = %f [%s]\n', RF0.Data, RF0.UnitsString);</span>
+0129     <span class="comment">% fprintf('   Zero crossing of the RF = %f  Delta RF = %g [%s]\n', RFnew, DeltaRF, RF0.UnitsString);</span>
+0130     <span class="comment">% answer = input('   Do you want to set the RF frequence now (n/y)? ','s');</span>
+0131     <span class="comment">% if strcmp(answer, 'y') == 1</span>
+0132     <span class="comment">%     setrf(RFnew);</span>
+0133     <span class="comment">%     fprintf('   New RF frequency = %f [%s]\n', getrf, RF0.UnitsString);</span>
+0134     <span class="comment">%     fprintf('   Measurement complete.\n');</span>
+0135     <span class="comment">% else</span>
+0136     <span class="comment">%     fprintf('   Measurement complete.  No change to the RF frequency.\n');</span>
+0137     <span class="comment">% end</span>
+0138     <span class="keyword">if</span> ~isempty(DeltaRF)
+0139         <span class="keyword">if</span> DisplayFlag
+0140             answer = inputdlg({strvcat(strvcat(strvcat(sprintf(<span class="string">'Recommend new RF Freqenecy is %g %s'</span>, RFnew, RF0.UnitsString), sprintf(<span class="string">'Delta RF is %g %s'</span>, DeltaRF, RF0.UnitsString)), <span class="string">'  '</span>),<span class="string">'Change the RF frequency?'</span>)},<span class="string">'FINDFR1'</span>,1,{sprintf(<span class="string">'%g'</span>,DeltaRF)});
+0141             <span class="keyword">if</span> isempty(answer)
+0142                 fprintf(<span class="string">'   No change was made to the RF frequency.\n'</span>);
+0143                 <span class="keyword">return</span>
+0144             <span class="keyword">end</span>
+0145             DeltaRF = str2num(answer{1});
+0146         <span class="keyword">end</span>
+0147         <a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a>(DeltaRF);
+0148         <span class="keyword">if</span> DisplayFlag
+0149             fprintf(<span class="string">'   RF frequency change by %f %s.\n'</span>, DeltaRF, RFUnitsString);
+0150         <span class="keyword">end</span>
+0151     <span class="keyword">else</span>
+0152         error(<span class="string">'RF frequency not changed because of a calculation problem.'</span>);
+0153     <span class="keyword">end</span>
+0154 <span class="keyword">end</span>
+0155 
+0156 
+0157 <span class="keyword">if</span> ~isempty(FileName)         <span class="comment">%save file</span>
+0158     frf.TimeStamp = clock;
+0159     frf.CreatedBy = <span class="string">'findrf'</span>;
+0160     frf.FileName  = FileName;
+0161     frf.x         = x;
+0162     frf.rf        = rf;
+0163     frf.Dx        = Dx;
+0164     frf.RF0       = RF0;
+0165     frf.RFnew     = RFnew;
+0166     frf.DeltaRF   = DeltaRF;
+0167     frf.BPMFamily = BPMFamily;
+0168     frf.BPMList   = BPMList;
+0169     frf.Xgolden   = Xgolden;
+0170     frf.Xoffset   = Xoffset;
+0171     save(FileName, <span class="string">'frf'</span>);
+0172     fprintf(<span class="string">'   Data saved to %s.mat in directory %s.\n'</span>, FileName, pwd);
+0173 <span class="keyword">end</span>
+0174 
+0175 
+0176</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

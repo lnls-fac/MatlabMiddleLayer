@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gap2tune_new</title>
+  <meta name="keywords" content="gap2tune_new">
+  <meta name="description" content="GAP2TUNE - Computes the vertical tune shift for a insertion device gap change.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; gap2tune_new.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>gap2tune_new
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GAP2TUNE - Computes the vertical tune shift for a insertion device gap change.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GAP2TUNE - Computes the vertical tune shift for a insertion device gap change.
+           Harmonic B-contents based on E. Hoyer data and slightly corrected
+           to show the measured tune shifts (beta-function is hardcoded).
+
+  [Dnuy, Beff, Bmax, Lambda, IDLength] = gap2tune(Sector, Gap, GeV, FitFlag)
+
+  INPUTS
+  1. Sector - Insertion device list (i.e. [7 1])
+  2. Gap    - Gap [mm]
+  3. GeV    - Storage ring energy [GeV]
+  4. FitFlag -  0 - use magnet measurements curve fit
+             else - use curve fit to measured tune shift
+
+  OUTPUTS
+  1. Dnuy - Vertical tune shift
+  2. Beff - Effective field in T
+  3. Bmax
+  4. Lambda
+  5. IDLength
+  6. B10
+  7. B30
+  8. B50
+
+  See also <a href="shift2tune.html" class="code" title="function [Dnux, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = shift2tune(Sector, Gap, EPUshift, GeV)">shift2tune</a>
+
+  Written by Winni Decking and Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Dnuy, Beff, Bmax, Lambda, IDLength, B10, B30, B50] = gap2tune(Sector, Gap, GeV, FitFlag)</a>
+0002 <span class="comment">%GAP2TUNE - Computes the vertical tune shift for a insertion device gap change.</span>
+0003 <span class="comment">%           Harmonic B-contents based on E. Hoyer data and slightly corrected</span>
+0004 <span class="comment">%           to show the measured tune shifts (beta-function is hardcoded).</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  [Dnuy, Beff, Bmax, Lambda, IDLength] = gap2tune(Sector, Gap, GeV, FitFlag)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  INPUTS</span>
+0009 <span class="comment">%  1. Sector - Insertion device list (i.e. [7 1])</span>
+0010 <span class="comment">%  2. Gap    - Gap [mm]</span>
+0011 <span class="comment">%  3. GeV    - Storage ring energy [GeV]</span>
+0012 <span class="comment">%  4. FitFlag -  0 - use magnet measurements curve fit</span>
+0013 <span class="comment">%             else - use curve fit to measured tune shift</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  OUTPUTS</span>
+0016 <span class="comment">%  1. Dnuy - Vertical tune shift</span>
+0017 <span class="comment">%  2. Beff - Effective field in T</span>
+0018 <span class="comment">%  3. Bmax</span>
+0019 <span class="comment">%  4. Lambda</span>
+0020 <span class="comment">%  5. IDLength</span>
+0021 <span class="comment">%  6. B10</span>
+0022 <span class="comment">%  7. B30</span>
+0023 <span class="comment">%  8. B50</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%  See also shift2tune</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  Written by Winni Decking and Greg Portmann</span>
+0028 
+0029 <span class="comment">% Created: Winni Decking 98/10/10</span>
+0030 <span class="comment">% Added sector 4 and 5:  Greg Portmann 5-4-1999</span>
+0031 <span class="comment">% Added new middle layer functionality 2005-12-22</span>
+0032 
+0033 
+0034 <span class="keyword">if</span> nargin &lt; 1
+0035     Sector = [];
+0036 <span class="keyword">end</span>
+0037 <span class="keyword">if</span> isempty(Sector)
+0038     Sector = family2dev(<span class="string">'ID'</span>);
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="keyword">if</span> nargin &lt; 2
+0042     Gap = [];
+0043 <span class="keyword">end</span>
+0044 <span class="keyword">if</span> isempty(Gap)
+0045     Gap = getam(<span class="string">'ID'</span>, Sector);
+0046 <span class="keyword">end</span>
+0047 
+0048 <span class="keyword">if</span> nargin &lt; 3
+0049     GeV = [];
+0050 <span class="keyword">end</span>
+0051 <span class="keyword">if</span> isempty(GeV)
+0052     GeV = getenergy;   <span class="comment">% or getfamilydata('Energy'); to assume production energy</span>
+0053     <span class="comment">%GeV = getfamilydata('Energy');</span>
+0054 <span class="keyword">end</span>
+0055 
+0056 <span class="keyword">if</span> nargin &lt; 4
+0057     FitFlag = 1;
+0058 <span class="keyword">end</span>
+0059 
+0060 <span class="keyword">if</span> size(Sector,2) == 1
+0061     Sector = elem2dev(<span class="string">'ID'</span>, Sector);
+0062 <span class="keyword">end</span>
+0063 <span class="keyword">if</span> size(Sector,1) ~= size(Gap,1)
+0064     <span class="keyword">if</span> size(Gap,1) == 1
+0065         Gap = ones(size(Sector,1),1) * Gap;
+0066     <span class="keyword">else</span>
+0067         error(<span class="string">'Rows of Sector &amp; Gap must equal (or Gap must be a scalar or row vector).'</span>);
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">end</span>
+0070 
+0071 
+0072 BetaX = 13.5;
+0073 BetaY = 2.25;
+0074 
+0075 
+0076 <span class="keyword">for</span> i = 1:size(Sector,1)
+0077 
+0078     <span class="keyword">if</span> Sector(i,:) == [4 1]
+0079         Lambda(i,1) = 50;
+0080         IDLength(i,1) = 1.85;
+0081 
+0082         <span class="keyword">if</span> FitFlag
+0083             <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0084             B10(i,1) = 1.9605;
+0085             B30(i,1) = 4.7452;
+0086             B50(i,1) = -0.0407;
+0087         <span class="keyword">else</span>
+0088             B10(i,1) = 2.1236;
+0089             B30(i,1) = -0.1076;
+0090             B50(i,1) = 0.3803;
+0091         <span class="keyword">end</span>
+0092 
+0093     <span class="keyword">elseif</span> Sector(i,:) == 50     <span class="comment">% old hybrid wiggler in sector 5 (1998-2004), W160</span>
+0094         Lambda(i,1) = 160;
+0095         IDLength(i,1) = 3.04;
+0096 
+0097         <span class="keyword">if</span> FitFlag
+0098             <span class="comment">% Data fit based on feed forward table and SR TUNE MATRIX, Christoph Steier, 2002-07-17</span>
+0099             B10(i,1) = 1.7459;
+0100             B30(i,1) = 3.0735;
+0101             B50(i,1) = -0.0015;
+0102         <span class="keyword">else</span>
+0103             B10(i,1) = 2.4066;
+0104             B30(i,1) = 0.7352;
+0105             B50(i,1) =-0.0138;
+0106         <span class="keyword">end</span>
+0107 
+0108     <span class="keyword">elseif</span> Sector(i,:) == [5 1] <span class="comment">% new W114 in sector 5, May 2004</span>
+0109 
+0110         Lambda(i,1) = 114;
+0111         IDLength(i,1) = 29*Lambda(i,1)/1000;
+0112 
+0113         <span class="keyword">if</span> FitFlag
+0114             <span class="comment">% based on tune measurements 2004-06-03 in srdata/insertiondevices/wiggler/W11</span>
+0115             B10(i,1) = 1.75;
+0116             B30(i,1) = 3.6;
+0117             B50(i,1) = 0;
+0118         <span class="keyword">else</span>
+0119             B10(i,1) = 2.6256;
+0120             B30(i,1) = 0.3487;
+0121             B50(i,1) = 0.1372;
+0122         <span class="keyword">end</span>
+0123 
+0124     <span class="keyword">elseif</span> Sector(i,:) == [6 1]
+0125 
+0126         <span class="comment">% based on Sumitomo measurements of peak field versus gap (11/17/2004)</span>
+0127 
+0128         Lambda(i,1) = 30;
+0129         IDLength(i,1) = 1.5;
+0130         
+0131         <span class="keyword">if</span> FitFlag
+0132             B10(i,1) = 2.1257;
+0133             B30(i,1) = 0.7071;
+0134             B50(i,1) = 3.6900;
+0135         <span class="keyword">else</span>
+0136             <span class="comment">% based on Steve Mark's engineering note</span>
+0137             B10(i,1) = 2.6706;
+0138             B30(i,1) = 0.3805;
+0139             B50(i,1) = -0.5593;          
+0140         <span class="keyword">end</span>
+0141         
+0142     <span class="keyword">elseif</span> Sector(i,:) == [7 1]
+0143         Lambda(i,1) = 50;
+0144         IDLength(i,1) = 4.45;
+0145 
+0146         <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0147         <span class="keyword">if</span> FitFlag
+0148             B10(i,1) = 2.0316;
+0149             B30(i,1) = 3.7192;
+0150             B50(i,1) =-.0407;
+0151         <span class="keyword">else</span>
+0152             B10(i,1) = 2.0597;
+0153             B30(i,1) = 0.677;
+0154             B50(i,1) =-.046;
+0155         <span class="keyword">end</span>
+0156 
+0157     <span class="keyword">elseif</span> Sector(i,:) == [8 1]
+0158         Lambda(i,1) = 50;
+0159         IDLength(i,1) = 4.45;
+0160         
+0161         <span class="keyword">if</span> FitFlag
+0162             <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0163             B10(i,1) = 1.9605;
+0164             B30(i,1) = 4.7452;
+0165             B50(i,1) = -0.0407;
+0166         <span class="keyword">else</span>
+0167             B10(i,1) = 2.0597;
+0168             B30(i,1) = 0.677;
+0169             B50(i,1) =-.046;
+0170         <span class="keyword">end</span>
+0171 
+0172     <span class="keyword">elseif</span> Sector(i,:) == [9 1]
+0173         Lambda(i,1) = 100;
+0174         IDLength(i,1) = 4.3;
+0175 
+0176         <span class="keyword">if</span> FitFlag
+0177             <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0178             B10(i,1) = 2.0463;
+0179             B30(i,1) = 1.9861;
+0180             B50(i,1) = -0.0642;
+0181         <span class="keyword">else</span>
+0182             B10(i,1) = 2.0249;
+0183             B30(i,1) = 0.7571;
+0184             B50(i,1) =-0.0664;
+0185         <span class="keyword">end</span>
+0186 
+0187     <span class="keyword">elseif</span> Sector(i,:) == [10 1]
+0188         Lambda(i,1) = 100;
+0189         IDLength(i,1) = 4.3;
+0190 
+0191         <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0192         <span class="keyword">if</span> FitFlag
+0193             B10(i,1) = 1.7079;
+0194             B30(i,1) = 2.2255;
+0195             B50(i,1) = -0.0580;
+0196         <span class="keyword">else</span>
+0197             B10(i,1) = 1.7054;
+0198             B30(i,1) = 0.1834;
+0199             B50(i,1) =-0.0191;
+0200         <span class="keyword">end</span>
+0201 
+0202     <span class="keyword">elseif</span> Sector(i,:) == [11 1]         <span class="comment">% information just copied from sector 4, should be replaced with real measurement data</span>
+0203         Lambda(i,1) = 50;
+0204         IDLength(i,1) = 1.825;
+0205 
+0206         <span class="keyword">if</span> FitFlag
+0207             <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0208             B10(i,1) = 1.9605;
+0209             B30(i,1) = 4.7452;
+0210             B50(i,1) = -0.0407;
+0211         <span class="keyword">else</span>
+0212             B10(i,1) = 2.1236;
+0213             B30(i,1) = -0.1076;
+0214             B50(i,1) = 0.3803;
+0215         <span class="keyword">end</span>
+0216 
+0217     <span class="keyword">elseif</span> Sector(i,:) == [11 2]         <span class="comment">% information just copied from sector 4, should be replaced with real measurement data</span>
+0218         Lambda(i,1) = 50;
+0219         IDLength(i,1) = 1.85;
+0220 
+0221         <span class="keyword">if</span> FitFlag
+0222             <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0223             B10(i,1) = 1.9605;
+0224             B30(i,1) = 4.7452;
+0225             B50(i,1) = -0.0407;
+0226         <span class="keyword">else</span>
+0227             B10(i,1) = 2.1236;
+0228             B30(i,1) = -0.1076;
+0229             B50(i,1) = 0.3803;
+0230         <span class="keyword">end</span>
+0231 
+0232     <span class="keyword">elseif</span> Sector(i,:) == [12 1]
+0233         Lambda(i,1) = 80;
+0234         IDLength(i,1) = 4.4;
+0235 
+0236         <span class="comment">% B10(i,1) adjusted base on measured tunes (see data in \\Als-filer\physdata\matlab\srdata\gaptrack\tune)</span>
+0237         <span class="keyword">if</span> FitFlag
+0238             B10(i,1) = 1.7763;
+0239             B30(i,1) = 3.2908;
+0240             B50(i,1) =-0.1355;
+0241         <span class="keyword">else</span>
+0242             B10(i,1) = 2.0517;
+0243             B30(i,1) = 0.714;
+0244             B50(i,1) =-0.0667;
+0245         <span class="keyword">end</span>
+0246 
+0247     <span class="keyword">else</span>
+0248 
+0249         fprintf(<span class="string">'   WARNING:  Unknown insertion, ID(%d,%d) (gap2tune).\n'</span>, Sector(i,:));
+0250         Lambda(i,1) = NaN;
+0251         IDLength(i,1) = NaN;
+0252         B10(i,1) = NaN;
+0253         B30(i,1) = NaN;
+0254         B50(i,1) = NaN;
+0255         
+0256         <span class="comment">%Dnuy = NaN;</span>
+0257         <span class="comment">%Beff = NaN;</span>
+0258         <span class="comment">%return</span>
+0259         
+0260     <span class="keyword">end</span>
+0261 
+0262     <span class="keyword">if</span> nargout &gt; 2
+0263         Bmax(i,:) = B10(i)*exp(-pi*Gap(i,:)/Lambda(i)) + B30(i)*exp(-3*pi*Gap(i,:)/Lambda(i)) + B50(i)*exp(-5*pi*Gap(i,:)/Lambda(i));
+0264     <span class="keyword">end</span>
+0265 
+0266     Beff(i,:) = sqrt((B10(i)*exp(-pi*Gap(i,:)/Lambda(i))).^2 + (B30(i)*exp(-3*pi*Gap(i,:)/Lambda(i))).^2 + (B50(i)*exp(-5*pi*Gap(i,:)/Lambda(i))).^2);
+0267 
+0268     Dnuy(i,:) = 1/(8*pi)*BetaY*IDLength(i)*0.2998^2*(Beff(i,:)./GeV).^2;
+0269 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

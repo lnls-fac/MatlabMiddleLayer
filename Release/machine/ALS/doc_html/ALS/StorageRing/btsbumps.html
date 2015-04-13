@@ -1,0 +1,350 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of btsbumps</title>
+  <meta name="keywords" content="btsbumps">
+  <meta name="description" content="btsbumps(On/Off)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; btsbumps.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>btsbumps
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>btsbumps(On/Off)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function btsbumps(OnOffStr); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  btsbumps(On/Off)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function btsbumps(OnOffStr);</a>
+0002 <span class="comment">%  btsbumps(On/Off)</span>
+0003 <span class="comment">%</span>
+0004 
+0005 <span class="keyword">global</span> BTS1spGlobal BTS2spGlobal BTS3spGlobal BTS4spGlobal SEKspGoal SENspGoal BUMP1spGlobal 
+0006 
+0007 N=40;
+0008 TimeOut = 2*60;
+0009 
+0010 <span class="keyword">if</span> nargin &lt; 1
+0011    error(<span class="string">'  BTSBUMPS:  1 input required.'</span>);
+0012 <span class="keyword">end</span>
+0013 
+0014 <span class="keyword">if</span> strcmp(lower(OnOffStr),<span class="string">'on'</span>)
+0015    disp(<span class="string">'                                   Setting BTS and Bump1 Magnets'</span>);
+0016 
+0017    <span class="comment">% Check if anything is already on</span>
+0018    BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0019    BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0020    BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0021    BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0022    SEKam = scaget(<span class="string">'SR01S___SEK____AM02'</span>);
+0023    SENam = scaget(<span class="string">'SR01S___SEN____AM00'</span>);
+0024    BUMP1am = scaget(<span class="string">'SR01S___BUMP1__AM00'</span>);
+0025 
+0026    SEKsp = scaget(<span class="string">'SR01S___SEK____AC01'</span>);
+0027    SENsp = scaget(<span class="string">'SR01S___SEN____AC00'</span>);
+0028    BUMP1sp = scaget(<span class="string">'SR01S___BUMP1__AC00'</span>);
+0029      
+0030    <span class="comment">%if abs(BTS1am)&gt;20 | abs(BTS2am)&gt;20 | abs(BTS3am)&gt;20 | abs(BTS4am)&gt;20 | ...</span>
+0031    <span class="keyword">if</span> (scaget(<span class="string">'SR01S___SEK____BC21'</span>)==1 &amp; SEKsp&gt;0) | <span class="keyword">...</span>
+0032       (scaget(<span class="string">'SR01S___SEN____BC20'</span>)==1 &amp; SENsp&gt;0) | <span class="keyword">...</span>
+0033       (scaget(<span class="string">'SR01S___BUMP1__BC21'</span>)==1 &amp; BUMP1sp&gt;0) 
+0034       fprintf(<span class="string">'                 BTS1       BTS2       BTS3       BTS4       SEK         SEN         BUMP1\n'</span>);
+0035       fprintf(<span class="string">'  Present AM:  %7.2f    %7.2f    %7.2f    %7.2f    %8.2f    %8.2f    %8.2f\r'</span>, BTS1am, BTS2am, BTS3am, BTS4am, SEKam, SENam, BUMP1am);
+0036       fprintf(<span class="string">'\n  Atleast one of the bump magnets (SEN, SEK, or BUMP1) is on already.\n'</span>);
+0037       fprintf(<span class="string">'  This program will not change any of these magnets automatically.\n'</span>); 
+0038       fprintf(<span class="string">'  Turn the BTS (1-4) and bump magnets on manually and hit return when done.'</span>);
+0039       pause;
+0040       disp(<span class="string">' '</span>);
+0041       BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0042       BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0043       BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0044       BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0045       SEKam = scaget(<span class="string">'SR01S___SEK____AM02'</span>);
+0046       SENam = scaget(<span class="string">'SR01S___SEN____AM00'</span>);
+0047       BUMP1am = scaget(<span class="string">'SR01S___BUMP1__AM00'</span>);
+0048       fprintf(<span class="string">'                 BTS1       BTS2       BTS3       BTS4       SEK         SEN         BUMP1\n'</span>);
+0049       fprintf(<span class="string">'  Present AM:  %7.2f    %7.2f    %7.2f    %7.2f    %8.2f    %8.2f    %8.2f\r'</span>, BTS1am, BTS2am, BTS3am, BTS4am, SEKam, SENam, BUMP1am);
+0050       disp(<span class="string">' '</span>);
+0051       <span class="keyword">return</span>
+0052    <span class="keyword">end</span>
+0053    
+0054    <span class="comment">% Setpoint always saved in the SP channel</span>
+0055    SEKspGoal = scaget(<span class="string">'SR01S___SEK____AC01'</span>);
+0056    SENspGoal = scaget(<span class="string">'SR01S___SEN____AC00'</span>);
+0057    BUMP1spGoal = scaget(<span class="string">'SR01S___BUMP1__AC00'</span>);
+0058 
+0059    
+0060    <span class="comment">% Zero the setpoint</span>
+0061    scaput(<span class="string">'SR01S___SEK____AC01'</span>, 0);
+0062    scaput(<span class="string">'SR01S___SEN____AC00'</span>, 0);
+0063    scaput(<span class="string">'SR01S___BUMP1__AC00'</span>, 0);
+0064    pause(1);
+0065    
+0066    <span class="comment">% Turn bumps on</span>
+0067    scaput(<span class="string">'SR01S___SEK____BC21'</span>, 1);
+0068    scaput(<span class="string">'SR01S___SEN____BC20'</span>, 1);
+0069    scaput(<span class="string">'SR01S___BUMP1__BC21'</span>, 1);
+0070    
+0071    
+0072    <span class="comment">% Turn on Bumps and BTS magnets</span>
+0073    <span class="keyword">if</span> isempty(BTS1spGlobal)
+0074       BTS1spGoal = 634;
+0075    <span class="keyword">else</span>
+0076       BTS1spGoal = BTS1spGlobal;
+0077    <span class="keyword">end</span>
+0078    <span class="keyword">if</span> isempty(BTS2spGlobal)
+0079       BTS2spGoal = 636.4;
+0080    <span class="keyword">else</span>
+0081       BTS2spGoal = BTS2spGlobal;
+0082    <span class="keyword">end</span>
+0083    <span class="keyword">if</span> isempty(BTS3spGlobal)
+0084       BTS3spGoal = 635.91;
+0085    <span class="keyword">else</span>
+0086       BTS3spGoal = BTS3spGlobal;
+0087    <span class="keyword">end</span>
+0088    <span class="keyword">if</span> isempty(BTS4spGlobal)
+0089       BTS4spGoal = 591.88;
+0090    <span class="keyword">else</span>
+0091       BTS4spGoal = BTS4spGlobal;
+0092    <span class="keyword">end</span>
+0093 
+0094 
+0095    <span class="comment">% Reset and turn on BTS magnets, if necessary</span>
+0096    <span class="comment">% Turn off reset</span>
+0097    scaput(<span class="string">'BTS_____B1___R_BC23'</span>, 0);
+0098    scaput(<span class="string">'BTS_____B2___R_BC23'</span>, 0);
+0099    scaput(<span class="string">'BTS_____B3___R_BC23'</span>, 0);
+0100    scaput(<span class="string">'BTS_____B4___R_BC23'</span>, 0);
+0101    pause(1);
+0102 
+0103    <span class="comment">% If off, reset</span>
+0104    <span class="keyword">if</span> scaget(<span class="string">'BTS_____B1_____BC22'</span>) == 0
+0105       scaput(<span class="string">'BTS_____B1___R_BC23'</span>, 1);
+0106    <span class="keyword">end</span>
+0107    <span class="keyword">if</span> scaget(<span class="string">'BTS_____B2_____BC22'</span>) == 0
+0108       scaput(<span class="string">'BTS_____B2___R_BC23'</span>, 1);
+0109    <span class="keyword">end</span>
+0110    <span class="keyword">if</span> scaget(<span class="string">'BTS_____B3_____BC22'</span>) == 0
+0111       scaput(<span class="string">'BTS_____B3___R_BC23'</span>, 1);
+0112    <span class="keyword">end</span>
+0113    <span class="keyword">if</span> scaget(<span class="string">'BTS_____B4_____BC22'</span>) == 0
+0114       scaput(<span class="string">'BTS_____B4___R_BC23'</span>, 1);
+0115    <span class="keyword">end</span>
+0116    pause(1);
+0117 
+0118    <span class="comment">% Turn on</span>
+0119    scaput(<span class="string">'BTS_____B1_____BC22'</span>, 1);
+0120    scaput(<span class="string">'BTS_____B2_____BC22'</span>, 1);
+0121    scaput(<span class="string">'BTS_____B3_____BC22'</span>, 1);
+0122    scaput(<span class="string">'BTS_____B4_____BC22'</span>, 1);
+0123 
+0124    <span class="comment">% Turn off reset</span>
+0125    scaput(<span class="string">'BTS_____B1___R_BC23'</span>, 0);
+0126    scaput(<span class="string">'BTS_____B2___R_BC23'</span>, 0);
+0127    scaput(<span class="string">'BTS_____B3___R_BC23'</span>, 0);
+0128    scaput(<span class="string">'BTS_____B4___R_BC23'</span>, 0);
+0129 
+0130 
+0131 <span class="keyword">elseif</span> strcmp(lower(OnOffStr),<span class="string">'off'</span>)
+0132    <span class="comment">% Check if all ready on</span>
+0133    BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0134    BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0135    BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0136    BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0137    BTS1sp = scaget(<span class="string">'BTS_____B1_____AC00'</span>);
+0138    BTS2sp = scaget(<span class="string">'BTS_____B2_____AC00'</span>);
+0139    BTS3sp = scaget(<span class="string">'BTS_____B3_____AC00'</span>);
+0140    BTS4sp = scaget(<span class="string">'BTS_____B4_____AC00'</span>);
+0141 
+0142    <span class="keyword">if</span> (abs(BTS1am)&lt;20 &amp; BTS1sp==0 &amp; scaget(<span class="string">'BTS_____B1_____BC22'</span>)==0) &amp; <span class="keyword">...</span>
+0143       (abs(BTS2am)&lt;20 &amp; BTS2sp==0 &amp; scaget(<span class="string">'BTS_____B2_____BC22'</span>)==0) &amp; <span class="keyword">...</span>
+0144       (abs(BTS3am)&lt;20 &amp; BTS3sp==0) &amp; <span class="keyword">...</span>
+0145       (abs(BTS4am)&lt;20 &amp; BTS4sp==0) &amp; <span class="keyword">...</span>
+0146       (scaget(<span class="string">'SR01S___SEK____BC21'</span>)==0) &amp; <span class="keyword">...</span>
+0147       (scaget(<span class="string">'SR01S___SEN____BC20'</span>)==0) &amp; <span class="keyword">...</span>
+0148       (scaget(<span class="string">'SR01S___BUMP1__BC21'</span>)==0) 
+0149       disp(<span class="string">'  BTS1, BTS2, BTS3, and BTS4 already zeroed'</span>);
+0150       disp(<span class="string">'  BTS1 and BTS2 already OFF'</span>);
+0151       disp(<span class="string">'  SEN, SEK, and BUMP1 already OFF'</span>);
+0152       <span class="keyword">return</span>
+0153    <span class="keyword">end</span>
+0154    
+0155 
+0156    <span class="comment">% Turn off Bumps and BTS magnets</span>
+0157    disp(<span class="string">'                                   Zeroing BTS and Bump Magnets'</span>);
+0158    
+0159    <span class="comment">% First save the last setpoint if the magnet is on</span>
+0160    BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0161    BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0162    BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0163    BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0164    <span class="keyword">if</span> abs(BTS1am) &gt; 25
+0165       BTS1spGlobal = scaget(<span class="string">'BTS_____B1_____AC00'</span>);
+0166    <span class="keyword">end</span>
+0167    <span class="keyword">if</span> abs(BTS2am) &gt; 25
+0168       BTS2spGlobal = scaget(<span class="string">'BTS_____B2_____AC00'</span>);
+0169    <span class="keyword">end</span>
+0170    <span class="keyword">if</span> abs(BTS3am) &gt; 25
+0171       BTS3spGlobal = scaget(<span class="string">'BTS_____B3_____AC00'</span>);
+0172    <span class="keyword">end</span>
+0173    <span class="keyword">if</span> abs(BTS4am) &gt; 25
+0174       BTS4spGlobal = scaget(<span class="string">'BTS_____B4_____AC00'</span>);
+0175    <span class="keyword">end</span>
+0176    
+0177    SEKspGlobal = scaget(<span class="string">'SR01S___SEK____AC01'</span>);
+0178    SENspGlobal = scaget(<span class="string">'SR01S___SEN____AC00'</span>);
+0179    BUMP1spGlobal = scaget(<span class="string">'SR01S___BUMP1__AC00'</span>);
+0180    
+0181    BTS1spGoal = 0;
+0182    BTS2spGoal = 0;
+0183    BTS3spGoal = 0;
+0184    BTS4spGoal = 0;
+0185    
+0186    SEKspGoal = 0;
+0187    SENspGoal = 0;
+0188    BUMP1spGoal = 0;
+0189 <span class="keyword">else</span>
+0190    error(<span class="string">'  BTSBUMPS:  input not valid.'</span>);
+0191 <span class="keyword">end</span>
+0192 
+0193 
+0194 <span class="comment">% Print to the screen</span>
+0195 BTS1sp = scaget(<span class="string">'BTS_____B1_____AC00'</span>);
+0196 BTS2sp = scaget(<span class="string">'BTS_____B2_____AC00'</span>);
+0197 BTS3sp = scaget(<span class="string">'BTS_____B3_____AC00'</span>);
+0198 BTS4sp = scaget(<span class="string">'BTS_____B4_____AC00'</span>);
+0199 SEKsp = scaget(<span class="string">'SR01S___SEK____AC01'</span>);
+0200 SENsp = scaget(<span class="string">'SR01S___SEN____AC00'</span>);
+0201 BUMP1sp = scaget(<span class="string">'SR01S___BUMP1__AC00'</span>);
+0202 
+0203 
+0204 fprintf(<span class="string">'                 BTS1       BTS2       BTS3       BTS4       SEK         SEN         BUMP1\n'</span>);
+0205 fprintf(<span class="string">'  Starting SP: %7.2f    %7.2f    %7.2f    %7.2f    %8.2f    %8.2f    %8.2f\n'</span>, BTS1sp, BTS2sp, BTS3sp, BTS4sp, SEKsp, SENsp, BUMP1sp);
+0206 fprintf(<span class="string">'      Goal SP: %7.2f    %7.2f    %7.2f    %7.2f    %8.2f    %8.2f    %8.2f\n'</span>, BTS1spGoal, BTS2spGoal, BTS3spGoal, BTS4spGoal, SEKspGoal, SENspGoal, BUMP1spGoal);
+0207 
+0208 t0 = clock;
+0209 BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0210 BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0211 BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0212 BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0213 SEKam = scaget(<span class="string">'SR01S___SEK____AM02'</span>);
+0214 SENam = scaget(<span class="string">'SR01S___SEN____AM00'</span>);
+0215 BUMP1am = scaget(<span class="string">'SR01S___BUMP1__AM00'</span>);
+0216 
+0217 <span class="keyword">for</span> i = 1:N
+0218    <span class="comment">% Set SP</span>
+0219    scaput(<span class="string">'BTS_____B1_____AC00'</span>, BTS1sp + i*(BTS1spGoal-BTS1sp)/N);
+0220    scaput(<span class="string">'BTS_____B2_____AC00'</span>, BTS2sp + i*(BTS2spGoal-BTS2sp)/N);
+0221    scaput(<span class="string">'BTS_____B3_____AC00'</span>, BTS3sp + i*(BTS3spGoal-BTS3sp)/N);
+0222    scaput(<span class="string">'BTS_____B4_____AC00'</span>, BTS4sp + i*(BTS4spGoal-BTS4sp)/N);
+0223    scaput(<span class="string">'SR01S___SEK____AC01'</span>, SEKsp + i*(SEKspGoal-SEKsp)/N);
+0224    scaput(<span class="string">'SR01S___SEN____AC00'</span>, SENsp + i*(SENspGoal-SENsp)/N);
+0225    scaput(<span class="string">'SR01S___BUMP1__AC00'</span>, BUMP1sp + i*(BUMP1spGoal-BUMP1sp)/N);
+0226    sleep(1);
+0227    
+0228    BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0229    BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0230    BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0231    BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0232    SEKam = scaget(<span class="string">'SR01S___SEK____AM02'</span>);
+0233    SENam = scaget(<span class="string">'SR01S___SEN____AM00'</span>);
+0234    BUMP1am = scaget(<span class="string">'SR01S___BUMP1__AM00'</span>);
+0235    
+0236    fprintf(<span class="string">'   Present AM: %7.2f    %7.2f    %7.2f    %7.2f    %8.2f    %8.2f    %8.2f\r'</span>, BTS1am, BTS2am, BTS3am, BTS4am, SEKam, SENam, BUMP1am);
+0237    pause(0);
+0238 <span class="keyword">end</span>
+0239 
+0240 <span class="keyword">while</span> any([abs(BTS1am-BTS1spGoal)&gt;15 abs(BTS2am-BTS2spGoal)&gt;15 abs(BTS2am-BTS3spGoal)&gt;15 abs(BTS4am-BTS4spGoal)&gt;15]) &amp; etime(clock,t0)&lt;=TimeOut
+0241 <span class="comment">%           abs(SEKam-SEKspGoal)&gt;20 abs(SENam-SENspGoal)&gt;20 abs(BUMP1am-BUMP1spGoal)&gt;20]) &amp; etime(clock,t0)&lt;=TimeOut</span>
+0242    BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0243    BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0244    BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0245    BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0246    SEKam = scaget(<span class="string">'SR01S___SEK____AM02'</span>);
+0247    SENam = scaget(<span class="string">'SR01S___SEN____AM00'</span>);
+0248    BUMP1am = scaget(<span class="string">'SR01S___BUMP1__AM00'</span>);
+0249    
+0250    fprintf(<span class="string">'   Present AM: %7.2f    %7.2f    %7.2f    %7.2f    %8.2f    %8.2f    %8.2f\r'</span>, BTS1am, BTS2am, BTS3am, BTS4am, SEKam, SENam, BUMP1am);
+0251    pause(0);
+0252 <span class="keyword">end</span>
+0253 
+0254 <span class="keyword">if</span>  etime(clock,t0) &gt;= TimeOut
+0255    fprintf(<span class="string">'\n   WARNING: Timed-out waiting for SP-AM to be within tolerance (%d second timeout)\n'</span>, TimeOut);
+0256    <span class="keyword">if</span> strcmp(lower(OnOffStr),<span class="string">'off'</span>) 
+0257       fprintf(<span class="string">'            BTS and BUMP magnets may or may not be OFF\n\n'</span>); 
+0258    <span class="keyword">else</span>
+0259       fprintf(<span class="string">'            BTS and BUMP magnets may or may not be ON\n\n'</span>); 
+0260    <span class="keyword">end</span>
+0261    <span class="keyword">return</span>
+0262 <span class="keyword">else</span>
+0263    <span class="comment">% Extra delay</span>
+0264    t0 = clock; 
+0265    <span class="keyword">while</span> etime(clock,t0) &lt; 5
+0266       BTS1am = scaget(<span class="string">'BTS_____B1_____AM00'</span>);
+0267       BTS2am = scaget(<span class="string">'BTS_____B2_____AM00'</span>);
+0268       BTS3am = scaget(<span class="string">'BTS_____B3_____AM00'</span>);
+0269       BTS4am = scaget(<span class="string">'BTS_____B4_____AM00'</span>);
+0270       
+0271       SEKam = scaget(<span class="string">'SR01S___SEK____AM02'</span>);
+0272       SENam = scaget(<span class="string">'SR01S___SEN____AM00'</span>);
+0273       BUMP1am = scaget(<span class="string">'SR01S___BUMP1__AM00'</span>);
+0274       
+0275       fprintf(<span class="string">'   Present AM: %7.2f    %7.2f    %7.2f    %7.2f    %8.2f    %8.2f    %8.2f\r'</span>, BTS1am, BTS2am, BTS3am, BTS4am, SEKam, SENam, BUMP1am);
+0276       pause(0);
+0277    <span class="keyword">end</span>
+0278    fprintf(<span class="string">'\n'</span>);
+0279 <span class="keyword">end</span>
+0280 
+0281 
+0282 <span class="keyword">if</span> strcmp(lower(OnOffStr),<span class="string">'off'</span>) 
+0283    <span class="comment">% Turn BTS1 and BTS2 off</span>
+0284    disp(<span class="string">'  BTS1, BTS2, BTS3, and BTS4 zeroed'</span>);
+0285    disp(<span class="string">'  BTS1 and BTS2 OFF'</span>);
+0286    scaput(<span class="string">'BTS_____B1_____BC22'</span>, 0);
+0287    scaput(<span class="string">'BTS_____B2_____BC22'</span>, 0);
+0288 
+0289    <span class="comment">% Turn bumps off and restore the last SP</span>
+0290    disp(<span class="string">'  SEN, SEK, and BUMP1 OFF (AM might still be dropping a little)'</span>);
+0291    scaput(<span class="string">'SR01S___SEK____BC21'</span>, 0);
+0292    scaput(<span class="string">'SR01S___SEN____BC20'</span>, 0);
+0293    scaput(<span class="string">'SR01S___BUMP1__BC21'</span>, 0);
+0294    
+0295    scaput(<span class="string">'SR01S___SEK____AC01'</span>, SEKspGlobal);
+0296    scaput(<span class="string">'SR01S___SEN____AC00'</span>, SENspGlobal);
+0297    scaput(<span class="string">'SR01S___BUMP1__AC00'</span>, BUMP1spGlobal);
+0298 <span class="keyword">else</span>
+0299    disp(<span class="string">'  BTS1, BTS2, BTS3, and BTS4 reached setpoint'</span>);
+0300    disp(<span class="string">'  SEN, SEK, and BUMP1 ON (AM might still be rising a little)'</span>);
+0301 <span class="keyword">end</span>
+0302 
+0303 disp(<span class="string">'  '</span>);
+0304</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

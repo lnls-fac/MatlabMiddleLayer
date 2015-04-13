@@ -1,0 +1,668 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of buildlocofitparameters</title>
+  <meta name="keywords" content="buildlocofitparameters">
+  <meta name="description" content="BUILDLOCOFITPARAMETERS - ALS LOCO fit parameters">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; buildlocofitparameters.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>buildlocofitparameters
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BUILDLOCOFITPARAMETERS - ALS LOCO fit parameters</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BUILDLOCOFITPARAMETERS - ALS LOCO fit parameters
+
+  [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(FileName)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(FileName)</a>
+0002 <span class="comment">%BUILDLOCOFITPARAMETERS - ALS LOCO fit parameters</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(FileName)</span>
+0005 
+0006 
+0007 
+0008 <span class="comment">%%%%%%%%%%%%%%</span>
+0009 <span class="comment">% Input file %</span>
+0010 <span class="comment">%%%%%%%%%%%%%%</span>
+0011 <span class="keyword">if</span> nargin == 0
+0012     [FileName, DirectoryName, FilterIndex] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select a LOCO input file'</span>);
+0013     <span class="keyword">if</span> FilterIndex == 0 
+0014         <span class="keyword">return</span>;
+0015     <span class="keyword">end</span>
+0016     FileName = [DirectoryName, FileName];
+0017 <span class="keyword">end</span>
+0018 
+0019 load(FileName);
+0020 
+0021 
+0022 
+0023 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0024 <span class="comment">% Remove bad devices %</span>
+0025 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0026 RemoveHCMDeviceList = [];
+0027 RemoveVCMDeviceList = [];
+0028 
+0029 RemoveHBPMDeviceList = [];
+0030 RemoveVBPMDeviceList = [];
+0031 
+0032 
+0033 
+0034 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0035 <span class="comment">% This function only works on the first iteration %</span>
+0036 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0037 <span class="keyword">if</span> exist(<span class="string">'BPMData'</span>,<span class="string">'var'</span>) &amp;&amp; length(BPMData)&gt;1
+0038     BPMData = BPMData(1);
+0039 <span class="keyword">end</span>
+0040 <span class="keyword">if</span> exist(<span class="string">'CMData'</span>,<span class="string">'var'</span>) &amp;&amp; length(CMData)&gt;1
+0041     CMData = CMData(1);
+0042 <span class="keyword">end</span>
+0043 <span class="keyword">if</span> exist(<span class="string">'FitParameters'</span>,<span class="string">'var'</span>) &amp;&amp; length(FitParameters)&gt;1
+0044     FitParameters = FitParameters(1);
+0045 <span class="keyword">end</span>
+0046 <span class="keyword">if</span> exist(<span class="string">'LocoFlags'</span>,<span class="string">'var'</span>) &amp;&amp; length(LocoFlags)&gt;1
+0047     LocoFlags = LocoFlags(1);
+0048 <span class="keyword">end</span>
+0049 <span class="keyword">if</span> exist(<span class="string">'LocoModel'</span>,<span class="string">'var'</span>) &amp;&amp; length(LocoModel)&gt;1
+0050     LocoModel = LocoModel(1);
+0051 <span class="keyword">end</span>
+0052 
+0053 
+0054 
+0055 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0056 <span class="comment">% Make sure the start point in loaded in the AT model %</span>
+0057 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0058 <span class="keyword">if</span> ~isempty(FitParameters)
+0059     <span class="keyword">for</span> i = 1:length(FitParameters.Params)
+0060         RINGData = locosetlatticeparam(RINGData, FitParameters.Params{i}, FitParameters.Values(i));
+0061     <span class="keyword">end</span>
+0062 <span class="keyword">end</span>
+0063 
+0064 
+0065 
+0066 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0067 <span class="comment">% Tune up a few parameters based on the MachineConfig %</span>
+0068 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0069 <span class="keyword">try</span>
+0070     <span class="keyword">if</span> isfield(LocoMeasData, <span class="string">'MachineConfig'</span>)
+0071         <span class="comment">% Sextupoles</span>
+0072         <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SF.Setpoint.Data == 0)
+0073             fprintf(<span class="string">'   Turning SF family off in the LOCO model.\n'</span>);
+0074             ATIndex = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SFF'</span>)';
+0075             <span class="keyword">for</span> i = 1:length(ATIndex)
+0076                 RINGData.Lattice{ATIndex(i)}.PolynomB(3) = 0;
+0077             <span class="keyword">end</span>
+0078         <span class="keyword">end</span>
+0079         <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SD.Setpoint.Data == 0)
+0080             fprintf(<span class="string">'   Turning SD family off in the LOCO model.\n'</span>);
+0081             ATIndex = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SDD'</span>)';
+0082             <span class="keyword">for</span> i = 1:length(ATIndex)
+0083                 RINGData.Lattice{ATIndex(i)}.PolynomB(3) = 0;
+0084             <span class="keyword">end</span>
+0085         <span class="keyword">end</span>
+0086 
+0087 
+0088         <span class="comment">% Skew quadrupoles</span>
+0089         <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SQSF.Setpoint.Data == 0)
+0090             fprintf(<span class="string">'   SQSF family was at zero when the response matrix was taken.\n'</span>);
+0091         <span class="keyword">end</span>
+0092         <span class="keyword">if</span> all(LocoMeasData.MachineConfig.SQSD.Setpoint.Data == 0)
+0093             fprintf(<span class="string">'   SQSD family was at zero when the response matrix was taken.\n'</span>);
+0094         <span class="keyword">end</span>
+0095     <span class="keyword">end</span>
+0096 <span class="keyword">catch</span>
+0097 <span class="keyword">end</span>
+0098 
+0099 
+0100 
+0101 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0102 <span class="comment">% LocoFlags to change from the default %</span>
+0103 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0104 <span class="comment">% LocoFlags.Threshold = 1e-5;</span>
+0105 <span class="comment">% LocoFlags.OutlierFactor = 10;</span>
+0106 <span class="comment">% LocoFlags.SVmethod = 1e-2;</span>
+0107 <span class="comment">% LocoFlags.HorizontalDispersionWeight = 12.5;</span>
+0108 <span class="comment">% LocoFlags.VerticalDispersionWeight = 12.5;</span>
+0109 <span class="comment">% LocoFlags.AutoCorrectDelta = 'Yes';</span>
+0110 <span class="comment">% LocoFlags.Coupling = 'No';</span>
+0111 <span class="comment">% LocoFlags.Dispersion = 'No';</span>
+0112 <span class="comment">% LocoFlags.Normalize = 'Yes';</span>
+0113 <span class="comment">% LocoFlags.ResponseMatrixCalculatorFlag1 = 'Linear';</span>
+0114 <span class="comment">% LocoFlags.ResponseMatrixCalculatorFlag2 = 'FixedPathLength';</span>
+0115 <span class="comment">% LocoFlags.CalculateSigma = 'No';</span>
+0116 <span class="comment">% LocoFlags.SinglePrecision = 'Yes';</span>
+0117 
+0118 <span class="comment">% CMData.FitKicks    = 'Yes';</span>
+0119 <span class="comment">% CMData.FitCoupling = 'No';</span>
+0120 <span class="comment">%</span>
+0121 <span class="comment">% BPMData.FitGains    = 'Yes';</span>
+0122 <span class="comment">% BPMData.FitCoupling = 'No';</span>
+0123 
+0124 
+0125 <span class="comment">% CMs to disable</span>
+0126 j = findrowindex(RemoveHCMDeviceList, LocoMeasData.HCM.DeviceList);
+0127 <span class="keyword">if</span> ~isempty(j)
+0128     CMData.HCMGoodDataIndex(j) = [];
+0129 <span class="keyword">end</span>
+0130 
+0131 j = findrowindex(RemoveVCMDeviceList, LocoMeasData.VCM.DeviceList);
+0132 <span class="keyword">if</span> ~isempty(j)
+0133     CMData.VCMGoodDataIndex(j) = [];
+0134 <span class="keyword">end</span>
+0135 
+0136 
+0137 <span class="comment">% BPMs to disable</span>
+0138 j = findrowindex(RemoveHBPMDeviceList, LocoMeasData.HBPM.DeviceList);
+0139 <span class="keyword">if</span> ~isempty(j)
+0140     irm = findrowindex(j(:),BPMData.HBPMGoodDataIndex(:));
+0141     BPMData.HBPMGoodDataIndex(irm) = [];
+0142 <span class="keyword">end</span>
+0143 
+0144 j = findrowindex(RemoveVBPMDeviceList, LocoMeasData.VBPM.DeviceList);
+0145 <span class="keyword">if</span> ~isempty(j)
+0146     irm = findrowindex(j(:),BPMData.VBPMGoodDataIndex(:));
+0147     BPMData.VBPMGoodDataIndex(irm) = [];
+0148 <span class="keyword">end</span>
+0149 
+0150 
+0151 
+0152 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0153 <span class="comment">% FitParameters %</span>
+0154 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0155 
+0156 <span class="comment">% Individual magnets</span>
+0157 <span class="comment">% For each parameter which is fit in the model a numerical response matrix</span>
+0158 <span class="comment">% gradient needs to be determined.  The FitParameters data structure determines what</span>
+0159 <span class="comment">% parameter in the model get varied and how are they grouped.  For no parameter fits, set</span>
+0160 <span class="comment">% FitParameters.Params to an empty vector.</span>
+0161 <span class="comment">%     FitParameters.Params = parameter group definition (cell array for AT)</span>
+0162 <span class="comment">%     FitParameters.Values = Starting value for the parameter fit</span>
+0163 <span class="comment">%     FitParameters.Deltas = change in parameter value used to compute the gradient (NaN forces loco to choose, see auto-correct delta flag below)</span>
+0164 <span class="comment">%     FitParameters.FitRFFrequency = ('Yes'/'No') Fit the RF frequency?</span>
+0165 <span class="comment">%     FitParameters.DeltaRF = Change in RF frequency when measuring &quot;dispersion&quot;.</span>
+0166 <span class="comment">%                             If the RF frequency is being fit the output is stored here.</span>
+0167 <span class="comment">%</span>
+0168 <span class="comment">% The FitParameters structure also contains the standard deviations of the fits:</span>
+0169 <span class="comment">%     LocoValuesSTD</span>
+0170 <span class="comment">%     FitParameters.DeltaRFSTD</span>
+0171 <span class="comment">%</span>
+0172 <span class="comment">% Note: FitParameters.DeltaRF is used when including dispersion in the response matrix.</span>
+0173 <span class="comment">%       LocoMeasData.DeltaRF is not used directly in loco.  Usually one would set</span>
+0174 <span class="comment">%       FitParameters.DeltaRF = LocoMeasData.DeltaRF as a starting point for the RF frequency.</span>
+0175 
+0176 FitParameters = [];
+0177 
+0178 ModeCell = {<span class="string">'Fit magnets by power supply'</span>,<span class="string">'Fit QF, QD, QFA, QDA by magnet &amp; the BEND by power supply'</span>,<span class="string">'Fit by magnet'</span>,<span class="string">'No parameter setup'</span>};
+0179 [ButtonName, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'BUILDLOCOINPUT'</span>,<span class="string">'PromptString'</span>,{<span class="string">'Fit Parameter Selection:'</span>,<span class="string">'(Not including skew quadrupoles)'</span>}, <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell, <span class="string">'ListSize'</span>, [435 110]);
+0180 drawnow;
+0181 <span class="keyword">if</span> OKFlag ~= 1
+0182     ButtonName = 1;
+0183 <span class="keyword">end</span>
+0184 
+0185 N = 0;
+0186 <span class="keyword">switch</span> ButtonName
+0187     <span class="keyword">case</span> 1 <span class="comment">%'Fit by Power Supply'</span>
+0188 
+0189         <span class="comment">% 59 Quads (48 actual quadrupoles + dipole gradient family)</span>
+0190         <span class="comment">% 24 Skew quad power supplies</span>
+0191         <span class="comment">%</span>
+0192         <span class="comment">%     1-24 QF   (24)</span>
+0193         <span class="comment">%    25-48 QD   (24)</span>
+0194         <span class="comment">%    49-52 QFA   (4)</span>
+0195         <span class="comment">%    53-58 QDA   (6)</span>
+0196         <span class="comment">%       59 BEND  (1)</span>
+0197         <span class="comment">%    60-70 SQSF (11)?</span>
+0198         <span class="comment">%    71-83 SQSD (13)?</span>
+0199 
+0200         fprintf(<span class="string">'\n   Parameter fits\n'</span>);
+0201         fprintf(<span class="string">'    1 - 24 QF   (24)\n'</span>);
+0202         fprintf(<span class="string">'   25 - 48 QD   (24)\n'</span>);
+0203         fprintf(<span class="string">'   49 - 52 QFA   (4)\n'</span>);
+0204         fprintf(<span class="string">'   53 - 58 QDA   (6)\n'</span>);
+0205         fprintf(<span class="string">'        59 BEND  (1)\n'</span>);        
+0206         
+0207         <span class="comment">% 24 QF K-values</span>
+0208         QFI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QF'</span>);
+0209         <span class="keyword">for</span> loop=1:length(QFI)
+0210             N = N + 1;
+0211             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QFI(loop),<span class="string">'K'</span>);
+0212         <span class="keyword">end</span>
+0213         FitParameters.Values = getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QFI);
+0214         FitParameters.Deltas = NaN * ones(length(QFI),1);
+0215 
+0216         
+0217         <span class="comment">% 24 QD K-values</span>
+0218         QDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QD'</span>);
+0219         <span class="keyword">for</span> loop=1:length(QDI)
+0220             N = N + 1;
+0221             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QDI(loop),<span class="string">'K'</span>);
+0222         <span class="keyword">end</span>
+0223         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QDI)];
+0224         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QDI),1)];
+0225 
+0226         
+0227         <span class="comment">% 4 QFA K-values</span>
+0228         QFAI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QFA'</span>);
+0229         FitParameters.Params{N+1} = mkparamgroup(RINGData.Lattice,QFAI([1:6 9:14 17:22]),<span class="string">'K'</span>);
+0230         FitParameters.Params{N+2} = mkparamgroup(RINGData.Lattice,QFAI([7:8]),<span class="string">'K'</span>);
+0231         FitParameters.Params{N+3} = mkparamgroup(RINGData.Lattice,QFAI([15:16]),<span class="string">'K'</span>);
+0232         FitParameters.Params{N+4} = mkparamgroup(RINGData.Lattice,QFAI([23:24]),<span class="string">'K'</span>);
+0233         N = N + 4;
+0234         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QFAI([1 7 15 23]))];
+0235         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(4,1)];
+0236 
+0237         
+0238         <span class="comment">% 6 QDA K-values</span>
+0239         QDAI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QDA'</span>);        
+0240         <span class="keyword">for</span> loop=1:length(QDAI)
+0241             N = N + 1;
+0242             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QDAI(loop),<span class="string">'K'</span>);
+0243         <span class="keyword">end</span>
+0244         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QDAI)];
+0245         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QDAI),1)];
+0246         
+0247 
+0248         <span class="comment">% 33 normal bend magnet K-values fit as a group</span>
+0249         BENDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'BEND'</span>);
+0250         N = N + 1;
+0251         FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,BENDI,<span class="string">'K'</span>);
+0252         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,BENDI(1))];
+0253         FitParameters.Deltas = [FitParameters.Deltas; NaN];
+0254 
+0255         
+0256     <span class="keyword">case</span> 2 <span class="comment">% Fit QF, QD, QFA, QDA by magnet &amp; the BEND by power supply</span>
+0257         
+0258         <span class="comment">%     1-24 QF   (24)</span>
+0259         <span class="comment">%    25-48 QD   (24)</span>
+0260         <span class="comment">%    49-72 QFA  (24)</span>
+0261         <span class="comment">%    73-78 QDA   (6)</span>
+0262         <span class="comment">%       79 BEND  (1)</span>
+0263         <span class="comment">%    80-90 SQSF (11)?</span>
+0264         <span class="comment">%   91-103 SQSD (13)?</span>
+0265 
+0266         fprintf(<span class="string">'\n   Parameter fits\n'</span>);
+0267         fprintf(<span class="string">'    1 - 24 QF   (24)\n'</span>);
+0268         fprintf(<span class="string">'   25 - 48 QD   (24)\n'</span>);
+0269         fprintf(<span class="string">'   49 - 72 QFA  (24)\n'</span>);
+0270         fprintf(<span class="string">'   73 - 78 QDA   (6)\n'</span>);
+0271         fprintf(<span class="string">'        79 BEND  (1)\n'</span>);
+0272         
+0273         
+0274         <span class="comment">% 24 QF K-values</span>
+0275         QFI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QF'</span>);
+0276         <span class="keyword">for</span> loop=1:length(QFI)
+0277             N = N + 1;
+0278             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QFI(loop),<span class="string">'K'</span>);
+0279         <span class="keyword">end</span>
+0280         FitParameters.Values = getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QFI);
+0281         FitParameters.Deltas = NaN * ones(length(QFI),1);
+0282 
+0283         
+0284         <span class="comment">% 24 QD K-values</span>
+0285         QDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QD'</span>);
+0286         <span class="keyword">for</span> loop=1:length(QDI)
+0287             N = N + 1;
+0288             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QDI(loop),<span class="string">'K'</span>);
+0289         <span class="keyword">end</span>
+0290         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QDI)];
+0291         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QDI),1)];
+0292 
+0293         
+0294         <span class="comment">% 24 QFA K-values</span>
+0295         QFAI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QFA'</span>);
+0296         <span class="keyword">for</span> loop=1:length(QFAI)
+0297             N = N + 1;
+0298             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QFAI(loop),<span class="string">'K'</span>);
+0299         <span class="keyword">end</span>
+0300         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QFAI)];
+0301         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QFAI),1)];
+0302 
+0303         
+0304         <span class="comment">% 6 QDA K-values</span>
+0305         QDAI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QDA'</span>);        
+0306         <span class="keyword">for</span> loop=1:length(QDAI)
+0307             N = N + 1;
+0308             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QDAI(loop),<span class="string">'K'</span>);
+0309         <span class="keyword">end</span>
+0310         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QDAI)];
+0311         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QDAI),1)];
+0312         
+0313 
+0314         <span class="comment">% 33 normal bend magnet K-values fit as a group</span>
+0315         BENDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'BEND'</span>);
+0316         N = N + 1;
+0317         FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,BENDI,<span class="string">'K'</span>);
+0318         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,BENDI(1))];
+0319         FitParameters.Deltas = [FitParameters.Deltas; NaN];
+0320 
+0321         
+0322     <span class="keyword">case</span> 3 <span class="comment">%'Fit by Magnet'</span>
+0323         
+0324         fprintf(<span class="string">'\n   Parameter fits\n'</span>);
+0325         fprintf(<span class="string">'   1 -  24 QF   (24)\n'</span>);
+0326         fprintf(<span class="string">'  25 -  48 QD   (24)\n'</span>);
+0327         fprintf(<span class="string">'  49 -  72 QFA  (24)\n'</span>);
+0328         fprintf(<span class="string">'  73 -  78 QDA   (6)\n'</span>);
+0329         fprintf(<span class="string">'  79 - 111 BEND (33)\n'</span>);
+0330        
+0331         
+0332         <span class="comment">% 24 QF K-values</span>
+0333         QFI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QF'</span>);
+0334         <span class="keyword">for</span> loop=1:length(QFI)
+0335             N = N + 1;
+0336             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QFI(loop),<span class="string">'K'</span>);
+0337         <span class="keyword">end</span>
+0338         FitParameters.Values = getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QFI);
+0339         FitParameters.Deltas = NaN * ones(length(QFI),1);
+0340 
+0341         
+0342         <span class="comment">% 24 QD K-values</span>
+0343         QDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QD'</span>);
+0344         <span class="keyword">for</span> loop=1:length(QDI)
+0345             N = N + 1;
+0346             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QDI(loop),<span class="string">'K'</span>);
+0347         <span class="keyword">end</span>
+0348         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QDI)];
+0349         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QDI),1)];
+0350 
+0351         
+0352         <span class="comment">% 24 QFA K-values</span>
+0353         QFAI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QFA'</span>);
+0354         <span class="keyword">for</span> loop=1:length(QFAI)
+0355             N = N + 1;
+0356             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QFAI(loop),<span class="string">'K'</span>);
+0357         <span class="keyword">end</span>
+0358         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QFAI)];
+0359         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QFAI),1)];
+0360 
+0361         
+0362         <span class="comment">% 6 QDA K-values</span>
+0363         QDAI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QDA'</span>);        
+0364         <span class="keyword">for</span> loop=1:length(QDAI)
+0365             N = N + 1;
+0366             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QDAI(loop),<span class="string">'K'</span>);
+0367         <span class="keyword">end</span>
+0368         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,QDAI)];
+0369         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(QDAI),1)];
+0370         
+0371 
+0372         <span class="comment">% 33 normal bend magnet K-values</span>
+0373         BENDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'BEND'</span>);        
+0374         <span class="keyword">for</span> loop=1:length(BENDI)
+0375             N = N + 1;
+0376             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,BENDI(loop),<span class="string">'K'</span>);
+0377         <span class="keyword">end</span>
+0378         FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,BENDI)];
+0379         FitParameters.Deltas = [FitParameters.Deltas; NaN * ones(length(BENDI),1)];
+0380 <span class="keyword">end</span>
+0381 
+0382 
+0383 <span class="comment">% Skew quadrupole fits</span>
+0384 <span class="comment">%if N</span>
+0385 ModeCell = {<span class="string">'Fit By Power Supply'</span>, <span class="string">'Fit All SQSF &amp; SQSD Magnets (48)'</span>, <span class="string">'Fit All QF, SQSF, &amp; SQSD Magnets (72)'</span>, <span class="string">'Do Not Fit Skew Quadrupoles'</span>};
+0386 [ButtonName, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'BUILDLOCOINPUT'</span>,<span class="string">'PromptString'</span>,{<span class="string">'Skew Quadrupole Fits?'</span>,<span class="string">'Fit Parameter Selection:'</span>}, <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell, <span class="string">'ListSize'</span>, [350 125]);
+0387 <span class="keyword">if</span> OKFlag ~= 1
+0388     ButtonName = 1;  <span class="comment">% Default</span>
+0389 <span class="keyword">end</span>
+0390 <span class="comment">%ButtonName = questdlg('Skew Quadrupole Fit?','SKEW QUADRUPOLE','Fit By Power Supply','Fit All SQSF &amp; SQSD Magnets (48)','Fit All QF, SQSF, &amp; SQSD Magnets (72)','Do Not Fit','Fit By Power Supply');</span>
+0391 <span class="keyword">switch</span> ButtonName
+0392     <span class="keyword">case</span> 1 <span class="comment">% 'Fit By Power Supply'</span>
+0393         FitSkewQuad = 1;
+0394 
+0395         <span class="comment">% Skew quadrupoles are in the sextupoles</span>
+0396         SFI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SFF'</span>);
+0397         SDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SDD'</span>);
+0398 
+0399         <span class="comment">% Skew quad power supply locations (Post 5-12-2005)</span>
+0400         sflist = [1 5 6 9 10 11 12 13 14 17 21];
+0401         sdlist = [3 5 6 7  9 10 11 12 13 14 15 19 23];
+0402 
+0403         fprintf(<span class="string">' %3d - %3d SQSF (11)\n'</span>, N+1, N+length(sflist));
+0404         fprintf(<span class="string">' %3d - %3d SQSD (13)\n'</span>, N+1+length(sflist), N+length(sflist)+length(sdlist));
+0405 
+0406         <span class="keyword">for</span> loop=1:length(sflist)
+0407             <span class="keyword">if</span> length(SFI) == 24
+0408                 N = N + 1;
+0409                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SFI(sflist(loop)),<span class="string">'s'</span>);
+0410             <span class="keyword">elseif</span> length(SFI) == 48
+0411                 <span class="comment">% Split sextupoles</span>
+0412                 N1 = 2*sflist(loop)-1;
+0413                 N2 = 2*sflist(loop);
+0414                 N = N + 1;
+0415                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SFI([N1 N2]),<span class="string">'s'</span>);
+0416             <span class="keyword">else</span>
+0417                 error(<span class="string">'   Error setting the SQSF parameter group.'</span>);
+0418             <span class="keyword">end</span>
+0419         <span class="keyword">end</span>
+0420         <span class="comment">%        FitParameters.Values = [FitParameters.Values; zeros(length(sflist),1)];</span>
+0421         <span class="keyword">if</span> length(SFI)==24
+0422             FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'PolynomA'</span>,SFI(sflist),2)];
+0423         <span class="keyword">else</span>
+0424             FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'PolynomA'</span>,SFI(2*sflist),2)];
+0425         <span class="keyword">end</span>
+0426         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(length(sflist),1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0427 
+0428         <span class="keyword">for</span> loop=1:length(sdlist)
+0429             <span class="keyword">if</span> length(SDI) == 24
+0430                 N = N + 1;
+0431                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SDI(sdlist(loop)),<span class="string">'s'</span>);
+0432             <span class="keyword">elseif</span> length(SDI) == 48
+0433                 <span class="comment">% Split sextupoles</span>
+0434                 N1 = 2*sdlist(loop)-1;
+0435                 N2 = 2*sdlist(loop);
+0436                 N = N + 1;
+0437                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SDI([N1 N2]),<span class="string">'s'</span>);
+0438             <span class="keyword">else</span>
+0439                 error(<span class="string">'   Error setting the SQSD parameter group.'</span>);
+0440             <span class="keyword">end</span>
+0441         <span class="keyword">end</span>
+0442         <span class="comment">% FitParameters.Values = [FitParameters.Values; zeros(length(sdlist),1)];</span>
+0443         <span class="keyword">if</span> length(SDI)==24
+0444             FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'PolynomA'</span>,SDI(sdlist),2)];
+0445         <span class="keyword">else</span>
+0446             FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'PolynomA'</span>,SDI(2*sdlist),2)];
+0447         <span class="keyword">end</span>
+0448         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(length(sdlist),1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0449 
+0450     <span class="keyword">case</span> 2 <span class="comment">% 'Fit All SQSF &amp; SQSD Magnets (48)'</span>
+0451         fprintf(<span class="string">' %3d - %3d SQSF (24)\n'</span>, N+1, N+24);
+0452         fprintf(<span class="string">' %3d - %3d SQSD (24)\n'</span>, N+1+24, N+24+24);
+0453 
+0454         FitSkewQuad = 1;
+0455 
+0456         <span class="comment">% Skew quadrupoles are in the sextupoles</span>
+0457         SFI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SFF'</span>);
+0458         SDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SDD'</span>);
+0459 
+0460         <span class="keyword">for</span> loop=1:24
+0461             <span class="keyword">if</span> length(SFI) == 24
+0462                 N = N + 1;
+0463                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SFI(loop),<span class="string">'s'</span>);
+0464             <span class="keyword">elseif</span> length(SFI) == 48
+0465                 <span class="comment">% Split sextupoles</span>
+0466                 N1 = 2*loop-1;
+0467                 N2 = 2*loop;
+0468                 N = N + 1;
+0469                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SFI([N1 N2]),<span class="string">'s'</span>);
+0470             <span class="keyword">else</span>
+0471                 error(<span class="string">'   Error setting the SQSF parameter group.'</span>);
+0472             <span class="keyword">end</span>
+0473         <span class="keyword">end</span>
+0474         FitParameters.Values = [FitParameters.Values; zeros(24,1)];
+0475         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(24,1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0476 
+0477         <span class="keyword">for</span> loop=1:24
+0478             <span class="keyword">if</span> length(SDI) == 24
+0479                 N = N + 1;
+0480                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SDI(loop),<span class="string">'s'</span>);
+0481             <span class="keyword">elseif</span> length(SDI) == 48
+0482                 <span class="comment">% Split sextupoles</span>
+0483                 N1 = 2*loop-1;
+0484                 N2 = 2*loop;
+0485                 N = N + 1;
+0486                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SDI([N1 N2]),<span class="string">'s'</span>);
+0487             <span class="keyword">else</span>
+0488                 error(<span class="string">'   Error setting the SQSD parameter group.'</span>);
+0489             <span class="keyword">end</span>
+0490         <span class="keyword">end</span>
+0491         FitParameters.Values = [FitParameters.Values; zeros(24,1)];
+0492         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(24,1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0493 
+0494     <span class="keyword">case</span> 3 <span class="comment">% 'Fit All QF, SQSF, &amp; SQSD Magnets (72)'</span>
+0495         fprintf(<span class="string">' %3d - %3d SQSF (24)\n'</span>, N+1, N+24);
+0496         fprintf(<span class="string">' %3d - %3d SQSD (24)\n'</span>, N+1+24, N+24+24);
+0497         fprintf(<span class="string">' %3d - %3d SQQF (24)\n'</span>, N+1+48, N+48+24);
+0498         
+0499         FitSkewQuad = 1;
+0500 
+0501         <span class="comment">% Skew quadrupoles are in the sextupoles</span>
+0502         SFI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SFF'</span>);
+0503         SDI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'SDD'</span>);
+0504         QFI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'QF'</span>);
+0505 
+0506         <span class="keyword">for</span> loop=1:24
+0507             <span class="keyword">if</span> length(SFI) == 24
+0508                 N = N + 1;
+0509                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SFI(loop),<span class="string">'s'</span>);
+0510             <span class="keyword">elseif</span> length(SFI) == 48
+0511                 <span class="comment">% Split sextupoles</span>
+0512                 N1 = 2*loop-1;
+0513                 N2 = 2*loop;
+0514                 N = N + 1;
+0515                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SFI([N1 N2]),<span class="string">'s'</span>);
+0516             <span class="keyword">else</span>
+0517                 error(<span class="string">'   Error setting the SQSF parameter group.'</span>);
+0518             <span class="keyword">end</span>
+0519         <span class="keyword">end</span>
+0520         FitParameters.Values = [FitParameters.Values; zeros(24,1)];
+0521         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(24,1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0522 
+0523         <span class="keyword">for</span> loop=1:24
+0524             <span class="keyword">if</span> length(SDI) == 24
+0525                 N = N + 1;
+0526                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SDI(loop),<span class="string">'s'</span>);
+0527             <span class="keyword">elseif</span> length(SDI) == 48
+0528                 <span class="comment">% Split sextupoles</span>
+0529                 N1 = 2*loop-1;
+0530                 N2 = 2*loop;
+0531                 N = N + 1;
+0532                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,SDI([N1 N2]),<span class="string">'s'</span>);
+0533             <span class="keyword">else</span>
+0534                 error(<span class="string">'   Error setting the SQSD parameter group.'</span>);
+0535             <span class="keyword">end</span>
+0536         <span class="keyword">end</span>
+0537         FitParameters.Values = [FitParameters.Values; zeros(24,1)];
+0538         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(24,1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0539     
+0540         <span class="keyword">for</span> loop=1:24
+0541             <span class="keyword">if</span> length(QFI) == 24
+0542                 N = N + 1;
+0543                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QFI(loop),<span class="string">'s'</span>);
+0544             <span class="keyword">elseif</span> length(QFI) == 48
+0545                 <span class="comment">% Split Quadrupole</span>
+0546                 N1 = 2*loop-1;
+0547                 N2 = 2*loop;
+0548                 N = N + 1;
+0549                 FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,QFI([N1 N2]),<span class="string">'s'</span>);
+0550             <span class="keyword">else</span>
+0551                 error(<span class="string">'   Error setting the SQQF parameter group.'</span>);
+0552             <span class="keyword">end</span>
+0553         <span class="keyword">end</span>
+0554         FitParameters.Values = [FitParameters.Values; zeros(24,1)];
+0555         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(24,1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0556         
+0557     <span class="keyword">case</span> 4 <span class="comment">%'Do Not Fit'</span>
+0558         fprintf(<span class="string">'   SQSF and SQSD not fit.\n\n'</span>);
+0559         FitSkewQuad = 0;
+0560 
+0561     <span class="keyword">otherwise</span>
+0562         <span class="comment">%fprintf('   SQSF and SQSD not fit.\n');</span>
+0563         FitSkewQuad = 0;
+0564 <span class="keyword">end</span>
+0565 <span class="comment">%end</span>
+0566 
+0567 
+0568 <span class="comment">% Superbend quadrupole fit</span>
+0569 ButtonName = questdlg(<span class="string">'Superbend Quad. &amp; Skew Quad. Fit?'</span>,<span class="string">'SUPERBEND'</span>,<span class="string">'Fit Quadrupoles at the SuperBends'</span>,<span class="string">'Do Not Fit'</span>,<span class="string">'Do Not Fit'</span>);
+0570 <span class="keyword">switch</span> ButtonName
+0571     <span class="keyword">case</span> <span class="string">'Do Not Fit'</span>
+0572         <span class="comment">%fprintf('   Superbend not fit.\n');</span>
+0573 
+0574     <span class="keyword">case</span> <span class="string">'Fit Quadrupoles at the SuperBends'</span>
+0575         
+0576         <span class="comment">% Superbend</span>
+0577         BSI = findcells(RINGData.Lattice,<span class="string">'FamName'</span>,<span class="string">'BS'</span>);
+0578 
+0579         <span class="comment">% K - Quadrupole Fit</span>
+0580         fprintf(<span class="string">' %3d - %3d SuperBend Quad Fit (3)\n'</span>, N+1, N+3);
+0581         <span class="keyword">for</span> loop=1:length(BSI)
+0582             N = N + 1;
+0583             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,BSI(loop),<span class="string">'K'</span>);
+0584             FitParameters.Values = [FitParameters.Values; getcellstruct(RINGData.Lattice,<span class="string">'K'</span>,BSI(loop))];
+0585         <span class="keyword">end</span>
+0586         FitParameters.Deltas = [FitParameters.Deltas; .05 * ones(length(BSI),1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0587 
+0588         <span class="comment">% Skew Quadrupole Fit</span>
+0589         fprintf(<span class="string">' %3d - %3d SuperBend Skew Fit (3)\n'</span>, N+1, N+3);
+0590         <span class="keyword">for</span> loop=1:length(BSI)
+0591             N = N + 1;
+0592             FitParameters.Params{N} = mkparamgroup(RINGData.Lattice,BSI(loop),<span class="string">'s'</span>);
+0593         <span class="keyword">end</span>
+0594         FitParameters.Values = [FitParameters.Values; zeros(length(BSI),1)];
+0595         FitParameters.Deltas = [FitParameters.Deltas; 0.5e-2 * ones(length(BSI),1)];  <span class="comment">% automatic delta determination does not work if starting value is 0</span>
+0596 <span class="keyword">end</span>
+0597 
+0598 fprintf(<span class="string">'\n'</span>);
+0599 
+0600 
+0601 <span class="comment">% Starting point for the deltas (automatic delta determination does not work if starting value is 0)</span>
+0602 <span class="comment">%FitParameters.Deltas = 0.0001 * ones(size(FitParameters.Values));</span>
+0603 
+0604 
+0605 <span class="comment">% RF parameter fit setup (There is a flag to actually do the fit)</span>
+0606 <span class="keyword">if</span> isempty(LocoMeasData.DeltaRF)
+0607     FitParameters.DeltaRF = 500;  <span class="comment">% It's good to have something here so that LOCO will compute a model dispersion</span>
+0608 <span class="keyword">else</span>
+0609     FitParameters.DeltaRF = LocoMeasData.DeltaRF;
+0610 <span class="keyword">end</span>
+0611 
+0612 
+0613 <span class="comment">% File check</span>
+0614 [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck({BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData});
+0615 
+0616 
+0617 <span class="comment">% Save</span>
+0618 save(FileName, <span class="string">'LocoModel'</span>, <span class="string">'FitParameters'</span>, <span class="string">'BPMData'</span>, <span class="string">'CMData'</span>, <span class="string">'RINGData'</span>, <span class="string">'LocoMeasData'</span>, <span class="string">'LocoFlags'</span>);
+0619 
+0620</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

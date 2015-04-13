@@ -1,0 +1,888 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of locofilecheck</title>
+  <meta name="keywords" content="locofilecheck">
+  <meta name="description" content="LOCOFILECHECK - Consistence check for the LOCO input file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; locofilecheck.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>locofilecheck
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LOCOFILECHECK - Consistence check for the LOCO input file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck(FileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOCOFILECHECK - Consistence check for the LOCO input file
+  [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck(FileName)
+            or
+  [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck({BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData})
+                                      
+  Checks the LOCO inputs and adds the defauls is inputs are missing.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="buildlocoinput.html" class="code" title="function [LocoMeasData, BPMData, CMData, RINGData, FitParameters, LocoFlags] = buildlocoinput(OutputFileName, GuessIt)">buildlocoinput</a>	BUILDLOCOINPUT - Matlab Middlelayer (MML) method for building a LOCO input file.</li><li><a href="loco.html" class="code" title="function [LocoModel, BPMData, CMData, FitParameters, LocoFlags, RINGData] = loco(LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">loco</a>	LOCO - Main routine for the LOCO algorithm</li><li><a href="locogui.html" class="code" title="function varargout = locogui(varargin)">locogui</a>	LOCOGUI - Graphical interface for running the LOCO algorithm</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck(FileName)</a>
+0002 <span class="comment">%LOCOFILECHECK - Consistence check for the LOCO input file</span>
+0003 <span class="comment">%  [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck(FileName)</span>
+0004 <span class="comment">%            or</span>
+0005 <span class="comment">%  [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck({BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData})</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  Checks the LOCO inputs and adds the defauls is inputs are missing.</span>
+0008 
+0009 <span class="comment">%  Written by Greg Portmann</span>
+0010 
+0011 
+0012 <span class="comment">% Default parameters</span>
+0013 Defaults_Lambda = .001;                 <span class="comment">% For Levenberg-Marquardt method</span>
+0014 Defaults_MaxIter = 10;                  <span class="comment">% For Levenberg-Marquardt method</span>
+0015 Defaults_Threshold = 1e-6;
+0016 Defaults_OutlierFactor = 5;
+0017 Defaults_HorizontalDispersionWeight = 1;
+0018 Defaults_VerticalDispersionWeight = 1;
+0019 Defaults_AutoCorrectDelta  = <span class="string">'Yes'</span>;
+0020 Defaults_ResponseMatrixCalculator = <span class="string">'Linear'</span>;          <span class="comment">% 'Linear' or 'Full'</span>
+0021 Defaults_ClosedOrbitType = <span class="string">'FixedPathLength'</span>;          <span class="comment">% 'FixedPathLength' or 'FixedMomentum';</span>
+0022 Defaults_ResponseMatrixMeasurement = <span class="string">'BiDirectional'</span>;  <span class="comment">% 'OneWay' or 'BiDirectional'</span>
+0023 Defaults_DispersionMeasurement     = <span class="string">'BiDirectional'</span>;  <span class="comment">% 'OneWay' or 'BiDirectional'</span>
+0024 Defaults_Normalize = <span class="string">'Yes'</span>;
+0025 Defaults_Coupling =<span class="string">'No'</span>;
+0026 Defaults_Dispersion = <span class="string">'Yes'</span>;
+0027 Defaults_FitHCMEnergyShift = <span class="string">'No'</span>;
+0028 Defaults_FitVCMEnergyShift = <span class="string">'No'</span>;
+0029 Defaults_FitRFFrequency = <span class="string">'No'</span>;
+0030 Defaults_CMFitKicks  = <span class="string">'Yes'</span>;
+0031 Defaults_CMFitCoupling = <span class="string">'No'</span>;
+0032 Defaults_BPMFitGains = <span class="string">'Yes'</span>;
+0033 Defaults_BPMFitCoupling = <span class="string">'No'</span>;
+0034 Defaults_SinglePrecision = <span class="string">'No'</span>;
+0035 Defaults_CalculateSigma = <span class="string">'Yes'</span>;
+0036 
+0037 
+0038 <span class="keyword">if</span> nargin == 0
+0039     [FileName, DirectoryName, FilterIndex] = uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select a LOCO input file'</span>);
+0040     <span class="keyword">if</span> FilterIndex == 0
+0041         <span class="keyword">return</span>;
+0042     <span class="keyword">end</span>
+0043     FileName = [DirectoryName, FileName];
+0044 <span class="keyword">end</span>
+0045 
+0046 
+0047 <span class="keyword">if</span> iscell(FileName)
+0048     BPMData       = FileName{1};
+0049     CMData        = FileName{2};
+0050     LocoMeasData  = FileName{3};
+0051     LocoModel     = FileName{4};
+0052     FitParameters = FileName{5};
+0053     LocoFlags     = FileName{6};
+0054     RINGData      = FileName{7};
+0055 <span class="keyword">elseif</span> ischar(FileName)    
+0056     <span class="keyword">try</span>
+0057         load(FileName);
+0058     <span class="keyword">catch</span>
+0059         error(<span class="string">'File does not exist or is not a *.mat file type.\n'</span>);
+0060     <span class="keyword">end</span>    
+0061 <span class="keyword">else</span>
+0062     error(<span class="string">'Input problem'</span>);
+0063 <span class="keyword">end</span>
+0064 
+0065 
+0066 <span class="comment">% Make sure LocoModel exists (this is mainly for locogui)</span>
+0067 <span class="keyword">if</span> ~exist(<span class="string">'LocoModel'</span>,<span class="string">'var'</span>)
+0068     LocoModel(length(CMData)) = struct(<span class="string">'M'</span>,[], <span class="string">'OutlierIndex'</span>,[], <span class="string">'Eta'</span>,[], <span class="string">'EtaOutlierIndex'</span>,[], <span class="string">'ChiSquare'</span>,[]);
+0069 <span class="keyword">end</span>
+0070 <span class="keyword">if</span> isempty(LocoModel)
+0071     clear LocoModel
+0072     LocoModel(length(CMData)) = struct(<span class="string">'M'</span>,[], <span class="string">'OutlierIndex'</span>,[], <span class="string">'Eta'</span>,[], <span class="string">'EtaOutlierIndex'</span>,[], <span class="string">'ChiSquare'</span>,[]);
+0073 <span class="keyword">end</span>
+0074 
+0075 
+0076 <span class="comment">% Make sure LocoFlags exists and is not empty</span>
+0077 <span class="keyword">if</span> ~exist(<span class="string">'LocoFlags'</span>,<span class="string">'var'</span>)
+0078     LocoFlags.Threshold = Defaults_Threshold;
+0079     <span class="comment">% The rest will be created in the for loop</span>
+0080 <span class="keyword">end</span>
+0081 <span class="keyword">if</span> isempty(LocoFlags)
+0082     LocoFlags.Threshold = Defaults_Threshold;
+0083     <span class="comment">% The rest will be created in the for loop</span>
+0084 <span class="keyword">end</span>
+0085 
+0086 
+0087 <span class="comment">% Make sure FitParameters exists and is not empty</span>
+0088 <span class="keyword">if</span> ~exist(<span class="string">'FitParameters'</span>,<span class="string">'var'</span>)
+0089     FitParameters = [];
+0090 <span class="keyword">end</span>
+0091 <span class="comment">%if isempty(FitParameters)</span>
+0092 <span class="comment">%    FitParameters.Values = [];</span>
+0093 <span class="comment">%end</span>
+0094 
+0095 
+0096 <span class="comment">% Make sure CMData exists and is not empty</span>
+0097 <span class="keyword">if</span> ~exist(<span class="string">'CMData'</span>,<span class="string">'var'</span>)
+0098     error(<span class="string">'CMData must exist.'</span>);
+0099 <span class="keyword">end</span>
+0100 <span class="keyword">if</span> isempty(CMData)
+0101     error(<span class="string">'CMData can not be empty.'</span>);
+0102 <span class="keyword">end</span>
+0103 
+0104 
+0105 <span class="comment">% Make sure BPMData exists and is not empty</span>
+0106 <span class="keyword">if</span> ~exist(<span class="string">'BPMData'</span>,<span class="string">'var'</span>)
+0107     error(<span class="string">'BPMData must exist.'</span>);
+0108 <span class="keyword">end</span>
+0109 <span class="keyword">if</span> isempty(BPMData)
+0110     error(<span class="string">'BPMData can not be empty.'</span>);
+0111 <span class="keyword">end</span>
+0112 
+0113 
+0114 <span class="comment">% Measured data checks</span>
+0115 <span class="keyword">if</span> ~exist(<span class="string">'LocoMeasData'</span>,<span class="string">'var'</span>)
+0116     error(<span class="string">' LocoMeasData variable does not exist.'</span>);
+0117 <span class="keyword">end</span>  
+0118 <span class="keyword">if</span> ~isfield(LocoMeasData, <span class="string">'M'</span>);
+0119     error(<span class="string">'The response matrix (LocoMeasData.M) must exist.'</span>);
+0120 <span class="keyword">end</span>
+0121 <span class="keyword">if</span> isempty(LocoMeasData.M);
+0122     error(<span class="string">'The response matrix (LocoMeasData.M) must exist.'</span>);
+0123 <span class="keyword">end</span>
+0124 
+0125 <span class="keyword">if</span> ~isfield(LocoMeasData, <span class="string">'BPMSTD'</span>);
+0126     error(<span class="string">'The response matrix stardard deviations (LocoMeasData.BPMSTD) must exist.'</span>);
+0127 <span class="keyword">end</span>
+0128 <span class="keyword">if</span> isempty(LocoMeasData.BPMSTD);
+0129     error(<span class="string">'The response matrix stardard deviations (LocoMeasData.BPMSTD) must exist.'</span>);
+0130 <span class="keyword">end</span>
+0131 LocoMeasData.BPMSTD = LocoMeasData.BPMSTD(:);
+0132 
+0133 <span class="keyword">if</span> ~isfield(LocoMeasData, <span class="string">'DeltaRF'</span>);
+0134     LocoMeasData.DeltaRF = [];
+0135 <span class="keyword">end</span>
+0136 <span class="keyword">if</span> isempty(LocoMeasData.DeltaRF);
+0137     fprintf(<span class="string">'   Measured delta RF (LocoMeasData.DeltaRF) does not exist.  It is required when using the fix momentum response matrix calculator and when including dispersion.\n'</span>);
+0138 <span class="keyword">end</span>
+0139 
+0140 <span class="keyword">if</span> ~isfield(LocoMeasData, <span class="string">'Eta'</span>);
+0141     LocoMeasData.Eta = [];
+0142 <span class="keyword">end</span>
+0143 <span class="keyword">if</span> isempty(LocoMeasData.Eta);
+0144     fprintf(<span class="string">'   Measured dispersion (LocoMeasData.Eta) does not exist.  It is required when using the fix momentum response matrix calculator and when including dispersion.\n'</span>);
+0145 <span class="keyword">end</span>
+0146 LocoMeasData.Eta = LocoMeasData.Eta(:);
+0147 
+0148 <span class="keyword">if</span> ~isfield(LocoMeasData, <span class="string">'RF'</span>);
+0149     LocoMeasData.RF = [];
+0150 <span class="keyword">end</span>
+0151 <span class="keyword">if</span> isempty(LocoMeasData.RF);
+0152     fprintf(<span class="string">'   Measured RF frequency (LocoMeasData.RF) does not exist.  It is required when using the fixed momentum response matrix calculator.\n'</span>);
+0153 <span class="keyword">end</span>
+0154 
+0155 
+0156 <span class="comment">% Check every iteration</span>
+0157 <span class="keyword">for</span> i = 1:length(CMData)
+0158     
+0159     <span class="comment">% LocoFlags checks</span>
+0160     
+0161     <span class="keyword">if</span> ~isfield(LocoFlags(i),<span class="string">'Method'</span>) || ~isfield(LocoFlags(i).Method, <span class="string">'Name'</span>)
+0162         LocoFlags(i).Method.Name = <span class="string">'Gauss-Newton'</span>;  <span class="comment">% Backward compatible (LocoFlags(i).Method)</span>
+0163     <span class="keyword">else</span>
+0164         <span class="keyword">if</span> isempty(LocoFlags(i).Method.Name)
+0165             <span class="keyword">if</span> ~isfield(FitParameters(i), <span class="string">'Weight'</span>)
+0166                 LocoFlags(i).Method.Name =  <span class="string">'Gauss-Newton With Cost Function'</span>;
+0167             <span class="keyword">else</span>
+0168                 LocoFlags(i).Method.Name =  <span class="string">'Gauss-Newton'</span>;
+0169             <span class="keyword">end</span>
+0170         <span class="keyword">end</span>
+0171     <span class="keyword">end</span>
+0172     <span class="keyword">if</span> strcmpi(LocoFlags(i).Method.Name, <span class="string">'Gradient'</span>)
+0173         LocoFlags(i).Method.Name = <span class="string">'Gauss-Newton'</span>; <span class="comment">% Backward compatible name change</span>
+0174     <span class="keyword">end</span>
+0175     <span class="keyword">if</span> strcmpi(LocoFlags(i).Method.Name, <span class="string">'Scalar Levenberg-Marquardt'</span>)
+0176         LocoFlags(i).Method.Name = <span class="string">'Scaled Levenberg-Marquardt'</span>; <span class="comment">% Temporary name change issue</span>
+0177     <span class="keyword">end</span>
+0178     <span class="keyword">if</span> ~any(strcmpi(LocoFlags(i).Method.Name, {<span class="string">'Gauss-Newton'</span>,<span class="string">'Gauss-Newton With Cost Function'</span>,<span class="string">'Levenberg-Marquardt'</span>, <span class="string">'Scaled Levenberg-Marquardt'</span>}))
+0179         error(<span class="string">'LocoFlags.Method not defined properly.'</span>);
+0180     <span class="keyword">end</span>
+0181 
+0182     <span class="keyword">if</span> isfield(LocoFlags(i), <span class="string">'Method'</span>) &amp;&amp; isfield(LocoFlags(i).Method, <span class="string">'MaxIter'</span>) &amp;&amp; LocoFlags(i).Method.MaxIter &lt; 1
+0183         LocoFlags(i).Method.MaxIter = 1;
+0184     <span class="keyword">end</span>
+0185     
+0186     <span class="keyword">if</span> any(strcmpi(LocoFlags(i).Method.Name, {<span class="string">'Levenberg-Marquardt'</span>, <span class="string">'Scaled Levenberg-Marquardt'</span>}))
+0187         <span class="keyword">if</span> ~isfield(LocoFlags(i).Method, <span class="string">'Lambda'</span>)
+0188             LocoFlags(i).Method.Lambda = Defaults_Lambda;
+0189         <span class="keyword">end</span>
+0190         <span class="keyword">if</span> isempty(LocoFlags(i).Method.Lambda)
+0191             LocoFlags(i).Method.Lambda = Defaults_Lambda;
+0192         <span class="keyword">end</span>
+0193         <span class="keyword">if</span> ~isfield(LocoFlags(i).Method, <span class="string">'MaxIter'</span>)
+0194             LocoFlags(i).Method.MaxIter = Defaults_MaxIter;
+0195         <span class="keyword">end</span>
+0196         <span class="keyword">if</span> isempty(LocoFlags(i).Method.MaxIter)
+0197             LocoFlags(i).Method.MaxIter = Defaults_MaxIter;
+0198         <span class="keyword">end</span>
+0199         LocoFlags(i).Method.MaxIter = ceil(LocoFlags(i).Method.MaxIter);
+0200     <span class="keyword">end</span>
+0201 
+0202 
+0203     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'OutlierFactor'</span>) || isempty(LocoFlags(i).OutlierFactor)
+0204         LocoFlags(i).OutlierFactor  = Defaults_OutlierFactor;
+0205     <span class="keyword">end</span>
+0206 
+0207     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'Threshold'</span>) || isempty(LocoFlags(i).Threshold)
+0208         LocoFlags(i).Threshold  = Defaults_Threshold;
+0209     <span class="keyword">end</span>
+0210     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'SVmethod'</span>)
+0211         LocoFlags(i).SVmethod  = LocoFlags(i).Threshold;
+0212     <span class="keyword">end</span>
+0213     
+0214     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'HorizontalDispersionWeight'</span>) || isempty(LocoFlags(i).HorizontalDispersionWeight)
+0215         LocoFlags(i).HorizontalDispersionWeight = Defaults_HorizontalDispersionWeight;
+0216     <span class="keyword">end</span>
+0217 
+0218     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'VerticalDispersionWeight'</span>) || isempty(LocoFlags(i).VerticalDispersionWeight)
+0219         LocoFlags(i).VerticalDispersionWeight = Defaults_VerticalDispersionWeight;
+0220     <span class="keyword">end</span>
+0221         
+0222     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'AutoCorrectDelta'</span>) || isempty(LocoFlags(i).AutoCorrectDelta)
+0223         LocoFlags(i).AutoCorrectDelta  = Defaults_AutoCorrectDelta;
+0224     <span class="keyword">end</span>
+0225     
+0226     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'Coupling'</span>) || isempty(LocoFlags(i).Coupling)
+0227         LocoFlags(i).Coupling  = Defaults_Coupling;
+0228     <span class="keyword">end</span>
+0229     
+0230     <span class="comment">% Normalization</span>
+0231     <span class="keyword">if</span> isfield(LocoFlags(i), <span class="string">'Normalize'</span>) &amp;&amp; (~isfield(LocoFlags(i), <span class="string">'Normalization'</span>) || ~isfield(LocoFlags(i).Normalization, <span class="string">'Flag'</span>)) <span class="comment">% To be backward compatible</span>
+0232         LocoFlags(i).Normalization.Flag = LocoFlags(i).Normalize;
+0233     <span class="keyword">end</span>
+0234     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'Normalization'</span>) || ~isfield(LocoFlags(i).Normalization, <span class="string">'Flag'</span>) || isempty(LocoFlags(i).Normalization.Flag)
+0235         LocoFlags(i).Normalization.Flag = Defaults_Normalize;
+0236     <span class="keyword">end</span>
+0237     
+0238     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'Dispersion'</span>)|| isempty(LocoFlags(i).Dispersion)
+0239         LocoFlags(i).Dispersion = Defaults_Dispersion;
+0240     <span class="keyword">end</span>
+0241     
+0242     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'ResponseMatrixCalculator'</span>)
+0243         <span class="comment">% First check old field name</span>
+0244         <span class="keyword">if</span> isfield(LocoFlags(i), <span class="string">'ResponseMatrixCalculatorFlag1'</span>)
+0245             <span class="keyword">for</span> j = 1:length(LocoFlags)
+0246                 LocoFlags(j).ResponseMatrixCalculator = LocoFlags(j).ResponseMatrixCalculatorFlag1;
+0247             <span class="keyword">end</span>
+0248         <span class="keyword">else</span>
+0249             LocoFlags(i).ResponseMatrixCalculator = Defaults_ResponseMatrixCalculator;
+0250         <span class="keyword">end</span>
+0251     <span class="keyword">end</span>
+0252     <span class="keyword">if</span> isempty(LocoFlags(i).ResponseMatrixCalculator)
+0253         LocoFlags(i).ResponseMatrixCalculator = Defaults_ResponseMatrixCalculator;
+0254     <span class="keyword">end</span>
+0255     
+0256     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'ClosedOrbitType'</span>)
+0257         <span class="comment">% First check old field name</span>
+0258         <span class="keyword">if</span> isfield(LocoFlags(i), <span class="string">'ResponseMatrixCalculatorFlag2'</span>)
+0259             <span class="keyword">for</span> j = 1:length(LocoFlags)
+0260                 LocoFlags(j).ClosedOrbitType = LocoFlags(j).ResponseMatrixCalculatorFlag2;
+0261             <span class="keyword">end</span>
+0262         <span class="keyword">else</span>
+0263             LocoFlags(i).ClosedOrbitType = Defaults_ClosedOrbitType;
+0264         <span class="keyword">end</span>
+0265     <span class="keyword">end</span>
+0266     <span class="keyword">if</span> isempty(LocoFlags(i).ClosedOrbitType)
+0267         LocoFlags(i).ClosedOrbitType = Defaults_ClosedOrbitType;
+0268     <span class="keyword">end</span>
+0269     
+0270     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'ResponseMatrixMeasurement'</span>)
+0271         LocoFlags(i).ResponseMatrixMeasurement = Defaults_ResponseMatrixMeasurement;
+0272     <span class="keyword">end</span>
+0273     <span class="keyword">if</span> isempty(LocoFlags(i).ResponseMatrixMeasurement)
+0274         LocoFlags(i).ResponseMatrixMeasurement = Defaults_ResponseMatrixMeasurement;
+0275     <span class="keyword">end</span>
+0276     
+0277     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'DispersionMeasurement'</span>)
+0278         LocoFlags(i).DispersionMeasurement = Defaults_DispersionMeasurement;
+0279     <span class="keyword">end</span>
+0280     <span class="keyword">if</span> isempty(LocoFlags(i).DispersionMeasurement)
+0281         LocoFlags(i).DispersionMeasurement = Defaults_DispersionMeasurement;
+0282     <span class="keyword">end</span>
+0283 
+0284     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'SinglePrecision'</span>)
+0285         LocoFlags(i).SinglePrecision = Defaults_SinglePrecision;
+0286     <span class="keyword">end</span>
+0287     <span class="keyword">if</span> isempty(LocoFlags(i).SinglePrecision)
+0288         LocoFlags(i).SinglePrecision = Defaults_SinglePrecision;
+0289     <span class="keyword">end</span>
+0290 
+0291     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'CalculateSigma'</span>)
+0292         LocoFlags(i).CalculateSigma = Defaults_CalculateSigma;
+0293     <span class="keyword">end</span>
+0294     <span class="keyword">if</span> isempty(LocoFlags(i).CalculateSigma)
+0295         LocoFlags(i).CalculateSigma = Defaults_CalculateSigma;
+0296     <span class="keyword">end</span>
+0297 
+0298     <span class="keyword">if</span> ~isfield(LocoFlags(i), <span class="string">'SVDDataFileName'</span>)
+0299         LocoFlags(i).SVDDataFileName = <span class="string">''</span>;
+0300     <span class="keyword">end</span>
+0301     <span class="keyword">if</span> isempty(LocoFlags(i).SVDDataFileName)
+0302         LocoFlags(i).SVDDataFileName = <span class="string">''</span>;
+0303     <span class="keyword">end</span>
+0304 
+0305     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'FitHCMEnergyShift'</span>)
+0306         CMData(i).FitHCMEnergyShift = Defaults_FitHCMEnergyShift;
+0307     <span class="keyword">end</span>
+0308     <span class="keyword">if</span> isempty(CMData(i).FitHCMEnergyShift)
+0309         CMData(i).FitHCMEnergyShift = Defaults_FitHCMEnergyShift;
+0310     <span class="keyword">end</span>
+0311 
+0312     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'FitVCMEnergyShift'</span>)
+0313         CMData(i).FitVCMEnergyShift = Defaults_FitVCMEnergyShift;
+0314     <span class="keyword">end</span>
+0315     <span class="keyword">if</span> isempty(CMData(i).FitHCMEnergyShift)
+0316         CMData(i).FitVCMEnergyShift = Defaults_FitVCMEnergyShift;
+0317     <span class="keyword">end</span>
+0318 
+0319 
+0320     <span class="comment">% FitParameters checks</span>
+0321     <span class="keyword">if</span> ~isempty(FitParameters)
+0322         <span class="comment">% Only check the FitParameters if the whole thing is not empty</span>
+0323         <span class="keyword">if</span> ~isfield(FitParameters(i), <span class="string">'Values'</span>)
+0324             <span class="comment">%error('FitParameters.Values must exist.');</span>
+0325             FitParameters(i).Values = [];
+0326         <span class="keyword">else</span>
+0327             <span class="comment">% Column vector</span>
+0328             FitParameters(i).Values = FitParameters(i).Values(:);
+0329         <span class="keyword">end</span>
+0330         <span class="comment">%if isempty(FitParameters(i).Values)</span>
+0331         <span class="comment">%    error('FitParameters.Values cannot be empty.');</span>
+0332         <span class="comment">%end</span>
+0333 
+0334         <span class="keyword">if</span> ~isfield(FitParameters(i),<span class="string">'ValuesSTD'</span>)
+0335             FitParameters(i).ValuesSTD = [];
+0336         <span class="keyword">end</span>
+0337 
+0338         <span class="keyword">if</span> ~isfield(FitParameters(i), <span class="string">'Deltas'</span>)
+0339             FitParameters(i).Deltas = NaN * ones(size(FitParameters(i).Values));
+0340         <span class="keyword">else</span>
+0341             <span class="comment">% Column vector</span>
+0342             FitParameters(i).Deltas = FitParameters(i).Deltas(:);
+0343         <span class="keyword">end</span>
+0344         <span class="keyword">if</span> isempty(FitParameters(i).Deltas)
+0345             FitParameters(i).Deltas = NaN * ones(size(FitParameters(i).Values));
+0346         <span class="keyword">end</span>
+0347 
+0348         <span class="keyword">if</span> ~isfield(FitParameters(i), <span class="string">'Params'</span>)
+0349             FitParameters(i).Params = NaN * ones(size(FitParameters(i).Values));
+0350         <span class="keyword">end</span>
+0351         <span class="keyword">if</span> isempty(FitParameters(i).Params)
+0352             FitParameters(i).Params = NaN * ones(size(FitParameters(i).Values));
+0353         <span class="keyword">end</span>
+0354 
+0355         <span class="keyword">if</span> ~isfield(FitParameters(i), <span class="string">'FitRFFrequency'</span>)
+0356             FitParameters(i).FitRFFrequency  = Defaults_FitRFFrequency;
+0357         <span class="keyword">end</span>
+0358         <span class="keyword">if</span> isempty(FitParameters(i).FitRFFrequency)
+0359             FitParameters(i).FitRFFrequency  = Defaults_FitRFFrequency;
+0360         <span class="keyword">end</span>
+0361 
+0362         <span class="keyword">if</span> ~isfield(FitParameters(i), <span class="string">'DeltaRF'</span>)
+0363             <span class="comment">%error('Model delta RF (FitParameters.DeltaRF) needs to exist.');</span>
+0364             <span class="comment">%FitParameters(i).DeltaRF = NaN;</span>
+0365             FitParameters.DeltaRF = LocoMeasData.DeltaRF;
+0366             fprintf(<span class="string">'   The model delta RF (FitParameters.DeltaRF) does not exist so it is being set to LocoMeasData.DeltaRF.\n'</span>);
+0367         <span class="keyword">else</span>
+0368             <span class="keyword">if</span> isempty(FitParameters(i).DeltaRF)
+0369                 <span class="comment">%error('Model delta RF (FitParameters.DeltaRF) needs to exist.');</span>
+0370                 <span class="comment">%FitParameters(i).DeltaRF = NaN;</span>
+0371                 FitParameters.DeltaRF = LocoMeasData.DeltaRF;
+0372                 fprintf(<span class="string">'   The model delta RF (FitParameters.DeltaRF) does not exist so it is being set to LocoMeasData.DeltaRF.\n'</span>);
+0373             <span class="keyword">end</span>
+0374         <span class="keyword">end</span>
+0375         <span class="keyword">if</span> isempty(FitParameters(i).DeltaRF);
+0376             fprintf(<span class="string">'   FitParameter.DeltaRF is empty so don''t use anything that requires dispersion.\n'</span>);
+0377         <span class="keyword">end</span>
+0378 
+0379         <span class="keyword">if</span> ~isfield(FitParameters(i),<span class="string">'DeltaRFSTD'</span>)
+0380             FitParameters(i).DeltaRFSTD = [];
+0381         <span class="keyword">end</span>
+0382         
+0383         <span class="comment">% Add a place holder for Chi2</span>
+0384         <span class="keyword">if</span> ~isfield(FitParameters(i),<span class="string">'Chi2'</span>)
+0385             FitParameters(i).Chi2 = [];
+0386         <span class="keyword">end</span>
+0387         
+0388         <span class="comment">% Vector length checks</span>
+0389         <span class="keyword">if</span> length(FitParameters(i).Params) ~= length(FitParameters(i).Values)
+0390             fprintf(<span class="string">'   The number of fit parameters (FitParameters(%d).Params) must equal the number of\n'</span>, i);
+0391             fprintf(<span class="string">'   fit values (FitParameters(%d).Values).\n'</span>, i);
+0392             error(<span class="string">' '</span>);
+0393         <span class="keyword">end</span>
+0394         <span class="keyword">if</span> length(FitParameters(i).Params) ~= length(FitParameters(i).Deltas)
+0395             fprintf(<span class="string">'   The number of fit parameters (FitParameters(%d).Params) must equal the number fit\n'</span>, i);
+0396             fprintf(<span class="string">'   deltas (FitParameters(%d).LocoDeltas).  Or leave LocoDeltas field blank.\n'</span>, i);
+0397             error(<span class="string">' '</span>);
+0398         <span class="keyword">end</span>
+0399         
+0400         <span class="comment">% FitParameters.Weight &amp; FitParameters.Cost moved to LocoFlags(i).Method.Cost.FitParameters</span>
+0401         <span class="keyword">if</span> isfield(FitParameters(i),<span class="string">'Weight'</span>) &amp;&amp; isfield(FitParameters(i).Weight,<span class="string">'Value'</span>) &amp;&amp; ~isempty(FitParameters(i).Weight.Value)
+0402             MeanMstd = mean(LocoMeasData.BPMSTD) / 1000;  <span class="comment">% Since LOCO is meters internally</span>
+0403             <span class="keyword">for</span> j = 1:length(FitParameters(i).Weight.Value)
+0404                 LocoFlags(i).Method.Cost.FitParameters(j,1) = FitParameters(i).Weight.Value{j}/MeanMstd;
+0405             <span class="keyword">end</span>
+0406         <span class="keyword">end</span>
+0407         <span class="keyword">if</span> isfield(FitParameters(i),<span class="string">'Cost'</span>) &amp;&amp; isfield(FitParameters(i).Cost,<span class="string">'Values'</span>) &amp;&amp; ~isempty(FitParameters(i).Cost.Values)
+0408             LocoFlags(i).Method.Cost.FitParameters = FitParameters(i).Cost.Values(:);
+0409         <span class="keyword">end</span>
+0410     <span class="keyword">end</span>
+0411 
+0412 
+0413     <span class="comment">% BPMData checks</span>
+0414     <span class="comment">%if ~isfield(BPMData(i), 'FamName')</span>
+0415     <span class="comment">%    error('BPMData field FamName must exist.');</span>
+0416     <span class="comment">%end</span>
+0417     <span class="comment">%if isempty(BPMData(i).FamName)</span>
+0418     <span class="comment">%    error('BPMData field FamName must exist.');</span>
+0419     <span class="comment">%end</span>
+0420     
+0421     <span class="keyword">if</span> ~isfield(BPMData(i), <span class="string">'HBPMIndex'</span>)
+0422         error(<span class="string">'BPMData field HBPMIndex must exist.'</span>);
+0423     <span class="keyword">end</span>
+0424     <span class="keyword">if</span> isempty(BPMData(i).HBPMIndex)
+0425         error(<span class="string">'BPMData field HBPMIndex must exist.'</span>);
+0426     <span class="keyword">end</span>
+0427     BPMData(i).HBPMIndex = BPMData(i).HBPMIndex(:);
+0428     
+0429     <span class="keyword">if</span> ~isfield(BPMData(i), <span class="string">'VBPMIndex'</span>)
+0430         error(<span class="string">'BPMData field VBPMIndex must exist.'</span>);
+0431     <span class="keyword">end</span>
+0432     <span class="keyword">if</span> isempty(BPMData(i).VBPMIndex)
+0433         error(<span class="string">'BPMData field VBPMIndex must exist.'</span>);
+0434     <span class="keyword">end</span>
+0435     BPMData(i).VBPMIndex = BPMData(i).VBPMIndex(:);
+0436 
+0437     <span class="keyword">if</span> ~isfield(BPMData(i), <span class="string">'FitGains'</span>)
+0438         BPMData(i).FitGains = Defaults_BPMFitGains;
+0439     <span class="keyword">end</span>
+0440     <span class="keyword">if</span> isempty(BPMData(i).FitGains)
+0441         BPMData(i).FitGains = Defaults_BPMFitGains;
+0442     <span class="keyword">end</span>
+0443     <span class="keyword">if</span> ~isfield(BPMData(i), <span class="string">'FitCoupling'</span>)
+0444         BPMData(i).FitCoupling = Defaults_BPMFitCoupling;
+0445     <span class="keyword">end</span>
+0446     <span class="keyword">if</span> isempty(BPMData(i).FitCoupling)
+0447         BPMData(i).FitCoupling = Defaults_BPMFitCoupling;
+0448     <span class="keyword">end</span>
+0449     
+0450     <span class="keyword">if</span> ~isfield(BPMData(i), <span class="string">'HBPMGoodDataIndex'</span>)
+0451         BPMData(i).HBPMGoodDataIndex = 1:length(BPMData(i).HBPMIndex);
+0452     <span class="keyword">end</span>
+0453     BPMData(i).HBPMGoodDataIndex = BPMData(i).HBPMGoodDataIndex(:)';
+0454     
+0455     <span class="keyword">if</span> ~isfield(BPMData(i), <span class="string">'VBPMGoodDataIndex'</span>)
+0456         BPMData(i).VBPMGoodDataIndex = 1:length(BPMData(i).VBPMIndex);
+0457     <span class="keyword">end</span>
+0458     BPMData(i).VBPMGoodDataIndex = BPMData(i).VBPMGoodDataIndex(:)';
+0459 
+0460     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'HBPMGain'</span>)
+0461         BPMData(i).HBPMGain = ones(length(BPMData(i).HBPMIndex),1);
+0462     <span class="keyword">end</span>
+0463     <span class="keyword">if</span> isempty(BPMData(i).HBPMGain)
+0464         BPMData(i).HBPMGain = ones(length(BPMData(i).HBPMIndex),1);
+0465     <span class="keyword">end</span>
+0466     BPMData(i).HBPMGain = BPMData(i).HBPMGain(:);
+0467     
+0468     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'VBPMGain'</span>)
+0469         BPMData(i).VBPMGain = ones(length(BPMData(i).VBPMIndex),1);
+0470     <span class="keyword">end</span>
+0471     <span class="keyword">if</span> isempty(BPMData(i).VBPMGain)
+0472         BPMData(i).VBPMGain = ones(length(BPMData(i).VBPMIndex),1);
+0473     <span class="keyword">end</span>
+0474     BPMData(i).VBPMGain = BPMData(i).VBPMGain(:);
+0475     
+0476     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'HBPMGainSTD'</span>)
+0477         BPMData(i).HBPMGainSTD = NaN * ones(length(BPMData(i).HBPMIndex),1);
+0478     <span class="keyword">end</span>
+0479     <span class="keyword">if</span> isempty(BPMData(i).HBPMGainSTD)
+0480         BPMData(i).HBPMGainSTD = NaN * ones(length(BPMData(i).HBPMIndex),1);
+0481     <span class="keyword">end</span>
+0482     BPMData(i).HBPMGainSTD = BPMData(i).HBPMGainSTD(:);
+0483     
+0484     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'VBPMGainSTD'</span>)
+0485         BPMData(i).VBPMGainSTD = NaN * ones(length(BPMData(i).VBPMIndex),1);
+0486     <span class="keyword">end</span>
+0487     <span class="keyword">if</span> isempty(BPMData(i).VBPMGainSTD)
+0488         BPMData(i).VBPMGainSTD = NaN * ones(length(BPMData(i).VBPMIndex),1);
+0489     <span class="keyword">end</span>
+0490     BPMData(i).VBPMGainSTD = BPMData(i).VBPMGainSTD(:);
+0491 
+0492     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'HBPMCoupling'</span>)
+0493         BPMData(i).HBPMCoupling = zeros(length(BPMData(i).HBPMIndex),1);
+0494     <span class="keyword">end</span>
+0495     <span class="keyword">if</span> isempty(BPMData(i).HBPMCoupling)
+0496         BPMData(i).HBPMCoupling = zeros(length(BPMData(i).HBPMIndex),1);
+0497     <span class="keyword">end</span>
+0498     BPMData(i).HBPMCoupling = BPMData(i).HBPMCoupling(:);
+0499     
+0500     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'VBPMCoupling'</span>)
+0501         BPMData(i).VBPMCoupling = zeros(length(BPMData(i).VBPMIndex),1);
+0502     <span class="keyword">end</span>
+0503     <span class="keyword">if</span> isempty(BPMData(i).VBPMCoupling)
+0504         BPMData(i).VBPMCoupling = zeros(length(BPMData(i).VBPMIndex),1);
+0505     <span class="keyword">end</span>
+0506     BPMData(i).VBPMCoupling = BPMData(i).VBPMCoupling(:);
+0507 
+0508     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'HBPMCouplingSTD'</span>)
+0509         BPMData(i).HBPMCouplingSTD = NaN * ones(length(BPMData(i).HBPMIndex),1);
+0510     <span class="keyword">end</span>
+0511     <span class="keyword">if</span> isempty(BPMData(i).HBPMCouplingSTD)
+0512         BPMData(i).HBPMCouplingSTD = NaN * ones(length(BPMData(i).HBPMIndex),1);
+0513     <span class="keyword">end</span>
+0514     BPMData(i).HBPMCouplingSTD = BPMData(i).HBPMCouplingSTD(:);
+0515 
+0516     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'VBPMCouplingSTD'</span>)
+0517         BPMData(i).VBPMCouplingSTD = NaN * ones(length(BPMData(i).VBPMIndex),1);
+0518     <span class="keyword">end</span>
+0519     <span class="keyword">if</span> isempty(BPMData(i).VBPMCouplingSTD)
+0520         BPMData(i).VBPMCouplingSTD = NaN * ones(length(BPMData(i).VBPMIndex),1);
+0521     <span class="keyword">end</span>
+0522     BPMData(i).VBPMCouplingSTD = BPMData(i).VBPMCouplingSTD(:);
+0523     
+0524     <span class="keyword">if</span> ~isfield(BPMData(i),<span class="string">'Cost'</span>)
+0525         BPMData(i).Cost = [];
+0526     <span class="keyword">end</span>
+0527 
+0528     
+0529     <span class="comment">% CMData checks</span>
+0530     <span class="comment">%if ~isfield(CMData(i), 'FamName')</span>
+0531     <span class="comment">%    error('CMData field FamName must exist.');</span>
+0532     <span class="comment">%end</span>
+0533     <span class="comment">%if isempty(CMData(i).FamName)</span>
+0534     <span class="comment">%    error('CMData field FamName must exist.');</span>
+0535     <span class="comment">%end</span>
+0536         
+0537     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'HCMIndex'</span>)
+0538         error(<span class="string">'CMData field HCMIndex must exist.'</span>);
+0539     <span class="keyword">end</span>
+0540     <span class="keyword">if</span> isempty(CMData(i).HCMIndex)
+0541         error(<span class="string">'CMData field HCMIndex must exist.'</span>);
+0542     <span class="keyword">end</span>
+0543     CMData(i).HCMIndex = CMData(i).HCMIndex(:);
+0544 
+0545     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'VCMIndex'</span>)
+0546         error(<span class="string">'CMData field VCMIndex must exist.'</span>);
+0547     <span class="keyword">end</span>
+0548     <span class="keyword">if</span> isempty(CMData(i).VCMIndex)
+0549         error(<span class="string">'CMData field VCMIndex must exist.'</span>);
+0550     <span class="keyword">end</span>
+0551     CMData(i).VCMIndex = CMData(i).VCMIndex(:);
+0552     
+0553     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'HCMGoodDataIndex'</span>)
+0554         CMData(i).HCMGoodDataIndex = 1:length(CMData(i).HCMIndex);
+0555     <span class="keyword">end</span>
+0556     <span class="keyword">if</span> isempty(CMData(i).HCMGoodDataIndex)
+0557         fprintf(<span class="string">'   CMData(%d).HCMGoodDataIndex is empty (ie, no horizonal correctors are being used)\n'</span>,i);
+0558     <span class="keyword">end</span>
+0559     CMData(i).HCMGoodDataIndex = CMData(i).HCMGoodDataIndex(:)';
+0560     
+0561     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'VCMGoodDataIndex'</span>)
+0562         CMData(i).VCMGoodDataIndex = 1:length(CMData(i).VCMIndex);
+0563     <span class="keyword">end</span>
+0564     <span class="keyword">if</span> isempty(CMData(i).VCMGoodDataIndex)
+0565         fprintf(<span class="string">'   CMData(%d).VCMGoodDataIndex is empty (ie, no vertical correctors are being used)\n'</span>,i);
+0566     <span class="keyword">end</span>
+0567     CMData(i).VCMGoodDataIndex = CMData(i).VCMGoodDataIndex(:)';
+0568     
+0569     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'FitKicks'</span>)
+0570         CMData(i).FitKicks  = Defaults_CMFitKicks;
+0571     <span class="keyword">end</span>
+0572     <span class="keyword">if</span> isempty(CMData(i).FitKicks)
+0573         CMData(i).FitKicks  = Defaults_CMFitKicks;
+0574     <span class="keyword">end</span>
+0575 
+0576     <span class="keyword">if</span> ~isfield(CMData(i), <span class="string">'FitCoupling'</span>)
+0577         CMData(i).FitCoupling  = Defaults_CMFitCoupling;
+0578     <span class="keyword">end</span> 
+0579     <span class="keyword">if</span> isempty(CMData(i).FitCoupling)
+0580         CMData(i).FitCoupling  = Defaults_CMFitCoupling;
+0581     <span class="keyword">end</span> 
+0582 
+0583     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'HCMKicks'</span>)
+0584         CMData(i).HCMKicks = ones(length(CMData(i).HCMIndex),1);
+0585     <span class="keyword">end</span>
+0586     <span class="keyword">if</span> isempty(CMData(i).HCMKicks)
+0587         CMData(i).HCMKicks = ones(length(CMData(i).HCMIndex),1);
+0588     <span class="keyword">end</span>
+0589     CMData(i).HCMKicks = CMData(i).HCMKicks(:);
+0590 
+0591     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'VCMKicks'</span>)
+0592         CMData(i).VCMKicks = ones(length(CMData(i).VCMIndex),1);
+0593     <span class="keyword">end</span>
+0594     <span class="keyword">if</span> isempty(CMData(i).VCMKicks)
+0595         CMData(i).VCMKicks = ones(length(CMData(i).VCMIndex),1);
+0596     <span class="keyword">end</span>
+0597     CMData(i).VCMKicks = CMData(i).VCMKicks(:);
+0598     
+0599     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'HCMEnergyShift'</span>)
+0600         CMData(i).HCMEnergyShift = zeros(length(CMData(i).HCMIndex),1);
+0601     <span class="keyword">end</span>
+0602     <span class="keyword">if</span> isempty(CMData(i).HCMEnergyShift)
+0603         CMData(i).HCMEnergyShift = zeros(length(CMData(i).HCMIndex),1);
+0604     <span class="keyword">end</span>
+0605     CMData(i).HCMEnergyShift = CMData(i).HCMEnergyShift(:);
+0606     
+0607     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'VCMEnergyShift'</span>)
+0608         CMData(i).VCMEnergyShift = zeros(length(CMData(i).VCMIndex),1);
+0609     <span class="keyword">end</span>
+0610     <span class="keyword">if</span> isempty(CMData(i).VCMEnergyShift)
+0611         CMData(i).VCMEnergyShift = zeros(length(CMData(i).VCMIndex),1);
+0612     <span class="keyword">end</span>
+0613     CMData(i).VCMEnergyShift = CMData(i).VCMEnergyShift(:);
+0614 
+0615     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'HCMEnergyShiftSTD'</span>)
+0616         CMData(i).HCMEnergyShiftSTD = NaN * ones(length(CMData(i).HCMIndex),1);
+0617     <span class="keyword">end</span>
+0618     <span class="keyword">if</span> isempty(CMData(i).HCMEnergyShiftSTD)
+0619         CMData(i).HCMEnergyShiftSTD = NaN * ones(length(CMData(i).HCMIndex),1);
+0620     <span class="keyword">end</span>
+0621     CMData(i).HCMEnergyShiftSTD = CMData(i).HCMEnergyShiftSTD(:);
+0622 
+0623     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'VCMEnergyShiftSTD'</span>)
+0624         CMData(i).VCMEnergyShiftSTD = NaN * ones(length(CMData(i).VCMIndex),1);
+0625     <span class="keyword">end</span>
+0626     <span class="keyword">if</span> isempty(CMData(i).HCMEnergyShiftSTD)
+0627         CMData(i).VCMEnergyShiftSTD = NaN * ones(length(CMData(i).VCMIndex),1);
+0628     <span class="keyword">end</span>
+0629     CMData(i).VCMEnergyShiftSTD = CMData(i).VCMEnergyShiftSTD(:);
+0630 
+0631     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'HCMCoupling'</span>)
+0632         CMData(i).HCMCoupling = zeros(length(CMData(i).HCMIndex),1);
+0633     <span class="keyword">end</span>
+0634     <span class="keyword">if</span> isempty(CMData(i).HCMCoupling)
+0635         CMData(i).HCMCoupling = zeros(length(CMData(i).HCMIndex),1);
+0636     <span class="keyword">end</span>
+0637     CMData(i).HCMCoupling = CMData(i).HCMCoupling(:);
+0638 
+0639     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'VCMCoupling'</span>)
+0640         CMData(i).VCMCoupling = zeros(length(CMData(i).VCMIndex),1);
+0641     <span class="keyword">end</span>
+0642     <span class="keyword">if</span> isempty(CMData(i).VCMCoupling)
+0643         CMData(i).VCMCoupling = zeros(length(CMData(i).VCMIndex),1);
+0644     <span class="keyword">end</span>
+0645     CMData(i).VCMCoupling = CMData(i).VCMCoupling(:);
+0646 
+0647     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'HCMKicksSTD'</span>)
+0648         CMData(i).HCMKicksSTD = NaN * ones(length(CMData(i).HCMIndex),1);
+0649     <span class="keyword">end</span>
+0650     <span class="keyword">if</span> isempty(CMData(i).HCMKicksSTD)
+0651         CMData(i).HCMKicksSTD = NaN * ones(length(CMData(i).HCMIndex),1);
+0652     <span class="keyword">end</span>
+0653     CMData(i).HCMKicksSTD =CMData(i).HCMKicksSTD(:);
+0654 
+0655     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'VCMKicksSTD'</span>)
+0656         CMData(i).VCMKicksSTD = NaN * ones(length(CMData(i).VCMIndex),1);
+0657     <span class="keyword">end</span>
+0658     <span class="keyword">if</span> isempty(CMData(i).VCMKicksSTD)
+0659         CMData(i).VCMKicksSTD = NaN * ones(length(CMData(i).VCMIndex),1);
+0660     <span class="keyword">end</span>
+0661     CMData(i).VCMKicksSTD =CMData(i).VCMKicksSTD(:);
+0662 
+0663     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'HCMCouplingSTD'</span>)
+0664         CMData(i).HCMCouplingSTD = NaN * ones(length(CMData(i).HCMIndex),1);
+0665     <span class="keyword">end</span>
+0666     <span class="keyword">if</span> isempty(CMData(i).HCMCouplingSTD)
+0667         CMData(i).HCMCouplingSTD = NaN * ones(length(CMData(i).HCMIndex),1);
+0668     <span class="keyword">end</span>
+0669     CMData(i).HCMCouplingSTD = CMData(i).HCMCouplingSTD(:);
+0670     
+0671     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'VCMCouplingSTD'</span>)
+0672         CMData(i).VCMCouplingSTD = NaN * ones(length(CMData(i).VCMIndex),1);
+0673     <span class="keyword">end</span>
+0674     <span class="keyword">if</span> isempty(CMData(i).VCMCouplingSTD)
+0675         CMData(i).VCMCouplingSTD = NaN * ones(length(CMData(i).VCMIndex),1);
+0676     <span class="keyword">end</span>
+0677     CMData(i).VCMCouplingSTD = CMData(i).VCMCouplingSTD(:);
+0678     
+0679     <span class="keyword">if</span> ~isfield(CMData(i),<span class="string">'Cost'</span>)
+0680         CMData(i).Cost = [];
+0681     <span class="keyword">end</span>
+0682 
+0683         
+0684     <span class="comment">% LocoModel checks</span>
+0685     <span class="keyword">if</span> ~isfield(LocoModel(i),<span class="string">'M'</span>)
+0686         LocoModel(i).M = [];
+0687     <span class="keyword">end</span>
+0688     
+0689     <span class="keyword">if</span> ~isfield(LocoModel(i),<span class="string">'Eta'</span>)
+0690         LocoModel(i).Eta = [];
+0691     <span class="keyword">end</span>
+0692     LocoModel(i).Eta = LocoModel(i).Eta(:);
+0693 
+0694     <span class="comment">% LocoModel.SValues moved to LocoFlags.Method</span>
+0695     <span class="keyword">if</span> isfield(LocoModel(i),<span class="string">'SValues'</span>)
+0696         LocoFlags(i).Method.SV = LocoModel(i).SValues;
+0697     <span class="keyword">end</span>
+0698     <span class="keyword">if</span> isfield(LocoModel(i),<span class="string">'SValuesIndex'</span>)
+0699         LocoFlags(i).Method.SVIndex = LocoModel(i).SValuesIndex;
+0700     <span class="keyword">end</span>
+0701     
+0702     <span class="keyword">if</span> ~isfield(LocoModel(i),<span class="string">'OutlierIndex'</span>)
+0703         LocoModel(i).OutlierIndex = [];
+0704     <span class="keyword">end</span>
+0705     
+0706     <span class="keyword">if</span> ~isfield(LocoModel(i),<span class="string">'EtaOutlierIndex'</span>)
+0707         LocoModel(i).EtaOutlierIndex = [];
+0708     <span class="keyword">end</span>
+0709     
+0710     <span class="keyword">if</span> ~isfield(LocoModel(i),<span class="string">'ChiSquare'</span>)
+0711         LocoModel(i).ChiSquare = [];
+0712     <span class="keyword">end</span>
+0713     
+0714      
+0715     <span class="comment">% Checks response matrix size</span>
+0716     <span class="keyword">if</span> size(LocoMeasData.M,1) ~= length(BPMData(i).HBPMIndex)+length(BPMData(i).VBPMIndex) 
+0717         fprintf(<span class="string">'\n   LocoMeasData.M is size %d x %d\n'</span>, size(LocoMeasData.M)) 
+0718         fprintf(<span class="string">'   NHBPM + NVBPM = %d + %d = %d\n'</span>, length(BPMData(i).HBPMIndex), length(BPMData(i).VBPMIndex), length(BPMData(i).HBPMIndex)+length(BPMData(i).VBPMIndex));
+0719         fprintf(<span class="string">'   NHCM  +  NVCM = %d + %d = %d\n'</span>, length(CMData(i).HCMIndex), length(CMData(i).VCMIndex), length(CMData(i).HCMIndex)+length(CMData(i).VCMIndex));
+0720         fprintf(<span class="string">'   The number of rows in the response matrix (LocoMeasData.M) must equal the\n'</span>);
+0721         fprintf(<span class="string">'   number of BPMs in BPMData(%d) (length(BPMData.HBPMIndex)+length(BPMData.VBPMIndex))\n'</span>, i);
+0722         fprintf(<span class="string">'   NOTE: the HBPMGoodDataIndex, VBPMGoodDataIndex, HCMGoodDataIndex, VCMGoodDataIndex do not matter.\n\n'</span>);
+0723         error(<span class="string">' '</span>);
+0724     <span class="keyword">end</span>
+0725     
+0726     <span class="keyword">if</span> size(LocoMeasData.M,2) ~= length(CMData(i).HCMIndex)+length(CMData(i).VCMIndex) 
+0727         fprintf(<span class="string">'\n   LocoMeasData.M is size %d x %d\n'</span>, size(LocoMeasData.M)) 
+0728         fprintf(<span class="string">'   NHBPM + NVBPM = %d + %d = %d\n'</span>, length(BPMData(i).HBPMIndex), length(BPMData(i).VBPMIndex), length(BPMData(i).HBPMIndex)+length(BPMData(i).VBPMIndex));
+0729         fprintf(<span class="string">'   NHCM  +  NVCM = %d + %d = %d\n'</span>, length(CMData(i).HCMIndex), length(CMData(i).VCMIndex), length(CMData(i).HCMIndex)+length(CMData(i).VCMIndex));
+0730         fprintf(<span class="string">'   The number of columns in the response matrix (LocoMeasData.M) must equal the\n'</span>);
+0731         fprintf(<span class="string">'   number of correctors in CMData(%d) (length(CMData.HCMIndex)+length(CMData.VCMIndex))\n'</span>, i);
+0732         fprintf(<span class="string">'   NOTE: the HBPMGoodDataIndex, VBPMGoodDataIndex, HCMGoodDataIndex, VCMGoodDataIndex do not matter.\n\n'</span>);
+0733         error(<span class="string">' '</span>);
+0734     <span class="keyword">end</span>
+0735        
+0736     
+0737     <span class="comment">% Checks to add:</span>
+0738     <span class="comment">% 1.  yes/no questions must be a yes or no answer</span>
+0739     <span class="comment">% 2.  Indexing in the vectors must be in range</span>
+0740     
+0741 <span class="keyword">end</span>
+0742 
+0743 
+0744 <span class="comment">% LocoModel.Normalize moved to LocoFlags.Normalization.Flag</span>
+0745 <span class="keyword">if</span> isfield(LocoFlags,<span class="string">'Normalize'</span>)
+0746     LocoFlags = rmfield(LocoFlags,<span class="string">'Normalize'</span>);
+0747 <span class="keyword">end</span>
+0748 
+0749 <span class="comment">% LocoModel.SValues moved to LocoFlags.Method</span>
+0750 <span class="keyword">if</span> isfield(LocoModel,<span class="string">'SValues'</span>)
+0751     LocoModel = rmfield(LocoModel,<span class="string">'SValues'</span>);
+0752 <span class="keyword">end</span>
+0753 <span class="keyword">if</span> isfield(LocoModel,<span class="string">'SValuesIndex'</span>)
+0754     LocoModel = rmfield(LocoModel,<span class="string">'SValuesIndex'</span>);
+0755 <span class="keyword">end</span>
+0756 
+0757 <span class="comment">% FitParameters.Weight &amp; FitParameters.Cost moved to LocoFlags(i).Method.Cost.FitParameters</span>
+0758 <span class="keyword">if</span> isfield(FitParameters,<span class="string">'Weight'</span>)
+0759     FitParameters = rmfield(FitParameters,<span class="string">'Weight'</span>);
+0760 <span class="keyword">end</span>
+0761 <span class="keyword">if</span> isfield(FitParameters,<span class="string">'Cost'</span>)
+0762     FitParameters = rmfield(FitParameters,<span class="string">'Cost'</span>);
+0763 <span class="keyword">end</span>
+0764 
+0765 
+0766 <span class="comment">% BPMSTD cannot be zero (only check good BPMs)</span>
+0767 <span class="comment">%i = find(LocoMeasData.BPMSTD == 0);</span>
+0768 <span class="comment">% Index = [BPMData.HBPMGoodDataIndex BPMData.VBPMGoodDataIndex];</span>
+0769 <span class="comment">% i = find(LocoMeasData.BPMSTD(Index) == 0);</span>
+0770 <span class="comment">% if ~isempty(i);</span>
+0771 <span class="comment">%     fprintf('   %d of BPM standard deviations (LocoMeasData.BPMSTD) are zero.\n',length(i));</span>
+0772 <span class="comment">% end</span>
+0773 
+0774 
+0775 <span class="keyword">try</span>
+0776     iBPM = 1:size(LocoMeasData.HBPM.DeviceList,1);
+0777     iBPM = iBPM(BPMData(end).HBPMGoodDataIndex);
+0778     i = find(LocoMeasData.BPMSTD(iBPM) == 0);
+0779     <span class="keyword">if</span> ~isempty(i);
+0780         <span class="keyword">if</span> length(i) &lt; 15
+0781             <span class="keyword">for</span> j = 1:length(i)
+0782                 fprintf(<span class="string">'   Zero standard deviation in horizontal BPM %d or device [%d,%d]  (LocoMeasData.BPMSTD)\n'</span>, iBPM(i(j)), LocoMeasData.HBPM.DeviceList(iBPM(i(j)),:));
+0783             <span class="keyword">end</span>
+0784         <span class="keyword">else</span>
+0785             fprintf(<span class="string">'   %d of the horizontal BPM standard deviations (LocoMeasData.BPMSTD) are zero.\n'</span>, length(i));
+0786         <span class="keyword">end</span>
+0787         
+0788         <span class="comment">% Remove from the good data index</span>
+0789         fprintf(<span class="string">'   %d horizontal BPM removed from the HBPMGoodDataIndex.\n\n'</span>, length(i));
+0790         iBPM = (1:size(LocoMeasData.HBPM.DeviceList,1))';
+0791         i = find(LocoMeasData.BPMSTD(iBPM) == 0);
+0792         k = findrowindex(i, BPMData(end).HBPMGoodDataIndex(:));
+0793         BPMData(end).HBPMGoodDataIndex(k) = [];
+0794     <span class="keyword">end</span>
+0795 
+0796     NHBPM = size(LocoMeasData.HBPM.DeviceList,1);
+0797     iBPM = NHBPM + (1:size(LocoMeasData.VBPM.DeviceList,1));
+0798     iBPM = iBPM(BPMData(end).VBPMGoodDataIndex);
+0799     i = find(LocoMeasData.BPMSTD(iBPM) == 0);
+0800     <span class="keyword">if</span> ~isempty(i);
+0801         <span class="keyword">if</span> length(i) &lt; 15
+0802             <span class="keyword">for</span> j = 1:length(i)
+0803                 fprintf(<span class="string">'   Zero standard deviation in vertical BPM %d or device [%d,%d]  (LocoMeasData.BPMSTD)\n'</span>, iBPM(i(j))-NHBPM, LocoMeasData.VBPM.DeviceList(iBPM(i(j))-NHBPM,:));
+0804             <span class="keyword">end</span>
+0805         <span class="keyword">else</span>
+0806             fprintf(<span class="string">'   %d of the vertical BPM standard deviations (LocoMeasData.BPMSTD) are zero.\n'</span>, length(i));
+0807         <span class="keyword">end</span>
+0808 
+0809         <span class="comment">% Remove from the good data index</span>
+0810         fprintf(<span class="string">'   %d vertical BPM removed from the VBPMGoodDataIndex.\n\n'</span>, length(i));
+0811         iBPM = NHBPM + (1:size(LocoMeasData.VBPM.DeviceList,1))';
+0812         i = find(LocoMeasData.BPMSTD(iBPM) == 0);
+0813         k = findrowindex(i, BPMData(end).VBPMGoodDataIndex(:));
+0814         BPMData(end).VBPMGoodDataIndex(k) = [];
+0815     <span class="keyword">end</span>
+0816 <span class="keyword">catch</span>
+0817     i = find(LocoMeasData.BPMSTD == 0);
+0818     <span class="keyword">if</span> ~isempty(i);
+0819         fprintf(<span class="string">'   %d BPM standard deviations (LocoMeasData.BPMSTD) are zero.\n   A problem occurred trying to remove them.\n'</span>, length(i));
+0820     <span class="keyword">end</span>
+0821 <span class="keyword">end</span>
+0822 
+0823 
+0824 <span class="comment">% Remove old variable names</span>
+0825 <span class="keyword">if</span> isfield(LocoFlags, <span class="string">'ResponseMatrixCalculatorFlag1'</span>)
+0826     LocoFlags = rmfield(LocoFlags,<span class="string">'ResponseMatrixCalculatorFlag1'</span>);
+0827 <span class="keyword">end</span>
+0828 <span class="keyword">if</span> isfield(LocoFlags, <span class="string">'ResponseMatrixCalculatorFlag2'</span>)
+0829     LocoFlags = rmfield(LocoFlags,<span class="string">'ResponseMatrixCalculatorFlag2'</span>);
+0830 <span class="keyword">end</span>
+0831 
+0832 
+0833 <span class="comment">% Save</span>
+0834 <span class="keyword">if</span> ischar(FileName)
+0835     pause(.1);
+0836     save(FileName, <span class="string">'LocoModel'</span>, <span class="string">'FitParameters'</span>, <span class="string">'BPMData'</span>, <span class="string">'CMData'</span>, <span class="string">'RINGData'</span>, <span class="string">'LocoMeasData'</span>, <span class="string">'LocoFlags'</span>);
+0837 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

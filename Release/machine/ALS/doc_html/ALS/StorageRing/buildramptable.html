@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of buildramptable</title>
+  <meta name="keywords" content="buildramptable">
+  <meta name="description" content="BUILDRAMPTABLE - Builds a ramp table used by amp2k and k2amp">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; buildramptable.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>buildramptable
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>BUILDRAMPTABLE - Builds a ramp table used by amp2k and k2amp</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function buildramptable </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">BUILDRAMPTABLE - Builds a ramp table used by amp2k and k2amp
+  Builds the ramp tables for the major magnet families: BEND, QFA, QDA, QF, QD, SF, SD.
+  The online model converts for amp2k and k2amp based on this function.
+
+  NOTES
+  1. The AT model must be accurate before running this function.  Ideally, the AT 
+     model will be the best LOCO calibrated model.
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="srcycle.html" class="code" title="function FailFlag = srcycle(varargin)">srcycle</a>	SRCYCLE - Storage ring cycle</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function buildramptable</a>
+0002 <span class="comment">%BUILDRAMPTABLE - Builds a ramp table used by amp2k and k2amp</span>
+0003 <span class="comment">%  Builds the ramp tables for the major magnet families: BEND, QFA, QDA, QF, QD, SF, SD.</span>
+0004 <span class="comment">%  The online model converts for amp2k and k2amp based on this function.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  NOTES</span>
+0007 <span class="comment">%  1. The AT model must be accurate before running this function.  Ideally, the AT</span>
+0008 <span class="comment">%     model will be the best LOCO calibrated model.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  Written by Greg Portmann</span>
+0011 
+0012 
+0013 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0014 <span class="comment">% Ramp up table %</span>
+0015 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0016 
+0017 OpsDataDirectory = getfamilydata(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0018 
+0019 iFileSep = findstr(OpsDataDirectory, filesep);
+0020 <span class="comment">% if length(iFileSep) &gt; 0</span>
+0021 <span class="comment">%     MasterRampDirectory = [OpsDataDirectory(1:iFileSep(end-2)), 'StorageRing', filesep];</span>
+0022 <span class="comment">% else</span>
+0023 <span class="comment">%     error('Problem knowing the directory location for the master ramp text file.');</span>
+0024 <span class="comment">% end</span>
+0025 <span class="comment">% load([MasterRampDirectory, 'rampmastup.txt']);</span>
+0026 
+0027 <span class="comment">% It's best not to assume data files are on the path for stand-alone (or use flag -a to include it in the compile)</span>
+0028 load(<span class="string">'rampmastup.txt'</span>);
+0029 a = rampmastup;
+0030 
+0031 RampTable.GeV           = a(1:end-1,1)';
+0032 RampTable.BEND.Setpoint = a(1:end-1,2)';
+0033 RampTable.QFA.Setpoint  = a(1:end-1,3)';
+0034 RampTable.QF.Setpoint   = a(1:end-1,4)';
+0035 RampTable.QD.Setpoint   = a(1:end-1,5)';
+0036 RampTable.SF.Setpoint   = a(1:end-1,6)';
+0037 RampTable.SD.Setpoint   = a(1:end-1,7)';
+0038 
+0039 
+0040 <span class="comment">% Normalized tables</span>
+0041 RampTable.GeV           = (RampTable.GeV          - RampTable.GeV(1))           / (RampTable.GeV(end)          - RampTable.GeV(1));
+0042 RampTable.BEND.Setpoint = (RampTable.BEND.Setpoint- RampTable.BEND.Setpoint(1)) / (RampTable.BEND.Setpoint(end)- RampTable.BEND.Setpoint(1));
+0043 RampTable.QFA.Setpoint  = (RampTable.QFA.Setpoint - RampTable.QFA.Setpoint(1))  / (RampTable.QFA.Setpoint(end) - RampTable.QFA.Setpoint(1));
+0044 RampTable.QF.Setpoint   = (RampTable.QF.Setpoint  - RampTable.QF.Setpoint(1))   / (RampTable.QF.Setpoint(end)  - RampTable.QF.Setpoint(1));
+0045 RampTable.QD.Setpoint   = (RampTable.QD.Setpoint  - RampTable.QD.Setpoint(1))   / (RampTable.QD.Setpoint(end)  - RampTable.QD.Setpoint(1));
+0046 RampTable.SF.Setpoint   = (RampTable.SF.Setpoint  - RampTable.SF.Setpoint(1))   / (RampTable.SF.Setpoint(end)  - RampTable.SF.Setpoint(1));
+0047 RampTable.SD.Setpoint   = (RampTable.SD.Setpoint  - RampTable.SD.Setpoint(1))   / (RampTable.SD.Setpoint(end)  - RampTable.SD.Setpoint(1));
+0048 
+0049 <span class="comment">% Base QDA on QD???</span>
+0050 RampTable.QDA.Setpoint   = (RampTable.QD.Setpoint  - RampTable.QD.Setpoint(1))   / (RampTable.QD.Setpoint(end)  - RampTable.QD.Setpoint(1));
+0051 
+0052 <span class="comment">% RampTable.HCMCHICANE.Setpoint = linspace(0, 1, length(RampTable.GeV));</span>
+0053 <span class="comment">% RampTable.VCMCHICANE.Setpoint = linspace(0, 1, length(RampTable.GeV));</span>
+0054 
+0055 
+0056 <span class="comment">% Add the K values to the ramp table (get from the AT lattice)</span>
+0057 fprintf(<span class="string">'   The k-value for the ramp tables come from the present AT\n'</span>);
+0058 fprintf(<span class="string">'   lattice so make sure the proper AT lattice is loaded.\n'</span>);
+0059 FieldNamesCell = fieldnames(RampTable);
+0060 <span class="keyword">for</span> i = 1:length(FieldNamesCell)
+0061     <span class="keyword">if</span> ~strcmpi(FieldNamesCell{i}, <span class="string">'GeV'</span>)
+0062         RampTable.(FieldNamesCell{i}).Physics = getpvmodel(FieldNamesCell{i}, <span class="string">'Setpoint'</span>, family2dev(FieldNamesCell{i},0), <span class="string">'Physics'</span>);
+0063     <span class="keyword">end</span>
+0064 <span class="keyword">end</span>
+0065 
+0066 
+0067 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0068 <span class="comment">% Add the upper &amp; lower lattices of the cycle %</span>
+0069 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0070 
+0071 <span class="comment">% Get the upper and lower cycled lattices</span>
+0072 load(getfamilydata(<span class="string">'OpsData'</span>, <span class="string">'HysteresisLoopUpperLattice'</span>));
+0073 RampTable.UpperLattice.Setpoint = ConfigSetpoint;
+0074 RampTable.UpperLattice.Monitor  = ConfigMonitor;
+0075 
+0076 load(getfamilydata(<span class="string">'OpsData'</span>, <span class="string">'HysteresisLoopLowerLattice'</span>));
+0077 RampTable.LowerLattice.Setpoint = ConfigSetpoint;
+0078 RampTable.LowerLattice.Monitor  = ConfigMonitor;
+0079 
+0080 <span class="comment">% % Remove some families</span>
+0081 <span class="comment">% RampTable.UpperLattice.Setpoint = RemoveSomeFamilies(RampTable.UpperLattice.Setpoint);</span>
+0082 <span class="comment">% RampTable.UpperLattice.Monitor  = RemoveSomeFamilies(RampTable.UpperLattice.Monitor);</span>
+0083 <span class="comment">% RampTable.LowerLattice.Setpoint = RemoveSomeFamilies(RampTable.LowerLattice.Setpoint);</span>
+0084 <span class="comment">% RampTable.LowerLattice.Monitor  = RemoveSomeFamilies(RampTable.LowerLattice.Monitor);</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">% % Remove some fields</span>
+0087 <span class="comment">% RampTable.UpperLattice.Setpoint = RemoveSomeFields(RampTable.UpperLattice.Setpoint);</span>
+0088 <span class="comment">% RampTable.UpperLattice.Monitor  = RemoveSomeFields(RampTable.UpperLattice.Monitor);</span>
+0089 <span class="comment">% RampTable.LowerLattice.Setpoint = RemoveSomeFields(RampTable.LowerLattice.Setpoint);</span>
+0090 <span class="comment">% RampTable.LowerLattice.Monitor  = RemoveSomeFields(RampTable.LowerLattice.Monitor);</span>
+0091 
+0092 
+0093 <span class="comment">% Absolute table</span>
+0094 <span class="comment">%GeVUpper = 1.89086196873342;  % 1.894, 1.8904 or 1.89086196873342???</span>
+0095 <span class="comment">%GeVLower = 1.522;             % Most operational modes use 1.522 GeV injection</span>
+0096 GeVUpper = getfamilydata(<span class="string">'Energy'</span>);
+0097 GeVLower = getfamilydata(<span class="string">'InjectionEnergy'</span>);
+0098 
+0099 fprintf(<span class="string">'   Building a table to ramp between %.4f and %.4f GeV.\n'</span>, GeVLower, GeVUpper);
+0100 fprintf(<span class="string">'   Change AD.Energy or AD.InjectionEnergy if this is not correct.\n'</span>);
+0101 
+0102 RampTable.GeV = (GeVUpper - GeVLower) * RampTable.GeV + GeVLower;
+0103 
+0104 
+0105 save([OpsDataDirectory, <span class="string">'alsrampup'</span>], <span class="string">'RampTable'</span>);
+0106 
+0107 
+0108 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0109 <span class="comment">% Ramp down table %</span>
+0110 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0111 <span class="comment">%load([MasterRampDirectory, 'rampmastdown.txt']);</span>
+0112 load(<span class="string">'rampmastdown.txt'</span>);
+0113 a = rampmastdown;
+0114 
+0115 RampTable.GeV           = a(2:<span class="keyword">end</span>,1)';
+0116 RampTable.BEND.Setpoint = a(2:<span class="keyword">end</span>,2)';
+0117 RampTable.QFA.Setpoint  = a(2:<span class="keyword">end</span>,3)';
+0118 RampTable.QF.Setpoint   = a(2:<span class="keyword">end</span>,4)';
+0119 RampTable.QD.Setpoint   = a(2:<span class="keyword">end</span>,5)';
+0120 RampTable.SF.Setpoint   = a(2:<span class="keyword">end</span>,6)';
+0121 RampTable.SD.Setpoint   = a(2:<span class="keyword">end</span>,7)';
+0122 
+0123 
+0124 <span class="comment">% Store normalized table</span>
+0125 RampTable.GeV           = (RampTable.GeV          - RampTable.GeV(end))           / (RampTable.GeV(1)          - RampTable.GeV(end));
+0126 RampTable.BEND.Setpoint = (RampTable.BEND.Setpoint- RampTable.BEND.Setpoint(end)) / (RampTable.BEND.Setpoint(1)- RampTable.BEND.Setpoint(end));
+0127 RampTable.QFA.Setpoint  = (RampTable.QFA.Setpoint - RampTable.QFA.Setpoint(end))  / (RampTable.QFA.Setpoint(1) - RampTable.QFA.Setpoint(end));
+0128 RampTable.QF.Setpoint   = (RampTable.QF.Setpoint  - RampTable.QF.Setpoint(end))   / (RampTable.QF.Setpoint(1)  - RampTable.QF.Setpoint(end));
+0129 RampTable.QD.Setpoint   = (RampTable.QD.Setpoint  - RampTable.QD.Setpoint(end))   / (RampTable.QD.Setpoint(1)  - RampTable.QD.Setpoint(end));
+0130 RampTable.SF.Setpoint   = (RampTable.SF.Setpoint  - RampTable.SF.Setpoint(end))   / (RampTable.SF.Setpoint(1)  - RampTable.SF.Setpoint(end));
+0131 RampTable.SD.Setpoint   = (RampTable.SD.Setpoint  - RampTable.SD.Setpoint(end))   / (RampTable.SD.Setpoint(1)  - RampTable.SD.Setpoint(end));
+0132 
+0133 <span class="comment">% Base QDA on QD???</span>
+0134 RampTable.QDA.Setpoint  = (RampTable.QD.Setpoint  - RampTable.QD.Setpoint(end))   / (RampTable.QD.Setpoint(1)  - RampTable.QD.Setpoint(end));
+0135 
+0136 <span class="comment">%RampTable.HCMCHICANE.Setpoint = linspace(0, 1, length(RampTable.GeV));</span>
+0137 <span class="comment">%RampTable.VCMCHICANE.Setpoint = linspace(0, 1, length(RampTable.GeV));</span>
+0138 
+0139 
+0140 <span class="comment">% Absolute table</span>
+0141 RampTable.GeV = (GeVUpper - GeVLower) * RampTable.GeV + GeVLower;
+0142 
+0143 <span class="comment">% MagnetTable = (UpperLattice(iDevUpper) - LowerLattice(iDevLower)) * MagnetTable;</span>
+0144 <span class="comment">% for j = 1:size(MagnetTable,1)</span>
+0145 <span class="comment">%     MagnetTable(j,:) = MagnetTable(j,:) + LowerLattice(iDevLower(j));</span>
+0146 <span class="comment">% end</span>
+0147 
+0148 
+0149 <span class="comment">% K values</span>
+0150 <span class="keyword">for</span> i = 1:length(FieldNamesCell)
+0151     <span class="keyword">if</span> ~strcmpi(FieldNamesCell{i}, <span class="string">'GeV'</span>)
+0152         RampTable.(FieldNamesCell{i}).Physics = getpvmodel(FieldNamesCell{i}, <span class="string">'Setpoint'</span>, family2dev(FieldNamesCell{i},0), <span class="string">'Physics'</span>);
+0153     <span class="keyword">end</span>
+0154 <span class="keyword">end</span>
+0155 
+0156 save([OpsDataDirectory, <span class="string">'alsrampdown'</span>], <span class="string">'RampTable'</span>);
+0157 
+0158 fprintf(<span class="string">'   Ramp  up  table saved to %s.mat\n'</span>, [OpsDataDirectory, <span class="string">'alsrampup'</span>]);
+0159 fprintf(<span class="string">'   Ramp down table saved to %s.mat\n'</span>, [OpsDataDirectory, <span class="string">'alsrampdown'</span>]);
+0160 <span class="keyword">return</span>
+0161 
+0162 
+0163 <span class="comment">% function Lattice = RemoveSomeFamilies(Lattice)</span>
+0164 <span class="comment">% % Remove families</span>
+0165 <span class="comment">% RemoveFamilyNames = {'HCMCHICANE','HCMCHICANEM','VCMCHICANE','SQEPU','SQSF','SQSD','RF','GeV','DCCT'};</span>
+0166 <span class="comment">% j = find(isfield(Lattice, RemoveFamilyNames));</span>
+0167 <span class="comment">% Lattice = rmfield(Lattice, RemoveFamilyNames(j));</span>
+0168 <span class="comment">% return</span>
+0169 <span class="comment">%</span>
+0170 <span class="comment">%</span>
+0171 <span class="comment">% function Lattice  = RemoveSomeFields(Lattice);</span>
+0172 <span class="comment">% % Remove fields</span>
+0173 <span class="comment">% RemoveFieldNames = {'RampRate','TimeConstant','DAC','Trim','FF1','FF2'};</span>
+0174 <span class="comment">% Fields = fieldnames(Lattice);</span>
+0175 <span class="comment">% for i = 1:length(Fields)</span>
+0176 <span class="comment">%     j = find(isfield(Lattice.(Fields{i}), RemoveFieldNames));</span>
+0177 <span class="comment">%     Lattice.(Fields{i}) = rmfield(Lattice.(Fields{i}), RemoveFieldNames(j));</span>
+0178 <span class="comment">% end</span>
+0179 <span class="comment">% return</span>
+0180</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

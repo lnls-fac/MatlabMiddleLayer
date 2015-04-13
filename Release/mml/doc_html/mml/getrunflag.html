@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getrunflag</title>
+  <meta name="keywords" content="getrunflag">
+  <meta name="description" content="GETRUNFLAG - Returns position if the device is in the process of changing a setpoint">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; getrunflag.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getrunflag
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [RunFlag, Delta, Tol] = getrunflag(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETRUNFLAG - Returns position if the device is in the process of changing a setpoint
+  If using family name, field, device list method,
+  [RunFlag, Delta, Tol] = getrunflag(Family, Field, DeviceList)
+  [RunFlag, Delta, Tol] = getrunflag(Family, DeviceList)  
+
+  If using channel name method,
+  [RunFlag, Delta] = getrunflag(ChannelNames)
+
+  INPUTS
+  1. Family - Family Name 
+              Common Name(s)
+              ChannelName(s)
+  2. Field - Field name  {Default: 'Setpoint')
+  3. DeviceList - [Sector Device #] or [element #] list {Default or empty list: whole family}
+
+  OUTPUTS
+  1. RunFlag - 1 if monitor has not reached the setpoint (Column vector)
+               0 if the monitor and the setpoint are within tolerance (Column vector)
+               [] runflag not found
+  2. Delta - Diffence between where it is and where is should be.
+  3. Tol - Allowed tolerance between the setpoint and the monitor
+
+  NOTES
+  1. If inputs are cell arrays, then outputs are cell arrays.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="channel2family.html" class="code" title="function [FamilyName, Field, DeviceList, ErrorFlag] = channel2family(varargin)">channel2family</a>	CHANNEL2FAMILY - Convert a channel name to a Family, Field, DeviceList</li><li><a href="common2family.html" class="code" title="function [FamilyName, DeviceList, ErrorFlag] = common2family(varargin)">common2family</a>	COMMON2FAMILY - Convert a common name to a family name</li><li><a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>	FAMILY2TOL - Return the (SP-AM) tolerance for a family</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li><li><a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>	GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</li><li><a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>	INPUTPARSINGFFD - Parses the typical input line of Family, Field, DeviceList</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>	RAW2REAL - Converts raw control system data to calibrated values</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>	GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</li><li><a href="setpv.html" class="code" title="function ErrorFlag = setpv(varargin)">setpv</a>	SETPV - Setpoint change of the online system or model</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [RunFlag, Delta, Tol] = getrunflag(varargin)</a>
+0002 <span class="comment">%GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</span>
+0003 <span class="comment">%  If using family name, field, device list method,</span>
+0004 <span class="comment">%  [RunFlag, Delta, Tol] = getrunflag(Family, Field, DeviceList)</span>
+0005 <span class="comment">%  [RunFlag, Delta, Tol] = getrunflag(Family, DeviceList)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  If using channel name method,</span>
+0008 <span class="comment">%  [RunFlag, Delta] = getrunflag(ChannelNames)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%  INPUTS</span>
+0011 <span class="comment">%  1. Family - Family Name</span>
+0012 <span class="comment">%              Common Name(s)</span>
+0013 <span class="comment">%              ChannelName(s)</span>
+0014 <span class="comment">%  2. Field - Field name  {Default: 'Setpoint')</span>
+0015 <span class="comment">%  3. DeviceList - [Sector Device #] or [element #] list {Default or empty list: whole family}</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  OUTPUTS</span>
+0018 <span class="comment">%  1. RunFlag - 1 if monitor has not reached the setpoint (Column vector)</span>
+0019 <span class="comment">%               0 if the monitor and the setpoint are within tolerance (Column vector)</span>
+0020 <span class="comment">%               [] runflag not found</span>
+0021 <span class="comment">%  2. Delta - Diffence between where it is and where is should be.</span>
+0022 <span class="comment">%  3. Tol - Allowed tolerance between the setpoint and the monitor</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  NOTES</span>
+0025 <span class="comment">%  1. If inputs are cell arrays, then outputs are cell arrays.</span>
+0026 
+0027 <span class="comment">%  Written by Greg Portmann</span>
+0028 
+0029 
+0030 <span class="keyword">if</span> nargin == 0
+0031     error(<span class="string">'Must have at least one input (Family or Channel Name).'</span>);
+0032 <span class="keyword">end</span>
+0033 
+0034 
+0035 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0036 <span class="comment">% Cell Array Inputs %</span>
+0037 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0038 <span class="keyword">if</span> iscell(varargin{1})
+0039     <span class="comment">% Cell arrays</span>
+0040     <span class="keyword">for</span> i = 1:length(varargin{1})
+0041         <span class="keyword">if</span> nargin &lt; 2
+0042             [RunFlag{i}, Delta{i}, Tol{i}] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(varargin{1}{i});
+0043         <span class="keyword">elseif</span> nargin &lt; 3
+0044             <span class="keyword">if</span> iscell(varargin{2})
+0045                 [RunFlag{i}, Delta{i}, Tol{i}] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(varargin{1}{i}, varargin{2}{i});
+0046             <span class="keyword">else</span>
+0047                 [RunFlag{i}, Delta{i}, Tol{i}] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(varargin{1}{i}, varargin{2});
+0048             <span class="keyword">end</span>
+0049         <span class="keyword">else</span>
+0050             <span class="keyword">if</span> iscell(varargin{3})
+0051                 [RunFlag{i}, Delta{i}, Tol{i}] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(varargin{1}{i}, varargin{2}{i}, varargin{3}{i});
+0052             <span class="keyword">else</span>
+0053                 [RunFlag{i}, Delta{i}, Tol{i}] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(varargin{1}{i}, varargin{2}{i}, varargin{3});
+0054             <span class="keyword">end</span>
+0055         <span class="keyword">end</span>
+0056     <span class="keyword">end</span>
+0057     <span class="keyword">return</span>
+0058 <span class="keyword">end</span>
+0059 
+0060 
+0061 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0062 <span class="comment">% Common Name Inputs %</span>
+0063 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0064 <span class="keyword">if</span> isempty(varargin{1})
+0065     <span class="comment">% Common names with no family name</span>
+0066     <span class="keyword">if</span> nargin &lt; 2
+0067         error(<span class="string">'If Family=[], 2 inputs are required.'</span>);
+0068     <span class="keyword">end</span>
+0069     CommonNames = varargin{3};
+0070     <span class="keyword">for</span> i = 1:size(CommonNames,1)
+0071         [Family, DeviceList] = <a href="common2family.html" class="code" title="function [FamilyName, DeviceList, ErrorFlag] = common2family(varargin)">common2family</a>(CommonNames(i,:));
+0072         <span class="keyword">if</span> isempty(Family)
+0073             error(<span class="string">'Common name could not be converted to a Family and DeviceList.'</span>);
+0074         <span class="keyword">end</span>
+0075         [RunFlag(i,:), Delta(i,:), Tol(i,:)] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(Family, DeviceList);
+0076     <span class="keyword">end</span>
+0077     <span class="keyword">return</span>
+0078 <span class="keyword">end</span>
+0079 
+0080 
+0081 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0082 <span class="comment">% Parse Family, Field, DeviceList %</span>
+0083 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0084 [Family, Field, DeviceList, UnitsFlag] = <a href="inputparsingffd.html" class="code" title="function [Family, Field, DeviceList, UnitsFlag, ModelFlag] = inputparsingffd(varargin)">inputparsingffd</a>(varargin{:});
+0085 
+0086 
+0087 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0088 <span class="comment">% Channel Name Inputs %</span>
+0089 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%</span>
+0090 <span class="keyword">if</span> ~<a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(Family)
+0091     <span class="comment">% Channel name method</span>
+0092     <span class="comment">% Try to convert to a family, field, and device</span>
+0093     ChannelNames = varargin{1};
+0094     <span class="keyword">for</span> i = 1:size(ChannelNames,1)
+0095         [Family, Field, DeviceList] = <a href="channel2family.html" class="code" title="function [FamilyName, Field, DeviceList, ErrorFlag] = channel2family(varargin)">channel2family</a>(ChannelNames(i,:));
+0096         <span class="keyword">if</span> isempty(Family)
+0097             error(<span class="string">'Channel name could not be converted to a Family, Field and DeviceList.'</span>);
+0098         <span class="keyword">end</span>
+0099         [RunFlag(i,:), Delta(i,:), Tol(i,:)] = <a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>(Family, Field, DeviceList);
+0100     <span class="keyword">end</span>
+0101     <span class="keyword">return</span>
+0102 <span class="keyword">end</span>
+0103 
+0104 
+0105 <span class="comment">% Default field is Setpoint</span>
+0106 <span class="keyword">if</span> isempty(Field)
+0107     Field = <span class="string">'Setpoint'</span>;
+0108 <span class="keyword">end</span>
+0109 
+0110 
+0111 <span class="comment">%%%%%%%%%%%%</span>
+0112 <span class="comment">% Get data %</span>
+0113 <span class="comment">%%%%%%%%%%%%</span>
+0114 RunFlag = [];
+0115 Delta = [];
+0116 Tol = [];
+0117 
+0118 <span class="comment">% 1. Look for a .RunFlagFcn function</span>
+0119 RunFlagFcn = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(Family, Field, <span class="string">'RunFlagFcn'</span>);
+0120 <span class="keyword">if</span> ~isempty(RunFlagFcn)
+0121     [RunFlag, Delta, Tol] = feval(RunFlagFcn, Family, Field, DeviceList);
+0122     <span class="keyword">return</span>
+0123 <span class="keyword">end</span>
+0124 
+0125 
+0126 <span class="comment">% 2. If Field = 'Setpoint', base on SP-AM tolerance</span>
+0127 <span class="keyword">if</span> strcmp(Field, <span class="string">'Setpoint'</span>)
+0128     <span class="comment">% Base runflag on abs(Setpoint-Monitor) &gt; Tol</span>
+0129     Tol = <a href="family2tol.html" class="code" title="function [Data, ErrorFlag] = family2tol(varargin)">family2tol</a>(Family, Field, DeviceList, <span class="string">'Hardware'</span>);
+0130     <span class="keyword">if</span> isempty(Tol)
+0131         <span class="keyword">return</span>;
+0132     <span class="keyword">end</span>
+0133 
+0134     <span class="comment">% Use the &quot;real&quot; Setpoint value</span>
+0135     SP  = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Family, <span class="string">'Setpoint'</span>, DeviceList, <span class="string">'Hardware'</span>);
+0136     <span class="keyword">if</span> isempty(SP)
+0137         <span class="keyword">return</span>;
+0138     <span class="keyword">end</span>
+0139     SP = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(Family, <span class="string">'Setpoint'</span>, SP, DeviceList);
+0140 
+0141     <span class="comment">% Use the &quot;real&quot; Monitor value</span>
+0142     AM  = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(Family, <span class="string">'Monitor'</span>, DeviceList, <span class="string">'Hardware'</span>);
+0143     <span class="keyword">if</span> isempty(AM)
+0144         <span class="keyword">return</span>;
+0145     <span class="keyword">end</span>
+0146     AM = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(Family, <span class="string">'Monitor'</span>, AM, DeviceList);
+0147     
+0148     RunFlag = abs(SP-AM) &gt; Tol;
+0149     Delta = SP-AM;
+0150 <span class="keyword">end</span>
+0151     
+0152</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

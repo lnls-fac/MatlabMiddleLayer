@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setchro</title>
+  <meta name="keywords" content="setchro">
+  <meta name="description" content="SETCHRO - Measures then sets the chromaticity">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setchro.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setchro
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETCHRO - Measures then sets the chromaticity</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [DelSext, ActuatorFamily] = setchro(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETCHRO - Measures then sets the chromaticity
+  [DelSext, SextFamily] = setchro(NewChromaticity, ChroResponseMatrix, DeltaRF)
+
+  INPUTS
+  1.                   | Horizontal Chromaticity |
+     NewChromaticity = |                         | 
+                       | Vertical Chromaticity   |
+  2. ChroResponseMatrix - Chromaticity response matrix {Default: getchroresp}
+  3. DeltaRF - measchro for an explaination of DeltaRF {Default comes from measchro}
+  4. Optional override of the units:
+     'Physics'  - Use physics  units {Default}
+     'Hardware' - Use hardware units
+  5. Optional override of the mode:
+     'Online'    - Set/Get data online  
+     'Simulator' - Set/Get data on the simulated accelerator (same commands as 'Online')
+     'Model'     - Set are the same as 'Simulator' / gets are directly from the model.
+     'Manual'    - Set/Get data manually
+
+  OUTPUTS
+  1. DelSext - Change in sextrupole strength (vector by family)
+  2. SextFamily - Families used (cell array)
+
+  ALGORITHM  
+     DelSext = inv(CHROMATICITY_RESP_MATRIX) * (NewChromaticity-getchro)
+
+  NOTES
+  1. Beware of what units you are working in.  The default units for chromaticity
+     are physics units.  This is an exception to the normal middle layer convention.
+     Hardware units for &quot;chromaticity&quot; is in tune change per change in RF frequency.  
+     Since this is an unusual unit to work with, the default units for chromaticity
+     is physics units.  Note that goal chromaticity is also stored in physics units.
+  2. The actuator family comes from findmemberof('Chromaticity Corrector') or 'SF','SD' if empty
+  
+  See also <a href="stepchro.html" class="code" title="function  [DelSext, ActuatorFamily] = stepchro(varargin)">stepchro</a>, <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>	GETGOLDEN - Returns the golden values for a family</li><li><a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>	GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>	MEASCHRO -  measures the chromaticity function emperically</li><li><a href="stepchro.html" class="code" title="function  [DelSext, ActuatorFamily] = stepchro(varargin)">stepchro</a>	STEPCHRO - Incremental change in the chromaticity (Delta Tune / Delta RF)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DelSext, ActuatorFamily] = setchro(varargin)</a>
+0002 <span class="comment">%SETCHRO - Measures then sets the chromaticity</span>
+0003 <span class="comment">%  [DelSext, SextFamily] = setchro(NewChromaticity, ChroResponseMatrix, DeltaRF)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1.                   | Horizontal Chromaticity |</span>
+0007 <span class="comment">%     NewChromaticity = |                         |</span>
+0008 <span class="comment">%                       | Vertical Chromaticity   |</span>
+0009 <span class="comment">%  2. ChroResponseMatrix - Chromaticity response matrix {Default: getchroresp}</span>
+0010 <span class="comment">%  3. DeltaRF - measchro for an explaination of DeltaRF {Default comes from measchro}</span>
+0011 <span class="comment">%  4. Optional override of the units:</span>
+0012 <span class="comment">%     'Physics'  - Use physics  units {Default}</span>
+0013 <span class="comment">%     'Hardware' - Use hardware units</span>
+0014 <span class="comment">%  5. Optional override of the mode:</span>
+0015 <span class="comment">%     'Online'    - Set/Get data online</span>
+0016 <span class="comment">%     'Simulator' - Set/Get data on the simulated accelerator (same commands as 'Online')</span>
+0017 <span class="comment">%     'Model'     - Set are the same as 'Simulator' / gets are directly from the model.</span>
+0018 <span class="comment">%     'Manual'    - Set/Get data manually</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  OUTPUTS</span>
+0021 <span class="comment">%  1. DelSext - Change in sextrupole strength (vector by family)</span>
+0022 <span class="comment">%  2. SextFamily - Families used (cell array)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  ALGORITHM</span>
+0025 <span class="comment">%     DelSext = inv(CHROMATICITY_RESP_MATRIX) * (NewChromaticity-getchro)</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  NOTES</span>
+0028 <span class="comment">%  1. Beware of what units you are working in.  The default units for chromaticity</span>
+0029 <span class="comment">%     are physics units.  This is an exception to the normal middle layer convention.</span>
+0030 <span class="comment">%     Hardware units for &quot;chromaticity&quot; is in tune change per change in RF frequency.</span>
+0031 <span class="comment">%     Since this is an unusual unit to work with, the default units for chromaticity</span>
+0032 <span class="comment">%     is physics units.  Note that goal chromaticity is also stored in physics units.</span>
+0033 <span class="comment">%  2. The actuator family comes from findmemberof('Chromaticity Corrector') or 'SF','SD' if empty</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%  See also stepchro, measchro</span>
+0036 
+0037 <span class="comment">%  Written by Greg Portmann</span>
+0038 
+0039 
+0040 ActuatorFamily = {};
+0041 ModeFlag  = {};           <span class="comment">% model, online, manual, or '' for default mode</span>
+0042 UnitsFlag = {<span class="string">'Physics'</span>};  <span class="comment">% hardware, physics, or '' for default units</span>
+0043 
+0044 <span class="keyword">for</span> i = length(varargin):-1:1
+0045     <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0046         UnitsFlag = varargin(i);
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0049         UnitsFlag = varargin(i);
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>)
+0052         ModeFlag = varargin(i);
+0053         varargin(i) = [];
+0054     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'online'</span>)
+0055         ModeFlag = varargin(i);
+0056         varargin(i) = [];
+0057     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'manual'</span>)
+0058         ModeFlag = varargin(i);
+0059         varargin(i) = [];
+0060     <span class="keyword">end</span>        
+0061 <span class="keyword">end</span>
+0062 
+0063 
+0064 NewChro = [];
+0065 <span class="keyword">if</span> length(varargin) &gt;= 1
+0066     NewChro = varargin{1};
+0067 <span class="keyword">end</span>
+0068 <span class="keyword">if</span> isempty(NewChro)
+0069     <span class="keyword">if</span> strcmpi(UnitsFlag{1}, <span class="string">'Physics'</span>)
+0070         NewChro = <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>(<span class="string">'Chromaticity'</span>);                        <span class="comment">% Physics units</span>
+0071     <span class="keyword">elseif</span> strcmpi(UnitsFlag{1}, <span class="string">'Hardware'</span>)
+0072         NewChro = -1 * <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>(<span class="string">'Chromaticity'</span>) / <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a> / <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>;  <span class="comment">% Hardware units</span>
+0073     <span class="keyword">else</span>
+0074         error(<span class="string">'Units unknown'</span>);
+0075     <span class="keyword">end</span>
+0076     NewChro = NewChro(1:2);
+0077     NewChro = NewChro(:);
+0078 <span class="keyword">end</span>
+0079 <span class="keyword">if</span> isempty(NewChro)
+0080     error(<span class="string">'Golden chromaticity not found'</span>);
+0081 <span class="keyword">end</span>
+0082 
+0083 <span class="keyword">if</span> length(varargin) &gt;= 2
+0084     ChroResponseMatrix = varargin{2};
+0085 <span class="keyword">else</span>
+0086     ChroResponseMatrix = [];    
+0087 <span class="keyword">end</span>
+0088 
+0089 disp(<span class="string">'   Begin initial chromaticity measurement...'</span>);
+0090 <span class="keyword">if</span> length(varargin) &lt; 3
+0091     MeasuredChrom = <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>(<span class="string">'Numeric'</span>, UnitsFlag{:}, ModeFlag{:});
+0092 <span class="keyword">else</span>
+0093     MeasuredChrom = <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>(varargin{3}, <span class="string">'Numeric'</span>, UnitsFlag{:}, ModeFlag{:});
+0094 <span class="keyword">end</span>
+0095 
+0096 fprintf(<span class="string">'   Measured Horizontal Chromaticity = %f (Goal is %f)\n'</span>, MeasuredChrom(1), NewChro(1));
+0097 fprintf(<span class="string">'   Measured Vertical   Chromaticity = %f (Goal is %f)\n'</span>, MeasuredChrom(2), NewChro(2));
+0098 
+0099 <span class="keyword">if</span> strcmpi(questdlg(<span class="string">'Do you want to change the chromaticity now?'</span>,<span class="string">'Yes'</span>,<span class="string">'No'</span>), <span class="string">'Yes'</span>)
+0100     disp(<span class="string">'   Begin chromaticity change ...'</span>);
+0101     drawnow;
+0102     [DelSext, ActuatorFamily] = <a href="stepchro.html" class="code" title="function  [DelSext, ActuatorFamily] = stepchro(varargin)">stepchro</a>([NewChro(1)-MeasuredChrom(1); NewChro(2)-MeasuredChrom(2)], ChroResponseMatrix, UnitsFlag{:}, ModeFlag{:});
+0103     disp(<span class="string">'   Finished chromaticity change'</span>);
+0104 <span class="keyword">else</span>
+0105     disp(<span class="string">'   Chromaticity not changed'</span>);
+0106     drawnow;
+0107     DelSext = [0;0];  <span class="comment">% I'm guessing that there are 2 chromaticity correction families</span>
+0108 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

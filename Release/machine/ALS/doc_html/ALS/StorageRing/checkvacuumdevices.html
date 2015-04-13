@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of checkvacuumdevices</title>
+  <meta name="keywords" content="checkvacuumdevices">
+  <meta name="description" content="function checkvacuumdevices(time);">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; checkvacuumdevices.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>checkvacuumdevices
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function checkvacuumdevices(time);</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function checkvacuumdevices(time); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> function checkvacuumdevices(time);
+
+ This function checks all ion pumps and gauges in the storage ring to
+         determine whether their control system values are updating. It displays a
+        list of problem IPs and IGs and their corresponding ILCs (or crates).
+ This routine is normally used during startups to find which vacuum device
+         ILCs need to be reloaded.
+ IP ILCs also handle the QFA shunts. They should not be reloaded, rebooted, or reset
+        during user operations as the shunts will cycle on/off and distort the beam.
+ Also: if the ILC for SR03S IP/IG is touched, the RF gate valves will close.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function checkvacuumdevices(time);</a>
+0002 
+0003 <span class="comment">% function checkvacuumdevices(time);</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% This function checks all ion pumps and gauges in the storage ring to</span>
+0006 <span class="comment">%         determine whether their control system values are updating. It displays a</span>
+0007 <span class="comment">%        list of problem IPs and IGs and their corresponding ILCs (or crates).</span>
+0008 <span class="comment">% This routine is normally used during startups to find which vacuum device</span>
+0009 <span class="comment">%         ILCs need to be reloaded.</span>
+0010 <span class="comment">% IP ILCs also handle the QFA shunts. They should not be reloaded, rebooted, or reset</span>
+0011 <span class="comment">%        during user operations as the shunts will cycle on/off and distort the beam.</span>
+0012 <span class="comment">% Also: if the ILC for SR03S IP/IG is touched, the RF gate valves will close.</span>
+0013 
+0014 <span class="comment">% 2002-08-30, Tom Scarvie</span>
+0015 
+0016 <span class="keyword">if</span> nargin &lt; 1
+0017     time = input(<span class="string">'Collect data for how many minutes? (for default 2 minutes, hit return): '</span>);
+0018     <span class="keyword">if</span> time &lt; 1
+0019         disp(<span class="string">'Time should be at least 1 minute!'</span>);
+0020         <span class="keyword">return</span>    
+0021     <span class="keyword">end</span>
+0022     <span class="keyword">if</span> isempty(time)
+0023         time = 2;
+0024     <span class="keyword">end</span>
+0025     <span class="keyword">if</span> time &lt; 10
+0026         time = time*60;
+0027     <span class="keyword">else</span>
+0028         ans = input(<span class="string">'That''s a pretty long time - are you sure you want to continue? (y/n) '</span>,<span class="string">'s'</span>);
+0029         <span class="keyword">if</span> ans == <span class="string">'y'</span> | ans == <span class="string">'Y'</span>
+0030             <span class="comment">%continue</span>
+0031         <span class="keyword">else</span>
+0032             <span class="keyword">return</span>
+0033         <span class="keyword">end</span>
+0034     <span class="keyword">end</span>
+0035 
+0036 <span class="keyword">elseif</span> nargin &gt; 1
+0037     error(<span class="string">'Checkvacuumdevices requires 1 or no input arguments.'</span>);
+0038 <span class="keyword">end</span>
+0039 
+0040 <span class="comment">% if time &lt; 10</span>
+0041 <span class="comment">%     time = time*60;</span>
+0042 <span class="comment">% end</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">% if time &lt; 60</span>
+0045 <span class="comment">%     disp('You should sample for longer than 1 minute.')</span>
+0046 <span class="comment">% elseif time &gt; 11*60</span>
+0047 <span class="comment">%     disp('No real need to sample for longer than 10 minutes.')</span>
+0048 <span class="comment">%     return</span>
+0049 <span class="comment">% end</span>
+0050 
+0051 format short e
+0052 
+0053 IPlist = [<span class="string">'SR01C___IP1____AM00     507     '</span>     
+0054      <span class="string">'SR01C___IP2____AM00     507     '</span>
+0055      <span class="string">'SR01C___IP3____AM00     507     '</span>
+0056      <span class="string">'SR01C___IP4____AM00     507     '</span>
+0057      <span class="string">'SR01C___IP5____AM00     507     '</span>
+0058      <span class="string">'SR01C___IP6____AM00     507     '</span>
+0059      <span class="string">'SR01S___IP1____AM00     506     '</span>
+0060      <span class="string">'SR01S___IP2____AM00     506     '</span>
+0061      <span class="string">'SR01S___IP3____AM00     506     '</span>
+0062      <span class="string">'SR01S___IP4____AM00     506     '</span>
+0063      <span class="string">'SR01S___IP5____AM00     506     '</span>
+0064      <span class="string">'SR02C___IP1____AM00     509     '</span>
+0065      <span class="string">'SR02C___IP2____AM00     509     '</span>
+0066      <span class="string">'SR02C___IP3____AM00     509     '</span>
+0067      <span class="string">'SR02C___IP4____AM00     509     '</span>
+0068      <span class="string">'SR02C___IP5____AM00     509     '</span>
+0069      <span class="string">'SR02C___IP6____AM00     509     '</span>
+0070      <span class="string">'SR02S___IP1____AM00     508     '</span>
+0071    <span class="comment">% 'SR02S___IP2____AM00     508     '</span>
+0072      <span class="string">'SR03C___IP1____AM00     511     '</span>
+0073      <span class="string">'SR03C___IP2____AM00     511     '</span>
+0074      <span class="string">'SR03C___IP3____AM00     511     '</span>
+0075      <span class="string">'SR03C___IP4____AM00     511     '</span>
+0076      <span class="string">'SR03C___IP5____AM00     511     '</span>
+0077      <span class="string">'SR03C___IP6____AM00     511     '</span>
+0078      <span class="string">'SR03S___IP1____AM00     510     '</span>
+0079      <span class="string">'SR03S___IP2____AM00     544     '</span>
+0080      <span class="string">'SR03S___IP4____AM01     511     '</span>
+0081      <span class="string">'SR03S___IP5____AM02     511     '</span>
+0082      <span class="string">'SR03S___IP6____AM03     511     '</span>
+0083      <span class="string">'SR03S___IP7____AM04     511     '</span>
+0084      <span class="string">'SR03S___IP8____AM04     544     '</span>
+0085      <span class="string">'SR04C___IP1____AM00     513     '</span>
+0086      <span class="string">'SR04C___IP2____AM00     513     '</span>
+0087      <span class="string">'SR04C___IP3____AM00     513     '</span>
+0088      <span class="string">'SR04C___IP4____AM00     513     '</span>
+0089      <span class="string">'SR04C___IP5____AM00     513     '</span>
+0090      <span class="string">'SR04C___IP6____AM00     513     '</span>
+0091      <span class="string">'SR04U___IP1____AM00     512     '</span>
+0092      <span class="string">'SR04U___IP2____AM00     512     '</span>
+0093      <span class="string">'SR04U___IP3____AM00     512     '</span>
+0094      <span class="string">'SR04U___IP4____AM00     512     '</span>
+0095      <span class="string">'SR05C___IP1____AM00     515     '</span>
+0096      <span class="string">'SR05C___IP2____AM00     515     '</span>
+0097      <span class="string">'SR05C___IP3____AM00     515     '</span>
+0098      <span class="string">'SR05C___IP4____AM00     515     '</span>
+0099      <span class="string">'SR05C___IP5____AM00     515     '</span>
+0100      <span class="string">'SR05C___IP6____AM00     515     '</span>
+0101      <span class="string">'SR05W___IP1____AM00     514     '</span>
+0102      <span class="string">'SR05W___IP3____AM00     514     '</span>
+0103      <span class="string">'SR05W___IP5____AM00     514     '</span>
+0104      <span class="string">'SR06C___IP1____AM00     517     '</span>
+0105      <span class="string">'SR06C___IP2____AM00     517     '</span>
+0106      <span class="string">'SR06C___IP3____AM00     517     '</span>
+0107      <span class="string">'SR06C___IP4____AM00     517     '</span>
+0108      <span class="string">'SR06C___IP5____AM00     517     '</span>
+0109      <span class="string">'SR06C___IP6____AM00     517     '</span>
+0110      <span class="string">'SR06S___IP1____AM00     516     '</span>
+0111      <span class="string">'SR06S___IP2____AM00     516     '</span>
+0112      <span class="string">'SR07C___IP1____AM00     519     '</span>
+0113      <span class="string">'SR07C___IP2____AM00     519     '</span>
+0114      <span class="string">'SR07C___IP3____AM00     519     '</span>
+0115      <span class="string">'SR07C___IP4____AM00     519     '</span>
+0116      <span class="string">'SR07C___IP5____AM00     519     '</span>
+0117      <span class="string">'SR07C___IP6____AM00     519     '</span>
+0118      <span class="string">'SR07U___IP1____AM00     518     '</span>
+0119      <span class="string">'SR07U___IP3____AM00     518     '</span>
+0120      <span class="string">'SR07U___IP5____AM00     518     '</span>
+0121      <span class="string">'SR08C___IP1____AM00     521     '</span>
+0122      <span class="string">'SR08C___IP2____AM00     521     '</span>
+0123      <span class="string">'SR08C___IP3____AM00     521     '</span>
+0124      <span class="string">'SR08C___IP4____AM00     521     '</span>
+0125      <span class="string">'SR08C___IP5____AM00     521     '</span>
+0126      <span class="string">'SR08C___IP6____AM00     521     '</span>
+0127      <span class="string">'SR08U___IP1____AM00     520     '</span>
+0128      <span class="string">'SR08U___IP3____AM00     520     '</span>
+0129      <span class="string">'SR08U___IP5____AM00     520     '</span>
+0130      <span class="string">'SR09C___IP1____AM00     523     '</span>
+0131      <span class="string">'SR09C___IP2____AM00     523     '</span>
+0132      <span class="string">'SR09C___IP3____AM00     523     '</span>
+0133      <span class="string">'SR09C___IP4____AM00     523     '</span>
+0134      <span class="string">'SR09C___IP5____AM00     523     '</span>
+0135      <span class="string">'SR09C___IP6____AM00     523     '</span>
+0136      <span class="string">'SR09U___IP1____AM00     522     '</span>
+0137      <span class="string">'SR09U___IP3____AM00     522     '</span>
+0138      <span class="string">'SR09U___IP5____AM00     522     '</span>
+0139      <span class="string">'SR10C___IP1____AM00     501     '</span>
+0140      <span class="string">'SR10C___IP2____AM00     501     '</span>
+0141      <span class="string">'SR10C___IP3____AM00     501     '</span>
+0142      <span class="string">'SR10C___IP4____AM00     501     '</span>
+0143      <span class="string">'SR10C___IP5____AM00     501     '</span>
+0144      <span class="string">'SR10C___IP6____AM00     501     '</span>
+0145      <span class="string">'SR10U___IP1____AM00     500     '</span>
+0146      <span class="string">'SR10U___IP3____AM00     500     '</span>
+0147      <span class="string">'SR10U___IP5____AM00     500     '</span>
+0148      <span class="string">'SR11C___IP1____AM00     503     '</span>
+0149      <span class="string">'SR11C___IP2____AM00     503     '</span>
+0150      <span class="string">'SR11C___IP3____AM00     503     '</span>
+0151      <span class="string">'SR11C___IP4____AM00     503     '</span>
+0152      <span class="string">'SR11C___IP5____AM00     503     '</span>
+0153      <span class="string">'SR11C___IP6____AM00     503     '</span>
+0154    <span class="comment">% 'SR11S___IP1____AM00     502     '</span>
+0155    <span class="comment">% 'SR11S___IP2____AM00     502     '</span>
+0156      <span class="string">'SR11U___IP1____AM00     srioc110'</span>
+0157      <span class="string">'SR11U___IP2____AM00     srioc110'</span>
+0158      <span class="string">'SR11U___IP3____AM00     srioc110'</span>
+0159      <span class="string">'SR11U___IP4____AM00     srioc110'</span>
+0160      <span class="string">'SR12C___IP1____AM00     505     '</span>
+0161      <span class="string">'SR12C___IP2____AM00     505     '</span>
+0162      <span class="string">'SR12C___IP3____AM00     505     '</span>
+0163      <span class="string">'SR12C___IP4____AM00     505     '</span>
+0164      <span class="string">'SR12C___IP5____AM00     505     '</span>
+0165      <span class="string">'SR12C___IP6____AM00     505     '</span>
+0166      <span class="string">'SR12U___IP1____AM03     714     '</span> 
+0167      <span class="string">'SR12U___IP3____AM04     714     '</span>
+0168      <span class="string">'SR12U___IP5____AM05     714     '</span>];
+0169 
+0170 IGlist = [<span class="string">'SR01C___IG2____AM00     507     '</span>
+0171      <span class="string">'SR01S___IG1____AM00     506     '</span>
+0172      <span class="string">'SR01S___IG2____AM00     506     '</span>
+0173      <span class="string">'SR02C___IG2____AM00     509     '</span>
+0174      <span class="string">'SR03C___IG2____AM00     511     '</span>
+0175      <span class="string">'SR04C___IG2____AM00     513     '</span>
+0176      <span class="string">'SR04U___IG1____AM00     512     '</span>
+0177      <span class="string">'SR04U___IG2____AM00     512     '</span>
+0178      <span class="string">'SR05C___IG2____AM00     515     '</span>
+0179      <span class="string">'SR05W___IG1____AM00     514     '</span>
+0180      <span class="string">'SR06C___IG2____AM00     517     '</span>
+0181      <span class="string">'SR07C___IG2____AM00     519     '</span>
+0182      <span class="string">'SR07U___IG1____AM00     518     '</span>
+0183      <span class="string">'SR08C___IG2____AM00     521     '</span>
+0184      <span class="string">'SR08U___IG1____AM00     520     '</span>
+0185      <span class="string">'SR09C___IG2____AM00     523     '</span>
+0186      <span class="string">'SR09U___IG1____AM00     522     '</span>
+0187      <span class="string">'SR10C___IG2____AM00     501     '</span>
+0188      <span class="string">'SR10U___IG1____AM00     500     '</span>
+0189      <span class="string">'SR11C___IG2____AM00     503     '</span>
+0190      <span class="string">'SR11U___IG1____AM00     s111446 '</span>
+0191      <span class="string">'SR11U___IG2____AM00     s111446 '</span>
+0192      <span class="string">'SR12C___IG2____AM00     505     '</span>];
+0193 
+0194 IPam = zeros(size(IPlist,1),time);
+0195 IGam = zeros(size(IGlist,1),time);
+0196 
+0197 <span class="keyword">for</span> t = 1:time
+0198     
+0199     <span class="keyword">for</span> i=1:size(IPlist,1)
+0200         IPam(i,t) = getam(IPlist(i,1:19));
+0201     <span class="keyword">end</span>
+0202     
+0203     <span class="keyword">for</span> i=1:size(IGlist,1)
+0204         IGam(i,t) = getam(IGlist(i,1:19));
+0205     <span class="keyword">end</span>
+0206     
+0207     <span class="comment">%    zeroIPlist = IPlist(find(IPam(:,t)==0),:)</span>
+0208     <span class="comment">%    zeroIGlist = IGlist(find(IGam(:,t)==0),:)</span>
+0209     
+0210     
+0211     <span class="comment">%    IPam(:,t)</span>
+0212     <span class="comment">%    IGam(:,t)</span>
+0213     
+0214     pause(1);
+0215     
+0216 <span class="keyword">end</span>
+0217 
+0218 staleIPlist = find(std(IPam,0,2)==0);
+0219 staleIGlist = find(std(IGam,0,2)==0);
+0220 
+0221 badIPlist = IPlist(staleIPlist,:);
+0222 badIGlist = IGlist(staleIGlist,:);
+0223 
+0224 ILClist = [badIPlist(:,25:27);badIGlist(:,25:27)];
+0225 
+0226 fprintf(<span class="string">'Ion pumps that don''t seem to be updating are:\n'</span>);
+0227 badIPlist
+0228 fprintf(<span class="string">'\n'</span>);
+0229 <span class="comment">%fprintf('Ion gauges that don''t seem to be updating are:\n');</span>
+0230 <span class="comment">%badIGlist</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

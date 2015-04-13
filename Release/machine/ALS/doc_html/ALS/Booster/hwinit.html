@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of hwinit</title>
+  <meta name="keywords" content="hwinit">
+  <meta name="description" content="HWINIT - Hardware initialization script for the Booster">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">Booster</a> &gt; hwinit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\Booster&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>hwinit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>HWINIT - Hardware initialization script for the Booster</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function hwinit(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">HWINIT - Hardware initialization script for the Booster</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="resetudferrors.html" class="code" title="function resetudferrors">resetudferrors</a>	Clear RF ramp UDF errors</li><li><a href="setboosterrampsd.html" class="code" title="function setboosterrampsd(T, Waveform, TableName, egul, eguf)">setboosterrampsd</a>	SETBOOSTERRAMPSD - Set the booster SD ramp table</li><li><a href="setboosterrampsf.html" class="code" title="function setboosterrampsf(T, Waveform, TableName, egul, eguf)">setboosterrampsf</a>	SETBOOSTERRAMPSF - Set the booster SF ramp table</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function hwinit(varargin)</a>
+0002 <span class="comment">%HWINIT - Hardware initialization script for the Booster</span>
+0003 
+0004 
+0005 DisplayFlag = 1;
+0006 <span class="keyword">for</span> i = length(varargin):-1:1
+0007     <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0008         DisplayFlag = 1;
+0009         varargin(i) = [];
+0010     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0011         DisplayFlag = 0;
+0012         varargin(i) = [];
+0013     <span class="keyword">end</span>
+0014 <span class="keyword">end</span>
+0015 
+0016 
+0017 fprintf(<span class="string">'   Initializing Booster parameters (hwinit)\n'</span>)
+0018 
+0019 
+0020 
+0021 <span class="comment">% Set corrector magnets</span>
+0022 <span class="keyword">try</span>
+0023     fprintf(<span class="string">'   1. Setting Booster magnets HCM, VCM, QF, QD, SF, SD, and BEND to a 10 Hz scan rate on the monitors ... '</span>);
+0024     setpv(family2channel(<span class="string">'HCM'</span>,  <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0025     setpv(family2channel(<span class="string">'VCM'</span>,  <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0026     setpv(family2channel(<span class="string">'QF'</span>,   <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0027     setpv(family2channel(<span class="string">'QD'</span>,   <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0028     setpv(family2channel(<span class="string">'SF'</span>,   <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0029     setpv(family2channel(<span class="string">'SD'</span>,   <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0030     setpv(family2channel(<span class="string">'BEND'</span>, <span class="string">'Monitor'</span>), <span class="string">'SCAN'</span>, 9);
+0031     fprintf(<span class="string">'Done\n'</span>);
+0032 <span class="keyword">catch</span>
+0033     fprintf(<span class="string">'\n   Error setting .SCAN field of BTS corrector magnets HCM and VCM.\n'</span>);
+0034 <span class="keyword">end</span>
+0035 
+0036 
+0037 <span class="comment">% Set BPMs</span>
+0038 <span class="keyword">try</span>
+0039     fprintf(<span class="string">'   2. Setting Booster BPMs to a 10 Hz scan rate ... '</span>);
+0040     setpv(family2channel(<span class="string">'BPMx'</span>),<span class="string">'SCAN'</span>, 9);
+0041     setpv(family2channel(<span class="string">'BPMy'</span>),<span class="string">'SCAN'</span>, 9);
+0042     fprintf(<span class="string">'Done\n'</span>);
+0043 <span class="keyword">catch</span>
+0044     fprintf(<span class="string">'\n   Error setting .SCAN field of BTS BPMs.\n'</span>);
+0045 <span class="keyword">end</span>
+0046 
+0047 
+0048 <span class="comment">% Set SF &amp; SD on</span>
+0049 <span class="keyword">try</span>
+0050     fprintf(<span class="string">'   3. Turning SF &amp; SD on ... '</span>);
+0051     setpv(<span class="string">'SF'</span>, <span class="string">'OnControl'</span>, 1);
+0052     setpv(<span class="string">'SD'</span>, <span class="string">'OnControl'</span>, 1);
+0053     fprintf(<span class="string">'Done\n'</span>);
+0054 <span class="keyword">catch</span>
+0055     fprintf(<span class="string">'\n   There was a problem turning SF &amp; SD on.\n'</span>);
+0056 <span class="keyword">end</span>
+0057 
+0058 
+0059 <span class="comment">% Set SF, SD, &amp; RF ramp tables</span>
+0060 <span class="keyword">try</span>
+0061     fprintf(<span class="string">'   4. Loading the booster SF ramp tables ... '</span>);
+0062     <a href="setboosterrampsf.html" class="code" title="function setboosterrampsf(T, Waveform, TableName, egul, eguf)">setboosterrampsf</a>;
+0063     fprintf(<span class="string">'Done\n'</span>);
+0064 <span class="keyword">catch</span>
+0065     fprintf(<span class="string">'\n   Error setting the booster SD ramp table.\n'</span>);
+0066 <span class="keyword">end</span>
+0067 <span class="keyword">try</span>
+0068     fprintf(<span class="string">'   5. Loading the booster SD ramp tables ... '</span>);
+0069     <a href="setboosterrampsd.html" class="code" title="function setboosterrampsd(T, Waveform, TableName, egul, eguf)">setboosterrampsd</a>;
+0070     fprintf(<span class="string">'Done\n'</span>);
+0071 <span class="keyword">catch</span>
+0072     fprintf(<span class="string">'\n   Error setting the booster SF ramp table.\n'</span>);
+0073 <span class="keyword">end</span>
+0074 <span class="comment">% try</span>
+0075 <span class="comment">%     fprintf('   6. Loading the booster RF ramp tables ... ');</span>
+0076 <span class="comment">%     setboosterramprf;</span>
+0077 <span class="comment">%     fprintf('Done\n');</span>
+0078 <span class="comment">% catch</span>
+0079 <span class="comment">%     fprintf('\n   Error setting the booster RF ramp table.\n');</span>
+0080 <span class="comment">% end</span>
+0081 
+0082 
+0083 <span class="comment">% UDF</span>
+0084 <span class="keyword">try</span>
+0085     fprintf(<span class="string">'   7. Setting the UDF fields for all families to 0 ... '</span>);
+0086     <a href="resetudferrors.html" class="code" title="function resetudferrors">resetudferrors</a>;
+0087     fprintf(<span class="string">'Done\n'</span>);
+0088 <span class="keyword">catch</span>
+0089     fprintf(<span class="string">'\n   Error setting the UDF for all families.\n'</span>);
+0090 <span class="keyword">end</span>
+0091 
+0092 
+0093 fprintf(<span class="string">'\n'</span>);
+0094 
+0095</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of magstep</title>
+  <meta name="keywords" content="magstep">
+  <meta name="description" content="MAGSTEP - Script for testing the time responce of a magnet">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; magstep.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>magstep
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MAGSTEP - Script for testing the time responce of a magnet</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MAGSTEP - Script for testing the time responce of a magnet</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>	GETX - Returns the horizontal orbit</li><li><a href="gety.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = gety(varargin)">gety</a>	GETY - Returns the vertical orbit</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li><li><a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>	STEPSP - Step the setpoint for family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%MAGSTEP - Script for testing the time responce of a magnet</span>
+0002 
+0003 
+0004 <span class="comment">% BPM Step</span>
+0005 BPMxFamily = <span class="string">'BPMx'</span>;
+0006 BPMxDevList = [1 2;1 3;1 4];  <span class="comment">%getbpmlist('BPMx'); %[2 1;2 2;2 3;2 4;2 5];</span>
+0007 BPMyFamily = <span class="string">'BPMy'</span>;
+0008 BPMyDevList = BPMxDevList; <span class="comment">%[2 1;2 2;2 3;2 4;2 5];</span>
+0009 
+0010 <span class="comment">% Magnet setup</span>
+0011 DeltaAmps = 2;
+0012 CMFamily = <span class="string">'VCM'</span>;
+0013 CMDevList = [5 10];
+0014 t = 0:.1:3;
+0015 
+0016 
+0017 AM0 = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(CMFamily, CMDevList);
+0018 BPMx0 = <a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>(BPMxDevList);
+0019 BPMy0 = <a href="gety.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = gety(varargin)">gety</a>(BPMxDevList);
+0020 
+0021 
+0022 t0 = gettime;
+0023 
+0024 
+0025 tic;
+0026 <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily, DeltaAmps, CMDevList, 0);
+0027 T0 = toc;
+0028 [am, tout] = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>({BPMxFamily, BPMyFamily, CMFamily}, {BPMxDevList, BPMyDevList, CMDevList}, t);
+0029 <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily,-DeltaAmps, CMDevList, -1);
+0030 pause(1);
+0031 
+0032 
+0033 tic;
+0034 <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily, DeltaAmps, CMDevList, -1);
+0035 T1 = toc;
+0036 <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily,-DeltaAmps, CMDevList, -1);
+0037 pause(1);
+0038 
+0039 
+0040 <span class="comment">% stepsp WaitFlag=-2 test</span>
+0041 tic;
+0042 <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily, DeltaAmps, CMDevList, -2);
+0043 T2 = toc;
+0044 <a href="stepsp.html" class="code" title="function ErrorFlag = stepsp(Family, varargin)">stepsp</a>(CMFamily,-DeltaAmps, CMDevList, -1);
+0045 pause(1);
+0046 
+0047 
+0048 <span class="comment">% setsp WaitFlag=-2 test</span>
+0049 SP = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(CMFamily, CMDevList);
+0050 tic;
+0051 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(CMFamily, SP+DeltaAmps, CMDevList, -2);
+0052 T3 = toc;
+0053 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(CMFamily, SP, CMDevList, -1);
+0054 
+0055 
+0056 fprintf(<span class="string">'\n'</span>);
+0057 fprintf(<span class="string">'   T(stepsp w/ waitonsp =  0) = %.3f seconds.\n'</span>, T0);
+0058 fprintf(<span class="string">'   T(stepsp w/ waitonsp = -1) = %.3f seconds.\n'</span>, T1);
+0059 fprintf(<span class="string">'   T(stepsp w/ waitonsp = -2) = %.3f seconds.\n'</span>, T2);
+0060 fprintf(<span class="string">'   T(setsp  w/ waitonsp = -2) = %.3f seconds.\n'</span>, T3);
+0061 fprintf(<span class="string">'\n'</span>);
+0062 
+0063 
+0064 
+0065 <span class="comment">% Display</span>
+0066 
+0067 x = am{1};
+0068 y = am{2};
+0069 cm = am{3};
+0070 
+0071 clf reset
+0072 subplot(2,1,1);
+0073 <span class="keyword">for</span> i = 1:size(BPMxDevList,1)
+0074     x(i,:) = x(i,:) - x(i,1);
+0075 <span class="keyword">end</span>
+0076 <span class="keyword">for</span> i = 1:size(BPMyDevList,1)
+0077     y(i,:) = y(i,:) - y(i,1);
+0078 <span class="keyword">end</span>
+0079 
+0080 
+0081 plot(tout,x,<span class="string">'.-b'</span>);
+0082 grid on;
+0083 <span class="keyword">if</span> size(BPMxDevList,1) == 1
+0084     ylabel(sprintf(<span class="string">'%s(%d,%d) [mm]'</span>, BPMxFamily, BPMxDevList));
+0085 <span class="keyword">elseif</span> size(BPMxDevList,1) &lt; 10
+0086     clear LabelCell
+0087     ylabel(sprintf(<span class="string">'BPM Data [mm]'</span>));
+0088     <span class="keyword">for</span> i = 1:size(BPMxDevList,1)
+0089         LabelCell{i} = sprintf(<span class="string">'%s(%d,%d)'</span>, BPMxFamily, BPMxDevList(i,:));
+0090     <span class="keyword">end</span>
+0091 <span class="keyword">end</span>
+0092 
+0093 hold on
+0094 plot(tout,y,<span class="string">'.-r'</span>);
+0095 hold off;
+0096 <span class="keyword">if</span> size(BPMyDevList,1) == 1
+0097     ylabel(sprintf(<span class="string">'%s(%d,%d) [mm]'</span>, BPMyFamily, BPMyDevList));
+0098 <span class="keyword">elseif</span> size(BPMxDevList,1) &lt; 10
+0099     ylabel(sprintf(<span class="string">'BPM Data [mm]'</span>));
+0100     <span class="keyword">for</span> i = 1:size(BPMyDevList,1)
+0101         LabelCell{i+size(BPMxDevList,1)} = sprintf(<span class="string">'%s(%d,%d)'</span>, BPMyFamily, BPMyDevList(i,:));
+0102     <span class="keyword">end</span>
+0103     legend(LabelCell,1);
+0104 <span class="keyword">end</span>
+0105 
+0106 xlabel(<span class="string">'Time [Seconds]'</span>);
+0107 title(sprintf(<span class="string">'%s(%d,%d):  Delta Amps = %.1f, Time for set: WaitFlag 0 = %.2f, -1 = %.2f, -2 = %.2f'</span>, CMFamily, CMDevList, DeltaAmps, T0, T1, T2));
+0108 grid on;
+0109 
+0110 subplot(2,1,2);
+0111 plot(tout,cm,<span class="string">'.-b'</span>); 
+0112 grid on;
+0113 ylabel(sprintf(<span class="string">'%s(%d,%d) [Amps]'</span>, CMFamily, CMDevList));
+0114 xlabel(<span class="string">'Time [Seconds]'</span>);
+0115 grid on;
+0116 
+0117 orient tall</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

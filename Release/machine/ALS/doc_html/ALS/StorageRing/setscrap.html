@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setscrap</title>
+  <meta name="keywords" content="setscrap">
+  <meta name="description" content="Error = setscrap(New PosH, New PosT, New PosB, WaitFlag);">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; setscrap.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>setscrap
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Error = setscrap(New PosH, New PosT, New PosB, WaitFlag);</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function Err = setscrap(PosH, PosT, PosB, WaitFlag); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">  Error = setscrap(New PosH, New PosT, New PosB, WaitFlag);
+        or
+  Error = setscrap('Name', Position, WaitFlag);
+
+            Name = 'top', 'bottom' ('bot'), or 'horizontal' ('hor')
+
+            PosH = Horizontal scraper position (0, 70) [mm]
+            PosT = Top scraper position        (0, 25) [mm]
+            PosB = Bottom scraper position     (0, 25) [mm]
+        WaitFlag = 0-return immediately, 1-return when ramp is done (default)
+
+           Error = 0 - no errors occurred
+                   1 - timed out waiting for a scraper reach the goal position 
+
+   For each scraper, 0mm is fully retracted, while 20mm is beam-center for the top and bottom
+      scraper, and 60mm is beam-center for the horizontal scraper.
+
+   Calling setscrap with no inputs, sets all scrapers to their home position.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getscrap.html" class="code" title="function [PosH, PosT, PosB, RunFlag] = getscrap(Name)">getscrap</a>	[PosH, PosT, PosB, RunFlag] = getscrap;</li><li><a href="setscrap.html" class="code" title="function Err = setscrap(PosH, PosT, PosB, WaitFlag);">setscrap</a>	Error = setscrap(New PosH, New PosT, New PosB, WaitFlag);</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setscrap.html" class="code" title="function Err = setscrap(PosH, PosT, PosB, WaitFlag);">setscrap</a>	Error = setscrap(New PosH, New PosT, New PosB, WaitFlag);</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Err = setscrap(PosH, PosT, PosB, WaitFlag);</a>
+0002 <span class="comment">%  Error = setscrap(New PosH, New PosT, New PosB, WaitFlag);</span>
+0003 <span class="comment">%        or</span>
+0004 <span class="comment">%  Error = setscrap('Name', Position, WaitFlag);</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%            Name = 'top', 'bottom' ('bot'), or 'horizontal' ('hor')</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%            PosH = Horizontal scraper position (0, 70) [mm]</span>
+0009 <span class="comment">%            PosT = Top scraper position        (0, 25) [mm]</span>
+0010 <span class="comment">%            PosB = Bottom scraper position     (0, 25) [mm]</span>
+0011 <span class="comment">%        WaitFlag = 0-return immediately, 1-return when ramp is done (default)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%           Error = 0 - no errors occurred</span>
+0014 <span class="comment">%                   1 - timed out waiting for a scraper reach the goal position</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%   For each scraper, 0mm is fully retracted, while 20mm is beam-center for the top and bottom</span>
+0017 <span class="comment">%      scraper, and 60mm is beam-center for the horizontal scraper.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%   Calling setscrap with no inputs, sets all scrapers to their home position.</span>
+0020 <span class="comment">%</span>
+0021 
+0022 <span class="comment">%  2002-04-18, started modifying routine for new scraper channels since scrapers have been moved to SR03</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% NEW VALUES ARE IN [MICRONS], NOT [MM]!!</span>
+0025 <span class="comment">% Things to check when install is done:</span>
+0026 <span class="comment">%         what routines call this one and do they need changes due to new ranges?</span>
+0027 <span class="comment">%        are there new channels that need to be included?</span>
+0028 
+0029 
+0030 ScraperTol = 0.2; <span class="comment">% mm value</span>
+0031 <span class="comment">%ScraperTol = 200; % micron value</span>
+0032 
+0033 <span class="keyword">if</span> nargout &gt;= 1
+0034    Err = 0;
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="comment">% Inputs checking</span>
+0038 <span class="keyword">if</span> nargin == 0 
+0039     <span class="comment">%setscrap(-28,9,-9); return; %old limits in [mm] here</span>
+0040     <a href="setscrap.html" class="code" title="function Err = setscrap(PosH, PosT, PosB, WaitFlag);">setscrap</a>(0, 0, 0); <span class="keyword">return</span>; <span class="comment">%old limits in microns</span>
+0041 <span class="keyword">elseif</span>  nargin == 1
+0042     error(<span class="string">'Required 0, 2, 3, or 4 inputs.'</span>);
+0043 <span class="keyword">elseif</span>  nargin == 2
+0044     <span class="keyword">if</span> ~isstr(PosH)
+0045         error(<span class="string">'For 2 inputs the first must be a string.'</span>);
+0046    <span class="keyword">end</span>
+0047    <span class="keyword">if</span> PosT &gt; 70
+0048       error(<span class="string">'The scraper positions must be entered in [mm]!'</span>);
+0049    <span class="keyword">end</span>   
+0050 <span class="keyword">elseif</span> nargin == 3
+0051     WaitFlag = 1;
+0052    <span class="keyword">if</span> (PosH &gt; 70 | PosT &gt; 25 | PosB &gt; 25)
+0053       error(<span class="string">'The scraper positions must be entered in [mm]!'</span>);
+0054    <span class="keyword">end</span>   
+0055 <span class="keyword">end</span>
+0056 
+0057 
+0058 <span class="keyword">if</span> isstr(PosH)
+0059     <span class="keyword">if</span> nargin == 3
+0060         WaitFlag = PosB;
+0061     <span class="keyword">else</span>
+0062         WaitFlag = 1;
+0063     <span class="keyword">end</span>
+0064 
+0065     <span class="keyword">if</span> strcmp(upper(PosH),<span class="string">'HORIZONTAL'</span>) | strcmp(upper(PosH),<span class="string">'HOR'</span>)
+0066         PosH = PosT;
+0067         PosT = scaget(<span class="string">'SR03S___SCRAPT_AC01.VAL'</span>)/1000;  <span class="comment">% ACxx.VAL are AC values, ACxx.EPOS are AM values</span>
+0068         PosB = scaget(<span class="string">'SR03S___SCRAPB_AC02.VAL'</span>)/1000;
+0069     <span class="keyword">elseif</span> strcmp(upper(PosH),<span class="string">'TOP'</span>)
+0070         PosH = scaget(<span class="string">'SR03S___SCRAPH_AC00.VAL'</span>)/1000;
+0071         PosB = scaget(<span class="string">'SR03S___SCRAPB_AC02.VAL'</span>)/1000;
+0072     <span class="keyword">elseif</span> strcmp(upper(PosH),<span class="string">'BOTTOM'</span>) | strcmp(upper(PosH),<span class="string">'BOT'</span>)
+0073         PosB = PosT;
+0074         PosH = scaget(<span class="string">'SR03S___SCRAPH_AC00.VAL'</span>)/1000;
+0075         PosT = scaget(<span class="string">'SR03S___SCRAPT_AC01.VAL'</span>)/1000;
+0076     <span class="keyword">else</span>
+0077         error(<span class="string">'Input string not known.'</span>);
+0078     <span class="keyword">end</span>
+0079 <span class="keyword">end</span>
+0080 
+0081 
+0082 <span class="comment">% Check scraper limits</span>
+0083 <span class="comment">%if PosH&gt;5 | PosH&lt;-28</span>
+0084 <span class="keyword">if</span> PosH&gt;70 | PosH&lt;0  <span class="comment">%old limits, new units</span>
+0085     error(<span class="string">'Scraper limit exceeded: horizontal scraper bounds [0 70].'</span>);
+0086 <span class="keyword">else</span>
+0087     <span class="comment">% OK to set scraper</span>
+0088     scaput(<span class="string">'SR03S___SCRAPH_AC00.VAL'</span>, PosH*1000);
+0089 <span class="keyword">end</span>
+0090 
+0091 
+0092 <span class="keyword">if</span> PosT&gt;25 | PosT&lt;0  <span class="comment">%old limits, new units</span>
+0093     error(<span class="string">'Scraper limit exceeded: top scraper bounds [0 25].'</span>);
+0094 <span class="keyword">else</span>
+0095     <span class="comment">% OK to set scraper</span>
+0096     scaput(<span class="string">'SR03S___SCRAPT_AC01.VAL'</span>, PosT*1000);
+0097 <span class="keyword">end</span>
+0098 
+0099 
+0100 <span class="keyword">if</span> PosB&gt;25 | PosB&lt;0  <span class="comment">%old limits, new units</span>
+0101     error(<span class="string">'Scraper limit exceeded: bottom scraper bounds [0 25].'</span>);
+0102 <span class="keyword">else</span>
+0103     <span class="comment">% OK to set scraper</span>
+0104     scaput(<span class="string">'SR03S___SCRAPB_AC02.VAL'</span>, PosB*1000);
+0105 <span class="keyword">end</span>
+0106 
+0107 
+0108 
+0109 <span class="keyword">if</span> WaitFlag
+0110     <span class="comment">% Check for tolerance band on AC-AM</span>
+0111     [PosHam, PosTam, PosBam, RunFlag] = <a href="getscrap.html" class="code" title="function [PosH, PosT, PosB, RunFlag] = getscrap(Name)">getscrap</a>;
+0112 
+0113     <span class="comment">% Delay for runflag</span>
+0114     sleep(2);
+0115     
+0116     t0 = gettime;
+0117     NotDoneFlag = 1;
+0118      <span class="keyword">while</span> NotDoneFlag
+0119         [PosHam, PosTam, PosBam, RunFlag] = <a href="getscrap.html" class="code" title="function [PosH, PosT, PosB, RunFlag] = getscrap(Name)">getscrap</a>;
+0120         NotDoneFlag = RunFlag | (abs(PosH-PosHam)&gt;ScraperTol) | (abs(PosT-PosTam)&gt;ScraperTol) | (abs(PosB-PosBam)&gt;ScraperTol) ;
+0121 
+0122         <span class="keyword">if</span> (gettime-t0 &gt; 60)
+0123             disp(<span class="string">'WARNING:  SETSCRAP time out (60 seconds):  scraper position out of tolerance or RunFlag still high'</span>);
+0124          disp(<span class="string">'                                           or setpoint out of bounds (see help setscrap for details).'</span>);
+0125          <span class="keyword">if</span> nargout &gt;= 1
+0126             Err = 1;
+0127          <span class="keyword">end</span>
+0128          <span class="keyword">break</span>;
+0129         <span class="keyword">end</span>
+0130     <span class="keyword">end</span>
+0131 
+0132     <span class="comment">% Extra delay</span>
+0133     <span class="comment">%sleep(.5);</span>
+0134 <span class="keyword">end</span>
+0135 
+0136 
+0137</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

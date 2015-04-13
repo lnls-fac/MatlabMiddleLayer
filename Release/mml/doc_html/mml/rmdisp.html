@@ -1,0 +1,456 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of rmdisp</title>
+  <meta name="keywords" content="rmdisp">
+  <meta name="description" content="RMDISP - Removes the portion of the orbit that correlates with the dispersion">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; rmdisp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>rmdisp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>RMDISP - Removes the portion of the orbit that correlates with the dispersion</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">RMDISP - Removes the portion of the orbit that correlates with the dispersion 
+  [DeltaRF, OrbitRM, c, DispOrbit] = rmdisp(BPMFamily, Orbit, BPMList, Dispersion)
+  [DeltaRF, OrbitRM, c, DispOrbit] = rmdisp(BPMStruct, Dispersion)
+
+  INPUTS
+  1. BPMFamily - Family name {Default: 'BPMx'}
+     BPMStruct - BPM data structure.  When using data structures, the orbit and
+                 BPMList are in the .Data and .DeviceList fields, respectively.
+  2. Orbit - Input orbit  {Default or empty: get the present orbit}
+  3. BPMList - Device or element list of BPMs  {Default or empty: all}
+  4  FLAGS - 'FitMean' or 'FitDispersionOnly' {Default} - Include or don't include the mean in the fit
+             'MeasDisp' - Measure the dispersion
+             'ModelDisp' - Calculate the model dispersion
+             'GoldenDisp' - Use the golden dispersion  {Default}
+             'Display' - Plot orbit information {Default: no display unless there are no outputs}
+             'NoDisplay' - No plot
+             'SetRF' - Sets the RF frequency to the new value (prompts to check the value if 'Display' is on)
+             'NoSetRF' - Don't set the RF frequency
+             (the usual Units and Mode flags: 'Online', 'Model', 'Manual', 'Hardware', 'Physics', etc.)
+  5. Dispersion - Optional input to specify the dispersion
+
+  OUTPUTS
+  1. DeltaRF - Change in RF frequency required to remove the dispersion component of 
+               the orbit.  The units are the in RF frequency units used by getrf/setrf.
+               If DeltaRF = [], the units of dispersion or RF frequency were not unknown.  In
+               which case use c, output 3, to get the change in RF frequency.
+  2. OrbitRM - Estimated orbit with the dispersion orbit removed
+  3. c - fit coefficient,  OrbitRM = Orbit - c * Dispersion
+         c converts to RF frequency change but it depends on the units for the 
+         orbit and dispersion.  For instance, if Orbit is in [mm] and Dispersion is
+         in [mm/MHz], then c is in MHz.  If Orbit is in [m] and Dispersion is in 
+         [meter/(dp/p)], then c is energy shift (DeltaRF = -c*mcf*RF [Hz]).  
+         To correct the orbit, change the RF frequency by negative of the frequency
+         change determined by the c coefficient.
+  3. DispOrbit - Dispersion orbit used in the calculation
+
+  NOTES
+  1. It is unclear to the author if it is better to fit the mean or not.  If the
+     BPM offsets are not known very well then fitting the mean may be better.  That way
+     the dispersion is not used as a way to change the orbit mean (beyond 
+     the mean change due to the shape and sampling of the dispersion function). 
+  2. When fitting the mean the RF frequency change is only based only the dispersion
+     fit coefficient.
+  3. It is best to use structure inputs, since the units are in the structure.  Hence,
+     the DeltaRF can be determined.
+
+  See also <a href="setorbit.html" class="code" title="function [OCS, OCS0, V, S, ErrorFlag] = setorbit(varargin)">setorbit</a>, <a href="findrf.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = findrf(varargin)">findrf</a>, <a href="plotcm.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)">plotcm</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getdisp.html" class="code" title="function [Data, FileName] = getdisp(varargin)">getdisp</a>	GETDISP - Returns the dispersion for a BPM family (from file)</li><li><a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>	GETLIST - Returns Device List for a Family</li><li><a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a>	GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</li><li><a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>	GETRF - Gets the RF frequency</li><li><a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>	GETSPOS - Returns the longitudinal position in meters</li><li><a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>	GETUNITS - Return the present family units and units string</li><li><a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>	ISFAMILY - True for family names</li><li><a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>	MEASDISP - Measures the dispersion function</li><li><a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a>	STEPRF - Increment change in the RF frequency</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)</a>
+0002 <span class="comment">%RMDISP - Removes the portion of the orbit that correlates with the dispersion</span>
+0003 <span class="comment">%  [DeltaRF, OrbitRM, c, DispOrbit] = rmdisp(BPMFamily, Orbit, BPMList, Dispersion)</span>
+0004 <span class="comment">%  [DeltaRF, OrbitRM, c, DispOrbit] = rmdisp(BPMStruct, Dispersion)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. BPMFamily - Family name {Default: 'BPMx'}</span>
+0008 <span class="comment">%     BPMStruct - BPM data structure.  When using data structures, the orbit and</span>
+0009 <span class="comment">%                 BPMList are in the .Data and .DeviceList fields, respectively.</span>
+0010 <span class="comment">%  2. Orbit - Input orbit  {Default or empty: get the present orbit}</span>
+0011 <span class="comment">%  3. BPMList - Device or element list of BPMs  {Default or empty: all}</span>
+0012 <span class="comment">%  4  FLAGS - 'FitMean' or 'FitDispersionOnly' {Default} - Include or don't include the mean in the fit</span>
+0013 <span class="comment">%             'MeasDisp' - Measure the dispersion</span>
+0014 <span class="comment">%             'ModelDisp' - Calculate the model dispersion</span>
+0015 <span class="comment">%             'GoldenDisp' - Use the golden dispersion  {Default}</span>
+0016 <span class="comment">%             'Display' - Plot orbit information {Default: no display unless there are no outputs}</span>
+0017 <span class="comment">%             'NoDisplay' - No plot</span>
+0018 <span class="comment">%             'SetRF' - Sets the RF frequency to the new value (prompts to check the value if 'Display' is on)</span>
+0019 <span class="comment">%             'NoSetRF' - Don't set the RF frequency</span>
+0020 <span class="comment">%             (the usual Units and Mode flags: 'Online', 'Model', 'Manual', 'Hardware', 'Physics', etc.)</span>
+0021 <span class="comment">%  5. Dispersion - Optional input to specify the dispersion</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  OUTPUTS</span>
+0024 <span class="comment">%  1. DeltaRF - Change in RF frequency required to remove the dispersion component of</span>
+0025 <span class="comment">%               the orbit.  The units are the in RF frequency units used by getrf/setrf.</span>
+0026 <span class="comment">%               If DeltaRF = [], the units of dispersion or RF frequency were not unknown.  In</span>
+0027 <span class="comment">%               which case use c, output 3, to get the change in RF frequency.</span>
+0028 <span class="comment">%  2. OrbitRM - Estimated orbit with the dispersion orbit removed</span>
+0029 <span class="comment">%  3. c - fit coefficient,  OrbitRM = Orbit - c * Dispersion</span>
+0030 <span class="comment">%         c converts to RF frequency change but it depends on the units for the</span>
+0031 <span class="comment">%         orbit and dispersion.  For instance, if Orbit is in [mm] and Dispersion is</span>
+0032 <span class="comment">%         in [mm/MHz], then c is in MHz.  If Orbit is in [m] and Dispersion is in</span>
+0033 <span class="comment">%         [meter/(dp/p)], then c is energy shift (DeltaRF = -c*mcf*RF [Hz]).</span>
+0034 <span class="comment">%         To correct the orbit, change the RF frequency by negative of the frequency</span>
+0035 <span class="comment">%         change determined by the c coefficient.</span>
+0036 <span class="comment">%  3. DispOrbit - Dispersion orbit used in the calculation</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">%  NOTES</span>
+0039 <span class="comment">%  1. It is unclear to the author if it is better to fit the mean or not.  If the</span>
+0040 <span class="comment">%     BPM offsets are not known very well then fitting the mean may be better.  That way</span>
+0041 <span class="comment">%     the dispersion is not used as a way to change the orbit mean (beyond</span>
+0042 <span class="comment">%     the mean change due to the shape and sampling of the dispersion function).</span>
+0043 <span class="comment">%  2. When fitting the mean the RF frequency change is only based only the dispersion</span>
+0044 <span class="comment">%     fit coefficient.</span>
+0045 <span class="comment">%  3. It is best to use structure inputs, since the units are in the structure.  Hence,</span>
+0046 <span class="comment">%     the DeltaRF can be determined.</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">%  See also setorbit, findrf, plotcm</span>
+0049 
+0050 <span class="comment">%  Written by Greg Portmann</span>
+0051 
+0052 
+0053 <span class="comment">% Option to fit the mean as well as the dispersion</span>
+0054 <span class="comment">% FitMeanFlag = 0 -&gt; only fit the dispersion</span>
+0055 <span class="comment">% FitMeanFlag = 1 -&gt; fit both the mean and dispersion but only remove the</span>
+0056 <span class="comment">%                    dispersion coefficient from the orbit</span>
+0057 <span class="comment">% It can be good fit the mean (at least if BPM offsets are not known),</span>
+0058 <span class="comment">% so that the dispersion is not used as a way to change the orbit mean (beyond</span>
+0059 <span class="comment">% the mean change due to the shape and sampling of the dispersion function).</span>
+0060 <span class="comment">% When using difference orbits, I wouldn't fit the mean.</span>
+0061 <span class="comment">% Note: fitting the mean and dispersion together is different from removing</span>
+0062 <span class="comment">% the mean then fitting the dispersion.</span>
+0063 FitMeanFlag = 0;
+0064 
+0065 
+0066 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0067 <span class="comment">% Input parsing and checking %</span>
+0068 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0069 
+0070 <span class="keyword">if</span> nargout == 0 
+0071     DisplayFlag = 1;
+0072 <span class="keyword">else</span>
+0073     DisplayFlag = 0;
+0074 <span class="keyword">end</span>
+0075 ChangeRFFlag = 0;
+0076 DispFlag = <span class="string">'GoldenDisp'</span>;
+0077 StructOutputFlag = 0;
+0078 NumericOutputFlag = 0; 
+0079 DispOrbitStruct = []; 
+0080 InputFlags = {};
+0081 <span class="keyword">for</span> i = length(varargin):-1:1
+0082     <span class="keyword">if</span> isstruct(varargin{i})
+0083         <span class="comment">% Ignor structures</span>
+0084     <span class="keyword">elseif</span> iscell(varargin{i})
+0085         <span class="comment">% Ignor cells</span>
+0086     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'SetRF'</span>)
+0087         ChangeRFFlag = 1;
+0088         varargin(i) = [];
+0089     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoSetRF'</span>)
+0090         ChangeRFFlag = 0;
+0091         varargin(i) = [];
+0092     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0093         DisplayFlag = 1;
+0094         varargin(i) = [];
+0095     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0096         DisplayFlag = 0;
+0097         varargin(i) = [];
+0098     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'ModelDisp'</span>)
+0099         DispFlag = varargin{i};
+0100         varargin(i) = [];
+0101     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'MeasDisp'</span>)
+0102         DispFlag = varargin{i};
+0103         varargin(i) = [];
+0104     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'FitMean'</span>)
+0105         FitMeanFlag = 1;
+0106         varargin(i) = [];
+0107     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'FitDispersionOnly'</span>)
+0108         FitMeanFlag = 0;
+0109         varargin(i) = [];
+0110     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'GoldenDisp'</span>)
+0111         DispFlag = varargin{i};
+0112         varargin(i) = [];
+0113     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) | strcmpi(varargin{i},<span class="string">'model'</span>)
+0114         ModeFlag = <span class="string">'SIMULATOR'</span>;
+0115         InputFlags = [InputFlags varargin(i)];
+0116         varargin(i) = [];
+0117     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Online'</span>)
+0118         ModeFlag = <span class="string">'Online'</span>;
+0119         InputFlags = [InputFlags varargin(i)];
+0120         varargin(i) = [];
+0121     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0122         ModeFlag = <span class="string">'Manual'</span>;
+0123         InputFlags = [InputFlags varargin(i)];
+0124         varargin(i) = [];
+0125     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0126         UnitsFlag = <span class="string">'Physics'</span>;
+0127         InputFlags = [InputFlags varargin(i)];
+0128         varargin(i) = [];
+0129     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0130         UnitsFlag = <span class="string">'Hardware'</span>;
+0131         InputFlags = [InputFlags varargin(i)];
+0132         varargin(i) = [];
+0133     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0134         StructOutputFlag = 1;
+0135         varargin(i) = [];
+0136     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0137         NumericOutputFlag = 1;
+0138         StructOutputFlag = 0;
+0139         varargin(i) = [];
+0140     <span class="keyword">end</span>
+0141 <span class="keyword">end</span>
+0142 
+0143 <span class="keyword">if</span> length(varargin) &lt; 1
+0144     varargin = {<span class="string">'BPMx'</span>};
+0145 <span class="keyword">end</span>
+0146 
+0147 <span class="keyword">if</span> isstruct(varargin{1})
+0148     BPM = varargin{1};
+0149     <span class="keyword">if</span> ~<a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(BPM)
+0150         error(sprintf(<span class="string">'%s is not a family'</span>), BPM.FamilyName);
+0151     <span class="keyword">end</span>
+0152     <span class="keyword">if</span> length(varargin) &gt;= 2
+0153         <span class="comment">% Use dispersion for the input line</span>
+0154         DispOrbitStruct = varargin{2};
+0155     <span class="keyword">end</span>
+0156 
+0157     <span class="comment">% Only change StructOutputFlag if 'numeric' is not on the input line</span>
+0158     <span class="keyword">if</span> ~NumericOutputFlag
+0159         StructOutputFlag = 1;
+0160     <span class="keyword">end</span>
+0161 <span class="keyword">else</span>
+0162     <span class="keyword">if</span> ischar(varargin{1})
+0163         BPM.FamilyName = varargin{1};
+0164     <span class="keyword">else</span>
+0165         error(<span class="string">'First input must be a structure or FamilyName'</span>);
+0166     <span class="keyword">end</span>
+0167     <span class="keyword">if</span> ~<a href="isfamily.html" class="code" title="function  [FamilyFlag, AO] = isfamily(Family, Field)">isfamily</a>(BPM.FamilyName)
+0168         error(sprintf(<span class="string">'%s is not a BPM family'</span>, BPM.FamilyName));
+0169     <span class="keyword">end</span>
+0170     <span class="keyword">if</span> length(varargin) &gt;= 2
+0171         BPM.Data = varargin{2};
+0172     <span class="keyword">else</span>
+0173         BPM = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(BPM.FamilyName, <span class="string">'Struct'</span>, InputFlags{:});
+0174     <span class="keyword">end</span>
+0175     <span class="keyword">if</span> length(varargin) &gt;= 3
+0176         BPM.DeviceList = varargin{3};
+0177     <span class="keyword">elseif</span> ~isfield(BPM, <span class="string">'DeviceList'</span>)
+0178         BPM.DeviceList = <a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>(BPM.FamilyName);
+0179     <span class="keyword">end</span>
+0180     <span class="keyword">if</span> length(varargin) &gt;= 4
+0181         <span class="comment">% Use dispersion for the input line</span>
+0182         DispOrbitStruct = varargin{4};
+0183     <span class="keyword">end</span>
+0184 <span class="keyword">end</span>
+0185 
+0186 
+0187 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0188 <span class="comment">% Get Dispersion %</span>
+0189 <span class="comment">%%%%%%%%%%%%%%%%%%</span>
+0190 DispUnitsString = <span class="string">''</span>; 
+0191 <span class="keyword">if</span> isempty(DispOrbitStruct)
+0192     <span class="keyword">if</span> strcmpi(DispFlag,<span class="string">'ModelDisp'</span>)
+0193         DispOrbitStruct = <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>(BPM, <span class="string">'Struct'</span>, <span class="string">'Model'</span>, InputFlags{:});
+0194         DispUnitsString = DispOrbitStruct.UnitsString;
+0195     <span class="keyword">elseif</span> strcmpi(DispFlag,<span class="string">'MeasDisp'</span>)
+0196         DispOrbitStruct = <a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>(BPM, <span class="string">'Struct'</span>, InputFlags{:});
+0197         DispUnitsString = DispOrbitStruct.UnitsString;
+0198     <span class="keyword">elseif</span> strcmpi(DispFlag,<span class="string">'GoldenDisp'</span>)
+0199         DispOrbitStruct = <a href="getdisp.html" class="code" title="function [Data, FileName] = getdisp(varargin)">getdisp</a>(BPM.FamilyName, BPM.DeviceList, <span class="string">'Struct'</span>);
+0200         DispUnitsString = DispOrbitStruct.UnitsString;
+0201     <span class="keyword">end</span>
+0202 <span class="keyword">end</span>
+0203 <span class="keyword">if</span> isempty(DispOrbitStruct)
+0204     error(<span class="string">'Did not find or generate a proper dispersion function'</span>);
+0205 <span class="keyword">end</span>
+0206 
+0207 <span class="comment">% If dispersion is a structure, just use the .Data field</span>
+0208 <span class="keyword">if</span> isstruct(DispOrbitStruct)
+0209     DispOrbit = DispOrbitStruct.Data;
+0210 <span class="keyword">else</span>
+0211     DispOrbit = DispOrbitStruct;    
+0212 <span class="keyword">end</span>
+0213 
+0214 
+0215 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0216 <span class="comment">% Fit the orbit into the dispersion function %</span>
+0217 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0218 
+0219 <span class="comment">% Dot product of dispersion and the orbit can be used</span>
+0220 <span class="comment">% to find the RF frequency but to find the orbit which best</span>
+0221 <span class="comment">% correlates to the dispersion use a least squares fit</span>
+0222 <span class="comment">% c = BPM.Data' * DispOrbit;</span>
+0223 
+0224 BPMDataOld = BPM.Data;
+0225 <span class="keyword">if</span> FitMeanFlag
+0226     <span class="comment">% Fit the mean and the dispersion orbit</span>
+0227     X = [ones(size(DispOrbit)) DispOrbit];
+0228     cfit = X \ BPM.Data; 
+0229     c = cfit(2);
+0230     <span class="comment">%BPM.Data = BPM.Data - X * c;</span>
+0231 <span class="keyword">else</span>
+0232     <span class="comment">% Fit the dispersion orbit</span>
+0233     cfit = DispOrbit \ BPM.Data; 
+0234     c = cfit;
+0235 <span class="keyword">end</span>
+0236 
+0237 <span class="comment">%BPM.Data = BPM.Data - X * c;</span>
+0238 BPM.Data = BPM.Data - DispOrbit * c;
+0239 
+0240 
+0241 <span class="comment">% Comput the change in RF frequency</span>
+0242 <span class="comment">% Units are a big pain the neck when it comes to determining the actual RF change</span>
+0243 <span class="comment">% Note: this section will depend a little on how the UnitsString is setup</span>
+0244 <span class="comment">% c units = BPM units / Dispersion units</span>
+0245 RF0 = <a href="getrf.html" class="code" title="function [RFsp, RFam, DataTime, ErrorFlag] = getrf(varargin)">getrf</a>(<span class="string">'Struct'</span>, InputFlags{:});
+0246 DeltaRF = [];            
+0247 <span class="keyword">if</span> ~isfield(BPM,<span class="string">'UnitsString'</span>) 
+0248     [units, unitsstring] = <a href="getunits.html" class="code" title="function [Units, UnitsString] = getunits(Family, Field)">getunits</a>(BPM, <span class="string">'Monitor'</span>);
+0249     BPM.UnitsString = unitsstring;  <span class="comment">% Hopefully this is true</span>
+0250     <span class="comment">%if DisplayFlag</span>
+0251     <span class="comment">%    fprintf('   BPM units are defined.  Assuming units are %s.\n', unitsstring);</span>
+0252     <span class="comment">%end</span>
+0253 <span class="keyword">end</span>
+0254 <span class="keyword">if</span> ~isempty(BPM.UnitsString) &amp; ~isempty(DispUnitsString)
+0255     <span class="comment">% May need to scale by the orbit units</span>
+0256     <span class="keyword">if</span> strfind(lower(BPM.UnitsString), <span class="string">'mm'</span>) | strfind(lower(BPM.UnitsString), <span class="string">'millimeter'</span>) | strfind(lower(BPM.UnitsString), <span class="string">'millimeters'</span>) 
+0257         <span class="comment">% BPM is in mm</span>
+0258         <span class="keyword">if</span> strfind(DispUnitsString, <span class="string">'mm'</span>) | strfind(DispUnitsString, <span class="string">'millimeter'</span>) | strfind(DispUnitsString, <span class="string">'millimeters'</span>)
+0259             <span class="comment">% Dispersion is in mm, hence the units are ok</span>
+0260         <span class="keyword">elseif</span> strfind(DispUnitsString, <span class="string">'m'</span>) | strfind(DispUnitsString, <span class="string">'meter'</span>) | strfind(DispUnitsString, <span class="string">'meters'</span>)  
+0261             <span class="comment">% Dispersion is in meters</span>
+0262             c = c / 1000;
+0263         <span class="keyword">else</span>
+0264             DeltaRF = [];            
+0265         <span class="keyword">end</span>
+0266     <span class="keyword">elseif</span> strfind(lower(BPM.UnitsString), <span class="string">'m'</span>) | strfind(lower(BPM.UnitsString), <span class="string">'meter'</span>) | strfind(lower(BPM.UnitsString), <span class="string">'meter'</span>) 
+0267         <span class="comment">% BPM is in meters</span>
+0268         <span class="keyword">if</span> strfind(lower(DispUnitsString), <span class="string">'mm'</span>) | strfind(lower(DispUnitsString), <span class="string">'millimeter'</span>) | strfind(lower(DispUnitsString), <span class="string">'millimeters'</span>)
+0269             <span class="comment">% Dispersion is in mm, hence the units are ok</span>
+0270             c = c * 1000;
+0271         <span class="keyword">elseif</span> strfind(lower(DispUnitsString), <span class="string">'m'</span>) | strfind(lower(DispUnitsString), <span class="string">'meter'</span>) | strfind(lower(DispUnitsString), <span class="string">'meters'</span>)
+0272             <span class="comment">% Dispersion is in meters, hence the units are ok</span>
+0273         <span class="keyword">else</span>
+0274             DeltaRF = [];            
+0275         <span class="keyword">end</span>
+0276     <span class="keyword">end</span>
+0277     
+0278     <span class="comment">% Change units to the same as getrf</span>
+0279     <span class="keyword">if</span> strfind(lower(DispUnitsString), <span class="string">'mhz'</span>)
+0280         <span class="keyword">if</span> strcmpi(RF0.UnitsString, <span class="string">'MHz'</span>)
+0281             DeltaRF = c;        <span class="comment">% c is MHz, DeltaRF is MHz</span>
+0282         <span class="keyword">elseif</span> strcmpi(RF0.UnitsString, <span class="string">'Hz'</span>)
+0283             DeltaRF = c * 1e6;  <span class="comment">% c is MHz, DeltaRF is Hz</span>
+0284         <span class="keyword">else</span>
+0285             DeltaRF = [];            
+0286         <span class="keyword">end</span>
+0287     <span class="keyword">elseif</span> strfind(lower(DispUnitsString), <span class="string">'hz'</span>)
+0288         <span class="keyword">if</span> strcmpi(RF0.UnitsString, <span class="string">'MHz'</span>)
+0289             DeltaRF = c / 1e6;  <span class="comment">% c is Hz, DeltaRF is MHz</span>
+0290         <span class="keyword">elseif</span> strcmpi(RF0.UnitsString, <span class="string">'Hz'</span>)
+0291             DeltaRF = c;        <span class="comment">% c is Hz, DeltaRF is Hz</span>
+0292         <span class="keyword">else</span>
+0293             DeltaRF = [];            
+0294         <span class="keyword">end</span>
+0295     <span class="keyword">elseif</span> strfind(lower(DispUnitsString), <span class="string">'dp/p'</span>)
+0296         DeltaRF = c * <a href="getmcf.html" class="code" title="function Alpha = getmcf(ModelString)">getmcf</a> * RF0.Data;  <span class="comment">% Units same as RF0</span>
+0297     <span class="keyword">else</span>
+0298         DeltaRF = [];
+0299     <span class="keyword">end</span>
+0300 
+0301     <span class="comment">% Return the change in RF required to remove the orbit error</span>
+0302     DeltaRF = -DeltaRF;
+0303 <span class="keyword">else</span>
+0304     DeltaRF = -c;    
+0305 <span class="keyword">end</span>
+0306 
+0307 
+0308 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0309 <span class="comment">% Output and display %</span>
+0310 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%</span>
+0311 <span class="keyword">if</span> DisplayFlag
+0312     spos = <a href="getspos.html" class="code" title="function S = getspos(Family, DeviceList)">getspos</a>(BPM);
+0313     clf reset
+0314     subplot(2,1,1);
+0315     plot(spos, BPMDataOld, <span class="string">'r'</span>, spos, BPM.Data, <span class="string">'b'</span>); 
+0316     grid on
+0317     xlabel(<span class="string">'Position [Meters]'</span>);
+0318     <span class="keyword">if</span> isfield(BPM,<span class="string">'UnitsString'</span>)
+0319         ylabel(sprintf(<span class="string">'%s [%s]'</span>, BPM.FamilyName, BPM.UnitsString));
+0320     <span class="keyword">else</span>
+0321         ylabel(sprintf(<span class="string">'%s'</span>, BPM.FamilyName));
+0322     <span class="keyword">end</span>
+0323     legend(<span class="string">'Starting Orbit'</span>,<span class="string">'Dispersion Removed'</span>)
+0324     <span class="keyword">if</span> length(cfit) == 2
+0325         title(sprintf(<span class="string">'%g + %g * Dispersion'</span>,cfit(1), cfit(2)));
+0326     <span class="keyword">else</span>
+0327         title(sprintf(<span class="string">'%g * Dispersion'</span>,cfit(1)));
+0328     <span class="keyword">end</span>
+0329     
+0330     subplot(2,1,2);
+0331     <span class="comment">%plot(spos, X * c, 'b');</span>
+0332     plot(spos, DispOrbit * c, <span class="string">'b'</span>); 
+0333     grid on
+0334     xlabel(<span class="string">'Position [Meters]'</span>);
+0335     <span class="keyword">if</span> isfield(BPM,<span class="string">'UnitsString'</span>)
+0336         ylabel(sprintf(<span class="string">'Orbit Removed [%s]'</span>,BPM.UnitsString));
+0337     <span class="keyword">else</span>
+0338         ylabel(sprintf(<span class="string">'Orbit Removed'</span>));
+0339     <span class="keyword">end</span>
+0340 <span class="keyword">end</span>
+0341 
+0342 
+0343 <span class="keyword">if</span> ~StructOutputFlag
+0344     BPM = BPM.Data;
+0345 <span class="keyword">end</span>
+0346 
+0347 
+0348 <span class="comment">% Set the RF frequency</span>
+0349 <span class="keyword">if</span> ChangeRFFlag
+0350     <span class="keyword">if</span> ~isempty(DeltaRF)
+0351         <span class="keyword">if</span> DisplayFlag
+0352             answer = inputdlg({strvcat(strvcat(sprintf(<span class="string">'Recommend change in RF is %g %s'</span>, DeltaRF, RF0.UnitsString), <span class="string">'  '</span>), <span class="string">'Change the RF frequency?'</span>)},<span class="string">'RMDISP'</span>,1,{sprintf(<span class="string">'%g'</span>,DeltaRF)});
+0353             <span class="keyword">if</span> isempty(answer)
+0354                 fprintf(<span class="string">'   No change was made to the RF frequency\n'</span>);
+0355                 <span class="keyword">return</span>
+0356             <span class="keyword">end</span>
+0357             DeltaRF = str2num(answer{1});
+0358         <span class="keyword">end</span>
+0359         <a href="steprf.html" class="code" title="function steprf(varargin)">steprf</a>(DeltaRF, InputFlags{:});
+0360     <span class="keyword">else</span>
+0361         error(<span class="string">'RF frequency not changed because of a problem converting the units for dispersion and orbit to RF frequency'</span>);
+0362     <span class="keyword">end</span>
+0363 <span class="keyword">end</span>
+0364</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

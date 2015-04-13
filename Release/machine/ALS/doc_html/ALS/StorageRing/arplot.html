@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of arplot</title>
+  <meta name="keywords" content="arplot">
+  <meta name="description" content="function [y, ivec] = arplot(ChanName, LineType);">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; arplot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>arplot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [y, ivec] = arplot(ChanName, LineType);</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [yout, ivecout] = arplot(ChanName, LineType); </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> function [y, ivec] = arplot(ChanName, LineType);
+
+   ChanName = EPICS channel name (automatically places a wild card at the end)
+   LineType = 0 color plot, solid line type {default}
+            = 1 (else) BW plot, differend line types 
+                         {for printing on BW printer}
+
+   Outputs:  y = raw data (each row is a channel)
+             ivec = indices in the ARChanNames matrix which match ChannelName
+
+   Some Interesting Channels:   SR05S___DCCTLP
+                                SR07U___GDS1
+                                SR01C___B
+                                SR01C___BPM?</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>	ARSELECT - Return the archived data for a group on channel names</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="camshaftkickertemperatures.html" class="code" title="function [T, LabelCell, ChanNames] = camshaftkickertemperatures(DeltaT)">camshaftkickertemperatures</a>	CAMSHAFTKICKERTEMPERATURES - Temperatures on the camshaft bunch kicker</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [yout, ivecout] = arplot(ChanName, LineType);</a>
+0002 <span class="comment">% function [y, ivec] = arplot(ChanName, LineType);</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   ChanName = EPICS channel name (automatically places a wild card at the end)</span>
+0005 <span class="comment">%   LineType = 0 color plot, solid line type {default}</span>
+0006 <span class="comment">%            = 1 (else) BW plot, differend line types</span>
+0007 <span class="comment">%                         {for printing on BW printer}</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%   Outputs:  y = raw data (each row is a channel)</span>
+0010 <span class="comment">%             ivec = indices in the ARChanNames matrix which match ChannelName</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%   Some Interesting Channels:   SR05S___DCCTLP</span>
+0013 <span class="comment">%                                SR07U___GDS1</span>
+0014 <span class="comment">%                                SR01C___B</span>
+0015 <span class="comment">%                                SR01C___BPM?</span>
+0016 
+0017 
+0018 <span class="keyword">global</span> ARt ARData ARChanNames ARDate
+0019 
+0020 
+0021 <span class="keyword">if</span> nargin == 1
+0022    LineType = 0;
+0023 <span class="keyword">end</span>
+0024 
+0025 
+0026 <span class="comment">% Get data</span>
+0027 y=[]; ivec=[];
+0028 <span class="keyword">for</span> i=1:size(ChanName,1)
+0029    [ynew, ivecnew] = <a href="arselect.html" class="code" title="function [y, ivec, iNotFound] = arselect(ChanName, OneChannelFlag);">arselect</a>(ChanName(i,:));
+0030    y=[y; ynew];
+0031    ivec=[ivec; ivecnew];
+0032 <span class="keyword">end</span>
+0033 
+0034 
+0035 <span class="comment">% For printing</span>
+0036 <span class="keyword">if</span> LineType ~= 0
+0037    hfig = gcf;
+0038    set(hfig, <span class="string">'DefaultAxesColorOrder'</span>,[1 1 1]);
+0039    set(hfig, <span class="string">'DefaultAxesLineStyleOrder'</span>,<span class="string">'-|--|-.|:'</span>);
+0040 <span class="keyword">else</span>
+0041    <span class="comment">%hfig = gcf;</span>
+0042    <span class="comment">%set(hfig, 'DefaultAxesColorOrder',[1 1 0;1 0 1;0 1 1;1 0 0;0 1 0;0 0 1]);</span>
+0043    <span class="comment">%set(hfig, 'DefaultAxesLineStyleOrder','-');</span>
+0044 <span class="keyword">end</span>
+0045 
+0046 <span class="keyword">if</span> size(ivec) ~= [0 0]
+0047    <span class="comment">%clf</span>
+0048    <span class="keyword">if</span> (size(y,1)==1)
+0049       plot(ARt/60/60, y); grid on; legend off;
+0050       title(ARDate);
+0051       <span class="comment">%xlabel('Time since midnight [hours]');</span>
+0052       xlabel(<span class="string">'Time [hours]'</span>);
+0053       k = find(ARChanNames(ivec,:)==<span class="string">'_'</span>);
+0054       ylabelstr = ARChanNames(ivec,:);
+0055       ylabelstr(k) = <span class="string">' '</span>;
+0056       ylabel(ylabelstr);
+0057       <span class="comment">%  elseif (size(y,1)==2)</span>
+0058       <span class="comment">%    plotyy(ARt/60/60, y(1,:), ARt/60/60, y(2,:)); grid on; legend off;</span>
+0059       <span class="comment">%    title(ARDate);</span>
+0060       <span class="comment">%    ylabel(ARChanNames(ivec(1),:));</span>
+0061       <span class="comment">%    y2label(ARChanNames(ivec(2),:));</span>
+0062    <span class="keyword">else</span> 
+0063       plot(ARt/60/60, y); grid on; legend off;
+0064       title(ARDate);
+0065       xlabel(<span class="string">'Time [hours]'</span>);
+0066       j = 0;
+0067       <span class="keyword">for</span> i = ivec'
+0068          j=j+1;
+0069          k = find(ARChanNames(i,:)==<span class="string">'_'</span>);
+0070          M(j,:) = ARChanNames(i,:); 
+0071          M(j,k) = <span class="string">' '</span>;
+0072       <span class="keyword">end</span>
+0073       legend(M);
+0074    <span class="keyword">end</span>
+0075 <span class="keyword">end</span>
+0076 
+0077 <span class="keyword">if</span> nargout &gt;= 1
+0078    yout = y;
+0079 <span class="keyword">end</span>
+0080 
+0081 <span class="keyword">if</span> nargout == 2
+0082    ivecout = ivec;
+0083 <span class="keyword">end</span>
+0084</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

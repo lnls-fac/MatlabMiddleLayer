@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gettune</title>
+  <meta name="keywords" content="gettune">
+  <meta name="description" content="GETTUNE - Returns the betatron tunes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; gettune.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>gettune
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETTUNE - Returns the betatron tunes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETTUNE - Returns the betatron tunes
+  | Higher Fractional Tune (X) |
+  |                            | = gettune(t, FreshDataFlag, TimeOutPeriod)
+  |  Lower Fractional Tune (Y) |
+
+  INPUTS
+  1. t, FreshDataFlag, TimeOutPeriod (see help getpv for details)
+  2. 'Struct'  - Output will be a response matrix structure
+     'Numeric' - Output will be a numeric matrix {default}
+  3. Optional override of the units:
+     'Physics'  - Use physics  units
+     'Hardware' - Use hardware units
+  4. Optional override of the mode:
+     'Online'    - Get data online  
+     'Simulator' - Get data on the simulated accelerator using AT
+     'Model'     - Same as 'Simulator'
+     'Manual'    - Get data manually
+
+  OUTPUTS
+  1. Fractional tune
+  2. tout     (see help getpv for details)
+  3. DataTime (see help getpv for details)
+  4. ErrorFlag =  0   -&gt; no errors
+                 else -&gt; error or warning occurred
+
+  NOTES
+  1. An easy way to measure N averaged tunes is mean(gettune(1:2:N)')' (2 seconds between measurements)
+
+  See also <a href="steptune.html" class="code" title="function [DelQuad, ActuatorFamily] = steptune(varargin)">steptune</a>, <a href="settune.html" class="code" title="function [DelQuad, ActuatorFamily] = settune(varargin)">settune</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>	GETPV - Returns a variable from the online system or the model</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="measbeta.html" class="code" title="function AO = measbeta(varargin)">measbeta</a>	MEASBETA - Measure the betatron functions</li><li><a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>	MEASCHRO -  measures the chromaticity function emperically</li><li><a href="quadcenter.html" class="code" title="function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)">quadcenter</a>	QUADCENTER - Measure the magnet center of a quadrupole magnet</li><li><a href="settune.html" class="code" title="function [DelQuad, ActuatorFamily] = settune(varargin)">settune</a>	SETTUNE - Set the tune</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Tune, tout, DataTime, ErrorFlag] = gettune(varargin)</a>
+0002 <span class="comment">%GETTUNE - Returns the betatron tunes</span>
+0003 <span class="comment">%  | Higher Fractional Tune (X) |</span>
+0004 <span class="comment">%  |                            | = gettune(t, FreshDataFlag, TimeOutPeriod)</span>
+0005 <span class="comment">%  |  Lower Fractional Tune (Y) |</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  INPUTS</span>
+0008 <span class="comment">%  1. t, FreshDataFlag, TimeOutPeriod (see help getpv for details)</span>
+0009 <span class="comment">%  2. 'Struct'  - Output will be a response matrix structure</span>
+0010 <span class="comment">%     'Numeric' - Output will be a numeric matrix {default}</span>
+0011 <span class="comment">%  3. Optional override of the units:</span>
+0012 <span class="comment">%     'Physics'  - Use physics  units</span>
+0013 <span class="comment">%     'Hardware' - Use hardware units</span>
+0014 <span class="comment">%  4. Optional override of the mode:</span>
+0015 <span class="comment">%     'Online'    - Get data online</span>
+0016 <span class="comment">%     'Simulator' - Get data on the simulated accelerator using AT</span>
+0017 <span class="comment">%     'Model'     - Same as 'Simulator'</span>
+0018 <span class="comment">%     'Manual'    - Get data manually</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  OUTPUTS</span>
+0021 <span class="comment">%  1. Fractional tune</span>
+0022 <span class="comment">%  2. tout     (see help getpv for details)</span>
+0023 <span class="comment">%  3. DataTime (see help getpv for details)</span>
+0024 <span class="comment">%  4. ErrorFlag =  0   -&gt; no errors</span>
+0025 <span class="comment">%                 else -&gt; error or warning occurred</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  NOTES</span>
+0028 <span class="comment">%  1. An easy way to measure N averaged tunes is mean(gettune(1:2:N)')' (2 seconds between measurements)</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  See also steptune, settune</span>
+0031 
+0032 <span class="comment">% Written by Gregory J. Portmann</span>
+0033 <span class="comment">% Modified by Laurent S. Nadolski</span>
+0034 
+0035 
+0036 DisplayFlag = 0;
+0037 <span class="keyword">for</span> i = length(varargin):-1:1
+0038     <span class="keyword">if</span> isstruct(varargin{i})
+0039         <span class="comment">% Ignore structures</span>
+0040     <span class="keyword">elseif</span> iscell(varargin{i})
+0041         <span class="comment">% Ignore cells</span>
+0042     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0043         DisplayFlag = 1;
+0044         varargin(i) = [];
+0045     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0046         DisplayFlag = 0;
+0047         varargin(i) = [];
+0048     <span class="keyword">end</span>
+0049 <span class="keyword">end</span>
+0050  
+0051 <span class="comment">% Get betatron tunes</span>
+0052 [Tune, tout, DataTime, ErrorFlag] = <a href="getpv.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)">getpv</a>(<span class="string">'TUNE'</span>, <span class="string">'Monitor'</span>, [1 1; 1 2], varargin{:});
+0053 
+0054 <span class="comment">% Complete structure</span>
+0055 <span class="keyword">if</span> isstruct(Tune)
+0056     TuneUnitsString = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TUNE'</span>,<span class="string">'Monitor'</span>,<span class="string">'HWUnits'</span>);
+0057     <span class="keyword">if</span> isempty(TuneUnitsString)
+0058         Tune.UnitsString = <span class="string">'Fractional Tune'</span>;
+0059     <span class="keyword">else</span>
+0060         Tune.UnitsString = TuneUnitsString;
+0061     <span class="keyword">end</span>
+0062     Tune.DataDescriptor = <span class="string">'TUNE'</span>;
+0063     Tune.CreatedBy = <span class="string">'gettune'</span>;
+0064 <span class="keyword">end</span>
+0065 
+0066 <span class="comment">% Display to the screen</span>
+0067 <span class="keyword">if</span> DisplayFlag
+0068    fprintf(<span class="string">'\n  Horizontal Tune = %f\n'</span>, Tune(1));
+0069    fprintf(<span class="string">'    Vertical Tune = %f\n\n'</span>, Tune(2));
+0070 <span class="keyword">end</span>
+0071 
+0072 
+0073 <span class="comment">% % Get data at every point in time vector, t</span>
+0074 <span class="comment">% t_start = gettime;</span>
+0075 <span class="comment">% for i = 1:length(t)</span>
+0076 <span class="comment">%     T = t(i)-(gettime-t_start);</span>
+0077 <span class="comment">%     if T &gt; 0</span>
+0078 <span class="comment">%         pause(T);</span>
+0079 <span class="comment">%     end</span>
+0080 <span class="comment">%     tout(i) = gettime - t_start;</span>
+0081 <span class="comment">%</span>
+0082 <span class="comment">%     [Tune(:,i), ErrorFlag] = local_gettune;</span>
+0083 <span class="comment">%</span>
+0084 <span class="comment">%     if FreshDataFlag</span>
+0085 <span class="comment">%         FreshDataCounter = FreshDataFlag;</span>
+0086 <span class="comment">%         t0 = gettime;</span>
+0087 <span class="comment">%         Tune0 = Tune(:,i);</span>
+0088 <span class="comment">%         while FreshDataCounter</span>
+0089 <span class="comment">%             [Tune(:,i), ErrorFlag] = local_gettune;</span>
+0090 <span class="comment">%</span>
+0091 <span class="comment">%             if ~any((Tune(:,i)-Tune0)==0)</span>
+0092 <span class="comment">%                 FreshDataCounter = FreshDataCounter - 1;</span>
+0093 <span class="comment">%             end</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">%             if (gettime-t0)&gt; TimeOutPeriod</span>
+0096 <span class="comment">%                 error('Timed out waiting for fresh tune data.');</span>
+0097 <span class="comment">%                 %ErrorFlag = 1;</span>
+0098 <span class="comment">%                 %break</span>
+0099 <span class="comment">%             end</span>
+0100 <span class="comment">%         end</span>
+0101 <span class="comment">%     end</span>
+0102 <span class="comment">% end</span>
+0103 <span class="comment">%</span>
+0104 <span class="comment">% % if nargout == 0</span>
+0105 <span class="comment">% %     fprintf('\n   Horizontal Tune = %f\n', Tune(1,1));</span>
+0106 <span class="comment">% %     fprintf('     Vertical Tune = %f\n\n', Tune(2,1));</span>
+0107 <span class="comment">% % end</span>
+0108 <span class="comment">%</span>
+0109 <span class="comment">%</span>
+0110 <span class="comment">%</span>
+0111 <span class="comment">% function [Tune, ErrorFlag] = local_gettune</span>
+0112 <span class="comment">%</span>
+0113 <span class="comment">% ErrorFlag = 0;</span>
+0114 <span class="comment">%</span>
+0115 <span class="comment">% [FamilyIndex, ACCELERATOR_OBJECT] = isfamily('TUNE');</span>
+0116 <span class="comment">%</span>
+0117 <span class="comment">% if isfield(ACCELERATOR_OBJECT, 'Mode')</span>
+0118 <span class="comment">%     Mode = ACCELERATOR_OBJECT.Mode;</span>
+0119 <span class="comment">% else</span>
+0120 <span class="comment">%     Mode = 'Online';</span>
+0121 <span class="comment">% end</span>
+0122 <span class="comment">%</span>
+0123 <span class="comment">% if strcmp(lower(Mode),'online')</span>
+0124 <span class="comment">%</span>
+0125 <span class="comment">%     RFam = getam('TUNE');</span>
+0126 <span class="comment">%</span>
+0127 <span class="comment">% elseif strcmp(lower(Mode),'simulator')</span>
+0128 <span class="comment">%</span>
+0129 <span class="comment">%     global THERING</span>
+0130 <span class="comment">%     if isempty(THERING)</span>
+0131 <span class="comment">%         error('Simulator variable is not setup properly.');</span>
+0132 <span class="comment">%     end</span>
+0133 <span class="comment">%</span>
+0134 <span class="comment">%     [TD, Tune1] = twissring(THERING,0,1:length(THERING)+1);</span>
+0135 <span class="comment">%     Tune = Tune1' + rand(2,1)*.0001;</span>
+0136 <span class="comment">%</span>
+0137 <span class="comment">% elseif strcmp(lower(Mode),'manual')</span>
+0138 <span class="comment">%</span>
+0139 <span class="comment">%     Tune(1,1) = input('   Input the horizontal tune = ');</span>
+0140 <span class="comment">%     Tune(2,1) = input('   Input the vertical   tune = ');</span>
+0141 <span class="comment">%</span>
+0142 <span class="comment">% elseif strcmp(lower(Mode),'als')</span>
+0143 <span class="comment">%</span>
+0144 <span class="comment">%     Tune = gettune_als;</span>
+0145 <span class="comment">%</span>
+0146 <span class="comment">% else</span>
+0147 <span class="comment">%</span>
+0148 <span class="comment">%     error(sprintf('Unknown mode for family %s.', ACCELERATOR_OBJECT.FamilyName));</span>
+0149 <span class="comment">%</span>
+0150 <span class="comment">% end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of amp2k</title>
+  <meta name="keywords" content="amp2k">
+  <meta name="description" content="AMP2K - Converts amperes to simulator values">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; amp2k.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>amp2k
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>AMP2K - Converts amperes to simulator values</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [k, B] = amp2k(Family, Field, Amps, DeviceList, Energy, BranchFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">AMP2K - Converts amperes to simulator values
+  [K, B] = amp2k(Family, Field, Amps, DeviceList, Energy, BranchFlag)
+
+  INPUTS
+  1. Family - Family name
+  2. Field - Sub-field (like 'Setpoint')
+  3. Amps - Ampere
+  4. DeviceList - Device list (Amps and DeviceList must have the same number of rows)
+  5. Energy - Energy in GeV {Default: getenergy}
+              If Energy is a vector, each output column will correspond to that energy.
+              Energy can be anything getenergy accepts, like 'Model' or 'Online'.
+              (Note: If Energy is a vector, then Amps can only have 1 column)
+  6. BranchFlag - 1 -&gt; Lower branch
+                  2 -&gt; Upper branch
+
+  OUTPUTS
+  1. K and B - K-value and field in AT convention
+     For dipole:      K = B / Brho
+     For quadrupole:  K = B'/ Brho
+     For sextupole:   K = B&quot;/ Brho / 2
+
+  NOTES
+  1. The Amp-to-K conversion is based on the 1.5 to 1.9 hysteresis loops.  Linearly projecting
+     outside this range can produce questionable results.
+  2. If Amps==0, then K and B are set to zero.  This is done because the hysteresis loops
+     do not interpolate to zero very well.
+  3. The input should be in real units (as expected in hw2physics).
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="alsinit.html" class="code" title="function alsinit(OperationalMode)">alsinit</a>	ALSINIT</li><li><a href="srcontrol5.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5</a>	srcontrol5</li><li><a href="srcontrol5_new_but_broken_EPUtuneFF_20070723.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5_new_but_broken_EPUtuneFF_20070723</a>	srcontrol5</li><li><a href="srcontrol5_with_chicane_checks.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5_with_chicane_checks</a>	srcontrol5</li><li><a href="srcontrol5_without_chicane_trim_checks_pre20070730.html" class="code" title="function srcontrol5(action, Input2, Input3)">srcontrol5_without_chicane_trim_checks_pre20070730</a>	srcontrol5</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [k, B] = amp2k(Family, Field, Amps, DeviceList, Energy, BranchFlag)</a>
+0002 <span class="comment">%AMP2K - Converts amperes to simulator values</span>
+0003 <span class="comment">%  [K, B] = amp2k(Family, Field, Amps, DeviceList, Energy, BranchFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Family - Family name</span>
+0007 <span class="comment">%  2. Field - Sub-field (like 'Setpoint')</span>
+0008 <span class="comment">%  3. Amps - Ampere</span>
+0009 <span class="comment">%  4. DeviceList - Device list (Amps and DeviceList must have the same number of rows)</span>
+0010 <span class="comment">%  5. Energy - Energy in GeV {Default: getenergy}</span>
+0011 <span class="comment">%              If Energy is a vector, each output column will correspond to that energy.</span>
+0012 <span class="comment">%              Energy can be anything getenergy accepts, like 'Model' or 'Online'.</span>
+0013 <span class="comment">%              (Note: If Energy is a vector, then Amps can only have 1 column)</span>
+0014 <span class="comment">%  6. BranchFlag - 1 -&gt; Lower branch</span>
+0015 <span class="comment">%                  2 -&gt; Upper branch</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%  OUTPUTS</span>
+0018 <span class="comment">%  1. K and B - K-value and field in AT convention</span>
+0019 <span class="comment">%     For dipole:      K = B / Brho</span>
+0020 <span class="comment">%     For quadrupole:  K = B'/ Brho</span>
+0021 <span class="comment">%     For sextupole:   K = B&quot;/ Brho / 2</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  NOTES</span>
+0024 <span class="comment">%  1. The Amp-to-K conversion is based on the 1.5 to 1.9 hysteresis loops.  Linearly projecting</span>
+0025 <span class="comment">%     outside this range can produce questionable results.</span>
+0026 <span class="comment">%  2. If Amps==0, then K and B are set to zero.  This is done because the hysteresis loops</span>
+0027 <span class="comment">%     do not interpolate to zero very well.</span>
+0028 <span class="comment">%  3. The input should be in real units (as expected in hw2physics).</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  Written by Greg Portmann</span>
+0031 
+0032 
+0033 <span class="keyword">if</span> nargin &lt; 3
+0034     error(<span class="string">'At least 3 input required'</span>);
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="keyword">if</span> isempty(Field)
+0038     Field = <span class="string">'Setpoint'</span>;
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="keyword">if</span> nargin &lt; 4
+0042     DeviceList = [];
+0043 <span class="keyword">end</span>
+0044 <span class="keyword">if</span> isempty(DeviceList)
+0045     DeviceList = family2dev(Family);
+0046 <span class="keyword">end</span>
+0047 
+0048 <span class="keyword">if</span> nargin &lt; 5
+0049     Energy = [];
+0050 <span class="keyword">end</span>
+0051 <span class="keyword">if</span> isempty(Energy)
+0052     Energy = getenergy;
+0053 <span class="keyword">elseif</span> ischar(Energy)
+0054     Energy = getenergy(Energy);
+0055 <span class="keyword">end</span>
+0056 
+0057 
+0058 <span class="comment">% Hysteresis branch</span>
+0059 <span class="keyword">if</span> nargin &lt; 6
+0060     BranchFlag = [];
+0061 <span class="keyword">else</span>
+0062     <span class="keyword">if</span> char(BranchFlag)
+0063         <span class="keyword">if</span> strcmpi(BranchFlag, <span class="string">'Lower'</span>)
+0064             <span class="comment">% Lower branch</span>
+0065             BranchFlag = 1;
+0066         <span class="keyword">elseif</span> strcmpi(BranchFlag, <span class="string">'Upper'</span>)
+0067             <span class="comment">% Upper branch</span>
+0068             BranchFlag = 2;
+0069         <span class="keyword">end</span>
+0070     <span class="keyword">end</span>
+0071 <span class="keyword">end</span>
+0072 <span class="keyword">if</span> isempty(BranchFlag)
+0073     <span class="keyword">if</span> strcmpi(getfamilydata(<span class="string">'HysteresisBranch'</span>),<span class="string">'Lower'</span>)
+0074         <span class="comment">% Lower branch</span>
+0075         BranchFlag = 1;
+0076     <span class="keyword">else</span>
+0077         <span class="comment">% Upper branch (default)</span>
+0078         BranchFlag = 2;
+0079     <span class="keyword">end</span>
+0080 <span class="keyword">end</span>
+0081 
+0082 
+0083 <span class="keyword">if</span> size(Amps,1) == 1 &amp;&amp; length(DeviceList) &gt; 1
+0084     Amps = ones(size(DeviceList,1),1) * Amps;
+0085 <span class="keyword">elseif</span> size(Amps,1) ~= size(DeviceList,1)
+0086     error(<span class="string">'Rows in Amps must equal rows in DeviceList or be a scalar'</span>);
+0087 <span class="keyword">end</span>
+0088 
+0089 
+0090 <span class="keyword">if</span> all(isnan(Amps))
+0091     k = Amps;
+0092     B = Amps;
+0093     <span class="keyword">return</span>
+0094 <span class="keyword">end</span>
+0095 
+0096 
+0097 <span class="comment">% Force Energy and Amps to have the same number of columns</span>
+0098 <span class="keyword">if</span> all(size(Energy) &gt; 1)
+0099     error(<span class="string">'Energy can only be a scalar or vector'</span>);
+0100 <span class="keyword">end</span>
+0101 Energy = Energy(:)';
+0102 
+0103 <span class="keyword">if</span> length(Energy) &gt; 1
+0104     <span class="keyword">if</span> size(Amps,2) == size(Energy,2)
+0105         <span class="comment">% OK</span>
+0106     <span class="keyword">elseif</span> size(Amps,2) &gt; 1
+0107         error(<span class="string">'If Energy is a vector, then Amps can only have 1 column.'</span>);
+0108     <span class="keyword">else</span>
+0109         <span class="comment">% Amps has one column, expand to the size of Energy</span>
+0110         Amps = Amps * ones(1,size(Energy,2));
+0111     <span class="keyword">end</span>
+0112 <span class="keyword">else</span>
+0113     Energy = Energy * ones(1,size(Amps,2));
+0114 <span class="keyword">end</span>
+0115 
+0116 
+0117 <span class="comment">% hw2physics already did a raw2real but this function works in raw units so convert it back ???</span>
+0118 Amps = real2raw(Family, Field, Amps, DeviceList);
+0119 
+0120 
+0121 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0122 <span class="comment">% Corrector Magnets %</span>
+0123 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0124 <span class="comment">% Put amp2k as the HCM/VCM conversions</span>
+0125 <span class="comment">% HCM(1,2,7,8)   BLeff  =  4.070*10-4 * I  (Tesla-meters)</span>
+0126 <span class="comment">% HCM(3,6)       BLeff  =  9.500*10-4 * I  (Tesla-meters)</span>
+0127 <span class="comment">% HCM(4,5)       BLeff  = 10.250*10-4 * I  (Tesla-meters)</span>
+0128 <span class="comment">% VCM(1,2,7,8)   BLeff  =  1.711*10-4 * I  (Tesla-meters)</span>
+0129 <span class="comment">% VCM(4,5)       BLeff  = -3.000*10-4 * I  (Tesla-meters)</span>
+0130 <span class="comment">% Rad = BLeff / Brho</span>
+0131 <span class="keyword">if</span> strcmpi(Family, <span class="string">'HCM'</span>)
+0132     Brho = getbrho(Energy);
+0133     <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0134         <span class="keyword">if</span> any(DeviceList(i,2) == [1 2 7 8])
+0135             BLeffPerI =  4.070e-4;  <span class="comment">%  (Tesla-meters)</span>
+0136             Leff = .5;
+0137 
+0138         <span class="keyword">elseif</span> all(DeviceList(i,:)==[5 3]) || all(DeviceList(i,:)==[5 6])
+0139             <span class="comment">% Skew quad power supply swap</span>
+0140             BLeffPerI = .6329 * 9.500e-4 * .45;  <span class="comment">%  (Tesla-meters)</span>
+0141             Leff = 0.2030;
+0142         <span class="keyword">elseif</span> all(DeviceList(i,:)==[5 5]) || all(DeviceList(i,:)==[7 4])
+0143             <span class="comment">% Skew quad power supply swap</span>
+0144             BLeffPerI = .5046 * 10.250e-4 * .45;  <span class="comment">%  (Tesla-meters)</span>
+0145             Leff = 0.2030;
+0146 
+0147         <span class="keyword">elseif</span> any(DeviceList(i,2) == [3 6])
+0148             BLeffPerI = 0.7667 * 9.500e-4;  <span class="comment">%  (Tesla-meters)</span>
+0149             Leff = 0.2030;
+0150         <span class="keyword">elseif</span> any(DeviceList(i,2) == [4 5])
+0151             BLeffPerI = 0.6156 * 10.250e-4;  <span class="comment">%  (Tesla-meters)</span>
+0152             Leff = 0.2030;
+0153         <span class="keyword">elseif</span> any(DeviceList(i,2) == 10)
+0154             <span class="comment">% Center chicane</span>
+0155             BLeffPerI = 1.0753 * .2e-4;  <span class="comment">%  (Tesla-meters)</span>
+0156             Leff = 0.2030;
+0157         <span class="keyword">else</span>
+0158             error(<span class="string">'Device not found in HCM family.'</span>);
+0159         <span class="keyword">end</span>
+0160 
+0161         k(i,:) = BLeffPerI .* Amps(i,:) ./ Brho;
+0162 
+0163         <span class="keyword">if</span> nargout &gt;= 2
+0164             B(i,:) = BLeffPerI .* Amps(i,:) ./ Leff;
+0165         <span class="keyword">end</span>
+0166     <span class="keyword">end</span>
+0167     <span class="keyword">return</span>
+0168 <span class="keyword">end</span>
+0169 
+0170 <span class="keyword">if</span> strcmpi(Family, <span class="string">'VCM'</span>)
+0171     Brho = getbrho(Energy);
+0172     <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0173         <span class="keyword">if</span> any(DeviceList(i,2) == [1 8])
+0174             BLeffPerI =  1.0802 * 1.711e-4;  <span class="comment">%  (Tesla-meters)</span>
+0175             Leff = .5;
+0176         <span class="keyword">elseif</span> any(DeviceList(i,2) == [2 7])
+0177             BLeffPerI =  0.8473 * 1.711e-4;  <span class="comment">%  (Tesla-meters)</span>
+0178             Leff = .5;
+0179         <span class="keyword">elseif</span> any(DeviceList(i,2) == [4 5])
+0180             BLeffPerI = -2.5 *3.0e-4;  <span class="comment">%  (Tesla-meters)  2.5 add emperically (Greg Portmann)</span>
+0181             Leff = 0.2030;
+0182         <span class="keyword">elseif</span> any(DeviceList(i,2) == 10)
+0183             <span class="comment">% Center chicane</span>
+0184             BLeffPerI = 0.3532e-4;  <span class="comment">%  (Tesla-meters)</span>
+0185             Leff = 0.2030;
+0186         <span class="keyword">else</span>
+0187             error(<span class="string">'Device not found in VCM family.'</span>);
+0188         <span class="keyword">end</span>
+0189 
+0190         k(i,:) = BLeffPerI .* Amps(i,:) ./ Brho;
+0191 
+0192         <span class="keyword">if</span> nargout &gt;= 2
+0193             B(i,:) = BLeffPerI .* Amps(i,:) ./ Leff;
+0194         <span class="keyword">end</span>
+0195     <span class="keyword">end</span>
+0196     <span class="keyword">return</span>
+0197 <span class="keyword">end</span>
+0198 
+0199 
+0200 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0201 <span class="comment">% Chicane Magnets %</span>
+0202 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0203 <span class="keyword">if</span> any(strcmpi(Family, {<span class="string">'HCMCHICANE'</span>,<span class="string">'VCMCHICANE'</span>}))
+0204     <span class="comment">% Put amp2k as the HCM/VCM conversions</span>
+0205     <span class="comment">% HCMCHICANE   BLeff  =  1*10-4 * I  (Tesla-meters)  ???</span>
+0206     <span class="comment">% VCMCHICANE   BLeff  =  1*10-4 * I  (Tesla-meters)  ???</span>
+0207     <span class="comment">% Rad = BLeff / Brho</span>
+0208 
+0209     Brho = getbrho(Energy);
+0210 
+0211     <span class="keyword">if</span> strcmpi(Family, <span class="string">'HCMCHICANE'</span>)
+0212         <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0213             <span class="comment">% Just valid for the center chicane trim corrector</span>
+0214             BLeffPerI = 1.0753 * .2e-4;  <span class="comment">%  (Tesla-meters)</span>
+0215             Leff = .5;
+0216             
+0217             k(i,:) = BLeffPerI .* Amps(i,:) ./ Brho;
+0218             <span class="keyword">if</span> nargout &gt;= 2
+0219                 B(i,:) = BLeffPerI .* Amps(i,:) ./ Leff;
+0220             <span class="keyword">end</span>
+0221         <span class="keyword">end</span>
+0222     <span class="keyword">end</span>
+0223 
+0224     <span class="keyword">if</span> strcmpi(Family, <span class="string">'VCMCHICANE'</span>)
+0225         <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0226             <span class="comment">% Just valid for the center chicane trim corrector</span>
+0227             BLeffPerI =   0.3532e-4;  <span class="comment">%  (Tesla-meters)</span>
+0228             Leff = .5;
+0229             
+0230             k(i,:) = BLeffPerI .* Amps(i,:) ./ Brho;
+0231             <span class="keyword">if</span> nargout &gt;= 2
+0232                 B(i,:) = BLeffPerI .* Amps(i,:) ./ Leff;
+0233             <span class="keyword">end</span>
+0234         <span class="keyword">end</span>
+0235     <span class="keyword">end</span>
+0236     <span class="keyword">return</span>
+0237 <span class="keyword">end</span>
+0238 
+0239 
+0240 <span class="comment">%%%%%%%%%%%%%%</span>
+0241 <span class="comment">% Skew Quads %</span>
+0242 <span class="comment">%%%%%%%%%%%%%%</span>
+0243 <span class="keyword">if</span> any(strcmpi(Family, {<span class="string">'SQSF'</span>,<span class="string">'SQSD'</span>}))
+0244     <span class="comment">% Scaling factors [A/m^-2] (based on magnetic measurements of skew quadrupoles)</span>
+0245     ChannelName = family2channel(Family, Field, DeviceList);
+0246     <span class="keyword">for</span> i = 1:size(Amps,1)
+0247         <span class="keyword">for</span> j = 1:size(Amps,2)
+0248             <span class="comment">% SQSF factor are weaker at 1.9 GeV because the higher sextupole strength causes pole saturation.</span>
+0249             <span class="keyword">if</span> strcmpi(ChannelName(i,9:12), <span class="string">'SQSF'</span>)
+0250                 <span class="keyword">if</span> Energy(j) &gt; 1.7
+0251                     ScaleFactor = (20.0 / 0.11) * Energy(j) / 1.894;
+0252                 <span class="keyword">else</span>
+0253                     ScaleFactor = (14.0 / 0.11) * Energy(j) / 1.894;
+0254                 <span class="keyword">end</span>
+0255             <span class="keyword">elseif</span> strcmpi(ChannelName(i,1:13), <span class="string">'SR05C___HCSF1'</span>) || strcmpi(ChannelName(i,1:13), <span class="string">'SR06C___HCSF1'</span>)
+0256                 <span class="keyword">if</span> Energy(j) &gt; 1.7
+0257                     ScaleFactor = (20.0 / 0.11) * Energy(j) / 1.894 / 4.7;
+0258                 <span class="keyword">else</span>
+0259                     ScaleFactor = (14.0 / 0.11) * Energy(j) / 1.894 / 4.7;
+0260                 <span class="keyword">end</span>
+0261             <span class="keyword">elseif</span> strcmpi(ChannelName(i,1:13), <span class="string">'SR05C___HCSF2'</span>) || strcmpi(ChannelName(i,1:13), <span class="string">'SR07C___HCSF1'</span>)
+0262                 <span class="keyword">if</span> Energy(j) &gt; 1.7
+0263                     ScaleFactor = (6.1 / 0.11) * Energy(j) / 1.894;
+0264                 <span class="keyword">else</span>
+0265                     ScaleFactor = (6.1 / 0.11) * Energy(j) / 1.894;  <span class="comment">% probably not correct; but saturation unknow so far</span>
+0266                 <span class="keyword">end</span>
+0267             <span class="keyword">elseif</span> strcmpi(ChannelName(i,9:12), <span class="string">'HCSD'</span>)
+0268                 <span class="keyword">if</span> Energy(j) &gt; 1.7
+0269                     ScaleFactor = (4.6 / 0.11) * Energy(j) / 1.894;
+0270                     <span class="comment">%ScaleFactor = Energy(j) / 1.9 / 0.0238;  % LOCO run on 2005-05-14</span>
+0271                 <span class="keyword">else</span>
+0272                     ScaleFactor = (4.6 / 0.11) * Energy(j) / 1.894;  <span class="comment">% probably not correct; but saturation unknow so far</span>
+0273                 <span class="keyword">end</span>
+0274             <span class="keyword">elseif</span> strcmpi(ChannelName(i,9:12), <span class="string">'SQSD'</span>)
+0275                 <span class="keyword">if</span> Energy(j) &gt; 1.7
+0276                     ScaleFactor = (14.0 / 0.11) * Energy(j) / 1.894;
+0277                 <span class="keyword">else</span>
+0278                     ScaleFactor = (14.0 / 0.11) * Energy(j) / 1.894;  <span class="comment">% probably not correct; but saturation unknow so far</span>
+0279                 <span class="keyword">end</span>
+0280             <span class="keyword">else</span>
+0281                 error(<span class="string">'%s unknown family'</span>, Family);
+0282             <span class="keyword">end</span>
+0283 
+0284             <span class="comment">% All skew power supplies have the wrong polarity</span>
+0285             ScaleFactor = -ScaleFactor;
+0286 
+0287             k(i,j) = Amps(i,j) / ScaleFactor;
+0288 
+0289             <span class="keyword">if</span> nargout &gt;=2
+0290                 B(i,j) = k(i,j) * getbrho(Energy(j));
+0291             <span class="keyword">end</span>
+0292         <span class="keyword">end</span>
+0293     <span class="keyword">end</span>
+0294     <span class="keyword">return</span>
+0295 <span class="keyword">end</span>
+0296 
+0297 
+0298 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0299 <span class="comment">% Setpoint and Monitor fields %</span>
+0300 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0301 <span class="keyword">if</span> any(strcmpi(Field, {<span class="string">'Setpoint'</span>,<span class="string">'Monitor'</span>}))
+0302 
+0303     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0304     <span class="comment">% Magnets in the Ramp Table %</span>
+0305     <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0306     
+0307     <span class="comment">% Convert amps to k for ALS:</span>
+0308     <span class="comment">% 1. Get the model k-value</span>
+0309     <span class="comment">% 2. Convert Amps to Energy-Table</span>
+0310     <span class="comment">% 3. Assumption: K = k-model is constant for every point on the BendAmps, Energy table</span>
+0311     <span class="comment">%    Therefore,  e = energy according to Amps to BendAmps to GeV</span>
+0312     <span class="comment">%                B = k-model * Brho(e)</span>
+0313     <span class="comment">%                k(Amps) = B / Brho(Energy)</span>
+0314     
+0315     <span class="comment">% Get the proper table</span>
+0316     <span class="comment">% The tables are normalized:  Setpoints = RampTable * (Upper-Lower) + Lower</span>
+0317     DirectoryName = getfamilydata(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0318     <span class="keyword">if</span> BranchFlag == 1
+0319         <span class="comment">% Lower branch</span>
+0320         load([DirectoryName <span class="string">'alsrampup'</span>]);
+0321     <span class="keyword">else</span>
+0322         <span class="comment">% Upper branch</span>
+0323         load([DirectoryName <span class="string">'alsrampdown'</span>]);
+0324     <span class="keyword">end</span>
+0325 
+0326     iDevTotal = findrowindex(DeviceList, family2dev(Family,0));
+0327 
+0328     <span class="comment">% K value corresponding to this magnet being on the ramp table hysteresis loop</span>
+0329     <span class="keyword">if</span> ~isfield(RampTable, Family) || ~isfield(RampTable.(Family), <span class="string">'Physics'</span>)
+0330         <span class="comment">% K value not known</span>
+0331         error(sprintf(<span class="string">'%s.%s needs a simulator value added to the ramp table'</span>, Family, Field));
+0332     <span class="keyword">else</span>
+0333         <span class="comment">% Get the model k-value of the &quot;prefect&quot; model</span>
+0334         K = RampTable.(Family).Physics(iDevTotal);
+0335     <span class="keyword">end</span>
+0336 
+0337     <span class="keyword">if</span> isnan(K)
+0338         error(sprintf(<span class="string">'%s.%s needs a simulator value added to the ramp table'</span>, Family, Field));
+0339     <span class="keyword">end</span>
+0340 
+0341     <span class="comment">% If a ramp table is not present then just do to linear ramp (but the K-value needed to be present)</span>
+0342     <span class="keyword">if</span> ~isfield(RampTable, Family) || ~isfield(RampTable.(Family), Field)
+0343         RampTable.(Family).(Field) = linspace(0, 1, length(RampTable.GeV));
+0344     <span class="keyword">end</span>
+0345     
+0346     
+0347     <span class="comment">% Setpoints = RampTable * (Upper-Lower) + Lower</span>
+0348     UpperLattice = RampTable.UpperLattice.(Field).(Family).(Field).Data;
+0349     LowerLattice = RampTable.LowerLattice.(Field).(Family).(Field).Data;
+0350     iDevUpper = findrowindex(DeviceList, RampTable.UpperLattice.(Field).(Family).(Field).DeviceList);
+0351     iDevLower = findrowindex(DeviceList, RampTable.LowerLattice.(Field).(Family).(Field).DeviceList);
+0352     
+0353     <span class="comment">% Convert to a absolute table</span>
+0354     MagnetTable = RampTable.(Family).(Field);
+0355     MagnetTable = (UpperLattice(iDevUpper) - LowerLattice(iDevLower)) * MagnetTable;
+0356     <span class="keyword">for</span> j = 1:size(MagnetTable,1)
+0357         MagnetTable(j,:) = MagnetTable(j,:) + LowerLattice(iDevLower(j));
+0358     <span class="keyword">end</span>
+0359     
+0360     
+0361     <span class="comment">% Interpolate between the points in the table</span>
+0362     Brho = getbrho(Energy);
+0363     <span class="keyword">for</span> i = 1:size(Amps,1)   <span class="comment">% size(Amps,1) should equal length(iDevTotal)</span>
+0364         <span class="comment">% Energy corresponding to this magnet and the BEND being on the</span>
+0365         <span class="comment">% ramp table hysteresis loop (linear interpolation)</span>
+0366         e = interp1(MagnetTable(i,:), RampTable.GeV, Amps(i,:), <span class="string">'linear'</span>, <span class="string">'extrap'</span>);
+0367 
+0368         <span class="comment">% B-field</span>
+0369         B(i,:) = K(i) * getbrho(e);
+0370 
+0371         <span class="comment">% K-value if at a different energy</span>
+0372         k(i,:) = B(i,:) ./ Brho;
+0373     <span class="keyword">end</span>
+0374 
+0375     <span class="comment">% This is a cluge!!!</span>
+0376     <span class="comment">% ALS hystersis loops do not interpolate to zero very well</span>
+0377     B(find(Amps==0)) = 0;
+0378     k(find(Amps==0)) = 0;
+0379     <span class="keyword">return</span>
+0380 <span class="keyword">end</span>
+0381 
+0382 
+0383 <span class="comment">% If you made it to here, I don't know how to convert it</span>
+0384 k = Amps;
+0385 B = Amps;
+0386 <span class="keyword">return</span>
+0387</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

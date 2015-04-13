@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getqfashunt</title>
+  <meta name="keywords" content="getqfashunt">
+  <meta name="description" content="Shunt = getqfashunt(ShuntNumber, DeviceList, ChanType)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getqfashunt.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getqfashunt
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>Shunt = getqfashunt(ShuntNumber, DeviceList, ChanType)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function Shunt = getqfashunt(ShuntNumber, DeviceList, ChanType) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Shunt = getqfashunt(ShuntNumber, DeviceList, ChanType)
+
+  Shunt = 0 off
+          1 on
+  ShuntNumber = 1 or 2
+  DeviceList ([Sector Device #] or [element #]) (default: whole family)
+  ChanType = 0 -&gt; BM (On/off (1/0) Monitor)
+             1 -&gt; BC (On/Off (1/0) Control)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="qfashunttest0.html" class="code" title="function qfashunttest0">qfashunttest0</a>	QFASHUNTTEST0 - Test if the QFA shunts turn on and off</li><li><a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>	SETQFASHUNT - Sets the QFA shunts</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Shunt = getqfashunt(ShuntNumber, DeviceList, ChanType)</a>
+0002 <span class="comment">% Shunt = getqfashunt(ShuntNumber, DeviceList, ChanType)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  Shunt = 0 off</span>
+0005 <span class="comment">%          1 on</span>
+0006 <span class="comment">%  ShuntNumber = 1 or 2</span>
+0007 <span class="comment">%  DeviceList ([Sector Device #] or [element #]) (default: whole family)</span>
+0008 <span class="comment">%  ChanType = 0 -&gt; BM (On/off (1/0) Monitor)</span>
+0009 <span class="comment">%             1 -&gt; BC (On/Off (1/0) Control)</span>
+0010 <span class="comment">%</span>
+0011 
+0012 <span class="keyword">if</span> nargin &lt; 1
+0013    error(<span class="string">'Must have a shunt number [1 or 2]'</span>);
+0014 <span class="keyword">end</span>
+0015 <span class="keyword">if</span> isempty(ShuntNumber)
+0016    error(<span class="string">'Input #1 empty.'</span>);
+0017 <span class="keyword">end</span>
+0018 
+0019 <span class="keyword">if</span> nargin &lt; 2
+0020    DeviceList = getlist(<span class="string">'QF'</span>);
+0021 <span class="keyword">end</span>
+0022 <span class="keyword">if</span> isempty(DeviceList)
+0023    DeviceList = getlist(<span class="string">'QF'</span>);
+0024 <span class="keyword">end</span>
+0025 <span class="keyword">if</span> (size(DeviceList,2) == 1) 
+0026    DeviceList = elem2dev(<span class="string">'QF'</span>, DeviceList);
+0027 <span class="keyword">end</span>
+0028 
+0029 <span class="keyword">if</span> nargin &lt; 3
+0030    ChanType = 0;
+0031 <span class="keyword">end</span>
+0032 <span class="keyword">if</span> isempty(ChanType)
+0033    ChanType = 0;
+0034 <span class="keyword">end</span>
+0035 
+0036 <span class="keyword">if</span> ChanType == 0
+0037    <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0038       <span class="keyword">if</span> DeviceList(i,2) == 1
+0039          <span class="keyword">if</span> ShuntNumber == 1
+0040             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA1S1_BM23'</span>, DeviceList(i,1)));
+0041          <span class="keyword">elseif</span> ShuntNumber == 2
+0042             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA1S2_BM22'</span>, DeviceList(i,1)));         
+0043          <span class="keyword">else</span>
+0044             error(<span class="string">'ShuntNumber must be 1 or 2.'</span>)
+0045          <span class="keyword">end</span>
+0046       <span class="keyword">elseif</span> DeviceList(i,2) == 2
+0047          <span class="keyword">if</span> ShuntNumber == 1
+0048             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA2S1_BM21'</span>, DeviceList(i,1)));
+0049          <span class="keyword">elseif</span> ShuntNumber == 2
+0050             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA2S2_BM20'</span>, DeviceList(i,1)));         
+0051          <span class="keyword">else</span>
+0052             error(<span class="string">'ShuntNumber must be 1 or 2.'</span>)
+0053          <span class="keyword">end</span>
+0054       <span class="keyword">else</span>
+0055          error(<span class="string">'DeviceList column #2 must be 1 or 2.'</span>)
+0056       <span class="keyword">end</span>
+0057    <span class="keyword">end</span>
+0058 <span class="keyword">elseif</span> ChanType == 1
+0059    <span class="keyword">for</span> i = 1:size(DeviceList,1)
+0060       <span class="keyword">if</span> DeviceList(i,2) == 1
+0061          <span class="keyword">if</span> ShuntNumber == 1
+0062             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA1S1_BC19'</span>, DeviceList(i,1)));
+0063          <span class="keyword">elseif</span> ShuntNumber == 2
+0064             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA1S2_BC18'</span>, DeviceList(i,1)));         
+0065          <span class="keyword">else</span>
+0066             error(<span class="string">'ShuntNumber must be 1 or 2.'</span>)
+0067          <span class="keyword">end</span>
+0068       <span class="keyword">elseif</span> DeviceList(i,2) == 2
+0069          <span class="keyword">if</span> ShuntNumber == 1
+0070             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA2S1_BC17'</span>, DeviceList(i,1)));
+0071          <span class="keyword">elseif</span> ShuntNumber == 2
+0072             Shunt(i,1)= scaget(sprintf(<span class="string">'SR%02dC___QFA2S2_BC16'</span>, DeviceList(i,1)));         
+0073          <span class="keyword">else</span>
+0074             error(<span class="string">'ShuntNumber must be 1 or 2.'</span>)
+0075          <span class="keyword">end</span>
+0076       <span class="keyword">else</span>
+0077          error(<span class="string">'DeviceList column #2 must be 1 or 2.'</span>)
+0078       <span class="keyword">end</span>
+0079    <span class="keyword">end</span>
+0080 <span class="keyword">else</span>
+0081    error(<span class="string">'ChanType must be 0 or 1'</span>);
+0082 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

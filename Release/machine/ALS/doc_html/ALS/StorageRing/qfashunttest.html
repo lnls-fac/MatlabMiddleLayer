@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of qfashunttest</title>
+  <meta name="keywords" content="qfashunttest">
+  <meta name="description" content="HCM Step">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; qfashunttest.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>qfashunttest
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>HCM Step</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> HCM Step</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>	SETQFASHUNT - Sets the QFA shunts</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% HCM Step</span>
+0002 
+0003 QuadFamily = <span class="string">'QFA'</span>;
+0004 QuadDevList = getlist(<span class="string">'QFA'</span>);  <span class="comment">%[6 1];</span>
+0005 
+0006 QuadDevList(10:<span class="keyword">end</span>,:) = [];
+0007 
+0008 
+0009 <span class="keyword">for</span> k = 1:size(QuadDevList,1)
+0010 
+0011     <span class="comment">% stepsp WaitFlag=-2 test</span>
+0012     tic;
+0013     x0 = getx;
+0014     y0 = gety;
+0015     <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 1, QuadDevList(k,:), -2);
+0016     <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(2, 1, QuadDevList(k,:), -2);
+0017     T2 = toc;
+0018     x1 = getx;
+0019     y1 = gety;
+0020     <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(1, 0, QuadDevList(k,:), -2);
+0021     <a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>(2, 0, QuadDevList(k,:), -2);
+0022     pause(1);
+0023 
+0024 
+0025     <span class="comment">% Model step</span>
+0026     <span class="comment">%setsp('HCM',.1*randn(96,1), 'Model');</span>
+0027     <span class="comment">%setsp('VCM',.1*randn(72,1), 'Model');</span>
+0028 
+0029     p = getpvmodel(<span class="string">'QFA'</span>,<span class="string">'PolynomA'</span>,QuadDevList(k,:));
+0030     p(1) = 1e-3;
+0031     
+0032     xm0 = getx(<span class="string">'Model'</span>);
+0033     ym0 = gety(<span class="string">'Model'</span>);
+0034 
+0035     setpvmodel(QuadFamily, <span class="string">'PolynomA'</span>, p, QuadDevList(k,:));
+0036     xm1 = getx(<span class="string">'Model'</span>);
+0037     ym1 = gety(<span class="string">'Model'</span>);
+0038     p(1) = 0;
+0039     setpvmodel(QuadFamily, <span class="string">'PolynomA'</span>, p, QuadDevList(k,:));
+0040 
+0041     <span class="comment">%setsp('HCM',0*randn(96,1), 'Model');</span>
+0042     <span class="comment">%setsp('VCM',0*randn(72,1), 'Model');</span>
+0043 
+0044 
+0045     <span class="comment">% Display</span>
+0046     figure;
+0047 
+0048     x  = x1 -x0;
+0049     xm = xm1-xm0;
+0050 
+0051     y  = y1 -y0;
+0052     ym = ym1-ym0;
+0053 
+0054     subplot(2,1,1);
+0055     [tmp,i] = max(abs(xm));
+0056     <span class="comment">%plot([x (x(i)/xm(i))*xm], '.-');</span>
+0057     plot([x sign(xm(i)/x(i))*(std(x)/std(xm))*xm], <span class="string">'.-'</span>);
+0058 
+0059     title(sprintf(<span class="string">'%s(%d,%d)  Time change shunt was %f seconds'</span>,QuadFamily, QuadDevList(k,1),QuadDevList(k,2), T2));
+0060 
+0061     subplot(2,1,2);
+0062     [tmp,i] = max(abs(ym));
+0063     <span class="comment">%plot([y (y(i)/ym(i))*ym], '.-');</span>
+0064     plot([y sign(ym(i)/y(i))*(std(y)/std(ym))*ym], <span class="string">'.-'</span>);
+0065 
+0066     save(sprintf(<span class="string">'%s_%d_%d'</span>,QuadFamily, QuadDevList(k,1),QuadDevList(k,2)))
+0067 
+0068     orient tall
+0069 
+0070 
+0071 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

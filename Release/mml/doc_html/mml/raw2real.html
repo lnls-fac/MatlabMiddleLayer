@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of raw2real</title>
+  <meta name="keywords" content="raw2real">
+  <meta name="description" content="RAW2REAL - Converts raw control system data to calibrated values">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; raw2real.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>raw2real
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>RAW2REAL - Converts raw control system data to calibrated values</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function DataOut = raw2real(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">RAW2REAL - Converts raw control system data to calibrated values
+  RealData = raw2real(Family, Field, RawData, DeviceList)
+  RealData = raw2real(DataStruct)
+
+  INPUTS
+  1. Family - Family Name
+     DataStruct - Data Structure  (.FamilyName, .Field, and .DeviceList fields are used if not input)
+  2. RawData - Raw control system data
+  3. DeviceList - Device list for that family
+  4. Flag
+     'Absolute' - Include the offset  {Default (unless it's a response matrix)}
+     'Incremental' - Gain only        {Response matrices are incremental only}
+     'Numeric' - forces numeric output for structure inputs      
+
+  OUTPUTS
+  1. RealData - Calibrated data
+     RealData = Gain .* (RawData - Offset)
+ 
+  ALGORITHM
+     RawData  = (RealData ./ Gain) + Offset
+     RealData = Gain .* (RawData - Offset)
+
+  NOTES
+  1. If the input is a structure, then the output will be a structure
+  2. If the inputs are cell arrays, then the output is a cell array
+  3. If Family is a cell array, then all other inputs must be cell arrays
+  4. The Offset is always in hardware units.
+
+  See also <a href="real2raw.html" class="code" title="function DataOut = real2raw(varargin)">real2raw</a>, <a href="physics2hw.html" class="code" title="function S = physics2hw(Family, Field, value, DeviceList, Energy)">physics2hw</a>, <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>, <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>, <a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>, <a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>	FAMILY2DEV - Return the device list for a family</li><li><a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>	GETGAIN - Returns the gain for a family</li><li><a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>	GETOFFSET - Returns the offset values for a family</li><li><a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>	RAW2REAL - Converts raw control system data to calibrated values</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getrunflag.html" class="code" title="function [RunFlag, Delta, Tol] = getrunflag(varargin)">getrunflag</a>	GETRUNFLAG - Returns position if the device is in the process of changing a setpoint</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="monmags.html" class="code" title="function [MagnetSetpoints, MagnetMonitors, BPMMonitors, MagnetSetpointsEnd, FileName] = monmags(varargin)">monmags</a>	MONMAGS - Monitors all magnet power supplies and plots various statistics</li><li><a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>	RAW2REAL - Converts raw control system data to calibrated values</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function DataOut = raw2real(varargin)</a>
+0002 <span class="comment">%RAW2REAL - Converts raw control system data to calibrated values</span>
+0003 <span class="comment">%  RealData = raw2real(Family, Field, RawData, DeviceList)</span>
+0004 <span class="comment">%  RealData = raw2real(DataStruct)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. Family - Family Name</span>
+0008 <span class="comment">%     DataStruct - Data Structure  (.FamilyName, .Field, and .DeviceList fields are used if not input)</span>
+0009 <span class="comment">%  2. RawData - Raw control system data</span>
+0010 <span class="comment">%  3. DeviceList - Device list for that family</span>
+0011 <span class="comment">%  4. Flag</span>
+0012 <span class="comment">%     'Absolute' - Include the offset  {Default (unless it's a response matrix)}</span>
+0013 <span class="comment">%     'Incremental' - Gain only        {Response matrices are incremental only}</span>
+0014 <span class="comment">%     'Numeric' - forces numeric output for structure inputs</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%  OUTPUTS</span>
+0017 <span class="comment">%  1. RealData - Calibrated data</span>
+0018 <span class="comment">%     RealData = Gain .* (RawData - Offset)</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  ALGORITHM</span>
+0021 <span class="comment">%     RawData  = (RealData ./ Gain) + Offset</span>
+0022 <span class="comment">%     RealData = Gain .* (RawData - Offset)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  NOTES</span>
+0025 <span class="comment">%  1. If the input is a structure, then the output will be a structure</span>
+0026 <span class="comment">%  2. If the inputs are cell arrays, then the output is a cell array</span>
+0027 <span class="comment">%  3. If Family is a cell array, then all other inputs must be cell arrays</span>
+0028 <span class="comment">%  4. The Offset is always in hardware units.</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  See also real2raw, physics2hw, hw2physics, getoffset, getgain, getgolden</span>
+0031 
+0032 <span class="comment">%  Written by Greg Portmann</span>
+0033 
+0034 
+0035 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0036 <span class="comment">% Input parsing %</span>
+0037 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0038 UnitsFlag = <span class="string">''</span>;
+0039 NumericFlag = [];
+0040 IncrementalFlag = {};
+0041 InputFlags = {};
+0042 <span class="keyword">for</span> i = length(varargin):-1:1
+0043     <span class="keyword">if</span> isstruct(varargin{i})
+0044         <span class="comment">% Ignor structures</span>
+0045     <span class="keyword">elseif</span> iscell(varargin{i})
+0046         <span class="comment">% Ignor cells</span>
+0047     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'struct'</span>)
+0048         NumericFlag = 0;
+0049         InputFlags = [InputFlags varargin(i)];
+0050         varargin(i) = [];
+0051     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'numeric'</span>)
+0052         NumericFlag = 1;
+0053         InputFlags = [InputFlags varargin(i)];
+0054         varargin(i) = [];
+0055     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Incremental'</span>)
+0056         IncrementalFlag = varargin(i);
+0057         varargin(i) = [];
+0058     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Absolute'</span>)
+0059         IncrementalFlag = varargin(i);
+0060         InputFlags = [InputFlags varargin(i)];
+0061         varargin(i) = [];
+0062     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>) || strcmpi(varargin{i},<span class="string">'Online'</span>) || strcmpi(varargin{i},<span class="string">'Manual'</span>)
+0063         <span class="comment">% Remove and ignor</span>
+0064         varargin(i) = [];
+0065     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'physics'</span>)
+0066         fprintf(<span class="string">'   WARNING: ''Physics'' flag ignored by raw2real\n'</span>);
+0067         varargin(i) = [];
+0068     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'hardware'</span>)
+0069         fprintf(<span class="string">'   WARNING: ''Hardware'' flag ignored by raw2real\n'</span>);
+0070         varargin(i) = [];
+0071     <span class="keyword">end</span>
+0072 <span class="keyword">end</span>
+0073 
+0074 
+0075 <span class="keyword">if</span> isempty(varargin)
+0076     error(<span class="string">'Must have at least 1 input for structures and 3 for non-structures.'</span>);
+0077 <span class="keyword">else</span>
+0078     Family = varargin{1};
+0079     <span class="keyword">if</span> length(varargin) &gt;= 2
+0080         Field = varargin{2};
+0081     <span class="keyword">end</span>
+0082     <span class="keyword">if</span> length(varargin) &gt;= 3
+0083         DataIn = varargin{3};
+0084     <span class="keyword">end</span>
+0085     <span class="keyword">if</span> length(varargin) &gt;= 4
+0086         DeviceList = varargin{4};
+0087     <span class="keyword">end</span>
+0088 <span class="keyword">end</span>
+0089 
+0090 
+0091 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0092 <span class="comment">% Cell Array Input %</span>
+0093 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0094 <span class="keyword">if</span> iscell(Family)
+0095     <span class="keyword">if</span> length(varargin) &gt;= 2
+0096         <span class="keyword">if</span> ~iscell(DataIn)
+0097             error(<span class="string">'If Family is a cell array, then RawData must be a cell array.'</span>);
+0098         <span class="keyword">end</span>        
+0099         <span class="keyword">if</span> length(Family) ~= length(DataIn)
+0100             error(<span class="string">'RawData and Family must be the same size cell arrays'</span>);
+0101         <span class="keyword">end</span>
+0102     <span class="keyword">end</span>
+0103     <span class="keyword">if</span> length(varargin) &gt;= 3
+0104         <span class="keyword">if</span> ~iscell(DeviceList)
+0105             error(<span class="string">'If Family is a cell array, then DeviceList must be a cell array.'</span>);
+0106         <span class="keyword">end</span>        
+0107         <span class="keyword">if</span> length(Family) ~= length(DeviceList)
+0108             error(<span class="string">'Family and DeviceList must be the same size cell arrays'</span>);
+0109         <span class="keyword">end</span>
+0110     <span class="keyword">end</span> 
+0111     <span class="keyword">for</span> i = 1:length(Family)
+0112         <span class="keyword">if</span> length(varargin) == 1
+0113             DataOut{i} = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(Family{i}, InputFlags{:});
+0114         <span class="keyword">elseif</span> length(varargin) == 2
+0115             DataOut{i} = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(Family{i}, Field{i}, InputFlags{:});
+0116         <span class="keyword">elseif</span> length(varargin) == 3
+0117             DataOut{i} = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(Family{i}, Field{i}, DataIn{i}, InputFlags{:});
+0118         <span class="keyword">else</span>
+0119             DataOut{i} = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(Family{i}, Field{i}, DataIn{i}, DeviceList{i}, InputFlags{:});
+0120         <span class="keyword">end</span>
+0121     <span class="keyword">end</span>
+0122     <span class="keyword">return</span>    
+0123 <span class="keyword">end</span>  
+0124 <span class="comment">% End cell inputs</span>
+0125 
+0126 
+0127 
+0128 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0129 <span class="comment">% Structure Inputs %</span>
+0130 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0131 <span class="keyword">if</span> isstruct(Family)
+0132     <span class="comment">% Convert entire data structure</span>
+0133     DataOut = Family;
+0134         
+0135     <span class="keyword">for</span> j = 1:size(DataOut,1)
+0136         <span class="keyword">for</span> k = 1:size(DataOut,2)
+0137             
+0138             <span class="keyword">if</span> isfield(DataOut(j,k),<span class="string">'Monitor'</span>) &amp;&amp; isfield(DataOut(j,k),<span class="string">'Actuator'</span>)
+0139                 <span class="comment">% Response matrix structure</span>
+0140                 
+0141                 <span class="keyword">if</span> strcmpi(IncrementalFlag, <span class="string">'Absolute'</span>) &amp;&amp; j==1 &amp;&amp; k==1
+0142                     fprintf(<span class="string">'   WARNING:  ''Absolute'' flag passed to raw2real for a response matrix.  Flag ignored!'</span>);
+0143                 <span class="keyword">end</span>
+0144                 
+0145                 <span class="comment">% Incrementally scale rows by Monitor and Columns by Actuators</span>
+0146                 DataOut(j,k).Data = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(DataOut(j,k).Monitor.FamilyName, DataOut(j,k).Monitor.Field, DataOut(j,k).Data, DataOut(j,k).Monitor.DeviceList, <span class="string">'Incremental'</span>);
+0147                 DataOut(j,k).Data = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(DataOut(j,k).Actuator.FamilyName, DataOut(j,k).Actuator.Field, DataOut(j,k).Data', DataOut(j,k).Actuator.DeviceList, <span class="string">'Incremental'</span>)';
+0148                 
+0149                 DataOut(j,k).Monitor  = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(DataOut(j,k).Monitor,  <span class="string">'Absolute'</span>); 
+0150                 DataOut(j,k).Actuator = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(DataOut(j,k).Actuator, <span class="string">'Absolute'</span>);
+0151                 <span class="keyword">if</span> isfield(DataOut(j,k), <span class="string">'ActuatorDelta'</span>)
+0152                     DataOut(j,k).ActuatorDelta = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(DataOut(j,k).Actuator.FamilyName, DataOut(j,k).Actuator.Field, DataOut(j,k).ActuatorDelta, [1 1], <span class="string">'Incremental'</span>);
+0153                 <span class="keyword">end</span>
+0154                                 
+0155             <span class="keyword">elseif</span> isfield(DataOut(j,k),<span class="string">'FamilyName'</span>) &amp;&amp; isfield(DataOut(j,k),<span class="string">'Field'</span>)
+0156                 <span class="comment">% Data structure</span>
+0157                 DataOut(j,k).Data = <a href="raw2real.html" class="code" title="function DataOut = raw2real(varargin)">raw2real</a>(DataOut(j,k).FamilyName, DataOut(j,k).Field, DataOut(j,k).Data, DataOut(j,k).DeviceList, IncrementalFlag{:});
+0158                 
+0159             <span class="keyword">else</span>
+0160                 error(<span class="string">'Unknown data structure type'</span>);
+0161             <span class="keyword">end</span>
+0162             
+0163             <span class="keyword">if</span> isfield(DataOut(j,k), <span class="string">'CreatedBy'</span>)
+0164                 DataOut(j,k).CreatedBy = [<span class="string">'raw2real,'</span>, DataOut(j,k).CreatedBy];
+0165             <span class="keyword">end</span>
+0166         <span class="keyword">end</span>
+0167     <span class="keyword">end</span>
+0168     
+0169     <span class="comment">% Make numeric if requested</span>
+0170     <span class="keyword">if</span> ~isempty(NumericFlag) &amp;&amp; NumericFlag == 1
+0171         DataOutNew = [];
+0172         <span class="keyword">for</span> j = 1:size(DataOut,1)
+0173             OutCol = [];
+0174             <span class="keyword">for</span> k = 1:size(DataOut,2)
+0175                 OutCol = [OutCol DataOut(j,k).Data];
+0176             <span class="keyword">end</span>
+0177             DataOutNew = [DataOutNew; OutCol];
+0178         <span class="keyword">end</span>
+0179         DataOut = DataOutNew;
+0180     <span class="keyword">end</span>
+0181     
+0182     <span class="keyword">return</span>;
+0183 <span class="keyword">end</span>
+0184 
+0185 
+0186 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0187 <span class="comment">% Main Function %</span>
+0188 <span class="comment">%%%%%%%%%%%%%%%%%</span>
+0189 
+0190 <span class="comment">% Family string input</span>
+0191 FamilyName = Family;
+0192 <span class="keyword">if</span> length(varargin) &lt; 3
+0193     error(<span class="string">'No RawData input'</span>);
+0194 <span class="keyword">end</span>
+0195 <span class="keyword">if</span> length(varargin) &lt; 4
+0196     DeviceList = [];
+0197 <span class="keyword">end</span>
+0198 <span class="keyword">if</span> isempty(IncrementalFlag)
+0199     IncrementalFlag = <span class="string">'Absolute'</span>;
+0200 <span class="keyword">end</span>
+0201 
+0202 
+0203 <span class="comment">% Defaults</span>
+0204 <span class="keyword">if</span> isempty(Field)
+0205     <span class="keyword">if</span> ismember(FamilyName,<span class="string">'BPM'</span>)
+0206         Field = <span class="string">'Monitor'</span>;
+0207     <span class="keyword">else</span>
+0208         Field = <span class="string">'Setpoint'</span>;
+0209     <span class="keyword">end</span>
+0210 <span class="keyword">end</span>
+0211 <span class="keyword">if</span> isempty(DeviceList)
+0212     DeviceList = <a href="family2dev.html" class="code" title="function DeviceList = family2dev(Family, varargin)">family2dev</a>(FamilyName);
+0213 <span class="keyword">end</span>
+0214 <span class="keyword">if</span> (size(DeviceList,2) == 1) 
+0215     DeviceList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(FamilyName, DeviceList);
+0216 <span class="keyword">end</span>
+0217 
+0218 
+0219 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0220 <span class="comment">% Convert the data %</span>
+0221 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0222 
+0223 Gain = <a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>(FamilyName, Field, DeviceList);
+0224 <span class="keyword">if</span> strcmpi(IncrementalFlag, <span class="string">'Incremental'</span>)
+0225     Offset = 0;
+0226 <span class="keyword">else</span>
+0227     Offset = <a href="getoffset.html" class="code" title="function Data = getoffset(varargin)">getoffset</a>(FamilyName, Field, DeviceList, <span class="string">'Hardware'</span>);
+0228 <span class="keyword">end</span>
+0229 
+0230 
+0231 <span class="keyword">for</span> i = 1:size(DataIn,2)
+0232     DataOut(:,i) = Gain .* (DataIn(:,i) - Offset);
+0233 <span class="keyword">end</span>
+0234 
+0235 
+0236 <span class="comment">%raw2real:  DataOut(:,i) = Gain .* (DataIn(:,i) - Offset);</span>
+0237 <span class="comment">%real2raw:  DataOut(:,i) = (DataIn(:,i) ./ Gain) + Offset;</span>
+0238 
+0239 
+0240</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

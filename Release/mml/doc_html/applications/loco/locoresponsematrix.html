@@ -1,0 +1,810 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of locoresponsematrix</title>
+  <meta name="keywords" content="locoresponsematrix">
+  <meta name="description" content="LOCORESPONSEMATRIX - Calculate the BPM response matrix and dispersion function">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; locoresponsematrix.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>locoresponsematrix
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LOCORESPONSEMATRIX - Calculate the BPM response matrix and dispersion function</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function RM = locoresponsematrix(RINGData, BPMData, CMData, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOCORESPONSEMATRIX - Calculate the BPM response matrix and dispersion function
+ M = LOCORESPONCEMATRIX(RINGData, BPMData, CMData)
+
+ Accelerator Toolbox implementation of generic LOCO function
+
+ RINGData - must have fields 'Lattice', 'CavityFrequency', 'CavityHarmNumber'
+            RINGData.Lattice - AT lattice cell arrary
+            RINGData.CavityFrequency  [Hz]
+            RINGData.CavityHarmNumber [Hz]
+
+ CMData -   must have fields: 'HCMIndex', 'VCMIndex', 'HCMKicks', 'VCMKicks', 'HCMCoupling', 'VCMCoupling'
+            CMData.HCMIndex    - indexes in the AT lattice of elements used as horizontal correctors
+            CMData.VCMIndex    - indexes in the AT lattice of elements used as vertical correctors
+                                 Elements used as correctors in both planes should be included in both lists
+            CMData.HCMKicks    - kick  size [radians] of horizontal correctors in the horizontal plane
+            CMData.VCMKicks    - kick  size [radians] of vertical correctors in the vertical plane
+            CMData.HCMCoupling - corrector coupling coefficient into another plane:
+                                 0.01 coupling means that for 1e-3 kick in the horizontal direction there
+                                 is a 1e-5 rad kick in the vertical direction
+            CMData.VCMCoupling - corrector coupling coefficient into another plane:
+                                 0.01 coupling means that for 1e-3 kick in the vertical direction there
+                                 is a 1e-5 rad kick in the horizontal direction
+
+ BPMData -  must have field 'BPMIndex'
+            CMData.BPMIndex - indexes of all BPMs or observation points in the AT lattice
+                              All BPS and observation points (single plane too)
+                              are included in CMData.BPMIndex.
+
+ Return value: a matrix with number of rows equal to 2*length(CMData.BPMIndex) and the number of columns
+               equal length(CMData.HCMIndex)+length(CMData.VCMIndex)
+
+ Additional string flags (in any order)
+
+ LOCORESPONSEMATRIX(...,ClosedOrbitType,...)
+       ClosedOrbitType is 'fixedmomentum',  'fixedpathlength' (default)
+
+ LOCORESPONCEMATRIX(..., 'linear') calculates M using linear approximation  !!! including the dispersion terms
+
+ LOCORESPONCEMATRIX(..., 'RF', DeltaRF) - 'RF' switch must be followed by the value of DeltaRF [Hz]
+
+ LOCORESPONCEMATRIX(..., 'ResponseMatrixMeasurement', 'oneway') - 'oneway' switch is used
+                        when the response matrix was measured only kicking the i-th corrector
+                        to +KicksCoupled(i) one way, default: ResponseMatrixMeasurement = 'bidirectional'
+
+ LOCORESPONCEMATRIX(..., 'DispersionMeasurement', 'oneway') - 'oneway' switch is used
+                        when the dispersion was measured only by varying the
+                        RF frequency in one direction, default: DispersionMeasurement = 'bidirectional'
+
+ Or a Flags structure can be an input argument:
+ LOCORESPONCEMATRIX(..., Flags)
+    Flags.ResponseMatrixMeasurement = 'oneway' or {'bi-directional'}
+    Flags.DispersionMeasurement     = 'oneway' or {'bi-directional'}
+    Flags.ResponseMatrixCalculator  = {'linear'} or 'full'
+    Flags.ClosedOrbitType           = 'fixedmomentum' or {'fixedpathlength'}
+
+  NOTE
+  1. Flag names are not case sensitive
+  2. JR - 12/7/05 added vectorized linear rm calculation (NewVectorizedMethod = 1)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="calclocochi2.html" class="code" title="function ChiSquare = calclocochi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">calclocochi2</a>	CALCLOCOCHI2 - Calculate the contribution to chi^2 of each fit parameter in LOCO</li><li><a href="loco.html" class="code" title="function [LocoModel, BPMData, CMData, FitParameters, LocoFlags, RINGData] = loco(LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData)">loco</a>	LOCO - Main routine for the LOCO algorithm</li><li><a href="lococalcchi2.html" class="code" title="function ChiSquare = lococalcchi2(LocoModel, LocoMeasData, BPMData, CMData, FitParameters, LocoFlags, RINGData, ConvertUnitsFlag, IterNumber)">lococalcchi2</a>	LOCOCALCCHI2 - Calculate the contribution to chi^2 of each fit parameter in LOCO</li><li><a href="locogui.html" class="code" title="function varargout = locogui(varargin)">locogui</a>	LOCOGUI - Graphical interface for running the LOCO algorithm</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function RM = locoresponsematrix(RINGData, BPMData, CMData, varargin)</a>
+0002 <span class="comment">%LOCORESPONSEMATRIX - Calculate the BPM response matrix and dispersion function</span>
+0003 <span class="comment">% M = LOCORESPONCEMATRIX(RINGData, BPMData, CMData)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Accelerator Toolbox implementation of generic LOCO function</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% RINGData - must have fields 'Lattice', 'CavityFrequency', 'CavityHarmNumber'</span>
+0008 <span class="comment">%            RINGData.Lattice - AT lattice cell arrary</span>
+0009 <span class="comment">%            RINGData.CavityFrequency  [Hz]</span>
+0010 <span class="comment">%            RINGData.CavityHarmNumber [Hz]</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% CMData -   must have fields: 'HCMIndex', 'VCMIndex', 'HCMKicks', 'VCMKicks', 'HCMCoupling', 'VCMCoupling'</span>
+0013 <span class="comment">%            CMData.HCMIndex    - indexes in the AT lattice of elements used as horizontal correctors</span>
+0014 <span class="comment">%            CMData.VCMIndex    - indexes in the AT lattice of elements used as vertical correctors</span>
+0015 <span class="comment">%                                 Elements used as correctors in both planes should be included in both lists</span>
+0016 <span class="comment">%            CMData.HCMKicks    - kick  size [radians] of horizontal correctors in the horizontal plane</span>
+0017 <span class="comment">%            CMData.VCMKicks    - kick  size [radians] of vertical correctors in the vertical plane</span>
+0018 <span class="comment">%            CMData.HCMCoupling - corrector coupling coefficient into another plane:</span>
+0019 <span class="comment">%                                 0.01 coupling means that for 1e-3 kick in the horizontal direction there</span>
+0020 <span class="comment">%                                 is a 1e-5 rad kick in the vertical direction</span>
+0021 <span class="comment">%            CMData.VCMCoupling - corrector coupling coefficient into another plane:</span>
+0022 <span class="comment">%                                 0.01 coupling means that for 1e-3 kick in the vertical direction there</span>
+0023 <span class="comment">%                                 is a 1e-5 rad kick in the horizontal direction</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% BPMData -  must have field 'BPMIndex'</span>
+0026 <span class="comment">%            CMData.BPMIndex - indexes of all BPMs or observation points in the AT lattice</span>
+0027 <span class="comment">%                              All BPS and observation points (single plane too)</span>
+0028 <span class="comment">%                              are included in CMData.BPMIndex.</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% Return value: a matrix with number of rows equal to 2*length(CMData.BPMIndex) and the number of columns</span>
+0031 <span class="comment">%               equal length(CMData.HCMIndex)+length(CMData.VCMIndex)</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% Additional string flags (in any order)</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">% LOCORESPONSEMATRIX(...,ClosedOrbitType,...)</span>
+0036 <span class="comment">%       ClosedOrbitType is 'fixedmomentum',  'fixedpathlength' (default)</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">% LOCORESPONCEMATRIX(..., 'linear') calculates M using linear approximation  !!! including the dispersion terms</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">% LOCORESPONCEMATRIX(..., 'RF', DeltaRF) - 'RF' switch must be followed by the value of DeltaRF [Hz]</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">% LOCORESPONCEMATRIX(..., 'ResponseMatrixMeasurement', 'oneway') - 'oneway' switch is used</span>
+0043 <span class="comment">%                        when the response matrix was measured only kicking the i-th corrector</span>
+0044 <span class="comment">%                        to +KicksCoupled(i) one way, default: ResponseMatrixMeasurement = 'bidirectional'</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% LOCORESPONCEMATRIX(..., 'DispersionMeasurement', 'oneway') - 'oneway' switch is used</span>
+0047 <span class="comment">%                        when the dispersion was measured only by varying the</span>
+0048 <span class="comment">%                        RF frequency in one direction, default: DispersionMeasurement = 'bidirectional'</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">% Or a Flags structure can be an input argument:</span>
+0051 <span class="comment">% LOCORESPONCEMATRIX(..., Flags)</span>
+0052 <span class="comment">%    Flags.ResponseMatrixMeasurement = 'oneway' or {'bi-directional'}</span>
+0053 <span class="comment">%    Flags.DispersionMeasurement     = 'oneway' or {'bi-directional'}</span>
+0054 <span class="comment">%    Flags.ResponseMatrixCalculator  = {'linear'} or 'full'</span>
+0055 <span class="comment">%    Flags.ClosedOrbitType           = 'fixedmomentum' or {'fixedpathlength'}</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">%  NOTE</span>
+0058 <span class="comment">%  1. Flag names are not case sensitive</span>
+0059 <span class="comment">%  2. JR - 12/7/05 added vectorized linear rm calculation (NewVectorizedMethod = 1)</span>
+0060 
+0061 NewVectorizedMethod = 1;
+0062 
+0063 C = 2.99792458e8;
+0064 
+0065 <span class="comment">% Defaults</span>
+0066 ResponseMatrixMeasurement = <span class="string">'bidirectional'</span>;
+0067 DispersionMeasurement     = <span class="string">'bidirectional'</span>;
+0068 ResponseMatrixCalculator  = <span class="string">'linear'</span>;
+0069 ClosedOrbitType           = <span class="string">'fixedpathlength'</span>;
+0070 MachineType               = <span class="string">'StorageRing'</span>;
+0071 
+0072 RFFLAG = 0;
+0073 DeltaRF = [];
+0074 
+0075 N = nargin-3;
+0076 i = 0;
+0077 <span class="keyword">while</span> i &lt; N
+0078     i = i + 1;
+0079     <span class="keyword">if</span> isstruct(varargin{i})
+0080         Flags = varargin{i};
+0081         <span class="keyword">if</span> isfield(Flags,<span class="string">'ResponseMatrixCalculator'</span>)
+0082             ResponseMatrixCalculator = Flags.ResponseMatrixCalculator;
+0083         <span class="keyword">end</span>
+0084         <span class="keyword">if</span> isfield(Flags,<span class="string">'ClosedOrbitType'</span>)
+0085             ClosedOrbitType = Flags.ClosedOrbitType;
+0086         <span class="keyword">end</span>
+0087         <span class="keyword">if</span> isfield(Flags,<span class="string">'ResponseMatrixMeasurement'</span>)
+0088             ResponseMatrixMeasurement = Flags.ResponseMatrixMeasurement;
+0089         <span class="keyword">end</span>
+0090         <span class="keyword">if</span> isfield(Flags,<span class="string">'DispersionMeasurement'</span>)
+0091             DispersionMeasurement = Flags.DispersionMeasurement;
+0092         <span class="keyword">end</span>
+0093         <span class="keyword">if</span> isfield(Flags,<span class="string">'MachineType'</span>)
+0094             MachineType = Flags.MachineType;
+0095         <span class="keyword">end</span>
+0096     <span class="keyword">elseif</span> ischar(varargin{i})
+0097         <span class="keyword">switch</span> lower(varargin{i})
+0098             <span class="keyword">case</span> <span class="string">'linear'</span>
+0099                 ResponseMatrixCalculator = <span class="string">'linear'</span>;
+0100             <span class="keyword">case</span> <span class="string">'full'</span>
+0101                 ResponseMatrixCalculator = <span class="string">'full'</span>;
+0102             <span class="keyword">case</span> <span class="string">'fixedmomentum'</span>
+0103                 ClosedOrbitType = <span class="string">'fixedmomentum'</span>;
+0104             <span class="keyword">case</span> <span class="string">'fixedpathlength'</span>
+0105                 ClosedOrbitType = <span class="string">'fixedpathlength'</span>;
+0106             <span class="keyword">case</span> <span class="string">'rf'</span>
+0107                 <span class="keyword">if</span> (i+4&lt;=nargin) &amp;&amp; isnumeric(varargin{i+1})
+0108                     RFFLAG = 1;
+0109                     DeltaRF = varargin{i+1};
+0110                     i = i + 1;
+0111                 <span class="keyword">else</span>
+0112                     error(<span class="string">'''RF'' flag must be followed by a numeric value of delta RF [Hz]'</span>);
+0113                 <span class="keyword">end</span>
+0114             <span class="keyword">case</span> <span class="string">'dispersionmeasurement'</span>
+0115                 <span class="keyword">if</span> (i+4&lt;=nargin) &amp;&amp; ischar(varargin{i+1})
+0116                     DispersionMeasurement = varargin{i+1};
+0117                     i = i + 1;
+0118                 <span class="keyword">else</span>
+0119                     error(<span class="string">'''DispersionMeasurement'' flag must be followed by ''oneway'' or ''bidirectional'''</span>);
+0120                 <span class="keyword">end</span>
+0121             <span class="keyword">case</span> <span class="string">'responsematrixmeasurement'</span>
+0122                 <span class="keyword">if</span> (i+4&lt;=nargin) &amp;&amp; ischar(varargin{i+1})
+0123                     ResponseMatrixMeasurement = varargin{i+1};
+0124                     i = i + 1;
+0125                 <span class="keyword">else</span>
+0126                     error(<span class="string">'''ResponseMatrixMeasurement'' flag must be followed by ''oneway'' or ''bidirectional'''</span>);
+0127                 <span class="keyword">end</span>
+0128             <span class="keyword">case</span> {<span class="string">'storagering'</span>,<span class="string">'booster'</span>,<span class="string">'boosterring'</span>}
+0129                 MachineType = <span class="string">'StorageRing'</span>;
+0130             <span class="keyword">case</span> {<span class="string">'transport'</span>,<span class="string">'linac'</span>}
+0131                 MachineType = <span class="string">'Transport'</span>;
+0132             <span class="keyword">otherwise</span>
+0133                 warning(<span class="string">'Unknown switch ignored.'</span>);
+0134         <span class="keyword">end</span>
+0135     <span class="keyword">else</span>
+0136         warning(<span class="string">'Unknown switch ignored.'</span>);
+0137     <span class="keyword">end</span>
+0138 <span class="keyword">end</span>
+0139 
+0140 
+0141 <span class="comment">% Input checks</span>
+0142 <span class="keyword">if</span> ~strcmpi(ResponseMatrixMeasurement, <span class="string">'bidirectional'</span>) &amp;&amp; ~strcmpi(ResponseMatrixMeasurement, <span class="string">'oneway'</span>)
+0143     error(<span class="string">'Unknown ResponseMatrixMeasurement type'</span>);
+0144 <span class="keyword">end</span>
+0145 <span class="keyword">if</span> ~strcmpi(DispersionMeasurement, <span class="string">'bidirectional'</span>) &amp;&amp; ~strcmpi(DispersionMeasurement, <span class="string">'oneway'</span>)
+0146     error(<span class="string">'Unknown DispersionMeasurement type'</span>);
+0147 <span class="keyword">end</span>
+0148 <span class="keyword">if</span> ~strcmpi(ResponseMatrixCalculator, <span class="string">'linear'</span>) &amp;&amp; ~strcmpi(ResponseMatrixCalculator, <span class="string">'full'</span>)
+0149     error(<span class="string">'Unknown ResponseMatrixCalculator method'</span>);
+0150 <span class="keyword">end</span>
+0151 <span class="keyword">if</span> ~strcmpi(ClosedOrbitType, <span class="string">'fixedpathlength'</span>) &amp;&amp; ~strcmpi(ClosedOrbitType, <span class="string">'fixedmomentum'</span>)
+0152     error(<span class="string">'Unknown ClosedOrbitType method'</span>);
+0153 <span class="keyword">end</span>
+0154 <span class="keyword">if</span> ~strcmpi(MachineType, <span class="string">'StorageRing'</span>) &amp;&amp; ~strcmpi(MachineType, <span class="string">'Transport'</span>)
+0155     error(<span class="string">'Unknown MachineType'</span>);
+0156 <span class="keyword">end</span>
+0157 
+0158 
+0159 <span class="comment">% Initialize</span>
+0160 ATRING = RINGData.Lattice;
+0161 NHC = length(CMData.HCMIndex);
+0162 NVC = length(CMData.VCMIndex);
+0163 NBPM = length(BPMData.BPMIndex);
+0164 
+0165 
+0166 <span class="keyword">if</span> strcmpi(MachineType, <span class="string">'StorageRing'</span>)
+0167 
+0168     <span class="keyword">if</span> RFFLAG
+0169         <span class="comment">% Add an extra column for the orbit responce to the RF frequency change</span>
+0170         RM = zeros(2*NBPM,NHC+NVC+1);
+0171     <span class="keyword">else</span>
+0172         RM = zeros(2*NBPM,NHC+NVC);
+0173     <span class="keyword">end</span>
+0174 
+0175     NE = length(ATRING);
+0176     <span class="keyword">if</span> strcmpi(ResponseMatrixCalculator, <span class="string">'Linear'</span>)
+0177         <span class="comment">% Calculate linear optics and chromatic finctions for the model</span>
+0178         [M44,T,ClosedOrbit] = findm44(ATRING,0,1:NE+1);
+0179         DP = 0.00001;
+0180         ClosedOrbitDP = findorbit4(ATRING,DP,1:NE+1);
+0181         Dispersion = (ClosedOrbitDP-ClosedOrbit)/DP;
+0182         L0 = findspos(ATRING,NE+1);
+0183 
+0184         <span class="comment">%%X1(6)/(DP*L0); % is not the same as mcf(ATRING)???  G. Portmann</span>
+0185         <span class="comment">%X1 = ringpass(ATRING,[ClosedOrbitDP(:,1);DP;0]);</span>
+0186         <span class="comment">%MCF = X1(6)/(DP*L0);</span>
+0187         MCF = mcf(ATRING);
+0188 
+0189         <span class="comment">% Transfer matrixes through individual correctors</span>
+0190         M44HCOR = cell(1,NHC);
+0191         M44VCOR = cell(1,NVC);
+0192         <span class="keyword">for</span> i=1:NHC
+0193             M44HCOR{i}=findelemm44(ATRING{CMData.HCMIndex(i)},ATRING{CMData.HCMIndex(i)}.PassMethod,[ClosedOrbit(:,CMData.HCMIndex(i));0;0]);
+0194         <span class="keyword">end</span>
+0195         <span class="keyword">for</span> i=1:NVC
+0196             match = find(CMData.VCMIndex(i)==CMData.HCMIndex);
+0197             <span class="keyword">if</span> match
+0198                 M44VCOR{i}=M44HCOR{match};
+0199             <span class="keyword">else</span>
+0200                 M44VCOR{i}=findelemm44(ATRING{CMData.VCMIndex(i)},ATRING{CMData.VCMIndex(i)}.PassMethod,[ClosedOrbit(:,CMData.VCMIndex(i));0;0]);
+0201             <span class="keyword">end</span>
+0202         <span class="keyword">end</span>
+0203 
+0204 
+0205         <span class="comment">% Assemble arrays of corrector kicks including coupling</span>
+0206         HCORTheta = zeros(4,NHC);
+0207         VCORTheta = zeros(4,NVC);
+0208 
+0209         HCORTheta(2,:) = CMData.HCMKicks(:)';
+0210         HCORTheta(4,:) = CMData.HCMCoupling(:)' .* CMData.HCMKicks(:)';
+0211         VCORTheta(2,:) = CMData.VCMCoupling(:)' .* CMData.VCMKicks(:)';
+0212         VCORTheta(4,:) = CMData.VCMKicks(:)';
+0213 
+0214 
+0215         <span class="comment">% Calculate closed orbit at the exit of each corrector magnet WITH applied kick</span>
+0216         <span class="keyword">for</span> i=1:NHC
+0217             CI = CMData.HCMIndex(i);
+0218             InverseT = inv(T(:,:,CI));
+0219             OrbitEntrance = (inv(eye(4)-T(:,:,CI)*M44*InverseT)*<span class="keyword">...</span>
+0220                 T(:,:,CI)*M44*InverseT*(eye(4)+inv(M44HCOR{i}))*HCORTheta(:,i)/2);
+0221 
+0222             OrbitExit = HCORTheta(:,i)/2+M44HCOR{i}*(OrbitEntrance+HCORTheta(:,i)/2);
+0223 
+0224 
+0225             R0 = inv(T(:,:,CI+1))*OrbitExit;
+0226 
+0227             <span class="keyword">if</span> NewVectorizedMethod
+0228 
+0229                 <span class="comment">% very slow loop - use vector operations instead</span>
+0230                 vectind = BPMData.BPMIndex(1:NBPM);
+0231 
+0232                 <span class="comment">% convert multidimensional loop to single matrix product</span>
+0233                 T3 = T([1, 3],:,vectind);
+0234                 T2 = reshape(permute(T3, [1 3 2]), NBPM*2, 4);
+0235 
+0236                 <span class="comment">% vector comparison</span>
+0237                 bgtc = find(vectind &gt; CMData.HCMIndex(i));
+0238                 bltc = find(vectind &lt;= CMData.HCMIndex(i));
+0239                 bgtc = [(bgtc - 1) .* 2 + 1 (bgtc - 1) .* 2 + 2];
+0240                 bltc = [(bltc - 1) .* 2 + 1 (bltc - 1) .* 2 + 2];
+0241 
+0242                 <span class="comment">% conditionally multiply</span>
+0243                 Tout1 = T2 * R0;
+0244                 Tout2 = T2 * M44 * R0;
+0245                 Tout = zeros(size(Tout1));
+0246                 Tout(bgtc,:) = Tout1(bgtc,:);
+0247                 Tout(bltc,:) = Tout2(bltc,:);
+0248 
+0249                 <span class="comment">% interleave the writes</span>
+0250                 jjj = zeros(2, NBPM);
+0251                 jjj(1,:) = 1:NBPM;
+0252                 jjj(2,:) = NBPM+1:NBPM*2;
+0253 
+0254                 RM(jjj(:), i) = Tout;
+0255 
+0256             <span class="keyword">else</span>
+0257 
+0258                 <span class="keyword">for</span> j=1:NBPM
+0259                     <span class="keyword">if</span> BPMData.BPMIndex(j)&gt;CMData.HCMIndex(i)
+0260                         RM([j, j+NBPM],i) = T([1, 3],:,BPMData.BPMIndex(j))*R0;
+0261                     <span class="keyword">else</span>
+0262                         RM([j, j+NBPM],i) = T([1, 3],:,BPMData.BPMIndex(j))*M44*R0;
+0263                     <span class="keyword">end</span>
+0264                 <span class="keyword">end</span>
+0265 
+0266             <span class="keyword">end</span>
+0267 
+0268             <span class="keyword">if</span> strcmpi(ClosedOrbitType, <span class="string">'FixedPathLength'</span>)
+0269                 <span class="comment">% Use the average value of the dispersion at entrance and exit</span>
+0270                 D = HCORTheta(2,i) * <span class="keyword">...</span>
+0271                     (Dispersion(1,CMData.HCMIndex(i))+Dispersion(1,CMData.HCMIndex(i)+1)) * <span class="keyword">...</span>
+0272                     Dispersion([1 3],BPMData.BPMIndex) /L0/MCF/2;
+0273 
+0274                 RM(1:NBPM,i) = RM(1:NBPM,i) - D(1,:)';
+0275                 RM(NBPM+1:<span class="keyword">end</span>,i) = RM(NBPM+1:<span class="keyword">end</span>,i) - D(2,:)';
+0276             <span class="keyword">end</span>
+0277 
+0278         <span class="keyword">end</span>
+0279 
+0280         <span class="keyword">for</span> i=1:NVC
+0281             CI = CMData.VCMIndex(i);
+0282 
+0283             InverseT = inv(T(:,:,CI));
+0284             OrbitEntrance = (inv(eye(4)-T(:,:,CI)*M44*InverseT) * T(:,:,CI) * M44 * <span class="keyword">...</span>
+0285                 InverseT * (eye(4)+inv(M44VCOR{i}))*VCORTheta(:,i)/2);
+0286             OrbitExit = VCORTheta(:,i)/2+M44VCOR{i}*(OrbitEntrance+VCORTheta(:,i)/2);
+0287 
+0288             R0 = inv(T(:,:,CI+1))*OrbitExit;
+0289 
+0290             <span class="keyword">if</span> NewVectorizedMethod
+0291 
+0292                 <span class="comment">% very slow loop - use vector operations instead</span>
+0293                 vectind = BPMData.BPMIndex(1:NBPM);
+0294 
+0295                 <span class="comment">% convert multidimensional loop to single matrix product</span>
+0296                 T3 = T([1, 3],:,vectind);
+0297                 T2 = reshape(permute(T3, [1 3 2]), NBPM*2, 4);
+0298 
+0299                 <span class="comment">% vector comparison</span>
+0300                 bgtc = find(vectind &gt; CMData.VCMIndex(i));
+0301                 bltc = find(vectind &lt;= CMData.VCMIndex(i));
+0302                 bgtc = [(bgtc - 1) .* 2 + 1 (bgtc - 1) .* 2 + 2];
+0303                 bltc = [(bltc - 1) .* 2 + 1 (bltc - 1) .* 2 + 2];
+0304 
+0305                 <span class="comment">% conditionally multiply</span>
+0306                 Tout1 = T2 * R0;
+0307                 Tout2 = T2 * M44 * R0;
+0308                 Tout = zeros(size(Tout1));
+0309                 Tout(bgtc,:) = Tout1(bgtc,:);
+0310                 Tout(bltc,:) = Tout2(bltc,:);
+0311 
+0312                 <span class="comment">% interleave the writes</span>
+0313                 jjj = zeros(2, NBPM);
+0314                 jjj(1,:) = 1:NBPM;
+0315                 jjj(2,:) = NBPM+1:NBPM*2;
+0316 
+0317                 RM(jjj(:), i+NHC) = Tout;
+0318 
+0319             <span class="keyword">else</span>
+0320 
+0321                 <span class="keyword">for</span> j=1:NBPM
+0322                     <span class="keyword">if</span> BPMData.BPMIndex(j)&gt;CMData.VCMIndex(i)
+0323                         RM([j, j+NBPM],i+NHC) = T([1, 3],:,BPMData.BPMIndex(j))*R0;
+0324                     <span class="keyword">else</span>
+0325                         RM([j, j+NBPM],i+NHC) = T([1, 3],:,BPMData.BPMIndex(j))*M44*R0;
+0326                     <span class="keyword">end</span>
+0327                 <span class="keyword">end</span>
+0328 
+0329             <span class="keyword">end</span>
+0330 
+0331             <span class="comment">% Vertical correctors with coupling to X and non-zero horizontal dispersion</span>
+0332             <span class="keyword">if</span> strcmpi(ClosedOrbitType, <span class="string">'FixedPathLength'</span>)
+0333                 <span class="comment">% Use the average value of the dispersion at entrance and exit</span>
+0334                 D = VCORTheta(2,i)*(Dispersion(1,CMData.VCMIndex(i))+Dispersion(1,CMData.VCMIndex(i)+1))*<span class="keyword">...</span>
+0335                     Dispersion([1 3],BPMData.BPMIndex)/L0/MCF/2;
+0336                 RM(1:NBPM,NHC+i) = RM(1:NBPM,NHC+i) - D(1,:)';
+0337                 RM(NBPM+1:<span class="keyword">end</span>,NHC+i) = RM(NBPM+1:<span class="keyword">end</span>,NHC+i) - D(2,:)';
+0338             <span class="keyword">end</span>
+0339         <span class="keyword">end</span>
+0340 
+0341         <span class="keyword">if</span> RFFLAG
+0342             <span class="keyword">if</span> strcmpi(DispersionMeasurement, <span class="string">'Bidirectional'</span>)
+0343                 ORBITPLUS = findsyncorbit(RINGData.Lattice, (-C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2)/2, 1:length(RINGData.Lattice)+1);
+0344                 ORBIT0    = findsyncorbit(RINGData.Lattice, ( C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2)/2, 1:length(RINGData.Lattice)+1);
+0345             <span class="keyword">else</span>
+0346                 ORBITPLUS = findsyncorbit(RINGData.Lattice, -C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2, 1:length(RINGData.Lattice)+1);
+0347                 ORBIT0    = findsyncorbit(RINGData.Lattice, 0, 1:length(RINGData.Lattice)+1);
+0348             <span class="keyword">end</span>
+0349             D = ORBITPLUS([1 3],BPMData.BPMIndex) - ORBIT0([1 3],BPMData.BPMIndex);
+0350             RM(:,end) = [D(1,:)'; D(2,:)'];
+0351         <span class="keyword">end</span>
+0352 
+0353 
+0354     <span class="keyword">elseif</span> strcmpi(ClosedOrbitType, <span class="string">'FixedPathLength'</span>)
+0355         <span class="comment">% Exact calculation using FINDSYNCORBIT</span>
+0356 
+0357         <span class="keyword">for</span> i = 1:NHC
+0358             <span class="keyword">switch</span> ATRING{CMData.HCMIndex(i)}.PassMethod
+0359                 <span class="keyword">case</span> <span class="string">'CorrectorPass'</span>
+0360 
+0361                     KickAngle0 = ATRING{CMData.HCMIndex(i)}.KickAngle;
+0362 
+0363                     <span class="keyword">if</span> strcmpi(ResponseMatrixMeasurement, <span class="string">'bidirectional'</span>)
+0364                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.HCMKicks(i)/2;
+0365                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.HCMKicks(i)*CMData.HCMCoupling(i)/2;
+0366                         ORBITPLUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0367 
+0368                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) - CMData.HCMKicks(i)/2;
+0369                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) - CMData.HCMKicks(i)*CMData.HCMCoupling(i)/2;
+0370                         ORBITMINUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0371                     <span class="keyword">else</span>
+0372                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.HCMKicks(i);
+0373                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.HCMKicks(i)*CMData.HCMCoupling(i);
+0374                         ORBITPLUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0375 
+0376                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1);
+0377                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2);
+0378                         ORBITMINUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0379                     <span class="keyword">end</span>
+0380 
+0381                     ATRING{CMData.HCMIndex(i)}.KickAngle = KickAngle0;
+0382 
+0383                     RM(:,i) = [ORBITPLUS(1,:)-ORBITMINUS(1,:),ORBITPLUS(3,:)-ORBITMINUS(3,:)]';
+0384 
+0385                 <span class="keyword">case</span> {<span class="string">'StrMPoleSymplectic4Pass'</span>,<span class="string">'BndMPoleSymplectic4Pass'</span>}
+0386                     error(<span class="string">'Not implemented yet'</span>);
+0387                 <span class="keyword">otherwise</span>
+0388                     error(<span class="string">'Unknown pass method for corrector'</span>);
+0389             <span class="keyword">end</span>
+0390         <span class="keyword">end</span>
+0391 
+0392         <span class="keyword">for</span> i = 1:NVC
+0393             <span class="keyword">switch</span> ATRING{CMData.VCMIndex(i)}.PassMethod
+0394                 <span class="keyword">case</span> <span class="string">'CorrectorPass'</span>
+0395                     KickAngle0 = ATRING{CMData.VCMIndex(i)}.KickAngle;
+0396 
+0397                     <span class="keyword">if</span> strcmpi(ResponseMatrixMeasurement, <span class="string">'Bidirectional'</span>)
+0398                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.VCMKicks(i)/2;
+0399                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.VCMKicks(i)*CMData.VCMCoupling(i)/2;
+0400                         ORBITPLUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0401 
+0402                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) - CMData.VCMKicks(i)/2;
+0403                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) - CMData.VCMKicks(i)*CMData.VCMCoupling(i)/2;
+0404                         ORBITMINUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0405                     <span class="keyword">else</span>
+0406                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.VCMKicks(i);
+0407                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.VCMKicks(i)*CMData.VCMCoupling(i);
+0408                         ORBITPLUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0409 
+0410                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2);
+0411                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1);
+0412                         ORBITMINUS = findsyncorbit(ATRING,0,BPMData.BPMIndex);
+0413                     <span class="keyword">end</span>
+0414 
+0415                     ATRING{CMData.VCMIndex(i)}.KickAngle = KickAngle0;
+0416 
+0417                     RM(:,NHC+i) = [ORBITPLUS(1,:)-ORBITMINUS(1,:),ORBITPLUS(3,:)-ORBITMINUS(3,:)]';
+0418 
+0419                 <span class="keyword">case</span> {<span class="string">'StrMPoleSymplectic4Pass'</span>,<span class="string">'BndMPoleSymplectic4Pass'</span>}
+0420                     error(<span class="string">'Not implemented yet'</span>);
+0421                 <span class="keyword">otherwise</span>
+0422                     error(<span class="string">'Unknown pass method for corrector'</span>)
+0423             <span class="keyword">end</span>
+0424         <span class="keyword">end</span>
+0425 
+0426         <span class="keyword">if</span> RFFLAG
+0427             <span class="keyword">if</span> strcmpi(DispersionMeasurement, <span class="string">'bidirectional'</span>)
+0428                 ORBITPLUS = findsyncorbit(RINGData.Lattice, (-C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2)/2, 1:length(RINGData.Lattice)+1);
+0429                 ORBIT0    = findsyncorbit(RINGData.Lattice, ( C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2)/2, 1:length(RINGData.Lattice)+1);
+0430             <span class="keyword">else</span>
+0431                 ORBITPLUS = findsyncorbit(RINGData.Lattice, -C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2, 1:length(RINGData.Lattice)+1);
+0432                 ORBIT0    = findsyncorbit(RINGData.Lattice, 0, 1:length(RINGData.Lattice)+1);
+0433             <span class="keyword">end</span>
+0434 
+0435             D = ORBITPLUS([1 3],BPMData.BPMIndex) - ORBIT0([1 3],BPMData.BPMIndex);
+0436             RM(:,end) = [D(1,:)';D(2,:)'];
+0437         <span class="keyword">end</span>
+0438 
+0439     <span class="keyword">elseif</span> strcmpi(ClosedOrbitType, <span class="string">'FixedMomentum'</span>)
+0440         <span class="comment">% ClosedOrbitType = 'fixedmomentum' - Exact calculation using FINDORBIT4</span>
+0441         <span class="keyword">for</span> i = 1:NHC
+0442             <span class="keyword">switch</span> ATRING{CMData.HCMIndex(i)}.PassMethod
+0443                 <span class="keyword">case</span> <span class="string">'CorrectorPass'</span>
+0444                     KickAngle0 = ATRING{CMData.HCMIndex(i)}.KickAngle;
+0445 
+0446                     <span class="keyword">if</span> strcmpi(ResponseMatrixMeasurement, <span class="string">'Bidirectional'</span>)
+0447                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.HCMKicks(i)/2;
+0448                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.HCMKicks(i)*CMData.HCMCoupling(i)/2;
+0449                         ORBITPLUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0450 
+0451                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) - CMData.HCMKicks(i)/2;
+0452                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) - CMData.HCMKicks(i)*CMData.HCMCoupling(i)/2;
+0453                         ORBITMINUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0454                     <span class="keyword">else</span>
+0455                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.HCMKicks(i);
+0456                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.HCMKicks(i)*CMData.HCMCoupling(i);
+0457                         ORBITPLUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0458 
+0459                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1);
+0460                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2);
+0461                         ORBITMINUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0462                     <span class="keyword">end</span>
+0463 
+0464                     ATRING{CMData.HCMIndex(i)}.KickAngle = KickAngle0;
+0465 
+0466                     RM(:,i) = [ORBITPLUS(1,:)-ORBITMINUS(1,:),ORBITPLUS(3,:)-ORBITMINUS(3,:)]';
+0467 
+0468                 <span class="keyword">case</span> {<span class="string">'StrMPoleSymplectic4Pass'</span>,<span class="string">'BndMPoleSymplectic4Pass'</span>}
+0469                     error(<span class="string">'Not implemented yet'</span>);
+0470                 <span class="keyword">otherwise</span>
+0471                     error(<span class="string">'Unknown pass method for corrector'</span>);
+0472             <span class="keyword">end</span>
+0473         <span class="keyword">end</span>
+0474 
+0475         <span class="keyword">for</span> i = 1:NVC
+0476             <span class="keyword">switch</span> ATRING{CMData.HCMIndex(i)}.PassMethod
+0477                 <span class="keyword">case</span> <span class="string">'CorrectorPass'</span>
+0478 
+0479                     KickAngle0 = ATRING{CMData.HCMIndex(i)}.KickAngle;
+0480 
+0481                     <span class="keyword">if</span> strcmpi(ResponseMatrixMeasurement, <span class="string">'Bidirectional'</span>)
+0482                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.VCMKicks(i)/2;
+0483                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.VCMKicks(i)*CMData.VCMCoupling(i)/2;
+0484                         ORBITPLUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0485 
+0486                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) - CMData.VCMKicks(i)/2;
+0487                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) - CMData.VCMKicks(i)*CMData.VCMCoupling(i)/2;
+0488                         ORBITMINUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0489                     <span class="keyword">else</span>
+0490                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.VCMKicks(i);
+0491                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.VCMKicks(i)*CMData.VCMCoupling(i);
+0492                         ORBITPLUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0493 
+0494                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2);
+0495                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1);
+0496                         ORBITMINUS = findorbit4(ATRING,0,BPMData.BPMIndex);
+0497                     <span class="keyword">end</span>
+0498 
+0499                     ATRING{CMData.VCMIndex(i)}.KickAngle = KickAngle0;
+0500 
+0501                     RM(:,NHC+i) = [ORBITPLUS(1,:)-ORBITMINUS(1,:),ORBITPLUS(3,:)-ORBITMINUS(3,:)]';
+0502 
+0503                 <span class="keyword">case</span> {<span class="string">'StrMPoleSymplectic4Pass'</span>,<span class="string">'BndMPoleSymplectic4Pass'</span>}
+0504                     error(<span class="string">'Not implemented yet'</span>);
+0505                 <span class="keyword">otherwise</span>
+0506                     error(<span class="string">'Unknown pass method for corrector'</span>)
+0507             <span class="keyword">end</span>
+0508         <span class="keyword">end</span>
+0509 
+0510         <span class="keyword">if</span> RFFLAG
+0511             <span class="keyword">if</span> strcmpi(DispersionMeasurement, <span class="string">'Bidirectional'</span>)
+0512                 ORBITPLUS = findsyncorbit(RINGData.Lattice, (-C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2)/2, 1:length(RINGData.Lattice)+1);
+0513                 ORBIT0    = findsyncorbit(RINGData.Lattice, ( C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2)/2, 1:length(RINGData.Lattice)+1);
+0514             <span class="keyword">else</span>
+0515                 ORBITPLUS = findsyncorbit(RINGData.Lattice, -C*DeltaRF*RINGData.CavityHarmNumber/RINGData.CavityFrequency^2, 1:length(RINGData.Lattice)+1);
+0516                 ORBIT0    = findsyncorbit(RINGData.Lattice, 0, 1:length(RINGData.Lattice)+1);
+0517             <span class="keyword">end</span>
+0518 
+0519             D = ORBITPLUS([1 3],BPMData.BPMIndex) - ORBIT0([1 3],BPMData.BPMIndex);
+0520             RM(:,end) = [D(1,:)'; D(2,:)'];
+0521         <span class="keyword">end</span>
+0522 
+0523     <span class="keyword">else</span>
+0524         error(<span class="string">'ClosedOrbitType method unknown'</span>);
+0525     <span class="keyword">end</span>
+0526 
+0527     <span class="comment">% End of storage ring</span>
+0528     
+0529     
+0530 <span class="keyword">else</span>
+0531     
+0532     
+0533     <span class="comment">% Transport line</span>
+0534     <span class="keyword">if</span> RFFLAG
+0535         RFFLAG = 0;
+0536         fprintf(<span class="string">'   RF flag ignored for transport lines.\n'</span>);
+0537     <span class="keyword">end</span>
+0538 
+0539     <span class="comment">%if strcmpi(ResponseMatrixCalculator, 'Linear')</span>
+0540     <span class="comment">%    ResponseMatrixCalculator = 'Full';</span>
+0541     <span class="comment">%    fprintf('   ResponseMatrixCalculator set to ''Full'' for transport lines (linear is actualy slower for small transport lines).\n');</span>
+0542     <span class="comment">%end</span>
+0543 
+0544     RM = zeros(2*NBPM,NHC+NVC);
+0545     
+0546     NE = length(ATRING);
+0547 
+0548     <span class="comment">% Find the response matrix about an initial orbit</span>
+0549     <span class="keyword">if</span> isfield(ATRING{1}, <span class="string">'TwissData'</span>)
+0550         TwissData = ATRING{1}.TwissData;
+0551         R0 = [TwissData.ClosedOrbit; TwissData.dP; TwissData.dL];
+0552     <span class="keyword">else</span>
+0553         <span class="comment">% Try the middlelayer</span>
+0554         <span class="keyword">try</span>
+0555             TwissData = getfamilydata(<span class="string">'TwissData'</span>);
+0556             R0 = [TwissData.ClosedOrbit; TwissData.dP; TwissData.dL];
+0557             <span class="keyword">if</span> isempty(TwissData)
+0558                 R0 = [0 0 0 0 0 0]';
+0559             <span class="keyword">end</span>
+0560         <span class="keyword">catch</span>
+0561             R0 = [0 0 0 0 0 0]';
+0562         <span class="keyword">end</span>
+0563     <span class="keyword">end</span>
+0564 
+0565     <span class="keyword">if</span> strcmpi(ResponseMatrixCalculator, <span class="string">'Linear'</span>)
+0566                        
+0567         <span class="comment">% Calculate linear optics and chromatic finctions for the model</span>
+0568         [M44, T, ClosedOrbit1] = findm44(ATRING, 0, 1:NE+1);
+0569 
+0570         <span class="comment">% Don't use the closed orbit that findm44 use.  Use linepass.</span>
+0571         ClosedOrbit = linepass(ATRING, R0, 1:length(ATRING)+1);
+0572     
+0573         <span class="comment">% Transfer matrixes through individual correctors</span>
+0574         M44HCOR = cell(1,NHC);
+0575         M44VCOR = cell(1,NVC);
+0576 
+0577         <span class="keyword">for</span> i=1:NHC
+0578             M44HCOR{i} = findelemm44(ATRING{CMData.HCMIndex(i)}, ATRING{CMData.HCMIndex(i)}.PassMethod, ClosedOrbit(:,CMData.HCMIndex(i)));
+0579         <span class="keyword">end</span>
+0580         <span class="keyword">for</span> i=1:NVC
+0581             match = find(CMData.VCMIndex(i)==CMData.HCMIndex);
+0582             <span class="keyword">if</span> match
+0583                 M44VCOR{i} = M44HCOR{match};
+0584             <span class="keyword">else</span>
+0585                 M44VCOR{i} = findelemm44(ATRING{CMData.VCMIndex(i)}, ATRING{CMData.VCMIndex(i)}.PassMethod, ClosedOrbit(:,CMData.VCMIndex(i)));
+0586             <span class="keyword">end</span>
+0587         <span class="keyword">end</span>
+0588 
+0589 
+0590         <span class="comment">% Assemble arrays of corrector kicks including coupling</span>
+0591         HCORTheta = zeros(4,NHC);
+0592         VCORTheta = zeros(4,NVC);
+0593 
+0594         HCORTheta(2,:) = CMData.HCMKicks(:)';
+0595         HCORTheta(4,:) = CMData.HCMCoupling(:)' .* CMData.HCMKicks(:)';
+0596         VCORTheta(2,:) = CMData.VCMCoupling(:)' .* CMData.VCMKicks(:)';
+0597         VCORTheta(4,:) = CMData.VCMKicks(:)';
+0598 
+0599 
+0600         <span class="comment">% Calculate closed orbit at the exit of each corrector magnet WITH applied kick</span>
+0601         <span class="keyword">for</span> i = 1:NHC
+0602             CI = CMData.HCMIndex(i);
+0603             InverseT = inv(T(:,:,CI));
+0604             
+0605             <span class="comment">% Split the kick on either side of the corrector</span>
+0606             OrbitExit = M44HCOR{i} * HCORTheta(:,i)/2 + HCORTheta(:,i)/2;
+0607             OrbitEntrance = inv(M44HCOR{i}) * OrbitExit;
+0608             R0 = InverseT * OrbitEntrance(1:4);
+0609             
+0610             <span class="keyword">for</span> j = 1:NBPM
+0611                 <span class="keyword">if</span> BPMData.BPMIndex(j) &gt; CMData.HCMIndex(i)
+0612                     RM([j, j+NBPM],i) = T([1 3],:,BPMData.BPMIndex(j)) * R0;
+0613                 <span class="keyword">end</span>
+0614             <span class="keyword">end</span>
+0615         <span class="keyword">end</span>
+0616 
+0617         <span class="keyword">for</span> i=1:NVC
+0618             CI = CMData.VCMIndex(i);
+0619             InverseT = inv(T(:,:,CI));
+0620 
+0621             <span class="comment">% Split the kick on either side of the corrector</span>
+0622             OrbitExit = M44VCOR{i} * VCORTheta(:,i)/2 + VCORTheta(:,i)/2;
+0623             OrbitEntrance = inv(M44HCOR{i}) * OrbitExit;
+0624             R0 = InverseT * OrbitEntrance(1:4);
+0625             
+0626             <span class="keyword">for</span> j=1:NBPM
+0627                 <span class="keyword">if</span> BPMData.BPMIndex(j)&gt;CMData.VCMIndex(i)
+0628                     RM([j, j+NBPM],i+NHC) = T([1 3],:,BPMData.BPMIndex(j)) * R0;
+0629                 <span class="keyword">end</span>
+0630             <span class="keyword">end</span>
+0631         <span class="keyword">end</span>
+0632         
+0633     <span class="keyword">elseif</span> strcmpi(ResponseMatrixCalculator, <span class="string">'Full'</span>)
+0634         
+0635         <span class="comment">% Exact calculation using linepass</span>
+0636         <span class="keyword">for</span> i = 1:NHC
+0637             <span class="keyword">switch</span> ATRING{CMData.HCMIndex(i)}.PassMethod
+0638                 <span class="keyword">case</span> <span class="string">'CorrectorPass'</span>
+0639 
+0640                     KickAngle0 = ATRING{CMData.HCMIndex(i)}.KickAngle;
+0641 
+0642                     <span class="keyword">if</span> strcmpi(ResponseMatrixMeasurement, <span class="string">'bidirectional'</span>)
+0643                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.HCMKicks(i)/2;
+0644                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.HCMKicks(i)*CMData.HCMCoupling(i)/2;
+0645                         ORBITPLUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0646 
+0647                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) - CMData.HCMKicks(i)/2;
+0648                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) - CMData.HCMKicks(i)*CMData.HCMCoupling(i)/2;
+0649                         ORBITMINUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0650                     <span class="keyword">else</span>
+0651                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.HCMKicks(i);
+0652                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.HCMKicks(i)*CMData.HCMCoupling(i);
+0653                         ORBITPLUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0654 
+0655                         ATRING{CMData.HCMIndex(i)}.KickAngle(1) = KickAngle0(1);
+0656                         ATRING{CMData.HCMIndex(i)}.KickAngle(2) = KickAngle0(2);
+0657                         ORBITMINUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0658                     <span class="keyword">end</span>
+0659 
+0660                     ATRING{CMData.HCMIndex(i)}.KickAngle = KickAngle0;
+0661 
+0662                     RM(:,i) = [ORBITPLUS(1,:)-ORBITMINUS(1,:),ORBITPLUS(3,:)-ORBITMINUS(3,:)]';
+0663 
+0664                 <span class="keyword">case</span> {<span class="string">'StrMPoleSymplectic4Pass'</span>,<span class="string">'BndMPoleSymplectic4Pass'</span>}
+0665                     error(<span class="string">'Not implemented yet'</span>);
+0666                 <span class="keyword">otherwise</span>
+0667                     error(<span class="string">'Unknown pass method for corrector'</span>);
+0668             <span class="keyword">end</span>
+0669         <span class="keyword">end</span>
+0670 
+0671         <span class="keyword">for</span> i = 1:NVC
+0672             <span class="keyword">switch</span> ATRING{CMData.VCMIndex(i)}.PassMethod
+0673                 <span class="keyword">case</span> <span class="string">'CorrectorPass'</span>
+0674                     KickAngle0 = ATRING{CMData.VCMIndex(i)}.KickAngle;
+0675 
+0676                     <span class="keyword">if</span> strcmpi(ResponseMatrixMeasurement, <span class="string">'Bidirectional'</span>)
+0677                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.VCMKicks(i)/2;
+0678                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.VCMKicks(i)*CMData.VCMCoupling(i)/2;
+0679                         ORBITPLUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0680 
+0681                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) - CMData.VCMKicks(i)/2;
+0682                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) - CMData.VCMKicks(i)*CMData.VCMCoupling(i)/2;
+0683                         ORBITMINUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0684                     <span class="keyword">else</span>
+0685                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2) + CMData.VCMKicks(i);
+0686                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1) + CMData.VCMKicks(i)*CMData.VCMCoupling(i);
+0687                         ORBITPLUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0688 
+0689                         ATRING{CMData.VCMIndex(i)}.KickAngle(2) = KickAngle0(2);
+0690                         ATRING{CMData.VCMIndex(i)}.KickAngle(1) = KickAngle0(1);
+0691                         ORBITMINUS = linepass(ATRING,R0,BPMData.BPMIndex);
+0692                     <span class="keyword">end</span>
+0693 
+0694                     ATRING{CMData.VCMIndex(i)}.KickAngle = KickAngle0;
+0695 
+0696                     RM(:,NHC+i) = [ORBITPLUS(1,:)-ORBITMINUS(1,:),ORBITPLUS(3,:)-ORBITMINUS(3,:)]';
+0697 
+0698                 <span class="keyword">case</span> {<span class="string">'StrMPoleSymplectic4Pass'</span>,<span class="string">'BndMPoleSymplectic4Pass'</span>}
+0699                     error(<span class="string">'Not implemented yet'</span>);
+0700                 <span class="keyword">otherwise</span>
+0701                     error(<span class="string">'Unknown pass method for corrector'</span>)
+0702             <span class="keyword">end</span>
+0703         <span class="keyword">end</span>
+0704     <span class="keyword">else</span>
+0705         error(<span class="string">'Unknown method for transfer lines.'</span>);
+0706     <span class="keyword">end</span>
+0707 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

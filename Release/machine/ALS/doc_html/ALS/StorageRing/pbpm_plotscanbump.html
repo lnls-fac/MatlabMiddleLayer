@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of pbpm_plotscanbump</title>
+  <meta name="keywords" content="pbpm_plotscanbump">
+  <meta name="description" content="if abs(y(1,1)-y(1,end)) < .1">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; pbpm_plotscanbump.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>pbpm_plotscanbump
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>if abs(y(1,1)-y(1,end)) < .1</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> if abs(y(1,1)-y(1,end)) &lt; .1
+     % Change Physics units to mm
+     y = y*1000;
+     yg = yg * 1000;
+ end</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>	SETOPERATIONALMODE - Switches between the various operational modes</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 
+0002 
+0003 
+0004 <span class="comment">% if abs(y(1,1)-y(1,end)) &lt; .1</span>
+0005 <span class="comment">%     % Change Physics units to mm</span>
+0006 <span class="comment">%     y = y*1000;</span>
+0007 <span class="comment">%     yg = yg * 1000;</span>
+0008 <span class="comment">% end</span>
+0009 
+0010 
+0011 py1 = (pBPM(1,:) - pBPM(3,:)) ./ (pBPM(1,:) + pBPM(3,:));
+0012 py2 = (pBPM(2,:) - pBPM(4,:)) ./ (pBPM(2,:) + pBPM(4,:));
+0013 
+0014 
+0015 <span class="comment">% y1-y2 should equal .978 mm (6/2006 distance between the blades)</span>
+0016 Gain = .978 ./ (py2 - py1);   
+0017 py = Gain .* py1;
+0018 
+0019 
+0020 figure(1);
+0021 clf reset
+0022 subplot(2,1,1);
+0023 plot(y(1,:)-yg(1,:), pBPM(1:4,:),<span class="string">'.-'</span>);
+0024 ylabel(<span class="string">'Blade Current [Volts]'</span>);
+0025 legend(<span class="string">'Top Inside'</span>,<span class="string">'Top Outside'</span>,<span class="string">'Bottom Inside'</span>,<span class="string">'Bottom Outside'</span>,0);
+0026 title(sprintf(<span class="string">'Local Bump Scan (%.1f Bias Voltage,  %.1f \\muA Sensitivity Range,  %.1f mA Beam Current)'</span>, BiasVoltage, 1e6*SensitivityRange, DCCT));
+0027 grid on;
+0028 a = axis;
+0029 axis tight;
+0030 yaxis(a(3:4));
+0031 
+0032 
+0033 subplot(2,1,2);
+0034 <span class="comment">%plot(y(1,:)-yg(1,:), [py1; py2],'.-');</span>
+0035 [ax,h1,h2] = plotyy(y(1,:)-yg(1,:), [py1; py2], y(1,:)-yg(1,:), py);
+0036 set(get(ax(1),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'(Top-Bottom)/(Top+Bottom)'</span>)
+0037 set(get(ax(2),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'Calibrated Vertical Position [mm]'</span>)
+0038 <span class="comment">%set(h1,'LineStyle','-');</span>
+0039 <span class="comment">%set(h2,'LineStyle','-');</span>
+0040 set(h1,<span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0041 set(h2,<span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0042 <span class="comment">%set(ax(2), 'YColor', RightGraphColor);</span>
+0043 <span class="comment">%set(h2, 'Color', RightGraphColor);</span>
+0044 <span class="comment">% axes(ax(1));</span>
+0045 <span class="comment">% aa = axis;</span>
+0046 <span class="comment">% aa(1) = 0;</span>
+0047 <span class="comment">% aa(2) = xmax;</span>
+0048 <span class="comment">% axis(aa);</span>
+0049 <span class="comment">% axes(ax(2));</span>
+0050 <span class="comment">% aa = axis;</span>
+0051 <span class="comment">% aa(1) = 0;</span>
+0052 <span class="comment">% aa(2) = xmax;</span>
+0053 <span class="comment">% axis(aa);</span>
+0054 
+0055 axes(ax(1));
+0056 a = axis;
+0057 axis tight;
+0058 yaxis(a(3:4));
+0059 
+0060 xlabel(<span class="string">'Electron Beam Position from the Golden Orbit Around BEND 7.2 [mm]'</span>);
+0061 legend(<span class="string">'Inside Blades'</span>, <span class="string">'Outside Blades'</span>, <span class="string">'Location'</span>,<span class="string">'NorthWest'</span>);
+0062 grid on;
+0063 
+0064 
+0065 axes(ax(2));
+0066 a = axis;
+0067 axis tight;
+0068 yaxis(a(3:4));
+0069 
+0070 <span class="comment">%a = axis;</span>
+0071 <span class="comment">%axis tight;</span>
+0072 <span class="comment">%yaxis(a(3:4));</span>
+0073 
+0074 
+0075 addlabel(1,0,sprintf(<span class="string">'%s'</span>, datestr(TimeStamp,0)));
+0076 yaxesposition(1.15);
+0077 orient tall
+0078 
+0079 
+0080 <span class="keyword">if</span> ~exist(<span class="string">'ypBPMmodel'</span>,<span class="string">'var'</span>)
+0081 
+0082     <span class="comment">% Must have the split dipole lattice loaded</span>
+0083     <span class="keyword">if</span> ~strcmpi(getfamilydata(<span class="string">'OperationalMode'</span>), <span class="string">'1.9 GeV, Model'</span>)
+0084         <a href="setoperationalmode.html" class="code" title="function setoperationalmode(ModeNumber)">setoperationalmode</a>(101);
+0085     <span class="keyword">end</span>
+0086     switch2sim;
+0087 
+0088     setsp(<span class="string">'HCM'</span>, 0, <span class="string">'Physics'</span>);
+0089     setsp(<span class="string">'VCM'</span>, 0, <span class="string">'Physics'</span>);
+0090 
+0091     iAT = family2atindex(<span class="string">'BEND'</span>,[7 2]);
+0092 
+0093 
+0094     <span class="comment">% LOCO gains need to be added since setoperationalmode(101) has unity gains</span>
+0095     <span class="comment">% However, make sure the LOCO gains are correct</span>
+0096     <span class="comment">%Xgain = getgain('BPMx', [7 5; 7 6])</span>
+0097     <span class="comment">%Xgain = [</span>
+0098     <span class="comment">%    0.9809</span>
+0099     <span class="comment">%    0.9888];</span>
+0100     <span class="comment">%Ygain = getgain('BPMy', [7 5; 7 6])</span>
+0101     <span class="comment">%Ygain = [</span>
+0102     <span class="comment">%    0.8989</span>
+0103     <span class="comment">%    0.8696];</span>
+0104     <span class="comment">%Ygain = [</span>
+0105     <span class="comment">%    1</span>
+0106     <span class="comment">%    1];</span>
+0107 
+0108     <span class="comment">% 2006-08-27 LOCO gains</span>
+0109     Ygain = [
+0110         0.9482;
+0111         0.9313];
+0112 
+0113     setfamilydata(Ygain, <span class="string">'BPMy'</span>, <span class="string">'Gain'</span>, [7 5; 7 6]);
+0114 
+0115     clear Orbit1 Orbit2 Orbit3 xm ym
+0116 
+0117     <span class="keyword">for</span> i = 1:length(ybump)
+0118         <span class="comment">% Add a local bump to the model (physics) which is the same as what was put on the machine (real units)</span>
+0119         fprintf(<span class="string">'  %2d. Local bump to %f \n'</span>, i, ybump(i));
+0120         OCSmodel = setorbitbump(<span class="string">'BPMy'</span>, [7 5;7 6], [Ygain(1)*ybump(i); Ygain(2)*ybump(i)]/1000, <span class="string">'VCM'</span>, [-3 -2 -1 1 2 3], 3, <span class="string">'Physics'</span>, <span class="string">'Abs'</span>);
+0121         OCSmodel = setorbitbump(<span class="string">'BPMx'</span>, [7 5;7 6], [0 0],                                       <span class="string">'HCM'</span>, [-3 -2 -1 1 2 3], 2, <span class="string">'Physics'</span>, <span class="string">'Abs'</span>);
+0122         OCSmodel = setorbitbump(<span class="string">'BPMy'</span>, [7 5;7 6], [Ygain(1)*ybump(i); Ygain(2)*ybump(i)]/1000, <span class="string">'VCM'</span>, [-3 -2 -1 1 2 3], 3, <span class="string">'Physics'</span>, <span class="string">'Abs'</span>);
+0123 
+0124         xm(:,i) = getx([7 5; 7 6]);
+0125         ym(:,i) = gety([7 5; 7 6]);
+0126 
+0127         tmp = getpvmodel(<span class="string">'All'</span>, <span class="string">'ClosedOrbit'</span>);
+0128 
+0129         Orbit1(:,i) = tmp(iAT(1),:)';
+0130         Orbit2(:,i) = tmp(iAT(2),:)';
+0131         Orbit3(:,i) = tmp(iAT(3),:)';
+0132     <span class="keyword">end</span>
+0133     clear tmp
+0134 
+0135     setsp(<span class="string">'HCM'</span>, 0, <span class="string">'Physics'</span>);
+0136     setsp(<span class="string">'VCM'</span>, 0, <span class="string">'Physics'</span>);
+0137 
+0138 
+0139     ypBPMmodel = 1000*Orbit2(3,:) + Orbit2(4,:) * 6000;  <span class="comment">% mm</span>
+0140 
+0141 <span class="keyword">end</span>
+0142 
+0143 
+0144 figure(2);
+0145 clf reset
+0146 
+0147 subplot(2,1,1);
+0148 plot(ypBPMmodel, pBPM(1:4,:),<span class="string">'.-'</span>);
+0149 ylabel(<span class="string">'Blade Current [Volts]'</span>);
+0150 legend(<span class="string">'Top Inside'</span>,<span class="string">'Top Outside'</span>,<span class="string">'Bottom Inside'</span>,<span class="string">'Bottom Outside'</span>,0);
+0151 title(sprintf(<span class="string">'Local Bump Scan (%.1f Bias Voltage,  %.1f \\muA Sensitivity Range,  %.1f mA Beam Current)'</span>, BiasVoltage, 1e6*SensitivityRange, DCCT));
+0152 grid on;
+0153 a = axis;
+0154 axis tight;
+0155 yaxis(a(3:4));
+0156 
+0157 
+0158 subplot(2,1,2);
+0159 <span class="comment">%plot(ypBPMmodel, [py1; py2],'.-');</span>
+0160 [ax,h1,h2] = plotyy(ypBPMmodel, [py1; py2], ypBPMmodel, py);
+0161 set(get(ax(1),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'(Top-Bottom)/(Top+Bottom)'</span>)
+0162 set(get(ax(2),<span class="string">'Ylabel'</span>),<span class="string">'String'</span>,<span class="string">'Calibrated Vertical Position [mm]'</span>)
+0163 <span class="comment">%set(h1,'LineStyle','-');</span>
+0164 <span class="comment">%set(h2,'LineStyle','-');</span>
+0165 set(h1,<span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0166 set(h2,<span class="string">'Marker'</span>,<span class="string">'.'</span>);
+0167 <span class="comment">%set(ax(2), 'YColor', RightGraphColor);</span>
+0168 <span class="comment">%set(h2, 'Color', RightGraphColor);</span>
+0169 <span class="comment">% axes(ax(1));</span>
+0170 <span class="comment">% aa = axis;</span>
+0171 <span class="comment">% aa(1) = 0;</span>
+0172 <span class="comment">% aa(2) = xmax;</span>
+0173 <span class="comment">% axis(aa);</span>
+0174 <span class="comment">% axes(ax(2));</span>
+0175 <span class="comment">% aa = axis;</span>
+0176 <span class="comment">% aa(1) = 0;</span>
+0177 <span class="comment">% aa(2) = xmax;</span>
+0178 <span class="comment">% axis(aa);</span>
+0179 
+0180 axes(ax(1));
+0181 a = axis;
+0182 axis tight;
+0183 yaxis(a(3:4));
+0184 
+0185 grid on;
+0186 xlabel(<span class="string">'Electron Beam Position Projected to the Photon BPM [mm]'</span>);
+0187 legend(<span class="string">'Inside Blades'</span>, <span class="string">'Outside Blades'</span>, <span class="string">'Location'</span>,<span class="string">'NorthWest'</span>);
+0188 
+0189 axes(ax(2));
+0190 a = axis;
+0191 axis tight;
+0192 yaxis(a(3:4));
+0193 
+0194 addlabel(1,0,sprintf(<span class="string">'%s'</span>, datestr(TimeStamp,0)));
+0195 yaxesposition(1.15);
+0196 orient tall
+0197 
+0198 
+0199 N1 = 1;
+0200 N2 = 5;
+0201 Slope1 = (py1(N2) - py1(N1)) / (ypBPMmodel(N2)-ypBPMmodel(N1));
+0202 Slope2 = (py2(N2) - py2(N1)) / (ypBPMmodel(N2)-ypBPMmodel(N1));
+0203 Slope  = (py(N2)  - py(N1))  / (ypBPMmodel(N2)-ypBPMmodel(N1));
+0204 <span class="comment">% text(a(1)+.1*(a(2)-a(1)), a(4)-.1*(a(4)-a(3)), sprintf('(%.2f - %.2f)/(%.2f - %.2f) = %.2f Inside  pBPM Slope (Point %d to Point %d)', py1(N2), py1(N1), ypBPMmodel(N2), ypBPMmodel(N1), Slope1, N1, N2));</span>
+0205 <span class="comment">% text(a(1)+.1*(a(2)-a(1)), a(4)-.2*(a(4)-a(3)), sprintf('(%.2f - %.2f)/(%.2f - %.2f) = %.2f Outside pBPM Slope (Point %d to Point %d)', py2(N2), py2(N1), ypBPMmodel(N2), ypBPMmodel(N1), Slope2, N1, N2));</span>
+0206 <span class="comment">% text(a(1)+.1*(a(2)-a(1)), a(4)-.3*(a(4)-a(3)), sprintf('(%.2f - %.2f)/(%.2f - %.2f) = %.2f pBPM Slope (Point %d to Point %d)', py2(N2), py2(N1), ypBPMmodel(N2), ypBPMmodel(N1), Slope2, N1, N2));</span>
+0207 
+0208 fprintf(<span class="string">'Calibrated pBPM Slope: (%5.2f - %5.2f)/(%5.2f - %5.2f) = %5.3f  (Point %d to Point %d)\n'</span>, py(N2),  py(N1),  ypBPMmodel(N2), ypBPMmodel(N1), Slope, N1, N2);
+0209 fprintf(<span class="string">'Inside     pBPM Slope: (%5.2f - %5.2f)/(%5.2f - %5.2f) = %5.3f  (Point %d to Point %d)\n'</span>, py1(N2), py1(N1), ypBPMmodel(N2), ypBPMmodel(N1), Slope1, N1, N2);
+0210 fprintf(<span class="string">'Outside    pBPM Slope: (%5.2f - %5.2f)/(%5.2f - %5.2f) = %5.3f  (Point %d to Point %d)\n'</span>, py2(N2), py2(N1), ypBPMmodel(N2), ypBPMmodel(N1), Slope2, N1, N2);
+0211 
+0212 
+0213 clear a ax h1 h2</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

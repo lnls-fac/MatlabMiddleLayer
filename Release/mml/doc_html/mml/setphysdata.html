@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setphysdata</title>
+  <meta name="keywords" content="setphysdata">
+  <meta name="description" content="SETPHYSDATA - Set physics data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; setphysdata.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setphysdata
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>SETPHYSDATA - Set physics data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function setphysdata(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETPHYSDATA - Set physics data
+  For vector inputs:
+  setphysdata(Family, Field, Data, DeviceList)
+  setphysdata(Family, Field, Data)
+
+  For structure inputs:
+  setphysdata(DataStruct, Field)   % Family, Data, and DeviceList are in DataStruct
+  setphysdata(Family, DataStruct)  % DataStruct is the entire family structure
+  setphysdata(DataStruct)          % DataStruct is the entire Physics Data Structure
+
+  INPUTS
+  1. Family = Family name (or first field name in the physdata structure)
+  2. Field  = Field  name ('Offset', 'Gain', 'Golden', etc)
+  3. Data = New data values
+  4. DeviceList = Device list for that family
+         or 
+  1. DataStruct = .FamilyName, .DeviceList, and .Data fields are used if they exist
+                  or DataStruct is saved according to the Field/Family
+  2. Field = Field name ('Offset', 'Gain', 'Golden', etc)
+
+  NOTE
+  1. If Data is a cell array, then Family, Field, and DeviceList must also be a cell arrays.
+  2. If the family or field does not exist, then it will be created!
+     When a new field is created a message will be printed to the screen.
+
+  EXAMPLES
+  1. To set the offset orbit for BPM(3,2) to 1.234
+     setphysdata('BPMx', 'Offset', 1.234, [3 2]);
+
+  NOTE: MML creators are phasing out the use of physdata.
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>	GETLIST - Returns Device List for a Family</li><li><a href="getphysdata.html" class="code" title="function [Data, iNotFound] = getphysdata(Family, Field, DeviceList)">getphysdata</a>	GETPHYSDATA - Gets physics data</li><li><a href="setphysdata.html" class="code" title="function setphysdata(varargin)">setphysdata</a>	SETPHYSDATA - Set physics data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="setphysdata.html" class="code" title="function setphysdata(varargin)">setphysdata</a>	SETPHYSDATA - Set physics data</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function savephysdatalocal(PhysData, ArchiveFlag)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setphysdata(varargin)</a>
+0002 <span class="comment">%SETPHYSDATA - Set physics data</span>
+0003 <span class="comment">%  For vector inputs:</span>
+0004 <span class="comment">%  setphysdata(Family, Field, Data, DeviceList)</span>
+0005 <span class="comment">%  setphysdata(Family, Field, Data)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%  For structure inputs:</span>
+0008 <span class="comment">%  setphysdata(DataStruct, Field)   % Family, Data, and DeviceList are in DataStruct</span>
+0009 <span class="comment">%  setphysdata(Family, DataStruct)  % DataStruct is the entire family structure</span>
+0010 <span class="comment">%  setphysdata(DataStruct)          % DataStruct is the entire Physics Data Structure</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%  INPUTS</span>
+0013 <span class="comment">%  1. Family = Family name (or first field name in the physdata structure)</span>
+0014 <span class="comment">%  2. Field  = Field  name ('Offset', 'Gain', 'Golden', etc)</span>
+0015 <span class="comment">%  3. Data = New data values</span>
+0016 <span class="comment">%  4. DeviceList = Device list for that family</span>
+0017 <span class="comment">%         or</span>
+0018 <span class="comment">%  1. DataStruct = .FamilyName, .DeviceList, and .Data fields are used if they exist</span>
+0019 <span class="comment">%                  or DataStruct is saved according to the Field/Family</span>
+0020 <span class="comment">%  2. Field = Field name ('Offset', 'Gain', 'Golden', etc)</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%  NOTE</span>
+0023 <span class="comment">%  1. If Data is a cell array, then Family, Field, and DeviceList must also be a cell arrays.</span>
+0024 <span class="comment">%  2. If the family or field does not exist, then it will be created!</span>
+0025 <span class="comment">%     When a new field is created a message will be printed to the screen.</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%  EXAMPLES</span>
+0028 <span class="comment">%  1. To set the offset orbit for BPM(3,2) to 1.234</span>
+0029 <span class="comment">%     setphysdata('BPMx', 'Offset', 1.234, [3 2]);</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%  NOTE: MML creators are phasing out the use of physdata.</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%  Written by Greg Portmann</span>
+0034 
+0035 
+0036 <span class="comment">% ArchiveFlag is a backup to DataRoot\PhysData</span>
+0037 ArchiveFlag = 1;    
+0038 
+0039 <span class="comment">% Look for keywords on the input line</span>
+0040 <span class="keyword">for</span> i = length(varargin):-1:1
+0041     <span class="keyword">if</span> isstruct(varargin{i})
+0042         <span class="comment">% Ignor structures</span>
+0043     <span class="keyword">elseif</span> iscell(varargin{i})
+0044         <span class="comment">% Ignor cells</span>
+0045     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoArchive'</span>)
+0046         ArchiveFlag = 0;    
+0047         varargin(i) = [];
+0048     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Archive'</span>)
+0049         ArchiveFlag = 1;    
+0050         varargin(i) = [];
+0051     <span class="keyword">end</span>
+0052 <span class="keyword">end</span>
+0053 
+0054 <span class="comment">% setphysdata(Family, Field, Data, DeviceList)</span>
+0055 <span class="keyword">if</span> length(varargin) == 0
+0056     error(<span class="string">'At least one input required'</span>);
+0057 <span class="keyword">end</span>
+0058 <span class="keyword">if</span> length(varargin) &gt;= 1
+0059     Family = varargin{1};
+0060 <span class="keyword">end</span>
+0061 <span class="keyword">if</span> length(varargin) &gt;= 2
+0062     Field = varargin{2};
+0063 <span class="keyword">end</span>
+0064 <span class="keyword">if</span> length(varargin) &gt;= 3
+0065     Data = varargin{3};
+0066 <span class="keyword">end</span>
+0067 <span class="keyword">if</span> length(varargin) &gt;= 4
+0068     DeviceList = varargin{4};
+0069 <span class="keyword">else</span>
+0070     DeviceList = [];
+0071 <span class="keyword">end</span>
+0072 
+0073 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0074 <span class="comment">% Cell array input %</span>
+0075 <span class="comment">%%%%%%%%%%%%%%%%%%%%</span>
+0076 <span class="keyword">if</span> iscell(Family)
+0077     <span class="keyword">if</span> length(varargin) &lt; 2
+0078         error(<span class="string">'For cell array inputs, Data and Family must exist'</span>);
+0079     <span class="keyword">end</span>
+0080     <span class="keyword">if</span> ~iscell(Family)
+0081         error(<span class="string">'If Data is a cell array, then Family must be a cell array.'</span>);
+0082     <span class="keyword">end</span>        
+0083     <span class="keyword">if</span> length(Family) ~= length(Data)
+0084         error(<span class="string">'Data and Family must be the same size cell arrays'</span>);
+0085     <span class="keyword">end</span>
+0086     <span class="keyword">if</span> length(varargin) &gt;= 3
+0087         <span class="keyword">if</span> ~iscell(Field)
+0088             error(<span class="string">'If Data is a cell array, then Field must be a cell array.'</span>);
+0089         <span class="keyword">end</span>        
+0090         <span class="keyword">if</span> length(Family) ~= length(Field)
+0091             error(<span class="string">'Data and Field must be the same size cell arrays'</span>);
+0092         <span class="keyword">end</span>
+0093     <span class="keyword">end</span>    
+0094     <span class="keyword">if</span> length(varargin) &gt;= 4
+0095         <span class="keyword">if</span> ~iscell(DeviceList)
+0096             error(<span class="string">'If Data is a cell array, then DeviceList must be a cell array.'</span>);
+0097         <span class="keyword">end</span>        
+0098         <span class="keyword">if</span> length(Family) ~= length(DeviceList)
+0099             error(<span class="string">'Data and DeviceList must be the same size cell arrays'</span>);
+0100         <span class="keyword">end</span>
+0101     <span class="keyword">end</span>    
+0102     <span class="keyword">for</span> i = 1:length(Data)
+0103         <span class="keyword">if</span> length(varargin) == 2
+0104             <a href="setphysdata.html" class="code" title="function setphysdata(varargin)">setphysdata</a>(Family{i}, Field{i});
+0105         <span class="keyword">elseif</span> length(varargin) == 3
+0106             <a href="setphysdata.html" class="code" title="function setphysdata(varargin)">setphysdata</a>(Family{i}, Field{i}, Data{i});
+0107         <span class="keyword">else</span>
+0108             <a href="setphysdata.html" class="code" title="function setphysdata(varargin)">setphysdata</a>(Family{i}, Field{i}, Data{i}, DeviceList{i});
+0109         <span class="keyword">end</span>
+0110     <span class="keyword">end</span>
+0111     <span class="keyword">return</span>    
+0112 <span class="keyword">end</span>  <span class="comment">% End cell inputs</span>
+0113 
+0114 
+0115 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0116 <span class="comment">% Set the data %</span>
+0117 <span class="comment">%%%%%%%%%%%%%%%%</span>
+0118 
+0119 <span class="keyword">if</span> length(varargin) == 1
+0120     <span class="keyword">if</span> isstruct(Family)
+0121         PhysData = Family;
+0122         fprintf(<span class="string">'   WARNING: The entire Physics Data Structure will be written over!'</span>);
+0123         <a href="#_sub1" class="code" title="subfunction savephysdatalocal(PhysData, ArchiveFlag)">savephysdatalocal</a>(PhysData, ArchiveFlag);
+0124     <span class="keyword">else</span>
+0125         error(<span class="string">'For 1 input, the Data input must be the entire Physics Data Structure'</span>);
+0126     <span class="keyword">end</span>
+0127     <span class="keyword">return</span>;
+0128 <span class="keyword">end</span>
+0129 
+0130 
+0131 <span class="comment">% Get the entire structure</span>
+0132 PhysData = <a href="getphysdata.html" class="code" title="function [Data, iNotFound] = getphysdata(Family, Field, DeviceList)">getphysdata</a>;
+0133 
+0134 
+0135 <span class="keyword">if</span> isstruct(Family)
+0136     <span class="keyword">if</span> isfield(Family, <span class="string">'FamilyName'</span>)
+0137         <span class="comment">% setphysdata(DataStruct, Field)</span>
+0138         DeviceList = Family.DeviceList;
+0139         Data = Family.Data;
+0140         Family = Family.FamilyName;
+0141     <span class="keyword">else</span>
+0142         error(<span class="string">'When using setphysdata(DataStruct, Field), DataStruct must have .FamilyName, .Data, .DeviceList fields'</span>);
+0143     <span class="keyword">end</span>
+0144 <span class="keyword">elseif</span> isstruct(Field)
+0145     <span class="comment">% setphysdata(Family, Data)</span>
+0146     <span class="comment">% The data is in the field input</span>
+0147     <span class="keyword">if</span> ~isfield(PhysData, Family)
+0148         fprintf(<span class="string">'   %s family will be created in the Physics Data Structure'</span>, Family);
+0149     <span class="keyword">end</span>
+0150     PhysData.(Family) = Field;  
+0151     <a href="#_sub1" class="code" title="subfunction savephysdatalocal(PhysData, ArchiveFlag)">savephysdatalocal</a>(PhysData, ArchiveFlag);
+0152     <span class="keyword">return</span>
+0153 <span class="keyword">else</span>
+0154     <span class="keyword">if</span> length(varargin) == 2
+0155         error(<span class="string">'The Physics Data Structure for a family should be a structure'</span>);
+0156     <span class="keyword">end</span>
+0157     <span class="keyword">if</span> length(varargin) == 3
+0158         DeviceList = [];
+0159     <span class="keyword">end</span>
+0160 <span class="keyword">end</span>
+0161 <span class="keyword">if</span> isempty(DeviceList)
+0162     <span class="keyword">try</span>
+0163         DeviceList = <a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>(Family, 0);
+0164     <span class="keyword">catch</span>
+0165         <span class="comment">% Not a family.  Set the entire field</span>
+0166         <span class="keyword">if</span> length(varargin) ~= 3
+0167             error(<span class="string">'When not using a family the number of inputs must be 3 (Family, Field, Data)'</span>);
+0168         <span class="keyword">end</span>
+0169         DataOld = PhysData.(Family).(Field);
+0170         <span class="keyword">if</span> any(size(DataOld) ~= size(Data))
+0171             fprintf(<span class="string">'\n   WARNING:  Data is not part of a family and length of old data does not match the length of the new data.\n'</span>);
+0172             fprintf(<span class="string">'             If that is not ok, hopefully you saved a backup file\n\n'</span>);
+0173         <span class="keyword">end</span>
+0174         PhysData.(Family).(Field) = Data;
+0175         <a href="#_sub1" class="code" title="subfunction savephysdatalocal(PhysData, ArchiveFlag)">savephysdatalocal</a>(PhysData, ArchiveFlag);
+0176         <span class="keyword">return</span>
+0177     <span class="keyword">end</span>
+0178 <span class="keyword">end</span>
+0179 
+0180 
+0181 <span class="comment">% If Data is a structure, then use the Data and DeviceList field</span>
+0182 <span class="keyword">if</span> isstruct(Data)
+0183     <span class="keyword">if</span> length(varargin) &gt;= 4
+0184         fprintf(<span class="string">'WARNING: Input DeviceList ignored.  Using the DeviceList in the data structure.'</span>);
+0185     <span class="keyword">end</span>
+0186     <span class="keyword">if</span> isfield(Data, <span class="string">'DeviceList'</span>)
+0187         DeviceList = Data.DeviceList;
+0188     <span class="keyword">else</span>
+0189         DeviceList = Data.Monitor.DeviceList;
+0190     <span class="keyword">end</span>
+0191     Data = Data.Data;
+0192 <span class="keyword">end</span>
+0193 
+0194 <span class="keyword">if</span> ~isfield(PhysData, Family)
+0195     fprintf(<span class="string">'   %s family, %s field will be created in the Physics Data Structure'</span>, Family, Field);
+0196     PhysData.(Family) = [];
+0197 <span class="keyword">else</span>
+0198     <span class="keyword">if</span> ~isfield(PhysData.(Family), Field)
+0199         fprintf(<span class="string">'   %s field will be created in the %s family in the Physics Data Structure'</span>, Field, Family);
+0200         PhysData.(Family).(Field) = [];
+0201     <span class="keyword">end</span>
+0202 <span class="keyword">end</span>
+0203 
+0204 <span class="keyword">if</span> size(DeviceList,2) == 1
+0205     DeviceList = <a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(Family, DeviceList);
+0206 <span class="keyword">end</span>
+0207 
+0208 
+0209 DeviceListTotal = <a href="getlist.html" class="code" title="function DeviceList = getlist(varargin)">getlist</a>(Family, 0);
+0210 
+0211 [i, iNotFound] = findrowindex(DeviceList, DeviceListTotal);  
+0212 <span class="keyword">if</span> ~isempty(iNotFound)
+0213     error(<span class="string">'Device not found in the family'</span>);
+0214 <span class="keyword">end</span>
+0215 
+0216 <span class="comment">% Save data as a vector using the entire family (or change the device list in the structure?)</span>
+0217 <span class="keyword">if</span> isfield(PhysData.(Family).(Field), <span class="string">'DeviceList'</span>)
+0218     <span class="comment">% A data structure was stored.  Convert it to an entire family list.</span>
+0219     j = findrowindex(PhysData.(Family).(Field).DeviceList, DeviceListTotal);  
+0220     DataTotal = NaN * ones(size(DeviceListTotal,1), size(PhysData.(Family).(Field).Data,2));
+0221     DataTotal(j,:) = PhysData.(Family).(Field).Data;
+0222     
+0223     <span class="comment">% Fill the new data to the structure</span>
+0224     DataTotal(i,:) = Data;
+0225     PhysData.(Family).(Field).Data = DataTotal;
+0226     PhysData.(Family).(Field).DeviceList = DeviceListTotal;
+0227     <span class="keyword">if</span> isfield(PhysData.(Family).(Field),<span class="string">'Status'</span>)
+0228         <span class="comment">% Status isn't relevant</span>
+0229         PhysData.(Family).(Field) = rmfield(PhysData.(Family).(Field),<span class="string">'Status'</span>);
+0230     <span class="keyword">end</span>
+0231 <span class="keyword">elseif</span> isfield(PhysData.(Family).(Field), <span class="string">'Monitor'</span>)
+0232     <span class="comment">% A data structure was stored.  Convert it to an entire family list.</span>
+0233     j = findrowindex(PhysData.(Family).(Field).Monitor.DeviceList, DeviceListTotal);  
+0234     DataTotal = NaN * ones(size(DeviceListTotal,1), size(PhysData.(Family).(Field).Data,2));
+0235     DataTotal(j,:) = PhysData.(Family).(Field).Data;
+0236     
+0237     <span class="comment">% Fill the new data to the structure</span>
+0238     DataTotal(i,:) = Data;
+0239     PhysData.(Family).(Field).Data = DataTotal;
+0240     PhysData.(Family).(Field).DeviceList = DeviceListTotal;
+0241     <span class="keyword">if</span> isfield(PhysData.(Family).(Field),<span class="string">'Status'</span>)
+0242         <span class="comment">% Status isn't relevant</span>
+0243         PhysData.(Family).(Field) = rmfield(PhysData.(Family).(Field),<span class="string">'Status'</span>);
+0244     <span class="keyword">end</span>
+0245 <span class="keyword">else</span>
+0246     <span class="comment">% Fill the new data</span>
+0247     DataTotal = PhysData.(Family).(Field);
+0248     DataTotal(i,:) = Data;
+0249     PhysData.(Family).(Field) = DataTotal;
+0250 <span class="keyword">end</span>    
+0251 
+0252 
+0253 <span class="comment">% if length(i) == size(Data,1)</span>
+0254 <span class="comment">%     DataVec = getphysdata(Family, Field);</span>
+0255 <span class="comment">%     DataVec(i) = Data;</span>
+0256 <span class="comment">%     PhysData.(Family).(Field) = DataVec;</span>
+0257 <span class="comment">% elseif length(Data) == 1</span>
+0258 <span class="comment">%     PhysData.(Family).(Field) = Data;</span>
+0259 <span class="comment">% else</span>
+0260 <span class="comment">%     error('The number of elements in the input data vector does not match the DeviceList');</span>
+0261 <span class="comment">% end</span>
+0262 
+0263 
+0264 <a href="#_sub1" class="code" title="subfunction savephysdatalocal(PhysData, ArchiveFlag)">savephysdatalocal</a>(PhysData, ArchiveFlag);
+0265 
+0266 
+0267 
+0268 <a name="_sub1" href="#_subfunctions" class="code">function savephysdatalocal(PhysData, ArchiveFlag)</a>
+0269 
+0270 <span class="comment">% Physics data is saved in this file</span>
+0271 FileName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OpsData'</span>,<span class="string">'PhysDataFile'</span>);
+0272 
+0273 <span class="comment">%FileName = [getfamilydata('Directory','OpsData') getfamilydata('OpsData','PhysDataFile')];</span>
+0274 
+0275 <span class="comment">%Machine = lower(getfamilydata('Machine'));</span>
+0276 <span class="comment">%FileName = which([Machine, 'physdata','.mat']);</span>
+0277 
+0278 <span class="keyword">if</span> ArchiveFlag
+0279     tmp = questdlg({<span class="keyword">...</span>
+0280             sprintf(<span class="string">'%s'</span>, FileName), <span class="keyword">...</span>
+0281             <span class="string">'is where many important parameters are saved to operate'</span>, <span class="keyword">...</span>
+0282             <span class="string">'this machine.  A backup of this file will be made first.  However, '</span>, <span class="keyword">...</span>
+0283             <span class="string">'Are you sure you want to change the Physics Data Structure?'</span>},<span class="keyword">...</span>
+0284         <span class="string">'SETPHYSDATA'</span>,<span class="string">'YES'</span>,<span class="string">'NO'</span>,<span class="string">'NO'</span>);
+0285 <span class="keyword">else</span>
+0286     tmp = questdlg({<span class="keyword">...</span>
+0287             sprintf(<span class="string">'%s'</span>, FileName), <span class="keyword">...</span>
+0288             <span class="string">'is where many important parameters are saved to operate'</span>, <span class="keyword">...</span>
+0289             <span class="string">'this machine.  You are about to change this file without a backup!'</span>, <span class="keyword">...</span>
+0290             <span class="string">'Are you sure you want to change the Physics Data Structure?'</span>},<span class="keyword">...</span>
+0291         <span class="string">'SETPHYSDATA'</span>,<span class="string">'YES'</span>,<span class="string">'NO'</span>,<span class="string">'NO'</span>);
+0292 <span class="keyword">end</span>
+0293 <span class="keyword">if</span> ~strcmpi(tmp,<span class="string">'YES'</span>)
+0294     fprintf(<span class="string">'   No change made to the Physics Data Structure\n'</span>);
+0295     <span class="keyword">return</span>
+0296 <span class="keyword">end</span>
+0297 
+0298 <span class="keyword">if</span> ArchiveFlag
+0299     <span class="comment">% Save a backup first</span>
+0300     DirStart = pwd;
+0301     <span class="comment">%DirectoryBackUp = getfamilydata('Directory','DataRoot');</span>
+0302     <span class="comment">%DirectoryBackUp = fullfile(DirectoryBackUp,'PhysData');</span>
+0303     DirectoryBackUp = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'Backup'</span>, filesep];
+0304 
+0305     <span class="comment">%FileNameBackUp = appendtimestamp('Physdata');</span>
+0306     FileNameBackUp  = prependtimestamp(<span class="string">'Physdata'</span>);
+0307 
+0308     [DirectoryBackUp, DirectoryErrorFlag] = gotodirectory(DirectoryBackUp);            
+0309     save(FileNameBackUp, <span class="string">'PhysData'</span>);
+0310     fprintf(<span class="string">'   Physics Data Structure backup to  %s\n'</span>, [pwd, filesep, FileNameBackUp]);
+0311     cd(DirStart);
+0312     <span class="keyword">if</span> DirectoryErrorFlag
+0313         fprintf(<span class="string">'   WARNING: The PhysData file was saved, but it did not go the desired directory!\n            Look in %s\n'</span>, DirectoryBackUp);
+0314     <span class="keyword">end</span>
+0315 <span class="keyword">end</span>
+0316 
+0317 save(FileName, <span class="string">'PhysData'</span>);    
+0318 fprintf(<span class="string">'   Physics Data Structure updated in %s\n'</span>, FileName);</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

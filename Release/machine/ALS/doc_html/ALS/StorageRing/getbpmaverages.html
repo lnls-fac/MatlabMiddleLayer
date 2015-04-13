@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getbpmaverages</title>
+  <meta name="keywords" content="getbpmaverages">
+  <meta name="description" content="GETBPMAVERAGES - Gets the BPM averages">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getbpmaverages.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getbpmaverages
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GETBPMAVERAGES - Gets the BPM averages</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [N, T, WarningFlag] = getbpmaverages(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETBPMAVERAGES - Gets the BPM averages
+  [N, T, WarningFlag] = getbpmaverages(DeviceList)
+
+  INPUTS
+  1. DeviceList - BPM device list {Default: [1 2]}
+
+  OUTPUTS
+  1. N - Number of averages
+  2. T - Sampling period after averaging [seconds]
+  3. WarningFlag - Warning if all BPM sampling periods are not the same
+
+  NOTES
+  1. In Simlutor mode, N = 1 and T = 0
+  2. For Bergoz BPM's the sampling period is an effective sampling period.
+  3. If there are 3 or more outputs, all the BPMs are checked for the same
+     effective number of averages.  This check takes much longer since all BPM are read.
+
+  See also <a href="setbpmaverages.html" class="code" title="function setbpmaverages(T, DeviceList)">setbpmaverages</a>, <a href="getbpmtimeconstant.html" class="code" title="function [BPMTimeConstant, WarningFlag] = getbpmtimeconstant(varargin)">getbpmtimeconstant</a>, <a href="setbpmtimeconstant.html" class="code" title="function setbpmtimeconstant(BPMTimeConstant, DeviceList)">setbpmtimeconstant</a>
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>	GETBPMAVERAGES - Gets the BPM averages</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="checkbpmavg.html" class="code" title="function checkbpmavg(TestHz, list)">checkbpmavg</a>	checkbpmavg(TestHz {2 Hz}, BPMlist {default: all BPMs returned by getlist})</li><li><a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>	GETBPMAVERAGES - Gets the BPM averages</li><li><a href="scanaperture.html" class="code" title="function scanaperture(BPMList, MaxChangeX, NStepsX, MaxChangeY, NStepsY, FileName)">scanaperture</a>	SCANAPERTURE - Aperture scan program</li><li><a href="setid.html" class="code" title="function Err = setid(DeviceList, NewPos, NewVel , WaitFlag, VelocityProfile, InfoFlag);">setid</a>	SETID - Set the insertion device vertical gap</li><li><a href="setorbitdefault.html" class="code" title="function [OCS, RF, OCS0, RF0] = setorbitdefault(varargin)">setorbitdefault</a>	[OCS, RF, OCS0, RF0] = setorbitdefault(EVectors {1e-2}, Iters {1}, RemoveBPMDeviceList, RemoveHCMDeviceList, RemoveVCMDeviceList)</li><li><a href="setqfashunt.html" class="code" title="function setqfashunt(ShuntNumber, Shunt, DeviceList, WaitFlag)">setqfashunt</a>	SETQFASHUNT - Sets the QFA shunts</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [N, T, WarningFlag] = getbpmaverages(varargin)</a>
+0002 <span class="comment">%GETBPMAVERAGES - Gets the BPM averages</span>
+0003 <span class="comment">%  [N, T, WarningFlag] = getbpmaverages(DeviceList)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. DeviceList - BPM device list {Default: [1 2]}</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  OUTPUTS</span>
+0009 <span class="comment">%  1. N - Number of averages</span>
+0010 <span class="comment">%  2. T - Sampling period after averaging [seconds]</span>
+0011 <span class="comment">%  3. WarningFlag - Warning if all BPM sampling periods are not the same</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  NOTES</span>
+0014 <span class="comment">%  1. In Simlutor mode, N = 1 and T = 0</span>
+0015 <span class="comment">%  2. For Bergoz BPM's the sampling period is an effective sampling period.</span>
+0016 <span class="comment">%  3. If there are 3 or more outputs, all the BPMs are checked for the same</span>
+0017 <span class="comment">%     effective number of averages.  This check takes much longer since all BPM are read.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%  See also setbpmaverages, getbpmtimeconstant, setbpmtimeconstant</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%  Written by Greg Portmann</span>
+0022 
+0023 
+0024 Mode = getfamilydata(<span class="string">'BPMx'</span>,<span class="string">'Monitor'</span>,<span class="string">'Mode'</span>);
+0025 DeviceList = [];
+0026 
+0027 <span class="keyword">if</span> strcmpi(Mode,<span class="string">'Simulator'</span>)
+0028 
+0029         <span class="keyword">if</span> length(varargin) &gt;= 1
+0030             <span class="keyword">if</span> ischar(varargin{1})
+0031                 varargin(1) = [];
+0032             <span class="keyword">end</span>
+0033         <span class="keyword">end</span>
+0034         <span class="keyword">if</span> length(varargin) &gt;= 1
+0035             <span class="keyword">if</span> isnumeric(varargin{1})
+0036                 DeviceList = varargin{1};
+0037             <span class="keyword">else</span>
+0038                 error(<span class="string">'DeviceList not found'</span>);
+0039             <span class="keyword">end</span>
+0040         <span class="keyword">end</span>
+0041         <span class="keyword">if</span> isempty(DeviceList)
+0042             DeviceList = family2dev(<span class="string">'BPMx'</span>);
+0043         <span class="keyword">end</span>
+0044 
+0045         N = 1 * ones(size(DeviceList,1),1);
+0046         T = 0 * ones(size(DeviceList,1),1);
+0047 
+0048         N = 1;
+0049         T = 0;
+0050 <span class="keyword">else</span>
+0051 
+0052     <span class="keyword">if</span> nargin == 0
+0053         <span class="comment">% Make the zero input case fast since it is used alot</span>
+0054         BPMTimeConstant = getpv(<span class="string">'BPMx'</span>, <span class="string">'TimeConstant'</span>, [1 2]);
+0055         T = 2.5 * BPMTimeConstant;
+0056         N = 1;
+0057     <span class="keyword">else</span>
+0058         <span class="keyword">if</span> length(varargin) &gt;= 1
+0059             <span class="keyword">if</span> ischar(varargin{1})
+0060                 varargin(1) = [];
+0061             <span class="keyword">end</span>
+0062         <span class="keyword">end</span>
+0063         <span class="keyword">if</span> length(varargin) &gt;= 1
+0064             <span class="keyword">if</span> isnumeric(varargin{1})
+0065                 DeviceList = varargin{1};
+0066             <span class="keyword">else</span>
+0067                 error(<span class="string">'DeviceList not found'</span>);
+0068             <span class="keyword">end</span>
+0069         <span class="keyword">end</span>
+0070         <span class="keyword">if</span> isempty(DeviceList)
+0071             DeviceList = family2dev(<span class="string">'BPMx'</span>);
+0072         <span class="keyword">end</span>
+0073 
+0074 
+0075         BPMNumAveragesPerOneSecondPeriod_OldStyle = 2 * 190;
+0076         <span class="comment">% BPMNumAveragesPerOneSecondPeriod_Bergoz = 2 * 2700;   % Bergoz BPMs used to have averaging (in the good old days)</span>
+0077 
+0078         N = getpv(<span class="string">'BPMx'</span>, <span class="string">'NumberOfAverages'</span>, DeviceList);
+0079         T = N / BPMNumAveragesPerOneSecondPeriod_OldStyle;
+0080 
+0081 
+0082         <span class="comment">% Get the Bergoz style BPM's</span>
+0083         i = find(isnan(N));
+0084         <span class="keyword">if</span> ~isempty(i)
+0085             <span class="comment">% Bergoz style BPM - set time constant</span>
+0086             <span class="comment">% 2.5 Time constants in T seconds should give reasonable results</span>
+0087             <span class="comment">% since data is not considered fresh for 2.2*T (ie, 5.5 time constants)</span>
+0088             T(i) = 2.5 * getpv(<span class="string">'BPMx'</span>, <span class="string">'TimeConstant'</span>, DeviceList(i,:));
+0089             N(i) = 1;
+0090         <span class="keyword">end</span>
+0091     <span class="keyword">end</span>
+0092 
+0093 
+0094     <span class="keyword">if</span> nargout &gt;= 3
+0095         <span class="comment">% Check if all the BPM have the same value</span>
+0096         [tmp, T_All] = <a href="getbpmaverages.html" class="code" title="function [N, T, WarningFlag] = getbpmaverages(varargin)">getbpmaverages</a>([]);
+0097         <span class="keyword">if</span> any(T_All(1) ~= T_All)
+0098             fprintf(<span class="string">'\n   Warning:  Not all the BPM number of averages are the same.\n'</span>);
+0099             fprintf(  <span class="string">'             Use setbpmaverages or srinit to fix the problem.\n\n'</span>);
+0100             WarningFlag = 1;
+0101         <span class="keyword">else</span>
+0102             WarningFlag = 0;
+0103         <span class="keyword">end</span>
+0104     <span class="keyword">end</span>
+0105 
+0106     
+0107     <span class="comment">% I'm adding extra delay because the BPM processing time seems a little long (GP)</span>
+0108     T    = 1.15 * T;
+0109 
+0110 <span class="keyword">end</span>
+0111</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

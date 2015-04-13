@@ -1,0 +1,589 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of locoplot</title>
+  <meta name="keywords" content="locoplot">
+  <meta name="description" content="LOCOPLOT - Subroutines for plotting LOCO output">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">loco</a> &gt; locoplot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\loco&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>locoplot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>LOCOPLOT - Subroutines for plotting LOCO output</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function ElementsInput = locoplot(FileName, IterationNumber, PlotString, PlaneString, ElementsInput) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOCOPLOT - Subroutines for plotting LOCO output
+  locoplot(FileName, IterationNumber, PlotString, PlaneString, Elements)
+  locoplot({BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData}, IterationNumber, PlotString, PlaneString, Elements)
+
+  INPUTS
+  1. FileName = data file name
+  2. IterationNumber = 0, 1, 2, etc
+       or
+  1. BPMData
+  2. CMData
+  3. LocoMeasData
+  4. LocoModel
+  5. FitParameters
+  6. LocoFlags
+  7. RINGData
+
+  What data to plot:
+     PlotString = 'Model', 'Measured', 'Model-Measured', , 'Model-Measured+EnergyShifts'
+
+  For 3-D surf plots of the entire response matrix:
+     PlaneString = 'XX', 'YY', 'XY', 'YX', 'All' 
+
+  For 2-D row (BPM) or column (CM) plots:
+     PlaneString = 'HBPM', 'VBPM', 'HCM', 'VCM'
+     Elements = element number within the response matrix (based on HBPMIndex,VBPMIndex,HCMIndex,VCMIndex) 
+
+  Written by Greg Portmann</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>	LOCOEDITLIST - Device list editor</li><li><a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>	LOCOMCF - Returns the momentum compaction factor</li><li><a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>	LOCOSETLATTICEPARAM - Set the AT lattice from the LOCO fit parameters</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="locogui.html" class="code" title="function varargout = locogui(varargin)">locogui</a>	LOCOGUI - Graphical interface for running the LOCO algorithm</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function ElementsInput = locoplot(FileName, IterationNumber, PlotString, PlaneString, ElementsInput)</a>
+0002 <span class="comment">%LOCOPLOT - Subroutines for plotting LOCO output</span>
+0003 <span class="comment">%  locoplot(FileName, IterationNumber, PlotString, PlaneString, Elements)</span>
+0004 <span class="comment">%  locoplot({BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData}, IterationNumber, PlotString, PlaneString, Elements)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%  INPUTS</span>
+0007 <span class="comment">%  1. FileName = data file name</span>
+0008 <span class="comment">%  2. IterationNumber = 0, 1, 2, etc</span>
+0009 <span class="comment">%       or</span>
+0010 <span class="comment">%  1. BPMData</span>
+0011 <span class="comment">%  2. CMData</span>
+0012 <span class="comment">%  3. LocoMeasData</span>
+0013 <span class="comment">%  4. LocoModel</span>
+0014 <span class="comment">%  5. FitParameters</span>
+0015 <span class="comment">%  6. LocoFlags</span>
+0016 <span class="comment">%  7. RINGData</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  What data to plot:</span>
+0019 <span class="comment">%     PlotString = 'Model', 'Measured', 'Model-Measured', , 'Model-Measured+EnergyShifts'</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%  For 3-D surf plots of the entire response matrix:</span>
+0022 <span class="comment">%     PlaneString = 'XX', 'YY', 'XY', 'YX', 'All'</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%  For 2-D row (BPM) or column (CM) plots:</span>
+0025 <span class="comment">%     PlaneString = 'HBPM', 'VBPM', 'HCM', 'VCM'</span>
+0026 <span class="comment">%     Elements = element number within the response matrix (based on HBPMIndex,VBPMIndex,HCMIndex,VCMIndex)</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%  Written by Greg Portmann</span>
+0029 
+0030 <span class="keyword">if</span> ~nargin == 5
+0031     error(<span class="string">'Requires 5 inputs (see help locoplot).'</span>);
+0032 <span class="keyword">end</span>
+0033 
+0034 <span class="keyword">if</span> isempty(FileName)
+0035     <span class="keyword">return</span>;
+0036 <span class="keyword">end</span>
+0037 
+0038 <span class="keyword">if</span> iscell(FileName)
+0039     BPMData       = FileName{1};
+0040     CMData        = FileName{2};
+0041     LocoMeasData  = FileName{3};
+0042     LocoModel     = FileName{4};
+0043     FitParameters = FileName{5};
+0044     LocoFlags     = FileName{6};
+0045     RINGData      = FileName{7};
+0046 <span class="keyword">elseif</span> isstr(FileName)    
+0047     <span class="keyword">try</span>
+0048         load(FileName);
+0049     <span class="keyword">catch</span>
+0050         fprintf(<span class="string">'   LOCOPLOT:  File does not exist or is not a *.mat file type.\n'</span>); <span class="keyword">return</span>;
+0051     <span class="keyword">end</span>    
+0052 <span class="keyword">else</span>
+0053     error(<span class="string">'Input problem'</span>);
+0054 <span class="keyword">end</span>
+0055 
+0056 legend off
+0057 
+0058 <span class="keyword">if</span> length(BPMData) &gt; 1
+0059     IterationNumber = IterationNumber + 1;
+0060     <span class="keyword">if</span> IterationNumber &gt; length(BPMData)
+0061         fprintf(<span class="string">'   LOCOPLOT:  The data file only has %d iterations.  Hence, the input InterationNumber cannot be %d.\n'</span>, length(BPMData)-1, IterationNumber-1);
+0062         <span class="keyword">return</span>
+0063     <span class="keyword">end</span>
+0064     
+0065     BPMData = BPMData(IterationNumber);
+0066     CMData = CMData(IterationNumber);
+0067     LocoModel = LocoModel(IterationNumber);
+0068     FitParameters = FitParameters(IterationNumber);
+0069     LocoFlags = LocoFlags(IterationNumber);
+0070 <span class="keyword">end</span>
+0071 
+0072 <span class="comment">% if isempty(LocoModel.M)</span>
+0073 <span class="comment">%     fprintf('   LOCOPLOT:  Model data is empty.\n');</span>
+0074 <span class="comment">%     return;</span>
+0075 <span class="comment">% end</span>
+0076 <span class="keyword">if</span> isempty(LocoMeasData.M)
+0077     fprintf(<span class="string">'   LOCOPLOT:  Measured data is empty. \n'</span>); 
+0078     <span class="keyword">return</span>;
+0079 <span class="keyword">end</span>
+0080 
+0081 Mmodel = LocoModel.M;
+0082 
+0083 Outliers = LocoModel.OutlierIndex;
+0084 
+0085 Mmeas = LocoMeasData.M;
+0086 Mmeas = Mmeas([BPMData.HBPMGoodDataIndex(:)' length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex(:)'], [CMData.HCMGoodDataIndex(:)' length(CMData.HCMIndex)+CMData.VCMGoodDataIndex(:)']); 
+0087 
+0088 NHBPM = length(BPMData.HBPMGoodDataIndex);
+0089 NVBPM = length(BPMData.VBPMGoodDataIndex);
+0090 NBPM  = NHBPM + NVBPM;
+0091 NHCM = length(CMData.HCMGoodDataIndex);
+0092 NVCM = length(CMData.VCMGoodDataIndex);
+0093 
+0094 <span class="comment">% Mark the outliers with NaN</span>
+0095 <span class="keyword">if</span> isempty(Mmodel)
+0096     Mmodel = NaN * Mmeas;
+0097 <span class="keyword">else</span>
+0098     Mmodel = Mmodel(:);
+0099     Mmodel(Outliers) = NaN; 
+0100     Mmodel = reshape(Mmodel,  NBPM, NHCM+NVCM);
+0101 <span class="keyword">end</span>
+0102 
+0103 <span class="keyword">if</span> strcmp(lower(PlotString),<span class="string">'model'</span>)
+0104     data = Mmodel;
+0105 <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'measured'</span>)
+0106     data = Mmeas;
+0107 <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured'</span>)
+0108     data = Mmodel-Mmeas;
+0109 <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured+energyshifts'</span>)
+0110     <span class="comment">%[Model, Meas] = locodata(FileName, IterationNumber-1, 'ResponseMatrix', 'Model+EnergyShift', 'ResponseMatrix', 'Meas');</span>
+0111     
+0112     <span class="comment">% Add the dispersion term (measured) to the model response matrix</span>
+0113     HCMEnergyShift = CMData.HCMEnergyShift(CMData.HCMGoodDataIndex);
+0114     VCMEnergyShift = CMData.VCMEnergyShift(CMData.VCMGoodDataIndex);
+0115     
+0116     <span class="comment">% Set the lattice model</span>
+0117     <span class="keyword">for</span> j = 1:length(FitParameters.Params)
+0118         RINGData = <a href="locosetlatticeparam.html" class="code" title="function RINGData = locosetlatticeparam(RINGData, LocoParams, LocoValues)">locosetlatticeparam</a>(RINGData, FitParameters.Params{j}, FitParameters.Values(j));
+0119     <span class="keyword">end</span>
+0120     AlphaMCF = <a href="locomcf.html" class="code" title="function Alpha = locomcf(RINGData)">locomcf</a>(RINGData);
+0121     EtaXmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(BPMData.HBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0122     EtaYmcf = -AlphaMCF * LocoMeasData.RF * LocoMeasData.Eta(length(BPMData.HBPMIndex)+BPMData.VBPMGoodDataIndex) / LocoMeasData.DeltaRF;
+0123     
+0124     <span class="keyword">for</span> i = 1:length(HCMEnergyShift)
+0125         Mmodel(:,i) = Mmodel(:,i) + HCMEnergyShift(i) * [EtaXmcf; EtaYmcf];
+0126     <span class="keyword">end</span>
+0127     
+0128     <span class="keyword">for</span> i = 1:length(VCMEnergyShift)
+0129         Mmodel(:,NHCM+i) = Mmodel(:,NHCM+i) + VCMEnergyShift(i) * [EtaXmcf; EtaYmcf];
+0130     <span class="keyword">end</span>
+0131     data = Mmodel-Mmeas;
+0132 <span class="keyword">else</span>
+0133     error(<span class="string">'   PlotString unknown type.'</span>);
+0134 <span class="keyword">end</span>
+0135 
+0136 PlaneString = upper(PlaneString);
+0137 
+0138 <span class="keyword">if</span> strcmp(PlaneString,<span class="string">'XX'</span>) | strcmp(PlaneString,<span class="string">'YY'</span>) | strcmp(PlaneString,<span class="string">'YX'</span>) | strcmp(PlaneString,<span class="string">'XY'</span>) | strcmp(PlaneString,<span class="string">'ALL'</span>)
+0139     <span class="comment">% 3-D Plots</span>
+0140     <span class="keyword">if</span> strcmp(PlaneString,<span class="string">'XX'</span>)
+0141         <span class="comment">% XX</span>
+0142         [X,Y] = meshgrid(BPMData.HBPMGoodDataIndex, CMData.HCMGoodDataIndex);
+0143         surf(X, Y, data(1:NHBPM,1:NHCM)');
+0144         ylabel(<span class="string">'HCM #'</span>);
+0145         xlabel(<span class="string">'HBPM #'</span>);
+0146         
+0147     <span class="keyword">elseif</span> strcmp(PlaneString,<span class="string">'YY'</span>)
+0148         <span class="comment">% YY</span>
+0149         [X,Y] = meshgrid(BPMData.VBPMGoodDataIndex, CMData.VCMGoodDataIndex);
+0150         surf(X, Y, data(NHBPM+1:NHBPM+NVBPM,NHCM+1:NHCM+NVCM)');
+0151         ylabel(<span class="string">'VCM #'</span>);
+0152         xlabel(<span class="string">'VBPM #'</span>);
+0153     <span class="keyword">elseif</span> strcmp(PlaneString,<span class="string">'XY'</span>)
+0154         <span class="comment">% XY</span>
+0155         [X,Y] = meshgrid(BPMData.HBPMGoodDataIndex, CMData.VCMGoodDataIndex);
+0156         surf(X, Y, data(1:NHBPM,NHCM+1:NHCM+NVCM)');
+0157         ylabel(<span class="string">'VCM #'</span>);
+0158         xlabel(<span class="string">'HBPM #'</span>);
+0159         
+0160     <span class="keyword">elseif</span> strcmp(PlaneString,<span class="string">'YX'</span>)
+0161         <span class="comment">% YX</span>
+0162         [X,Y] = meshgrid(BPMData.VBPMGoodDataIndex, CMData.HCMGoodDataIndex);
+0163         surf(X, Y, data(NHBPM+1:NHBPM+NVBPM,1:NHCM)');
+0164         ylabel(<span class="string">'HCM #'</span>);
+0165         xlabel(<span class="string">'VBPM #'</span>);
+0166     <span class="keyword">elseif</span> strcmp(PlaneString,<span class="string">'ALL'</span>)
+0167         <span class="comment">% All</span>
+0168         surf(data');
+0169         <span class="comment">%ylabel('CM''s');</span>
+0170         <span class="comment">%xlabel('BPM''s');</span>
+0171         
+0172         <span class="comment">% Change label to BPM numbers</span>
+0173         [Ny,Nx] = size(data');
+0174         Ticks = 1:ceil(Nx/10):Nx;
+0175         set(gca, <span class="string">'XTick'</span>, Ticks);      
+0176         TickNumber = [BPMData.HBPMGoodDataIndex(:)' BPMData.VBPMGoodDataIndex(:)'];
+0177         TickNumber = TickNumber(Ticks);
+0178         set(gca, <span class="string">'XTickLabel'</span>, num2cell(TickNumber));         
+0179         xlabel(<span class="string">'HBPM# and VBPM#'</span>);
+0180 
+0181         <span class="comment">% Change label to HCM and VCM numbers</span>
+0182         Ticks = 1:ceil(Ny/10):Ny;
+0183         set(gca, <span class="string">'YTick'</span>, Ticks);      
+0184         TickNumber = [CMData.HCMGoodDataIndex(:)' CMData.VCMGoodDataIndex(:)'];
+0185         TickNumber = TickNumber(Ticks);
+0186         set(gca, <span class="string">'YTickLabel'</span>, num2cell(TickNumber));         
+0187         ylabel(<span class="string">'HCM# and VCM#'</span>);
+0188     <span class="keyword">else</span>
+0189         fprintf(<span class="string">'   LOCOPLOT:  PlaneString unknown. \n'</span>); 
+0190         <span class="keyword">return</span>;        
+0191     <span class="keyword">end</span>
+0192     
+0193     
+0194     <span class="keyword">if</span> strcmp(lower(PlotString),<span class="string">'model'</span>)
+0195         title(<span class="string">'Model Response Matrix'</span>);
+0196         zlabel(<span class="string">'[mm]'</span>);
+0197     <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'measured'</span>)
+0198         title(<span class="string">'Measured Response Matrix'</span>);
+0199         zlabel(<span class="string">'[mm]'</span>);
+0200     <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured'</span>)
+0201         title(<span class="string">'Model - Measured Response Matrix'</span>);
+0202         zlabel(<span class="string">'Error [mm]'</span>);
+0203     <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured+energyshifts'</span>)
+0204         title(<span class="string">'Model-Measured+EnergyShifts Response Matrix'</span>);
+0205         zlabel(<span class="string">'Error [mm]'</span>);
+0206     <span class="keyword">end</span>
+0207     
+0208     <span class="comment">% For some reason axis tight has a problem with 3-D plots with only NaN's</span>
+0209     <span class="keyword">if</span> ~all(isnan(data))
+0210         axis tight
+0211     <span class="keyword">end</span>
+0212 <span class="keyword">end</span>
+0213 
+0214 
+0215 <span class="comment">% 2-D plots</span>
+0216 
+0217 <span class="keyword">if</span> strcmp(PlaneString,<span class="string">'HBPM'</span>)
+0218     BPMData.BPMIndex = BPMData.BPMIndex(:);
+0219     <span class="keyword">if</span> ~exist(<span class="string">'ElementsInput'</span>,<span class="string">'var'</span>)
+0220         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([BPMData.HBPMGoodDataIndex(:) BPMData.BPMIndex(BPMData.HBPMIndex(BPMData.HBPMGoodDataIndex))], PlaneString, zeros(length(BPMData.HBPMGoodDataIndex),1));
+0221         <span class="keyword">if</span> isempty(ElementsInput)
+0222             <span class="keyword">return</span>
+0223         <span class="keyword">end</span>
+0224         ElementsInput = ElementsInput(:,1)';
+0225     <span class="keyword">end</span>
+0226     <span class="keyword">if</span> isempty(ElementsInput)
+0227         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([BPMData.HBPMGoodDataIndex(:) BPMData.BPMIndex(BPMData.HBPMIndex(BPMData.HBPMGoodDataIndex))], PlaneString, zeros(length(BPMData.HBPMGoodDataIndex),1));
+0228         <span class="keyword">if</span> isempty(ElementsInput)
+0229             <span class="keyword">return</span>
+0230         <span class="keyword">end</span>
+0231         ElementsInput = ElementsInput(:,1)';
+0232     <span class="keyword">end</span>
+0233     
+0234     <span class="comment">% Convert to elements in the HBPMGoodDataIndex vector</span>
+0235     [tmp1, tmp2, Elements] = intersect(ElementsInput, BPMData.HBPMGoodDataIndex);
+0236     
+0237     <span class="keyword">if</span> ~isempty(Elements)
+0238         plot(data(Elements,:)');
+0239         
+0240         <span class="comment">% Change label to HCM and VCM numbers</span>
+0241         N = NHCM + NVCM;
+0242         Ticks = 1:ceil(N/10):N;
+0243         set(gca, <span class="string">'XTick'</span>, Ticks);      
+0244         TickNumber = [CMData.HCMGoodDataIndex(:)' CMData.VCMGoodDataIndex(:)'];
+0245         TickNumber = TickNumber(Ticks);
+0246         set(gca, <span class="string">'XTickLabel'</span>, num2cell(TickNumber));         
+0247         xlabel(<span class="string">'Horizontal and Vertical Corrector Magnets'</span>);
+0248         
+0249         <span class="keyword">if</span> strcmp(lower(PlotString),<span class="string">'model'</span>)
+0250             title(<span class="string">'Model Response Matrix'</span>);
+0251             <span class="keyword">if</span> length(Elements) == 1
+0252                 ylabel(sprintf(<span class="string">'Horizontal BPM(%d) [mm]'</span>, BPMData.HBPMGoodDataIndex(Elements)));
+0253             <span class="keyword">else</span>
+0254                 ylabel(<span class="string">'Horizontal BPM [mm]'</span>);
+0255             <span class="keyword">end</span>
+0256         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'measured'</span>)
+0257             title(<span class="string">'Measured Response Matrix'</span>);
+0258             <span class="keyword">if</span> length(Elements) == 1
+0259                 ylabel(sprintf(<span class="string">'Horizontal BPM(%d) [mm]'</span>, BPMData.HBPMGoodDataIndex(Elements)));
+0260             <span class="keyword">else</span>
+0261                 ylabel(<span class="string">'Horizontal BPM [mm]'</span>);
+0262             <span class="keyword">end</span>
+0263         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured'</span>)
+0264             title(<span class="string">'Model - Measured Response Matrix'</span>);
+0265             <span class="keyword">if</span> length(Elements) == 1
+0266                 ylabel(sprintf(<span class="string">'Horizontal Error BPM(%d) [mm]'</span>, BPMData.HBPMGoodDataIndex(Elements)));
+0267             <span class="keyword">else</span>
+0268                 ylabel(<span class="string">'Horizontal BPM Error [mm]'</span>);
+0269             <span class="keyword">end</span>
+0270         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured+energyshifts'</span>)
+0271             title(<span class="string">'Model-Measured+EnergyShifts Response Matrix'</span>);
+0272             <span class="keyword">if</span> length(Elements) == 1
+0273                 ylabel(sprintf(<span class="string">'Horizontal Error BPM(%d) [mm]'</span>, BPMData.HBPMGoodDataIndex(Elements)));
+0274             <span class="keyword">else</span>
+0275                 ylabel(<span class="string">'Horizontal BPM Error [mm]'</span>);
+0276             <span class="keyword">end</span>
+0277         <span class="keyword">end</span>
+0278         
+0279         <span class="comment">% Only put a legend up to size 10</span>
+0280         <span class="keyword">if</span> length(Elements)&gt;1 &amp; length(Elements)&lt;=10
+0281             <span class="keyword">for</span> i = 1:length(Elements)
+0282                 legendstr{i} = sprintf(<span class="string">'BPM(%d)'</span>,BPMData.HBPMGoodDataIndex(Elements(i)));
+0283             <span class="keyword">end</span>
+0284             legend(legendstr,0);
+0285         <span class="keyword">end</span>
+0286         axis tight
+0287     <span class="keyword">end</span>
+0288 <span class="keyword">end</span>
+0289 
+0290 
+0291 <span class="keyword">if</span> strcmp(PlaneString,<span class="string">'VBPM'</span>)
+0292     BPMData.BPMIndex = BPMData.BPMIndex(:);
+0293     <span class="keyword">if</span> ~exist(<span class="string">'ElementsInput'</span>,<span class="string">'var'</span>)
+0294         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([BPMData.VBPMGoodDataIndex(:) BPMData.BPMIndex(BPMData.VBPMIndex(BPMData.VBPMGoodDataIndex))], PlaneString, zeros(length(BPMData.VBPMGoodDataIndex),1));
+0295         <span class="keyword">if</span> isempty(ElementsInput)
+0296             <span class="keyword">return</span>
+0297         <span class="keyword">end</span>
+0298         ElementsInput = ElementsInput(:,1)';
+0299     <span class="keyword">end</span>
+0300     <span class="keyword">if</span> isempty(ElementsInput)
+0301         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([BPMData.VBPMGoodDataIndex(:) BPMData.BPMIndex(BPMData.VBPMIndex(BPMData.VBPMGoodDataIndex))], PlaneString, zeros(length(BPMData.VBPMGoodDataIndex),1));
+0302         <span class="keyword">if</span> isempty(ElementsInput)
+0303             <span class="keyword">return</span>
+0304         <span class="keyword">end</span>
+0305         ElementsInput = ElementsInput(:,1)';
+0306     <span class="keyword">end</span>
+0307     
+0308     <span class="comment">% Convert to elements in the HBPMGoodDataIndex vector</span>
+0309     [tmp1, tmp2, Elements] = intersect(ElementsInput, BPMData.VBPMGoodDataIndex);
+0310     
+0311     <span class="keyword">if</span> ~isempty(Elements)
+0312         plot(data(NHBPM+Elements,:)');
+0313         
+0314         <span class="comment">% Change label to HCM and VCM numbers</span>
+0315         N = NHCM + NVCM;
+0316         Ticks = 1:ceil(N/10):N;
+0317         set(gca, <span class="string">'XTick'</span>, Ticks);      
+0318         TickNumber = [CMData.HCMGoodDataIndex(:)' CMData.VCMGoodDataIndex(:)'];
+0319         TickNumber = TickNumber(Ticks);
+0320         set(gca, <span class="string">'XTickLabel'</span>, num2cell(TickNumber));         
+0321         xlabel(<span class="string">'Horizontal and Vertical Corrector Magnets'</span>);
+0322         
+0323         <span class="keyword">if</span> strcmp(lower(PlotString),<span class="string">'model'</span>)
+0324             title(<span class="string">'Model Response Matrix'</span>);
+0325             <span class="keyword">if</span> length(Elements) == 1
+0326                 ylabel(sprintf(<span class="string">'Vertical BPM(%d) [mm]'</span>, BPMData.VBPMGoodDataIndex(Elements)));
+0327             <span class="keyword">else</span>
+0328                 ylabel(<span class="string">'Vertical BPM [mm]'</span>);
+0329             <span class="keyword">end</span>
+0330         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'measured'</span>)
+0331             title(<span class="string">'Measured Response Matrix'</span>);
+0332             <span class="keyword">if</span> length(Elements) == 1
+0333                 ylabel(sprintf(<span class="string">'Vertical BPM(%d) [mm]'</span>, BPMData.VBPMGoodDataIndex(Elements)));
+0334             <span class="keyword">else</span>
+0335                 ylabel(<span class="string">'Vertical BPM [mm]'</span>);
+0336             <span class="keyword">end</span>
+0337         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured'</span>)
+0338             title(<span class="string">'Model - Measured Response Matrix'</span>);
+0339             <span class="keyword">if</span> length(Elements) == 1
+0340                 ylabel(sprintf(<span class="string">'Vertical Error BPM(%d) [mm]'</span>, BPMData.VBPMGoodDataIndex(Elements)));
+0341             <span class="keyword">else</span>
+0342                 ylabel(<span class="string">'Vertical BPM Error [mm]'</span>);
+0343             <span class="keyword">end</span>
+0344         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured+energyshifts'</span>)
+0345             title(<span class="string">'Model-Measured+EnergyShifts Response Matrix'</span>);
+0346             <span class="keyword">if</span> length(Elements) == 1
+0347                 ylabel(sprintf(<span class="string">'Vertical Error BPM(%d) [mm]'</span>, BPMData.VBPMGoodDataIndex(Elements)));
+0348             <span class="keyword">else</span>
+0349                 ylabel(<span class="string">'Vertical BPM Error [mm]'</span>);
+0350             <span class="keyword">end</span>
+0351         <span class="keyword">end</span>
+0352         
+0353         <span class="comment">% Only put a legend up to size 10</span>
+0354         <span class="keyword">if</span> length(Elements)&gt;1 &amp; length(Elements)&lt;=10
+0355             <span class="keyword">for</span> i = 1:length(Elements)
+0356                 legendstr{i} = sprintf(<span class="string">'BPM(%d)'</span>,BPMData.VBPMGoodDataIndex(Elements(i)));
+0357             <span class="keyword">end</span>
+0358             legend(legendstr,0);
+0359         <span class="keyword">end</span>
+0360         axis tight
+0361     <span class="keyword">end</span>
+0362 <span class="keyword">end</span>
+0363 
+0364 
+0365 <span class="keyword">if</span> strcmp(PlaneString,<span class="string">'HCM'</span>)   
+0366     CMData.HCMGoodDataIndex = CMData.HCMGoodDataIndex(:)';
+0367     CMData.HCMIndex = CMData.HCMIndex(:);
+0368     <span class="keyword">if</span> ~exist(<span class="string">'ElementsInput'</span>,<span class="string">'var'</span>)
+0369         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([CMData.HCMGoodDataIndex(:) CMData.HCMIndex(CMData.HCMGoodDataIndex)], PlaneString, zeros(length(CMData.HCMGoodDataIndex),1));
+0370         <span class="keyword">if</span> isempty(ElementsInput)
+0371             <span class="keyword">return</span>
+0372         <span class="keyword">end</span>
+0373         ElementsInput = ElementsInput(:,1)';
+0374     <span class="keyword">end</span>
+0375     <span class="keyword">if</span> isempty(ElementsInput)
+0376         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([CMData.HCMGoodDataIndex(:) CMData.HCMIndex(CMData.HCMGoodDataIndex)], PlaneString, zeros(length(CMData.HCMGoodDataIndex),1));
+0377         <span class="keyword">if</span> isempty(ElementsInput)
+0378             <span class="keyword">return</span>
+0379         <span class="keyword">end</span>
+0380         ElementsInput = ElementsInput(:,1)';
+0381     <span class="keyword">end</span>
+0382 
+0383     <span class="comment">% Convert to elements in the HCMGoodDataIndex vector</span>
+0384     [tmp1, tmp2, Elements] = intersect(ElementsInput, CMData.HCMGoodDataIndex);
+0385     
+0386     <span class="keyword">if</span> ~isempty(Elements)
+0387         plot(data(:,Elements));
+0388 
+0389         <span class="comment">% Change label to BPM numbers</span>
+0390         N = NBPM;
+0391         Ticks = 1:ceil(N/10):N;
+0392         set(gca, <span class="string">'XTick'</span>, Ticks);      
+0393         TickNumber = [BPMData.HBPMGoodDataIndex(:)' BPMData.VBPMGoodDataIndex(:)'];
+0394         TickNumber = TickNumber(Ticks);
+0395         set(gca, <span class="string">'XTickLabel'</span>, num2cell(TickNumber));         
+0396         xlabel(<span class="string">'Horizontal and Vertical BPM Numbers'</span>);
+0397                 
+0398         <span class="keyword">if</span> strcmp(lower(PlotString),<span class="string">'model'</span>)
+0399             title(<span class="string">'Model Response Matrix'</span>);
+0400             <span class="keyword">if</span> length(ElementsInput) == 1
+0401                 ylabel(sprintf(<span class="string">'HCM(%d) [mm]'</span>, ElementsInput));
+0402             <span class="keyword">else</span>
+0403                 ylabel(<span class="string">'HCM [mm]'</span>);
+0404             <span class="keyword">end</span>
+0405         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'measured'</span>)
+0406             title(<span class="string">'Measured Response Matrix'</span>);
+0407             <span class="keyword">if</span> length(ElementsInput) == 1
+0408                 ylabel(sprintf(<span class="string">'HCM(%d) [mm]'</span>, ElementsInput));
+0409             <span class="keyword">else</span>
+0410                 ylabel(<span class="string">'HCM [mm]'</span>);
+0411             <span class="keyword">end</span>
+0412         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured'</span>)
+0413             title(<span class="string">'Model - Measured Response Matrix'</span>);
+0414             <span class="keyword">if</span> length(ElementsInput) == 1
+0415                 ylabel(sprintf(<span class="string">'HCM(%d) Error [mm]'</span>, ElementsInput));
+0416             <span class="keyword">else</span>
+0417                 ylabel(<span class="string">'HCM Error [mm]'</span>);
+0418             <span class="keyword">end</span>
+0419         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured+energyshifts'</span>)
+0420             title(<span class="string">'Model-Measured+EnergyShifts Response Matrix'</span>);
+0421             <span class="keyword">if</span> length(ElementsInput) == 1
+0422                 ylabel(sprintf(<span class="string">'HCM(%d) Error [mm]'</span>, ElementsInput));
+0423             <span class="keyword">else</span>
+0424                 ylabel(<span class="string">'HCM Error [mm]'</span>);
+0425             <span class="keyword">end</span>
+0426         <span class="keyword">end</span>
+0427         
+0428         <span class="comment">% Only put a legend up to size 10</span>
+0429         <span class="keyword">if</span> length(ElementsInput)&gt;1 &amp; length(ElementsInput)&lt;=10
+0430             <span class="keyword">for</span> i = 1:length(ElementsInput)
+0431                 legendstr{i} = sprintf(<span class="string">'HCM(%d)'</span>,ElementsInput(i));
+0432             <span class="keyword">end</span>
+0433             legend(legendstr,0);
+0434         <span class="keyword">end</span>
+0435         axis tight
+0436     <span class="keyword">end</span>
+0437 <span class="keyword">end</span>
+0438 
+0439 
+0440 
+0441 <span class="keyword">if</span> strcmp(PlaneString,<span class="string">'VCM'</span>)
+0442     CMData.VCMGoodDataIndex = CMData.VCMGoodDataIndex(:)';
+0443     CMData.VCMIndex = CMData.VCMIndex(:);
+0444     <span class="keyword">if</span> ~exist(<span class="string">'ElementsInput'</span>,<span class="string">'var'</span>)
+0445         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([CMData.VCMGoodDataIndex(:) CMData.VCMIndex(CMData.VCMGoodDataIndex)], PlaneString, zeros(length(CMData.VCMGoodDataIndex),1));
+0446         <span class="keyword">if</span> isempty(ElementsInput)
+0447             <span class="keyword">return</span>
+0448         <span class="keyword">end</span>
+0449         ElementsInput = ElementsInput(:,1)';
+0450     <span class="keyword">end</span>
+0451     <span class="keyword">if</span> isempty(ElementsInput)
+0452         ElementsInput = <a href="locoeditlist.html" class="code" title="function newList = locoeditlist(List, ListName, CheckList)">locoeditlist</a>([CMData.VCMGoodDataIndex(:) CMData.VCMIndex(CMData.VCMGoodDataIndex)], PlaneString, zeros(length(CMData.VCMGoodDataIndex),1));
+0453         <span class="keyword">if</span> isempty(ElementsInput)
+0454             <span class="keyword">return</span>
+0455         <span class="keyword">end</span>
+0456         ElementsInput = ElementsInput(:,1)';
+0457     <span class="keyword">end</span>
+0458             
+0459     <span class="comment">% Convert to elements in the VCMGoodDataIndex vector</span>
+0460     [tmp1, tmp2, Elements] = intersect(ElementsInput, CMData.VCMGoodDataIndex);
+0461     
+0462     <span class="keyword">if</span> ~isempty(Elements)
+0463         plot(data(:,NHCM+Elements));
+0464         
+0465         <span class="comment">% Change label to BPM numbers</span>
+0466         N = NBPM;
+0467         Ticks = 1:ceil(N/10):N;
+0468         set(gca, <span class="string">'XTick'</span>, Ticks);      
+0469         TickNumber = [BPMData.HBPMGoodDataIndex(:)' BPMData.VBPMGoodDataIndex(:)'];
+0470         TickNumber = TickNumber(Ticks);
+0471         set(gca, <span class="string">'XTickLabel'</span>, num2cell(TickNumber));         
+0472         xlabel(<span class="string">'Horizontal and Vertical BPM Numbers'</span>);
+0473                 
+0474         <span class="keyword">if</span> strcmp(lower(PlotString),<span class="string">'model'</span>)
+0475             title(<span class="string">'Model Response Matrix'</span>);
+0476             <span class="keyword">if</span> length(Elements) == 1
+0477                 ylabel(sprintf(<span class="string">'VCM(%d) [mm]'</span>, CMData.VCMGoodDataIndex(Elements)));
+0478             <span class="keyword">else</span>
+0479                 ylabel(<span class="string">'VCM [mm]'</span>);
+0480             <span class="keyword">end</span>
+0481         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'measured'</span>)
+0482             title(<span class="string">'Measured Response Matrix'</span>);
+0483             <span class="keyword">if</span> length(Elements) == 1
+0484                 ylabel(sprintf(<span class="string">'VCM(%d) [mm]'</span>, CMData.VCMGoodDataIndex(Elements)));
+0485             <span class="keyword">else</span>
+0486                 ylabel(<span class="string">'VCM [mm]'</span>);
+0487             <span class="keyword">end</span>
+0488         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured'</span>)
+0489             title(<span class="string">'Model - Measured Response Matrix'</span>);
+0490             <span class="keyword">if</span> length(Elements) == 1
+0491                 ylabel(sprintf(<span class="string">'VCM(%d) Error [mm]'</span>, CMData.VCMGoodDataIndex(Elements)));
+0492             <span class="keyword">else</span>
+0493                 ylabel(<span class="string">'VCM Error [mm]'</span>);
+0494             <span class="keyword">end</span>
+0495         <span class="keyword">elseif</span> strcmp(lower(PlotString),<span class="string">'model-measured+energyshifts'</span>)
+0496             title(<span class="string">'Model-Measured+EnergyShifts Response Matrix'</span>);
+0497             <span class="keyword">if</span> length(Elements) == 1
+0498                 ylabel(sprintf(<span class="string">'VCM(%d) Error [mm]'</span>, CMData.VCMGoodDataIndex(Elements)));
+0499             <span class="keyword">else</span>
+0500                 ylabel(<span class="string">'VCM Error [mm]'</span>);
+0501             <span class="keyword">end</span>
+0502         <span class="keyword">end</span>
+0503         
+0504         <span class="comment">% Only put a legend up to size 10</span>
+0505         <span class="keyword">if</span> length(Elements)&gt;1 &amp; length(Elements)&lt;=10
+0506             <span class="keyword">for</span> i = 1:length(Elements)
+0507                 legendstr{i} = sprintf(<span class="string">'VCM(%d)'</span>,CMData.VCMGoodDataIndex(Elements(i)));
+0508             <span class="keyword">end</span>
+0509             legend(legendstr,0);
+0510         <span class="keyword">end</span>
+0511         axis tight
+0512     <span class="keyword">end</span>
+0513 <span class="keyword">end</span>
+0514 
+0515 <span class="keyword">if</span> ~exist(<span class="string">'ElementsInput'</span>,<span class="string">'var'</span>) &amp; nargout &gt; 0
+0516     ElementsInput = [];
+0517 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

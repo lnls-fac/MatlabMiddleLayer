@@ -1,0 +1,756 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of quadplot</title>
+  <meta name="keywords" content="quadplot">
+  <meta name="description" content="QUADPLOT - Plots quadrupole centering data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; quadplot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>quadplot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>QUADPLOT - Plots quadrupole centering data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">QUADPLOT - Plots quadrupole centering data
+  [QMS, WarningString] = quadplot(Input1, Handle, sigmaBPM)
+
+  INPUTS
+  1. Input1 can be a filename for the data or a QMS structure (see help quadcenter for details).
+     If empty or zero inputs, then a dialog box will be provided to select a file.
+  2. Handle can be a figure handle or a vector of 4 axes handles 
+     If Handle=0, no results are plotted
+  3. Standard deviation of the BPMs (scalar if all BPMs are the same) 
+     These should be in the data file, but this provides an override if not
+     found then the default is inf (ie, not used).
+
+  OUTPUTS
+  1. For details of the QMS data structure see help quadcenter
+     This function added:
+     QMS.Offset - Offset computed at each BPM
+     QMS.FitParameters - Fit parameter at each BPM
+     QMS.FitParametersStd - Sigma of the fit parameter at each BPM
+     QMS.BPMStd - BPM sigma at each BPM
+     QMS.OffsetSTDMontiCarlo - Monti Carlo estimate of the sigma of the offset (optional)
+
+  2. WarningString = string with warning message if you occurred</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>	LOCO2GCR - Converts the LOCO BPM output to gain, crunch, and roll parameterization</li><li><a href="getcrunch.html" class="code" title="function Data = getcrunch(varargin)">getcrunch</a>	GETCRUNCH- Returns the crunch values for a family (radians)</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>	GETGAIN - Returns the gain for a family</li><li><a href="getroll.html" class="code" title="function Data = getroll(varargin)">getroll</a>	GETROLL - Returns the roll values for a family (radians)</li><li><a href="quaderrors.html" class="code" title="function QMS = quaderrors(Input1, FigureHandle, MontiCarloFlag)">quaderrors</a>	QUADERRORS - Computes the error bars for quadrupole center measurement</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="plotorbitdata.html" class="code" title="function [BPMx, BPMy] = plotorbitdata(varargin)">plotorbitdata</a>	PLOTORBITDATA - Plots BPM statistics</li><li><a href="quadcenter.html" class="code" title="function [QMS1, QMS2] = quadcenter(QuadFamily, QuadDev, XYPlane, FigureHandle)">quadcenter</a>	QUADCENTER - Measure the magnet center of a quadrupole magnet</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [QMS, WarningString] = quadplot(Input1, FigureHandle, sigmaBPM)</a>
+0002 <span class="comment">%QUADPLOT - Plots quadrupole centering data</span>
+0003 <span class="comment">%  [QMS, WarningString] = quadplot(Input1, Handle, sigmaBPM)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. Input1 can be a filename for the data or a QMS structure (see help quadcenter for details).</span>
+0007 <span class="comment">%     If empty or zero inputs, then a dialog box will be provided to select a file.</span>
+0008 <span class="comment">%  2. Handle can be a figure handle or a vector of 4 axes handles</span>
+0009 <span class="comment">%     If Handle=0, no results are plotted</span>
+0010 <span class="comment">%  3. Standard deviation of the BPMs (scalar if all BPMs are the same)</span>
+0011 <span class="comment">%     These should be in the data file, but this provides an override if not</span>
+0012 <span class="comment">%     found then the default is inf (ie, not used).</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%  OUTPUTS</span>
+0015 <span class="comment">%  1. For details of the QMS data structure see help quadcenter</span>
+0016 <span class="comment">%     This function added:</span>
+0017 <span class="comment">%     QMS.Offset - Offset computed at each BPM</span>
+0018 <span class="comment">%     QMS.FitParameters - Fit parameter at each BPM</span>
+0019 <span class="comment">%     QMS.FitParametersStd - Sigma of the fit parameter at each BPM</span>
+0020 <span class="comment">%     QMS.BPMStd - BPM sigma at each BPM</span>
+0021 <span class="comment">%     QMS.OffsetSTDMontiCarlo - Monti Carlo estimate of the sigma of the offset (optional)</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%  2. WarningString = string with warning message if you occurred</span>
+0024 
+0025 <span class="comment">%  Written by Greg Portmann</span>
+0026 
+0027 
+0028 <span class="comment">% To Do:</span>
+0029 <span class="comment">% 1. It wouldn't be to difficult to added a LS weight based on slope or even the ideal weighting of std(center).</span>
+0030 <span class="comment">%    I haven't done it yet because the BPM errors are usually roughly equal at most accelerators.</span>
+0031 
+0032 
+0033 <span class="comment">% Remove BPM gain and roll before finding the center</span>
+0034 ModelCoordinates = 0;
+0035 
+0036 <span class="comment">% Figure setup</span>
+0037 Buffer = .03;
+0038 HeightBuffer = .08;
+0039 
+0040 
+0041 <span class="comment">% Remove BPM if it's slope less than MinSlopeFraction * (the maximum slope)</span>
+0042 MinSlopeFraction = .25;
+0043 
+0044 <span class="comment">% # of STD of the center calculation allowed</span>
+0045 CenterOutlierFactor = 1;
+0046 
+0047 
+0048 QMS = [];
+0049 WarningString = <span class="string">''</span>;
+0050 
+0051 
+0052 <span class="comment">% Inputs</span>
+0053 <span class="keyword">try</span>
+0054     <span class="keyword">if</span> nargin == 0
+0055         [FileName, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a Quadrupole Center File'</span>, [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>), <span class="string">'QMS'</span>, filesep]);
+0056         <span class="keyword">if</span> ~isstr(FileName)
+0057             <span class="keyword">return</span>
+0058         <span class="keyword">else</span>
+0059             load([PathName,FileName]);
+0060         <span class="keyword">end</span>
+0061     <span class="keyword">else</span>
+0062         <span class="keyword">if</span> isempty(Input1)
+0063             [FileName, PathName] = uigetfile(<span class="string">'*.mat'</span>, <span class="string">'Select a Quadrupole Center File'</span>);
+0064             <span class="comment">%[FileName, PathName] = uigetfile('*.mat', 'Select a Quadrupole Center File', [getfamilydata('Directory','DataRoot'), 'QMS', filesep]);</span>
+0065             <span class="keyword">if</span> ~isstr(FileName)
+0066                 <span class="keyword">return</span>
+0067             <span class="keyword">else</span>
+0068                 load([PathName,FileName]);
+0069             <span class="keyword">end</span>
+0070         <span class="keyword">elseif</span> isstr(Input1)
+0071             FileName = Input1;
+0072             load(FileName);
+0073         <span class="keyword">else</span>
+0074             QMS = Input1;
+0075             FileName = [];
+0076         <span class="keyword">end</span>
+0077     <span class="keyword">end</span>
+0078 <span class="keyword">catch</span>
+0079     error(<span class="string">'Problem getting input data'</span>);
+0080 <span class="keyword">end</span>
+0081 <span class="keyword">if</span> nargin &lt; 2
+0082     FigureHandle = [];
+0083 <span class="keyword">end</span>
+0084 
+0085 [BPMelem1, iNotFound] = findrowindex(QMS.BPMDev, QMS.BPMDevList);
+0086 <span class="keyword">if</span> ~isempty(iNotFound)
+0087     error(<span class="string">'BPM at the quadrupole not found in the BPM device list'</span>);
+0088 <span class="keyword">end</span>
+0089 
+0090 QuadraticFit = QMS.QuadraticFit;       <span class="comment">% 0 = linear fit, else quadratic fit</span>
+0091 OutlierFactor = QMS.OutlierFactor;     <span class="comment">% if abs(data - fit) &gt; OutlierFactor, then remove that BPM</span>
+0092 
+0093 
+0094 <span class="comment">% Get BPM standard deviation</span>
+0095 <span class="keyword">if</span> nargin &lt; 3
+0096     <span class="comment">% Get from the data file</span>
+0097     <span class="keyword">if</span> isfield(QMS, <span class="string">'BPMSTD'</span>)
+0098         sigmaBPM = QMS.BPMSTD;
+0099     <span class="keyword">else</span>
+0100         sigmaBPM = inf;
+0101     <span class="keyword">end</span>
+0102 <span class="keyword">end</span>
+0103 <span class="keyword">if</span> isempty(sigmaBPM)
+0104     sigmaBPM = inf;
+0105 <span class="keyword">end</span>
+0106 <span class="keyword">if</span> isnan(sigmaBPM) | isinf(sigmaBPM)
+0107     sigmaBPM = inf;
+0108     fprintf(<span class="string">'   WARNING: BPM standard deviation is unknown, hence there is no BPM outlier condition.\n'</span>);
+0109 <span class="keyword">end</span>
+0110 sigmaBPM = sigmaBPM(:);
+0111 QMS.BPMSTD = sigmaBPM;
+0112 
+0113 
+0114 <span class="comment">% Get figure handle</span>
+0115 <span class="keyword">if</span> all(FigureHandle ~= 0) 
+0116     <span class="keyword">if</span> isempty(FigureHandle)
+0117         FigureHandle = figure;
+0118         clf reset
+0119         AxesHandles(1) = subplot(4,1,1);
+0120         AxesHandles(2) = subplot(4,1,2);
+0121         AxesHandles(3) = subplot(4,1,3);
+0122         AxesHandles(4) = subplot(4,1,4);    
+0123     <span class="keyword">else</span>
+0124         <span class="keyword">if</span> length(FigureHandle) == 1
+0125             FigureHandle = figure(FigureHandle);
+0126             clf reset
+0127             AxesHandles(1) = subplot(4,1,1);
+0128             AxesHandles(2) = subplot(4,1,2);
+0129             AxesHandles(3) = subplot(4,1,3);
+0130             AxesHandles(4) = subplot(4,1,4);    
+0131         <span class="keyword">elseif</span> length(FigureHandle) == 4
+0132             FigureHandle = figure;
+0133             clf reset
+0134             AxesHandles = FigureHandle;
+0135         <span class="keyword">else</span>
+0136             error(<span class="string">'Improper size of input FigureHandle'</span>);
+0137         <span class="keyword">end</span>
+0138     <span class="keyword">end</span>
+0139 <span class="keyword">end</span>
+0140 
+0141 
+0142 
+0143 <span class="comment">% Change the coordinates to model X &amp; Y</span>
+0144 <span class="keyword">if</span> ModelCoordinates
+0145     fprintf(<span class="string">'   Changing to model coordinates (the final center should be &quot;rotated&quot; back to the raw BPM coordinates).\n'</span>);
+0146     Gx  = <a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>(<span class="string">'BPMx'</span>, QMS.BPMDevList);   <span class="comment">% Unfortunately I don't have both families in the QMS structure???</span>
+0147     Gy  = <a href="getgain.html" class="code" title="function Data = getgain(varargin)">getgain</a>(<span class="string">'BPMy'</span>, QMS.BPMDevList);
+0148     Crunch = <a href="getcrunch.html" class="code" title="function Data = getcrunch(varargin)">getcrunch</a>(QMS.BPMFamily, QMS.BPMDevList);
+0149     Roll   = <a href="getroll.html" class="code" title="function Data = getroll(varargin)">getroll</a>(QMS.BPMFamily, QMS.BPMDevList);
+0150     
+0151     <span class="keyword">for</span> i = 1:length(Gx)
+0152         M = <a href="gcr2loco.html" class="code" title="function m = gcr2loco(gx, gy, c, r)">gcr2loco</a>(Gx(i), Gy(i), Crunch(i), Roll(i));
+0153         invM = inv(M);
+0154         
+0155         tmp = invM * [QMS.x0(i,:); QMS.y0(i,:)];
+0156         QMS.x0(i,:) = tmp(1,:);
+0157         QMS.y0(i,:) = tmp(2,:);
+0158         
+0159         tmp = invM * [QMS.x1(i,:); QMS.y1(i,:)];
+0160         QMS.x1(i,:) = tmp(1,:);
+0161         QMS.y1(i,:) = tmp(2,:);
+0162         
+0163         tmp = invM * [QMS.x2(i,:); QMS.y2(i,:)];
+0164         QMS.x2(i,:) = tmp(1,:);
+0165         QMS.y2(i,:) = tmp(2,:);
+0166         
+0167         tmp = invM * [QMS.xstart(i,:); QMS.ystart(i,:)];
+0168         QMS.xstart(i,:) = tmp(1,:);
+0169         QMS.ystart(i,:) = tmp(2,:);
+0170     <span class="keyword">end</span>
+0171 <span class="keyword">end</span>
+0172 
+0173 
+0174 <span class="comment">% Select the x or y plane</span>
+0175 <span class="keyword">if</span> QMS.QuadPlane == 1    
+0176     x0 = QMS.x0;
+0177     x1 = QMS.x1;
+0178     x2 = QMS.x2;
+0179 
+0180     <span class="comment">% Plot setup</span>
+0181     <span class="keyword">if</span> all(FigureHandle ~= 0) 
+0182         set(FigureHandle,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[Buffer .25+Buffer .5-Buffer-.003 .75-1.2*Buffer-HeightBuffer]);
+0183     <span class="keyword">end</span>
+0184 <span class="keyword">else</span>
+0185     x0 = QMS.y0;
+0186     x1 = QMS.y1;
+0187     x2 = QMS.y2;
+0188         
+0189     <span class="comment">% Plot setup</span>
+0190     <span class="keyword">if</span> all(FigureHandle ~= 0) 
+0191         set(FigureHandle,<span class="string">'units'</span>,<span class="string">'normal'</span>,<span class="string">'position'</span>,[.503 .25+Buffer .5-Buffer-.003 .75-1.2*Buffer-HeightBuffer]);
+0192     <span class="keyword">end</span>
+0193 <span class="keyword">end</span>
+0194 
+0195 
+0196 <span class="comment">% % Change the number of points</span>
+0197 <span class="comment">% if strcmpi(QMS.ModulationMethod, 'Sweep')</span>
+0198 <span class="comment">%     %Ndiv2 = floor(size(x1,2)/2);</span>
+0199 <span class="comment">%     %Npoint1 = Ndiv2;</span>
+0200 <span class="comment">%     %Npoint2 = Ndiv2+2;</span>
+0201 <span class="comment">%     %x1 = x1(:,Npoint1:Npoint2);</span>
+0202 <span class="comment">%     %x2 = x2(:,Npoint1:Npoint2);</span>
+0203 <span class="comment">%     %y1 = y1(:,Npoint1:Npoint2);</span>
+0204 <span class="comment">%     %y2 = y2(:,Npoint1:Npoint2);</span>
+0205 <span class="comment">%     %N = size(x1,2);</span>
+0206 <span class="comment">%     %Ndiv2 = floor(size(x1,2)/2);</span>
+0207 <span class="comment">%</span>
+0208 <span class="comment">%     Npoint1 = 2;</span>
+0209 <span class="comment">%     Npoint2 = size(QMS.x1, 2);</span>
+0210 <span class="comment">%     x0 = x0(:,Npoint1:Npoint2);</span>
+0211 <span class="comment">%     x1 = x1(:,Npoint1:Npoint2);</span>
+0212 <span class="comment">%     x2 = x2(:,Npoint1:Npoint2);</span>
+0213 <span class="comment">%     fprintf('  Using %d points (%d to %d, total %d) (%s method).', Npoint2-Npoint1+1, Npoint1, Npoint2, size(QMS.x1,2), QMS.ModulationMethod) ;</span>
+0214 <span class="comment">% end</span>
+0215 
+0216 
+0217 <span class="comment">% Expand sigmaBPM is necessary</span>
+0218 <span class="keyword">if</span> length(sigmaBPM) == 1
+0219     sigmaBPM = ones(size(x1,1),1) * sigmaBPM;
+0220 <span class="keyword">end</span>
+0221 
+0222 N = size(x1,2);
+0223 
+0224 
+0225 <span class="comment">%</span>
+0226 <span class="comment">% QUAD0 = getquad(QMS, 'Model');</span>
+0227 <span class="comment">% CM0 = getsp(QMS.CorrFamily, QMS.CorrDevList, 'Model');</span>
+0228 <span class="comment">%</span>
+0229 <span class="comment">%</span>
+0230 <span class="comment">% % Start the corrector a little lower first for hysteresis reasons</span>
+0231 <span class="comment">% CorrStep = 2 * QMS.CorrDelta / (N-1);</span>
+0232 <span class="comment">% stepsp(QMS.CorrFamily, -QMS.CorrDelta, QMS.CorrDevList, -1, 'Model');</span>
+0233 <span class="comment">%</span>
+0234 <span class="comment">% %XstartModel = getam(BPMxFamily, BPMxDev)</span>
+0235 <span class="comment">% for i = 1:N</span>
+0236 <span class="comment">%     % Step the vertical orbit</span>
+0237 <span class="comment">%     if i ~= 1</span>
+0238 <span class="comment">%         stepsp(QMS.CorrFamily, CorrStep, QMS.CorrDevList, -1, 'Model');</span>
+0239 <span class="comment">%     end</span>
+0240 <span class="comment">%</span>
+0241 <span class="comment">% %    fprintf('   %d. %s(%d,%d) = %+5.2f, %s(%d,%d) = %+.5f %s\n', i, QMS.CorrFamily, QMS.CorrDevList(1,:), getsp(QMS.CorrFamily, QMS.CorrDevList(1,:),'Model'),  BPMyFamily, BPMyDev, getam(BPMyFamily, BPMyDev,'Model'), QMS_Vertical.Orbit0.UnitsString); pause(0);</span>
+0242 <span class="comment">%</span>
+0243 <span class="comment">%     %OrbitCorrection(XstartModel, BPMxFamily, BPMxDev, HCMFamily, HCMDev, 2, 'Model');</span>
+0244 <span class="comment">%</span>
+0245 <span class="comment">%     if strcmpi(lower(QMS.ModulationMethod), 'sweep')</span>
+0246 <span class="comment">%         % One dimensional sweep of the quadrupole</span>
+0247 <span class="comment">%         xm1(:,i) = getam(QMS.BPMFamily, QMS.BPMDev, 'Model');</span>
+0248 <span class="comment">%         xm0(:,i) = xm1(:,i);</span>
+0249 <span class="comment">%         setquad(QMS, i*QMS.QuadDelta+QUAD0, -1, 'Model');</span>
+0250 <span class="comment">%         xm2(:,i) = getam(QMS.BPMFamily, QMS.BPMDevList, 'Model');</span>
+0251 <span class="comment">%     elseif strcmpi(lower(QMS.ModulationMethod), 'bipolar')</span>
+0252 <span class="comment">%         % Modulate the quadrupole</span>
+0253 <span class="comment">%         xm0(:,i) = getam(QMS.BPMFamily, QMS.BPMDev, 'Model');</span>
+0254 <span class="comment">%         [xq0(:,i), yq0(:,i)] = modeltwiss('x', QMS.QuadFamily, QMS.QuadDev);</span>
+0255 <span class="comment">%</span>
+0256 <span class="comment">%         setquad(QMS, QMS.QuadDelta+QUAD0, -1, 'Model');</span>
+0257 <span class="comment">%         xm1(:,i) = getam(QMS.BPMFamily, QMS.BPMDev, 'Model');</span>
+0258 <span class="comment">%         [xq1(:,i), yq1(:,i)] = modeltwiss('x', QMS.QuadFamily, QMS.QuadDev);</span>
+0259 <span class="comment">%</span>
+0260 <span class="comment">%</span>
+0261 <span class="comment">%         setquad(QMS,-QMS.QuadDelta+QUAD0, -1, 'Model');</span>
+0262 <span class="comment">%         xm2(:,i) = getam(QMS.BPMFamily, QMS.BPMDev, 'Model');</span>
+0263 <span class="comment">%         [xq2(:,i), yq2(:,i)] = modeltwiss('x', QMS.QuadFamily, QMS.QuadDev);</span>
+0264 <span class="comment">%</span>
+0265 <span class="comment">%         setquad(QMS, QUAD0, -1, 'Model');</span>
+0266 <span class="comment">%     elseif strcmpi(lower(QMS.ModulationMethod), 'unipolar')</span>
+0267 <span class="comment">%         % Modulate the quadrupole</span>
+0268 <span class="comment">%         xm1(:,i) = getam(QMS.BPMFamily, QMS.BPMDev, 'Model');</span>
+0269 <span class="comment">%         xm0(:,i) = x1(:,i);</span>
+0270 <span class="comment">%         setquad(QMS, QMS.QuadDelta+QUAD0, -1, 'Model');</span>
+0271 <span class="comment">%         xm2(:,i) = getam(QMS.BPMFamily, QMS.BPMDev, 'Model');</span>
+0272 <span class="comment">%         setquad(QMS, QUAD0, -1, 'Model');</span>
+0273 <span class="comment">%     end</span>
+0274 <span class="comment">% end</span>
+0275 <span class="comment">%</span>
+0276 <span class="comment">% setquad(QMS, QUAD0, -1, 'Model');</span>
+0277 <span class="comment">% setsp(QMS.CorrFamily, CM0, QMS.CorrDevList, -1, 'Model');</span>
+0278 <span class="comment">%</span>
+0279 <span class="comment">% xq0 = 1000*xq0;</span>
+0280 <span class="comment">% xq1 = 1000*xq1;</span>
+0281 <span class="comment">% xq2 = 1000*xq2;</span>
+0282 <span class="comment">%</span>
+0283 <span class="comment">% yq0 = 1000*yq0;</span>
+0284 <span class="comment">% yq1 = 1000*yq1;</span>
+0285 <span class="comment">% yq2 = 1000*yq2;</span>
+0286 
+0287 
+0288 
+0289 <span class="comment">% Fit verses the position at the BPM next to the quadrupole</span>
+0290 <span class="keyword">if</span> strcmpi(QMS.ModulationMethod, <span class="string">'sweep'</span>)
+0291     <span class="comment">% One dimensional sweep of the quadrupole</span>
+0292     <span class="comment">%x = x1(BPMelem1,:)';</span>
+0293     x = (x1(BPMelem1,:)' + x2(BPMelem1,:)')/2;     
+0294 <span class="keyword">elseif</span> strcmpi(QMS.ModulationMethod, <span class="string">'bipolar'</span>)
+0295     <span class="comment">% Modulation of the quadrupole</span>
+0296     x = (x1(BPMelem1,:)' + x2(BPMelem1,:)')/2;     
+0297 <span class="keyword">elseif</span> strcmpi(QMS.ModulationMethod, <span class="string">'unipolar'</span>)
+0298     <span class="comment">% Unipolar modulation of the quadrupole</span>
+0299     <span class="comment">%x = x1(BPMelem1,:)';</span>
+0300     x = (x1(BPMelem1,:)' + x2(BPMelem1,:)')/2;     
+0301 <span class="keyword">end</span>
+0302 
+0303 
+0304 <span class="comment">% x = xm0 + yq0-(xm0-xm0(3));</span>
+0305 <span class="comment">% x = xm0(3) + yq0-yq0(3);</span>
+0306 <span class="comment">% x = x';</span>
+0307 
+0308 
+0309 
+0310 <span class="keyword">if</span> isfield(QMS, <span class="string">'Orbit0'</span>)
+0311     BPMUnitsString = QMS.Orbit0.UnitsString;
+0312 <span class="keyword">else</span>
+0313     BPMUnitsString = <span class="string">'mm'</span>;
+0314 <span class="keyword">end</span>
+0315 
+0316 <span class="comment">% Figure #1</span>
+0317 <span class="keyword">if</span> all(FigureHandle ~= 0) 
+0318         
+0319     <span class="comment">% Plot horizontal raw data</span>
+0320     axes(AxesHandles(1));
+0321     plot((QMS.x2(BPMelem1,:)+QMS.x1(BPMelem1,:))/2, (QMS.x2-QMS.x1), <span class="string">'-x'</span>);
+0322     hold on;
+0323     plot((QMS.x2(BPMelem1,1)+QMS.x1(BPMelem1,1))/2, (QMS.x2(:,1)-QMS.x1(:,1)), <span class="string">'xb'</span>);
+0324     hold off;
+0325     xlabel(sprintf(<span class="string">'%s(%d,%d), raw values [%s]'</span>, <span class="string">'BPMx'</span>, QMS.BPMDev(1), QMS.BPMDev(2), BPMUnitsString));
+0326     ylabel({sprintf(<span class="string">'\\Delta %s [%s]'</span>, <span class="string">'BPMx'</span>, BPMUnitsString),<span class="string">'(raw data)'</span>});
+0327     <span class="keyword">if</span> isempty(FileName)
+0328         title(sprintf(<span class="string">'Center for %s(%d,%d) %s(%d,%d)'</span>, QMS.BPMFamily, QMS.BPMDev(1), QMS.BPMDev(2), QMS.QuadFamily, QMS.QuadDev), <span class="string">'interpreter'</span>, <span class="string">'none'</span>);
+0329     <span class="keyword">else</span>
+0330         title(sprintf(<span class="string">'Center for %s(%d,%d) %s(%d,%d) (%s)'</span>, QMS.BPMFamily, QMS.BPMDev(1), QMS.BPMDev(2), QMS.QuadFamily, QMS.QuadDev, FileName), <span class="string">'interpreter'</span>, <span class="string">'none'</span>);
+0331     <span class="keyword">end</span>
+0332     grid on
+0333     axis tight
+0334 
+0335     <span class="keyword">if</span> QMS.QuadPlane == 1
+0336         Axes2Axis = axis;
+0337     <span class="keyword">end</span>
+0338 
+0339     <span class="comment">% Plot vertical raw data</span>
+0340     axes(AxesHandles(2));
+0341     plot((QMS.y2(BPMelem1,:)+QMS.y1(BPMelem1,:))/2, (QMS.y2-QMS.y1), <span class="string">'-x'</span>);
+0342     hold on;
+0343     plot((QMS.y2(BPMelem1,1)+QMS.y1(BPMelem1,1))/2, (QMS.y2(:,1)-QMS.y1(:,1)), <span class="string">'xb'</span>);
+0344     hold off;
+0345     <span class="comment">%plot(x, x2-x1, '-x');</span>
+0346     <span class="comment">%plot(linspace(-DelHCM,DelHCM,3), x2-x1);</span>
+0347     xlabel(sprintf(<span class="string">'%s(%d,%d), raw values [%s]'</span>, <span class="string">'BPMy'</span>, QMS.BPMDev(1), QMS.BPMDev(2), BPMUnitsString));
+0348     ylabel({sprintf(<span class="string">'\\Delta %s [%s]'</span>, <span class="string">'BPMy'</span>, BPMUnitsString),<span class="string">'(raw data)'</span>});
+0349     grid on
+0350     axis tight
+0351 
+0352     <span class="keyword">if</span> QMS.QuadPlane == 2
+0353         Axes2Axis = axis;
+0354     <span class="keyword">end</span>
+0355 <span class="keyword">end</span>
+0356 
+0357 
+0358 <span class="keyword">if</span> isempty(FileName)
+0359     fprintf(<span class="string">'   Calculating the center of %s(%d,%d) using %s(%d,%d)\n'</span>, QMS.QuadFamily, QMS.QuadDev, QMS.BPMFamily, QMS.BPMDev);
+0360 <span class="keyword">else</span>
+0361     fprintf(<span class="string">'   Calculating the center of %s(%d,%d) using %s(%d,%d) (Data file: %s)\n'</span>, QMS.QuadFamily, QMS.QuadDev, QMS.BPMFamily, QMS.BPMDev, FileName);
+0362 <span class="keyword">end</span>
+0363 fprintf(<span class="string">'   Quadrupole modulation delta = %.3f amps, %s(%d,%d) max step = %.3f amps  (%s)\n'</span>, QMS.QuadDelta, QMS.CorrFamily, QMS.CorrDevList(1,:), QMS.CorrDelta, QMS.ModulationMethod);
+0364 
+0365 
+0366         
+0367 <span class="comment">% Least squares fit</span>
+0368 merit = x2 - x1;
+0369 <span class="keyword">if</span> QuadraticFit
+0370     X = [ones(size(x)) x x.^2];
+0371     fprintf(<span class="string">'   %d point parabolic least squares fit\n'</span>, N);
+0372 <span class="keyword">else</span>
+0373     X = [ones(size(x)) x];
+0374     fprintf(<span class="string">'   %d point linear least squares fit\n'</span>, N);
+0375 <span class="keyword">end</span>
+0376 
+0377 
+0378 <span class="comment">% Axes #3</span>
+0379 <span class="keyword">if</span> all(FigureHandle ~= 0) 
+0380     axes(AxesHandles(3));
+0381     xx = linspace(x(1), x(end), 200);
+0382 <span class="keyword">end</span>
+0383 
+0384 iBPMOutlier = [];
+0385 invXX   = inv(X'*X);
+0386 invXX_X = invXX * X';
+0387 
+0388 <span class="keyword">for</span> i = 1:size(x1,1)
+0389     <span class="comment">% least-square fit: m = slope and b = Y-intercept</span>
+0390     b = invXX_X * merit(i,:)';
+0391     bhat(i,:) = b';
+0392     
+0393     <span class="comment">% Should equal</span>
+0394     <span class="comment">%b = X \merit(i,:)';</span>
+0395     <span class="comment">%bhat1(i,:) = b';</span>
+0396     
+0397     <span class="comment">% Standard deviation</span>
+0398     bstd = sigmaBPM(i) * invXX; 
+0399     bhatstd(i,:) = diag(bstd)';  <span class="comment">% hopefully cross-correlation terms are small</span>
+0400     
+0401     <span class="keyword">if</span> all(FigureHandle ~= 0)   
+0402         <span class="keyword">if</span> QuadraticFit
+0403             y = b(3)*xx.^2 + b(2)*xx + b(1);
+0404         <span class="keyword">else</span>
+0405             y = b(2)*xx + b(1);
+0406         <span class="keyword">end</span>
+0407 <span class="comment">%        plot(xx, y); hold on</span>
+0408     <span class="keyword">end</span>
+0409     
+0410     <span class="comment">% Outlier condition: remove if the error between the fit and the data is greater than OutlierFactor</span>
+0411     <span class="keyword">if</span> QuadraticFit
+0412         y = b(3)*x.^2 + b(2)*x + b(1);
+0413     <span class="keyword">else</span>
+0414         y = b(2)*x + b(1);
+0415     <span class="keyword">end</span>
+0416     <span class="keyword">if</span> max(abs(y - merit(i,:)')) &gt; OutlierFactor * sigmaBPM(i)    <span class="comment">% OutlierFactor was absolute max(abs(y - merit(i,:)')) &gt; OutlierFactor</span>
+0417         iBPMOutlier = [iBPMOutlier;i];
+0418     <span class="keyword">end</span>
+0419     
+0420     <span class="keyword">if</span> QuadraticFit
+0421         <span class="comment">% Quadratic fit</span>
+0422         <span class="keyword">if</span> b(2) &gt; 0
+0423             offset(i,1) = (-b(2) + sqrt(b(2)^2 - 4*b(3)*b(1))) / (2*b(3));
+0424         <span class="keyword">else</span>
+0425             offset(i,1) = (-b(2) - sqrt(b(2)^2 - 4*b(3)*b(1))) / (2*b(3));
+0426         <span class="keyword">end</span>
+0427         <span class="keyword">if</span> ~isreal(offset(i,1))
+0428             <span class="comment">% (b^2-4ac) can be negative but it will only happen if the slope is very small.  The offset</span>
+0429             <span class="comment">% should just get thrown out later as an outlier but change the solution to the minimum of the parabola.</span>
+0430             offset(i,1) = -b(2) / b(1) / 2;
+0431         <span class="keyword">end</span>
+0432     <span class="keyword">else</span>
+0433         <span class="comment">% Linear fit</span>
+0434         offset(i,1) = -b(1)/b(2); 
+0435     <span class="keyword">end</span>
+0436 <span class="keyword">end</span>
+0437 
+0438 QMS.Offset = offset;
+0439 QMS.FitParameters = bhat;
+0440 QMS.FitParametersStd = bhatstd;
+0441 QMS.BPMStd = sigmaBPM;
+0442 
+0443 
+0444 <span class="comment">% % Label axes #2</span>
+0445 <span class="comment">% if all(FigureHandle ~= 0)</span>
+0446 <span class="comment">%     xlabel(sprintf('%s(%d,%d), raw values [%s]', QMS.BPMFamily, QMS.BPMDev(1), QMS.BPMDev(2), BPMUnitsString));</span>
+0447 <span class="comment">%     ylabel(sprintf('BPM LS Fit [%s]', BPMUnitsString));</span>
+0448 <span class="comment">%     grid on</span>
+0449 <span class="comment">%     axis tight</span>
+0450 <span class="comment">% end</span>
+0451 
+0452 
+0453 <span class="comment">% Compute offset for different conditions</span>
+0454 fprintf(<span class="string">'   %d total BPMs\n'</span>, length(offset));
+0455 fprintf(<span class="string">'   BPMs are removed for 1. Bad Status, 2. BPM Outlier, 3. Small Slope, or 4. Center Outlier\n'</span>);
+0456 <span class="comment">%m1 = mean(offset);</span>
+0457 <span class="comment">%s1 = std(offset);</span>
+0458 <span class="comment">%fprintf('   0. Mean = %.5f %s, STD = %.5f %s, all %d BPMs\n', m1, BPMUnitsString, s1, BPMUnitsString, length(offset));</span>
+0459 
+0460 
+0461 <span class="comment">% Remove bad Status BPMs</span>
+0462 iStatus = find(QMS.BPMStatus==0);
+0463 iBad = iStatus;
+0464 <span class="keyword">if</span> length(iBad) == length(offset)
+0465     error(<span class="string">'All the BPMs have bad status'</span>);
+0466 <span class="keyword">end</span>
+0467 offset1 = offset;
+0468 offset1(iBad) = [];
+0469 m2 = mean(offset1);
+0470 s2 = std(offset1);
+0471 fprintf(<span class="string">'   1. Mean = %+.5f %s, STD = %.5f %s, %2d points with bad status\n'</span>, m2, BPMUnitsString, s2, BPMUnitsString, length(iBad));
+0472 
+0473 <span class="comment">% Remove bad Status + Outliers</span>
+0474 iBad = unique([iStatus; iBPMOutlier]);
+0475 <span class="keyword">if</span> length(iBad) == length(offset)
+0476     error(<span class="string">'All BPMs either have bad status or failed the BPM outlier condition'</span>);
+0477 <span class="keyword">end</span>
+0478 offset1 = offset;
+0479 offset1(iBad) = [];
+0480 m2 = mean(offset1);
+0481 s2 = std(offset1);
+0482 fprintf(<span class="string">'   2. Mean = %+.5f %s, STD = %.5f %s, %2d points with condition 1 and abs(fit - measured data) &gt; %.2f std(BPM) (BPM outlier)\n'</span>, m2, BPMUnitsString, s2, BPMUnitsString, length(iBad), OutlierFactor);
+0483 
+0484 
+0485 <span class="comment">% Remove bad Status + Small slopes</span>
+0486 <span class="comment">%iSlope = find(abs(bhat(:,2)) &lt; max(abs(bhat(:,2)))*MinSlopeFraction);</span>
+0487 
+0488 <span class="comment">% Look for slope outliers</span>
+0489 Slopes = abs(bhat(:,2));
+0490 [Slopes, i] = sort(Slopes);
+0491 Slopes = Slopes(round(end/2):end);  <span class="comment">% remove the first half</span>
+0492 <span class="keyword">if</span> length(Slopes) &gt; 5
+0493     SlopesMax = Slopes(end-4); 
+0494 <span class="keyword">else</span>
+0495     SlopesMax = Slopes(end); 
+0496 <span class="keyword">end</span>
+0497 <span class="comment">%i = find(abs(Slopes-mean(Slopes)) &gt; 2 * std(Slopes));</span>
+0498 <span class="comment">%Slopes(i) = [];</span>
+0499 
+0500 iSlope = find(abs(bhat(:,2)) &lt; SlopesMax * MinSlopeFraction);
+0501 iBad = unique([iStatus; iBPMOutlier; iSlope]);
+0502 <span class="keyword">if</span> length(iBad) == length(offset)
+0503     error(<span class="string">'All BPMs either have bad status, failed the BPM outlier condition, or failed the slope condition'</span>);
+0504 <span class="keyword">end</span>
+0505 offset1 = offset;
+0506 offset1(iBad) = [];
+0507 m2 = mean(offset1);
+0508 s2 = std(offset1);
+0509 fprintf(<span class="string">'   3. Mean = %+.5f %s, STD = %.5f %s, %2d points with condition 1, 2, and slope &lt; %.2f max(slope)\n'</span>, m2, BPMUnitsString, s2, BPMUnitsString, length(iBad), MinSlopeFraction);
+0510 
+0511 
+0512 <span class="comment">% Offset outlier offsets-mean(offsets) greater than 1 std</span>
+0513 itotal = (1:length(offset))';
+0514 iok = itotal;
+0515 
+0516 offset1 = offset;
+0517 offset1(iBad) = [];
+0518 iok(iBad) = [];
+0519 
+0520 i = find(abs(offset1-mean(offset1)) &gt; CenterOutlierFactor * std(offset1));
+0521 iCenterOutlier = iok(i);
+0522 iBad = unique([iBad; iCenterOutlier]);
+0523 <span class="keyword">if</span> length(iBad) == length(offset)
+0524     error(<span class="string">'All BPMs either have bad status, failed the BPM outlier condition, or failed the slope condition, , or failed the center outlier condition'</span>);
+0525 <span class="keyword">end</span>
+0526 offset1(i) = [];
+0527 iok(i) = [];
+0528 
+0529 m2 = mean(offset1);
+0530 s2 = std(offset1);
+0531 QMS.GoodIndex = iok;
+0532 fprintf(<span class="string">'   4. Mean = %+.5f %s, STD = %.5f %s, %2d points with condition 1, 2, 3, and abs(center-mean(center)) &gt; %.2f std(center) (Center outlier)\n'</span>, m2, BPMUnitsString, s2, BPMUnitsString, length(iBad), CenterOutlierFactor);
+0533 
+0534 
+0535 NN = length(offset);
+0536 
+0537 <span class="comment">% Axes #4</span>
+0538 <span class="keyword">if</span> all(FigureHandle ~= 0) 
+0539     axes(AxesHandles(4));
+0540     [xx1,yy1]=stairs(1:NN,offset);
+0541     offset1 = offset;
+0542     offset1(iBad) = NaN*ones(length(iBad),1);
+0543     [xx2, yy2] = stairs(1:NN, offset1);
+0544     plot(xx1,yy1,<span class="string">'r'</span>, xx2,yy2,<span class="string">'b'</span>);
+0545     xlabel(<span class="string">'BPM Number'</span>);
+0546     ylabel(sprintf(<span class="string">'%s Center [%s]'</span>, QMS.BPMFamily, BPMUnitsString));
+0547     grid on
+0548     axis tight
+0549     <span class="comment">%xaxis([0 NN+1]);</span>
+0550     axis([0 NN+1 min(offset1)-.1e-3 max(offset1)+.1e-3]);
+0551 <span class="keyword">end</span>
+0552 
+0553 
+0554 <span class="comment">% Axes #3</span>
+0555 
+0556 <span class="keyword">if</span> all(FigureHandle ~= 0) 
+0557     <span class="keyword">if</span> 0
+0558         <span class="comment">% Plot red line over the bad lines</span>
+0559         axes(AxesHandles(3));
+0560         <span class="keyword">for</span> j = 1:length(iBad)
+0561             i = iBad(j);
+0562             <span class="keyword">if</span> QuadraticFit
+0563                 y = bhat(i,3)*xx.^2 + bhat(i,2)*xx + bhat(i,1);
+0564             <span class="keyword">else</span>
+0565                 y = bhat(i,2)*xx + bhat(i,1);
+0566             <span class="keyword">end</span>
+0567             plot(xx, y,<span class="string">'r'</span>); 
+0568         <span class="keyword">end</span>
+0569         hold off
+0570         axis tight
+0571     <span class="keyword">else</span>
+0572         <span class="comment">% Only plot the good data</span>
+0573         axes(AxesHandles(3));
+0574         yy = [];
+0575         <span class="keyword">for</span> i = 1:size(x1,1)
+0576             <span class="keyword">if</span> ~any(i == iBad)
+0577                 <span class="keyword">if</span> QuadraticFit
+0578                     y = bhat(i,3)*xx.^2 + bhat(i,2)*xx + bhat(i,1);
+0579                 <span class="keyword">else</span>
+0580                     y = bhat(i,2)*xx + bhat(i,1);
+0581                 <span class="keyword">end</span>
+0582                 yy = [yy;y];
+0583             <span class="keyword">end</span>
+0584         <span class="keyword">end</span>
+0585         plot(xx, yy); 
+0586         hold off
+0587         grid on
+0588         axis tight
+0589     <span class="keyword">end</span>
+0590     xlabel(sprintf(<span class="string">'%s(%d,%d), raw values [%s]'</span>, QMS.BPMFamily, QMS.BPMDev(1), QMS.BPMDev(2), BPMUnitsString));
+0591     ylabel({sprintf(<span class="string">'\\Delta %s [%s]'</span>, QMS.BPMFamily, BPMUnitsString),<span class="string">'(LS fit)'</span>});
+0592     grid on
+0593     axis tight
+0594 
+0595     xaxis(Axes2Axis(1:2));
+0596 <span class="keyword">end</span>
+0597 
+0598 
+0599 
+0600 <span class="keyword">if</span> ~isempty(iStatus)
+0601     <span class="keyword">if</span> ~isempty(find(iStatus==BPMelem1))
+0602         fprintf(<span class="string">'   WARNING: BPM(%d,%d) has a bad status\n'</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0603         WarningString = sprintf(<span class="string">'BPM(%d,%d) has a bad status'</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0604     <span class="keyword">end</span>
+0605 <span class="keyword">end</span>
+0606 <span class="keyword">if</span> ~isempty(iBPMOutlier)
+0607     <span class="keyword">if</span> ~isempty(find(iBPMOutlier==BPMelem1))
+0608         fprintf(<span class="string">'   WARNING: BPM(%d,%d) removed due to outlier (based on std(BPM))\n'</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0609         WarningString = sprintf(<span class="string">'BPM(%d,%d) removed due to outlier (based on std(BPM))'</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0610     <span class="keyword">end</span>
+0611 <span class="keyword">end</span>
+0612 <span class="keyword">if</span> ~isempty(iSlope)
+0613     <span class="keyword">if</span> ~isempty(find(iSlope==BPMelem1))
+0614         fprintf(<span class="string">'   WARNING: BPM(%d,%d) slope is too small\n'</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0615         WarningString = sprintf(<span class="string">'BPM(%d,%d) slope is too small'</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0616     <span class="keyword">end</span>
+0617 <span class="keyword">end</span>
+0618 <span class="keyword">if</span> ~isempty(iCenterOutlier)
+0619     <span class="keyword">if</span> ~isempty(find(iCenterOutlier==BPMelem1))
+0620         fprintf(<span class="string">'   WARNING: BPM(%d,%d) removed due to outlier (based on all the centers)\n'</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0621         WarningString = sprintf(<span class="string">'BPM(%d,%d) '</span>, QMS.BPMDev(1), QMS.BPMDev(2));
+0622     <span class="keyword">end</span>
+0623 <span class="keyword">end</span>
+0624 
+0625 
+0626 <span class="comment">% % Axes #3</span>
+0627 <span class="comment">% if all(FigureHandle ~= 0)</span>
+0628 <span class="comment">%     axes(AxesHandles(4));</span>
+0629 <span class="comment">%     iii=1:NN;</span>
+0630 <span class="comment">%     iii(iBad)=[];</span>
+0631 <span class="comment">%     for j = 1:length(iii)</span>
+0632 <span class="comment">%         i = iii(j);</span>
+0633 <span class="comment">%</span>
+0634 <span class="comment">%         if 1</span>
+0635 <span class="comment">%             % Plot fit</span>
+0636 <span class="comment">%             if QuadraticFit</span>
+0637 <span class="comment">%                 y = bhat(i,3)*xx.^2 + bhat(i,2)*xx + bhat(i,1);</span>
+0638 <span class="comment">%             else</span>
+0639 <span class="comment">%                 y = bhat(i,2)*xx + bhat(i,1);</span>
+0640 <span class="comment">%             end</span>
+0641 <span class="comment">%             if all(FigureHandle ~= 0)</span>
+0642 <span class="comment">%                 plot(xx, y,'b'); hold on</span>
+0643 <span class="comment">%             end</span>
+0644 <span class="comment">%         else</span>
+0645 <span class="comment">%             % Plot error in fit</span>
+0646 <span class="comment">%             if QuadraticFit</span>
+0647 <span class="comment">%                 y = bhat(i,3)*x.^2 + bhat(i,2)*x + bhat(i,1);</span>
+0648 <span class="comment">%             else</span>
+0649 <span class="comment">%                 y = bhat(i,2)*x + bhat(i,1);</span>
+0650 <span class="comment">%             end</span>
+0651 <span class="comment">%             plot(x, y - merit(i,:)','b'); hold on</span>
+0652 <span class="comment">%         end</span>
+0653 <span class="comment">%     end</span>
+0654 <span class="comment">%     hold off</span>
+0655 <span class="comment">%     xlabel(sprintf('%s(%d,%d), raw values [%s]', QMS.BPMFamily, QMS.BPMDev(1), QMS.BPMDev(2), BPMUnitsString));</span>
+0656 <span class="comment">%     ylabel(sprintf('Final %s Merit Fun [%s]', QMS.BPMFamily, BPMUnitsString));</span>
+0657 <span class="comment">%     grid on</span>
+0658 <span class="comment">%     axis tight</span>
+0659 <span class="comment">%     orient tall</span>
+0660 <span class="comment">% end</span>
+0661 
+0662 
+0663 <span class="keyword">if</span> ~isempty(QMS.OldCenter)
+0664     fprintf(<span class="string">'   Starting Offset %s(%d,%d) = %+f [%s]\n'</span>, QMS.BPMFamily, QMS.BPMDev, QMS.OldCenter, BPMUnitsString);
+0665 <span class="keyword">end</span>
+0666 fprintf(<span class="string">'   New Offset      %s(%d,%d) = %+f [%s]\n'</span>, QMS.BPMFamily, QMS.BPMDev, m2, BPMUnitsString);
+0667 
+0668 QMS.Center = m2;
+0669 QMS.CenterSTD = s2;
+0670 
+0671 
+0672 <span class="keyword">if</span> all(FigureHandle ~= 0)
+0673     addlabel(1, 0, datestr(QMS.TimeStamp));
+0674     addlabel(0, 0, sprintf(<span class="string">'Offset %s(%d,%d)=%f, {\\Delta}%s(%d,%d)=%f, {\\Delta}%s(%d,%d)=%f'</span>, QMS.BPMFamily, QMS.BPMDev, QMS.Center, QMS.QuadFamily, QMS.QuadDev, QMS.QuadDelta, QMS.CorrFamily, QMS.CorrDevList(1,:), QMS.CorrDelta(1)));
+0675 <span class="keyword">end</span>
+0676 
+0677 fprintf(<span class="string">'\n'</span>);
+0678 
+0679 
+0680 <span class="comment">% Get and plot errors</span>
+0681 <span class="keyword">if</span> all(FigureHandle ~= 0)
+0682     QMS = <a href="quaderrors.html" class="code" title="function QMS = quaderrors(Input1, FigureHandle, MontiCarloFlag)">quaderrors</a>(QMS, gcf+1);
+0683 <span class="keyword">else</span>
+0684     <span class="comment">% This is a cluge for now</span>
+0685     QMS = <a href="quaderrors.html" class="code" title="function QMS = quaderrors(Input1, FigureHandle, MontiCarloFlag)">quaderrors</a>(QMS, 0);
+0686 <span class="keyword">end</span>
+0687 
+0688 
+0689 <span class="comment">%QMS = orderfields(QMS);</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

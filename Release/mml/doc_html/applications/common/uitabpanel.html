@@ -1,0 +1,708 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of uitabpanel</title>
+  <meta name="keywords" content="uitabpanel">
+  <meta name="description" content="UITABPANEL adds a group of tabbed uipanel container objects to a figure.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; uitabpanel.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>uitabpanel
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>UITABPANEL adds a group of tabbed uipanel container objects to a figure.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function hh = uitabpanel(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> UITABPANEL adds a group of tabbed uipanel container objects to a figure.
+   The user can click on a tab with the left mouse button to select it.
+   One tab is always selected, and appears on top of all the orthers.
+   The syntax is the same as UIPANEL except the following property changes:
+
+     Property              Values
+     -------------------   -------------------------------------------------
+     Title                 a cell array of strings specifying the title of
+                           each tab
+     String                (same as Title)
+     TitlePosition         the location of tabs in relation of the visible
+                           panel, the value is the same as UIPANEL
+     Style                 (same as TitlePosition)
+     FrameBackgroundColor  the background color for the tabpanel frame 
+     FrameBorderType       the border type for the tabpanel frame
+     PanelBackgroundColor  the background color for the active tab/panel
+     TitleHighlightColor   the highlight color for the active tab
+     TitleForegroundColor  the foreground color for tab titiles
+     TitleBackgroundColor  the background color for the inactive tabs
+     SelectedItem          index specifying the currently active tab
+
+   A yet another type of UITABPANEL is a group of popup panels, which
+   toggles open and close of a panel when its titile is clicked. Additional
+   properties for popup tabpanel are:
+
+     Property              Values
+     -------------------   -------------------------------------------------
+     Style                 'popup'
+     PanelHeights          a numeric array specfying the height in 
+                           characters of each popup panel
+     PanelBorderType       the border type for the popup panels
+     TitleHighlightColor   (not applicable)
+  
+   By defining 'CreateFcn', MATLAB will build the group of panels at 
+   creation of UITABPANEL. An array of handles of the UIPANELs can
+   be retrieved by calling getappdata(hTabpanel,'panels').
+
+   Example:
+     htab = uitabpanel('title',{'1','2','3'})
+     hpanel = getappdata(htab,'panels')
+   
+     See also <a href="uitabdemo.html" class="code" title="function hh = uitabdemo(option)">uitabdemo</a>, uipanel, uicontrol, set, get.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="uitabdemo.html" class="code" title="function hh = uitabdemo(option)">uitabdemo</a>	UITABDEMO  This script demostrates the use of UITABPANEL.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<ul style="list-style-image:url(../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function PopupTabCbk(hobj,evdt,indx)</a></li><li><a href="#_sub2" class="code">function PopupTabSliderCbk(hobj,evdt)</a></li><li><a href="#_sub3" class="code">function PopupTabEnableAllCbk(hobj,evdt,cstr)</a></li><li><a href="#_sub4" class="code">function PopupTabResizeCbk(hobj,evdt)</a></li><li><a href="#_sub5" class="code">function TopBottomTabCbk(hobj,evdt,indx)</a></li><li><a href="#_sub6" class="code">function TopBottomTabResizeCbk(hobj,evdt)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function hh = uitabpanel(varargin)</a>
+0002 
+0003 <span class="comment">% UITABPANEL adds a group of tabbed uipanel container objects to a figure.</span>
+0004 <span class="comment">%   The user can click on a tab with the left mouse button to select it.</span>
+0005 <span class="comment">%   One tab is always selected, and appears on top of all the orthers.</span>
+0006 <span class="comment">%   The syntax is the same as UIPANEL except the following property changes:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%     Property              Values</span>
+0009 <span class="comment">%     -------------------   -------------------------------------------------</span>
+0010 <span class="comment">%     Title                 a cell array of strings specifying the title of</span>
+0011 <span class="comment">%                           each tab</span>
+0012 <span class="comment">%     String                (same as Title)</span>
+0013 <span class="comment">%     TitlePosition         the location of tabs in relation of the visible</span>
+0014 <span class="comment">%                           panel, the value is the same as UIPANEL</span>
+0015 <span class="comment">%     Style                 (same as TitlePosition)</span>
+0016 <span class="comment">%     FrameBackgroundColor  the background color for the tabpanel frame</span>
+0017 <span class="comment">%     FrameBorderType       the border type for the tabpanel frame</span>
+0018 <span class="comment">%     PanelBackgroundColor  the background color for the active tab/panel</span>
+0019 <span class="comment">%     TitleHighlightColor   the highlight color for the active tab</span>
+0020 <span class="comment">%     TitleForegroundColor  the foreground color for tab titiles</span>
+0021 <span class="comment">%     TitleBackgroundColor  the background color for the inactive tabs</span>
+0022 <span class="comment">%     SelectedItem          index specifying the currently active tab</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%   A yet another type of UITABPANEL is a group of popup panels, which</span>
+0025 <span class="comment">%   toggles open and close of a panel when its titile is clicked. Additional</span>
+0026 <span class="comment">%   properties for popup tabpanel are:</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%     Property              Values</span>
+0029 <span class="comment">%     -------------------   -------------------------------------------------</span>
+0030 <span class="comment">%     Style                 'popup'</span>
+0031 <span class="comment">%     PanelHeights          a numeric array specfying the height in</span>
+0032 <span class="comment">%                           characters of each popup panel</span>
+0033 <span class="comment">%     PanelBorderType       the border type for the popup panels</span>
+0034 <span class="comment">%     TitleHighlightColor   (not applicable)</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">%   By defining 'CreateFcn', MATLAB will build the group of panels at</span>
+0037 <span class="comment">%   creation of UITABPANEL. An array of handles of the UIPANELs can</span>
+0038 <span class="comment">%   be retrieved by calling getappdata(hTabpanel,'panels').</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">%   Example:</span>
+0041 <span class="comment">%     htab = uitabpanel('title',{'1','2','3'})</span>
+0042 <span class="comment">%     hpanel = getappdata(htab,'panels')</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">%     See also uitabdemo, uipanel, uicontrol, set, get.</span>
+0045   
+0046 <span class="comment">% Author: Shiying Zhao (zhao@arch.umsl.edu)</span>
+0047 <span class="comment">% Version: 1.0</span>
+0048 <span class="comment">% First created: May 02, 2006</span>
+0049 <span class="comment">% Last modified: May 20, 2006</span>
+0050 
+0051 tag = <span class="string">''</span>;
+0052 units = <span class="string">'normalized'</span>;
+0053 position = [0,0,1,1];
+0054 fontweight = <span class="string">'normal'</span>;
+0055 [style,type] = deal(<span class="string">'lefttop'</span>,2);
+0056 visible = <span class="string">'on'</span>;
+0057 
+0058 foregroundcolor = [1,1,1];
+0059 backgroundcolor = [0.7725,0.8431,0.9608];
+0060 panelbackgroundcolor = [0.4314,0.5882,0.8431];
+0061 titlehighlightcolor = [1,0.8,0];
+0062 
+0063 horizontalalignment = <span class="string">'center'</span>;
+0064 [createfcn,deletefcn,resizefcn] = deal({},{},{});
+0065 
+0066 active = 0;
+0067 styles = {<span class="string">'popup'</span>,<span class="string">'lefttop'</span>,<span class="string">'righttop'</span>,<span class="string">'leftbottom'</span>,<span class="string">'rightbottom'</span>, <span class="keyword">...</span>
+0068   <span class="string">'centertop'</span>,<span class="string">'centerbottom'</span>};
+0069 
+0070 <span class="keyword">for</span> k=1:2:nargin
+0071   property = lower(varargin{k});
+0072   value = varargin{k+1};
+0073   <span class="keyword">switch</span> property
+0074     <span class="keyword">case</span> {<span class="string">'style'</span>,<span class="string">'tabposition'</span>,<span class="string">'titleposition'</span>}
+0075       style = value;
+0076       type = strmatch(lower(style),styles);
+0077       <span class="keyword">if</span> isempty(type)
+0078         error([<span class="string">'Bad value for Style/TitlePosition property: '</span> style <span class="string">'.'</span>]);
+0079       <span class="keyword">end</span>
+0080     <span class="keyword">case</span> {<span class="string">'title'</span>,<span class="string">'string'</span>}
+0081       string = value;
+0082       ntab = length(string);
+0083     <span class="keyword">case</span> {<span class="string">'frameposition'</span>,<span class="string">'position'</span>}
+0084       position = value;
+0085     <span class="keyword">case</span> {<span class="string">'framebackgroundcolor'</span>,<span class="string">'backgroundcolor'</span>}
+0086       backgroundcolor = value;
+0087     <span class="keyword">case</span> {<span class="string">'framebordertype'</span>,<span class="string">'bordertype'</span>}
+0088       bordertype = value;
+0089     <span class="keyword">case</span> {<span class="string">'panelheights'</span>,<span class="string">'heights'</span>}
+0090       panelheight = value;
+0091     <span class="keyword">case</span> {<span class="string">'titleforegroundcolor'</span>,<span class="string">'foregroundcolor'</span>}
+0092       foregroundcolor = value;
+0093     <span class="keyword">case</span> {<span class="string">'selecteditem'</span>,<span class="string">'active'</span>}
+0094       active = value;
+0095     <span class="keyword">otherwise</span>
+0096       eval([property <span class="string">'= value;'</span>]);
+0097   <span class="keyword">end</span>
+0098 <span class="keyword">end</span>
+0099 
+0100 <span class="keyword">if</span> ~exist(<span class="string">'parent'</span>,<span class="string">'var'</span>)
+0101   parent = gcf;
+0102 <span class="keyword">end</span>
+0103 <span class="keyword">if</span> ~exist(<span class="string">'margins'</span>,<span class="string">'var'</span>)
+0104   <span class="keyword">if</span> type==1
+0105     margins = {[1.5,0.75,1.5,1],<span class="string">'characters'</span>};
+0106   <span class="keyword">else</span>
+0107     margins = {1,<span class="string">'pixels'</span>};
+0108   <span class="keyword">end</span>
+0109 <span class="keyword">end</span>
+0110 <span class="keyword">if</span> ~iscell(margins)
+0111   margins = {margins,units};
+0112 <span class="keyword">end</span>
+0113 
+0114 <span class="keyword">if</span> ~exist(<span class="string">'bordertype'</span>,<span class="string">'var'</span>)
+0115   <span class="keyword">if</span> type==1
+0116     bordertype = <span class="string">'etchedin'</span>;
+0117   <span class="keyword">else</span>
+0118     bordertype = <span class="string">'none'</span>;
+0119   <span class="keyword">end</span>
+0120 <span class="keyword">end</span>
+0121 
+0122 <span class="keyword">if</span> ~exist(<span class="string">'titlebackgroundcolor'</span>,<span class="string">'var'</span>)
+0123   titlebackgroundcolor = 0.95*panelbackgroundcolor;
+0124 <span class="keyword">end</span>
+0125 
+0126 cmenu = uicontextmenu;
+0127 uimenu(cmenu,<span class="string">'Label'</span>,<span class="string">'Goto Tab'</span>);
+0128 uimenu(cmenu,<span class="string">'Separator'</span>,<span class="string">'on'</span>);
+0129 
+0130 htab = uipanel( <span class="keyword">...</span>
+0131   <span class="string">'Parent'</span>,parent, <span class="keyword">...</span>
+0132   <span class="string">'Units'</span>,units, <span class="keyword">...</span>
+0133   <span class="string">'Position'</span>,position, <span class="keyword">...</span>
+0134   <span class="string">'DeleteFcn'</span>,deletefcn, <span class="keyword">...</span>
+0135   <span class="string">'ResizeFcn'</span>,resizefcn, <span class="keyword">...</span>
+0136   <span class="string">'BackgroundColor'</span>,backgroundcolor, <span class="keyword">...</span>
+0137   <span class="string">'BorderType'</span>,bordertype, <span class="keyword">...</span>
+0138   <span class="string">'UIContextMenu'</span>,cmenu, <span class="keyword">...</span>
+0139   <span class="string">'Visible'</span>,visible, <span class="keyword">...</span>
+0140   <span class="string">'Tag'</span>,tag);
+0141 set(htab,<span class="string">'Units'</span>,<span class="string">'pixels'</span>);
+0142 tabpos = get(htab,<span class="string">'Position'</span>);
+0143 
+0144 status = uicontainer( <span class="keyword">...</span>
+0145   <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0146   <span class="string">'BackgroundColor'</span>,backgroundcolor, <span class="keyword">...</span>
+0147   <span class="string">'Units'</span>,margins{2}, <span class="keyword">...</span>
+0148   <span class="string">'Position'</span>,[1,1,1,1], <span class="keyword">...</span>
+0149   <span class="string">'UIContextMenu'</span>,cmenu, <span class="keyword">...</span>
+0150   <span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0151 set(status,<span class="string">'Units'</span>,<span class="string">'pixels'</span>);
+0152 charsz = get(status,<span class="string">'Position'</span>);
+0153 margins = [charsz(1:2),charsz(1:2)].*margins{1};
+0154 set(status,<span class="string">'Units'</span>,<span class="string">'characters'</span>);
+0155 set(status,<span class="string">'Position'</span>,[1,1,1,1]);
+0156 set(status,<span class="string">'Units'</span>,<span class="string">'pixels'</span>);
+0157 charsz = get(status,<span class="string">'Position'</span>);
+0158 titleheight = 1.5*charsz(4);
+0159 
+0160 <span class="keyword">if</span> type==1
+0161   <span class="comment">%--------------------------------------------------------------------------</span>
+0162   <span class="comment">%  PopupTab</span>
+0163   <span class="comment">%--------------------------------------------------------------------------</span>
+0164   panelpos = tabpos;
+0165   titlepos = [margins(1),tabpos(2)+tabpos(4)-titleheight-margins(2), <span class="keyword">...</span>
+0166     tabpos(3)-sum(margins([1,3])),titleheight];
+0167   ttextpos = [0.05,0.1,0.9,0.76];
+0168   
+0169   <span class="keyword">if</span> ~exist(<span class="string">'panelheight'</span>,<span class="string">'var'</span>)
+0170     panelheight = ones(1,ntab);
+0171   <span class="keyword">end</span>
+0172   <span class="keyword">if</span> ~exist(<span class="string">'panelbordertype'</span>,<span class="string">'var'</span>)
+0173     panelbordertype = <span class="string">'line'</span>;
+0174   <span class="keyword">end</span>
+0175 
+0176   <span class="keyword">for</span> k=1:ntab
+0177     title(k) = uicontrol( <span class="keyword">...</span>
+0178       <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0179       <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0180       <span class="string">'Position'</span>,titlepos, <span class="keyword">...</span>
+0181       <span class="string">'ForegroundColor'</span>,foregroundcolor, <span class="keyword">...</span>
+0182       <span class="string">'BackgroundColor'</span>,titlebackgroundcolor, <span class="keyword">...</span>
+0183       <span class="string">'FontWeight'</span>,fontweight, <span class="keyword">...</span>
+0184       <span class="string">'HorizontalAlignment'</span>,horizontalalignment, <span class="keyword">...</span>
+0185       <span class="string">'Callback'</span>,{@<a href="#_sub1" class="code" title="subfunction PopupTabCbk(hobj,evdt,indx)">PopupTabCbk</a>,k}, <span class="keyword">...</span>
+0186       <span class="string">'Style'</span>,<span class="string">'toggle'</span>, <span class="keyword">...</span>
+0187       <span class="string">'String'</span>,string{k}, <span class="keyword">...</span>
+0188       <span class="string">'Value'</span>,0, <span class="keyword">...</span>
+0189       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0190 
+0191     panel(k) = uipanel( <span class="keyword">...</span>
+0192       <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0193       <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0194       <span class="string">'Position'</span>,titlepos+[0,0,0,panelheight(k)*charsz(4)], <span class="keyword">...</span>
+0195       <span class="string">'BackgroundColor'</span>,panelbackgroundcolor, <span class="keyword">...</span>
+0196       <span class="string">'BorderType'</span>,panelbordertype, <span class="keyword">...</span>
+0197       <span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0198 
+0199     uimenu(cmenu, <span class="keyword">...</span>
+0200       <span class="string">'Label'</span>,string{k}, <span class="keyword">...</span>
+0201       <span class="string">'Callback'</span>,{@<a href="#_sub1" class="code" title="subfunction PopupTabCbk(hobj,evdt,indx)">PopupTabCbk</a>,k});
+0202   <span class="keyword">end</span>
+0203   
+0204   uimenu(cmenu,<span class="string">'Separator'</span>,<span class="string">'on'</span>);
+0205   uimenu(cmenu, <span class="keyword">...</span>
+0206     <span class="string">'Label'</span>,<span class="string">'Expand All'</span>, <span class="keyword">...</span>
+0207     <span class="string">'Callback'</span>,{@<a href="#_sub3" class="code" title="subfunction PopupTabEnableAllCbk(hobj,evdt,cstr)">PopupTabEnableAllCbk</a>,<span class="string">'on'</span>});
+0208   uimenu(cmenu, <span class="keyword">...</span>
+0209     <span class="string">'Label'</span>,<span class="string">'Collapse All'</span>, <span class="keyword">...</span>
+0210     <span class="string">'Callback'</span>,{@<a href="#_sub3" class="code" title="subfunction PopupTabEnableAllCbk(hobj,evdt,cstr)">PopupTabEnableAllCbk</a>,<span class="string">'off'</span>});
+0211 
+0212   sliderpos = [tabpos(3)-14,2,15,tabpos(4)-3];
+0213   slider = uicontrol( <span class="keyword">...</span>
+0214     <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0215     <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0216     <span class="string">'Position'</span>,sliderpos, <span class="keyword">...</span>
+0217     <span class="string">'BackgroundColor'</span>,panelbackgroundcolor, <span class="keyword">...</span>
+0218     <span class="string">'Style'</span>,<span class="string">'slider'</span>, <span class="keyword">...</span>
+0219     <span class="string">'Callback'</span>,@<a href="#_sub2" class="code" title="subfunction PopupTabSliderCbk(hobj,evdt)">PopupTabSliderCbk</a>, <span class="keyword">...</span>
+0220     <span class="string">'Value'</span>,0, <span class="keyword">...</span>
+0221     <span class="string">'Min'</span>,-1, <span class="keyword">...</span>
+0222     <span class="string">'Max'</span>,0, <span class="keyword">...</span>
+0223     <span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0224 
+0225   statuspos = titlepos;
+0226   statuspos([2,4]) = [margins(4),panelpos(4)-(ntab+1)*(margins(4)+titlepos(4))];
+0227   set(status,<span class="string">'Position'</span>,statuspos);
+0228   <a href="#_sub1" class="code" title="subfunction PopupTabCbk(hobj,evdt,indx)">PopupTabCbk</a>(title(1),[],active);
+0229   set(status,<span class="string">'ResizeFcn'</span>,@<a href="#_sub4" class="code" title="subfunction PopupTabResizeCbk(hobj,evdt)">PopupTabResizeCbk</a>);
+0230 
+0231 <span class="keyword">else</span>
+0232   <span class="comment">%--------------------------------------------------------------------------</span>
+0233   <span class="comment">%  TopT/Bottom Tab</span>
+0234   <span class="comment">%--------------------------------------------------------------------------</span>
+0235   margins(3:4) = -(margins(1:2)+margins(3:4));
+0236   <span class="keyword">switch</span> type
+0237     <span class="keyword">case</span> 2 <span class="comment">%lefttop</span>
+0238       [loop,sign] = deal(1:ntab,[1,0,1,0]);
+0239     <span class="keyword">case</span> 3 <span class="comment">%righttop</span>
+0240       [loop,sign] = deal(ntab:-1:1,[ntab,0,0,0]);
+0241     <span class="keyword">case</span> 4 <span class="comment">%lefttbottom</span>
+0242       [loop,sign] = deal(1:ntab,[1,0,1,1]);
+0243     <span class="keyword">case</span> 5 <span class="comment">%rightbottom</span>
+0244       [loop,sign] = deal(ntab:-1:1,[ntab,0,0,1]);
+0245     <span class="keyword">case</span> 6 <span class="comment">%centertop</span>
+0246       [loop,sign] = deal(1:ntab,[1,ntab,1,0]);
+0247     <span class="keyword">case</span> 7 <span class="comment">%centerbottom</span>
+0248       [loop,sign] = deal(1:ntab,[1,ntab,1,1]);
+0249   <span class="keyword">end</span>
+0250   addtitle = 2*[sign(3:4),-1,-1];
+0251   <span class="keyword">if</span> sign(3)
+0252     ttextpos = [0.05,0.08,0.9,0.76];
+0253   <span class="keyword">else</span>
+0254     ttextpos = [0.05,0.05,0.9,0.76];
+0255   <span class="keyword">end</span>
+0256   
+0257   <span class="keyword">if</span> ~exist(<span class="string">'panelbordertype'</span>,<span class="string">'var'</span>)
+0258     panelbordertype = <span class="string">'beveledout'</span>;
+0259   <span class="keyword">end</span>
+0260   
+0261   <span class="keyword">for</span> k=1:ntab
+0262     title(k) = uipanel( <span class="keyword">...</span>
+0263       <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0264       <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0265       <span class="string">'BackgroundColor'</span>,titlebackgroundcolor, <span class="keyword">...</span>
+0266       <span class="string">'BorderType'</span>,panelbordertype, <span class="keyword">...</span>
+0267       <span class="string">'ButtonDownFcn'</span>,{@<a href="#_sub5" class="code" title="subfunction TopBottomTabCbk(hobj,evdt,indx)">TopBottomTabCbk</a>,k}, <span class="keyword">...</span>
+0268       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0269     <span class="comment">%titlewidth(k) = (length(string{k})+4)*1.2*charsz(3);</span>
+0270 
+0271     ttext(k) = uicontrol( <span class="keyword">...</span>
+0272       <span class="string">'Parent'</span>,title(k), <span class="keyword">...</span>
+0273       <span class="string">'Units'</span>,<span class="string">'normalized'</span>, <span class="keyword">...</span>
+0274       <span class="string">'Position'</span>,ttextpos, <span class="keyword">...</span>
+0275       <span class="string">'ForegroundColor'</span>,foregroundcolor, <span class="keyword">...</span>
+0276       <span class="string">'BackgroundColor'</span>,titlebackgroundcolor, <span class="keyword">...</span>
+0277       <span class="string">'HorizontalAlignment'</span>,horizontalalignment, <span class="keyword">...</span>
+0278       <span class="string">'Style'</span>,<span class="string">'text'</span>, <span class="keyword">...</span>
+0279       <span class="string">'String'</span>,string{k}, <span class="keyword">...</span>
+0280       <span class="string">'Enable'</span>,<span class="string">'inactive'</span>, <span class="keyword">...</span>
+0281       <span class="string">'HitTest'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+0282       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0283 
+0284     panel(k) = uipanel( <span class="keyword">...</span>
+0285       <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0286       <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0287       <span class="string">'BackgroundColor'</span>,panelbackgroundcolor, <span class="keyword">...</span>
+0288       <span class="string">'BorderType'</span>,panelbordertype, <span class="keyword">...</span>
+0289       <span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0290 
+0291     uimenu(cmenu, <span class="keyword">...</span>
+0292       <span class="string">'Label'</span>,string{k}, <span class="keyword">...</span>
+0293       <span class="string">'Callback'</span>,{@<a href="#_sub5" class="code" title="subfunction TopBottomTabCbk(hobj,evdt,indx)">TopBottomTabCbk</a>,k});
+0294   <span class="keyword">end</span>
+0295 
+0296   <span class="keyword">if</span> ~active, active = 1; <span class="keyword">end</span>
+0297   set(panel(active),<span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0298   
+0299   inset(1) = uicontrol( <span class="keyword">...</span>
+0300     <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0301     <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0302     <span class="string">'BackgroundColor'</span>,panelbackgroundcolor, <span class="keyword">...</span>
+0303     <span class="string">'Style'</span>,<span class="string">'text'</span>, <span class="keyword">...</span>
+0304     <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0305   <span class="keyword">if</span> ~isnan(titlehighlightcolor)
+0306     inset(2) = uicontrol( <span class="keyword">...</span>
+0307       <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0308       <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0309       <span class="string">'BackgroundColor'</span>,titlehighlightcolor, <span class="keyword">...</span>
+0310       <span class="string">'Style'</span>,<span class="string">'text'</span>, <span class="keyword">...</span>
+0311       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0312     inset(3) = uicontrol( <span class="keyword">...</span>
+0313       <span class="string">'Parent'</span>,htab, <span class="keyword">...</span>
+0314       <span class="string">'Units'</span>,<span class="string">'pixels'</span>, <span class="keyword">...</span>
+0315       <span class="string">'BackgroundColor'</span>,0.85*titlehighlightcolor, <span class="keyword">...</span>
+0316       <span class="string">'Style'</span>,<span class="string">'text'</span>, <span class="keyword">...</span>
+0317       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0318   <span class="keyword">end</span>
+0319   
+0320   <a href="#_sub6" class="code" title="subfunction TopBottomTabResizeCbk(hobj,evdt)">TopBottomTabResizeCbk</a>(status,[]);
+0321   set(status,<span class="string">'ResizeFcn'</span>,@<a href="#_sub6" class="code" title="subfunction TopBottomTabResizeCbk(hobj,evdt)">TopBottomTabResizeCbk</a>);
+0322 <span class="keyword">end</span>
+0323 
+0324 setappdata(htab,<span class="string">'panels'</span>,panel);
+0325 setappdata(htab,<span class="string">'status'</span>,status);
+0326 <span class="keyword">if</span> ~isempty(createfcn)
+0327   createfcn(htab,[],panel,status);
+0328 <span class="keyword">end</span>
+0329 
+0330 <span class="keyword">if</span> nargout, hh = htab; <span class="keyword">end</span>
+0331 
+0332 
+0333 <span class="comment">%--------------------------------------------------------------------------</span>
+0334 <span class="comment">% Inner Functions for Popup Tab</span>
+0335 <span class="comment">%--------------------------------------------------------------------------</span>
+0336   <span class="keyword">function</span> <a href="#_sub1" class="code" title="subfunction PopupTabCbk(hobj,evdt,indx)">PopupTabCbk</a>(hobj,evdt,indx)
+0337 
+0338     set(title,<span class="string">'Value'</span>,0);
+0339     <span class="keyword">if</span> indx&gt;0
+0340       indxvis = strcmp(get(panel(indx),<span class="string">'Visible'</span>),<span class="string">'off'</span>);
+0341       <span class="keyword">if</span> indxvis
+0342         set(panel(indx),<span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0343       <span class="keyword">else</span>
+0344         set(panel(indx),<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0345       <span class="keyword">end</span>
+0346     <span class="keyword">end</span>
+0347     <span class="keyword">if</span> isempty(strmatch(<span class="string">'on'</span>,get(panel,<span class="string">'Visible'</span>)))
+0348       set(status,<span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0349     <span class="keyword">else</span>
+0350       set(status,<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0351     <span class="keyword">end</span>
+0352 
+0353     currval = get(slider,<span class="string">'Value'</span>);
+0354     <span class="keyword">if</span> currval&lt;0
+0355       set(slider,<span class="string">'Value'</span>,0);
+0356       <a href="#_sub2" class="code" title="subfunction PopupTabSliderCbk(hobj,evdt)">PopupTabSliderCbk</a>(slider,evdt);
+0357     <span class="keyword">end</span>
+0358     titlepos = get(title(1),<span class="string">'Position'</span>);
+0359     addtolen = titlepos(2)+titlepos(4)+margins(4);
+0360 
+0361     <span class="keyword">for</span> k=1:ntab
+0362       titlepos = get(title(k),<span class="string">'Position'</span>);
+0363       titlepos(2) = addtolen-titlepos(4)-margins(4);
+0364       set(title(k),<span class="string">'Position'</span>,titlepos);
+0365       addtolen = titlepos(2);
+0366       visible = strcmp(get(panel(k),<span class="string">'Visible'</span>),<span class="string">'on'</span>);
+0367       <span class="keyword">if</span> visible
+0368         panelpos = get(panel(k),<span class="string">'Position'</span>);
+0369         addtolen = addtolen-panelpos(4);
+0370         panelpos(2) = addtolen;
+0371         set(panel(k),<span class="string">'Position'</span>,panelpos);
+0372       <span class="keyword">end</span>
+0373     <span class="keyword">end</span>
+0374 
+0375     <span class="keyword">if</span> visible
+0376       botpos = get(panel(ntab),<span class="string">'Position'</span>);
+0377     <span class="keyword">else</span>
+0378       botpos = get(title(ntab),<span class="string">'Position'</span>);
+0379     <span class="keyword">end</span>
+0380 
+0381     visible = strcmp(get(slider,<span class="string">'Visible'</span>),<span class="string">'on'</span>);
+0382     addwidth = (-1)^(~visible);
+0383     <span class="keyword">if</span> botpos(2)*addwidth&gt;0
+0384       <span class="keyword">if</span> visible
+0385         set(slider,<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0386       <span class="keyword">else</span>
+0387         set(slider,<span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0388       <span class="keyword">end</span>
+0389     <span class="keyword">else</span>
+0390       <span class="keyword">if</span> visible
+0391         addwidth = 0;
+0392       <span class="keyword">else</span>
+0393         <span class="keyword">return</span>;
+0394       <span class="keyword">end</span>
+0395     <span class="keyword">end</span>
+0396 
+0397     addwidth = addwidth*sliderpos(3);
+0398     <span class="keyword">for</span> k=1:ntab
+0399       titlepos = get(title(k),<span class="string">'Position'</span>);
+0400       titlepos(3) = titlepos(3)+addwidth;
+0401       set(title(k),<span class="string">'Position'</span>,titlepos);
+0402       set(title(k),<span class="string">'UserData'</span>,titlepos(2));
+0403 
+0404       panelpos = get(panel(k),<span class="string">'Position'</span>);
+0405       panelpos(3) = panelpos(3)+addwidth;
+0406       set(panel(k),<span class="string">'Position'</span>,panelpos);
+0407       set(panel(k),<span class="string">'UserData'</span>,panelpos(2));
+0408     <span class="keyword">end</span>
+0409 
+0410     toplen = botpos(2)-margins(2);
+0411     <span class="keyword">if</span> toplen&gt;0
+0412       set(slider,<span class="string">'Value'</span>,0);
+0413       <span class="keyword">return</span>;
+0414     <span class="keyword">end</span>
+0415 
+0416     <span class="keyword">try</span>
+0417       <span class="keyword">if</span> indxvis
+0418         viewpos = get(panel(indx),<span class="string">'Position'</span>);
+0419         <span class="keyword">if</span> viewpos(2)-viewpos(4)&lt;0
+0420           <span class="keyword">if</span> viewpos(4)+margins(4)&lt;=tabpos(4);
+0421             currval = min(0,viewpos(2)-margins(4)/2);
+0422           <span class="keyword">else</span>
+0423             viewpos = get(title(indx),<span class="string">'Position'</span>);
+0424             currval = viewpos(2)+viewpos(4)+margins(4)/2-tabpos(4);
+0425           <span class="keyword">end</span>
+0426         <span class="keyword">end</span>
+0427       <span class="keyword">end</span>
+0428     <span class="keyword">catch</span>
+0429     <span class="keyword">end</span>
+0430 
+0431     set(slider,<span class="string">'Min'</span>,toplen);
+0432     set(slider,<span class="string">'Value'</span>,max(currval,toplen));
+0433     set(slider,<span class="string">'SliderStep'</span>,[0.3,1]/max(1,-toplen/100));
+0434     <a href="#_sub2" class="code" title="subfunction PopupTabSliderCbk(hobj,evdt)">PopupTabSliderCbk</a>(slider,evdt);
+0435 
+0436   <span class="keyword">end</span>
+0437 
+0438 
+0439 <span class="comment">%--------------------------------------------------------------------------</span>
+0440   <span class="keyword">function</span> <a href="#_sub2" class="code" title="subfunction PopupTabSliderCbk(hobj,evdt)">PopupTabSliderCbk</a>(hobj,evdt)
+0441 
+0442     currval = get(hobj,<span class="string">'Value'</span>);
+0443     <span class="keyword">for</span> k=1:ntab
+0444       titlepos = get(title(k),<span class="string">'Position'</span>);
+0445       titlepos(2) = get(title(k),<span class="string">'UserData'</span>)-currval;
+0446       set(title(k),<span class="string">'Position'</span>,titlepos);
+0447       panelpos = get(panel(k),<span class="string">'Position'</span>);
+0448       panelpos(2) = get(panel(k),<span class="string">'UserData'</span>)-currval;
+0449       set(panel(k),<span class="string">'Position'</span>,panelpos);
+0450     <span class="keyword">end</span>
+0451 
+0452   <span class="keyword">end</span>
+0453 
+0454 
+0455 <span class="comment">%--------------------------------------------------------------------------</span>
+0456   <span class="keyword">function</span> <a href="#_sub3" class="code" title="subfunction PopupTabEnableAllCbk(hobj,evdt,cstr)">PopupTabEnableAllCbk</a>(hobj,evdt,cstr)
+0457 
+0458     set(panel,<span class="string">'Visible'</span>,cstr);
+0459     <a href="#_sub1" class="code" title="subfunction PopupTabCbk(hobj,evdt,indx)">PopupTabCbk</a>(hobj,evdt,0);
+0460 
+0461   <span class="keyword">end</span>
+0462 
+0463 
+0464 <span class="comment">%--------------------------------------------------------------------------</span>
+0465   <span class="keyword">function</span> <a href="#_sub4" class="code" title="subfunction PopupTabResizeCbk(hobj,evdt)">PopupTabResizeCbk</a>(hobj,evdt)
+0466 
+0467     oldpos = tabpos;
+0468     units = get(htab,<span class="string">'Units'</span>);
+0469     set(htab,<span class="string">'Units'</span>,<span class="string">'pixels'</span>);
+0470     tabpos = get(htab,<span class="string">'Position'</span>);
+0471     set(htab,<span class="string">'Units'</span>,units);
+0472 
+0473     addtopos = tabpos-oldpos;
+0474     sliderpos([1,2,4]) = sliderpos([1,2,4])+addtopos([1,2,4]);
+0475     set(slider,<span class="string">'Position'</span>,sliderpos);
+0476 
+0477     addtopos = [tabpos(3:4)-oldpos(3:4),0,0];
+0478     currval = get(slider,<span class="string">'Value'</span>);
+0479     <span class="keyword">if</span> currval&lt;0
+0480       set(slider,<span class="string">'Value'</span>,0);
+0481       <a href="#_sub2" class="code" title="subfunction PopupTabSliderCbk(hobj,evdt)">PopupTabSliderCbk</a>(slider,evdt);
+0482     <span class="keyword">end</span>
+0483 
+0484     <span class="keyword">for</span> k=1:ntab
+0485       titlepos = get(title(k),<span class="string">'Position'</span>);
+0486       set(title(k),<span class="string">'Position'</span>,titlepos+addtopos);
+0487     <span class="keyword">end</span>
+0488     <a href="#_sub1" class="code" title="subfunction PopupTabCbk(hobj,evdt,indx)">PopupTabCbk</a>(title(1),evdt,0);
+0489 
+0490     visible = strcmp(get(slider,<span class="string">'Visible'</span>),<span class="string">'on'</span>);
+0491     <span class="keyword">if</span> visible &amp; currval&lt;0
+0492       set(slider,<span class="string">'Value'</span>,max(currval,get(slider,<span class="string">'Min'</span>)));
+0493       <a href="#_sub2" class="code" title="subfunction PopupTabSliderCbk(hobj,evdt)">PopupTabSliderCbk</a>(slider,evdt);
+0494     <span class="keyword">end</span>
+0495 
+0496   <span class="keyword">end</span>
+0497 
+0498 
+0499 <span class="comment">%--------------------------------------------------------------------------</span>
+0500 <span class="comment">% Inner Functions for Top/Bottom Tab</span>
+0501 <span class="comment">%--------------------------------------------------------------------------</span>
+0502   <span class="keyword">function</span> <a href="#_sub5" class="code" title="subfunction TopBottomTabCbk(hobj,evdt,indx)">TopBottomTabCbk</a>(hobj,evdt,indx)
+0503 
+0504     <span class="keyword">if</span> active==indx, <span class="keyword">return</span>; <span class="keyword">end</span>
+0505 
+0506     <span class="comment">% deactivate tab(active)</span>
+0507     n = active;
+0508     titlepos = get(title(n),<span class="string">'Position'</span>);
+0509     titlepos = titlepos+addtitle.*[n==sign(1),1,n==sign(1),1];
+0510     titlepos(3) = titlepos(3)+addtitle(3)*(n==sign(2));
+0511     set(title(n),<span class="string">'Position'</span>,titlepos,<span class="string">'BackgroundColor'</span>,titlebackgroundcolor);
+0512     set(ttext(n),<span class="string">'FontWeight'</span>,<span class="string">'normal'</span>,<span class="string">'BackgroundColor'</span>,titlebackgroundcolor);
+0513     set(panel(n),<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0514 
+0515     <span class="comment">% activate tab(indx)</span>
+0516     active = indx;
+0517     titlepos = get(title(indx),<span class="string">'Position'</span>);
+0518     titlepos = titlepos-addtitle.*[indx==sign(1),1,indx==sign(1),1];
+0519     titlepos(3) = titlepos(3)-addtitle(3)*(indx==sign(2));
+0520     
+0521     set(title(indx),<span class="string">'Position'</span>,titlepos,<span class="string">'BackgroundColor'</span>,panelbackgroundcolor);
+0522     set(ttext(indx),<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>,<span class="string">'BackgroundColor'</span>,panelbackgroundcolor);
+0523     insetpos = [titlepos(1)+1,titlepos(2)+sign(4)*titlepos(4)-2,titlepos(3)-1,3];
+0524     set(inset(1),<span class="string">'Position'</span>,insetpos);
+0525     <span class="keyword">try</span>
+0526       insetpos = insetpos+[0,(1-2*sign(4))*titleheight+2*sign(4),0,-2];
+0527       set(inset(2),<span class="string">'Position'</span>,insetpos);
+0528       set(inset(3),<span class="string">'Position'</span>,insetpos+[2,1-2*sign(4),-4,0]);
+0529     <span class="keyword">catch</span>
+0530     <span class="keyword">end</span>
+0531     set(panel(indx),<span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0532 
+0533     <span class="keyword">if</span> isappdata(htab,<span class="string">'SelectionChangeFcn'</span>)
+0534       SelectionChangeFcn = getappdata(htab,<span class="string">'SelectionChangeFcn'</span>);
+0535       eventdata = struct(<span class="string">'EventName'</span>,<span class="string">'SelectionChanged'</span>, <span class="keyword">...</span>
+0536         <span class="string">'OldValue'</span>,n,<span class="string">'NewValue'</span>,indx,<span class="string">'Panels'</span>,panel,<span class="string">'Status'</span>,status);
+0537       <span class="keyword">if</span> iscell(SelectionChangeFcn)
+0538         SelectionChangeFcn{1}(hobj,eventdata,SelectionChangeFcn{2:end});
+0539       <span class="keyword">else</span>
+0540         SelectionChangeFcn(hobj,eventdata);
+0541       <span class="keyword">end</span>
+0542     <span class="keyword">end</span>
+0543 
+0544   <span class="keyword">end</span>
+0545 
+0546 
+0547 <span class="comment">%--------------------------------------------------------------------------</span>
+0548   <span class="keyword">function</span> <a href="#_sub6" class="code" title="subfunction TopBottomTabResizeCbk(hobj,evdt)">TopBottomTabResizeCbk</a>(hobj,evdt)
+0549 
+0550     units = get(htab,<span class="string">'Units'</span>);
+0551     set(htab,<span class="string">'Units'</span>,<span class="string">'pixels'</span>);
+0552     tabpos = get(htab,<span class="string">'Position'</span>);
+0553     set(htab,<span class="string">'Units'</span>,units);
+0554 
+0555     titlepos = [0,0,0,titleheight];
+0556     <span class="keyword">if</span> sign(4)
+0557       panelpos = [0,titleheight+1,tabpos(3),tabpos(4)-titleheight]+margins;
+0558       titlepos(2) = panelpos(2)-titlepos(4);
+0559     <span class="keyword">else</span>
+0560       panelpos = [0,0,tabpos(3),tabpos(4)-titleheight]+margins;
+0561       titlepos(2) = panelpos(2)+panelpos(4);
+0562     <span class="keyword">end</span>
+0563     set(panel,<span class="string">'Position'</span>,panelpos);
+0564     
+0565     n = sum(cellfun(<span class="string">'length'</span>,string))+2*ntab;
+0566     <span class="keyword">if</span> type&lt;6
+0567       <span class="keyword">if</span> (n+2*ntab)*1.2*charsz(3)+2&gt;panelpos(3)
+0568         [loop,sign(1:3)] = deal(1:ntab,[1,ntab,1]);
+0569       <span class="keyword">else</span>
+0570         <span class="keyword">if</span> type==2 | type==4
+0571           [loop,sign(1:3)] = deal(1:ntab,[1,0,1]);
+0572         <span class="keyword">else</span>
+0573           [loop,sign(1:3)] = deal(ntab:-1:1,[ntab,0,0]);
+0574         <span class="keyword">end</span>
+0575       <span class="keyword">end</span>
+0576       addtitle = 2*[sign(3:4),-1,-1];
+0577     <span class="keyword">end</span>
+0578     titlepos(1) = panelpos(1)+(1-sign(3))*panelpos(3);
+0579     <span class="keyword">for</span> k=loop
+0580       <span class="keyword">if</span> sign(2)
+0581         titlepos(3) = panelpos(3)*(length(string{k})+2)/n;
+0582         addtopos = addtitle.*[k==1,1,k==1|k==ntab,1];
+0583       <span class="keyword">else</span>
+0584         titlepos(3) = (length(string{k})+4)*1.2*charsz(3);
+0585         addtopos = addtitle.*[k==sign(1),1,k==sign(1),1];
+0586       <span class="keyword">end</span>
+0587       titlepos(1) = titlepos(1)-(1-sign(3))*titlepos(3);
+0588       set(title(k),<span class="string">'Position'</span>,titlepos+addtopos);
+0589       titlepos(1) = titlepos(1)+sign(3)*titlepos(3);
+0590     <span class="keyword">end</span>
+0591 
+0592     statuspos = titlepos;
+0593     statuspos(1) = sign(3)*titlepos(1)+2;
+0594     statuspos(3) = titlepos(1)+sign(3)*(tabpos(3)-2*titlepos(1))-4;
+0595   
+0596     titlepos = get(title(active),<span class="string">'Position'</span>);
+0597     titlepos = titlepos-addtitle.*[active==sign(1),1,active==sign(1),1];
+0598     titlepos(3) = titlepos(3)-addtitle(3)*(active==sign(2));
+0599     set(title(active),<span class="string">'Position'</span>,titlepos,<span class="string">'BackgroundColor'</span>,panelbackgroundcolor);
+0600     set(ttext(active),<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>,<span class="string">'BackgroundColor'</span>,panelbackgroundcolor);
+0601 
+0602     insetpos = [titlepos(1)+1,titlepos(2)+sign(4)*titlepos(4)-2,titlepos(3)-1,3];
+0603     set(inset(1),<span class="string">'Position'</span>,insetpos);
+0604     <span class="keyword">try</span>
+0605       insetpos = insetpos+[0,(1-2*sign(4))*titleheight+2*sign(4),0,-2];
+0606       set(inset(2),<span class="string">'Position'</span>,insetpos);
+0607       set(inset(3),<span class="string">'Position'</span>,insetpos+[2,1-2*sign(4),-4,0]);
+0608     <span class="keyword">catch</span>
+0609     <span class="keyword">end</span>
+0610     <span class="keyword">try</span>
+0611       <span class="comment">% This causes the above statements being excuted twice for each resizing.</span>
+0612       set(status,<span class="string">'Position'</span>,statuspos,<span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0613     <span class="keyword">catch</span>
+0614       set(status,<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0615     <span class="keyword">end</span>
+0616 
+0617   <span class="keyword">end</span>
+0618 
+0619 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

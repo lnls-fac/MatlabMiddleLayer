@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of moveFOFBlogs</title>
+  <meta name="keywords" content="moveFOFBlogs">
+  <meta name="description" content="This routine watches for the Fast Orbit Feedback system to go off.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; moveFOFBlogs.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>moveFOFBlogs
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>This routine watches for the Fast Orbit Feedback system to go off.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function moveFOFBlogs </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> This routine watches for the Fast Orbit Feedback system to go off.
+ If the turnoff is due to a trip, new log files will be written.
+ This script waits for the log files to be written, then moves the
+ log files into a different, date&amp;time stamped directory for
+ preservation and later FOFB troubleshooting</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function moveFOFBlogs</a>
+0002 
+0003 <span class="comment">% This routine watches for the Fast Orbit Feedback system to go off.</span>
+0004 <span class="comment">% If the turnoff is due to a trip, new log files will be written.</span>
+0005 <span class="comment">% This script waits for the log files to be written, then moves the</span>
+0006 <span class="comment">% log files into a different, date&amp;time stamped directory for</span>
+0007 <span class="comment">% preservation and later FOFB troubleshooting</span>
+0008 
+0009 <span class="comment">% Change to fast orbit feedback directory</span>
+0010 cd /home/physdata/matlab/srdata/orbitfeedback_fast/log
+0011 
+0012 <span class="keyword">while</span> 1
+0013     FOFBOnStatus = [getam(<span class="string">'SR01____FFBON__BM00'</span>) getam(<span class="string">'SR02____FFBON__BM00'</span>) getam(<span class="string">'SR03____FFBON__BM00'</span>)<span class="keyword">...</span>
+0014         getam(<span class="string">'SR04____FFBON__BM00'</span>) getam(<span class="string">'SR05____FFBON__BM00'</span>) getam(<span class="string">'SR06____FFBON__BM00'</span>)<span class="keyword">...</span>
+0015         getam(<span class="string">'SR07____FFBON__BM00'</span>) getam(<span class="string">'SR08____FFBON__BM00'</span>) getam(<span class="string">'SR09____FFBON__BM00'</span>)<span class="keyword">...</span>
+0016         getam(<span class="string">'SR10____FFBON__BM00'</span>) getam(<span class="string">'SR11____FFBON__BM00'</span>) getam(<span class="string">'SR12____FFBON__BM00'</span>)];
+0017 
+0018     <span class="keyword">if</span> any(FOFBOnStatus==0)
+0019         
+0020         pause(5); <span class="comment">% make sure that new log file has been created</span>
+0021         
+0022         D = dir(<span class="string">'SR01bpm.log'</span>);
+0023        
+0024         <span class="keyword">if</span> ~strncmp(D.date,datestr(now),17)
+0025             pause(120) <span class="comment">% wait for logs files to be written</span>
+0026             
+0027             <span class="comment">% Get time and date</span>
+0028             tmp = clock;
+0029             year   = tmp(1);
+0030             month  = tmp(2);
+0031             day    = tmp(3);
+0032             hour   = tmp(4);
+0033             minute = tmp(5);
+0034             seconds= tmp(6);
+0035 
+0036             <span class="comment">% Create date and time stamped directory</span>
+0037             Directory = sprintf(<span class="string">'trip_%d-%02d-%02d_%02d:%02d:%.0f'</span>, year, month, day, hour, minute, seconds);
+0038             mkdir(sprintf(<span class="string">'%s'</span>, Directory));
+0039             copyfile(<span class="string">'./*.log'</span>, Directory);
+0040         <span class="keyword">end</span>
+0041     <span class="keyword">end</span>
+0042 <span class="keyword">end</span>
+0043 
+0044</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

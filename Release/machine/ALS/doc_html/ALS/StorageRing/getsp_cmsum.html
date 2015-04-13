@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getsp_cmsum</title>
+  <meta name="keywords" content="getsp_cmsum">
+  <meta name="description" content="[Amps, tout, DataTime, ErrorFlag] = getsp_cmsum(Family, DeviceList)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">ALS</a> &gt; <a href="index.html">StorageRing</a> &gt; getsp_cmsum.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ALS\StorageRing&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>getsp_cmsum
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>[Amps, tout, DataTime, ErrorFlag] = getsp_cmsum(Family, DeviceList)</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [Amps, t, DataTime, ErrorFlag] = getsp_cmsum(Family, varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [Amps, tout, DataTime, ErrorFlag] = getsp_cmsum(Family, DeviceList)
+ [Amps, tout, DataTime, ErrorFlag] = getsp_cmsum(Family, Field, DeviceList)
+
+ Returns the sum of summing junctions for correctors.
+ Note: the Field input is ignored but special functions must have Family, Field, DeviceList</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Amps, t, DataTime, ErrorFlag] = getsp_cmsum(Family, varargin)</a>
+0002 <span class="comment">% [Amps, tout, DataTime, ErrorFlag] = getsp_cmsum(Family, DeviceList)</span>
+0003 <span class="comment">% [Amps, tout, DataTime, ErrorFlag] = getsp_cmsum(Family, Field, DeviceList)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Returns the sum of summing junctions for correctors.</span>
+0006 <span class="comment">% Note: the Field input is ignored but special functions must have Family, Field, DeviceList</span>
+0007 
+0008 
+0009 <span class="keyword">if</span> nargin &lt; 1
+0010     error(<span class="string">'Must have at least 1 input (Family, Data Structure, or Channel Name).'</span>);
+0011 <span class="keyword">end</span>
+0012 
+0013 tout = [];
+0014 DataTime = [];
+0015 ErrorFlag = 0;
+0016 
+0017 
+0018 <span class="comment">% Remove the Field input</span>
+0019 <span class="keyword">if</span> length(varargin) &gt;= 1
+0020     <span class="keyword">if</span> ischar(varargin{1})
+0021         <span class="comment">% Remove and ignor the Field string</span>
+0022         varargin(1) = [];
+0023     <span class="keyword">end</span>
+0024 <span class="keyword">end</span>
+0025 
+0026 
+0027 
+0028 [SP,   t, DataTime, ErrorFlag1] = getpv(Family, <span class="string">'Setpoint'</span>, <span class="string">'Hardware'</span>, varargin{:});
+0029 [FF1,  t, DataTime, ErrorFlag2] = getpv(Family, <span class="string">'FF1'</span>,      <span class="string">'Hardware'</span>, varargin{:});
+0030 [FF2,  t, DataTime, ErrorFlag3] = getpv(Family, <span class="string">'FF2'</span>,      <span class="string">'Hardware'</span>, varargin{:});
+0031 [Trim, t, DataTime, ErrorFlag4] = getpv(Family, <span class="string">'Trim'</span>,     <span class="string">'Hardware'</span>, varargin{:});
+0032 FFMultiplier = getpv(Family, <span class="string">'FFMultiplier'</span>, varargin{:});
+0033 
+0034 <span class="comment">%[AM,   t, DataTime, ErrorFlag ] = getpv(Family, 'Monitor',  'Hardware', varargin{:});</span>
+0035 <span class="comment">%[DAC,  t, DataTime, ErrorFlag5] = getpv(Family, 'DAC',      'Hardware', varargin{:});</span>
+0036 <span class="comment">% DAC(isnan(DAC)) = 0;</span>
+0037 
+0038 SP(isnan(SP))   = 0;
+0039 FF1(isnan(FF1)) = 0;
+0040 FF2(isnan(FF2)) = 0;
+0041 Trim(isnan(Trim)) = 0;
+0042 FFMultiplier(isnan(FFMultiplier)) = 1;
+0043 
+0044 Amps = SP + Trim + FFMultiplier.*(FF1 + FF2);
+0045 
+0046 ErrorFlag = ErrorFlag1 | ErrorFlag2 | ErrorFlag3 | ErrorFlag4;
+0047</pre></div>
+<hr><address>Generated on Thu 02-Aug-2007 13:16:07 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

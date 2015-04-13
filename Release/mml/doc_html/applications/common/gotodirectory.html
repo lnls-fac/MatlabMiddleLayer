@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of gotodirectory</title>
+  <meta name="keywords" content="gotodirectory">
+  <meta name="description" content="GOTODIRECTORY - Goto a directory creating the path if necessary">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">applications</a> &gt; <a href="index.html">common</a> &gt; gotodirectory.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for applications\common&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>gotodirectory
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>GOTODIRECTORY - Goto a directory creating the path if necessary</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function [FinalDir, ErrorFlag] = gotodirectory(GotoDir) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GOTODIRECTORY - Goto a directory creating the path if necessary
+  [FinalDir, ErrorFlag] = gotodirectory(DirName)
+
+  Go to directory DirName.  Creates all the necessary directories along the way. 
+  DirName must start from the root of the tree or the present directory.  '.' does nothing.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [FinalDir, ErrorFlag] = gotodirectory(GotoDir)</a>
+0002 <span class="comment">%GOTODIRECTORY - Goto a directory creating the path if necessary</span>
+0003 <span class="comment">%  [FinalDir, ErrorFlag] = gotodirectory(DirName)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Go to directory DirName.  Creates all the necessary directories along the way.</span>
+0006 <span class="comment">%  DirName must start from the root of the tree or the present directory.  '.' does nothing.</span>
+0007 
+0008 <span class="comment">%  Written by Greg Portmann</span>
+0009 
+0010 
+0011 ErrorFlag = 0;
+0012 
+0013 <span class="keyword">if</span> nargin == 0
+0014     FinalDir = [pwd filesep];
+0015     <span class="keyword">return</span>
+0016 <span class="keyword">elseif</span> isempty(GotoDir)
+0017     FinalDir = [pwd filesep];
+0018     <span class="keyword">return</span>
+0019 <span class="keyword">elseif</span> strcmp(GotoDir,<span class="string">'.'</span>)
+0020     FinalDir = [pwd filesep];
+0021     <span class="keyword">return</span>
+0022 <span class="keyword">end</span>
+0023 
+0024 
+0025 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0026 <span class="comment">% Go to directory %</span>
+0027 <span class="comment">%%%%%%%%%%%%%%%%%%%</span>
+0028 
+0029 <span class="comment">% Find the file separators</span>
+0030 k = findstr(GotoDir, filesep);
+0031 
+0032 <span class="keyword">if</span> isempty(k)
+0033     <span class="comment">% Add a filesep to the end</span>
+0034     GotoDir(end+1) = filesep;
+0035     k(1) = length(GotoDir);
+0036 <span class="keyword">else</span>
+0037     <span class="comment">% If k starts with a filesep, then remove the index to it</span>
+0038     <span class="keyword">if</span> k(1) == 1
+0039         k(1) = [];
+0040     <span class="keyword">end</span>
+0041     <span class="comment">% Try again</span>
+0042     <span class="keyword">if</span> length(k) &gt;= 1
+0043         <span class="keyword">if</span> k(1) == 2
+0044             k(1) = [];
+0045             <span class="keyword">if</span> ispc &amp;&amp; length(k) &gt;= 1
+0046                 k(1) = [];
+0047             <span class="keyword">end</span>
+0048         <span class="keyword">end</span>
+0049     <span class="keyword">end</span>
+0050     <span class="comment">% And again</span>
+0051     <span class="keyword">if</span> length(k) &gt;= 1
+0052         <span class="keyword">if</span> k(1) == 3
+0053             k(1) = [];
+0054         <span class="keyword">end</span>
+0055     <span class="keyword">end</span>
+0056 <span class="keyword">end</span>
+0057 
+0058 <span class="comment">% If doesnot end with a filesep, then add one</span>
+0059 <span class="keyword">if</span> ~strcmp(GotoDir(end), filesep)
+0060     GotoDir(end+1) = filesep; 
+0061     k(end+1) = length(GotoDir);
+0062 <span class="keyword">end</span>
+0063 
+0064 
+0065 <span class="comment">% Try to cd as far as possible</span>
+0066 j = 1;
+0067 <span class="keyword">for</span> i = 1:length(k)
+0068     <span class="comment">%GotoDir(j:k(i))</span>
+0069     <span class="keyword">try</span>
+0070         cd(GotoDir(j:k(i)));
+0071     <span class="keyword">catch</span>
+0072         <span class="comment">% Create that directory</span>
+0073         [Success, msg] = mkdir(GotoDir(j:k(i)));
+0074         <span class="keyword">if</span> Success
+0075             cd(GotoDir(j:k(i)));
+0076         <span class="keyword">else</span>
+0077             <span class="keyword">if</span> ispc
+0078                 ErrorFlag = 1;
+0079                 fprintf(<span class="string">'   Problem creating directory: %s\n'</span>, msg);
+0080                 <span class="keyword">break</span>
+0081             <span class="keyword">else</span>
+0082                 <span class="comment">% I'm getting a tcsh error that's not really can error so I have a test another way</span>
+0083                 <span class="keyword">try</span>
+0084                     cd(GotoDir(j:k(i)));
+0085                 <span class="keyword">catch</span>
+0086                     ErrorFlag = 1;
+0087                     fprintf(<span class="string">'   Problem creating directory: %s\n'</span>, msg);
+0088                     <span class="keyword">break</span>
+0089                 <span class="keyword">end</span>
+0090             <span class="keyword">end</span>
+0091         <span class="keyword">end</span>
+0092     <span class="keyword">end</span>
+0093     j = k(i) + 1;
+0094 <span class="keyword">end</span>
+0095 
+0096 
+0097 <span class="comment">% Return</span>
+0098 FinalDir = pwd;
+0099 FinalDir = [FinalDir filesep];
+0100</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

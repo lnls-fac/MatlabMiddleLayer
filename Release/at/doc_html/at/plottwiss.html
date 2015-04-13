@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plottwiss</title>
+  <meta name="keywords" content="plottwiss">
+  <meta name="description" content="PLOTTWISS - Plot the optical functions and tune of the present lattice">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">at</a> &gt; plottwiss.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for at&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>plottwiss
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>PLOTTWISS - Plot the optical functions and tune of the present lattice</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ax, h1, h2] = plottwiss(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">PLOTTWISS - Plot the optical functions and tune of the present lattice</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="drawlattice.html" class="code" title="function h = drawlattice(Offset, Scaling, hAxes, Ldraw)">drawlattice</a>	DRAWLATTICE - Draws the AT lattice to a figure</li><li><a href="modeltwiss.html" class="code" title="function [TwissX, TwissY, Sx, Sy, Tune, Chrom, h] = modeltwiss(varargin)">modeltwiss</a>	MODELTWISS - Returns a twiss function of the model</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [ax, h1, h2] = plottwiss(varargin)</a>
+0002 <span class="comment">%PLOTTWISS - Plot the optical functions and tune of the present lattice</span>
+0003 
+0004 
+0005 <span class="comment">%[TD, Tune] = twissring(RING,0,1:(length(RING)+1),'chrom');</span>
+0006 
+0007 [BetaX, BetaY, Sx, Sy, Tune] = <a href="modeltwiss.html" class="code" title="function [TwissX, TwissY, Sx, Sy, Tune, Chrom, h] = modeltwiss(varargin)">modeltwiss</a>(<span class="string">'Beta'</span>, <span class="string">'All'</span>);
+0008 [EtaX, EtaY] = <a href="modeltwiss.html" class="code" title="function [TwissX, TwissY, Sx, Sy, Tune, Chrom, h] = modeltwiss(varargin)">modeltwiss</a>(<span class="string">'Eta'</span>, <span class="string">'All'</span>);
+0009 
+0010 [N, Nsymmetry] = getnumberofsectors;
+0011 L = getfamilydata(<span class="string">'Circumference'</span>);
+0012 Lsector = L / Nsymmetry;
+0013 
+0014 i = 1:length(Sx);
+0015 i(find(Sx &gt; Lsector)) = [];
+0016 i(end+1) = i(end) + 1;
+0017 
+0018 <span class="comment">%figure</span>
+0019 clf reset;
+0020 [ax,h1,h2] = plotyy(Sx(i), [BetaX(i) BetaY(i)], Sx(i), EtaX(i));
+0021 
+0022 xlabel(<span class="string">'Position [meters]'</span>);
+0023 <span class="comment">%ylabel('[meters]');</span>
+0024 title(sprintf(<span class="string">'Optical Functions ({\\it \\nu_x} = %5.3f, {\\it \\nu_y} = %5.3f)'</span>, Tune(1),Tune(2)));
+0025 <span class="comment">%axis tight;</span>
+0026 
+0027 set(get(ax(1),<span class="string">'ylabel'</span>),<span class="string">'string'</span>,<span class="string">'{\it\beta}  [meters]'</span>);
+0028 <span class="comment">%set(get(ax(1),'ylabel'),'string','{\it\beta_x}   {\it\beta_y  [meters]}');</span>
+0029 set(get(ax(2),<span class="string">'ylabel'</span>),<span class="string">'string'</span>,<span class="string">'{\it\eta_x [meters]}'</span>);
+0030 
+0031 
+0032 <span class="comment">% Plot 1 sector</span>
+0033 axes(ax(2));
+0034 <span class="comment">%axis tight;</span>
+0035 a2 = axis;
+0036 <span class="keyword">if</span> ~isempty(L) &amp;&amp; ~isempty(N)
+0037     a2(1) = 0;
+0038     a2(2) = Lsector;
+0039 <span class="keyword">end</span>
+0040 
+0041 <span class="comment">% Make room for the lattice</span>
+0042 DeltaY = a2(4) - a2(3);
+0043 a2(3) = a2(3) - .12 * DeltaY;
+0044 <span class="comment">%a2(4) = a2(4) + .08 * DeltaY;</span>
+0045 axis(a2);
+0046 
+0047 axes(ax(1));
+0048 <span class="comment">%axis tight</span>
+0049 a1 = axis;
+0050 <span class="keyword">if</span> ~isempty(L) &amp;&amp; ~isempty(N)
+0051     a1(2) = Lsector;
+0052 <span class="keyword">end</span>
+0053 
+0054 <span class="comment">% Make room for the lattice</span>
+0055 DeltaY = a1(4) - a1(3);
+0056 a1(3) = a1(3) - .12 * DeltaY;
+0057 <span class="comment">%a1(4) = a1(4) + .08 * DeltaY;</span>
+0058 axis([a2(1:2) a1(3:4)]);
+0059 
+0060 
+0061 <span class="comment">% Draw the lattice</span>
+0062 a = axis;
+0063 hold on;
+0064 <a href="drawlattice.html" class="code" title="function h = drawlattice(Offset, Scaling, hAxes, Ldraw)">drawlattice</a>(a(3)+.06*DeltaY, .05*DeltaY, ax(1), Lsector);
+0065 axis(a);
+0066 hold off;
+0067 
+0068 
+0069 legend(<span class="string">'{\it\beta_x}'</span>, <span class="string">'{\it\beta_y }'</span>, 0);
+0070 
+0071 ax(end+1) = gca;
+0072 linkaxes(ax, <span class="string">'x'</span>);
+0073 
+0074 axes(ax(2));
+0075 
+0076</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 11:03:42 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

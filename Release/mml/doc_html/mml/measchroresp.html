@@ -1,0 +1,684 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of measchroresp</title>
+  <meta name="keywords" content="measchroresp">
+  <meta name="description" content="MEASCHRORESP - measures the response from sextupoles to chromaticity">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; measchroresp.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>measchroresp
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>MEASCHRORESP - measures the response from sextupoles to chromaticity</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [Rmat, OutputFileName] = measchroresp(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MEASCHRORESP - measures the response from sextupoles to chromaticity
+  [R, FileName] = measchroresp(ActuatorFamily, ActuatorDeviceList, ActuatorDelta, DeltaRF, WaitFlag, FileName, DirectoryName, ExtraDelay)
+
+  INPUTS 
+  1. ActuatorFamily = Family name or cell array of family nams {default: {'SF','SD'}}
+
+  2. ActuatorDeviceList = Device list {Default: [], the entire family}
+                          (Note: all devices in DeviceList are changed at the same time)
+
+  3. ActuatorDelta = Change in magnet strength {Default: getfamilydata(ActuatorFamily, 'Setpoint', 'DeltaRespMat')}
+
+  4. DeltaRF = Change in RF frequency to measure the chromaticity {Default:  measchro default}
+
+  5. If WaitFlag &gt;= 0, then WaitFlag is the delay before measuring the tune (sec)
+                  = -3, then a delay of 2.2*getfamilydata('TuneDelay') is used {Default} 
+                  = -4, then pause until keyboard input
+                  = -5, then input the tune measurement manually by keyboard input
+
+  6. Optional input to change the default filename and directory
+     FileName - Filename for the response matrix data
+                (No input or empty means data will be saved to the default file)  
+     DirectoryName - Directory name to store the response matrix data file 
+     Note: a. FileName can include the path if DirectoryName is not used
+           b. For model response matrices, FileName must exist for a file save
+           c. When using the default FileName, a dialog box will prompt for changes
+
+  7. ExtraDelay - extra time delay [seconds] after a setpoint change
+
+  8. 'Struct'  - Return a response matrix structure
+     'Numeric' - Returns numeric output (cell array if more than one sextupole family) {Default}
+     'Matrix'  - Return a matrix output {Default}
+
+                 Note: 'Matrix' is only a valid flag for Numeric outputs
+                 Often use with the model input.  For example, to compare the model
+                 chromaticity response matrix to the default matrix,
+                 Mmodel = measchroresp('Model','Matrix');
+                 Mmeas  = getchroresp;
+
+  10. Optional override of the units:
+      'Physics'  - Use physics  units
+      'Hardware' - Use hardware units
+
+  11. Optional override of the mode:
+      'Online'    - Set/Get data online  
+      'Model'     - Get the model chromaticity directly from AT (uses modelchro)
+      'Simulator' - Set/Get data on the simulated accelerator using AT (ie, same commands as 'Online')
+      'Manual'    - Set/Get data manually
+
+  12. 'Display'   - Prints status information to the command window {Default}
+      'NoDisplay' - Nothing is printed to the command window
+
+  13. 'Archive'   - Save the response matrix structure {Default, unless mode='Model'}
+      'NoArchive' - Save the response matrix structure
+
+  Note: the 'ModulationMethod' is always 'Unipolar' (since hysteresis is usually an issue)
+ 
+  OUTPUTS
+  R = Response matrix from delta sextupole to delta chromaticity
+
+         If more than one sextupole family is input, the R is a cell array indexed by 
+         sextupole family (ie, the number of families in ActuatorFamily).  The default
+         is to make R{1} SF and R{2} SD.  R{1} or R.Data for structure output
+         is a 2x(number of sextupoles in family) array.  The first row is horizontal 
+         chromaticity and the second is vertical.
+
+         Units: delta(Chromaticity) / delta(Sextupole) is set by the .Units field for the 
+                setpoints (ie, the sextupole family).  
+                Typically,  Hardware units:  (1/MHz)/Amp;
+                            Physics  units:  (1/(dp/p))/K;
+
+  See also <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>, <a href="stepchro.html" class="code" title="function  [DelSext, ActuatorFamily] = stepchro(varargin)">stepchro</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>	FINDMEMBEROF - Finds all family members</li><li><a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>	GETMACHINECONFIG - Returns or saves to file the present storage ring setpoints and monitors</li><li><a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>	GETSP - Gets setpoint channels</li><li><a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>	GETX - Returns the horizontal orbit</li><li><a href="gety.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = gety(varargin)">gety</a>	GETY - Returns the vertical orbit</li><li><a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>	HW2PHYSICS - Converts from 'Hardware' units to 'Physics' units</li><li><a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>	MEASCHRO -  measures the chromaticity function emperically</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="buildopsdatafiles.html" class="code" title="function buildopsdatafiles">buildopsdatafiles</a>	BUILDOPSDATAFILES - Builds the files for the OpsData directory from the model</li><li><a href="getchroresp.html" class="code" title="function [ChromaticityMatrix, FileName] = getchroresp(varargin)">getchroresp</a>	GETCHRORESP - Loads the chromaticity response vector (or matrix) for multiple sextupole families</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [Rmat, OutputFileName] = measchroresp(varargin)</a>
+0002 <span class="comment">%MEASCHRORESP - measures the response from sextupoles to chromaticity</span>
+0003 <span class="comment">%  [R, FileName] = measchroresp(ActuatorFamily, ActuatorDeviceList, ActuatorDelta, DeltaRF, WaitFlag, FileName, DirectoryName, ExtraDelay)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  INPUTS</span>
+0006 <span class="comment">%  1. ActuatorFamily = Family name or cell array of family nams {default: {'SF','SD'}}</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  2. ActuatorDeviceList = Device list {Default: [], the entire family}</span>
+0009 <span class="comment">%                          (Note: all devices in DeviceList are changed at the same time)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  3. ActuatorDelta = Change in magnet strength {Default: getfamilydata(ActuatorFamily, 'Setpoint', 'DeltaRespMat')}</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  4. DeltaRF = Change in RF frequency to measure the chromaticity {Default:  measchro default}</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%  5. If WaitFlag &gt;= 0, then WaitFlag is the delay before measuring the tune (sec)</span>
+0016 <span class="comment">%                  = -3, then a delay of 2.2*getfamilydata('TuneDelay') is used {Default}</span>
+0017 <span class="comment">%                  = -4, then pause until keyboard input</span>
+0018 <span class="comment">%                  = -5, then input the tune measurement manually by keyboard input</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">%  6. Optional input to change the default filename and directory</span>
+0021 <span class="comment">%     FileName - Filename for the response matrix data</span>
+0022 <span class="comment">%                (No input or empty means data will be saved to the default file)</span>
+0023 <span class="comment">%     DirectoryName - Directory name to store the response matrix data file</span>
+0024 <span class="comment">%     Note: a. FileName can include the path if DirectoryName is not used</span>
+0025 <span class="comment">%           b. For model response matrices, FileName must exist for a file save</span>
+0026 <span class="comment">%           c. When using the default FileName, a dialog box will prompt for changes</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%  7. ExtraDelay - extra time delay [seconds] after a setpoint change</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%  8. 'Struct'  - Return a response matrix structure</span>
+0031 <span class="comment">%     'Numeric' - Returns numeric output (cell array if more than one sextupole family) {Default}</span>
+0032 <span class="comment">%     'Matrix'  - Return a matrix output {Default}</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">%                 Note: 'Matrix' is only a valid flag for Numeric outputs</span>
+0035 <span class="comment">%                 Often use with the model input.  For example, to compare the model</span>
+0036 <span class="comment">%                 chromaticity response matrix to the default matrix,</span>
+0037 <span class="comment">%                 Mmodel = measchroresp('Model','Matrix');</span>
+0038 <span class="comment">%                 Mmeas  = getchroresp;</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">%  10. Optional override of the units:</span>
+0041 <span class="comment">%      'Physics'  - Use physics  units</span>
+0042 <span class="comment">%      'Hardware' - Use hardware units</span>
+0043 <span class="comment">%</span>
+0044 <span class="comment">%  11. Optional override of the mode:</span>
+0045 <span class="comment">%      'Online'    - Set/Get data online</span>
+0046 <span class="comment">%      'Model'     - Get the model chromaticity directly from AT (uses modelchro)</span>
+0047 <span class="comment">%      'Simulator' - Set/Get data on the simulated accelerator using AT (ie, same commands as 'Online')</span>
+0048 <span class="comment">%      'Manual'    - Set/Get data manually</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">%  12. 'Display'   - Prints status information to the command window {Default}</span>
+0051 <span class="comment">%      'NoDisplay' - Nothing is printed to the command window</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">%  13. 'Archive'   - Save the response matrix structure {Default, unless mode='Model'}</span>
+0054 <span class="comment">%      'NoArchive' - Save the response matrix structure</span>
+0055 <span class="comment">%</span>
+0056 <span class="comment">%  Note: the 'ModulationMethod' is always 'Unipolar' (since hysteresis is usually an issue)</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">%  OUTPUTS</span>
+0059 <span class="comment">%  R = Response matrix from delta sextupole to delta chromaticity</span>
+0060 <span class="comment">%</span>
+0061 <span class="comment">%         If more than one sextupole family is input, the R is a cell array indexed by</span>
+0062 <span class="comment">%         sextupole family (ie, the number of families in ActuatorFamily).  The default</span>
+0063 <span class="comment">%         is to make R{1} SF and R{2} SD.  R{1} or R.Data for structure output</span>
+0064 <span class="comment">%         is a 2x(number of sextupoles in family) array.  The first row is horizontal</span>
+0065 <span class="comment">%         chromaticity and the second is vertical.</span>
+0066 <span class="comment">%</span>
+0067 <span class="comment">%         Units: delta(Chromaticity) / delta(Sextupole) is set by the .Units field for the</span>
+0068 <span class="comment">%                setpoints (ie, the sextupole family).</span>
+0069 <span class="comment">%                Typically,  Hardware units:  (1/MHz)/Amp;</span>
+0070 <span class="comment">%                            Physics  units:  (1/(dp/p))/K;</span>
+0071 <span class="comment">%</span>
+0072 <span class="comment">%  See also measchro, stepchro</span>
+0073 
+0074 <span class="comment">%  Written by Greg Portmann</span>
+0075 
+0076 
+0077 <span class="comment">% Initialize</span>
+0078 ActuatorFamily = <a href="findmemberof.html" class="code" title="function  [FamilyName, FieldName] = findmemberof(MemberString, varargin)">findmemberof</a>(<span class="string">'Chromaticity Corrector'</span>)';
+0079 <span class="keyword">if</span> isempty(ActuatorFamily)
+0080     error(<span class="string">'MemberOf ''Chromaticity Corrector'' was not found'</span>);
+0081 <span class="keyword">end</span>
+0082 
+0083 ActuatorDeviceList = [];
+0084 ActuatorDelta = [];
+0085 DeltaRF = []; 
+0086 WaitFlag = -3;
+0087 DirectoryName = [];
+0088 ExtraDelay = 0; 
+0089 ModulationMethod = <span class="string">'unipolar'</span>;
+0090 StructOutputFlag = 0;
+0091 MatrixFlag = 1;
+0092 DisplayFlag = -1;
+0093 ArchiveFlag = -1;
+0094 FileName = -1;
+0095 ModeFlag = <span class="string">''</span>;          <span class="comment">% model, online, manual, or '' for default mode</span>
+0096 UnitsFlag = <span class="string">'Physics'</span>;  <span class="comment">% hardware, physics, or '' for default units</span>
+0097 
+0098 InputFlags = {};
+0099 <span class="keyword">for</span> i = length(varargin):-1:1
+0100     <span class="keyword">if</span> strcmpi(varargin{i},<span class="string">'Struct'</span>)
+0101         StructOutputFlag = 1;
+0102         MatrixFlag = 0;
+0103         varargin(i) = [];
+0104     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Numeric'</span>)
+0105         StructOutputFlag = 0;
+0106         varargin(i) = [];
+0107     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Matrix'</span>)
+0108         MatrixFlag = 1;
+0109         StructOutputFlag = 0;
+0110         varargin(i) = [];
+0111     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'unipolar'</span>)
+0112         <span class="comment">% Ignor</span>
+0113         <span class="comment">%ModulationMethod = 'unipolar';</span>
+0114         varargin(i) = [];
+0115     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'bipolar'</span>)
+0116         <span class="comment">% Ignor</span>
+0117         <span class="comment">%ModulationMethod = 'bipolar';</span>
+0118         varargin(i) = [];
+0119     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'simulator'</span>) || strcmpi(varargin{i},<span class="string">'model'</span>) || strcmpi(varargin{i},<span class="string">'online'</span>) || strcmpi(varargin{i},<span class="string">'manual'</span>)
+0120         ModeFlag = varargin{i};
+0121         InputFlags = [InputFlags varargin(i)];
+0122         varargin(i) = [];
+0123     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Physics'</span>)
+0124         UnitsFlag = varargin{i};
+0125         InputFlags = [InputFlags varargin(i)];
+0126         varargin(i) = [];
+0127     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Hardware'</span>)
+0128         UnitsFlag = varargin{i};
+0129         InputFlags = [InputFlags varargin(i)];
+0130         varargin(i) = [];
+0131     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Archive'</span>)
+0132         ArchiveFlag = 1;
+0133         <span class="keyword">if</span> length(varargin) &gt; i
+0134             <span class="comment">% Look for a filename as the next input</span>
+0135             <span class="keyword">if</span> ischar(varargin{i+1})
+0136                 FileName = varargin{i+1};
+0137                 varargin(i+1) = [];
+0138             <span class="keyword">end</span>
+0139         <span class="keyword">end</span>
+0140         varargin(i) = [];
+0141     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoArchive'</span>)
+0142         ArchiveFlag = 0;
+0143         varargin(i) = [];
+0144     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'NoDisplay'</span>)
+0145         DisplayFlag = 0;
+0146         varargin(i) = [];
+0147     <span class="keyword">elseif</span> strcmpi(varargin{i},<span class="string">'Display'</span>)
+0148         DisplayFlag = 1;
+0149         varargin(i) = [];
+0150     <span class="keyword">end</span>
+0151 <span class="keyword">end</span>
+0152 
+0153 TimeStamp = clock;
+0154 
+0155 
+0156 <span class="keyword">if</span> length(varargin) &gt;= 1
+0157     ActuatorFamily = varargin{1};  
+0158 <span class="keyword">end</span>
+0159 
+0160 <span class="keyword">if</span> length(varargin) &gt;= 2
+0161     ActuatorDeviceList = varargin{2};  
+0162 <span class="keyword">end</span>
+0163 
+0164 <span class="keyword">if</span> length(varargin) &gt;= 3
+0165     ActuatorDelta = varargin{3};  
+0166 <span class="keyword">end</span>
+0167 
+0168 
+0169 <span class="comment">% Force to be a cells</span>
+0170 <span class="keyword">if</span> ~iscell(ActuatorFamily)
+0171     ActuatorFamily = {ActuatorFamily};
+0172 <span class="keyword">end</span>
+0173 
+0174 <span class="keyword">if</span> isempty(ActuatorDeviceList)
+0175     <span class="keyword">for</span> i = 1:length(ActuatorFamily)
+0176         ActuatorDeviceList{i} = [];
+0177     <span class="keyword">end</span>
+0178 <span class="keyword">else</span>
+0179     <span class="keyword">if</span> ~iscell(ActuatorDeviceList)
+0180         ActuatorDeviceList = {ActuatorDeviceList};
+0181     <span class="keyword">end</span>
+0182 <span class="keyword">end</span>
+0183 
+0184 <span class="keyword">if</span> isempty(ActuatorDelta)
+0185     <span class="keyword">for</span> i = 1:length(ActuatorFamily)
+0186         ActuatorDelta{i} = [];
+0187     <span class="keyword">end</span>
+0188 <span class="keyword">else</span>
+0189     <span class="keyword">if</span> ~iscell(ActuatorDelta)
+0190         ActuatorDelta = {ActuatorDelta};
+0191     <span class="keyword">end</span>
+0192 <span class="keyword">end</span>
+0193 
+0194 
+0195 <span class="keyword">if</span> length(varargin) &gt;= 4
+0196     DeltaRF = varargin{4};  
+0197 <span class="keyword">end</span>
+0198 
+0199 <span class="comment">% WaitFlag input</span>
+0200 <span class="keyword">if</span> length(varargin) &gt;= 5
+0201     WaitFlag = varargin{5};
+0202 <span class="keyword">end</span>
+0203 <span class="keyword">if</span> isempty(WaitFlag) || WaitFlag == -3
+0204     WaitFlag = 2.2 * <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'TuneDelay'</span>);
+0205 <span class="keyword">end</span>
+0206 <span class="keyword">if</span> isempty(WaitFlag)
+0207     WaitFlag = input(<span class="string">'   Delay for Tune Measurement (Seconds, Keyboard Pause = -4, or Manual Tune Input = -5) = '</span>);
+0208 <span class="keyword">end</span>
+0209 
+0210 <span class="keyword">if</span> length(varargin) &gt;= 6
+0211     FileName = varargin{6};  
+0212 <span class="keyword">end</span>
+0213 <span class="keyword">if</span> length(varargin) &gt;= 7
+0214     <span class="keyword">if</span> isempty(varargin{7})
+0215         <span class="comment">% Use default</span>
+0216         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'ChroResponse'</span>);
+0217     <span class="keyword">elseif</span> ischar(varargin{7})
+0218         DirectoryName = varargin{7};
+0219     <span class="keyword">else</span>
+0220         <span class="comment">% Empty DirectoryName mean it will only be used if FileName is empty</span>
+0221         DirectoryName = [];
+0222     <span class="keyword">end</span>
+0223 <span class="keyword">end</span>
+0224 
+0225 <span class="comment">% Look for ExtraDelay</span>
+0226 <span class="keyword">if</span> length(varargin) &gt;= 8
+0227     <span class="keyword">if</span> isempty(varargin{8})
+0228         <span class="comment">% Use default</span>
+0229     <span class="keyword">end</span>
+0230     <span class="keyword">if</span> isnumeric(varargin{8})
+0231         ExtraDelay = varargin{8};
+0232     <span class="keyword">end</span>
+0233 <span class="keyword">end</span>
+0234 
+0235 
+0236 <span class="comment">% Check units (default units is based on the actuator)</span>
+0237 <span class="keyword">if</span> isempty(UnitsFlag)
+0238     UnitsFlag = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(ActuatorFamily{1},<span class="string">'Setpoint'</span>,<span class="string">'Units'</span>);
+0239 <span class="keyword">end</span>
+0240 <span class="keyword">if</span> isempty(UnitsFlag)
+0241     error(<span class="string">'Unknown Units'</span>);
+0242 <span class="keyword">end</span>
+0243 
+0244 <span class="comment">% Check mode</span>
+0245 <span class="comment">% if isempty(ModeFlag)</span>
+0246 <span class="comment">%     ModeFlag = getfamilydata(ActuatorFamily{1},'Setpoint','Mode');</span>
+0247 <span class="comment">% end</span>
+0248 
+0249 
+0250 <span class="comment">% Change defaults for the model (note: simulator mode mimics online)</span>
+0251 <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'Model'</span>)
+0252     <span class="comment">% Only archive data if ArchiveFlag==1 or FileName~=[]</span>
+0253     <span class="keyword">if</span> ischar(FileName) || ArchiveFlag == 1
+0254         ArchiveFlag = 1;    
+0255     <span class="keyword">else</span>
+0256         ArchiveFlag = 0;            
+0257     <span class="keyword">end</span>
+0258     
+0259     <span class="comment">% Only display is it was turned on at the command line</span>
+0260     <span class="keyword">if</span> DisplayFlag == 1
+0261         <span class="comment">% Keep DisplayFlag = 1</span>
+0262     <span class="keyword">else</span>
+0263         DisplayFlag = 0;
+0264     <span class="keyword">end</span>
+0265 <span class="keyword">else</span>
+0266     <span class="comment">% Online or Simulator: Archive unless ArchiveFlag was forced to zero</span>
+0267     <span class="keyword">if</span> ArchiveFlag ~= 0
+0268         ArchiveFlag = 1;  
+0269         <span class="keyword">if</span> FileName == -1
+0270             FileName = <span class="string">''</span>;
+0271         <span class="keyword">end</span>
+0272     <span class="keyword">end</span>    
+0273 <span class="keyword">end</span>
+0274 
+0275 
+0276 <span class="keyword">if</span> strcmpi(ModeFlag,<span class="string">'Model'</span>) || strcmpi(ModeFlag,<span class="string">'Simulator'</span>)
+0277     <span class="comment">% No need for delays with the model</span>
+0278     WaitFlag = 0;
+0279     ExtraDelay = 0; 
+0280 <span class="keyword">end</span>
+0281 
+0282 <span class="comment">% % Print setup information</span>
+0283 <span class="comment">% if DisplayFlag</span>
+0284 <span class="comment">%     if ~strcmpi(ModeFlag,'Model')</span>
+0285 <span class="comment">%         fprintf('\n');</span>
+0286 <span class="comment">%         fprintf('   MEASCHRORESP measures the chromaticity response to the sextupole magnet families.\n');</span>
+0287 <span class="comment">%         fprintf('   The storage ring lattice and hardware should be setup for properly.\n');</span>
+0288 <span class="comment">%         fprintf('   Make sure the following information is correct:\n');</span>
+0289 <span class="comment">%         fprintf('   1.  Proper magnet lattice (including skew quadrupoles)\n');</span>
+0290 <span class="comment">%         fprintf('   2.  Proper electron beam energy\n');</span>
+0291 <span class="comment">%         fprintf('   3.  Proper electron bunch pattern\n');</span>
+0292 <span class="comment">%         fprintf('   4.  Tune is functioning or in manual mode\n');</span>
+0293 <span class="comment">%         fprintf('   5.  The injection bump magnets off\n\n');</span>
+0294 <span class="comment">%         drawnow;</span>
+0295 <span class="comment">%     end</span>
+0296 <span class="comment">% end</span>
+0297 
+0298 
+0299 <span class="comment">% Browse for filename and directory if using default FileName</span>
+0300 <span class="keyword">if</span> ArchiveFlag
+0301     <span class="keyword">if</span> isempty(FileName)
+0302         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'ChroRespFile'</span>));
+0303         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'ChroResponse'</span>);
+0304         <span class="keyword">if</span> isempty(DirectoryName)
+0305             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'Response'</span>, filesep, <span class="string">'Chromaticity'</span>, filesep];
+0306         <span class="keyword">else</span>
+0307             <span class="comment">% Make sure default directory exists</span>
+0308             DirStart = pwd;
+0309             [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0310             cd(DirStart);
+0311         <span class="keyword">end</span>
+0312         [FileName, DirectoryName] = uiputfile(<span class="string">'*.mat'</span>, <span class="string">'Select a Chromaticity Response File'</span>, [DirectoryName FileName]);
+0313         drawnow;
+0314         <span class="keyword">if</span> FileName == 0 
+0315             ArchiveFlag = 0;
+0316             disp(<span class="string">'   Chromaticity response measurement canceled.'</span>);
+0317             Rmat = []; OutputFileName=<span class="string">''</span>;
+0318             <span class="keyword">return</span>
+0319         <span class="keyword">end</span>
+0320         FileName = [DirectoryName, FileName];
+0321     <span class="keyword">elseif</span> FileName == -1
+0322         FileName = appendtimestamp(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Default'</span>, <span class="string">'ChroRespFile'</span>));
+0323         DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'ChroResponse'</span>);
+0324         <span class="keyword">if</span> isempty(DirectoryName)
+0325             DirectoryName = [<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'DataRoot'</span>) <span class="string">'Response'</span>, filesep, <span class="string">'Chromaticity'</span>, filesep];
+0326         <span class="keyword">end</span>
+0327         FileName = [DirectoryName, FileName];
+0328     <span class="keyword">end</span>
+0329     
+0330     <span class="comment">% Acquire initial data</span>
+0331     MachineConfig = <a href="getmachineconfig.html" class="code" title="function [ConfigSetpoint, ConfigMonitor, FileName] = getmachineconfig(varargin)">getmachineconfig</a>(InputFlags{:});
+0332 <span class="keyword">end</span>
+0333 
+0334 
+0335 <span class="comment">% % Query to begin measurement</span>
+0336 <span class="comment">% if DisplayFlag</span>
+0337 <span class="comment">%     tmp = questdlg('Begin response matrix measurement?','MEASCHRORESP','YES','NO','YES');</span>
+0338 <span class="comment">%     if strcmp(tmp,'NO')</span>
+0339 <span class="comment">%         fprintf('   Response matrix measurement aborted\n');</span>
+0340 <span class="comment">%         Rmat = [];</span>
+0341 <span class="comment">%         return</span>
+0342 <span class="comment">%     end</span>
+0343 <span class="comment">% end</span>
+0344 
+0345 
+0346 <span class="comment">% Begin main loop over actuators</span>
+0347 TimeStart = gettime;
+0348 <span class="keyword">for</span> i = 1:length(ActuatorFamily)
+0349     <span class="keyword">if</span> DisplayFlag
+0350         fprintf(<span class="string">'   Beginning %s:\n'</span>, ActuatorFamily{i});
+0351     <span class="keyword">end</span>
+0352     
+0353     <span class="comment">% Force to be a column vector</span>
+0354     ActuatorDelta{i} = ActuatorDelta{i}(:);
+0355 
+0356     <span class="comment">% Default check</span>
+0357     <span class="comment">% Find the delta from the AO (.DeltaRespMat is always hardware!!!)</span>
+0358     <span class="keyword">if</span> isempty(ActuatorDelta{i})        
+0359         ActuatorDelta{i} = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(ActuatorFamily{i}, <span class="string">'Setpoint'</span>, <span class="string">'DeltaRespMat'</span>, ActuatorDeviceList{i});
+0360         <span class="keyword">if</span> isempty(ActuatorDelta{i})
+0361             error(sprintf(<span class="string">'%s.Setpoint.DeltaRespMat field must be set properly'</span>,ActuatorFamily{i}));
+0362         <span class="keyword">elseif</span> strcmpi(UnitsFlag, <span class="string">'Physics'</span>) <span class="comment">%&amp; strcmpi(getfamilydata(ActuatorFamily{i}, 'Setpoint', 'Units'), 'Hardware')</span>
+0363             SP = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(ActuatorFamily{i}, ActuatorDeviceList{i}, <span class="string">'Numeric'</span>, ModeFlag, <span class="string">'Hardware'</span>);
+0364             ActuatorDelta{i} = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{i}, <span class="string">'Setpoint'</span>, SP+ActuatorDelta{i}, ActuatorDeviceList{i}, ModeFlag) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{i}, <span class="string">'Setpoint'</span>, SP, ActuatorDeviceList{i}, ModeFlag);
+0365         <span class="comment">%elseif strcmpi(UnitsFlag, 'Hardware') &amp; strcmpi(getfamilydata(ActuatorFamily{i}, 'Setpoint', 'Units'), 'Physics')</span>
+0366         <span class="comment">%    SP = getsp(ActuatorFamily{i}, ActuatorDeviceList{i}, 'Numeric', ModeFlag, 'Physics');</span>
+0367         <span class="comment">%    ActuatorDelta{i} = physics2hw(ActuatorFamily{i}, 'Setpoint', SP+ActuatorDelta{i}, ActuatorDeviceList{i}, ModeFlag) - physics2hw(ActuatorFamily{i}, 'Setpoint', SP, ActuatorDeviceList{i}, ModeFlag);</span>
+0368         <span class="keyword">end</span>
+0369     <span class="keyword">end</span>
+0370     
+0371     Rmat{i}.Data = [];
+0372     Rmat{i}.Monitor.FamilyName = <span class="string">'Chromaticity'</span>;
+0373     Rmat{i}.Monitor.DeviceList = [1 1;1 2];
+0374     Rmat{i}.Monitor.ElementList = [1; 2];
+0375     Rmat{i}.Actuator = <a href="getsp.html" class="code" title="function [SP, tout, DataTime, ErrorFlag] = getsp(Family, varargin)">getsp</a>(ActuatorFamily{i}, ActuatorDeviceList{i}, <span class="string">'Struct'</span>, ModeFlag, UnitsFlag);
+0376     Rmat{i}.ActuatorDelta = ActuatorDelta{i};
+0377     Rmat{i}.GeV = bend2gev(ModeFlag);
+0378     Rmat{i}.TimeStamp = TimeStamp;
+0379     <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0380         Rmat{i}.Units = <span class="string">'Hardware'</span>;
+0381         Rmat{i}.UnitsString = <span class="string">'(1/MHz)/Amp'</span>;
+0382         Rmat{i}.Monitor.Units = <span class="string">'Hardware'</span>;
+0383     <span class="keyword">else</span>
+0384         Rmat{i}.Units = <span class="string">'Physics'</span>;
+0385         Rmat{i}.UnitsString = <span class="string">'(1/(dp/p))/K'</span>;
+0386         Rmat{i}.Monitor.Units = <span class="string">'Physics'</span>;
+0387     <span class="keyword">end</span>
+0388     Rmat{i}.ModulationMethod = <span class="string">'Unipolar'</span>;
+0389     Rmat{i}.WaitFlag = WaitFlag;
+0390     Rmat{i}.DataDescriptor = <span class="string">'Chromaticity Response Matrix'</span>;
+0391     Rmat{i}.CreatedBy = <span class="string">'measchroresp'</span>;
+0392     Rmat{i}.OperationalMode = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OperationalMode'</span>);
+0393     Rmat{i}.Chromaticity1 = [];
+0394     Rmat{i}.Chromaticity2 = [];
+0395     
+0396     InitActuator = Rmat{i}.Actuator.Data;
+0397     
+0398     <span class="comment">% Acquire initial data</span>
+0399     <span class="keyword">if</span> StructOutputFlag               
+0400         Rmat{i}.X = <a href="getx.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getx(varargin)">getx</a>(<span class="string">'Struct'</span>, ModeFlag, UnitsFlag);
+0401         Rmat{i}.Y = <a href="gety.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = gety(varargin)">gety</a>(<span class="string">'Struct'</span>, ModeFlag, UnitsFlag);
+0402         Rmat{i}.DCCT = <a href="getdcct.html" class="code" title="function [DCCT, tout, DataTime, ErrorFlag] = getdcct(varargin)">getdcct</a>(ModeFlag);
+0403     <span class="keyword">end</span>    
+0404     
+0405     <span class="comment">% No actuator change for first point</span>
+0406     <span class="keyword">if</span> DisplayFlag
+0407         fprintf(<span class="string">'   Initial actuator value for %s is %+f [%s]\n'</span>, Rmat{i}.Actuator.FamilyName, Rmat{i}.Actuator.Data(1), Rmat{i}.Actuator.Units);
+0408         fprintf(<span class="string">'   No change to actuator'</span>); 
+0409         drawnow;
+0410     <span class="keyword">end</span>    
+0411             
+0412     <span class="comment">% Wait for signal processing if requested</span>
+0413     sleep(ExtraDelay);
+0414 
+0415     <span class="comment">% Acquire data</span>
+0416     <span class="keyword">if</span> DisplayFlag
+0417         fprintf(<span class="string">', recording data point #1\n'</span>); 
+0418         drawnow;
+0419     <span class="keyword">end</span>
+0420     Rmat{i}.Chromaticity1 = <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>(DeltaRF, WaitFlag, <span class="string">'Struct'</span>, UnitsFlag, ModeFlag);
+0421     Rmat{i}.Monitor = Rmat{i}.Chromaticity1;
+0422     ChromaticityMinus = Rmat{i}.Chromaticity1.Data;  
+0423     
+0424     <span class="comment">% Step actuator up</span>
+0425     <span class="keyword">if</span> DisplayFlag
+0426         fprintf(<span class="string">'\n   Changing actuator by %+f'</span>, ActuatorDelta{i}(1));
+0427         drawnow;
+0428     <span class="keyword">end</span>
+0429     <span class="keyword">try</span>
+0430         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{i}, InitActuator+ActuatorDelta{i}, ActuatorDeviceList{i}, WaitFlag, ModeFlag, UnitsFlag);
+0431     <span class="keyword">catch</span>
+0432         fprintf(<span class="string">'\n   %s\n'</span>, lasterr);
+0433         FamilyMessage = sprintf(<span class="string">'An error occurred setting %s\n'</span>, ActuatorFamily{i});
+0434         CommandInput = questdlg( <span class="keyword">...</span>
+0435             strvcat(FamilyMessage, <span class="keyword">...</span>
+0436             strvcat(<span class="string">'Either manually varify that the magnet is at the proper setpoint'</span>, <span class="keyword">...</span>
+0437             strvcat(<span class="string">'and continue measuring the response matrix or stop'</span>,<span class="string">'the response matrix measurement?'</span>))), <span class="keyword">...</span>
+0438             <span class="string">'MEASRESPMAT'</span>, <span class="keyword">...</span>
+0439             <span class="string">'Continue'</span>, <span class="keyword">...</span>
+0440             <span class="string">'Stop'</span>, <span class="keyword">...</span>
+0441             <span class="string">'Continue'</span>);
+0442         <span class="keyword">switch</span> CommandInput
+0443             <span class="keyword">case</span> <span class="string">'Stop'</span>
+0444                 fprintf(<span class="string">'\n   Reseting actuator %s \n'</span>, ActuatorFamily{i});
+0445                 <span class="keyword">try</span>
+0446                     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{i}, InitActuator, ActuatorDeviceList{i}, 0);
+0447                 <span class="keyword">catch</span>
+0448                     fprintf(<span class="string">'   %s\n'</span>, lasterr);
+0449                 <span class="keyword">end</span>
+0450                 fprintf(<span class="string">'   Chromaticity response matrix measurement stopped.\n\n'</span>);
+0451                 OutputFileName = <span class="string">''</span>;
+0452                 <span class="keyword">return</span>;
+0453             <span class="keyword">case</span> <span class="string">'Continue'</span>
+0454         <span class="keyword">end</span>
+0455     <span class="keyword">end</span>
+0456 
+0457     <span class="comment">% Wait for signal processing if requested</span>
+0458     sleep(ExtraDelay);
+0459 
+0460     <span class="comment">% Acquire data</span>
+0461     <span class="keyword">if</span> DisplayFlag
+0462         fprintf(<span class="string">', recording data point #2\n'</span>); 
+0463         drawnow;
+0464     <span class="keyword">end</span>
+0465     Rmat{i}.Chromaticity2 = <a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>(DeltaRF, WaitFlag, <span class="string">'Struct'</span>, UnitsFlag, ModeFlag);
+0466     ChromaticityPlus = Rmat{i}.Chromaticity2.Data;
+0467     
+0468     <span class="comment">% Restore actuators</span>
+0469     <span class="keyword">try</span>
+0470         <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(ActuatorFamily{i}, InitActuator, ActuatorDeviceList{i}, WaitFlag, ModeFlag, UnitsFlag);
+0471     <span class="keyword">catch</span>
+0472         fprintf(<span class="string">'\n   %s\n'</span>, lasterr);
+0473         FamilyMessage = sprintf(<span class="string">'An error occurred setting %s\n'</span>, ActuatorFamily{i});
+0474         CommandInput = questdlg( <span class="keyword">...</span>
+0475             strvcat(FamilyMessage, <span class="keyword">...</span>
+0476             strvcat(<span class="string">'Either manually varify that the magnet is at the proper setpoint'</span>, <span class="keyword">...</span>
+0477             strvcat(<span class="string">'and continue measuring the response matrix or stop'</span>,<span class="string">'the response matrix measurement?'</span>))), <span class="keyword">...</span>
+0478             <span class="string">'MEASRESPMAT'</span>, <span class="keyword">...</span>
+0479             <span class="string">'Continue'</span>, <span class="keyword">...</span>
+0480             <span class="string">'Stop'</span>, <span class="keyword">...</span>
+0481             <span class="string">'Continue'</span>);
+0482         <span class="keyword">switch</span> CommandInput
+0483             <span class="keyword">case</span> <span class="string">'Stop'</span>
+0484                 fprintf(<span class="string">'   Chromaticity response matrix measurement stopped.\n\n'</span>);
+0485                 OutputFileName = <span class="string">''</span>;
+0486                 <span class="keyword">return</span>;
+0487             <span class="keyword">case</span> <span class="string">'Continue'</span>
+0488         <span class="keyword">end</span>
+0489     <span class="keyword">end</span>
+0490 
+0491     <span class="keyword">if</span> DisplayFlag
+0492         fprintf(<span class="string">'   Reset actuator %s \n\n'</span>, ActuatorFamily{i}); 
+0493         drawnow;
+0494     <span class="keyword">end</span>
+0495     
+0496     <span class="comment">% Compute response matrix columns</span>
+0497     <span class="comment">% For each magnet:  1. Divide by the change in amperes [Chromaticity / Ampere]</span>
+0498     <span class="comment">%                   2. Scale each magnet by its fractional contribution in physics units</span>
+0499     <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0500         DeltaPhysics = <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{i}, <span class="string">'Setpoint'</span>, InitActuator+ActuatorDelta{i}, ActuatorDeviceList{i}, ModeFlag) - <a href="hw2physics.html" class="code" title="function S = hw2physics(Family, Field, value, DeviceList, Energy)">hw2physics</a>(ActuatorFamily{i}, <span class="string">'Setpoint'</span>, InitActuator, ActuatorDeviceList{i}, ModeFlag);
+0501     <span class="keyword">else</span>
+0502         DeltaPhysics = ActuatorDelta{i};
+0503     <span class="keyword">end</span>
+0504     
+0505     <span class="comment">% In order to backout the chromaticity response at each magnet, assume that</span>
+0506     <span class="comment">% the chromaticity response at each magnet is equal in physics units.</span>
+0507     DelChroPerK = (ChromaticityPlus-ChromaticityMinus) / sum(DeltaPhysics);
+0508     
+0509     <span class="comment">% Expand to each magnet</span>
+0510     Rmat{i}.Data = DelChroPerK * ones(1,length(DeltaPhysics));
+0511     
+0512     <span class="comment">% When in hardware unit convert to delta chromaticity / ampere</span>
+0513     <span class="keyword">if</span> strcmpi(UnitsFlag, <span class="string">'Hardware'</span>)
+0514         KPerAmp = DeltaPhysics ./ ActuatorDelta{i};
+0515         <span class="keyword">for</span> j = 1:length(DeltaPhysics)
+0516             Rmat{i}.Data(:,j) = KPerAmp(j) * Rmat{i}.Data(:,j);
+0517         <span class="keyword">end</span>
+0518     <span class="keyword">end</span>
+0519 <span class="keyword">end</span>
+0520 
+0521 
+0522 <span class="comment">% For one family inputs, there is no need for a cell output (probably already done in measrespmat)</span>
+0523 <span class="keyword">if</span> length(Rmat) == 1
+0524     Rmat = Rmat{1};
+0525 <span class="keyword">end</span>
+0526 
+0527 
+0528 <span class="comment">% Save data in the proper directory</span>
+0529 <span class="keyword">if</span> ArchiveFlag || ischar(FileName)
+0530     [DirectoryName, FileName, Ext] = fileparts(FileName);
+0531     DirStart = pwd;
+0532     [DirectoryName, ErrorFlag] = gotodirectory(DirectoryName);
+0533     <span class="keyword">if</span> ErrorFlag
+0534         fprintf(<span class="string">'\n   There was a problem getting to the proper directory!\n\n'</span>);
+0535     <span class="keyword">end</span>
+0536     save(FileName, <span class="string">'Rmat'</span>,<span class="string">'MachineConfig'</span>);
+0537     cd(DirStart);
+0538     OutputFileName = [DirectoryName, FileName, <span class="string">'.mat'</span>];
+0539     
+0540     <span class="keyword">if</span> DisplayFlag
+0541         fprintf(<span class="string">'   Chromaticity response matrix data (''Rmat'') saved to disk\n'</span>);
+0542         fprintf(<span class="string">'   Filename: %s\n'</span>, OutputFileName);
+0543         fprintf(<span class="string">'   The total response matrix measurement time: %.2f minutes.\n'</span>, (gettime-TimeStart)/60);
+0544     <span class="keyword">end</span>
+0545 <span class="keyword">end</span>
+0546 
+0547 
+0548 <span class="keyword">if</span> MatrixFlag &amp;&amp; StructOutputFlag
+0549     error(<span class="string">'Cannot ask for a matrix and a structure output.'</span>);
+0550 <span class="keyword">end</span>
+0551 
+0552 
+0553 <span class="comment">% Return the data field of Rmat</span>
+0554 <span class="keyword">if</span> ~StructOutputFlag
+0555     <span class="keyword">if</span> length(ActuatorFamily) == 1
+0556         Rmat = Rmat.Data;
+0557     <span class="keyword">else</span>
+0558         <span class="keyword">for</span> i = 1:length(ActuatorFamily)
+0559             <span class="keyword">if</span> MatrixFlag
+0560                 R(:,i) = sum(Rmat{i}.Data,2);
+0561             <span class="keyword">else</span>
+0562                 R{i} = Rmat{i}.Data;
+0563             <span class="keyword">end</span>
+0564         <span class="keyword">end</span>
+0565         Rmat = R;
+0566     <span class="keyword">end</span>
+0567 <span class="keyword">end</span>
+0568</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

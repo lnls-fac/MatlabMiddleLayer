@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of loadorbit</title>
+  <meta name="keywords" content="loadorbit">
+  <meta name="description" content="LOADORBIT -  Loads orbit by file/directory specification - or - Golden %orbit by default">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; loadorbit.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>loadorbit
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>LOADORBIT -  Loads orbit by file/directory specification - or - Golden %orbit by default</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function varargout = loadorbit(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">LOADORBIT -  Loads orbit by file/directory specification - or - Golden %orbit by default
+[X,Y] = loadorbit(BPMxList,BPMyList,DirSpec,FileName,&lt;'x'/'z'/'b'&gt;,&lt;'struct'&gt;,&lt;'auto'&gt;,)
+
+  Inputs: 
+          1a.  varargin = If varargin contains keyword 'struct' return entire matrix structure
+          1b.  varargin = If varargin contains keyword 'auto' do not use file browser
+          1c.  varargin = If varargin contains keyword 'x' or 'z' only return horizontal or vertical orbit
+                          [X]   = loadorbit(BPMxList,[],      DirSpec, FileName, 'x', 'Struct');
+                          [Z]   = loadorbit([],      BPMyList,DirSpec, FileName, 'z', 'Struct');
+                          [X,Z] = loadorbit(BPMxList,BPMyList,DirSpec, FileName, 'b', 'Struct','Auto');
+                          Dimension: 1, 'x' - return only horizontal coordinates
+                          Dimension: 2, 'z' - return only vertical coordinates
+                          Dimension: 3, 'b' - return both planes
+                          - defaults to both planes (Dimension 3)
+                          Assumes BPM families are 'BPMx' and 'BPMz'
+                          BPMlist ([Sector Device #] or [element #]) (default: all BPMs)
+          2.  DirSpec   = Directory name for orbit data file  
+          3.  FileName  = File name for orbit data
+
+   OUPUTS:
+   1. Beam position</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>	DEV2ELEM - Converts an element list to a device list</li><li><a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>	ELEM2DEV - Converts a device list to an element list</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>	GETHBPMFAMILY - Return the default horizontal BPM family</li><li><a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>	GETVBPMFAMILY - Return the default vertical BPM family</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function ierror=checkdevicelist(X,BPMxList,Z,BPMyList,Dim);</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = loadorbit(varargin)</a>
+0002 <span class="comment">%LOADORBIT -  Loads orbit by file/directory specification - or - Golden %orbit by default</span>
+0003 <span class="comment">%[X,Y] = loadorbit(BPMxList,BPMyList,DirSpec,FileName,&lt;'x'/'z'/'b'&gt;,&lt;'struct'&gt;,&lt;'auto'&gt;,)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Inputs:</span>
+0006 <span class="comment">%          1a.  varargin = If varargin contains keyword 'struct' return entire matrix structure</span>
+0007 <span class="comment">%          1b.  varargin = If varargin contains keyword 'auto' do not use file browser</span>
+0008 <span class="comment">%          1c.  varargin = If varargin contains keyword 'x' or 'z' only return horizontal or vertical orbit</span>
+0009 <span class="comment">%                          [X]   = loadorbit(BPMxList,[],      DirSpec, FileName, 'x', 'Struct');</span>
+0010 <span class="comment">%                          [Z]   = loadorbit([],      BPMyList,DirSpec, FileName, 'z', 'Struct');</span>
+0011 <span class="comment">%                          [X,Z] = loadorbit(BPMxList,BPMyList,DirSpec, FileName, 'b', 'Struct','Auto');</span>
+0012 <span class="comment">%                          Dimension: 1, 'x' - return only horizontal coordinates</span>
+0013 <span class="comment">%                          Dimension: 2, 'z' - return only vertical coordinates</span>
+0014 <span class="comment">%                          Dimension: 3, 'b' - return both planes</span>
+0015 <span class="comment">%                          - defaults to both planes (Dimension 3)</span>
+0016 <span class="comment">%                          Assumes BPM families are 'BPMx' and 'BPMz'</span>
+0017 <span class="comment">%                          BPMlist ([Sector Device #] or [element #]) (default: all BPMs)</span>
+0018 <span class="comment">%          2.  DirSpec   = Directory name for orbit data file</span>
+0019 <span class="comment">%          3.  FileName  = File name for orbit data</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%   OUPUTS:</span>
+0022 <span class="comment">%   1. Beam position</span>
+0023 
+0024 <span class="comment">% Written by J. Corbett 7/12/03</span>
+0025 <span class="comment">% Modified by Laurent S. Nadolski</span>
+0026 
+0027 <span class="comment">% TODO clean up, a bit messy</span>
+0028 
+0029 <span class="comment">% %remove [] from varargin</span>
+0030 <span class="comment">%   for k = length(varargin):-1:1</span>
+0031 <span class="comment">%     if isempty(varargin{k})</span>
+0032 <span class="comment">%             varargin(k) = [];</span>
+0033 <span class="comment">%     end</span>
+0034 <span class="comment">%   end</span>
+0035 
+0036 
+0037 <span class="comment">%Default input values - assign opsdata directory and golden file</span>
+0038 BPMxFamily = <a href="gethbpmfamily.html" class="code" title="function Family = gethbpmfamily(OneHit)">gethbpmfamily</a>;
+0039 BPMyFamily = <a href="getvbpmfamily.html" class="code" title="function Family = getvbpmfamily(OneHit)">getvbpmfamily</a>;
+0040 BPMxList   = find(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMxFamily,<span class="string">'Status'</span>));
+0041 BPMyList   = find(<a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMyFamily,<span class="string">'Status'</span>));
+0042 DirSpec    = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>,<span class="string">'BPMData'</span>);   <span class="comment">%default to BPM data directory</span>
+0043 FileName   =  [];                <span class="comment">%no default file</span>
+0044 XPlaneFlag = 0;
+0045 YPlaneFlag = 0;
+0046 XYPlaneFlag= 0;
+0047 StructOutputFlag = 0;       <span class="comment">%default numeric output (not structure)</span>
+0048 AutoReadFlag     = 0;       <span class="comment">%default pop file read browser</span>
+0049 
+0050 <span class="comment">%Check for structure output request</span>
+0051    [varargin, StructOutputFlag] = findkeyword(varargin,<span class="string">'struct'</span>);
+0052 
+0053 <span class="comment">%Check for auto read request</span>
+0054   <span class="comment">% [varargin, AutoReadFlag] = findkeyword(varargin,'auto');</span>
+0055    
+0056 <span class="comment">%Check for plane request</span>
+0057    [varargin, XPlaneFlag] = findkeyword(varargin,<span class="string">'x'</span>);
+0058    [varargin, YPlaneFlag] = findkeyword(varargin,<span class="string">'z'</span>);
+0059    [varargin, XYPlaneFlag]= findkeyword(varargin,<span class="string">'b'</span>);
+0060 
+0061 <span class="comment">%Evaluate the dimension (default 3=both)</span>
+0062    Dim = 0;   <span class="comment">%unspecified</span>
+0063    <span class="keyword">if</span> XPlaneFlag
+0064       Dim = 1;
+0065    <span class="keyword">elseif</span>  YPlaneFlag
+0066       Dim = 2;
+0067    <span class="keyword">elseif</span>  XYPlaneFlag
+0068       Dim = 3;
+0069    <span class="keyword">end</span>
+0070 
+0071 <span class="comment">%assign values specified by varargin</span>
+0072    <span class="keyword">if</span> nargin&gt;=1
+0073      <span class="keyword">if</span>  size(varargin,2) &gt;= 1  
+0074          BPMxList=varargin{1}; 
+0075      <span class="keyword">end</span>
+0076      <span class="keyword">if</span>  size(varargin,2) &gt;= 2  
+0077          BPMyList=varargin{2}; 
+0078      <span class="keyword">end</span>
+0079      <span class="keyword">if</span>     size(varargin,2) &gt;= 3  DirSpec=varargin{3}; <span class="keyword">end</span>
+0080      <span class="keyword">if</span>     size(varargin,2) == 4  FileName=[varargin{4} <span class="string">'.mat'</span>]; <span class="keyword">end</span>
+0081    <span class="keyword">end</span>
+0082    
+0083    X=[];
+0084    Z=[];
+0085 
+0086 <span class="keyword">if</span> AutoReadFlag == 0    <span class="comment">%browse for file</span>
+0087 [FileName, DirSpec,FilterIndex]=uigetfile(<span class="string">'*.mat'</span>,<span class="string">'Select Orbit Archive File'</span>,[DirSpec FileName]);
+0088     <span class="keyword">if</span> FilterIndex==0
+0089     disp(<span class="string">'   Warning: No orbit loaded'</span>);
+0090     <span class="keyword">if</span>     Dim==1
+0091     varargout{1}=[];
+0092     <span class="keyword">elseif</span> Dim==2
+0093     varargout{1}=[];
+0094     <span class="keyword">elseif</span> Dim==0 | Dim==3
+0095     varargout{1}=[];
+0096     varargout{2}=[];
+0097     <span class="keyword">end</span>
+0098     <span class="keyword">return</span>
+0099     <span class="keyword">end</span>
+0100 <span class="keyword">end</span>
+0101     
+0102 FileSpec=[DirSpec FileName];
+0103 <span class="keyword">if</span> exist(FileSpec,<span class="string">'file'</span>)==0 | exist(FileSpec,<span class="string">'file'</span>)==7
+0104     error([<span class="string">'File not found in loadorbit: '</span> FileSpec]);
+0105     disp(<span class="string">'   Warning: No orbit loaded'</span>);
+0106     <span class="keyword">if</span>     Dim==1
+0107     varargout{1}=[];
+0108     <span class="keyword">elseif</span> Dim==2
+0109     varargout{1}=[];
+0110     <span class="keyword">elseif</span> Dim==0 | Dim==3
+0111     varargout{1}=[];
+0112     varargout{2}=[];
+0113     <span class="keyword">end</span>
+0114   <span class="keyword">return</span>
+0115 <span class="keyword">end</span>
+0116 
+0117 orbitdata = load(FileSpec);          <span class="comment">%load orbit archive file - always a structure in archive</span>
+0118 
+0119 structnames = fieldnames(orbitdata);
+0120 
+0121 <span class="comment">%Note that structure names can be any string (not just X, Z)</span>
+0122 <span class="keyword">for</span> ii=1:size(structnames,1)
+0123     DataStruct=orbitdata.(structnames{ii});
+0124     <span class="keyword">if</span> iscell(DataStruct)  DataStruct=DataStruct{1}; <span class="keyword">end</span>
+0125     <span class="keyword">if</span>      DataStruct.FamilyName==BPMxFamily    
+0126       X = DataStruct;
+0127     <span class="keyword">elseif</span>  DataStruct.FamilyName==BPMyFamily    
+0128       Z = DataStruct;
+0129     <span class="keyword">end</span>
+0130 <span class="keyword">end</span>
+0131 
+0132 <span class="comment">%check requested data exists</span>
+0133 <span class="keyword">if</span> (Dim==1 | Dim==3) &amp; isempty(X)  error([<span class="string">'horizontal data not available in orbit file: '</span> FileSpec]); <span class="keyword">end</span>
+0134 <span class="keyword">if</span> (Dim==2 | Dim==3) &amp; isempty(Z)  error([  <span class="string">'vertical data not available in orbit file: '</span> FileSpec]); <span class="keyword">end</span>
+0135 
+0136 <span class="keyword">if</span> ~isempty(X.DeviceList) BPMxList=<a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>(BPMxFamily,X.DeviceList); <span class="keyword">end</span>
+0137 <span class="keyword">if</span> ~isempty(Z.DeviceList) BPMyList=<a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>(BPMyFamily,Z.DeviceList); <span class="keyword">end</span>
+0138 [ierror]=<a href="#_sub1" class="code" title="subfunction ierror=checkdevicelist(X,BPMxList,Z,BPMyList,Dim);">checkdevicelist</a>(X,BPMxList,Z,BPMyList,Dim);
+0139 <span class="keyword">if</span> ierror==1 <span class="keyword">return</span>; <span class="keyword">end</span>
+0140 
+0141 <span class="keyword">if</span>     Dim==0   <span class="comment">%no specific plane request</span>
+0142    <span class="keyword">if</span> size(structnames,1)==1 &amp;&amp; ~isempty(X)  Dim=1; <span class="keyword">end</span>  <span class="comment">%put data into X=varargout{1}</span>
+0143    <span class="keyword">if</span> size(structnames,1)==1 &amp;&amp; ~isempty(Z)  Dim=2; <span class="keyword">end</span>  <span class="comment">%put data into Z=varargout{2}</span>
+0144    <span class="keyword">if</span> size(structnames,1)==2   Dim=3; <span class="keyword">end</span>  <span class="comment">%put data into X=varargout{1}, Z=varargout{1}</span>
+0145 <span class="keyword">end</span>
+0146       
+0147 <span class="comment">%Reduce orbit if necessary</span>
+0148 <span class="keyword">if</span> Dim == 1 | Dim == 3
+0149 X.Data = X.Data;
+0150 X.DeviceList=<a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(BPMxFamily,BPMxList);
+0151 <span class="keyword">end</span>
+0152 <span class="keyword">if</span> Dim == 2 | Dim == 3
+0153 Z.Data = Z.Data;
+0154 Z.DeviceList=<a href="elem2dev.html" class="code" title="function Output = elem2dev(Family, ElementList)">elem2dev</a>(BPMyFamily,BPMyList);
+0155 <span class="keyword">end</span>
+0156 
+0157 X.FileName = FileSpec;
+0158 Z.FileName = FileSpec;
+0159 
+0160 <span class="keyword">if</span> StructOutputFlag == 0   <span class="comment">%caller wants numeric output</span>
+0161 X = X.Data;
+0162 Z = Z.Data;
+0163 <span class="keyword">end</span>
+0164 
+0165 <span class="comment">%Output requested planes</span>
+0166 <span class="keyword">if</span>     Dim==1
+0167     varargout{1}=X;
+0168     <span class="keyword">if</span> nargout==2 varargout{2}=[]; <span class="keyword">end</span>  <span class="comment">%Dim=0 (unspecified) but caller expects two outputs</span>
+0169 <span class="keyword">elseif</span> Dim==2                           
+0170     <span class="keyword">if</span> nargout==2                       <span class="comment">%Dim=0 (unspecified) but caller expects two outputs</span>
+0171         varargout{1}=[]; 
+0172         varargout{2}=Z;
+0173     <span class="keyword">else</span>  
+0174         varargout{1}=Z;
+0175     <span class="keyword">end</span>
+0176 <span class="keyword">elseif</span> Dim==3
+0177     varargout{1}=X;
+0178     varargout{2}=Z;
+0179 <span class="keyword">end</span>
+0180 
+0181 
+0182 <span class="comment">%==========================================================</span>
+0183 <a name="_sub1" href="#_subfunctions" class="code">function ierror=checkdevicelist(X,BPMxList,Z,BPMyList,Dim);</a>
+0184 <span class="comment">%==========================================================</span>
+0185 ierror=0;
+0186 <span class="comment">%check for BPMs requested but not supplied</span>
+0187 <span class="keyword">if</span>     Dim==1
+0188   [ElemListNotFound, iNotFound]=setdiff(BPMxList, <a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>(BPMxFamily,X.DeviceList));
+0189   <span class="keyword">if</span> iNotFound&gt;0
+0190     ierror=1;
+0191     <span class="keyword">for</span> ii=1:iNotFound
+0192         disp([<span class="string">'Warning: BPM value not in Archive Orbit: '</span> <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMxFamily,<span class="string">'CommonNames'</span>,ElemListNotFound(ii))]);
+0193     <span class="keyword">end</span>
+0194    <span class="keyword">return</span>
+0195    <span class="keyword">end</span>
+0196 
+0197 <span class="keyword">elseif</span> Dim==2
+0198   [ElemListNotFound, iNotFound]=setdiff(BPMyList, <a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>(BPMyFamily,Z.DeviceList));
+0199     <span class="keyword">if</span> iNotFound&gt;0
+0200     ierror=1;
+0201     <span class="keyword">for</span> ii=1:iNotFound
+0202         disp([<span class="string">'Warning: BPM value not in Archive Orbit: '</span> <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMyFamily,<span class="string">'CommonNames'</span>,ElemListNotFound(ii))]);
+0203     <span class="keyword">end</span>
+0204    <span class="keyword">return</span>
+0205    <span class="keyword">end</span>
+0206 
+0207 <span class="keyword">elseif</span> Dim==3
+0208   [ElemListNotFound, iNotFound]=setdiff(BPMxList, <a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>(BPMxFamily,X.DeviceList));
+0209     <span class="keyword">if</span> iNotFound&gt;0
+0210     ierror=1;
+0211     <span class="keyword">for</span> ii=1:iNotFound
+0212         disp([<span class="string">'Warning: BPM value not in Archive Orbit: '</span> <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMyFamily,<span class="string">'CommonNames'</span>,ElemListNotFound(ii))]);
+0213     <span class="keyword">end</span>
+0214    <span class="keyword">return</span>
+0215    <span class="keyword">end</span>
+0216 
+0217   [ElemListNotFound, iNotFound]=setdiff(BPMyList, <a href="dev2elem.html" class="code" title="function Output = dev2elem(Family, DevList)">dev2elem</a>(BPMyFamily,Z.DeviceList));
+0218     <span class="keyword">if</span> iNotFound&gt;0
+0219     ierror=1;
+0220     <span class="keyword">for</span> ii=1:iNotFound
+0221         disp([<span class="string">'Warning: BPM value not in Archive Orbit: '</span> <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(BPMyFamily,<span class="string">'CommonNames'</span>,ElemListNotFound(ii))]);
+0222     <span class="keyword">end</span>
+0223    <span class="keyword">return</span>
+0224    <span class="keyword">end</span>
+0225 
+0226 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

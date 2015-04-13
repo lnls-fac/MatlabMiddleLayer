@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getmcf</title>
+  <meta name="keywords" content="getmcf">
+  <meta name="description" content="GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; getmcf.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getmcf
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function Alpha = getmcf(ModelString) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model
+  Alpha = getmcf               % returns getfamilydata('MCF')
+  Alpha = getmcf('Model')      % returns mcf(THERING)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="findrf1.html" class="code" title="function [DeltaRF, RFnew, frf] = findrf1(DeltaRF, BPMFamily, BPMList, FileName)">findrf1</a>	FINDRF1 - Finds the RF frequency that minimizes the horizonal dispersion</li><li><a href="getenergy.html" class="code" title="function [Energy, HCMEnergy] = getenergy(varargin)">getenergy</a>	GETENERGY - Returns the beam energy base on the bend magnet</li><li><a href="getgolden.html" class="code" title="function Data = getgolden(varargin)">getgolden</a>	GETGOLDEN - Returns the golden values for a family</li><li><a href="measchro.html" class="code" title="function [Chromaticity, FileName] = measchro(varargin)">measchro</a>	MEASCHRO -  measures the chromaticity function emperically</li><li><a href="measdisp.html" class="code" title="function [Dx, Dy, FileName] = measdisp(varargin)">measdisp</a>	MEASDISP - Measures the dispersion function</li><li><a href="orbitcorrectionmethods.html" class="code" title="function [OCS, SmatNoWeights, S, U, V] = orbitcorrectionmethods(OCS, Smat, S, U, V)">orbitcorrectionmethods</a>	ORBITCORRECTIONMETHODS - Some the orbit correction methods used on light sources</li><li><a href="plotcm.html" class="code" title="function [DeltaRF, HCMEnergyChangeTotal, DeltaL] = plotcm(varargin)">plotcm</a>	PLOTCM - Plots the horizontal and vertical corrector magnet families and</li><li><a href="rmdisp.html" class="code" title="function [DeltaRF, BPM, c, DispOrbit] = rmdisp(varargin)">rmdisp</a>	RMDISP - Removes the portion of the orbit that correlates with the dispersion</li><li><a href="setchro.html" class="code" title="function [DelSext, ActuatorFamily] = setchro(varargin)">setchro</a>	SETCHRO - Measures then sets the chromaticity</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Alpha = getmcf(ModelString)</a>
+0002 <span class="comment">%GETMCF - Returns the momentum compaction factor (MCF) stored in the AD or the model</span>
+0003 <span class="comment">%  Alpha = getmcf               % returns getfamilydata('MCF')</span>
+0004 <span class="comment">%  Alpha = getmcf('Model')      % returns mcf(THERING)</span>
+0005 
+0006 <span class="comment">%  Written by Greg Portmann</span>
+0007 
+0008 
+0009 <span class="keyword">if</span> nargin &lt; 1
+0010     ModelString = <span class="string">''</span>;
+0011 <span class="keyword">end</span>
+0012 
+0013 <span class="keyword">if</span> strcmpi(ModelString,<span class="string">'model'</span>) | strcmpi(ModelString,<span class="string">'simulator'</span>)
+0014     <span class="comment">% Get from the model</span>
+0015     Alpha = modelmcf;
+0016 <span class="keyword">else</span>
+0017     Alpha = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'MCF'</span>);
+0018 <span class="comment">%     try</span>
+0019 <span class="comment">%         % Get from the model</span>
+0020 <span class="comment">%         Alpha = modelmcf;</span>
+0021 <span class="comment">%     catch</span>
+0022 <span class="comment">%         Alpha = getfamilydata('MCF');</span>
+0023 <span class="comment">%         fprintf('   modelmcf failing so MCF = %f (getfamilydata(''MCF'')) is being used.\n', Alpha);</span>
+0024 <span class="comment">%     end</span>
+0025 <span class="keyword">end</span>
+0026</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

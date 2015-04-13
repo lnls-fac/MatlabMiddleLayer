@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of mcamontimer</title>
+  <meta name="keywords" content="mcamontimer">
+  <meta name="description" content="MCAMONTIMER - Controls the initialisation and termination of the MATLAB">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../index.html">Home</a> &gt;  <a href="#">links</a> &gt; <a href="index.html">mca_asp</a> &gt; mcamontimer.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../index.html"><img alt="<" border="0" src="../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for links\mca_asp&nbsp;<img alt=">" border="0" src="../../right.png"></a></td></tr></table>-->
+
+<h1>mcamontimer
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>MCAMONTIMER - Controls the initialisation and termination of the MATLAB</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="box"><strong>function varargout = mcamontimer(varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">MCAMONTIMER - Controls the initialisation and termination of the MATLAB
+              timer used to poll the MCA monitor command queue.
+
+ Started = mcamontimer - returns 1 if monitor polling has been started
+                         returns 0 if monitor polling has not been started
+
+ mcamontimer('start') - starts the timer polling every 0.1 seconds
+ mcamontimer('stop')  - stops the timer
+
+ Notes: 
+ (1) If monitors are installed using mcamon but mcaTimer has not been
+     started, the monitor events will queue up indefinitely.  There is
+     no limit to the size of the queue.
+ (2) A polling period of 0.1 seconds is used.  This may be varied if
+     desired by modifying the 'Period' argument in the definition of
+     mcaTimer.
+ (3) Call mcamontimer('start') once.
+
+ See also <a href="mcamon.html" class="code" title="function varargout = mcamon(handle,varargin)">MCAMON</a>, <a href="mcamonevents.html" class="code" title="function varargout = mcamonevents(varargin)">MCAMONEVENTS</a>, <a href="mcacache.html" class="code" title="function varargout = mcacache(varargin)">MCACACHE</a>, <a href="mcaclearmon.html" class="code" title="function mcaclearmon(varargin)">MCACLEARMON</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function varargout = mcamontimer(varargin)</a>
+0002 <span class="comment">%MCAMONTIMER - Controls the initialisation and termination of the MATLAB</span>
+0003 <span class="comment">%              timer used to poll the MCA monitor command queue.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Started = mcamontimer - returns 1 if monitor polling has been started</span>
+0006 <span class="comment">%                         returns 0 if monitor polling has not been started</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% mcamontimer('start') - starts the timer polling every 0.1 seconds</span>
+0009 <span class="comment">% mcamontimer('stop')  - stops the timer</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% Notes:</span>
+0012 <span class="comment">% (1) If monitors are installed using mcamon but mcaTimer has not been</span>
+0013 <span class="comment">%     started, the monitor events will queue up indefinitely.  There is</span>
+0014 <span class="comment">%     no limit to the size of the queue.</span>
+0015 <span class="comment">% (2) A polling period of 0.1 seconds is used.  This may be varied if</span>
+0016 <span class="comment">%     desired by modifying the 'Period' argument in the definition of</span>
+0017 <span class="comment">%     mcaTimer.</span>
+0018 <span class="comment">% (3) Call mcamontimer('start') once.</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% See also MCAMON, MCAMONEVENTS, MCACACHE, MCACLEARMON</span>
+0021 <span class="comment">%</span>
+0022 <span class="keyword">persistent</span> mcaTimer TimerStarted;
+0023 
+0024 <span class="keyword">if</span> (nargin == 0)
+0025     <span class="keyword">if</span> (TimerStarted)
+0026         varargout{1} = 1;
+0027     <span class="keyword">else</span>
+0028         varargout{1} = 0;
+0029     <span class="keyword">end</span>
+0030     
+0031 <span class="comment">% Note that different timer mechanisms are used on Windows and elsewhere.</span>
+0032 <span class="comment">% On Windows, the MATLAB timer is blocked when a figure window is dragged</span>
+0033 <span class="comment">% or any modal dialog is opened (such as a uigetdir dialog).  This does not</span>
+0034 <span class="comment">% happen on Unix.  In orde to get around this on Windows, I have used the</span>
+0035 <span class="comment">% timereval function instead of the MATLAB timer.</span>
+0036 <span class="comment">%</span>
+0037 <span class="keyword">elseif</span> (nargin == 1)
+0038     <span class="keyword">switch</span> varargin{1}
+0039         
+0040         <span class="keyword">case</span> <span class="string">'start'</span>
+0041             <span class="keyword">if</span> (TimerStarted)
+0042                 error(<span class="string">'MCA monitor polling is already started.'</span>);
+0043             <span class="keyword">end</span>
+0044             mlock;
+0045             <span class="keyword">if</span> (ispc)
+0046                 mcaTimer = timereval(2, 100, <span class="string">'mca(600)'</span>);
+0047             <span class="keyword">else</span>
+0048                 mcaTimer = timer(<span class="string">'TimerFcn'</span>, <span class="string">'mca(600)'</span>, <span class="string">'Period'</span>, 0.1, <span class="string">'ExecutionMode'</span>, <span class="string">'fixedSpacing'</span>);
+0049                 start (mcaTimer);
+0050             <span class="keyword">end</span>
+0051             TimerStarted = 1;
+0052             
+0053         <span class="keyword">case</span> <span class="string">'stop'</span>
+0054             <span class="keyword">if</span> (TimerStarted)
+0055                 munlock;
+0056                 <span class="keyword">if</span> (ispc)
+0057                     timereval(5, mcaTimer);
+0058                 <span class="keyword">else</span>
+0059                     stop (mcaTimer);
+0060                     clear mcaTimer;
+0061                 <span class="keyword">end</span>
+0062                 TimerStarted = 0;
+0063             <span class="keyword">else</span>
+0064                 error(<span class="string">'MCA monitor polling has not been started.'</span>);
+0065             <span class="keyword">end</span>            
+0066         <span class="keyword">otherwise</span>
+0067             error(<span class="string">'Invalid parameter specified for mcamontimer.  Use ''start'' or ''stop''.'</span>)
+0068     <span class="keyword">end</span>
+0069 <span class="keyword">else</span>
+0070     error(<span class="string">'Invalid number of arguments in mcamontimer.'</span>)
+0071 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of golden2sim</title>
+  <meta name="keywords" content="golden2sim">
+  <meta name="description" content="GOLDEN2SIM - loads online machine configuration to AT configuration">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">mml</a> &gt; golden2sim.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for mml&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>golden2sim
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>GOLDEN2SIM - loads online machine configuration to AT configuration</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function golden2sim(ZeroCMFlag) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">GOLDEN2SIM - loads online machine configuration to AT configuration
+  golden2sim(ZeroCMFlag)
+
+  ZeroCMFlag = 0 set the machine corrector setting to the simulator
+               1 zero the correctors in the simulator {Default}
+
+  NOTES
+  1. The RF frequency of the simulator is not changed
+  2. Use ZeroCMFlag = 1 when you think the corrector magnets on the 
+     online machine are restoring the orbit to the design orbit (or close)
+
+  See also <a href="machine2sim.html" class="code" title="function machine2sim(ZeroCMFlag)">machine2sim</a>, <a href="sim2machine.html" class="code" title="function sim2machine">sim2machine</a></pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>	GETAM - Gets monitor channels</li><li><a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>	GETFAMILYDATA - Gets data associated with the accelerator control</li><li><a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>	GETHCMFAMILY - Returns the default horizontal corrector family</li><li><a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>	GETVCMFAMILY - Returns the default vertical corrector family</li><li><a href="setmachineconfig.html" class="code" title="function [ConfigSetpoint, FileName] = setmachineconfig(varargin)">setmachineconfig</a>	SETMACHINECONFIG - Sets the storage ring setpoints from a file or configuration data structure</li><li><a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>	SETSP - Makes an absolute setpoint change to the 'Setpoint' field</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function golden2sim(ZeroCMFlag)</a>
+0002 <span class="comment">%GOLDEN2SIM - loads online machine configuration to AT configuration</span>
+0003 <span class="comment">%  golden2sim(ZeroCMFlag)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  ZeroCMFlag = 0 set the machine corrector setting to the simulator</span>
+0006 <span class="comment">%               1 zero the correctors in the simulator {Default}</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  NOTES</span>
+0009 <span class="comment">%  1. The RF frequency of the simulator is not changed</span>
+0010 <span class="comment">%  2. Use ZeroCMFlag = 1 when you think the corrector magnets on the</span>
+0011 <span class="comment">%     online machine are restoring the orbit to the design orbit (or close)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%  See also machine2sim, sim2machine</span>
+0014 
+0015 <span class="comment">%  Written by Greg Portmann</span>
+0016 
+0017 
+0018 <span class="keyword">if</span> nargin &lt; 1
+0019     ZeroCMFlag = 1;
+0020 <span class="keyword">end</span>
+0021 
+0022 
+0023 <span class="comment">% Get from the golden config</span>
+0024 FileName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'OpsData'</span>, <span class="string">'LatticeFile'</span>);
+0025 DirectoryName = <a href="getfamilydata.html" class="code" title="function [Data, ErrorFlag] = getfamilydata(Family, Field1, Field2, DeviceList)">getfamilydata</a>(<span class="string">'Directory'</span>, <span class="string">'OpsData'</span>);
+0026 load([DirectoryName FileName]);
+0027 
+0028 
+0029 <span class="comment">% Set to the simulator (don't change the simulator RF)</span>
+0030 RFsim = <a href="getam.html" class="code" title="function [AM, tout, DataTime, ErrorFlag] = getam(varargin)">getam</a>(<span class="string">'RF'</span>,<span class="string">'Simulator'</span>);
+0031 <a href="setmachineconfig.html" class="code" title="function [ConfigSetpoint, FileName] = setmachineconfig(varargin)">setmachineconfig</a>(ConfigSetpoint, <span class="string">'Simulator'</span>);
+0032 <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(<span class="string">'RF'</span>, RFsim, <span class="string">'Simulator'</span>);
+0033 
+0034 <span class="keyword">if</span> ZeroCMFlag
+0035     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(<a href="gethcmfamily.html" class="code" title="function Family = gethcmfamily(OneHit)">gethcmfamily</a>, 0, <span class="string">'Simulator'</span>);
+0036     <a href="setsp.html" class="code" title="function ErrorFlag = setsp(Family, varargin)">setsp</a>(<a href="getvcmfamily.html" class="code" title="function Family = getvcmfamily(OneHit)">getvcmfamily</a>, 0, <span class="string">'Simulator'</span>);
+0037 <span class="keyword">end</span>
+0038</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

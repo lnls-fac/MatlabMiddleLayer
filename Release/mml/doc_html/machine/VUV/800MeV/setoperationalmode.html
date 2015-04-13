@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setoperationalmode</title>
+  <meta name="keywords" content="setoperationalmode">
+  <meta name="description" content="SETOPERATIONALMODE - Switches between the various operational modes">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="#">machine</a> &gt; <a href="#">VUV</a> &gt; <a href="index.html">800MeV</a> &gt; setoperationalmode.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for machine\VUV\800MeV&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>setoperationalmode
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>SETOPERATIONALMODE - Switches between the various operational modes</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function setoperationalmode(OperationalMode) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">SETOPERATIONALMODE - Switches between the various operational modes
+  setoperationalmode(Mode)
+
+  Mode = 1. 0.80 GeV, User Mode
+         2. 0.80 GeV, Test Mode</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>	SETLOCODATA - Applies the LOCO calibration data to both the middle layer & the accelerator</li><li><a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>	UPDATEATINDEX - Updates the AT indices in the MiddleLayer with the present AT lattice</li><li><a href="vuvatlat.html" class="code" title="function vuvatlat">vuvatlat</a>	VUVATLAT - VUV storage ring AT lattice</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="vuvinit.html" class="code" title="function vuvinit(OperationalMode)">vuvinit</a>	VUVINIT - Initialize NSLS VUV ring parameters for control in MATLAB</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function setoperationalmode(OperationalMode)</a>
+0002 <span class="comment">%SETOPERATIONALMODE - Switches between the various operational modes</span>
+0003 <span class="comment">%  setoperationalmode(Mode)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%  Mode = 1. 0.80 GeV, User Mode</span>
+0006 <span class="comment">%         2. 0.80 GeV, Test Mode</span>
+0007 <span class="comment">%</span>
+0008 
+0009 
+0010 <span class="keyword">global</span> THERING
+0011 
+0012 
+0013 <span class="comment">% Check if the AO exists</span>
+0014 checkforao;
+0015 
+0016 
+0017 <span class="keyword">if</span> nargin &lt; 1
+0018     ModeCell = {<span class="string">'800 MeV, User Mode'</span>, <span class="string">'800 MeV, Model'</span>};
+0019     [OperationalMode, OKFlag] = listdlg(<span class="string">'Name'</span>,<span class="string">'VUV'</span>,<span class="string">'PromptString'</span>,<span class="string">'Select the Operational Mode:'</span>, <span class="string">'SelectionMode'</span>,<span class="string">'single'</span>, <span class="string">'ListString'</span>, ModeCell);
+0020     <span class="keyword">if</span> OKFlag ~= 1
+0021         fprintf(<span class="string">'   Operational mode not changed\n'</span>);
+0022         <span class="keyword">return</span>
+0023     <span class="keyword">end</span>
+0024 <span class="keyword">end</span>
+0025 
+0026 
+0027 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0028 <span class="comment">% load AcceleratorData structure %</span>
+0029 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+0030 AD = getad;
+0031 AD.Machine = <span class="string">'VUV'</span>;               <span class="comment">% Will already be defined if setpathmml was used</span>
+0032 AD.SubMachine = <span class="string">'800MeV'</span>;    <span class="comment">% Will already be defined if setpathmml was used</span>
+0033 AD.OperationalMode = <span class="string">''</span>;          <span class="comment">% Gets filled in later</span>
+0034 AD.Energy          = 0.808;  <span class="comment">% GeV</span>
+0035 AD.InjectionEnergy = 0.743;  <span class="comment">% GeV</span>
+0036 AD.HarmonicNumber = 9;
+0037 
+0038 
+0039 <span class="comment">% Defaults RF changes for disperion and chromaticity measurements (must be in Hardware units)</span>
+0040 AD.DeltaRFDisp = 1000*1e-6;
+0041 AD.DeltaRFChro = [-500 250 0 250 500]*1e-6;
+0042 
+0043 
+0044 <span class="comment">% Tune processor delay: delay required to wait</span>
+0045 <span class="comment">% to have a fresh tune measurement after changing</span>
+0046 <span class="comment">% a variable like the RF frequency.  Setpv will wait</span>
+0047 <span class="comment">% 2.2 * TuneDelay to be guaranteed a fresh data point.</span>
+0048 AD.TuneDelay = 30.0;  <span class="comment">% the scan rate is 30 sec/plane</span>
+0049 
+0050 
+0051 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0052 <span class="comment">% Operational Modes %</span>
+0053 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0054 
+0055 <span class="comment">% Mode setup variables (mostly path and file names)</span>
+0056 <span class="comment">% AD.OperationalMode - String used in titles</span>
+0057 <span class="comment">% ModeName - string used for mode directory name off DataRoot/MachineName</span>
+0058 <span class="comment">% OpsFileExtension - string add to default file names</span>
+0059 <span class="keyword">if</span> OperationalMode == 1
+0060     <span class="comment">% User mode</span>
+0061     AD.OperationalMode = <span class="string">'800 MeV, User Mode'</span>;
+0062     ModeName = <span class="string">'User'</span>;
+0063     OpsFileExtension = <span class="string">''</span>;
+0064 
+0065     <span class="comment">% AT lattice</span>
+0066     <a href="vuvatlat.html" class="code" title="function vuvatlat">vuvatlat</a>;
+0067     AD.ATModel = <span class="string">'vuvatlat'</span>;
+0068 
+0069     <span class="comment">% Golden Tune</span>
+0070     AO = getao;
+0071     AO.TUNE.Golden = [
+0072         0.1400
+0073         0.2600
+0074         NaN];
+0075     setao(AO);
+0076 
+0077     <span class="comment">% Golden chromaticity is in the AD (Physics units)</span>
+0078     AD.Chromaticity.Golden = [1; 1];
+0079 
+0080     <span class="comment">% This is a bit of a cluge to know if the user is on the BNL filer</span>
+0081     <span class="comment">% If so, then the MML user probably wants to be online</span>
+0082     MMLROOT = getmmlroot;
+0083     <span class="keyword">if</span> isempty(findstr(lower(MMLROOT),<span class="string">'/home/moper/acceleratorcontrol'</span>))
+0084         switch2sim;
+0085     <span class="keyword">else</span>
+0086         switch2online;
+0087     <span class="keyword">end</span>
+0088     switch2hw;
+0089 
+0090 <span class="keyword">elseif</span> OperationalMode == 2
+0091     <span class="comment">% Model mode</span>
+0092     AD.OperationalMode = <span class="string">'800 MeV, Model Mode'</span>;
+0093     ModeName = <span class="string">'Model'</span>;
+0094     OpsFileExtension = <span class="string">''</span>;
+0095 
+0096     <span class="comment">% AT lattice</span>
+0097     <a href="vuvatlat.html" class="code" title="function vuvatlat">vuvatlat</a>;
+0098     AD.ATModel = <span class="string">'vuvatlat'</span>;
+0099 
+0100     <span class="comment">% Golden Tune</span>
+0101     AO = getao;
+0102     AO.TUNE.Golden = [
+0103         0.1922
+0104         0.2934
+0105         NaN];
+0106     setao(AO);
+0107 
+0108     <span class="comment">% Golden chromaticity is in the AD (Physics units)</span>
+0109     AD.Chromaticity.Golden = [1; 1];
+0110 
+0111     switch2hw;
+0112     switch2sim;
+0113 <span class="keyword">end</span>
+0114 
+0115 
+0116 <span class="comment">% Set the AD directory path</span>
+0117 setad(AD);
+0118 setmmldirectories(AD.Machine, AD.SubMachine, ModeName, OpsFileExtension);
+0119 AD = getad;
+0120 
+0121 
+0122 <span class="comment">% Circumference</span>
+0123 AD.Circumference = findspos(THERING,length(THERING)+1);
+0124 
+0125 
+0126 <span class="comment">% Updates the AT indices in the MiddleLayer with the present AT lattice</span>
+0127 <a href="updateatindex.html" class="code" title="function updateatindex">updateatindex</a>;
+0128 
+0129 
+0130 <span class="comment">% Set the model energy</span>
+0131 setenergymodel(AD.Energy);
+0132 
+0133 
+0134 <span class="comment">% Cavity and radiation</span>
+0135 setcavity off;  
+0136 setradiation off;
+0137 fprintf(<span class="string">'   Radiation and cavities are off. Use setradiation / setcavity to modify.\n'</span>); 
+0138 
+0139 
+0140 MCF = getmcf(<span class="string">'Model'</span>);
+0141 <span class="keyword">if</span> isnan(MCF)
+0142     AD.MCF = 0.0235;
+0143     fprintf(<span class="string">'   Model alpha calculation failed, middlelayer alpha set to  %f\n'</span>, AD.MCF);
+0144 <span class="keyword">else</span>
+0145     AD.MCF = MCF;
+0146     fprintf(<span class="string">'   Middlelayer alpha set to %f (determined by the initial AT model)\n'</span>, AD.MCF);
+0147 <span class="keyword">end</span>
+0148 
+0149 setad(AD);
+0150 
+0151 
+0152 <span class="comment">% I usually put a LocoData.mat file in the same location as vuvphysdata.mat</span>
+0153 <span class="comment">% This file is a LOCO run with a good set of BPM and Corrector gains/coupling</span>
+0154 <span class="comment">% LocoFileDirectory = getfamilydata('OpsData','PhysDataFile');</span>
+0155 <span class="comment">% i = findstr(LocoFileDirectory, filesep);</span>
+0156 <span class="comment">% setlocodata([LocoFileDirectory(1:i(end)),'LocoData']);</span>
+0157 
+0158 <span class="comment">% Set BPM and Corrector gains and coupling</span>
+0159 <a href="setlocodata.html" class="code" title="function setlocodata(CommandInput, FileName)">setlocodata</a>(<span class="string">'Nominal'</span>);
+0160 
+0161 <span class="keyword">if</span> OperationalMode == 2
+0162     setfamilydata(0,<span class="string">'BPMx'</span>,<span class="string">'Offset'</span>);
+0163     setfamilydata(0,<span class="string">'BPMy'</span>,<span class="string">'Offset'</span>);
+0164     setfamilydata(0,<span class="string">'BPMx'</span>,<span class="string">'Golden'</span>);
+0165     setfamilydata(0,<span class="string">'BPMy'</span>,<span class="string">'Golden'</span>);
+0166 <span class="keyword">end</span>
+0167 
+0168 fprintf(<span class="string">'   Middlelayer setup for operation mode: %s\n'</span>, AD.OperationalMode);
+0169 
+0170 
+0171 
+0172 
+0173 
+0174</pre></div>
+<hr><address>Generated on Fri 01-Aug-2008 10:57:33 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

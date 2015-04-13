@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of scantune</title>
+  <meta name="keywords" content="scantune">
+  <meta name="description" content="RASTER SCAN PROGRAM">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">spear3</a> &gt; scantune.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for spear3&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>scantune
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>RASTER SCAN PROGRAM</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> RASTER SCAN PROGRAM
+ 
+ DelNu        -    2 column vector, desired change in tunes from the starting tunes
+ iNuX        -    integer, x tune counter
+ iNuY        -    integer, y tune counter
+ DelX        -    real, delta x tune changes
+ DelY        -    real, delta y tune changes
+ InitCurrent    -    2 column vector, Initial Currents
+
+ Amps        -    2 column matrix with each column having
+            a length of NoTune, the settings for QF
+            and QD for each tune
+ ThTune    -    2 column matrix with each column having
+            a length of NoTune, theoretical value of 
+            the tunes for each quadrupole setting
+ DCCT        -    vector, value of the DCCT at each tune
+ Counts    -    vector, number of counts per second
+ Tunes         -    [data point number, tune]
+ InitQFsp    -    vector, initial QF current setpoints before experiment
+ InitQDsp    -    vector, initial QD current setpoints before experiment
+ output.dat    -    file to which the data is printed</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a>	GETDCCT - returns the beam current</li><li><a href="setquad.html" class="code" title="function setquad(QMS, QuadSetpoint, WaitFlag)">setquad</a>	setquad(QMS, QuadSetpoint, WaitFlag)</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% RASTER SCAN PROGRAM</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% DelNu        -    2 column vector, desired change in tunes from the starting tunes</span>
+0004 <span class="comment">% iNuX        -    integer, x tune counter</span>
+0005 <span class="comment">% iNuY        -    integer, y tune counter</span>
+0006 <span class="comment">% DelX        -    real, delta x tune changes</span>
+0007 <span class="comment">% DelY        -    real, delta y tune changes</span>
+0008 <span class="comment">% InitCurrent    -    2 column vector, Initial Currents</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Amps        -    2 column matrix with each column having</span>
+0011 <span class="comment">%            a length of NoTune, the settings for QF</span>
+0012 <span class="comment">%            and QD for each tune</span>
+0013 <span class="comment">% ThTune    -    2 column matrix with each column having</span>
+0014 <span class="comment">%            a length of NoTune, theoretical value of</span>
+0015 <span class="comment">%            the tunes for each quadrupole setting</span>
+0016 <span class="comment">% DCCT        -    vector, value of the DCCT at each tune</span>
+0017 <span class="comment">% Counts    -    vector, number of counts per second</span>
+0018 <span class="comment">% Tunes         -    [data point number, tune]</span>
+0019 <span class="comment">% InitQFsp    -    vector, initial QF current setpoints before experiment</span>
+0020 <span class="comment">% InitQDsp    -    vector, initial QD current setpoints before experiment</span>
+0021 <span class="comment">% output.dat    -    file to which the data is printed</span>
+0022 
+0023 
+0024   <span class="comment">% Initialize</span>
+0025   TuneDelay = 15;
+0026 
+0027   <span class="keyword">if</span> isempty(GeV)
+0028     alspara;
+0029   <span class="keyword">end</span>
+0030 
+0031 
+0032   Counts=[]; DCCT=[]; Amps=[]; ThTune=[]; Tunes=[]; DelTune=[0 0]; BPMxy=[];
+0033   figure(1);
+0034 
+0035   disp([<span class="string">'  The delay before a tune measurement is set to '</span>,num2str(TuneDelay), <span class="string">' seconds.'</span>]);
+0036   disp([<span class="string">'  If this is not enough (or too much), edit tunescan.m.'</span>]);
+0037   disp([<span class="string">'  '</span>]);
+0038 
+0039   fn = input(<span class="string">'  File name (no extension!) = '</span>,<span class="string">'s'</span>);   disp([<span class="string">'  '</span>]);
+0040   fid2 = fopen([fn,<span class="string">'.dat'</span>], <span class="string">'wt+'</span>);   <span class="comment">% Output data file</span>
+0041 
+0042 
+0043   <span class="comment">% Print time/data to data file</span>
+0044   time=clock; 
+0045   fprintf(fid2,<span class="string">'%% %s   %d:%d:%2.0f \n'</span>, date, time(4),time(5),time(6));
+0046   fprintf(fid2,<span class="string">'%% Output file format  (BPM is sector10 #8)\n'</span>);
+0047   fprintf(fid2,<span class="string">'%% data point #, QF [amps], QD [amps], ThTuneX, ThTuneY, Gamma Counts, DCCT, BPMx, BPMy\n\n'</span>);
+0048   fprintf(fid2,<span class="string">'Data=[\n'</span>);
+0049 
+0050 
+0051   <span class="comment">% Initialize variables</span>
+0052   NumX = 30;                    <span class="comment">% Number of x tunes</span>
+0053   NumY = 16;                    <span class="comment">% Number of y tunes</span>
+0054   DelX = 0.005;                    <span class="comment">% Delta x steps</span>
+0055   DelY =-0.005;                    <span class="comment">% Delta y steps</span>
+0056 
+0057   <span class="comment">%Amps(1,1) = 74.3 + 0.186862;            % QF current</span>
+0058   <span class="comment">%Amps(1,2) = 77.0 + 0.147173;            % QD current</span>
+0059 
+0060   ThTune(1,1) = 0.3089;            <span class="comment">% X tune</span>
+0061   ThTune(1,2) = 0.1687;            <span class="comment">% Y tune</span>
+0062 
+0063   DelAmps(1,:)=[0 0];
+0064   DelNu = [0 ; 0];                <span class="comment">% Delta Nu</span>
+0065   DelNuX = 0;                    <span class="comment">% Raster direction offset</span>
+0066   DirNuX = -1;                    <span class="comment">% Horizontal direction</span>
+0067 
+0068 
+0069   <span class="comment">% Get raster scan arrays</span>
+0070   Num = 1;                            <span class="comment">% Tune counter number</span>
+0071   <span class="keyword">for</span> iNuY = 0:(NumY-1)
+0072     <span class="keyword">for</span> iNuX = 0:(NumX-1)
+0073       DelNu(1,1) = ((DirNuX)^(iNuY))*iNuX*DelX + DelNuX;
+0074       DelNu(2,1) = iNuY*DelY;
+0075       <span class="keyword">if</span> ((iNuY == 0) &amp; (iNuX == 0))
+0076         <span class="comment">%fprintf(fid,'%g  %g  %g  %g  %g \n', NumX*NumY, InitCurrent(1,1), InitCurrent(2,1),InitTune(1,1),InitTune(2,1));</span>
+0077       <span class="keyword">else</span>
+0078         DelCur = inv(Mtune)*DelNu;
+0079         <span class="comment">%fprintf(fid,'%g  %g  %g  %g  %g \n', Num, DelCur(1,1), DelCur(2,1),DelNu(1,1),DelNu(2,1));</span>
+0080         DelAmps(Num,1) = DelCur(1,1);                <span class="comment">% QF current</span>
+0081         DelAmps(Num,2) = DelCur(2,1);                <span class="comment">% QD current</span>
+0082         ThTune(Num,1) = ThTune(1,1) + DelNu(1,1);        <span class="comment">% Theoretical NuX</span>
+0083         ThTune(Num,2) = ThTune(1,2) + DelNu(2,1);        <span class="comment">% Theoretical NuY</span>
+0084       <span class="keyword">end</span>;
+0085       Num = Num + 1;
+0086     <span class="keyword">end</span>;
+0087     <span class="keyword">if</span> (DirNuX)^(iNuY) &gt; 0
+0088       DelNuX = DelNu(1,1);
+0089     <span class="keyword">else</span>
+0090       DelNuX = 0;
+0091     <span class="keyword">end</span>;
+0092   <span class="keyword">end</span>;
+0093 
+0094 
+0095   <span class="comment">% Store initial value of the quadrupole setpoints (return to these values at the end)</span>
+0096   InitQF = getsp(<span class="string">'QF'</span>);          <span class="comment">% save original QF setpoint</span>
+0097   InitQD = getsp(<span class="string">'QD'</span>);          <span class="comment">% save original QD setpoint</span>
+0098 
+0099 <span class="comment">%  disp('Hit return when scraper is OUT'); pause;</span>
+0100 <span class="comment">%  % Loop through raster scan to set hysteresis</span>
+0101 <span class="comment">%  for i=1:NumY</span>
+0102 <span class="comment">%    % Set Magnets</span>
+0103 <span class="comment">%    stepquad(DelAmps(i*NumX,1), DelAmps(i*NumX,2));</span>
+0104 <span class="comment">%</span>
+0105 <span class="comment">%    if (i*NumX+1&lt;NumX*NumY)</span>
+0106 <span class="comment">%      stepquad(DelAmps(i*NumX,1), DelAmps(i*NumX,2));</span>
+0107 <span class="comment">%    end</span>
+0108 <span class="comment">%  end</span>
+0109 <span class="comment">%  % Return to start point</span>
+0110 <span class="comment">%  setquad(InitQF, InitQD);</span>
+0111 <span class="comment">%  disp('Hit return when scraper is IN'); pause;</span>
+0112 
+0113   <span class="comment">% Loop through all the tunes measuring the current</span>
+0114   <span class="keyword">for</span> i=1:NumX*NumY
+0115 
+0116     stepquad(DelAmps(i,1), DelAmps(i,2));
+0117     sleep(1);
+0118     Counts(i) = getgamma;
+0119     DCCT(i) = <a href="getdcct.html" class="code" title="function [DCCT, DCCTMed, DCCTSlow] = getdcct(varargin)">getdcct</a>;                            <span class="comment">% measure current</span>
+0120     BPMxy(i,:) = [getx(1,[10 8]) gety(1,[10 8])]; <span class="comment">% BPM sector 10, number 8</span>
+0121 
+0122     <span class="keyword">if</span> (i==1 | i==round(NumX/2) | i==NumX | i==NumX*NumY-NumX+1 | i==NumX*NumY-round(NumX/2)+1 | i==NumX*NumY),
+0123       disp([<span class="string">'  Sleeping '</span>,num2str(TuneDelay), <span class="string">' seconds for tune measurement.'</span>]); sleep(TuneDelay);         
+0124       Tunes = [Tunes;
+0125                gettune' i];
+0126       <span class="keyword">if</span> (i==1)
+0127         DelTune =  Tunes(1,1:2) - ThTune(1,:);
+0128       <span class="keyword">end</span>
+0129     <span class="keyword">end</span>
+0130     ThTune(i,:) = ThTune(i,:) + DelTune;
+0131 
+0132 
+0133     <span class="comment">% plot results</span>
+0134     <span class="keyword">if</span> (rem(i,30)==0)
+0135       plot3(ThTune(1:i,1), ThTune(1:i,2), Counts(1:i)); drawnow;
+0136     <span class="keyword">end</span>
+0137 
+0138 
+0139     <span class="comment">% Print out results</span>
+0140     <span class="comment">%fprintf(     '%g  %g  %g  %g  %g  %g  %g  %g  %g\n', i, DelAmps(i,1), DelAmps(i,2), ThTune(i,1),ThTune(i,2), Counts(i), DCCT(i), BPMxy(i,1), BPMxy(i,2));</span>
+0141     fprintf(fid2,<span class="string">'%g  %g  %g  %g  %g  %g  %g  %g  %g\n'</span>, i, DelAmps(i,1), DelAmps(i,2), ThTune(i,1),ThTune(i,2), Counts(i), DCCT(i), BPMxy(i,1), BPMxy(i,2));
+0142 
+0143 
+0144     <span class="comment">% Break out of the program if the current drops below a .5 mA or Counts&gt;6000</span>
+0145     <span class="keyword">if</span> (DCCT(i) &lt; .5), disp(<span class="string">' Beam current dropped to zero'</span>); <span class="keyword">break</span>; <span class="keyword">end</span>; 
+0146     <span class="keyword">if</span> (Counts(i)&gt;6000), disp(<span class="string">' Counts &gt; 6000'</span>); Counts(i); <span class="keyword">break</span>; <span class="keyword">end</span>;
+0147 
+0148   <span class="keyword">end</span>
+0149 
+0150 
+0151   fprintf(fid2,<span class="string">'];\n\n'</span>);
+0152   fprintf(fid2,<span class="string">'Tunes=[\n'</span>);
+0153   <span class="keyword">for</span> i=1:size(Tunes,1)
+0154     fprintf(fid2,<span class="string">'%g  %g  %g \n'</span>, Tunes(i,1), Tunes(i,2), Tunes(i,3));
+0155   <span class="keyword">end</span> 
+0156   fprintf(fid2,<span class="string">'];\n'</span>);
+0157 
+0158 
+0159   <span class="comment">% Reset quads</span>
+0160   <a href="setquad.html" class="code" title="function setquad(QMS, QuadSetpoint, WaitFlag)">setquad</a>(InitQF, InitQD);
+0161 
+0162 
+0163   <span class="comment">% Close file</span>
+0164   status = fclose(fid2); 
+0165   eval([<span class="string">'save '</span>, fn]);
+0166 
+0167   <span class="comment">% Plot results</span>
+0168   figure(1);hold off;                           <span class="comment">% set up figure</span>
+0169   plot(ThTune(:,1),ThTune(:,2),<span class="string">'r.'</span>);           <span class="comment">% print theoretical tunes</span>
+0170   hold on; 
+0171   <span class="keyword">for</span> i=1:size(Tunes,1)
+0172     plot(Tunes(i,1),Tunes(i,2),<span class="string">'og'</span>);
+0173     plot(ThTune(Tunes(i,3),1),ThTune(Tunes(i,3),2),<span class="string">'xr'</span>);
+0174   <span class="keyword">end</span>
+0175   hold off;
+0176 
+0177   figure(2);
+0178   N = max(size(Counts));
+0179   plot3(ThTune(1:N,1), ThTune(1:N,2), Counts); 
+0180 
+0181</pre></div>
+<hr><address>Generated on Wed 16-Aug-2006 12:45:04 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>
