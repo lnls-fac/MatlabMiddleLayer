@@ -10,10 +10,8 @@ ovu_vchamber   = [0.0117 0.004 2];
 
 bends = findcells(the_ring, 'BendingAngle');
 ivu   = sort([findcells(the_ring, 'FamName', 'id_endb'), ...
-              findcells(the_ring, 'FamName', 'mib'), ...
               findcells(the_ring, 'FamName', 'dib1')]);
 ovu   = sort([findcells(the_ring, 'FamName', 'id_enda'), ...
-              findcells(the_ring, 'FamName', 'mia'), ...
               findcells(the_ring, 'FamName', 'dia1')]);
 other = setdiff(1:length(the_ring), [bends ivu ovu]);
 
@@ -28,4 +26,15 @@ for i=1:length(ovu)
 end
 for i=1:length(other)
     the_ring{other(i)}.VChamber = other_vchamber;
+end
+
+mia = findcells(the_ring, 'FamName', 'mia');
+for i=3:length(mia)
+    the_ring{mia(i)}.VChamber = ovu_vchamber;
+end
+
+
+mib = findcells(the_ring, 'FamName', 'mib');
+for i=1:length(mib)
+    the_ring{mib(i)}.VChamber = ivu_vchamber;
 end

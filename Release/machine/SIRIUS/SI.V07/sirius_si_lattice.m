@@ -277,10 +277,12 @@ if any(lens < 0)
 end
 
 % adjusts RF frequency according to lattice length and synchronous condition
-[beta, ~, ~] = lnls_beta_gamma(energy/1e9);
+%[beta, ~, ~] = lnls_beta_gamma(energy/1e9);
 const  = lnls_constants;
 L0_tot = findspos(THERING, length(THERING)+1);
-rev_freq    = beta * const.c / L0_tot;
+%rev_freq    = beta * const.c / L0_tot;
+rev_freq    = const.c / L0_tot;
+
 rf_idx      = findcells(THERING, 'FamName', 'cav');
 rf_frequency = rev_freq * harmonic_number;
 THERING{rf_idx}.Frequency = rf_frequency;
