@@ -1,4 +1,4 @@
-function fadata = faload(filenames, selected_bpm, selected_corr, npts)
+function fadata = faload(filenames, selected_bpm, selected_corr, npts, nmarker)
 %
 % FALOAD Loads fast acquisition (FA) data from file.
 
@@ -14,7 +14,10 @@ if nargin < 4
     npts = [];
 end
 
-nmarker = 1;
+if nargin < 5 || isempty(nmarker)
+    nmarker = 1;
+end
+
 
 if ischar(filenames)
     try
@@ -69,7 +72,7 @@ if ischar(filenames)
 
         marker = typecast(data(:,end-1-nmarker:end-2), 'uint32');
         
-        data = data(:, 1:end-3);
+        data = data(:, 1:end-2-nmarker);
         
     catch err
         fclose(fileid);
