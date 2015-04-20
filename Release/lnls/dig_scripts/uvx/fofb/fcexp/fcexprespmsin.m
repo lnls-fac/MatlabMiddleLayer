@@ -19,7 +19,7 @@ expinfo.duration = 1000;
 expinfo.pauselength = 10;
 expinfo.mode = 'corr_sum';
 expinfo.profiles = corr_steps;
-expinfo.freqs = 2*Ts*(70:111);
+expinfo.freqs = 2*Ts*(70:0.2:78.2);
 
 expinfo.marker = uint32(marker);
 

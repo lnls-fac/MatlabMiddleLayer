@@ -16,7 +16,7 @@ if nargin < 3 || isempty(bw)
 end
 
 if nargin < 4 || isempty(period)
-    period = 189;
+    period = 93;
 end
 
 if nargin < 5 || isempty(selected_corr)

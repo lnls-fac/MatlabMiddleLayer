@@ -12,11 +12,11 @@ if nargin < 2 || isempty(amplitude)
 end
 
 if nargin < 3 || isempty(bw)
-    bw = 500;
+    bw = 750;
 end
 
 if nargin < 4 || isempty(period)
-    period = 45;
+    period = 62;
 end
 
 if nargin < 5 || isempty(selected_corr)
@@ -26,7 +26,8 @@ end
 profiles = zeros(length(selected_corr), ncorr);
 
 for i=1:length(selected_corr)
-    profiles(i, selected_corr(i)) = 1;
+    corr_steps = uvxcorrsteps;
+    profiles(i, selected_corr(i)) = corr_steps(selected_corr(i));
 end
 
 expinfo.excitation = 'prbs';
