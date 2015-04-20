@@ -27,7 +27,7 @@ end
 expinfo.excitation = 'multisine';
 expinfo.amplitude = amplitude;
 expinfo.band = [0 2*Ts*bw];
-expinfo.sineinfo = [100, 10, 1];
+expinfo.sinedata = [100, 10, 1];
 
 expinfo.duration = 100;
 expinfo.pauselength = 10;
