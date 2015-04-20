@@ -26,20 +26,32 @@ i=0;
 failure = false;
 timestamp = 0;
 
+buffer_filled = false;
+
 conn = tcpip(conninfo.address, conninfo.port, 'OutputBufferSize', 10*npts_packet*(ncols+nmarker+1)*4);
 fopen(conn);
 while i < stopat
-    [packet, expinterval] = fcn(i, npts_packet, expinfo, fcdata);
-    
-    %data((1+i*npts_packet):(i+1)*npts_packet, :) = packet;
-    
-    % Ensure data is encoded in 4-byte floating point representation
-    packet = single(packet);
-    
-    if expinterval
-        fcmode = uint32(0);
+    if buffer_filled
+        [packet, expinterval] = fcn(i, npts_packet, expinfo, fcdata);
+
+        % Ensure data is encoded in 4-byte floating point representation
+        packet = single(packet);
+
+        if expinterval
+            fcmode = fcbuildmode('');
+        else
+            fcmode = fcbuildmode(expinfo.mode);
+        end
     else
-        fcmode = fcbuildmode(expinfo.mode);
+        % Add dummy packets on beginning of data transmission to avoid gap
+        % on FC data at the receiver end
+        packet = zeros(npts_packet, ncols + nmarker, 'single');
+        fcmode = fcbuildmode('');
+        
+        if i > 3
+            buffer_filled = true;
+            i = 0;
+        end
     end
     
     while true
@@ -49,7 +61,7 @@ while i < stopat
                 %hi = fread(conn, 1, 'uint32');
                 %lo = fread(conn, 1, 'uint32');
                 hi=0; lo=0;
-                if i == 0
+                if i == 0 && buffer_filled
                     timestamp = bitsll(uint64(hi), 32) + uint64(lo);
                 end
                 packet_ = [packet repmat(typecast(fcmode, 'single'), npts_packet, 1)];
