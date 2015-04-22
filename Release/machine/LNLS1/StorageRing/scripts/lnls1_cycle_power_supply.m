@@ -3,10 +3,10 @@ function r = lnls1_cycle_power_supply(FamName,varargin)
 %
 %History: 
 %
-%2011-05-02:    alterado o time_step para 1.5s de forma a não sobrecarregar o OPR1...
-%2010-10-20:    generalizada função para aceitar mais de um FamName (cells) e
+%2011-05-02:    alterado o time_step para 1.5s de forma a nï¿½o sobrecarregar o OPR1...
+%2010-10-20:    generalizada funï¿½ï¿½o para aceitar mais de um FamName (cells) e
 %               DeviceList.
-%2010-09-13:    comentários iniciais no código.
+%2010-09-13:    comentï¿½rios iniciais no cï¿½digo.
 
 r.initial_phase             = 0;
 r.nr_points_in_one_period   = 21;
@@ -20,7 +20,7 @@ end
 
 
 pts  = 1:(r.nr_periods * r.nr_points_in_one_period);
-r.ramp = exp(- pts / (r.tau_over_period * r.nr_points_in_one_period)) .* sin(r.initial_phase + 2 * pi * pts / r.nr_points_in_one_period); 
+r.ramp = 1.12*exp(- pts / (r.tau_over_period * r.nr_points_in_one_period)) .* sin(r.initial_phase + 2 * pi * pts / r.nr_points_in_one_period); 
 %figure;
 %plot(r.ramp);
 
