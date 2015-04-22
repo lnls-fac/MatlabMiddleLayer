@@ -34,23 +34,26 @@ fitting_tol_tune = 3.0;
 ids_def = create_ids_def_PH_new_order;
 ids = [];
 
-% --- phase 1 ---
-ids = [ids ids_def.caterete];
-ids = [ids ids_def.ema];
-ids = [ids ids_def.manaca];
-ids = [ids ids_def.carnauba];
-ids = [ids ids_def.jatoba];
-ids = [ids ids_def.inga];
-ids = [ids ids_def.sabia];
-ids = [ids ids_def.ipe];
-% --- phase 2 ---
-ids = [ids ids_def.caterete2];
-ids = [ids ids_def.ema2];
-ids = [ids ids_def.manaca2];
-ids = [ids ids_def.carnauba2];
-ids = [ids ids_def.inga2];
-ids = [ids ids_def.sabia2];
+% % --- phase 1 ---
+% ids = [ids ids_def.caterete];
+% ids = [ids ids_def.ema];
+% ids = [ids ids_def.manaca];
+% ids = [ids ids_def.carnauba];
+% ids = [ids ids_def.jatoba];
+% ids = [ids ids_def.inga];
+% ids = [ids ids_def.sabia];
+% ids = [ids ids_def.ipe];
+% % --- phase 2 ---
+% ids = [ids ids_def.caterete2];
+% ids = [ids ids_def.ema2];
+% ids = [ids ids_def.manaca2];
+% ids = [ids ids_def.carnauba2];
+% ids = [ids ids_def.inga2];
+% ids = [ids ids_def.sabia2];
 ids = [ids ids_def.ipe2];
+% -- tests --
+%ids = [ids ids_def.dhscu20];
+
 
 % loads initial SIRIUS lattice model
 %global THERING
@@ -68,7 +71,7 @@ fprintf('tunes: %9.6f %9.6f\n', twiss0.tunes(1), twiss0.tunes(2));
 
 
 % inserts IDs and does initial symmetrization
-the_ring = insert_ids_set(the_ring0, ids, 1.0);
+the_ring = insert_ids_set(the_ring0, ids, 0.01);
 the_ring = restore_lattice_ordering(the_ring); save('the_ring_withids_notsymm.mat', 'the_ring');
 the_ring = locally_symmetrize_ids(the_ring, twiss0, ids, fitting_tol_symm, max_nr_iters);
 
@@ -573,6 +576,15 @@ ids_def.ipe2.straight_label       = 'mia';
 ids_def.ipe2.straight_number      = 9;
 ids_def.ipe2.strength             = 2; % two IDs in series
 
+
+% -- tests --
+
+ids_def.dhscu20.label              = 'dhscu20';
+ids_def.dhscu20.kicktable_file     = '../id_modelling/DHSCU20/DHSCU20_PL.txt';
+ids_def.dhscu20.nr_segs            = 20;
+ids_def.dhscu20.straight_label     = 'mib';
+ids_def.dhscu20.straight_number    = 10;
+ids_def.dhscu20.strength           = 1;
 
 
 function ids_def = create_ids_def_PH
