@@ -12,7 +12,7 @@ r.initial_phase             = 0;
 r.nr_points_in_one_period   = 21;
 r.nr_periods                = 8;
 r.tau_over_period           = 2; 
-r.time_step                 = 1.5;
+r.time_step                 = 1.0;
 
 if strcmpi(getmode('BEND'), 'simulator')
     r.time_step = 0;
@@ -54,7 +54,9 @@ for i=1:length(r.ramp)
             if ~isempty(r.DevList{j}), setsp(FamName{j}, r.MaxSP{j} .* r.ramp(i), r.DevList{j}); end
         end
     else
-        if ~isempty(r.DevList), setsp(FamName, r.MaxSP .* r.ramp(i), r.DevList); end
+        if ~isempty(r.DevList)
+            setsp(FamName, r.MaxSP .* r.ramp(i), r.DevList);
+        end
     end
     sleep(r.time_step);
     drawnow;
