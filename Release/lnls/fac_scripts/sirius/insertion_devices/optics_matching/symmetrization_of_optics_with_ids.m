@@ -50,9 +50,9 @@ ids = [];
 % ids = [ids ids_def.carnauba2];
 % ids = [ids ids_def.inga2];
 % ids = [ids ids_def.sabia2];
-ids = [ids ids_def.ipe2];
+%ids = [ids ids_def.ipe2];
 % -- tests --
-%ids = [ids ids_def.dhscu20];
+ids = [ids ids_def.dhscu20];
 
 
 % loads initial SIRIUS lattice model
@@ -71,7 +71,7 @@ fprintf('tunes: %9.6f %9.6f\n', twiss0.tunes(1), twiss0.tunes(2));
 
 
 % inserts IDs and does initial symmetrization
-the_ring = insert_ids_set(the_ring0, ids, 0.01);
+the_ring = insert_ids_set(the_ring0, ids, 1.0);
 the_ring = restore_lattice_ordering(the_ring); save('the_ring_withids_notsymm.mat', 'the_ring');
 the_ring = locally_symmetrize_ids(the_ring, twiss0, ids, fitting_tol_symm, max_nr_iters);
 
@@ -581,6 +581,7 @@ ids_def.ipe2.strength             = 2; % two IDs in series
 
 ids_def.dhscu20.label              = 'dhscu20';
 ids_def.dhscu20.kicktable_file     = '../id_modelling/DHSCU20/DHSCU20_PL.txt';
+%ids_def.dhscu20.kicktable_file       = '../id_modelling/U19/U19_kicktable.txt';
 ids_def.dhscu20.nr_segs            = 20;
 ids_def.dhscu20.straight_label     = 'mib';
 ids_def.dhscu20.straight_number    = 10;

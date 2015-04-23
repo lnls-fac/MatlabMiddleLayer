@@ -5,7 +5,6 @@ function lnls_at2flatfile(lattice, filename)
 %
 %Ximenes - 2014-08-27
 
-
 cts = lnls_constants;
 L = findspos(lattice, length(lattice)+1);
 rv_freq = cts.c / L;
@@ -24,7 +23,6 @@ if strcmpi('StrMPoleSymplectic4RadPass',pmethods)
 else
     radiation_on = 'false';
 end
-
 
 fp = fopen(filename, 'w');
 
