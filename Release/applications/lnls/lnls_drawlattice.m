@@ -88,7 +88,7 @@ for i=1:(length(pos)-1)
             text(s+len/2, 1.9, the_ring{i}.FamName, 'HorizontalAlignment', 'center', 'FontWeight', 'bold','Parent',h);
         end
     elseif isfield(the_ring{i}, 'PolynomB')
-        if (strcmpi(the_ring{i}.FamName,'pmm')==0)
+        if ~strcmpi(the_ring{i}.FamName,'pmm')
             rectangle('Position',[s,-1*Delta+offset,len,2*Delta], 'FaceColor', [0.539 0.598 0.465], 'EdgeColor', [0.539 0.598 0.465],'Parent',h);
             if ~unset_names
                 text(s+len/2, -1.9, the_ring{i}.FamName, 'HorizontalAlignment', 'center', 'FontWeight', 'bold','Parent',h);
