@@ -11,17 +11,17 @@ diary([name, '_summary.txt']);
 RandStream.setGlobalStream(RandStream('mt19937ar','seed', 131071));
 
 the_ring = create_nominal_model();
+family_data = sirius_si_family_data(the_ring);
 
 machine = create_apply_errors(the_ring);
 
-machine = correct_orbit(machine);
+machine = correct_orbit(machine, family_data);
 
-machine = correct_coupling(machine);
+machine = correct_coupling(machine, family_data);
 
 machine = correct_tune(machine);
 
 machine = create_apply_multipoles(machine);
-
 
 % finalizacoes
 diary 'off'
@@ -37,12 +37,12 @@ cd('../');
 
 %% Definition of the nominal AT model
     function the_ring = create_nominal_model()
-        fun_name = ls('../firstRun_*');
-        [path,fun_name] = fileparts(fun_name);
-        cur_dir = pwd;
-        cd(path);
-        the_ring  = sirius_si_lattice('C','03',str2func(fun_name));
-        cd(cur_dir);
+%         fun_name = ls('../firstRun_*');
+%         [path,fun_name] = fileparts(fun_name);
+%         cur_dir = pwd;
+%         cd(path);
+        the_ring  = sirius_si_lattice('C','05');
+%         cd(cur_dir);
         the_ring = setcavity('off', the_ring);
         the_ring = setradiation('off', the_ring);
         save([name,'the_ring.mat'], 'the_ring');
@@ -102,7 +102,7 @@ cd('../');
         % config.girder.sigma_pitch =  20 * mrad * 0;
         
         % gera vetores com erros
-        nr_machines = 20;
+        nr_machines = 2;
         cutoff_errors = 1;
         errors  = lnls_latt_err_generate_errors(name, the_ring, config, nr_machines, cutoff_errors);
         
@@ -111,12 +111,12 @@ cd('../');
     end
 
 %% Cod Correction
-    function machine = correct_orbit(machine)
+    function machine = correct_orbit(machine, family_data)
         % parameters for slow correction algorithms
         
-        orbit.bpm_idx = sort(findcells(the_ring, 'FamName', 'bpm'));
-        orbit.hcm_idx = sort(findcells(the_ring, 'FamName', 'hcm'));
-        orbit.vcm_idx = sort(findcells(the_ring, 'FamName', 'vcm'));
+        orbit.bpm_idx = sort(family_data.bpm.ATIndex);
+        orbit.hcm_idx = sort(family_data.chs.ATIndex);
+        orbit.vcm_idx = sort(family_data.cvs.ATIndex);
         
         orbit.sext_ramp         = [0 1];
         orbit.svs               = 'all';
@@ -126,8 +126,8 @@ cd('../');
         orbit.simul_bpm_err     = false;
         
         nper = 10;
-        % orbit.respm = calc_respm_cod(the_ring, orbit.bpm_idx, orbit.hcm_idx, orbit.vcm_idx, nper, true);
-        % orbit.respm = orbit.respm.respm;
+        orbit.respm = calc_respm_cod(the_ring, orbit.bpm_idx, orbit.hcm_idx, orbit.vcm_idx, nper, true);
+        orbit.respm = orbit.respm.respm;
         machine = lnls_latt_err_correct_cod(name, machine, orbit);
         
         name_saved_machines = [name_saved_machines,'_machines_cod_corrected'];
@@ -135,34 +135,29 @@ cd('../');
     end
 
 %% Coupling Correction
-    function machine = correct_coupling(machine)
+    function machine = correct_coupling(machine, family_data)
         
-        labels = {'sda','sdb','sf1','sf4'};
-        knobs=[];
-        for i=1:length(labels)
-            knobs = [knobs, findcells(the_ring,'FamName',labels{i})];
-        end
-        coup.scm_idx       = sort(knobs);
-        coup.bpm_idx = sort(findcells(the_ring, 'FamName', 'bpm'));
-        coup.hcm_idx = sort(findcells(the_ring, 'FamName', 'hcm'));
-        coup.vcm_idx = sort(findcells(the_ring, 'FamName', 'vcm'));
+        coup.scm_idx = sort(family_data.qs.ATIndex);
+        coup.bpm_idx = sort(family_data.bpm.ATIndex);
+        coup.hcm_idx = sort(family_data.chs.ATIndex);
+        coup.vcm_idx = sort(family_data.cvs.ATIndex);
         coup.svs           = 'all';
         coup.max_nr_iter   = 50;
         coup.tolerance     = 1e-5;
         coup.simul_bpm_corr_err = false;
         
         % calcs coupling symmetrization matrix
-        fname = [name '_info_coup.mat'];
         nper = 10;
-        % if ~exist(fname, 'file')
-        %     [respm, info] = calc_respm_coupling(the_ring, coup, nper);
-        %     coup.respm = respm;
-        %     save(fname, 'info');
-        % else
-        %     data = load(fname);
-        %     [respm, ~] = calc_respm_coupling(the_ring, coup, nper, data.info);
-        %     coup.respm = respm;
-        % end
+%         fname = [name '_info_coup.mat'];
+%         if ~exist(fname, 'file')
+            [respm, info] = calc_respm_coupling(the_ring, coup, nper);
+            coup.respm = respm;
+%             save(fname, 'info');
+%         else
+%             data = load(fname);
+%             [respm, ~] = calc_respm_coupling(the_ring, coup, nper, data.info);
+%             coup.respm = respm;
+%         end
         machine = lnls_latt_err_correct_coupling(name, machine, coup);
         
         name_saved_machines = [name_saved_machines '_coup'];
@@ -230,8 +225,7 @@ cd('../');
         multi.bends.skew_vals = 1*ones(1,7)*1e-5;
         
         cutoff_errors = 2;
-        nr_machines = 20;
-        multi_errors  = lnls_latt_err_generate_multipole_errors(name, the_ring, multi, nr_machines, cutoff_errors);
+        multi_errors  = lnls_latt_err_generate_multipole_errors(name, the_ring, multi, length(machine), cutoff_errors);
         machine = lnls_latt_err_apply_multipole_errors(name, machine, multi_errors, multi);
         
         name_saved_machines = [name_saved_machines '_multi'];
