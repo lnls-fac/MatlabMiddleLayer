@@ -26,8 +26,6 @@ machine = create_apply_multipoles(machine);
 % finalizacoes
 diary 'off'
 fclose('all');
-cd('../');
-
 
 
 
