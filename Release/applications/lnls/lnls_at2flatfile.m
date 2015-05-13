@@ -24,6 +24,7 @@ else
     radiation_on = 'false';
 end
 
+
 fp = fopen(filename, 'w');
 
 fprintf(fp, '# Lattice flatfile generated with lnls_at2flatfile\n');
@@ -40,62 +41,49 @@ double_format = '%+.17E ';
 for i=1:length(lattice)
     fprintf(fp, '### %04i ###\r\n',i-1);
     fprintf(fp, column_format, 'fam_name'); fprintf(fp, '%s\r\n', lattice{i}.FamName);
-    if lattice{i}.Length ~= 0
-        fprintf(fp, column_format, 'length'); fprintf(fp, [double_format, '\r\n'], lattice{i}.Length);
-    end
+    fprintf(fp, column_format, 'length'); fprintf(fp, [double_format, '\r\n'], lattice{i}.Length);
     fprintf(fp, column_format, 'pass_method'); fprintf(fp, ['%s', '\r\n'], get_passmethod(lattice{i}));
-    if isfield(lattice{i}, 'NumIntSteps') && (lattice{i}.NumIntSteps > 1)
-        fprintf(fp, column_format, 'nr_steps'); 
-        fprintf(fp, '%i\r\n', lattice{i}.NumIntSteps); 
-    end;
+    if isfield(lattice{i}, 'NumIntSteps'), fprintf(fp, column_format, 'nr_steps'); fprintf(fp, '%i\r\n', lattice{i}.NumIntSteps); end;
     if isfield(lattice{i}, 'PolynomA')
         [PolyA, PolyB] = calc_polynoms(lattice{i});
         if (~isempty(PolyA) && any(PolyA ~= 0)), fprintf(fp, column_format, 'polynom_a'); print_polynom(fp, PolyA, double_format); end;
         if (~isempty(PolyB) && any(PolyB ~= 0)), fprintf(fp, column_format, 'polynom_b'); print_polynom(fp, PolyB, double_format); end;
     end
-    if isfield(lattice{i}, 'Voltage') && (lattice{i}.Voltage ~= 0)
+    if isfield(lattice{i}, 'Voltage')
         fprintf(fp, column_format, 'voltage'); fprintf(fp, [double_format, '\r\n'], lattice{i}.Voltage);
     end
-    if isfield(lattice{i}, 'Frequency') && (lattice{i}.Frequency ~= 0)
+    if isfield(lattice{i}, 'Frequency')
         fprintf(fp, column_format, 'frequency'); fprintf(fp, [double_format, '\r\n'], lattice{i}.Frequency);
     end
     if isfield(lattice{i}, 'BendingAngle')
         fprintf(fp, column_format, 'angle'); fprintf(fp, [double_format, '\r\n'], lattice{i}.BendingAngle);
-        if lattice{i}.EntranceAngle ~= 0
-            fprintf(fp, column_format, 'angle_in'); fprintf(fp, [double_format, '\r\n'], lattice{i}.EntranceAngle);
-        end
-        if lattice{i}.ExitAngle ~= 0
-            fprintf(fp, column_format, 'angle_out'); fprintf(fp, [double_format, '\r\n'], lattice{i}.ExitAngle);
-        end
+        fprintf(fp, column_format, 'angle_in'); fprintf(fp, [double_format, '\r\n'], lattice{i}.EntranceAngle);
+        fprintf(fp, column_format, 'angle_out'); fprintf(fp, [double_format, '\r\n'], lattice{i}.ExitAngle);
     end
-    if isfield(lattice{i}, 'FullGap') && (lattice{i}.FullGap ~= 0)
+    if isfield(lattice{i}, 'FullGap')
         fprintf(fp, column_format, 'gap'); fprintf(fp, [double_format, '\r\n'], lattice{i}.FullGap);
     end
-    if isfield(lattice{i}, 'FringeInt1') && (lattice{i}.FringeInt1 ~= 0)
+    if isfield(lattice{i}, 'FringeInt1')
         fprintf(fp, column_format, 'fint_in'); fprintf(fp, [double_format, '\r\n'], lattice{i}.FringeInt1);
     end
-    if isfield(lattice{i}, 'FringeInt2') && (lattice{i}.FringeInt2 ~= 0)
+    if isfield(lattice{i}, 'FringeInt2')
         fprintf(fp, column_format, 'fint_out'); fprintf(fp, [double_format, '\r\n'], lattice{i}.FringeInt2);
     end
     if isfield(lattice{i}, 'KickAngle')
-        if lattice{i}.KickAngle(1) ~= 0
-            fprintf(fp, column_format, 'hkick'); fprintf(fp, [double_format, '\r\n'], lattice{i}.KickAngle(1));
-        end
-        if lattice{i}.KickAngle(2) ~= 0
-            fprintf(fp, column_format, 'vkick'); fprintf(fp, [double_format, '\r\n'], lattice{i}.KickAngle(2));
-        end
+        fprintf(fp, column_format, 'hkick'); fprintf(fp, [double_format, '\r\n'], lattice{i}.KickAngle(1));
+        fprintf(fp, column_format, 'vkick'); fprintf(fp, [double_format, '\r\n'], lattice{i}.KickAngle(2));
     end
     if isfield(lattice{i}, 'VChamber')
         fprintf(fp, column_format, 'hmax'); fprintf(fp, [double_format, '\r\n'], abs(lattice{i}.VChamber(1)));
         fprintf(fp, column_format, 'vmax'); fprintf(fp, [double_format, '\r\n'], abs(lattice{i}.VChamber(2)));
     end
-    if isfield(lattice{i}, 'T1') && any(lattice{i}.T1)
+    if isfield(lattice{i}, 'T1')
         fprintf(fp, column_format, 't_in'); fprintf(fp, [double_format, ' '], lattice{i}.T1); fprintf(fp, '\r\n');
     end
-    if isfield(lattice{i}, 'T2') && any(lattice{i}.T2)
+    if isfield(lattice{i}, 'T2')
         fprintf(fp, column_format, 't_out'); fprintf(fp, [double_format, ' '], lattice{i}.T2); fprintf(fp, '\r\n');
     end
-    if isfield(lattice{i}, 'R1') && notidentity(lattice{i}.R1)
+    if isfield(lattice{i}, 'R1')
         fprintf(fp, column_format, 'rx|r_in'); fprintf(fp, [double_format, ' '], lattice{i}.R1(1,:)); fprintf(fp, '\r\n');
         fprintf(fp, column_format, 'px|r_in'); fprintf(fp, [double_format, ' '], lattice{i}.R1(2,:)); fprintf(fp, '\r\n');
         fprintf(fp, column_format, 'ry|r_in'); fprintf(fp, [double_format, ' '], lattice{i}.R1(3,:)); fprintf(fp, '\r\n');
@@ -103,7 +91,7 @@ for i=1:length(lattice)
         fprintf(fp, column_format, 'de|r_in'); fprintf(fp, [double_format, ' '], lattice{i}.R1(5,:)); fprintf(fp, '\r\n');
         fprintf(fp, column_format, 'dl|r_in'); fprintf(fp, [double_format, ' '], lattice{i}.R1(6,:)); fprintf(fp, '\r\n');
     end
-    if isfield(lattice{i}, 'R2') && notidentity(lattice{i}.R2)
+    if isfield(lattice{i}, 'R2')
         fprintf(fp, column_format, 'rx|r_out'); fprintf(fp, [double_format, ' '], lattice{i}.R2(1,:)); fprintf(fp, '\r\n');
         fprintf(fp, column_format, 'px|r_out'); fprintf(fp, [double_format, ' '], lattice{i}.R2(2,:)); fprintf(fp, '\r\n');
         fprintf(fp, column_format, 'ry|r_out'); fprintf(fp, [double_format, ' '], lattice{i}.R2(3,:)); fprintf(fp, '\r\n');
@@ -121,10 +109,6 @@ end
 
 fclose(fp);
 
-function re = notidentity(R)
-    re = R*R - R;
-    re = any(re(:));
-    
 function passmethod = get_passmethod(element)
 
 if isfield(element, 'Frequency') || strcmpi(element.PassMethod, 'CavityPass')

@@ -581,7 +581,6 @@ ids_def.ipe2.strength             = 2; % two IDs in series
 
 ids_def.dhscu20.label              = 'dhscu20';
 ids_def.dhscu20.kicktable_file     = '../id_modelling/DHSCU20/DHSCU20_PL.txt';
-%ids_def.dhscu20.kicktable_file       = '../id_modelling/U19/U19_kicktable.txt';
 ids_def.dhscu20.nr_segs            = 20;
 ids_def.dhscu20.straight_label     = 'mib';
 ids_def.dhscu20.straight_number    = 10;

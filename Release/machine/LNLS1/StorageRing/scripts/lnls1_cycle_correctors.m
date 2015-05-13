@@ -1,10 +1,10 @@
 function r = lnls1_cycle_correctors(varargin)
-%Faz ciclagens de corretoras de órbita do anel.
+%Faz ciclagens de corretoras de ï¿½rbita do anel.
 %
 %History: 
 %
-%2011-05-02: alterado o time_step para 1.5s de forma a não sobrecarregar o OPR1...
-%2010-09-13: comentários iniciais no código.
+%2011-05-02: alterado o time_step para 1.5s de forma a nï¿½o sobrecarregar o OPR1...
+%2010-09-13: comentï¿½rios iniciais no cï¿½digo.
 
 
 if ~strcmpi(getmode('BEND'), 'Online'), switch2online; end
@@ -93,9 +93,9 @@ else
     r.VCM_names = {};
 end
 
-disp([get_date_str ': início da ciclagem de corretotas']);
+disp([get_date_str ': inï¿½cio da ciclagem de corretotas']);
 
-fprintf('Parâmetros de ciclagem\n\n');
+fprintf('Parï¿½metros de ciclagem\n\n');
 disp(r);
 fprintf('\n');
 
@@ -108,7 +108,7 @@ for i=1:length(r.VCM_names)
     fprintf('%s ',r.VCM_names{i});
 end
 fprintf('\n');
-fprintf('Número total de pontos: %i\n', length(r.ramp));
+fprintf('Nï¿½mero total de pontos: %i\n', length(r.ramp));
 
 
 
