@@ -1,54 +1,57 @@
-%   LNLS_CARREGA_FUNCOES fornece um vetor r com posições, a pressão P e as
-%   funções Bx, By, -B'/2, D e D', sem elementos repetidos.
+%   LNLS_CARREGA_FUNCOES fornece um vetor r com posiï¿½ï¿½es, a pressï¿½o P e as
+%   funï¿½ï¿½es Bx, By, -B'/2, D e D', sem elementos repetidos.
 %
 %   [r,P,Bx,By,alpha,eta,eta_diff,err] = LNLS_CARREGA_FUNCOES(s_B,Bx0,By0,
 %   alpha0,eta0,eta_diff0,pres,flag_refine) com pres do tipo string carrega
-%   o perfil de pressao cujo arquivo (caminho e nome) é pres; com pres
-%   igual a um número, considera a pressão constante e igual a pres; com
-%   pres vazio, abre interface para seleção de arquivo; com pres==-1, os
-%   valores de pressão não são fornecidos.
+%   o perfil de pressao cujo arquivo (caminho e nome) ï¿½ pres; com pres
+%   igual a um nï¿½mero, considera a pressï¿½o constante e igual a pres; com
+%   pres vazio, abre interface para seleï¿½ï¿½o de arquivo; com pres==-1, os
+%   valores de pressï¿½o nï¿½o sï¿½o fornecidos.
 %
 %   ENTRADA
-%       s_B          posição [m]
-%       Bx0          função betatron horizontal [m]
-%       By0          função betatron vertical [m]
-%       alpha0       derivada da função betatron horizontal
-%       eta0         função dispersão [m]
-%       eta_diff0    derivada da função dispersão
-%       pres         nome do arquivo .txt com o perfil de pressão ou valor
-%                    médio da pressão [mbar] (opcional)
-%       flag_refine  se verdadeiro, não interpola as funções
-%   SAÍDA
-%       r            posição [m]
-%       P            pressão [mbar]
-%       Bx           função betatron horizontal [m]
-%       By           função betatron vertical [m]
-%       alpha        derivada da função betatron horizontal
-%       eta          função dispersão [m]
-%       eta_diff     derivada da função dispersão
+%       s_B          posiï¿½ï¿½o [m]
+%       Bx0          funï¿½ï¿½o betatron horizontal [m]
+%       By0          funï¿½ï¿½o betatron vertical [m]
+%       alpha0       derivada da funï¿½ï¿½o betatron horizontal
+%       eta0         funï¿½ï¿½o dispersï¿½o [m]
+%       eta_diff0    derivada da funï¿½ï¿½o dispersï¿½o
+%       pres         nome do arquivo .txt com o perfil de pressï¿½o ou valor
+%                    mï¿½dio da pressï¿½o [mbar] (opcional)
+%       flag_refine  se verdadeiro, nï¿½o interpola as funï¿½ï¿½es
+%   SAï¿½DA
+%       r            posiï¿½ï¿½o [m]
+%       P            pressï¿½o [mbar]
+%       Bx           funï¿½ï¿½o betatron horizontal [m]
+%       By           funï¿½ï¿½o betatron vertical [m]
+%       alpha        derivada da funï¿½ï¿½o betatron horizontal
+%       eta          funï¿½ï¿½o dispersï¿½o [m]
+%       eta_diff     derivada da funï¿½ï¿½o dispersï¿½o
 %       err          verdadeiro se ocorreu erro
 
-function [r,P,Bx,By,alpha,eta,eta_diff,err] = lnls_carrega_funcoes(s_B,Bx0,By0,alpha0,eta0,eta_diff0,pres,flag_refine)
+function [r,P,Bx,By,alphax,alphay,etax,etaxl,etay,etayl,err] = lnls_carrega_funcoes(s_B,Bx0,By0,alphax0,alphay0,etax0,etay0,etaxl0,etayl0,pres,flag_refine)
 
-% Parâmetro fixo
-h = 0.01; % passo para interpolação
+% Parï¿½metro fixo
+h = 0.01; % passo para interpolaï¿½ï¿½o
 
 err = false;
 
-% Remove valores repetidos (para interpolação)
+% Remove valores repetidos (para interpolaï¿½ï¿½o)
 [r0,indices3] = unique(s_B);
 Bx = Bx0(indices3);
 By = By0(indices3);
-alpha = alpha0(indices3);
-eta = eta0(indices3);
-eta_diff = eta_diff0(indices3);
+alphax = alphax0(indices3);
+alphay = alphay0(indices3);
+etax = etax0(indices3);
+etay = etay0(indices3);
+etaxl = etaxl0(indices3);
+etayl = etayl0(indices3);
 
 idx_fim = length(r0);
 
 if(flag_refine)
     r = r0;
 else
-    % Intervalo para interpolação
+    % Intervalo para interpolaï¿½ï¿½o
     a = r0(1);
     b = r0(idx_fim);
     r = (a:h:b)';
@@ -56,14 +59,17 @@ else
     % Interpola
     Bx = interp1(r0,Bx,r,'cubic');
     By = interp1(r0,By,r,'cubic');
-    alpha = interp1(r0,alpha,r,'cubic');
-    eta = interp1(r0,eta,r,'cubic');
-    eta_diff = interp1(r0,eta_diff,r,'cubic');
+    alphax = interp1(r0,alphax,r,'cubic');
+    alphay = interp1(r0,alphay,r,'cubic');
+    etax = interp1(r0,etax,r,'cubic');
+    etaxl = interp1(r0,etaxl,r,'cubic');
+    etay = interp1(r0,etay,r,'cubic');
+    etayl = interp1(r0,etayl,r,'cubic');
 end
 
 idx_fim = length(r);
 
-% Seleciona o perfil de pressão
+% Seleciona o perfil de pressï¿½o
 if(pres == -1)
     err = true;
     P = 0;
@@ -87,12 +93,12 @@ else
     error('No pressure profile.');
 end
 
-% Interpola a pressão
+% Interpola a pressï¿½o
 if(flag_interp)
     [s_P,P1] = lnls_importa_perfil_pressao(nome);
     [s_P,idx] = unique(s_P);
     P1 = P1(idx);
-    % Normaliza a posição
+    % Normaliza a posiï¿½ï¿½o
     s_P = s_P - s_P(1);
     s_P = s_P / s_P(length(s_P)) * r(idx_fim);
     P = interp1(s_P,P1,r,'linear');

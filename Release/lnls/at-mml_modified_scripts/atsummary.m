@@ -135,10 +135,17 @@ r.synctune = sqrt((r.etac*r.harmon*v_cav*cos(r.syncphase))/(2*pi*r.e0*1e9));
 r.bunchlength = r.beta*const.c*abs(r.etac)*r.naturalEnergySpread/(r.synctune*r.revFreq*2*pi);
 r.the_ring = the_ring;
 
-% Lifetime and pressure - Afonso 2012-07-02
+% Lifetime and pressure - Afonso 2012-07-02 - Ximenes 2015-06-13
 try
-    AD = getad;
-    [lifetime,pressure] = lnls_calcula_tau(r,AD,-1,-1);
+    AD = getad; 
+  
+    pressure_file = fullfile(getmmlroot,'machine',AD.Machine,AD.SubMachine,AD.OpsData.PrsProfFile);
+    if(exist(pressure_file,'file'))
+        [lifetime,pressure] = lnls_calcula_tau(r,AD,-1,-1);
+    else
+        [lifetime,pressure] = lnls_calcula_tau(r,AD,AD.AveragePressure,-1);
+    end
+   
     if(isnumeric(lifetime.total))
         r.lifetime = lifetime.total;
     elseif(isfield(r,'lifetime'))

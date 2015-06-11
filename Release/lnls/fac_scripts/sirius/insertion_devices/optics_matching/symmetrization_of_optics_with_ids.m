@@ -15,23 +15,8 @@ fitting_tol_tune = 3.0;
 %ids_def = create_ids_def_PC_old;
 %ids_def = create_ids_def_PH;
 
-% % old ID table
-% ids = [];
-% ids = [ids ids_def.araucaria1];
-% ids = [ids ids_def.araucaria2];
-% ids = [ids ids_def.sibipiruna1];
-% ids = [ids ids_def.sibipiruna2];
-% ids = [ids ids_def.caterete];
-% ids = [ids ids_def.mangabeira];
-% ids = [ids ids_def.manaca];
-% ids = [ids ids_def.carnauba];
-% ids = [ids ids_def.w2t];
-% ids = [ids ids_def.scw3t];
-% ids = [ids ids_def.inga1];
-% ids = [ids ids_def.inga2];
 
-
-ids_def = create_ids_def_PH_new_order;
+ids_def = create_ids_def;
 ids = [];
 
 % % --- phase 1 ---
@@ -52,7 +37,8 @@ ids = [];
 % ids = [ids ids_def.sabia2];
 %ids = [ids ids_def.ipe2];
 % -- tests --
-ids = [ids ids_def.dhscu20];
+%ids = [ids ids_def.dhscu20];
+ids = [ids ids_def.epu80pv];
 
 
 % loads initial SIRIUS lattice model
@@ -63,7 +49,7 @@ ids = [ids ids_def.dhscu20];
 % data = load('the_ring_withids_ac10_5_2014-05-15.mat');
 %the_ring0 = data.the_ring;
 the_ring0 = sirius_si_lattice();
-the_ring = the_ring0; save('the_ring.mat', 'the_ring');
+%the_ring = the_ring0; save('the_ring.mat', 'the_ring');
 
 the_ring0 = start_at_last_element(the_ring0, 'mc'); % shifts model to start at center of 2T bending magnets
 twiss0 = calc_short_twiss(the_ring0); % calcs original twiss parameters
@@ -71,9 +57,9 @@ fprintf('tunes: %9.6f %9.6f\n', twiss0.tunes(1), twiss0.tunes(2));
 
 
 % inserts IDs and does initial symmetrization
-the_ring = insert_ids_set(the_ring0, ids, 1.0);
+the_ring = insert_ids_set(the_ring0, ids, 0.0);
 the_ring = restore_lattice_ordering(the_ring); save('the_ring_withids_notsymm.mat', 'the_ring');
-the_ring = locally_symmetrize_ids(the_ring, twiss0, ids, fitting_tol_symm, max_nr_iters);
+%the_ring = locally_symmetrize_ids(the_ring, twiss0, ids, fitting_tol_symm, max_nr_iters);
 
 
 for i=1:3
@@ -282,7 +268,7 @@ elements = mc(section_nr):mc(section_nr+1);
 center = intersect([findcells(the_ring, 'FamName', 'mia') findcells(the_ring, 'FamName', 'mib')], elements);
 the_ring = lnls_insert_kicktable(the_ring, center, id.kicktable_file, id.nr_segs, id.strength, id.label);
 
-% change family names of local quadrupols
+% change family names of local quadrupoles
 mc = unique([1 findcells(the_ring, 'FamName', 'mc') length(the_ring)]);
 elements = mc(section_nr):mc(section_nr+1);
 dipoles_all = findcells(the_ring, 'BendingAngle');
@@ -444,7 +430,7 @@ for i=1:length(etax_idx)
     residue(end+1,1) = twiss.etax(etax_idx(i)) / scale_eta;
 end;
 
-function ids_def = create_ids_def_PH_new_order
+function ids_def = create_ids_def
 
 % trechos impares - Betas Baixos
 
@@ -576,7 +562,6 @@ ids_def.ipe2.straight_label       = 'mia';
 ids_def.ipe2.straight_number      = 9;
 ids_def.ipe2.strength             = 2; % two IDs in series
 
-
 % -- tests --
 
 ids_def.dhscu20.label              = 'dhscu20';
@@ -586,380 +571,10 @@ ids_def.dhscu20.straight_label     = 'mib';
 ids_def.dhscu20.straight_number    = 10;
 ids_def.dhscu20.strength           = 1;
 
-
-function ids_def = create_ids_def_PH
-
-
-ids_def.caterete.label           = 'caterete';
-ids_def.caterete.kicktable_file  = '../id_modelling/U19/U19_kicktable.txt';
-ids_def.caterete.nr_segs         = 20;
-ids_def.caterete.straight_label  = 'mib';
-ids_def.caterete.straight_number = 1;
-ids_def.caterete.strength        = 1;
-
-ids_def.ema.label           = 'ema';
-ids_def.ema.kicktable_file  = '../id_modelling/U19/U19_kicktable.txt';
-ids_def.ema.nr_segs         = 20;
-ids_def.ema.straight_label  = 'mib';
-ids_def.ema.straight_number = 2;
-ids_def.ema.strength        = 1;
-
-ids_def.manaca.label           = 'manaca';
-ids_def.manaca.kicktable_file  = '../id_modelling/U19/U19_kicktable.txt';
-ids_def.manaca.nr_segs         = 20;
-ids_def.manaca.straight_label  = 'mib';
-ids_def.manaca.straight_number = 3;
-ids_def.manaca.strength        = 1;
-
-ids_def.carnauba.label           = 'carnauba';
-ids_def.carnauba.kicktable_file  = '../id_modelling/U19/U19_kicktable.txt';
-ids_def.carnauba.nr_segs         = 20;
-ids_def.carnauba.straight_label  = 'mib';
-ids_def.carnauba.straight_number = 4;
-ids_def.carnauba.strength        = 1;
-
-% ids_def.jatoba.label           = 'jatoba';
-% ids_def.jatoba.kicktable_file  = '../id_modelling/SCW4T/SCW4T_kicktable.txt';
-% ids_def.jatoba.nr_segs         = 20;
-% ids_def.jatoba.straight_label  = 'mib';
-% ids_def.jatoba.straight_number = 6;
-% ids_def.jatoba.strength        = 1;
-
-ids_def.inga1.label           = 'inga1';
-ids_def.inga1.kicktable_file  = '../id_modelling/U25/U25_kicktable.txt';
-ids_def.inga1.nr_segs         = 20;
-ids_def.inga1.straight_label  = 'mib';
-ids_def.inga1.straight_number = 7;
-ids_def.inga1.strength        = 1;
-
-ids_def.inga2.label           = 'inga2';
-ids_def.inga2.kicktable_file  = '../id_modelling/U25/U25_kicktable.txt';
-ids_def.inga2.nr_segs         = 20;
-ids_def.inga2.straight_label  = 'mib';
-ids_def.inga2.straight_number = 8;
-ids_def.inga2.strength        = 1;
-
-ids_def.sabia1.label           = 'sabia1';
-ids_def.sabia1.kicktable_file  = '../id_modelling/EPU80/EPU80_PH_kicktable.txt';
-ids_def.sabia1.nr_segs         = 20;
-ids_def.sabia1.straight_label  = 'mia';
-ids_def.sabia1.straight_number = 4;
-ids_def.sabia1.strength        = 1;
-
-ids_def.sabia2.label           = 'sabia2';
-ids_def.sabia2.kicktable_file  = '../id_modelling/EPU80/EPU80_PH_kicktable.txt';
-ids_def.sabia2.nr_segs         = 20;
-ids_def.sabia2.straight_label  = 'mia';
-ids_def.sabia2.straight_number = 5;
-ids_def.sabia2.strength        = 1;
-
-
-ids_def.ipe1.label           = 'ipe1';
-ids_def.ipe1.kicktable_file  = '../id_modelling/EPU80/EPU80_PH_kicktable.txt';
-ids_def.ipe1.nr_segs         = 20;
-ids_def.ipe1.straight_label  = 'mia';
-ids_def.ipe1.straight_number = 6;
-ids_def.ipe1.strength        = 1;
-
-ids_def.ipe2.label           = 'ipe2';
-ids_def.ipe2.kicktable_file  = '../id_modelling/EPU80/EPU80_PH_kicktable.txt';
-ids_def.ipe2.nr_segs         = 20;
-ids_def.ipe2.straight_label  = 'mia';
-ids_def.ipe2.straight_number = 7;
-ids_def.ipe2.strength        = 1;
-
-ids_def.jatoba.label           = 'jatoba';
-ids_def.jatoba.kicktable_file  = '../id_modelling/SCW4T/SCW4T_kicktable.txt';
-ids_def.jatoba.nr_segs         = 20;
-ids_def.jatoba.straight_label  = 'mia';
-ids_def.jatoba.straight_number = 8;
-ids_def.jatoba.strength        = 1;
-
-
-
-function ids_def = create_ids_def_PH_old
-
-
-ids_def.caterete.label           = 'caterete';
-ids_def.caterete.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.caterete.nr_segs         = 20;
-ids_def.caterete.straight_label  = 'mib';
-ids_def.caterete.straight_number = 1;
-ids_def.caterete.strength        = 1;
-
-ids_def.mangabeira.label           = 'mangabeira';
-ids_def.mangabeira.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.mangabeira.nr_segs         = 20;
-ids_def.mangabeira.straight_label  = 'mib';
-ids_def.mangabeira.straight_number = 2;
-ids_def.mangabeira.strength        = 1;
-
-ids_def.manaca.label           = 'manaca';
-ids_def.manaca.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.manaca.nr_segs         = 20;
-ids_def.manaca.straight_label  = 'mib';
-ids_def.manaca.straight_number = 3;
-ids_def.manaca.strength        = 1;
-
-ids_def.carnauba.label           = 'carnauba';
-ids_def.carnauba.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.carnauba.nr_segs         = 20;
-ids_def.carnauba.straight_label  = 'mib';
-ids_def.carnauba.straight_number = 4;
-ids_def.carnauba.strength        = 1;
-
-
-ids_def.w2t.label           = 'w2t';
-ids_def.w2t.kicktable_file  = '../id_modelling/W2T/W2T_kicktable.txt';
-ids_def.w2t.nr_segs         = 20;
-ids_def.w2t.straight_label  = 'mib';
-ids_def.w2t.straight_number = 5;
-ids_def.w2t.strength        = 1;
-
-ids_def.scw3t.label           = 'scw3t';
-ids_def.scw3t.kicktable_file  = '../id_modelling/SCW3T/SCW3T_kicktable.txt';
-ids_def.scw3t.nr_segs         = 20;
-ids_def.scw3t.straight_label  = 'mib';
-ids_def.scw3t.straight_number = 6;
-ids_def.scw3t.strength        = 1;
-
-ids_def.inga1.label           = 'inga1';
-ids_def.inga1.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.inga1.nr_segs         = 20;
-ids_def.inga1.straight_label  = 'mib';
-ids_def.inga1.straight_number = 7;
-ids_def.inga1.strength        = 1;
-
-ids_def.inga2.label           = 'inga2';
-ids_def.inga2.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.inga2.nr_segs         = 20;
-ids_def.inga2.straight_label  = 'mib';
-ids_def.inga2.straight_number = 8;
-ids_def.inga2.strength        = 1;
-
-ids_def.araucaria1.label           = 'araucaria1';
-%ids_def.araucaria1.kicktable_file  = '../id_modelling/EPU50/EPU50_PV_kicktable.txt';
-ids_def.araucaria1.kicktable_file  = '../id_modelling/EPU50/EPU50_PH_kicktable.txt';
-ids_def.araucaria1.nr_segs         = 20;
-ids_def.araucaria1.straight_label  = 'mia';
-ids_def.araucaria1.straight_number = 4;
-ids_def.araucaria1.strength        = 1;
-
-ids_def.araucaria2.label           = 'araucaria2';
-%ids_def.araucaria2.kicktable_file  = '../id_modelling/EPU200/EPU200_PV_kicktable.txt';
-ids_def.araucaria2.kicktable_file  = '../id_modelling/EPU200/EPU200_PH_kicktable.txt';
-ids_def.araucaria2.nr_segs         = 20;
-ids_def.araucaria2.straight_label  = 'mia';
-ids_def.araucaria2.straight_number = 5;
-ids_def.araucaria2.strength        = 1;
-
-
-ids_def.sibipiruna1.label           = 'sibipiruna1';
-%ids_def.sibipiruna1.kicktable_file  = '../id_modelling/EPU50/EPU50_PV_kicktable.txt';
-ids_def.sibipiruna1.kicktable_file  = '../id_modelling/EPU50/EPU50_PH_kicktable.txt';
-ids_def.sibipiruna1.nr_segs         = 20;
-ids_def.sibipiruna1.straight_label  = 'mia';
-ids_def.sibipiruna1.straight_number = 6;
-ids_def.sibipiruna1.strength        = 1;
-
-
-ids_def.sibipiruna2.label           = 'sibipiruna2';
-%ids_def.sibipiruna2.kicktable_file  = '../id_modelling/EPU200/EPU200_PV_kicktable.txt';
-ids_def.sibipiruna2.kicktable_file  = '../id_modelling/EPU200/EPU200_PH_kicktable.txt';
-ids_def.sibipiruna2.nr_segs         = 20;
-ids_def.sibipiruna2.straight_label  = 'mia';
-ids_def.sibipiruna2.straight_number = 7;
-ids_def.sibipiruna2.strength        = 1;
-
-function ids_def = create_ids_def_PV_old
-
-
-ids_def.caterete.label           = 'caterete';
-ids_def.caterete.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.caterete.nr_segs         = 20;
-ids_def.caterete.straight_label  = 'mib';
-ids_def.caterete.straight_number = 1;
-ids_def.caterete.strength        = 1;
-
-ids_def.mangabeira.label           = 'mangabeira';
-ids_def.mangabeira.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.mangabeira.nr_segs         = 20;
-ids_def.mangabeira.straight_label  = 'mib';
-ids_def.mangabeira.straight_number = 2;
-ids_def.mangabeira.strength        = 1;
-
-ids_def.manaca.label           = 'manaca';
-ids_def.manaca.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.manaca.nr_segs         = 20;
-ids_def.manaca.straight_label  = 'mib';
-ids_def.manaca.straight_number = 3;
-ids_def.manaca.strength        = 1;
-
-ids_def.carnauba.label           = 'carnauba';
-ids_def.carnauba.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.carnauba.nr_segs         = 20;
-ids_def.carnauba.straight_label  = 'mib';
-ids_def.carnauba.straight_number = 4;
-ids_def.carnauba.strength        = 1;
-
-
-ids_def.w2t.label           = 'w2t';
-ids_def.w2t.kicktable_file  = '../id_modelling/W2T/W2T_kicktable.txt';
-ids_def.w2t.nr_segs         = 20;
-ids_def.w2t.straight_label  = 'mib';
-ids_def.w2t.straight_number = 5;
-ids_def.w2t.strength        = 1;
-
-ids_def.scw3t.label           = 'scw3t';
-ids_def.scw3t.kicktable_file  = '../id_modelling/SCW3T/SCW3T_kicktable.txt';
-ids_def.scw3t.nr_segs         = 20;
-ids_def.scw3t.straight_label  = 'mib';
-ids_def.scw3t.straight_number = 6;
-ids_def.scw3t.strength        = 1;
-
-ids_def.inga1.label           = 'inga1';
-ids_def.inga1.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.inga1.nr_segs         = 20;
-ids_def.inga1.straight_label  = 'mib';
-ids_def.inga1.straight_number = 7;
-ids_def.inga1.strength        = 1;
-
-ids_def.inga2.label           = 'inga2';
-ids_def.inga2.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.inga2.nr_segs         = 20;
-ids_def.inga2.straight_label  = 'mib';
-ids_def.inga2.straight_number = 8;
-ids_def.inga2.strength        = 1;
-
-ids_def.araucaria1.label           = 'araucaria1';
-%ids_def.araucaria1.kicktable_file  = '../id_modelling/EPU50/EPU50_PV_kicktable.txt';
-ids_def.araucaria1.kicktable_file  = '../id_modelling/EPU50/EPU50_PH_kicktable.txt';
-ids_def.araucaria1.nr_segs         = 20;
-ids_def.araucaria1.straight_label  = 'mia';
-ids_def.araucaria1.straight_number = 4;
-ids_def.araucaria1.strength        = 1;
-
-ids_def.araucaria2.label           = 'araucaria2';
-ids_def.araucaria2.kicktable_file  = '../id_modelling/EPU200/EPU200_PV_kicktable.txt';
-%ids_def.araucaria2.kicktable_file  = '../id_modelling/EPU200/EPU200_PH_kicktable.txt';
-ids_def.araucaria2.nr_segs         = 20;
-ids_def.araucaria2.straight_label  = 'mia';
-ids_def.araucaria2.straight_number = 5;
-ids_def.araucaria2.strength        = 1;
-
-
-ids_def.sibipiruna1.label           = 'sibipiruna1';
-ids_def.sibipiruna1.kicktable_file  = '../id_modelling/EPU50/EPU50_PV_kicktable.txt';
-%ids_def.sibipiruna1.kicktable_file  = '../id_modelling/EPU50/EPU50_PH_kicktable.txt';
-ids_def.sibipiruna1.nr_segs         = 20;
-ids_def.sibipiruna1.straight_label  = 'mia';
-ids_def.sibipiruna1.straight_number = 6;
-ids_def.sibipiruna1.strength        = 1;
-
-
-ids_def.sibipiruna2.label           = 'sibipiruna2';
-ids_def.sibipiruna2.kicktable_file  = '../id_modelling/EPU200/EPU200_PV_kicktable.txt';
-%ids_def.sibipiruna2.kicktable_file  = '../id_modelling/EPU200/EPU200_PH_kicktable.txt';
-ids_def.sibipiruna2.nr_segs         = 20;
-ids_def.sibipiruna2.straight_label  = 'mia';
-ids_def.sibipiruna2.straight_number = 7;
-ids_def.sibipiruna2.strength        = 1;
-
-function ids_def = create_ids_def_PC_old
-
-
-ids_def.caterete.label           = 'caterete';
-ids_def.caterete.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.caterete.nr_segs         = 20;
-ids_def.caterete.straight_label  = 'mib';
-ids_def.caterete.straight_number = 1;
-ids_def.caterete.strength        = 1;
-
-ids_def.mangabeira.label           = 'mangabeira';
-ids_def.mangabeira.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.mangabeira.nr_segs         = 20;
-ids_def.mangabeira.straight_label  = 'mib';
-ids_def.mangabeira.straight_number = 2;
-ids_def.mangabeira.strength        = 1;
-
-ids_def.manaca.label           = 'manaca';
-ids_def.manaca.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.manaca.nr_segs         = 20;
-ids_def.manaca.straight_label  = 'mib';
-ids_def.manaca.straight_number = 3;
-ids_def.manaca.strength        = 1;
-
-ids_def.carnauba.label           = 'carnauba';
-ids_def.carnauba.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.carnauba.nr_segs         = 20;
-ids_def.carnauba.straight_label  = 'mib';
-ids_def.carnauba.straight_number = 4;
-ids_def.carnauba.strength        = 1;
-
-
-ids_def.w2t.label           = 'w2t';
-ids_def.w2t.kicktable_file  = '../id_modelling/W2T/W2T_kicktable.txt';
-ids_def.w2t.nr_segs         = 20;
-ids_def.w2t.straight_label  = 'mib';
-ids_def.w2t.straight_number = 5;
-ids_def.w2t.strength        = 1;
-
-ids_def.scw3t.label           = 'scw3t';
-ids_def.scw3t.kicktable_file  = '../id_modelling/SCW3T/SCW3T_kicktable.txt';
-ids_def.scw3t.nr_segs         = 20;
-ids_def.scw3t.straight_label  = 'mib';
-ids_def.scw3t.straight_number = 6;
-ids_def.scw3t.strength        = 1;
-
-ids_def.inga1.label           = 'inga1';
-ids_def.inga1.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.inga1.nr_segs         = 20;
-ids_def.inga1.straight_label  = 'mib';
-ids_def.inga1.straight_number = 7;
-ids_def.inga1.strength        = 1;
-
-ids_def.inga2.label           = 'inga2';
-ids_def.inga2.kicktable_file  = '../id_modelling/U18/U18_kicktable.txt';
-ids_def.inga2.nr_segs         = 20;
-ids_def.inga2.straight_label  = 'mib';
-ids_def.inga2.straight_number = 8;
-ids_def.inga2.strength        = 1;
-
-ids_def.araucaria1.label           = 'araucaria1';
-%ids_def.araucaria1.kicktable_file  = '../id_modelling/EPU50/EPU50_PV_kicktable.txt';
-%ids_def.araucaria1.kicktable_file  = '../id_modelling/EPU50/EPU50_PH_kicktable.txt';
-ids_def.araucaria1.kicktable_file  = '../id_modelling/EPU50/EPU50_PC_kicktable.txt';
-ids_def.araucaria1.nr_segs         = 20;
-ids_def.araucaria1.straight_label  = 'mia';
-ids_def.araucaria1.straight_number = 4;
-ids_def.araucaria1.strength        = 1;
-
-ids_def.araucaria2.label           = 'araucaria2';
-%ids_def.araucaria2.kicktable_file = '../id_modelling/EPU200/EPU200_PV_kicktable.txt';
-%ids_def.araucaria2.kicktable_file = '../id_modelling/EPU200/EPU200_PH_kicktable.txt';
-ids_def.araucaria2.kicktable_file  = '../id_modelling/EPU200/EPU200_PC_kicktable.txt';
-ids_def.araucaria2.nr_segs         = 20;
-ids_def.araucaria2.straight_label  = 'mia';
-ids_def.araucaria2.straight_number = 5;
-ids_def.araucaria2.strength        = 1;
-
-
-ids_def.sibipiruna1.label           = 'sibipiruna1';
-%ids_def.sibipiruna1.kicktable_file = '../id_modelling/EPU50/EPU50_PV_kicktable.txt';
-%ids_def.sibipiruna1.kicktable_file = '../id_modelling/EPU50/EPU50_PH_kicktable.txt';
-ids_def.sibipiruna1.kicktable_file  = '../id_modelling/EPU50/EPU50_PC_kicktable.txt';
-ids_def.sibipiruna1.nr_segs         = 20;
-ids_def.sibipiruna1.straight_label  = 'mia';
-ids_def.sibipiruna1.straight_number = 6;
-ids_def.sibipiruna1.strength        = 1;
-
-
-ids_def.sibipiruna2.label           = 'sibipiruna2';
-%ids_def.sibipiruna2.kicktable_file = '../id_modelling/EPU200/EPU200_PV_kicktable.txt';
-%ids_def.sibipiruna2.kicktable_file = '../id_modelling/EPU200/EPU200_PH_kicktable.txt';
-ids_def.sibipiruna2.kicktable_file  = '../id_modelling/EPU200/EPU200_PC_kicktable.txt';
-ids_def.sibipiruna2.nr_segs         = 20;
-ids_def.sibipiruna2.straight_label  = 'mia';
-ids_def.sibipiruna2.straight_number = 7;
-ids_def.sibipiruna2.strength        = 1;
+ids_def.epu80pv.label              = 'sabia2';
+ids_def.epu80pv.kicktable_file     = '../id_modelling/EPU80/EPU80_PV_kicktable_5p4meters.txt';
+ids_def.epu80pv.nr_segs            = 40;
+ids_def.epu80pv.straight_label     = 'mia';
+ids_def.epu80pv.straight_number    = 8;
+ids_def.epu80pv.strength           = 2; % two IDs in series
 

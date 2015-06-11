@@ -122,7 +122,8 @@ AD.MCF                 = getmcf('Model');
 AD.BeamCurrent         = 0.500; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.010;
-AD.OpsData.PrsProfFile = 'sirius_pressure_profile.txt';
+AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;
@@ -158,7 +159,8 @@ AD.MCF                 = getmcf('Model');
 AD.BeamCurrent         = 0.500; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.010;
-AD.OpsData.PrsProfFile = 'sirius_pressure_profile.txt';
+AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;
@@ -194,7 +196,8 @@ AD.MCF                 = getmcf('Model');
 AD.BeamCurrent         = 0.500; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.010;
-AD.OpsData.PrsProfFile = 'sirius_pressure_profile.txt';
+AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;

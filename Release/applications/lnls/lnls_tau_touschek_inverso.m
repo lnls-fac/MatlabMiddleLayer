@@ -1,4 +1,6 @@
 function Resp = lnls_tau_touschek_inverso(params,Accep,optics)
+
+
 %   Resp =lnls_tau_touschek_inverso(params,Accep,optics) 
 %      calcula o inverso do tempo de vida Touschek.
 %
@@ -92,8 +94,8 @@ ksip = (2*sqrt(C1)/gamma .* d_accp).^2;
 ksin = (2*sqrt(C1)/gamma .* d_accn).^2;
 
 % Interpola d_touschek
-Dp = interp1(x_tabela,y_tabela,ksip,'linear',NaN);
-Dn = interp1(x_tabela,y_tabela,ksin,'linear',NaN);
+Dp = interp1(x_tabela,y_tabela,ksip,'linear',0.0);
+Dn = interp1(x_tabela,y_tabela,ksin,'linear',0.0);
 
 % Tempo de vida touschek inverso
 Ratep = (r0^2*c/8/pi)*N/gamma^2 ./ d_accp.^3 .* Dp ./ V;

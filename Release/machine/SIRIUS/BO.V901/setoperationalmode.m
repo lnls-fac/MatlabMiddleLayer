@@ -136,6 +136,12 @@ AD.ATModel             = 'sirius_bo_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
 
+AD.BeamCurrent         = 0.002; % [A]
+AD.NrBunches           = AD.HarmonicNumber;
+AD.Coupling            = 0.0002;
+AD.OpsData.PrsProfFile = 'sirius_bo_pressure_profile.txt';
+AD.AveragePressure     = 1.5e-8; % [mbar]
+
 setad(AD);
 switch2sim;
 switch2hw; 
@@ -164,6 +170,12 @@ AD.TuneDelay           = 0.0;
 AD.ATModel             = 'sirius_bo_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
+
+AD.BeamCurrent         = 0.002; % [A]
+AD.NrBunches           = AD.HarmonicNumber;
+AD.Coupling            = 0.0002;
+AD.OpsData.PrsProfFile = 'sirius_bo_pressure_profile.txt';
+AD.AveragePressure     = 1.5e-8; % [mbar]
 
 setad(AD);
 switch2sim;
