@@ -18,7 +18,8 @@ mode = 'M';
 version = '0';
 
 harmonic_number = 828;
-if energy == 0.15e9, rf_voltage = 150e3; else rf_voltage = 950e3; end
+rf_voltage = sirius_bo_rf_voltage(energy);
+%if energy == 0.15e9, rf_voltage = 150e3; else rf_voltage = 950e3; end
 
 lattice_title = [lattice_version '.' mode version];
 fprintf(['   Loading lattice ' lattice_title ' - ' num2str(energy/1e9) ' GeV' '\n']);

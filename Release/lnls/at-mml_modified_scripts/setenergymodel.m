@@ -12,7 +12,7 @@ function setenergymodel(GeV)
 %  See also getenergymodel
 
 %  Written by Greg Portmann
-%  2011-10-26: Mudado para acomodar dependencia dos parametros dos modelos de IDs em função da energia do feixe (Ximenes 2011-10-
+%  2011-10-26: Mudado para acomodar dependencia dos parametros dos modelos de IDs em funï¿½ï¿½o da energia do feixe (Ximenes 2011-10-
 
 if ischar(GeV)
     if strcmpi(GeV, 'Production')
@@ -35,14 +35,11 @@ if ~isempty(whos('global','GLOBVAL'))
 end
 
 global THERING;
-GeV0 = unique(getcellstruct(THERING, 'Energy', 1:length(THERING))) / 1e9;
 
 % Newer AT versions require 'Energy' to be an AT field
-global THERING
 THERING = setcellstruct(THERING, 'Energy', 1:length(THERING), 1e+009 * GeV(end));
 
 % IDs with HE modelling
-
 idx1 = findcells(THERING, 'Field');
 idx2 = findcells(THERING, 'BendingAngle');
 at_idx = intersect(idx1, idx2);
@@ -53,4 +50,11 @@ if ~isempty(at_idx)
     for i=1:length(fname)
         lnls1_set_id_field(fname{i}, fields(i));
     end
+end
+
+% sets RF voltage for Sirius Booster
+ad = getad();
+if strfind(ad.SubMachine, 'BO.V')
+    idx = findcells(THERING, 'Voltage');
+    THERING{idx}.Voltage = sirius_bo_rf_voltage(GeV*1e9);
 end
