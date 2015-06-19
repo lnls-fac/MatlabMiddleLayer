@@ -222,7 +222,7 @@ ctrl.sumsqrT = uicontrol('Style','text','Position',[764 20 90 20],'String','0.0'
         
         if isempty(chil)
             maxy = max(erro);
-            lnls_drawlattice(res{val_conf}.(str_sys).the_ring,res{val_conf}.(str_sys).symmetry,-maxy/20,true,maxy/21,true,hax);
+            lnls_drawlattice(res{val_conf}.(str_sys).the_ring,res{val_conf}.(str_sys).symmetry,-maxy/20,true,maxy/21,true,false,hax);
             %     xlim(hax,[0,findspos(res{val_conf}.(str_sys).the_ring)/res{val_conf}.(str_sys).symmetry]);
             ylim(hax,[-maxy/10, maxy]*1.05);
             set(hax,'XGrid','on','YGrid','on');
