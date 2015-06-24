@@ -1,4 +1,4 @@
-function tracy3_da_ma_lt(path)
+function trackcpp_da_ma_lt(path)
 
 % users selects submachine
 prompt = {'Submachine (bo/si)', 'energy [GeV]', 'Number of plots','Types of plots'};
@@ -57,9 +57,9 @@ else
     ats = atsummary(the_ring);
     params.E     = energy * 1e9;
     % Data given by Natalia
-    params.emit0 = 0.306e-9; %ats.naturalEmittance;
-    params.sigE  = 8.8e-4;   %ats.naturalEnergySpread;
-    params.sigS  = 2.7e-3;   %3.5e-3; % takes IBS into account
+    params.emit0 = 0.240e-9; %ats.naturalEmittance;
+    params.sigE  = 9.4e-4;   %ats.naturalEnergySpread;
+    params.sigS  = 3.0e-3;   %3.5e-3; % takes IBS into account
     params.K     = 0.01;
     params.I     = 100;
     params.nrBun = 864;
@@ -94,7 +94,8 @@ esp_lin = 5;
 size_font = 24;
 limx = 12;
 limy = 3.5;
-lime = 5;
+limpe = 6;
+limne = 6;
 
 % if ~exist('var_plane','var')
 var_plane = 'x'; %determinaçao da abertura dinâmica por varreduda no plano x
@@ -105,6 +106,7 @@ pl = zeros(n_calls,3);
 pldp = zeros(n_calls,3);
 pllt = zeros(n_calls,2);
 i=0;
+
 while i < n_calls
     paths = my_uigetdir(path,'Em qual pasta estao os dados?');
     if isempty(paths);
@@ -141,16 +143,14 @@ while i < n_calls
                 if exist(fullfile(pathname,'dynap_xy_out.txt'),'file');
                     [onda(j,:,:), ~] = trackcpp_load_dynap_xy(pathname,var_plane);
                     j = j + 1;
-                else
-                    fprintf('%-2d-%-3d: xy nao carregou\n',i,k);
+                else fprintf('%-2d-%-3d: xy nao carregou\n',i,k);
                 end
             end
             if ex
                 if exist(fullfile(pathname, 'dynap_ex_out.txt'),'file');
                     [offda(m,:,:), ~] = trackcpp_load_dynap_ex(pathname);
                     m = m + 1;
-                else
-                    fprintf('%-2d-%-3d: ex nao carregou\n',i,k);
+                else fprintf('%-2d-%-3d: ex nao carregou\n',i,k);
                 end
             end
             
@@ -158,9 +158,7 @@ while i < n_calls
                 if exist(fullfile(pathname,'dynap_ma_out.txt'),'file');
                     [spos, accep(l+1,:,:), ~, ~] = trackcpp_load_ma_data(pathname);
                     l = l + 1;
-                else
-                    fprintf('%-2d-%-3d: ma nao carregou\n',i,k);
-                    break;
+                else fprintf('%-2d-%-3d: ma nao carregou\n',i,k); break; 
                 end
                 Accep(1,:) = spos;
                 Accep(2,:) = min(accep(l,1,:), accepRF);
@@ -186,14 +184,12 @@ while i < n_calls
         
         if xy
             if i == 1
-                f=figure('Position',[1,1,896,750]);
+                f  = figure('Position',[1,1,896,750]);
                 fa = axes('Parent',f,'YGrid','on','XGrid','on','FontSize',size_font);
-                box(fa,'on');
-                hold(fa,'all');
+                box(fa,'on');  hold(fa,'all');
                 xlabel('x [mm]','FontSize',size_font);
                 ylabel('y [mm]','FontSize',size_font);
-                xlim(fa,[-limx limx]);
-                ylim(fa,[0 limy]);
+                xlim(fa,[-limx limx]);  ylim(fa,[0 limy]);
             end
             pl(i,2) = plot(fa, 1000*aveOnda(1,:,1), 1000*aveOnda(1,:,2), ...
                 'Marker','.','LineWidth',esp_lin,'Color',color, 'LineStyle','-');
@@ -207,14 +203,12 @@ while i < n_calls
         
         if ex
             if i == 1
-                fdp=figure('Position',[1,1,896,750]);
+                fdp  = figure('Position',[1,1,896,750]);
                 fdpa = axes('Parent',fdp,'YGrid','on','XGrid','on','FontSize',size_font);
-                box(fdpa,'on');
-                hold(fdpa,'all');
+                box(fdpa,'on'); hold(fdpa,'all');
                 xlabel('\delta [%]','FontSize',size_font);
                 ylabel('x [mm]','FontSize',size_font);
-                xlim(fdpa,[-lime lime]);
-                ylim(fdpa,[-limx,0]);
+                xlim(fdpa,[-limne limpe]);  ylim(fdpa,[-limx,0]);
             end
             pldp(i,2) = plot(fdpa, 100*aveOffda(1,:,1),1000*aveOffda(1,:,2),...
                 'Marker','.','LineWidth',esp_lin,'Color',color, 'LineStyle','-');
@@ -228,20 +222,18 @@ while i < n_calls
         
         if ma
             %imprime o tempo de vida
-            fprintf('\n Configuração:        %-s  \n',upper(cell_leg_text{i}));
-            fprintf(' Tempo de vida médio: %10.5f h \n',aveLT);
-            if rms_mode; fprintf(' Desvio Padrão:       %10.5f h \n',rmsLT); end;
+            if i==1, fprintf('\n%-20s %-15s \n','Configuração', 'Tempo de Vida'); end;
+            if rms_mode; fprintf(  '%-20s %7.2f \x00B1 %-5.2f h\n',upper(cell_leg_text{i}), aveLT, rmsLT);
+            else         fprintf(  '%-20s %7.2f h\n',upper(cell_leg_text{i}), aveLT); end;
             
             if i == 1
-                flt=figure('Position',[1, 1, 1296, 553]);
+                flt  = figure('Position',[1, 1, 1296, 553]);
                 falt = axes('Parent',flt,'YGrid','on','FontSize',size_font,...
                             'Position',[0.10 0.17 0.84 0.80],'XGrid','on',...
                             'yTickLabel',{'-5','-2.5','0','2.5','5'},...
                             'YTick',[-5 -2.5 0 2.5 5]);
-                box(falt,'on');
-                hold(falt,'all');
-                xlim(falt, [0, 52]);
-                ylim(falt, [-lime-0.2,lime+0.2]);
+                box(falt,'on');  hold(falt,'all'); 
+                ylim(falt, [-limne-0.2,limpe+0.2]); xlim(falt, [0, 52]);
                 xlabel('Pos [m]','FontSize',size_font);
                 ylabel('\delta [%]','FontSize',size_font);
             end
@@ -254,8 +246,6 @@ while i < n_calls
                       color,'LineWidth',2,'LineStyle','--');
             end
         end
-        
-        disp('------------');
         drawnow;
     end
 end
