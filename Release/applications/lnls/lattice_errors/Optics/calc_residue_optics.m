@@ -36,8 +36,8 @@ A = A - Dispx(indcs);
 v = [v; DISPWEIGHT * A(:)];
 
 % Mirror Symetries:
-bpm_idx = logical(repmat([1,1,0,1,0,1,1,0,1],1,20));
-hcm_idx = logical(repmat([1,1,1,1,1,1,1,1],1,20));
+bpm_idx = logical(repmat([1,1,0,1,0,1,0,1,1],1,20));
+hcm_idx = logical(repmat([1,1,1,1,1,1],1,20));
 vcm_idx = logical(repmat([1,1,1,1,1,1],1,20));
 Mxx = Mxx(bpm_idx,hcm_idx);
 Myy = Myy(bpm_idx,vcm_idx);

@@ -65,8 +65,8 @@ sext_pass_method = 'StrMPoleSymplectic4Pass';
 MOMACCEP = marker('calc_mom_accep', 'IdentityPass');     
 
 % -- drifts --
-LIA  = drift('lia2', 2.5679,'DriftPass');
-LIB  = drift('lib2', 2.3279,'DriftPass');
+LIA  = drift('lia2', 1.5679,'DriftPass');
+LIB  = drift('lib2', 1.3279,'DriftPass');
 L035 = drift('l035', 0.0350,'DriftPass');
 L050 = drift('l050', 0.0500,'DriftPass');
 L077 = drift('l077', 0.0770,'DriftPass');
@@ -139,26 +139,27 @@ QF2  = quadrupole('qf2',  0.200, qf2_strength,  quad_pass_method);
 QF3  = quadrupole('qf3',  0.200, qf3_strength,  quad_pass_method);
 QF4  = quadrupole('qf4',  0.200, qf4_strength,  quad_pass_method);
 
-% -- sextupoles and slow correctors --         
-SDA  = sextupole('sda', 0.150, sda_strength, sext_pass_method); %
-SFA  = sextupole('sfa', 0.150, sfa_strength, sext_pass_method); % chs/cvs
-SDB  = sextupole('sdb', 0.150, sdb_strength, sext_pass_method); %
-SFB  = sextupole('sfb', 0.150, sfb_strength, sext_pass_method); % chs/cvs
-SD1J = sextupole('sd1j', 0.150, sd1j_strength, sext_pass_method); % chs/cvs
-SF1J = sextupole('sf1j', 0.150, sf1j_strength, sext_pass_method); %
-SD2J = sextupole('sd2j', 0.150, sd2j_strength, sext_pass_method); % chs
-SD3J = sextupole('sd3j', 0.150, sd3j_strength, sext_pass_method); % cvs
-SF2J = sextupole('sf2j', 0.150, sf2j_strength, sext_pass_method); % chs
-SD1K = sextupole('sd1k', 0.150, sd1k_strength, sext_pass_method); % chs/cvs
-SF1K = sextupole('sf1k', 0.150, sf1k_strength, sext_pass_method); %
-SD2K = sextupole('sd2k', 0.150, sd2k_strength, sext_pass_method); % chs
-SD3K = sextupole('sd3k', 0.150, sd3k_strength, sext_pass_method); % cvs
-SF2K = sextupole('sf2k', 0.150, sf2k_strength, sext_pass_method); % chs
+% -- sextupoles and slow correctors --
+sext_len = 150 * 1e-3; 
+SDA  = sextupole('sda' , sext_len, sda_strength , sext_pass_method); %
+SFA  = sextupole('sfa' , sext_len, sfa_strength , sext_pass_method); % chs/cvs
+SDB  = sextupole('sdb' , sext_len, sdb_strength , sext_pass_method); %
+SFB  = sextupole('sfb' , sext_len, sfb_strength , sext_pass_method); % chs/cvs
+SD1J = sextupole('sd1j', sext_len, sd1j_strength, sext_pass_method); % chs/cvs
+SF1J = sextupole('sf1j', sext_len, sf1j_strength, sext_pass_method); %
+SD2J = sextupole('sd2j', sext_len, sd2j_strength, sext_pass_method); % chs
+SD3J = sextupole('sd3j', sext_len, sd3j_strength, sext_pass_method); % cvs
+SF2J = sextupole('sf2j', sext_len, sf2j_strength, sext_pass_method); % chs
+SD1K = sextupole('sd1k', sext_len, sd1k_strength, sext_pass_method); % chs/cvs
+SF1K = sextupole('sf1k', sext_len, sf1k_strength, sext_pass_method); %
+SD2K = sextupole('sd2k', sext_len, sd2k_strength, sext_pass_method); % chs
+SD3K = sextupole('sd3k', sext_len, sd3k_strength, sext_pass_method); % cvs
+SF2K = sextupole('sf2k', sext_len, sf2k_strength, sext_pass_method); % chs
 
 % -- bpms and fast correctors --
 BPM    = marker('bpm', 'IdentityPass');
 CF     = sextupole('cf', 0.100, 0.0, quad_pass_method);
-
+RBPM   = marker('rbpm', 'IdentityPass');
 
 % -- rf cavities --
 RFC = rfcavity('cav', 0, 3.0e6, 500e6, harmonic_number, 'CavityPass');
@@ -174,23 +175,22 @@ MIDB   = marker('id_endb', 'IdentityPass');    % marker for the extremities of I
 
 %% transport lines
 
-M2A = [GIRDER,CF,L085,SFA,L150,QFA,L124,BPM,L116,SDA,L150,QDA,L170,GIRDER];                 % high beta xxM2 girder  
-M1A = fliplr(M2A);                                                                          % high beta xxM1 girder
-IDA = [GIRDER,LIA,MIDA,L500,L500,MIA,MOMACCEP,L500,L500,MIDA,LIA,GIRDER];                   % high beta ID straight section
-CAV = [GIRDER,LIA,L500,L500,MIA,MOMACCEP,RFC,L500,L500,LIA,GIRDER];                         % high beta RF cavity straight section 
-INJ = [GIRDER,LIA,L500,L500,END,START,MIA,MOMACCEP,L500,L500,LIA,GIRDER];                   % high beta INJ straight section
-M1B = [GIRDER,L170,QDB1,L150,SDB,L116,BPM,L124,QFB,L150,SFB,L050,CF,L035,QDB2,GIRDER];      % low beta xxM1 girder
-M2B = fliplr(M1B);                                                                          % low beta xxM2 girder
-IDB = [GIRDER,LIB,MIDB,L500,L500,MIB,MOMACCEP,L500,L500,MIDB,LIB,GIRDER];                   % low beta ID straight section
-C3  = [BPM,L100,B3C];                                                                       % arc sector in between B3-B3
-C1A = [GIRDER,L610,SD1J,L170,QF1,L135, BPM,L125,SF1J,L230,QF2,L170,SD2J,L210,BPM,L130,GIRDER]; % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C2A = [GIRDER,L460,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,L788,GIRDER];            % arc sector in between B2-B3 (high beta odd-numbered straight sections)
-C4A = [GIRDER,L888,QF4,L112,BPM,L118,SF2K,L077,CF,L083,QF3,L170,SD3K,L330,BPM,L130,GIRDER];   % arc sector in between B3-B2 (high beta odd-numbered straight sections)
-C5A = [GIRDER,L340,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,L610,GIRDER];           % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-C1B = [GIRDER,L610,SD1K,L170,QF1,L135, BPM,L125,SF1K,L230,QF2,L170,SD2K,L210,BPM,L130,GIRDER]; % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C2B = [GIRDER,L460,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,L788,GIRDER];            % arc sector in between B2-B3 (low beta even-numbered straight sections)
-C4B = [GIRDER,L888,QF4,L112,BPM,L118,SF2J,L077,CF,L083,QF3,L170,SD3J,L330,BPM,L130,GIRDER];   % arc sector in between B3-B2 (low beta even-numbered straight sections)
-C5B = [GIRDER,L340,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,L610,GIRDER];           % arc sector in between B2-B1 (low beta even-numbered straight sections)
+M2A = [GIRDER,CF,L085,SFA,L150,QFA,L124,BPM,L116,SDA,L150,QDA,L170,GIRDER];                             % high beta xxM2 girder  
+M1A = fliplr(M2A);                                                                                      % high beta xxM1 girder
+IDA = [GIRDER,LIA,RBPM,L500,L500,MIDA,L500,L500,MIA,MOMACCEP,L500,L500,MIDA,L500,L500,RBPM,LIA,GIRDER]; % high beta ID straight section
+CAV = [GIRDER,LIA,RBPM,L500,L500,L500,L500,MIA,MOMACCEP,RFC,L500,L500,L500,L500,RBPM,LIA,GIRDER];       % high beta RF cavity straight section 
+INJ = [GIRDER,LIA,RBPM,L500,L500,L500,L500,END,START,MIA,MOMACCEP,L500,L500,L500,L500,RBPM,LIA,GIRDER]; % high beta INJ straight section
+M1B = [GIRDER,L170,QDB1,L150,SDB,L116,BPM,L124,QFB,L150,SFB,L050,CF,L035,QDB2,GIRDER];                  % low beta xxM1 girder
+M2B = fliplr(M1B);                                                                                      % low beta xxM2 girder
+IDB = [GIRDER,LIB,RBPM,L500,L500,MIDB,L500,L500,MIB,MOMACCEP,L500,L500,MIDB,L500,L500,RBPM,LIB,GIRDER]; % low beta ID straight section
+C1A = [GIRDER,L610,SD1J,L170,QF1,L135, BPM,L125,SF1J,L230,QF2,L170,SD2J,L210,BPM,L130,GIRDER];          % arc sector in between B1-B2 (high beta odd-numbered straight sections)
+C2A = [GIRDER,L460,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,L788,GIRDER,BPM,RBPM,L100];        % arc sector in between B2-B3 (high beta odd-numbered straight sections)
+C3A = [GIRDER,L888,QF4,L112,RBPM,BPM,L118,SF2K,L077,CF,L083,QF3,L170,SD3K,L330,BPM,L130,GIRDER];             % arc sector in between B3-B2 (high beta odd-numbered straight sections)
+C4A = [GIRDER,L340,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,L610,GIRDER];                    % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C1B = [GIRDER,L610,SD1K,L170,QF1,L135, BPM,L125,SF1K,L230,QF2,L170,SD2K,L210,BPM,L130,GIRDER];          % arc sector in between B1-B2 (low beta even-numbered straight sections)
+C2B = [GIRDER,L460,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,L788,GIRDER,BPM,RBPM,L100];        % arc sector in between B2-B3 (low beta even-numbered straight sections)
+C3B = [GIRDER,L888,QF4,L112,RBPM,BPM,L118,SF2J,L077,CF,L083,QF3,L170,SD3J,L330,BPM,L130,GIRDER];             % arc sector in between B3-B2 (low beta even-numbered straight sections)
+C4B = [GIRDER,L340,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,L610,GIRDER];                    % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
 
 %% GIRDERS
@@ -220,50 +220,50 @@ GIRDER_17M1 = M1A; GIRDER_17M2 = M2A; GIRDER_18M1 = M1B; GIRDER_18M2 = M2B;
 GIRDER_19M1 = M1A; GIRDER_19M2 = M2A; GIRDER_20M1 = M1B; GIRDER_20M2 = M2B;
 
 % dispersive arcs
-GIRDER_01C1 = C1A; GIRDER_01C2 = C2A; GIRDER_01C3 = C3; GIRDER_01C4 = C4A; GIRDER_01C5 = C5A;
-GIRDER_02C1 = C1B; GIRDER_02C2 = C2B; GIRDER_02C3 = C3; GIRDER_02C4 = C4B; GIRDER_02C5 = C5B;
-GIRDER_03C1 = C1A; GIRDER_03C2 = C2A; GIRDER_03C3 = C3; GIRDER_03C4 = C4A; GIRDER_03C5 = C5A;
-GIRDER_04C1 = C1B; GIRDER_04C2 = C2B; GIRDER_04C3 = C3; GIRDER_04C4 = C4B; GIRDER_04C5 = C5B;
-GIRDER_05C1 = C1A; GIRDER_05C2 = C2A; GIRDER_05C3 = C3; GIRDER_05C4 = C4A; GIRDER_05C5 = C5A;
-GIRDER_06C1 = C1B; GIRDER_06C2 = C2B; GIRDER_06C3 = C3; GIRDER_06C4 = C4B; GIRDER_06C5 = C5B;
-GIRDER_07C1 = C1A; GIRDER_07C2 = C2A; GIRDER_07C3 = C3; GIRDER_07C4 = C4A; GIRDER_07C5 = C5A;
-GIRDER_08C1 = C1B; GIRDER_08C2 = C2B; GIRDER_08C3 = C3; GIRDER_08C4 = C4B; GIRDER_08C5 = C5B;
-GIRDER_09C1 = C1A; GIRDER_09C2 = C2A; GIRDER_09C3 = C3; GIRDER_09C4 = C4A; GIRDER_09C5 = C5A;
-GIRDER_10C1 = C1B; GIRDER_10C2 = C2B; GIRDER_10C3 = C3; GIRDER_10C4 = C4B; GIRDER_10C5 = C5B;
-GIRDER_11C1 = C1A; GIRDER_11C2 = C2A; GIRDER_11C3 = C3; GIRDER_11C4 = C4A; GIRDER_11C5 = C5A;
-GIRDER_12C1 = C1B; GIRDER_12C2 = C2B; GIRDER_12C3 = C3; GIRDER_12C4 = C4B; GIRDER_12C5 = C5B;
-GIRDER_13C1 = C1A; GIRDER_13C2 = C2A; GIRDER_13C3 = C3; GIRDER_13C4 = C4A; GIRDER_13C5 = C5A;
-GIRDER_14C1 = C1B; GIRDER_14C2 = C2B; GIRDER_14C3 = C3; GIRDER_14C4 = C4B; GIRDER_14C5 = C5B;
-GIRDER_15C1 = C1A; GIRDER_15C2 = C2A; GIRDER_15C3 = C3; GIRDER_15C4 = C4A; GIRDER_15C5 = C5A;
-GIRDER_16C1 = C1B; GIRDER_16C2 = C2B; GIRDER_16C3 = C3; GIRDER_16C4 = C4B; GIRDER_16C5 = C5B;
-GIRDER_17C1 = C1A; GIRDER_17C2 = C2A; GIRDER_17C3 = C3; GIRDER_17C4 = C4A; GIRDER_17C5 = C5A;
-GIRDER_18C1 = C1B; GIRDER_18C2 = C2B; GIRDER_18C3 = C3; GIRDER_18C4 = C4B; GIRDER_18C5 = C5B;
-GIRDER_19C1 = C1A; GIRDER_19C2 = C2A; GIRDER_19C3 = C3; GIRDER_19C4 = C4A; GIRDER_19C5 = C5A;
-GIRDER_20C1 = C1B; GIRDER_20C2 = C2B; GIRDER_20C3 = C3; GIRDER_20C4 = C4B; GIRDER_20C5 = C5B;
+GIRDER_01C1 = C1A; GIRDER_01C2 = C2A; GIRDER_01C3 = C3A; GIRDER_01C4 = C4A;
+GIRDER_02C1 = C1B; GIRDER_02C2 = C2B; GIRDER_02C3 = C3B; GIRDER_02C4 = C4B;
+GIRDER_03C1 = C1A; GIRDER_03C2 = C2A; GIRDER_03C3 = C3A; GIRDER_03C4 = C4A;
+GIRDER_04C1 = C1B; GIRDER_04C2 = C2B; GIRDER_04C3 = C3B; GIRDER_04C4 = C4B;
+GIRDER_05C1 = C1A; GIRDER_05C2 = C2A; GIRDER_05C3 = C3A; GIRDER_05C4 = C4A;
+GIRDER_06C1 = C1B; GIRDER_06C2 = C2B; GIRDER_06C3 = C3B; GIRDER_06C4 = C4B;
+GIRDER_07C1 = C1A; GIRDER_07C2 = C2A; GIRDER_07C3 = C3A; GIRDER_07C4 = C4A;
+GIRDER_08C1 = C1B; GIRDER_08C2 = C2B; GIRDER_08C3 = C3B; GIRDER_08C4 = C4B;
+GIRDER_09C1 = C1A; GIRDER_09C2 = C2A; GIRDER_09C3 = C3A; GIRDER_09C4 = C4A;
+GIRDER_10C1 = C1B; GIRDER_10C2 = C2B; GIRDER_10C3 = C3B; GIRDER_10C4 = C4B;
+GIRDER_11C1 = C1A; GIRDER_11C2 = C2A; GIRDER_11C3 = C3A; GIRDER_11C4 = C4A;
+GIRDER_12C1 = C1B; GIRDER_12C2 = C2B; GIRDER_12C3 = C3B; GIRDER_12C4 = C4B;
+GIRDER_13C1 = C1A; GIRDER_13C2 = C2A; GIRDER_13C3 = C3A; GIRDER_13C4 = C4A;
+GIRDER_14C1 = C1B; GIRDER_14C2 = C2B; GIRDER_14C3 = C3B; GIRDER_14C4 = C4B;
+GIRDER_15C1 = C1A; GIRDER_15C2 = C2A; GIRDER_15C3 = C3A; GIRDER_15C4 = C4A;
+GIRDER_16C1 = C1B; GIRDER_16C2 = C2B; GIRDER_16C3 = C3B; GIRDER_16C4 = C4B;
+GIRDER_17C1 = C1A; GIRDER_17C2 = C2A; GIRDER_17C3 = C3A; GIRDER_17C4 = C4A;
+GIRDER_18C1 = C1B; GIRDER_18C2 = C2B; GIRDER_18C3 = C3B; GIRDER_18C4 = C4B;
+GIRDER_19C1 = C1A; GIRDER_19C2 = C2A; GIRDER_19C3 = C3A; GIRDER_19C4 = C4A;
+GIRDER_20C1 = C1B; GIRDER_20C2 = C2B; GIRDER_20C3 = C3B; GIRDER_20C4 = C4B;
 
 
 %% SECTORS # 01..20
 
-S01 = [GIRDER_01M1, GIRDER_01S, GIRDER_01M2, B1, GIRDER_01C1, B2, GIRDER_01C2, GIRDER_01C3, GIRDER_01C4, B2, GIRDER_01C5, B1];
-S02 = [GIRDER_02M1, GIRDER_02S, GIRDER_02M2, B1, GIRDER_02C1, B2, GIRDER_02C2, GIRDER_02C3, GIRDER_02C4, B2, GIRDER_02C5, B1];
-S03 = [GIRDER_03M1, GIRDER_03S, GIRDER_03M2, B1, GIRDER_03C1, B2, GIRDER_03C2, GIRDER_03C3, GIRDER_03C4, B2, GIRDER_03C5, B1];
-S04 = [GIRDER_04M1, GIRDER_04S, GIRDER_04M2, B1, GIRDER_04C1, B2, GIRDER_04C2, GIRDER_04C3, GIRDER_04C4, B2, GIRDER_04C5, B1];
-S05 = [GIRDER_05M1, GIRDER_05S, GIRDER_05M2, B1, GIRDER_05C1, B2, GIRDER_05C2, GIRDER_05C3, GIRDER_05C4, B2, GIRDER_05C5, B1];
-S06 = [GIRDER_06M1, GIRDER_06S, GIRDER_06M2, B1, GIRDER_06C1, B2, GIRDER_06C2, GIRDER_06C3, GIRDER_06C4, B2, GIRDER_06C5, B1];
-S07 = [GIRDER_07M1, GIRDER_07S, GIRDER_07M2, B1, GIRDER_07C1, B2, GIRDER_07C2, GIRDER_07C3, GIRDER_07C4, B2, GIRDER_07C5, B1];
-S08 = [GIRDER_08M1, GIRDER_08S, GIRDER_08M2, B1, GIRDER_08C1, B2, GIRDER_08C2, GIRDER_08C3, GIRDER_08C4, B2, GIRDER_08C5, B1];
-S09 = [GIRDER_09M1, GIRDER_09S, GIRDER_09M2, B1, GIRDER_09C1, B2, GIRDER_09C2, GIRDER_09C3, GIRDER_09C4, B2, GIRDER_09C5, B1];
-S10 = [GIRDER_10M1, GIRDER_10S, GIRDER_10M2, B1, GIRDER_10C1, B2, GIRDER_10C2, GIRDER_10C3, GIRDER_10C4, B2, GIRDER_10C5, B1];
-S11 = [GIRDER_11M1, GIRDER_11S, GIRDER_11M2, B1, GIRDER_11C1, B2, GIRDER_11C2, GIRDER_11C3, GIRDER_11C4, B2, GIRDER_11C5, B1];
-S12 = [GIRDER_12M1, GIRDER_12S, GIRDER_12M2, B1, GIRDER_12C1, B2, GIRDER_12C2, GIRDER_12C3, GIRDER_12C4, B2, GIRDER_12C5, B1];
-S13 = [GIRDER_13M1, GIRDER_13S, GIRDER_13M2, B1, GIRDER_13C1, B2, GIRDER_13C2, GIRDER_13C3, GIRDER_13C4, B2, GIRDER_13C5, B1];
-S14 = [GIRDER_14M1, GIRDER_14S, GIRDER_14M2, B1, GIRDER_14C1, B2, GIRDER_14C2, GIRDER_14C3, GIRDER_14C4, B2, GIRDER_14C5, B1];
-S15 = [GIRDER_15M1, GIRDER_15S, GIRDER_15M2, B1, GIRDER_15C1, B2, GIRDER_15C2, GIRDER_15C3, GIRDER_15C4, B2, GIRDER_15C5, B1];
-S16 = [GIRDER_16M1, GIRDER_16S, GIRDER_16M2, B1, GIRDER_16C1, B2, GIRDER_16C2, GIRDER_16C3, GIRDER_16C4, B2, GIRDER_16C5, B1];
-S17 = [GIRDER_17M1, GIRDER_17S, GIRDER_17M2, B1, GIRDER_17C1, B2, GIRDER_17C2, GIRDER_17C3, GIRDER_17C4, B2, GIRDER_17C5, B1];
-S18 = [GIRDER_18M1, GIRDER_18S, GIRDER_18M2, B1, GIRDER_18C1, B2, GIRDER_18C2, GIRDER_18C3, GIRDER_18C4, B2, GIRDER_18C5, B1];
-S19 = [GIRDER_19M1, GIRDER_19S, GIRDER_19M2, B1, GIRDER_19C1, B2, GIRDER_19C2, GIRDER_19C3, GIRDER_19C4, B2, GIRDER_19C5, B1];
-S20 = [GIRDER_20M1, GIRDER_20S, GIRDER_20M2, B1, GIRDER_20C1, B2, GIRDER_20C2, GIRDER_20C3, GIRDER_20C4, B2, GIRDER_20C5, B1];
+S01 = [GIRDER_01M1, GIRDER_01S, GIRDER_01M2, B1, GIRDER_01C1, B2, GIRDER_01C2, B3C, GIRDER_01C3, B2, GIRDER_01C4, B1];
+S02 = [GIRDER_02M1, GIRDER_02S, GIRDER_02M2, B1, GIRDER_02C1, B2, GIRDER_02C2, B3C, GIRDER_02C3, B2, GIRDER_02C4, B1];
+S03 = [GIRDER_03M1, GIRDER_03S, GIRDER_03M2, B1, GIRDER_03C1, B2, GIRDER_03C2, B3C, GIRDER_03C3, B2, GIRDER_03C4, B1];
+S04 = [GIRDER_04M1, GIRDER_04S, GIRDER_04M2, B1, GIRDER_04C1, B2, GIRDER_04C2, B3C, GIRDER_04C3, B2, GIRDER_04C4, B1];
+S05 = [GIRDER_05M1, GIRDER_05S, GIRDER_05M2, B1, GIRDER_05C1, B2, GIRDER_05C2, B3C, GIRDER_05C3, B2, GIRDER_05C4, B1];
+S06 = [GIRDER_06M1, GIRDER_06S, GIRDER_06M2, B1, GIRDER_06C1, B2, GIRDER_06C2, B3C, GIRDER_06C3, B2, GIRDER_06C4, B1];
+S07 = [GIRDER_07M1, GIRDER_07S, GIRDER_07M2, B1, GIRDER_07C1, B2, GIRDER_07C2, B3C, GIRDER_07C3, B2, GIRDER_07C4, B1];
+S08 = [GIRDER_08M1, GIRDER_08S, GIRDER_08M2, B1, GIRDER_08C1, B2, GIRDER_08C2, B3C, GIRDER_08C3, B2, GIRDER_08C4, B1];
+S09 = [GIRDER_09M1, GIRDER_09S, GIRDER_09M2, B1, GIRDER_09C1, B2, GIRDER_09C2, B3C, GIRDER_09C3, B2, GIRDER_09C4, B1];
+S10 = [GIRDER_10M1, GIRDER_10S, GIRDER_10M2, B1, GIRDER_10C1, B2, GIRDER_10C2, B3C, GIRDER_10C3, B2, GIRDER_10C4, B1];
+S11 = [GIRDER_11M1, GIRDER_11S, GIRDER_11M2, B1, GIRDER_11C1, B2, GIRDER_11C2, B3C, GIRDER_11C3, B2, GIRDER_11C4, B1];
+S12 = [GIRDER_12M1, GIRDER_12S, GIRDER_12M2, B1, GIRDER_12C1, B2, GIRDER_12C2, B3C, GIRDER_12C3, B2, GIRDER_12C4, B1];
+S13 = [GIRDER_13M1, GIRDER_13S, GIRDER_13M2, B1, GIRDER_13C1, B2, GIRDER_13C2, B3C, GIRDER_13C3, B2, GIRDER_13C4, B1];
+S14 = [GIRDER_14M1, GIRDER_14S, GIRDER_14M2, B1, GIRDER_14C1, B2, GIRDER_14C2, B3C, GIRDER_14C3, B2, GIRDER_14C4, B1];
+S15 = [GIRDER_15M1, GIRDER_15S, GIRDER_15M2, B1, GIRDER_15C1, B2, GIRDER_15C2, B3C, GIRDER_15C3, B2, GIRDER_15C4, B1];
+S16 = [GIRDER_16M1, GIRDER_16S, GIRDER_16M2, B1, GIRDER_16C1, B2, GIRDER_16C2, B3C, GIRDER_16C3, B2, GIRDER_16C4, B1];
+S17 = [GIRDER_17M1, GIRDER_17S, GIRDER_17M2, B1, GIRDER_17C1, B2, GIRDER_17C2, B3C, GIRDER_17C3, B2, GIRDER_17C4, B1];
+S18 = [GIRDER_18M1, GIRDER_18S, GIRDER_18M2, B1, GIRDER_18C1, B2, GIRDER_18C2, B3C, GIRDER_18C3, B2, GIRDER_18C4, B1];
+S19 = [GIRDER_19M1, GIRDER_19S, GIRDER_19M2, B1, GIRDER_19C1, B2, GIRDER_19C2, B3C, GIRDER_19C3, B2, GIRDER_19C4, B1];
+S20 = [GIRDER_20M1, GIRDER_20S, GIRDER_20M2, B1, GIRDER_20C1, B2, GIRDER_20C2, B3C, GIRDER_20C3, B2, GIRDER_20C4, B1];
 
 anel = [S01,S02,S03,S04,S05,S06,S07,S08,S09,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19,S20];
 elist = anel;

@@ -31,6 +31,7 @@ data.sd3k.nr_segs = 1;
 data.sf2k.nr_segs = 1;
 
 data.bpm.nr_segs = 1;
+data.rbpm.nr_segs= 1;
 data.cf.nr_segs  = 1;
 data.chf.nr_segs = 1;
 data.cvf.nr_segs = 1;
