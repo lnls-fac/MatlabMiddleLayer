@@ -46,10 +46,10 @@ for i2=1:nelem
     ind = indcs(i2);
     bpm.pos(i2) = position(ind);
     bpm.ind(i2) = ind;
+    fprintf('%2d, ',i2);
     for i3=1:length(miss)
         mis = miss{i3};
         mis_err = errs{i3};
-        
         goal_codx = zeros(1,size(res.cod_cor.bpm_idx,1));
         goal_cody = zeros(1,size(res.cod_cor.bpm_idx,1));
         if strcmp(mis,'misx'), goal_codx(i2) = mis_err; else goal_cody(i2) = mis_err; end

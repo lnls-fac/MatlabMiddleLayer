@@ -1,14 +1,15 @@
 function lnls_plot_cod(default_path)
 
 
-prompt = {'Submachine (bo/si)', 'COD unit (um/mm)', 'symmetry', 'plot title'};
-defaultanswer = {'si', 'um', '10', 'V07.C05'};
+prompt = {'Submachine (bo/si)', 'COD unit (um/mm)', 'symmetry', 'plot title', 'corrected?(y/n)'};
+defaultanswer = {'si', 'um', '20', 'v10.c01','y'};
 answer = inputdlg(prompt,'Select submachine and trackcpp algorithms to run',1,defaultanswer);
 if isempty(answer), return; end;
 submachine = answer{1};
 unit = answer{2};
 symmetry = str2double(answer{3});
 plot_title = answer{4};
+if strcmpi(answer{5},'y'), corrected = True; else corrected = false; end
 size_font = 16;
 
 % selects file with random machines and loads it
@@ -50,10 +51,16 @@ vcms = fam_data.(cv).ATIndex;
 bpms = fam_data.bpm.ATIndex;
 kickx = zeros(length(machine), length(hcms));
 kicky = zeros(length(machine), length(vcms));
+sexts = findcells(machine{1},'PolynomB');
 fprintf('Individual Machine Statistics: \n\n');
 fprintf('%3s |   codx[um]    |   cody[um]    | max. kick [urad]\n', 'i');
 fprintf('    | (max)  (std)  | (max)  (std)  |   x     y   \n');
 for i=1:length(machine)
+    if ~corrected
+        machine{i} = lnls_set_kickangle(machine{i},0.0*hcms,hcms,'x');
+        machine{i} = lnls_set_kickangle(machine{i},0.0*vcms,vcms,'y');
+        machine{i} = setcellstruct(machine{i},'PolynomB',sexts,0,1,3);
+    end
     orb = findorbit4(machine{i}, 0, 1:length(machine{i}));
     codrx(i,:) = factor * orb(1,:);
     codry(i,:) = factor * orb(3,:);
@@ -88,7 +95,7 @@ y = codry(:,sel); y_std = std(y);
 
 f1 = figure;
 set(f1, 'Position', [1 1 1000 350]);
-axes('Parent',f1, 'FontSize',14);
+axes('Parent',f1, 'FontSize',14,'Units','Pixels','Position',[80,55,900,260]);
 hold all;
 max_y = max(max(x));
 min_y = min(min(y));

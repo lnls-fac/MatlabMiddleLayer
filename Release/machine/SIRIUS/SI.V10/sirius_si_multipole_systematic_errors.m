@@ -12,7 +12,7 @@ fam_data = sirius_si_family_data(the_ring);
 % incrusted coils in the poles for independent control of que gradient.
 
 model_name = 'BEND';
-r0         = 11.7/1000;
+r0         = 12/1000;
 monoms     =   [2,      3,      4,     5,     6];
 Bn_normal  = 1*[1.4e-4 -6.7e-5 -5.1e-4 5.9e-5 3.3e-4];  
 Bn_skew    = 1*[0.0     0.0     0.0    0.0    0.0]; 
@@ -23,7 +23,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 % QUADRUPOLES Q14 MODEL2
 % ======================
 model_name = 'q14';
-r0         = 11.7/1000;
+r0         = 12/1000;
 % systematic multipoles from '2015-01-27 Quadrupolo_Anel_QC_Modelo 2_-12_12mm_-500_500mm.txt'
 monoms     =   [ 5,       9,       13,       17];
 Bn_normal  = 1*[-3.6e-4, +1.4e-3, -5.9e-04, +5.7e-5];
@@ -35,7 +35,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 % QUADRUPOLES Q20 MODEL3
 % ======================
 model_name = 'q20';
-r0         = 11.7/1000;
+r0         = 12/1000;
 % systematic multipoles from '2015-02-10 Quadrupolo_Anel_QM_Modelo 3_-12_12mm_-500_500mm.txt'
 monoms     =   [ 5,       9,       13,       17];
 Bn_normal  = 1*[-3.7e-4, +1.4e-3, -5.7e-04, +3.8e-5];
@@ -47,7 +47,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 % QUADRUPOLES Q30 MODEL4
 % ======================
 model_name = 'q30';
-r0         = 11.7/1000;
+r0         = 12/1000;
 % systematic multipoles from '2015-02-13 Quadrupolo_Anel_QL_Modelo 4_-12_12mm_-500_500mm.txt'
 monoms     =   [ 5,       9,       13,       17];
 Bn_normal  = 1*[-3.9e-4, +1.5e-3, -6.0e-04, +4.8e-5];
@@ -59,7 +59,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 % SEXTUPOLES
 % ==========
 model_name = 'SEXT';
-r0         = 11.7/1000;
+r0         = 12/1000;
 % systematic multipoles from '2015-02-03 Sextupolo_Anel_S_Modelo 1_-12_12mm_-500_500mm.txt'
 monoms     =   [ 4,       6,       8,       14];
 Bn_normal  = 1*[-6.7e-5, -1.3e-4, -2.1e-3, +1.0e-3];
@@ -71,7 +71,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 % CHS
 % ===
 model_name = 'chs';
-r0         = 11.7/1000;
+r0         = 12/1000;
 % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CH_Modelo 1_-12_12mm_-500_500mm.txt'
 monoms     =   [ 4,       6,       8,       14];
 Bn_normal  = 1*[+2.8e-1, +2.8e-2, -3.9e-2, +1.1e-2];
@@ -83,7 +83,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 % CVS
 % ===
 model_name = 'cvs';
-r0         = 11.7/1000;
+r0         = 12/1000;
 % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CV_Modelo 1_-12_12mm_-500_500mm.txt'
 monoms     =   [ 4,       6,       8,       10     ];
 Bn_normal  = 1*[ 0.0,     0.0,     0.0,     0.0,   ];
@@ -96,7 +96,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 % QS
 % ==
 model_name = 'qs';
-r0         = 11.7/1000;
+r0         = 12/1000;
 % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CV_Modelo 1_-12_12mm_-500_500mm.txt'
 monoms    = [      3,      7,      9,     13];
 Bn_normal = [   0.00,   0.00,   0.00,   0.00];

@@ -114,7 +114,7 @@ finalizations();
         %MAGNET BLOCKS
         
         % <dipoles with only one piece> alignment, rotation and excitation errors
-        config.fams.b3bc.labels     = {'b3','bc'};
+        config.fams.b3bc.labels     = {'bc_hf','bc_lf'};
         config.fams.b3bc.sigma_y    = 40 * um * 1;
         config.fams.b3bc.sigma_x    = 40 * um * 1;
         config.fams.b3bc.sigma_roll = 0.30 * mrad * 1;
@@ -309,7 +309,7 @@ finalizations();
         % QUADRUPOLES
         multi.quadsM.labels = {'qdb1','qda', 'qfa','qfb','qdb2','qf1','qf2','qf3','qf4'};
         multi.quadsM.main_multipole = 2;% positive for normal negative for skew
-        multi.quadsM.r0 = 11.7e-3;
+        multi.quadsM.r0 = 12e-3;
         multi.quadsM.order     = [ 3   4   5   6]; % 1 for dipole
         multi.quadsM.main_vals = ones(1,4)*1.5e-4;
         multi.quadsM.skew_vals = ones(1,4)*0.5e-4;
@@ -317,15 +317,15 @@ finalizations();
         % SEXTUPOLES
         multi.sexts.labels = {'sda','sfa','sd1j','sf1j','sd2j','sd3j','sf2j','sf2k','sd3k','sd2k','sf1k','sd1k','sdb','sfb'};
         multi.sexts.main_multipole = 3;% positive for normal negative for skew
-        multi.sexts.r0 = 11.7e-3;
+        multi.sexts.r0 = 12e-3;
         multi.sexts.order     = [4   5   6   7 ]; % 1 for dipole
         multi.sexts.main_vals = ones(1,4)*1.5e-4;
         multi.sexts.skew_vals = ones(1,4)*0.5e-4;
         
         % DIPOLES
-        multi.bends.labels = {'b1','b2','b3', 'bc'};
+        multi.bends.labels = {'b1','b2','bc_hf', 'bc_lf'};
         multi.bends.main_multipole = 1;% positive for normal negative for skew
-        multi.bends.r0 = 11.7e-3;
+        multi.bends.r0 = 12e-3;
         multi.bends.order = [ 3   4   5   6]; % 1 for dipole
         multi.bends.main_vals = ones(1,4)*1.5e-4;
         multi.bends.skew_vals = ones(1,4)*0.5e-4;

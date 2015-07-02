@@ -47,28 +47,29 @@ res.slow.labels = {'qfa','qdb2','qfb','qdb1','qda','qf1','qf2','qf3','qf4'};
 res.slow.nrsegs = ones(1,9);
 res.slow.results.quads       = lnls_AmpFactors_magnets(res.slow);
 
-res.slow.labels = {'sda','sfa','sd1','sf1','sd2','sd3','sf2','sf3','sd4',...
-                   'sd5','sf4','sd6','sdb','sfb'};
+res.slow.labels = {'sda','sfa','sd1j','sf1j','sd2j','sd3j','sf2j','sf2k','sd3k',...
+                   'sd2k','sf1k','sd1k','sdb','sfb'};
 res.slow.nrsegs = ones(1, 14);
 res.slow.results.sexts       = lnls_AmpFactors_magnets(res.slow);
 
-res.slow.labels = {'b1','b2','b3','bc'};
-res.slow.nrsegs = [2 3 2 12];
+res.slow.labels = {'b1','b2','bc_lf','bc_hf'};
+res.slow.nrsegs = [2 3 7 14];
 res.slow.results.bends      = lnls_AmpFactors_magnets(res.slow);
 
-res.slow.labels = {'b1','b2','b3'};
-res.slow.nrsegs = [1 1 1];
+res.slow.labels = {'b1','b2'};
+res.slow.nrsegs = [1 1];
 res.slow.results.blocks     = lnls_AmpFactors_magnets(res.slow);
 
 res.slow.results.bpm        = lnls_AmpFactors_bpms(res.slow);
 res.slow.results.girder_on  = lnls_AmpFactors_girders(res.slow, true);
 res.slow.results.girder_off = lnls_AmpFactors_girders(res.slow, false);
+fprintf('\n');
 
 %% fast orbit correction system
 res.fast = res.slow;
 res.fast.where2calclabels = {'mia','mib','mc'};
 res.fast.where2calc = {mia, mib, mc};
-res.fast.cod_cor.bpm_idx = fam_data.bpm.ATIndex(logical(repmat([1,0,0,0,1,1,0,0,1],1,20)));
+res.fast.cod_cor.bpm_idx = fam_data.rbpm.ATIndex;
 res.fast.cod_cor.hcm_idx = fam_data.chf.ATIndex;
 res.fast.cod_cor.vcm_idx = fam_data.cvf.ATIndex;
 res.fast.cod_cor.respm = calc_respm_cod(the_ring, res.fast.cod_cor.bpm_idx,...
@@ -84,23 +85,23 @@ res.fast.labels = {'qfa','qdb2','qfb','qdb1','qda','qf1','qf2','qf3','qf4'};
 res.fast.nrsegs = ones(1,9);
 res.fast.results.quads       = lnls_AmpFactors_magnets(res.fast);
 
-res.fast.labels = {'sda','sfa','sd1','sf1','sd2','sd3','sf2','sf3','sd4',...
-                   'sd5','sf4','sd6','sdb','sfb'};
+res.fast.labels = {'sda','sfa','sd1j','sf1j','sd2j','sd3j','sf2j','sf2k','sd3k',...
+                   'sd2k','sf1k','sd1k','sdb','sfb'};
 res.fast.nrsegs = ones(1, 14);
 res.fast.results.sexts       = lnls_AmpFactors_magnets(res.fast);
 
-res.fast.labels = {'b1','b2','b3','bc'};
-res.fast.nrsegs = [2 3 2 12];
+res.fast.labels = {'b1','b2','bc_lf','bc_hf'};
+res.fast.nrsegs = [2 3 7 14];
 res.fast.results.bends      = lnls_AmpFactors_magnets(res.fast);
 
-res.fast.labels = {'b1','b2','b3'};
-res.fast.nrsegs = [1 1 1];
+res.fast.labels = {'b1','b2'};
+res.fast.nrsegs = [1 1];
 res.fast.results.blocks     = lnls_AmpFactors_magnets(res.fast);
 
 res.fast.results.bpm        = lnls_AmpFactors_bpms(res.fast);
 res.fast.results.girder_on  = lnls_AmpFactors_girders(res.fast, true);
 res.fast.results.girder_off = lnls_AmpFactors_girders(res.fast, false);
-
+fprintf('\n');
 
 %% Without Correction
 res.wocor = res.slow;
@@ -113,17 +114,17 @@ res.wocor.labels = {'qfa','qdb2','qfb','qdb1','qda','qf1','qf2','qf3','qf4'};
 res.wocor.nrsegs = ones(1,9);
 res.wocor.results.quads       = lnls_AmpFactors_magnets(res.wocor);
 
-res.wocor.labels = {'sda','sfa','sd1','sf1','sd2','sd3','sf2','sf3','sd4',...
-                   'sd5','sf4','sd6','sdb','sfb'};
+res.wocor.labels = {'sda','sfa','sd1j','sf1j','sd2j','sd3j','sf2j','sf2k','sd3k',...
+                   'sd2k','sf1k','sd1k','sdb','sfb'};
 res.wocor.nrsegs = ones(1, 14);
 res.wocor.results.sexts       = lnls_AmpFactors_magnets(res.wocor);
 
-res.wocor.labels = {'b1','b2','b3','bc'};
-res.wocor.nrsegs = [2 3 2 12];
+res.wocor.labels = {'b1','b2','bc_lf','bc_hf'};
+res.wocor.nrsegs = [2 3 7 14];
 res.wocor.results.bends      = lnls_AmpFactors_magnets(res.wocor);
 
-res.wocor.labels = {'b1','b2','b3'};
-res.wocor.nrsegs = [1 1 1];
+res.wocor.labels = {'b1','b2'};
+res.wocor.nrsegs = [1 1];
 res.wocor.results.blocks     = lnls_AmpFactors_magnets(res.wocor);
 
 res.wocor.results.girder = lnls_AmpFactors_girders(res.wocor, true);

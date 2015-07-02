@@ -1,5 +1,5 @@
-function calc_nonlinear_bsc(the_ring, n_per)
-% calc_nonlinear_bsc(the_ring, nper)
+function r = nonlinearBSC_calc(the_ring, n_per)
+% nonlinearBSC_calc(the_ring, nper)
 %
 % calcula o beam stay clear nao linear para o primeiro superperiodo da rede
 % the_ring, que possui n_per periodos. cam_vac eh o valor do raio da camara
@@ -129,7 +129,9 @@ for ii=1:length(points)
 end
 
 % vamos salvar os dados do BSC nao linear:
-save(sprintf('%s',[date name]),'the_ring','points','bsch_pos','bsch_neg','bscv_pos','bscv_neg');
+r = struct('the_ring',{the_ring},'n_per',n_per,'points',points,'bsch_pos',bsch_pos,...
+           'bsch_neg',bsch_neg,'bscv_pos',bscv_pos,'bscv_neg',bscv_neg);
+save(sprintf('%s',[date name]),'r');
 
 
 %por fim, vamos gerar um arquivo com o bsc nao linear

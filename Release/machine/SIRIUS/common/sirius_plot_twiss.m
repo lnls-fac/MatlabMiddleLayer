@@ -81,7 +81,7 @@ switch lower(maquina)
     otherwise
         fprintf('Maquina nao reconhecida');
         %break;
-end;
+end
 
 if ~tipo
     figure1=figure('Color',[1 1 1],'Position', [1 1 1000 621]);
@@ -154,15 +154,13 @@ if ~tipo
     hold off;
 else
     xlimit=[0 twiss.pos(fim)];
-    
+
     %Create Figure
-    figure1 = figure('Color',[1 1 1],'Position', [1 1 1000 621]);
-    annotation('textbox', [0.3,0.88,0.1,0.1], 'FontSize',FnSz,...
-               'FontWeight','bold', 'LineStyle','none',...
-               'String', ['Twiss Functions - ' titulo]);
+    figure1 = figure('Color',[1 1 1],'Position', [1 1 900 650]);
     
     %Grafico dispersao horizontal
-    subplot('position',[0.1 0.66 0.85 0.26],'FontSize',FnSz);
+    axes('Units','pixels','Position',[70 380 780 230],'FontSize',FnSz);
+    title(['Beam Stay Clear - ' titulo], 'FontWeight','bold');
     hold all;
     plot(twiss.pos(ini:fim),100*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
     xlim(xlimit); ylim([-0.1, 105*max(twiss.etax)]);
@@ -172,24 +170,23 @@ else
     box on;
     
     %Grafico rede magnetica
-    subplot('position',[0.1 0.57 0.85 0.03]);
-    switch  lower(maquina)
-        case 'si'
-            lnls_drawlattice(THERING,20,0,1);
-            xlim(xlimit);
-            axis off;
-        case 'bo'
-            lnls_drawlattice(THERING,10,0,1);
-            xlim(xlimit);
-            axis off;
-        otherwise
-            lnls_drawlattice(THERING,1,0,1);
-            xlim(xlimit);
-            axis off;
+    axes('Units','pixels','Position',[70 300 780 50]);
+    if strcmp(maquina,'si')
+        lnls_drawlattice(THERING,20,0,true,1,true);
+        xlim(xlimit);
+        axis off;
+    elseif strcmp(maquina,'bo')
+        lnls_drawlattice(THERING,10,0,true,1,true);
+        xlim(xlimit);
+        axis off;
+    else
+        lnls_drawlattice(THERING,1,0,true,1,true);
+        xlim(xlimit);
+        axis off;
     end
     
     %Grafico funcoes betatron
-    subplot('position',[0.1 0.12 0.85 0.42],'FontSize',FnSz);
+    axes('Units','pixels','Position',[70 70 780 230],'FontSize',FnSz);
     hold all;
     xlim(xlimit);
     plot(twiss.pos(ini:fim),twiss.betax(ini:fim),'LineWidth',LnWd,'Color',BxCl);
@@ -200,7 +197,7 @@ else
     legend('boxoff');
     grid on;
     box on;
-end;
+end
 
 if save_fig
     %if strcmp(save_fig,'pdf')==1

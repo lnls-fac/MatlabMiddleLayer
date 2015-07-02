@@ -46,16 +46,15 @@ funcs = {@lnls_add_misalignmentX,...
 miss = {'misx','misy','roll'};
 errs = {res.mis_err,res.mis_err,res.rot_err};
 
-indcs = findcells(the_ring,'FamName','girder');
+indcs = findcells(the_ring,'Girder');
 indcs = indcs(position(indcs) < max_pos);
-nelem = length(indcs)-1; % the last girder does not end inside the sector
 girders = unique(getcellstruct(the_ring,'Girder',indcs));
-girder.ind = indcs;
-for i1 = 1:nelem
+for i1 = 1:length(girders)
     %apply alignment errors
     gir = girders{i1};
     fprintf([gir ', ']);
     ind = findcells(the_ring,'Girder',gir);
+    girder.ind(i1) = ind(1);
     girder.pos(i1) = mean(position([ind(1),ind(end)+1]));
     for i2=1:length(miss)
         misalign = funcs{i2};
@@ -63,26 +62,20 @@ for i1 = 1:nelem
         mis_err = errs{i2};
         err = repmat(mis_err,1,length(ind));
         the_ring_err = misalign(err,ind,the_ring);
-        
         if isfield(res,'cod_cor')
-            ibpm = findcells(the_ring(ind),'FamName','bpm');
             par = res.cod_cor;
+            [~,~,idx] = intersect(ind,par.bpm_idx);
             goal_codx = zeros(1,size(par.bpm_idx,1));
             goal_cody = zeros(1,size(par.bpm_idx,1));
-            if bpm_on && ~isempty(ibpm)
-                if strcmp(mis,'misx')
-                    for ii = ibpm, goal_codx(par.bpm_idx == ind(ii)) = mis_err; end
-                elseif strcmp(mis,'misy')
-                    for ii = ibpm, goal_cody(par.bpm_idx == ind(ii)) = mis_err; end
-                end
+            if bpm_on && ~isempty(idx)
+                if strcmp(mis,'misx'), goal_codx(idx) = mis_err;
+                elseif strcmp(mis,'misy'), goal_cody(idx) = mis_err; end
             end
             [the_ring_err, hkicks, vkicks, ~, ~] = cod_sg(par, the_ring_err, ...
                                                           goal_codx, goal_cody);
         end
-%         ref = zeros(4,length(the_ring));
-%         if strcmp(mis,'misx'), ref(1,ind) = mis_err;
-%         elseif strcmp(mis,'misy'), ref(3,ind) = mis_err; end
-        boba = findorbit4(the_ring_err,0,1:length(the_ring));% - ref;
+
+        boba = findorbit4(the_ring_err,0,1:length(the_ring));
         twi_err = calctwiss(the_ring_err);
         for i3=1:length(res.where2calc)
             girder.(mis).orbx(i3,i1) = sqrt(lnls_meansqr(boba(1,res.where2calc{i3}),2))/mis_err;

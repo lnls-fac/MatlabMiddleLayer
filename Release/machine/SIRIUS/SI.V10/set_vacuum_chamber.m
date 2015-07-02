@@ -1,40 +1,44 @@
-function the_ring = set_vacuum_chamber(the_ring0)
+function the_ring = set_vacuum_chamber(the_ring)
 
 % y = +/- y_lim * (1 - (x/x_lim)^n)^(1/n);
 
-the_ring = the_ring0;
-bends_vchamber = [0.0117 0.0117 100]; % n = 100: ~rectangular
-other_vchamber = [0.0117 0.0117 2];   % n = 2;   circular/eliptica
-ivu_vchamber   = [0.0117 0.00225 2];   
-ovu_vchamber   = [0.0117 0.004 2];
+bc_vchamber    = [0.012 0.0045 100]; % n = 100: ~rectangular
+other_vchamber = [0.012 0.012 2];   % n = 2;   circular/eliptica
+ivu_vchamber   = [0.012 0.00225 2];   
+ovu_vchamber   = [0.012 0.004 2];
 
-bends = findcells(the_ring, 'BendingAngle');
-ivu   = sort([findcells(the_ring, 'FamName', 'id_endb'), ...
-              findcells(the_ring, 'FamName', 'dib1')]);
-ovu   = sort([findcells(the_ring, 'FamName', 'id_enda'), ...
-              findcells(the_ring, 'FamName', 'dia1')]);
-other = setdiff(1:length(the_ring), [bends ivu ovu]);
-
-for i=1:length(bends)
-    the_ring{bends(i)}.VChamber = bends_vchamber;
-end
-for i=1:length(ivu)
-    the_ring{ivu(i)}.VChamber = ivu_vchamber;
-end
-for i=1:length(ovu)
-    the_ring{ovu(i)}.VChamber = ovu_vchamber;
-end
-for i=1:length(other)
-    the_ring{other(i)}.VChamber = other_vchamber;
+% Set ordinary Vacuum Chamber
+for i=1:length(the_ring)
+    the_ring{i}.VChamber = other_vchamber;
 end
 
-mia = findcells(the_ring, 'FamName', 'mia');
-for i=3:length(mia)
-    the_ring{mia(i)}.VChamber = ovu_vchamber;
+% Shift the ring to do not begin between id markers
+bpm = findcells(the_ring,'FamName','bpm');
+the_ring = circshift(the_ring,[0,-bpm(1)]);
+
+% Set bc vacuum chamber
+bcs = findcells(the_ring, 'FamName','bc_hf');
+for i=1:length(bcs)
+    the_ring{bcs(i)}.VChamber = bc_vchamber;
 end
 
-
-mib = findcells(the_ring, 'FamName', 'mib');
-for i=1:length(mib)
-    the_ring{mib(i)}.VChamber = ivu_vchamber;
+% Set in-vacuum ids vacuum chamber
+idb = findcells(the_ring, 'FamName', 'id_endb');
+ivu_ini = idb(1:2:end);  ivu_end = idb(2:2:end);
+for i=1:length(ivu_ini)
+    for j=ivu_ini(i):ivu_end(i)
+     the_ring{j}.VChamber = ivu_vchamber;
+    end
 end
+
+% Set other ids vacuum chamber
+ida = findcells(the_ring, 'FamName', 'id_enda');
+ovu_ini = ida(1:2:end);  ovu_end = ida(2:2:end);
+for i=1:length(ovu_ini)
+    for j=ovu_ini(i):ovu_end(i)
+     the_ring{j}.VChamber = ovu_vchamber;
+    end
+end
+
+% Shift the ring back.
+the_ring = circshift(the_ring,[0,bpm(1)]);

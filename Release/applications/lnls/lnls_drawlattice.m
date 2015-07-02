@@ -85,17 +85,20 @@ end
 Colors = {[0.91 0.91 0.91], [0.84 0.91 0.85], [0.80 0.88 0.97],...
           [0.83 0.82 0.78], [0.99 0.92 0.80], [0.68 0.92 1.00]};%, [1 0.60 0.60]};
 
-gir = findcells(the_ring,'FamName','girder');
+gir = findcells(the_ring,'Girder');
+gir_names = unique(getcellstruct(the_ring,'Girder',gir));
+
 pos = findspos(the_ring,1:length(the_ring)+1);
 max_pos = pos(end) / (nper - 0.001);
 
 j = 1;
-for i=1:(length(gir)-1)
-    s = pos(gir(i));
+for i=1:length(gir_names)
+    idx = findcells(the_ring,'Girder',gir_names{i});
+    s = pos(idx(end)+1);
     if s > max_pos, return; end
-    len = pos(gir(i+1)) - s;
+    len = s - pos(idx(1));
     if ~len, continue; end
-    rectangle('Parent',h,'Position',[s, offset-scale, len, 2*scale],...
+    rectangle('Parent',h,'Position',[s-len-0.05, offset-scale, len+0.1, 2*scale],...
     'FaceColor',Colors{mod(j-1,length(Colors))+1},...
     'Curvature',[0.5 0.5]);
     j = j + 1;

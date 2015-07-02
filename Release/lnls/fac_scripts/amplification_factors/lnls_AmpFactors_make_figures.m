@@ -13,7 +13,7 @@ function lnls_AmpFactors_make_figures(res)
 % lnls_AmpFactors_bpms lnls_AmpFactors_girders
 % lnls_AmpFactors_make_txtSummary
 
-
+clear hax ctrl
 % If the input is not a structure, turn it into one.
 if ~iscell(res)
     res = {res};
@@ -30,36 +30,36 @@ hax = axes('Units','pixels', 'Position',[100.8, 86.2, 741.2, 408.8],'FontSize',1
 
 
 % Popup to control the the effect on the ring of the selected error
-string = {'orbx','orby','corx','cory','coup','betx','bety'};
+string1 = {'orbx','orby','corx','cory','coup','betx','bety'};
 efct_conv = [1e-6, 1e-6 , 1e-6 , 1e-6,pi/180, 1e-2 , 1e-2];
 efct_unit = {'\mum','\mum','\murad','\murad','%','%','%'};
 uicontrol('Style','text','Position',[647 607 70 20],'String','Effect');
-ctrl.efct = uicontrol('Style', 'popup','String', string,'Position', [647 587 70 20]);
+ctrl.efct = uicontrol('Style', 'popup','String', string1,'Position', [647 587 70 20]);
 
 % Popup to control the points where amplification factors were averaged
-string = {'empty'};
+string1 = {'empty'};
 uicontrol('Style','text','Position',[764 607 100 20],'String','Points Avgd.');
-ctrl.wre2clc = uicontrol('Style', 'popup','String', string,'Position', [764 587 100 20]);
+ctrl.wre2clc = uicontrol('Style', 'popup','String', string1,'Position', [764 587 100 20]);
 
 % Popup to control the orbit correction system employed
-sys_names = fieldnames(res{1});
-sys_names = sys_names(~strcmp('name',sys_names));
+sys_names1 = fieldnames(res{1});
+sys_names1 = sys_names1(~strcmp('name',sys_names1));
 uicontrol('Style','text','Position',[167.3 607 70 20],'String','System');
-ctrl.sys = uicontrol('Style', 'popup','String', sys_names,...
+ctrl.sys = uicontrol('Style', 'popup','String', sys_names1,...
     'Position', [167.3 587 70 20],'Callback', {@fun_sys,res});
 
 % Popup to control the Configuration Selected
-string = getcellstruct(res,'name',1:length(res));
+string1 = getcellstruct(res,'name',1:length(res));
 uicontrol('Style','text','Position',[20 607 120 20],'String','Configuration');
-ctrl.config = uicontrol('Style', 'popup','String', string,...
+ctrl.config = uicontrol('Style', 'popup','String', string1,...
     'Position', [20 587 120 20],'Callback', {@fun_config,res});
 
 % Popup to control the type of error whose effect on the ring will be shown
-string = {'misx','misy','exci','roll'};
+string1 = {'misx','misy','exci','roll'};
 err_conv=[ 1e-6 , 1e-6 , 1e-2 , 1e-6];
 err_unit={ 'um' , 'um' ,  '%' ,'urad'};
 uicontrol('Style','text','Position',[401 607 69 20],'String','Error Type');
-ctrl.err = uicontrol('Style', 'popup', 'String', string,...
+ctrl.err = uicontrol('Style', 'popup', 'String', string1,...
                 'Position', [405 587 63 20], 'Callback',{@fun_err});
 uicontrol('Style','text','Position',[478 607 55 20],'String','Value');
 ctrl.errVal = uicontrol('Style','edit','String','1.0','Position',[480 588 50 20]);
@@ -67,12 +67,12 @@ uicontrol('Style','text','Position',[537 607 54 20],'String','Unit');
 ctrl.errUnit = uicontrol('Style','text','String',err_unit{1},'Position',[537 588 55 20]);
 
 % Checkbox to control the type of elements to which the errors were applied
-sys_names = fieldnames(res{1});
-res_names = fieldnames(res{1}.(sys_names{2}).results);
+sys_names1 = fieldnames(res{1});
+res_names1 = fieldnames(res{1}.(sys_names1{2}).results);
 uicontrol('Style','text','Position',[284.7 607 80 20],'String','Elements');
-ctrl.res = zeros(1,length(res_names));
-for ii=1:length(res_names)
-    ctrl.res(ii) = uicontrol('Style', 'checkbox','String', res_names{ii},'Min',0,...
+ctrl.res = zeros(1,length(res_names1));
+for ii=1:length(res_names1)
+    ctrl.res(ii) = uicontrol('Style', 'checkbox','String', res_names1{ii},'Min',0,...
         'Max',1, 'Position', [284.7 587-20*(ii-1) 80 20]);
 end
 
@@ -101,9 +101,9 @@ ctrl.sumsqrT = uicontrol('Style','text','Position',[764 20 90 20],'String','0.0'
     function fun_config(hObj,event, res)
         
         val_conf = get(hObj,'Value');
-        sys_names = fieldnames(res{val_conf});
-        sys_names = sys_names(~strcmp('name',sys_names));
-        set(ctrl.sys,'String',sys_names);
+        sys_names2 = fieldnames(res{val_conf});
+        sys_names2 = sys_names2(~strcmp('name',sys_names2));
+        set(ctrl.sys,'String',sys_names2);
         
         val_sys = get(ctrl.sys,'Value');str_sys = get(ctrl.sys,'String');
         str_sys = str_sys{val_sys};
@@ -111,10 +111,10 @@ ctrl.sumsqrT = uicontrol('Style','text','Position',[764 20 90 20],'String','0.0'
         set(ctrl.wre2clc,'String',res{val_conf}.(str_sys).where2calclabels);
         
         delete(ctrl.res(:));
-        res_names = fieldnames(res{val_conf}.(str_sys).results);
-        ctrl.res = zeros(1,length(res_names));
-        for i=1:length(res_names)
-            ctrl.res(i) = uicontrol('Style', 'checkbox','String', res_names{i},'Min',0,...
+        res_names2 = fieldnames(res{val_conf}.(str_sys).results);
+        ctrl.res = zeros(1,length(res_names2));
+        for i=1:length(res_names2)
+            ctrl.res(i) = uicontrol('Style', 'checkbox','String', res_names2{i},'Min',0,...
                 'Max',1, 'Position', [284.7 587-20*(i-1) 80 20]);
         end
     end
@@ -127,10 +127,10 @@ ctrl.sumsqrT = uicontrol('Style','text','Position',[764 20 90 20],'String','0.0'
         set(ctrl.wre2clc,'String',res{val_conf}.(str_sys).where2calclabels);
         
         delete(ctrl.res(:));
-        res_names = fieldnames(res{val_conf}.(str_sys).results);
-        ctrl.res = zeros(1,length(res_names));
-        for i=1:length(res_names)
-            ctrl.res(i) = uicontrol('Style', 'checkbox','String', res_names{i},'Min',0,...
+        res_names2 = fieldnames(res{val_conf}.(str_sys).results);
+        ctrl.res = zeros(1,length(res_names2));
+        for i=1:length(res_names2)
+            ctrl.res(i) = uicontrol('Style', 'checkbox','String', res_names2{i},'Min',0,...
                 'Max',1, 'Position', [284.7 587-20*(i-1) 80 20]);
         end
         
@@ -186,8 +186,8 @@ ctrl.sumsqrT = uicontrol('Style','text','Position',[764 20 90 20],'String','0.0'
             return;
         end
         for i=1:length(ind)
-            string = get(ctrl.res(i),'String');
-            r = res{val_conf}.(str_sys).results.(string);
+            string2 = get(ctrl.res(i),'String');
+            r = res{val_conf}.(str_sys).results.(string2);
             if ind(i) && isfield(r,str_err) && isfield(r.(str_err),str_efct)
                 data = r.(str_err).(str_efct)*val_errVal*err_conv(val_err)/efct_conv(val_efct)*cutoff_corr;
                 if any(size(data)==1)
@@ -215,9 +215,9 @@ ctrl.sumsqrT = uicontrol('Style','text','Position',[764 20 90 20],'String','0.0'
         ctrl.sumsqr(j+1) = uicontrol('Style','text','Position',[100+75*j 20 70 20],'String',sumsqri);
         
         % color = {'b','r','g','m','c'};
-        string = [str_conf, '.', str_sys,'.',str_ele,'.', str_err, '.', ...
+        string2 = [str_conf, '.', str_sys,'.',str_ele,'.', str_err, '.', ...
                   str_efct, '.', str_clc,'.',str_errVal,' --> ', sumsqri];
-        plot(hax, pos, erro,'Color',cor, 'DisplayName',string,'LineWidth',2);
+        plot(hax, pos, erro,'Color',cor, 'DisplayName',string2,'LineWidth',2);
         ylabel(hax,[upper(str_efct), ' [',efct_unit{val_efct},']'],'FontSize',16);
         
         if isempty(chil)
@@ -249,9 +249,9 @@ ctrl.sumsqrT = uicontrol('Style','text','Position',[764 20 90 20],'String','0.0'
         set(ax,'FontSize',16, 'Units', 'Normalized');
         set(ax,'YGrid','on','XGrid','on', 'Position',[0.118 0.142 0.836 0.775], 'box','on');
         xlabel(ax,'Pos [m]','FontSize',16);
-        val = get(ctrl.efct,'Value');string = get(ctrl.efct,'String');
-        string = upper(string{val});
-        ylabel(ax,[string,  ' [',efct_unit{val},']'],'FontSize',16);
+        val = get(ctrl.efct,'Value');string2 = get(ctrl.efct,'String');
+        string2 = upper(string2{val});
+        ylabel(ax,[string2,  ' [',efct_unit{val},']'],'FontSize',16);
         chil = get(ax,'Children');
         pl = [];
         text = {};

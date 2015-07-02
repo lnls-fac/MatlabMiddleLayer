@@ -2,8 +2,8 @@ function data = sirius_si_family_data(the_ring)
 
 data.b1.nr_segs   = 2;
 data.b2.nr_segs   = 3;
-data.b3.nr_segs   = 7;
-data.bc.nr_segs   = 14;
+data.bc_lf.nr_segs   = 7;
+data.bc_hf.nr_segs   = 14;
 
 data.qfa.nr_segs  = 1;
 data.qda.nr_segs  = 1;
@@ -61,11 +61,9 @@ end
 idx = [];
 idx = [idx; data.('sfa').ATIndex];
 idx = [idx; data.('sd1j').ATIndex];
-% idx = [idx; data.('sd2j').ATIndex];
 idx = [idx; data.('sf2j').ATIndex];
 idx = [idx; data.('sfb').ATIndex];
 idx = [idx; data.('sd1k').ATIndex];
-% idx = [idx; data.('sd2k').ATIndex];
 idx = [idx; data.('sf2k').ATIndex];
 idx = sort(idx);
 data.chs.ATIndex = reshape(idx,data.chs.nr_segs,[]);
