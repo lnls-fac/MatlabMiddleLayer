@@ -63,15 +63,16 @@ inicio   = marker('inicio', 'IdentityPass');
 fim      = marker('fim',    'IdentityPass');
 
 % --- quadrupoles ---
-qa1      = quadrupole('qa1', 0.14, qa1_strength, quad_pass_method);
-qa2      = quadrupole('qa2', 0.14, qa2_strength, quad_pass_method);
-qb1      = quadrupole('qb1', 0.14, qb1_strength, quad_pass_method);
-qb2      = quadrupole('qb2', 0.14, qb2_strength, quad_pass_method);
-qc1      = quadrupole('qc1', 0.14, qc1_strength, quad_pass_method);
-qc2      = quadrupole('qc2', 0.2, qc2_strength, quad_pass_method);
-qd1      = quadrupole('qd1', 0.14, qd1_strength, quad_pass_method);
-qd2      = quadrupole('qd2', 0.2, qd2_strength, quad_pass_method);
-qd3      = quadrupole('qd3', 0.14, qd3_strength, quad_pass_method);
+  
+qa1      = quadrupole('qf01a', 0.14, qf_01_a_strength, quad_pass_method); % qf
+qa2      = quadrupole('qf01b', 0.14, qf_01_b_strength, quad_pass_method); % qf
+qb1      = quadrupole('qd02',  0.14, qd_02_strength,   quad_pass_method); % qd
+qb2      = quadrupole('qf02',  0.14, qf_02_strength,   quad_pass_method); % qf
+qc1      = quadrupole('qd03',  0.14, qd_03_strength,   quad_pass_method); % qd
+qc2      = quadrupole('qf03',  0.20, qf_03_strength,   quad_pass_method); % qf
+qd1      = quadrupole('qd04a', 0.14, qd_04_a_strength, quad_pass_method); % qd
+qd2      = quadrupole('qf04',  0.20, qf_04_strength,   quad_pass_method); % qf
+qd3      = quadrupole('qd04b', 0.14, qd_04_b_strength, quad_pass_method); % qd
 
 % --- beam position monitors ---
 bpm    = marker('bpm', 'IdentityPass');
@@ -82,8 +83,8 @@ ch     = corrector('hcm',  0, [0 0], 'CorrectorPass');
 cv     = corrector('vcm',  0, [0 0], 'CorrectorPass');
 
 % --- bending magnets --- 
-deg_2_rad = (pi/180);
 
+deg_2_rad = (pi/180);
       
 % -- bend --
 dip_nam =  'bend';
