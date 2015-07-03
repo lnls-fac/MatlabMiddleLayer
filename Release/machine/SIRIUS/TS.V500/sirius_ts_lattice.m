@@ -56,23 +56,20 @@ ld2p     = drift('ld2p', 0.13933, 'DriftPass');
 % --- markers ---
 
 mbend    = marker('mbend',  'IdentityPass');
-msf      = marker('msf',    'IdentityPass');
-msg      = marker('msg',    'IdentityPass');
-msex     = marker('msex',   'IdentityPass');
-inicio   = marker('inicio', 'IdentityPass');
-fim      = marker('fim',    'IdentityPass');
+start    = marker('start',  'IdentityPass');
+fim      = marker('end',    'IdentityPass');
 
 % --- quadrupoles ---
   
-qa1      = quadrupole('qf01a', 0.14, qf_01_a_strength, quad_pass_method); % qf
-qa2      = quadrupole('qf01b', 0.14, qf_01_b_strength, quad_pass_method); % qf
-qb1      = quadrupole('qd02',  0.14, qd_02_strength,   quad_pass_method); % qd
-qb2      = quadrupole('qf02',  0.14, qf_02_strength,   quad_pass_method); % qf
-qc1      = quadrupole('qd03',  0.14, qd_03_strength,   quad_pass_method); % qd
-qc2      = quadrupole('qf03',  0.20, qf_03_strength,   quad_pass_method); % qf
-qd1      = quadrupole('qd04a', 0.14, qd_04_a_strength, quad_pass_method); % qd
-qd2      = quadrupole('qf04',  0.20, qf_04_strength,   quad_pass_method); % qf
-qd3      = quadrupole('qd04b', 0.14, qd_04_b_strength, quad_pass_method); % qd
+qa1      = quadrupole('qf1a', 0.14, qf1a_strength, quad_pass_method); % qf
+qa2      = quadrupole('qf1b', 0.14, qf1b_strength, quad_pass_method); % qf
+qb1      = quadrupole('qd2',  0.14, qd2_strength,  quad_pass_method); % qd
+qb2      = quadrupole('qf2',  0.14, qf2_strength,  quad_pass_method); % qf
+qc1      = quadrupole('qd3',  0.14, qd3_strength,  quad_pass_method); % qd
+qc2      = quadrupole('qf3',  0.20, qf3_strength,  quad_pass_method); % qf
+qd1      = quadrupole('qd4a', 0.14, qd4a_strength, quad_pass_method); % qd
+qd2      = quadrupole('qf4',  0.20, qf4_strength,  quad_pass_method); % qf
+qd3      = quadrupole('qd4b', 0.14, qd4b_strength, quad_pass_method); % qd
 
 % --- beam position monitors ---
 bpm    = marker('bpm', 'IdentityPass');
@@ -100,7 +97,7 @@ bend      = [h1 mbend h2];
 
 
 % -- extraction septum booster --
-dip_nam =  'sex';
+dip_nam =  'septex';
 dip_len =  0.85;
 dip_ang =  -3.6 * deg_2_rad;
 dip_K   =  0.0;
@@ -109,10 +106,13 @@ h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
 h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-septex  = [h1 msex h2];
+bseptex = marker('bsetpex', 'IdentityPass'); % marker at the beginning of extraction septum
+mseptex = marker('msetpex', 'IdentityPass'); % marker at the center of extraction septum
+septum  = [h1, mseptex, h2];
+septex  = [bseptex, septum, l20, septum];
 
 % -- sep grosso --
-dip_nam =  'seg';
+dip_nam =  'septing';
 dip_len =  1.10;
 dip_ang =  6.2 * deg_2_rad;
 dip_K   =  0.0;
@@ -121,10 +121,11 @@ h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
 h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-septgr  = [h1 msg h2];
+mseptin_a = marker('bsepting', 'IdentityPass'); % marker at the center of thick septum
+septgr  = [h1, mseptin_a, h2];
 
 % -- sep fino --
-dip_nam =  'sef';
+dip_nam =  'septinf';
 dip_len =  0.925;
 dip_ang =  3.13 * deg_2_rad;
 dip_K   =  0.00;
@@ -133,7 +134,9 @@ h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
 h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-septfi  = [h1 msf ch h2];
+mseptin_b = marker('mseptinf', 'IdentityPass'); % marker at the center of thin septum
+eseptin_b = marker('eseptinf', 'IdentityPass'); % marker at the end of thin septum
+septfi    = [h1, mseptin_b, h2, eseptin_b];     % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
            
 % --- lines ---
@@ -145,28 +148,28 @@ lb2   = [l20, l40];
 lb3   = [lb3p, l40, l40, l40, l40, l40, l40, l40, l40, l40, bpm, l20, ch, l25, cv, l25];
 lc1   = [l15, l20, l40, l40];
 lc2   = [l22, l20, l40];
-lc3   = [lc3p, bpm, l20,ch, l25, cv, l25];
+lc3   = [lc3p, bpm, l20, ch, l25, cv, l25];
 ld1   = [l20, l40, l40, l15, l15];
 ld2   = [ld2p, l40, bpm, l20, cv, l25, ch, l20];
 ld3   = [l15, l15];
 ld4   = [l15, l20, l40, l40, l40, bpm, l20, cv, l25];
-linea = [septex, ch, l20, septex, la1, qa1, la2, qa2, la3];
+linea = [septex, la1, qa1, la2, qa2, la3];
 lineb = [bend, lb1, qb1, lb2, qb2, lb3];
 linec = [bend, lc1, qc1, lc2, qc2, lc3];
 lined = [bend, ld1, qd1, ld2, qd2, ld3, qd3, ld4];
-linee = [septgr, l40, septfi, bpm];
-ltba  = [inicio, linea, lineb, linec, lined, linee, fim];
+linee = [septgr, l40, septfi];
+ltba  = [start, linea, lineb, linec, lined, linee, fim];
 
 %% line extension to PMM
-l10      = drift('l10', 0.10, 'DriftPass');
-lki      = drift('lki', 2.14, 'DriftPass');
-lkipmm   = drift('lkipmm', 0.807, 'DriftPass');
-MIA      = marker('MIA', 'IdentityPass');
-sept_in  = marker('sept_in', 'IdentityPass');
-kick_in  = marker('kick_in', 'IdentityPass');
-PMM      = marker('PMM', 'IdentityPass');
-AN_kipmm = [sept_in, l10, MIA, lki, lkipmm, PMM];
-ltba_estendido  = [inicio, linea, lineb, linec, lined, linee, AN_kipmm, fim];
+% l10      = drift('l10', 0.10, 'DriftPass');
+% lki      = drift('lki', 2.14, 'DriftPass');
+% lkipmm   = drift('lkipmm', 0.807, 'DriftPass');
+% MIA      = marker('MIA', 'IdentityPass');
+% sept_in  = marker('sept_in', 'IdentityPass');
+% kick_in  = marker('kick_in', 'IdentityPass');
+% PMM      = marker('PMM', 'IdentityPass');
+% AN_kipmm = [sept_in, l10, MIA, lki, lkipmm, PMM];
+% ltba_estendido  = [inicio, linea, lineb, linec, lined, linee, AN_kipmm, fim];
 
 %% finalization 
 
@@ -175,8 +178,8 @@ elist = ltba;
 the_line = buildlat(elist);
 the_line = setcellstruct(the_line, 'Energy', 1:length(the_line), energy);
 
-% shift lattice to start at the marker 'inicio'
-idx = findcells(the_line, 'FamName', 'inicio');
+% shift lattice to start at the marker 'start'
+idx = findcells(the_line, 'FamName', 'start');
 the_line = [the_line(idx:end) the_line(1:idx-1)];
 
 % checa se ha elementos com comprimentos negativos
