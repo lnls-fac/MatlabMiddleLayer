@@ -140,7 +140,7 @@ elseif iscell(filenames)
    
        
     for i=1:length(filenames)
-        subfadata = faload(filenames{i}, selected_bpm, selected_corr, npts);
+        subfadata = faload(filenames{i}, selected_bpm, selected_corr, npts, nmarker);
         if isempty(npts)
             fadata.time           = [fadata.time;           subfadata.time];
             fadata.bpm_readings   = [fadata.bpm_readings;   subfadata.bpm_readings];
