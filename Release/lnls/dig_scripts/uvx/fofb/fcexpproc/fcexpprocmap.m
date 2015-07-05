@@ -7,6 +7,7 @@ data = faload(filenames,0,0);
 t = find(data.marker(2:end) ~= data.marker(1:end-1));
 
 fprintf('\nMapping experiments...');
+expmap = struct;
 j=1;
 for i=1:length(t)-1
     idx = t(i)+1:t(i+1);
