@@ -16,7 +16,7 @@ else
     accelerator_defaultanswer = {'3.00', '864', 'on', 'on', 'on'};
     dynap_xy_defaultanswer    = {'5000', '0', '120', '-0.012','+0.012','30','0','0.003'}; % to be changed
     dynap_ex_defaultanswer    = {'3500', '0.001', '40', '-0.05','+0.05','55','-0.012','0'}; % to be changed
-    dynap_ma_defaultanswer    = {'2000', '0.02', '0.001', '0', '52', 'calc_mom_accep'};
+    dynap_ma_defaultanswer    = {'2000', '0.02', '0.001', '0', '52', 'calc_mom_accep mia mib'};
 end
 
 % user defines accelerator
@@ -46,7 +46,7 @@ end
 if strcmpi(answer{4}, 'yes')
     prompt = {'dynap_ma_nr_turns', 'dynap_ma_e_e0', 'dynap_ma_e_tol', 'dynap_ma_s_min[m]', 'dynap_ma_s_max[m]', 'dynap_ma_fam_names'};
     dynap_ma_answer = inputdlg(prompt,'Specify dynap_ma parameters', 1, dynap_ma_defaultanswer);
-    if isempty(dynap_xy_answer), return; end;
+    if isempty(dynap_ma_answer), return; end;
 else
     dynap_ma_answer = [];
 end

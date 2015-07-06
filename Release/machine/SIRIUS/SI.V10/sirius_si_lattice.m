@@ -177,12 +177,12 @@ MIDB   = marker('id_endb', 'IdentityPass');    % marker for the extremities of I
 
 M2A = [GIR,CF,L085,SFA,L150,QFA,L124,BPM,L116,SDA,L150,QDA,GIR,L170,GIR];                             % high beta xxM2 girder  
 M1A = fliplr(M2A);                                                                                      % high beta xxM1 girder
-IDA = [LIA,RBPM,L500,L500,MIDA,L500,L500,MIA,MOMACCEP,L500,L500,MIDA,L500,L500,RBPM,LIA]; % high beta ID straight section
-CAV = [LIA,RBPM,L500,L500,L500,L500,MIA,MOMACCEP,RFC,L500,L500,L500,L500,RBPM,LIA];       % high beta RF cavity straight section 
-INJ = [LIA,RBPM,L500,L500,L500,L500,END,START,MIA,MOMACCEP,L500,L500,L500,L500,RBPM,LIA]; % high beta INJ straight section
+IDA = [L500,RBPM,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,RBPM,L500]; % high beta ID straight section
+CAV = [L500,RBPM,LIA,L500,L500,L500,MIA,RFC,L500,L500,L500,LIA,RBPM,L500];       % high beta RF cavity straight section 
+INJ = [L500,RBPM,LIA,L500,L500,L500,END,START,MIA,L500,L500,L500,LIA,RBPM,L500]; % high beta INJ straight section
 M1B = [GIR,L170,GIR,QDB1,L150,SDB,L116,BPM,L124,QFB,L150,SFB,L050,CF,L035,QDB2,GIR];                  % low beta xxM1 girder
 M2B = fliplr(M1B);                                                                                      % low beta xxM2 girder
-IDB = [LIB,RBPM,L500,L500,MIDB,L500,L500,MIB,MOMACCEP,L500,L500,MIDB,L500,L500,RBPM,LIB]; % low beta ID straight section
+IDB = [L500,RBPM,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,RBPM,L500]; % low beta ID straight section
 C1A = [GIR,L610,GIR,SD1J,L170,QF1,L135, BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L185];          % arc sector in between B1-B2 (high beta odd-numbered straight sections)
 C2A = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];        % arc sector in between B2-B3 (high beta odd-numbered straight sections)
 C3A = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2K,L077,CF,L083,QF3,L170,SD3K,GIR,L275,GIR,BPM,L185];             % arc sector in between B3-B2 (high beta odd-numbered straight sections)

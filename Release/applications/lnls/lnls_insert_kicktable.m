@@ -1,12 +1,36 @@
-function the_ring = lnls_insert_kicktable(the_ring0, idx_pos, file_name, nsegs, strength, famname)
+function the_ring = lnls_insert_kicktable(the_ring0, idx_pos, id)
+% the_ring = lnls_insert_kicktable(the_ring0, idx_pos, id)
+% INPUTS:
+%  the_ring - AT model of the lattice;
+%  idx_pos  - index of the element where to insert the kicktable;
+%  id       - structure with information regarding the id. Fields:
+%    kicktable_file - path to the kicktable file;
+%    nr_segs        - number of segmets of the kicktable;
+%    strength       - fraction of the kick defined in the kicktable file
+%                     which will be applied to the AT element to be inserted;
+%    label          - family name of the element which will be inserted;
 
-    
+file_name = id.kicktable_file;
+nsegs     = id.nr_segs;
+strength  = id.strength;
+famname   = id.label;
+
 % reads kicktable
 [posx, posy, kickx, kicky, id_length] = lnls_read_kickmap_file(file_name);
 
 % calculates indices of elements in the location of insertion
-idx_dws = idx_pos+1; while any(strcmpi(the_ring0{idx_dws}.PassMethod, {'IdentityPass', 'DriftPass'})), idx_dws = idx_dws + 1; end; idx_dws = idx_dws - 1;
-idx_ups = idx_pos-1; while any(strcmpi(the_ring0{idx_ups}.PassMethod, {'IdentityPass', 'DriftPass'})), idx_ups = idx_ups - 1; end; idx_ups = idx_ups + 1;
+idx_dws = idx_pos+1; 
+while any(strcmpi(the_ring0{idx_dws}.PassMethod, 'DriftPass')), 
+    idx_dws = idx_dws + 1; 
+end
+idx_dws = idx_dws - 1;
+
+idx_ups = idx_pos-1;
+while any(strcmpi(the_ring0{idx_ups}.PassMethod, 'DriftPass'))
+    idx_ups = idx_ups - 1;
+end
+idx_ups = idx_ups + 1;
+
 lens_ups = getcellstruct(the_ring0, 'Length', idx_ups:idx_pos);
 lens_dws = getcellstruct(the_ring0, 'Length', idx_pos:idx_dws);
 
