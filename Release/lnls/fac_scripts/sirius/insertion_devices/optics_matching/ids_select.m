@@ -140,13 +140,13 @@ for i =1:length(ids_names)
             ids(i).straight_label  = 'mib';
             ids(i).straight_number = 10;
             ids(i).strength        = 1;
-%         case 'sabia2'
-%             ids(i).label           = 'sabia2';
-%             ids(i).kicktable_file  = '../id_modelling/EPU80/EPU80_PV_kicktable_5p4meters.txt';
-%             ids(i).nr_segs         = 40;
-%             ids(i).straight_label  = 'mia';
-%             ids(i).straight_number = 8;
-%             ids(i).strength        = 2; % two IDs in series
+        case 'EPU80PV'
+            ids(i).label           = 'EPU80PV';
+            ids(i).kicktable_file  = '../id_modelling/EPU80/EPU80_PV_kicktable_5p4meters.txt';
+            ids(i).nr_segs         = 40;
+            ids(i).straight_label  = 'mia';
+            ids(i).straight_number = 8;
+            ids(i).strength        = 2; % two IDs in series
         otherwise
             error('ID not recognized');
     end

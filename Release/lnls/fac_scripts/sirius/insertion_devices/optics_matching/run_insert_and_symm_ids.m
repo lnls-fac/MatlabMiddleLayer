@@ -1,11 +1,12 @@
 function run_insert_and_symm_ids
 
 % Loads ID definitions
-ids_names = {'ipe', 'inga', 'sabia',...%high beta
-             'inga2','sabia2','ipe2',...
-             'caterete','ema','manaca','carnauba',...%low beta 
-             'caterete2','ema2','manaca2','carnauba2',...%low beta
-             }; %high beta
+ids_names = {%'ipe', 'inga', 'sabia',...%high beta
+             %'inga2','sabia2','ipe2',...
+             %'caterete','ema','manaca','carnauba',...%low beta 
+             %'caterete2','ema2','manaca2','carnauba2',...%low beta
+             'EPU80PV' % high beta
+             }; 
 ids = ids_select(ids_names);
 
 % Create nominal model
