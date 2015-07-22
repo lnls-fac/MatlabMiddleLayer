@@ -32,7 +32,7 @@ version = '01';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
 
-lattice_version = 'SI.V10';
+lattice_version = 'SI.V11';
 % processamento de input (energia e modo de operacao)
 for i=1:length(varargin)
     if ischar(varargin{i}) && length(varargin{i})==1
@@ -175,7 +175,7 @@ MIDB   = marker('id_endb', 'IdentityPass');    % marker for the extremities of I
 
 %% transport lines
 
-M2A = [GIR,CF,L085,SFA,L150,QFA,L124,BPM,L116,SDA,L150,QDA,GIR,L170,GIR];                             % high beta xxM2 girder  
+M2A = [GIR,CF,L085,SFA,L150,QFA,L124,BPM,L116,QDA,L150,SDA,GIR,L170,GIR];                             % high beta xxM2 girder  
 M1A = fliplr(M2A);                                                                                      % high beta xxM1 girder
 IDA = [L500,RBPM,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,RBPM,L500]; % high beta ID straight section
 CAV = [L500,RBPM,LIA,L500,L500,L500,MIA,RFC,L500,L500,L500,LIA,RBPM,L500];       % high beta RF cavity straight section 
