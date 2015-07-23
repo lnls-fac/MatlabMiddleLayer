@@ -5,7 +5,9 @@ ids_names = {'ipe', 'inga', 'sabia',...%high beta
               'inga2','sabia2','ipe2',...%high beta
               'caterete','ema','manaca','carnauba',...%low beta 
               'caterete2','ema2','manaca2','carnauba2',...%low beta
-              'caterete3','ema3','sabia3','ipe3'}; 
+              'caterete3','ema3','sabia3','ipe3',...
+              %'dhscu20',...
+             }; 
 ids = ids_select(ids_names);
 
 % Create nominal model
