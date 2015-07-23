@@ -1,4 +1,4 @@
-function sirius_plot_BSC(maquina,tipo,save_fig,e_spread)
+function [POS, HBSC, VBSC] = sirius_plot_BSC(maquina,tipo,save_fig,e_spread)
 %Funcao que faz o grafico do tamanho do feixe apenas no booster e anel de
 %armazenmento.  +
 %Antes de executar esse script e necessario rodar o camando
@@ -94,7 +94,7 @@ elseif strcmp(maquina,'ts')
     delta = 0.0;
 else
     fprintf('Maquina nao reconhecida');
-    %break;
+    return;
 end
 
 %Guarda tamanho da camara de vacuo
@@ -214,5 +214,7 @@ if save_fig
     saveas(figure1, [maquina '_BSC']);
 end
 
-end
+POS  = twiss.pos(ini:fim);
+HBSC = HBSC(ini:fim);
+VBSC = VBSC(ini:fim);
 

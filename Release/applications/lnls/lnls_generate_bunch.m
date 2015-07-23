@@ -5,17 +5,17 @@ function Rin = lnls_generate_bunch(emitx, emity, sigmae, sigmas,twiss, n_part, c
 % emity = vertical emittance;
 % sigmae= energy dispersion;
 % sigmas= bunch length;
-% twiss = [betax, alphax, betay, alphay, etax, etaxl, etay, etayl];
+% twiss = structure with fields: betax,betay,etax,etay,alphax,alphay,etaxl,etayl;
 % n_part = number of particles
 % cutoff = number of sigmas to cut the distribution (in bunch size, not
 % emittance. e.g. if cutoof =3 particles with up to 9*emitx will be included)
 
 
 % get the twiss parameters;
-betx = twiss(1); alpx = twiss(2);
-bety = twiss(3); alpy = twiss(4);
-etax = twiss(5); etpx = twiss(6);
-etay = twiss(7); etpy = twiss(8);
+betx = twiss.betax(1); alpx = twiss.alphax(1);
+bety = twiss.betay(1); alpy = twiss.alphay(1);
+etax = twiss.etax(1); etpx = twiss.etaxl(1);
+etay = twiss.etay(1); etpy = twiss.etayl(1);
 
 %generate the longitudinal phase space;
 sigmaep = lnls_generate_random_numbers(sigmae, n_part, 'norm', cutoff, 0);

@@ -114,12 +114,12 @@ finalizations();
         %MAGNET BLOCKS
         
         % <dipoles with only one piece> alignment, rotation and excitation errors
-        config.fams.bc.labels     = {'bc_hf','bc_lf'};
-        config.fams.bc.sigma_y    = 40 * um * 1;
-        config.fams.bc.sigma_x    = 40 * um * 1;
-        config.fams.bc.sigma_roll = 0.30 * mrad * 1;
-        config.fams.bc.sigma_e    = 0.05 * percent * 1;
-        config.fams.bc.sigma_e_kdip = 0.10 * percent * 1;  % quadrupole errors due to pole variations
+        config.fams.b3bc.labels     = {'bc_hf','bc_lf'};
+        config.fams.b3bc.sigma_y    = 40 * um * 1;
+        config.fams.b3bc.sigma_x    = 40 * um * 1;
+        config.fams.b3bc.sigma_roll = 0.30 * mrad * 1;
+        config.fams.b3bc.sigma_e    = 0.05 * percent * 1;
+        config.fams.b3bc.sigma_e_kdip = 0.10 * percent * 1;  % quadrupole errors due to pole variations
         
         % <girders> alignment and rotation
         config.girder.girder_error_flag = true;

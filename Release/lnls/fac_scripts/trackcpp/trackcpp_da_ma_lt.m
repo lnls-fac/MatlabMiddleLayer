@@ -112,6 +112,8 @@ while i < n_calls
     if isempty(paths);
         return;
     end
+    paths = find_right_folders(paths);
+    
     for jj=1:length(paths)
         path = paths{jj};
         if i >= n_calls, break; end
@@ -266,3 +268,28 @@ if ma
     title(falt,['MA - ' title_text{1}]);
     lnls_drawlattice(the_ring,10, 0, true,0.2, false, falt);
 end
+
+
+function pathnames = find_right_folders(paths)
+    pathnames = {};
+    for i=1:length(paths)
+        path = paths{i};
+        listing = dir(path);
+        if any(strncmp({listing.name},'rms',3))
+            pathnames = [pathnames,path];
+            continue;
+        end
+        paths2 = {};
+        for ii=1:length(listing)
+            if any(strcmp(listing(ii).name,{'dynap_xy_out.txt',...
+                                            'dynap_ex_out.txt',...
+                                            'dynap_ma_out.txt'}))
+                pathnames = [pathnames,path];
+            else
+                if listing(ii).isdir && ~any(strcmp(listing(ii).name,{'.','..'}));
+                    paths2 = [paths2,fullfile(path,listing(ii).name)];
+                end
+            end
+        end
+        if ~isempty(paths2), pathnames = [pathnames, find_right_folders(paths2)];end;
+    end
