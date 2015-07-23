@@ -1,54 +1,58 @@
-function show_changes_in_quadrupole_strengths_for_machine_with_id(the_ring2, the_ring1)
+function show_changes_in_quadrupole_strengths_for_machine_with_id(the_ring1,the_ring2)
 
-clc;
+if ~exist('the_ring1','var'), load('the_ring0.mat'); the_ring1 = the_ring0;end
+if ~exist('the_ring2','var'), load('the_ring_withids.mat'); the_ring2 = the_ring_glob; end
+if ~exist('knobs','var'), knobs = {'qda','qfa','qdb1','qdb2','qfb'};end
 
-% loads the_ring
-if ~exist('the_ring','var')
-    load('the_ring.mat'); the_ring1 = the_ring;
-    load('the_ring_withids.mat'); the_ring2 = the_ring;
+idx1 = findcells(the_ring1,'FamName','mc'); idx1 = idx1(end);
+the_ring1 = circshift(the_ring1',[0,-idx1]);
+idx2 = findcells(the_ring2,'FamName','mc'); idx2 = idx2(end);
+the_ring2 = circshift(the_ring2',[0,-idx2]);
+
+mc1 = sort([1,findcells(the_ring1,'FamName','mc'),length(the_ring1)]);
+mc2 = sort([1,findcells(the_ring2,'FamName','mc'),length(the_ring2)]);
+
+for i=1:20
+    the_line1 = the_ring1(mc1(i):mc1(i+1));
+    the_line2 = the_ring2(mc2(i):mc2(i+1));
+    
+    idx = findcells(the_line2,'XGrid');
+    if ~isempty(idx), id_name = ['<',the_line2{idx(1)}.FamName, '>'];
+    else id_name = 'No ID'; end
+    if mod(i,2), fprintf('[ %02d-MIB ] --> %s\n', i, id_name);
+    else fprintf('[ %02d-MIA ] --> %s\n', i, id_name); end
+    
+    idx1 = setdiff(findcells(the_line1, 'K'), findcells(the_line1, 'BendingAngle'));
+    idx2 = setdiff(findcells(the_line2, 'K'), findcells(the_line2, 'BendingAngle'));
+    K1 = getcellstruct(the_line1, 'PolynomB', idx1, 1, 2);
+    K2 = getcellstruct(the_line2, 'PolynomB', idx2, 1, 2);
+    fam_name = getcellstruct(the_line2, 'FamName', idx2);
+    
+    for ii=1:length(K1)
+        if any(strcmp(fam_name{ii},knobs))
+            fprintf('%10s : K1 %+09.6f, K2 %+09.6f, dK %+09.6f, dK %+6.2f %%\n',...
+                fam_name{ii}, K1(ii), K2(ii), K2(ii)-K1(ii), (K2(ii)-K1(ii))/K1(ii)*100);
+        end
+    end
+    fprintf('---\n');
 end
 
-idx1 = setdiff(findcells(the_ring1, 'K'), findcells(the_ring1, 'BendingAngle'));
-idx2 = setdiff(findcells(the_ring2, 'K'), findcells(the_ring2, 'BendingAngle'));
-K1 = getcellstruct(the_ring1, 'K', idx1);
-K2 = getcellstruct(the_ring2, 'K', idx2);
-
-idx = 1; mia_nr = 1; mib_nr = 1; max_abs_var = 0; current_id = '';
-for i=1:length(the_ring2)
-    if strcmpi(the_ring2{i}.FamName, 'mia')
-        fprintf('[ MIA-%02i ]\n', mia_nr);
-        mia_nr = mia_nr + 1;
-    end
-    if strcmpi(the_ring2{i}.FamName, 'mib')
-        fprintf('[ MIB-%02i ]\n', mib_nr);
-        mib_nr = mib_nr + 1;
-    end
-    if isfield(the_ring{i},'K') && ~isfield(the_ring{i}, 'BendingAngle')
-        k1 = the_ring1{idx1(idx)}.K; idx = idx + 1;
-        k2 = the_ring2{i}.K;
-        dk = 100*(k2-k1)/abs(k1);
-        if (abs(dk) > max_abs_var), max_abs_var = abs(dk); end
-        fprintf('%10s : K1 %+09.6f, K2 %+09.6f, dK %+09.6f, dK %+6.2f %%\n', the_ring{i}.FamName, k1, k2, k2-k1, dk);
-    end
-    if isfield(the_ring{i}, 'XGrid') && ~strcmpi(the_ring{i}.FamName, current_id)
-        fprintf('<%s>\n', the_ring{i}.FamName);
-        current_id = the_ring{i}.FamName;
-    end
-    if strcmpi(the_ring{i}.FamName, 'mb1')
-        fprintf('---\n');
-    end
-end
-fprintf('\n\n');
+%Max quadrupole strengths
+maxK14 = -3.74;
+maxK20 = 4.54;
+maxK30 = 4.54;
 
 fprintf('SUMMARY OF QUAD VARIATIONS WITH ID SET\n')
 fprintf('======================================\n')
-fprintf('Max. variation dK: %+6.2f\n', max_abs_var);
+fprintf('Max q14 quadrupole Strength: %6.2f\n',maxK14);
+fprintf('Max q20 quadrupole Strength: %6.2f\n',maxK20);
+fprintf('Max q30 quadrupole Strength: %6.2f\n',maxK30);
 
-get_max_deltas_from_quadrupole_model('q14', the_ring1, the_ring2)
-get_max_deltas_from_quadrupole_model('q20', the_ring1, the_ring2)
-get_max_deltas_from_quadrupole_model('q30', the_ring1, the_ring2)
+get_max_deltas_from_quadrupole_model('q14', the_ring1, the_ring2, maxK14)
+get_max_deltas_from_quadrupole_model('q20', the_ring1, the_ring2, maxK20)
+get_max_deltas_from_quadrupole_model('q30', the_ring1, the_ring2, maxK30)
 
-function get_max_deltas_from_quadrupole_model(quad_model, the_ring1, the_ring2)
+function get_max_deltas_from_quadrupole_model(quad_model, the_ring1, the_ring2, maxK)
 
 ao = getao();
 fams = findmemberof(quad_model);
@@ -86,10 +90,12 @@ end
 if strcmp(max_pos_family,'')
     fprintf('%s: has not positive delta K\n', quad_model);
 else
-    fprintf('%s: max pos. delta at %5s, from %+6.4f to %+6.4f, (%+4.1f %%). \n', quad_model, max_pos_family, max_pos_K1, max_pos_K2, 100*(max_pos_K2-max_pos_K1)/max_pos_K1);
+    fprintf('%s: max pos. delta at %5s, from %+6.4f to %+6.4f, (%+4.1f %%). \n',...
+        quad_model, max_pos_family, max_pos_K1, max_pos_K2, 100*(max_pos_K2-max_pos_K1)/maxK);
 end
 if strcmp(max_neg_family,'')
     fprintf('%s: has no negative delta K\n', quad_model);
 else
-    fprintf('%s: max neg. delta at %5s, from %+6.4f to %+6.4f, (%+4.1f %%). \n', quad_model, max_neg_family, max_neg_K1, max_neg_K2, 100*(max_neg_K2-max_neg_K1)/max_neg_K1);
+    fprintf('%s: max neg. delta at %5s, from %+6.4f to %+6.4f, (%+4.1f %%). \n',...
+        quad_model, max_neg_family, max_neg_K1, max_neg_K2, 100*(max_neg_K2-max_neg_K1)/maxK);
 end

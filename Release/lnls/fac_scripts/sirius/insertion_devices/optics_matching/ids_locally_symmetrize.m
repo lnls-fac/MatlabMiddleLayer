@@ -92,20 +92,3 @@ etax   = TwissData(symm_point).Dispersion(1);
 etaxl  = TwissData(symm_point).Dispersion(2);
 residue = [alphax / scale_alpha, alphay / scale_alpha]';
 % residue = [alphax / scale_alpha, alphay / scale_alpha,  etaxl / scale_alpha, etax / scale_eta]';
-
-% function residue = calc_residue_local_symm(the_ring, optionals)
-% symm_point = 1;
-% betax0     = optionals{2};
-% betay0     = optionals{3};
-% etax0      = optionals{4};
-% 
-% scale_alpha = 1e-5;
-% scale_eta   = 1e-5;
-% 
-% TwissData = twissring(the_ring, 0, 1:length(the_ring)+1, 'Chrom');
-% betax = TwissData(symm_point).beta(1);
-% betay = TwissData(symm_point).beta(2);
-% etax   = TwissData(symm_point).Dispersion(1);
-% etaxl  = TwissData(symm_point).Dispersion(2);
-% residue = [(betax-betax0) / scale_alpha, (betay-betay0) / scale_alpha]';
-% % residue = [(betax-betax0) / scale_alpha, (betay-betay0) / scale_alpha, (etax-etax0)/scale_eta]';
