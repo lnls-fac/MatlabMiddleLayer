@@ -5,13 +5,15 @@ ids_names = {%'ipe', 'inga', 'sabia',...%high beta
              %'inga2','sabia2','ipe2',...
              %'caterete','ema','manaca','carnauba',...%low beta 
              %'caterete2','ema2','manaca2','carnauba2',...%low beta
-             'EPU80PV' % high beta
+             %'epu80pv', ... % high beta
+             'dhscu20' % low beta
              }; 
 ids = ids_select(ids_names);
 
 % Create nominal model
 the_ring0 = sirius_si_lattice();
 %save('the_ring.mat', 'the_ring');
+the_ring0(findcells(the_ring0, 'FamName', 'calc_mom_accep')) = [];
 
 % Calcs original twiss parameters
 twiss0 = calctwiss(the_ring0, 'n+1'); 

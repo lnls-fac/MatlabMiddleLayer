@@ -140,8 +140,8 @@ for i =1:length(ids_names)
             ids(i).straight_label  = 'mib';
             ids(i).straight_number = 10;
             ids(i).strength        = 1;
-        case 'EPU80PV'
-            ids(i).label           = 'EPU80PV';
+        case 'epu80pv'
+            ids(i).label           = 'epu80pv';
             ids(i).kicktable_file  = '../id_modelling/EPU80/EPU80_PV_kicktable_5p4meters.txt';
             ids(i).nr_segs         = 40;
             ids(i).straight_label  = 'mia';
