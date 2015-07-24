@@ -12,4 +12,8 @@ function generate_kicktable_ALL
 % ID = generate_kicktable(fullfile('EPU200','EPU200_PV - ID.mat'));
 
 % ID = generate_kicktable(fullfile('SCW4T','SCW4T - ID.mat'));
-ID = generate_kicktable(fullfile('U19','U19 - ID.mat'));
+% ID = generate_kicktable(fullfile('U19','U19 - ID.mat'));
+
+% ID = generate_kicktable(fullfile('EPU80','EPU80_2ID_PH - ID.mat'));
+% ID = generate_kicktable(fullfile('EPU80','EPU80_2ID_PV - ID.mat'));
+ID = generate_kicktable(fullfile('EPU80','EPU80_2ID_PC - ID.mat'));

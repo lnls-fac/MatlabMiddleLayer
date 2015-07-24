@@ -6,21 +6,21 @@ ids_names = {'ipe', 'inga', 'sabia',...%high beta
               'caterete','ema','manaca','carnauba',...%low beta 
               'caterete2','ema2','manaca2','carnauba2',...%low beta
               'caterete3','ema3','sabia3','ipe3',...
-              %'dhscu20',...
              }; 
 ids = ids_select(ids_names);
 
 % Create nominal model
-the_ring0 = sirius_si_lattice();
-save('the_ring0.mat', 'the_ring0');
+the_ring = sirius_si_lattice();
+save('the_ring0.mat', 'the_ring');
 
 % Calcs original twiss parameters
-twiss0 = calctwiss(the_ring0, 'n+1'); 
+twiss0 = calctwiss(the_ring, 'n+1'); 
 tunes0 = [twiss0.mux(end), twiss0.muy(end)]/2/pi;
-mc = findcells(the_ring0,'FamName','mc');
+mc = findcells(the_ring,'FamName','mc');
 
 % Inserts IDs
-the_ring = ids_insert_set(the_ring0, ids);
+strength = 1;
+the_ring = ids_insert_set(the_ring, ids, strength);
 save('the_ring_nosym.mat', 'the_ring');
 
 % Local symmetrization of each ID
@@ -31,8 +31,8 @@ symm_loc.goal        = [twiss0.betax(mc(1)),twiss0.alphax(mc(1)),...
                        twiss0.betay(mc(1)),twiss0.alphay(mc(1)),...
                        twiss0.etax(mc(1)), twiss0.etaxl(mc(1))];
 symm_loc.id_sections = getcellstruct(ids,'straight_number',1:length(ids));
-the_ring_loc = ids_locally_symmetrize(the_ring, symm_loc);
-save('the_ring_locsym.mat', 'the_ring_loc');
+the_ring = ids_locally_symmetrize(the_ring, symm_loc);
+save('the_ring_locsym.mat', 'the_ring');
 
 % Local symmetrization of each ID
 symm_glob.knobs      = {'qfa','qda','qfb','qdb1'};
@@ -40,9 +40,7 @@ symm_glob.id_sections = symm_loc.id_sections;
 symm_glob.nr_iters = 30;
 symm_glob.tol      = 1e-2;
 symm_glob.svs_lst  = [10,20,30,38];
-the_ring_glob      = ids_globally_symmetrize(the_ring_loc, tunes0, symm_glob);
+the_ring           = ids_globally_symmetrize(the_ring, tunes0, symm_glob);
 
 % saves lattice model with ids
-save('the_ring_withids.mat', 'the_ring_glob');
-
-
+save('the_ring_withids.mat', 'the_ring');

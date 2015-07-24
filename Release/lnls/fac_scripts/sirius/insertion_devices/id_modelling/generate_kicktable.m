@@ -9,7 +9,8 @@ addpath('epu');
 %id_mat_file_name = fullfile('EPU80','EPU80_PH - ID.mat');
 %id_mat_file_name = fullfile('U25','U25 - ID.mat');
 %id_mat_file_name = fullfile('U19','U19 - ID.mat');
-id_mat_file_name = fullfile('EPU80','EPU80_PV - ID.mat');
+% id_mat_file_name = fullfile('EPU80','EPU80_PV - ID.mat');
+% id_mat_file_name = fullfile('EPU80','EPU80PH - ID.mat');
 
 if ~exist('id_mat_file_name','var')
     [FileName,PathName,~] = uigetfile('*.mat','Select mat file with ID model','');
@@ -19,7 +20,7 @@ r = load(id_mat_file_name, 'ID'); ID = r.ID;
 
 % defines grid for kicktable calculation (mm units)
 kicktable_grid.symmetric = true; % reflection symmetry on x and y axis (only 1/4 of initial points are calculated)
-kicktable_grid.x = 30 * linspace(-1,1,81); 
+kicktable_grid.x = 12 * linspace(-1,1,81); 
 kicktable_grid.y = (ID.def.physical_gap/2) * linspace(-1,1,17);
 %kicktable_grid.x = 30 * linspace(-1,1,3); 
 %kicktable_grid.y = (ID.def.physical_gap/2) * linspace(-1,1,3);
@@ -70,7 +71,7 @@ posy = grid.y;
 lnls_create_waitbar('Construindo Funcao Potencial', 0.2, length(posy) * length(posx));
 U = zeros(length(posy), length(posx));
 counter = 0;
-figure; set(gcf, 'Name', 'KICKTABLES-PotU');
+f = figure; set(f, 'Name', 'KICKTABLES-PotU'); ax = axes('Parent',f);
 plot_flag = false;
 for i=1:length(posy)
     for j=1:length(posx)
@@ -82,7 +83,7 @@ for i=1:length(posy)
             U = symmetrize_U_function(U);
         end
         if plot_flag
-            plot_U_function(posx, posy, U);
+            plot_U_function(posx, posy, U, ax);
             drawnow;
         end;
         counter = counter + 1;
@@ -142,14 +143,14 @@ kicktables.U = U;
 kicktables.kickx = kickx;
 kicktables.kicky = kicky;
 
-function plot_U_function(posx, posy, U)
+function plot_U_function(posx, posy, U, ax)
 
 [X,Y] = meshgrid(posx, posy);
-[C,h] = contourf(X,Y,U,16);
-colorbar;
-xlabel('Pos X [mm]');
-ylabel('Pos Y [mm]');
-title('Kick Potential U [T^2.mm^3]');
+[C,h] = contourf(ax,X,Y,U,16);
+colorbar('peer',ax);
+xlabel(ax,'Pos X [mm]');
+ylabel(ax,'Pos Y [mm]');
+title(ax, 'Kick Potential U [T^2.mm^3]');
 return
 
 set(h,'ShowText','on','TextStep',get(h,'LevelStep')*2)
