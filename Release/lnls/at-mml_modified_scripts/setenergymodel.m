@@ -58,5 +58,5 @@ if strfind(ad.SubMachine, 'BO.V')
     idx = findcells(THERING, 'Voltage');
     voltage = sirius_bo_rf_voltage(GeV*1e9);
     THERING{idx}.Voltage = voltage;
-    fprintf('  Adjusting RF voltage: %f MV\n', voltage/1e6);
+    fprintf('   Adjusting RF voltage: %f MV\n', voltage/1e6);
 end
