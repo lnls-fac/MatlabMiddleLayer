@@ -166,12 +166,12 @@ MIDB   = marker('id_endb', 'IdentityPass');    % marker for the extremities of I
 
 M2A = [GIRDER,CF,L11,SFA,L12,BPM,L14,QFA,L24,QDA,L15,SDA,L19,GIRDER];               % high beta xxM2 girder                                                                                  
 M1A = fliplr(M2A);                                                                  % high beta xxM1 girder
-IDA = [GIRDER,LIA,MIDA,L50,L50,MIA,MOMACCEP,L50,L50,MIDA,LIA,GIRDER];               % high beta ID straight section
-CAV = [GIRDER,LIA,L50,L50,MIA,MOMACCEP,RFC,L50,L50,LIA,GIRDER];                     % high beta RF cavity straight section 
-INJ = [GIRDER,LIA,L50,L50,END,START,MIA,MOMACCEP,L50,L50,LIA,GIRDER];               % high beta INJ straight section
+IDA = [GIRDER,LIA,MIDA,L50,L50,MIA,L50,L50,MIDA,LIA,GIRDER];               % high beta ID straight section
+CAV = [GIRDER,LIA,L50,L50,MIA,RFC,L50,L50,LIA,GIRDER];                     % high beta RF cavity straight section 
+INJ = [GIRDER,LIA,L50,L50,END,START,MIA,L50,L50,LIA,GIRDER];               % high beta INJ straight section
 M1B = [GIRDER,L19,SDB,L15,QDB1,L24,QFB,L14,BPM,L12,SFB,L11,CF,L13,QDB2,GIRDER];     % low beta xxM1 girder
 M2B = fliplr(M1B);                                                                  % low beta xxM2 girder
-IDB = [GIRDER,LIB,MIDB,L50,L50,MIB,MOMACCEP,L50,L50,MIDB,LIB,GIRDER];               % low beta ID straight section
+IDB = [GIRDER,LIB,MIDB,L50,L50,MIB,L50,L50,MIDB,LIB,GIRDER];               % low beta ID straight section
 C3  = [LBC,BC,LBC];                                                                 % arc sector in between B3-B3
 C1A = [GIRDER,L61,SD1,L17,QF1,L14, BPM,L12,SF1,L23,QF2,L17,SD2,L21,BPM,L13,GIRDER]; % arc sector in between B1-B2 (high beta odd-numbered straight sections)
 C2A = [GIRDER,L46,SD3,L17,QF3,L23,SF2,L12,BPM,L14,QF4,L12,CF,L38,BPM,L13,GIRDER];   % arc sector in between B2-B3 (high beta odd-numbered straight sections)
