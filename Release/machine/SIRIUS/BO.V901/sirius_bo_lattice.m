@@ -112,8 +112,8 @@ fodo1ch   = [mqf, qf, fliplr(lch), girder, lfree_2, b,         lfree_2, girder, 
 fodo1rf   = [mqf, qf, lfree, rfc,  girder, lfree_2, b,         lfree_2, girder, bpm, lsf, qf];
 
 %booster   = [boos, boos, boos, boos, boos];
-boosinj   = [fodo1sd, fodo2kese, fodo1ch, fodo2si, fodo1ki, fodo2sd, fodo1, fodo2, fodo1, fodo2];
-boosrf    = [fodo1sd, fodo2, fodo1, fodo2, fodo1rf, fodo2sd, fodo1, fodo2, fodo1, fodo2];
+boosinj   = [fodo1sd, fodo2kese, fodo1ch, fodo2si, fodo1ki, fodo2sd, fodo1, fodo2, fodo1rf, fodo2];
+boosrf    = [fodo1sd, fodo2, fodo1, fodo2, fodo1, fodo2sd, fodo1, fodo2, fodo1, fodo2];
 boocor    = [start, boosinj, boos, boosrf, boos, boos, fim];
 elist     = boocor;
 
