@@ -211,6 +211,107 @@ IDS.EPU80_2ID_PC.vchamber_thkness     = 1.00 * mm;
 IDS.EPU80_2ID_PC.mech_tol             = 0.50 * mm;
 IDS.EPU80_2ID_PC.physical_gap         = IDS.EPU80_2ID_PC.magnetic_gap - 2 * (IDS.EPU80_2ID_PC.vchamber_thkness + IDS.EPU80_2ID_PC.mech_tol);
 
+% --- tests ---
+
+IDS.EPU80_2ID_W60_LH.id_label             = 'EPU80_2ID_W60_LH';
+IDS.EPU80_2ID_W60_LH.period               = 80 * mm;
+IDS.EPU80_2ID_W60_LH.nr_periods           = 67;
+IDS.EPU80_2ID_W60_LH.magnetic_gap         = 16.0 * mm;
+IDS.EPU80_2ID_W60_LH.cassette_separation  = 0.001 * mm; % diferente de zero para evitar singularidades nas express?es
+IDS.EPU80_2ID_W60_LH.block_separation     = 0  * mm;
+IDS.EPU80_2ID_W60_LH.block_width          = 60 * mm;
+IDS.EPU80_2ID_W60_LH.block_height         = 60 * mm;
+IDS.EPU80_2ID_W60_LH.phase_csd            =  0 * mm;
+IDS.EPU80_2ID_W60_LH.phase_cie            =  0 * mm;
+IDS.EPU80_2ID_W60_LH.chamfer              =  0 * mm;
+IDS.EPU80_2ID_W60_LH.magnetization        =  (0.9/0.7037) * 0.7634 * Tesla;
+IDS.EPU80_2ID_W60_LH.vchamber_thkness     = 1.00 * mm;
+IDS.EPU80_2ID_W60_LH.mech_tol             = 0.50 * mm;
+IDS.EPU80_2ID_W60_LH.physical_gap         = IDS.EPU80_2ID_W60_LH.magnetic_gap - 2 * (IDS.EPU80_2ID_W60_LH.vchamber_thkness + IDS.EPU80_2ID_W60_LH.mech_tol);
+
+IDS.EPU80_2ID_W60_LV.id_label             = 'EPU80_2ID_W60_LV';
+IDS.EPU80_2ID_W60_LV.period               = 80 * mm;
+IDS.EPU80_2ID_W60_LV.nr_periods           = 67;
+IDS.EPU80_2ID_W60_LV.magnetic_gap         = 16.0 * mm;
+IDS.EPU80_2ID_W60_LV.cassette_separation  = 0.001 * mm; % diferente de zero para evitar singularidades nas express?es
+IDS.EPU80_2ID_W60_LV.block_separation     = 0  * mm;
+IDS.EPU80_2ID_W60_LV.block_width          = 60 * mm;
+IDS.EPU80_2ID_W60_LV.block_height         = 60 * mm;
+IDS.EPU80_2ID_W60_LV.phase_csd            = 40 * mm;
+IDS.EPU80_2ID_W60_LV.phase_cie            = 40 * mm;
+IDS.EPU80_2ID_W60_LV.chamfer              =  0 * mm;
+IDS.EPU80_2ID_W60_LV.magnetization        =  (0.9/0.7037) * 0.7634 * Tesla;
+IDS.EPU80_2ID_W60_LV.vchamber_thkness     = 1.00 * mm;
+IDS.EPU80_2ID_W60_LV.mech_tol             = 0.50 * mm;
+IDS.EPU80_2ID_W60_LV.physical_gap         = IDS.EPU80_2ID_W60_LV.magnetic_gap - 2 * (IDS.EPU80_2ID_W60_LV.vchamber_thkness + IDS.EPU80_2ID_W60_LV.mech_tol);
+
+IDS.EPU80_2ID_W60_CP.id_label             = 'EPU80_2ID_W60_CP';
+IDS.EPU80_2ID_W60_CP.period               = 80 * mm;
+IDS.EPU80_2ID_W60_CP.nr_periods           = 67;
+IDS.EPU80_2ID_W60_CP.magnetic_gap         = 16.0 * mm;
+IDS.EPU80_2ID_W60_CP.cassette_separation  = 0.001 * mm; % diferente de zero para evitar singularidades nas express?es
+IDS.EPU80_2ID_W60_CP.block_separation     = 0  * mm;
+IDS.EPU80_2ID_W60_CP.block_width          = 60 * mm;
+IDS.EPU80_2ID_W60_CP.block_height         = 60 * mm;
+IDS.EPU80_2ID_W60_CP.phase_csd            = 23.7 * mm;
+IDS.EPU80_2ID_W60_CP.phase_cie            = 23.7 * mm;
+IDS.EPU80_2ID_W60_CP.chamfer              =  0 * mm;
+IDS.EPU80_2ID_W60_CP.magnetization        =  (0.9/0.7037) * 0.7634 * Tesla;
+IDS.EPU80_2ID_W60_CP.vchamber_thkness     = 1.00 * mm;
+IDS.EPU80_2ID_W60_CP.mech_tol             = 0.50 * mm;
+IDS.EPU80_2ID_W60_CP.physical_gap         = IDS.EPU80_2ID_W60_CP.magnetic_gap - 2 * (IDS.EPU80_2ID_W60_CP.vchamber_thkness + IDS.EPU80_2ID_W60_CP.mech_tol);
+
+
+
+IDS.EPU80_2ID_W80_LH.id_label             = 'EPU80_2ID_W80_LH';
+IDS.EPU80_2ID_W80_LH.period               = 80 * mm;
+IDS.EPU80_2ID_W80_LH.nr_periods           = 67;
+IDS.EPU80_2ID_W80_LH.magnetic_gap         = 16.0 * mm;
+IDS.EPU80_2ID_W80_LH.cassette_separation  = 0.001 * mm; % diferente de zero para evitar singularidades nas express?es
+IDS.EPU80_2ID_W80_LH.block_separation     = 0  * mm;
+IDS.EPU80_2ID_W80_LH.block_width          = 80 * mm;
+IDS.EPU80_2ID_W80_LH.block_height         = 60 * mm;
+IDS.EPU80_2ID_W80_LH.phase_csd            =  0 * mm;
+IDS.EPU80_2ID_W80_LH.phase_cie            =  0 * mm;
+IDS.EPU80_2ID_W80_LH.chamfer              =  0 * mm;
+IDS.EPU80_2ID_W80_LH.magnetization        =  (0.9/0.7037) * 0.7634 * Tesla;
+IDS.EPU80_2ID_W80_LH.vchamber_thkness     = 1.00 * mm;
+IDS.EPU80_2ID_W80_LH.mech_tol             = 0.50 * mm;
+IDS.EPU80_2ID_W80_LH.physical_gap         = IDS.EPU80_2ID_W80_LH.magnetic_gap - 2 * (IDS.EPU80_2ID_W80_LH.vchamber_thkness + IDS.EPU80_2ID_W80_LH.mech_tol);
+
+IDS.EPU80_2ID_W80_LV.id_label             = 'EPU80_2ID_W80_LV';
+IDS.EPU80_2ID_W80_LV.period               = 80 * mm;
+IDS.EPU80_2ID_W80_LV.nr_periods           = 67;
+IDS.EPU80_2ID_W80_LV.magnetic_gap         = 16.0 * mm;
+IDS.EPU80_2ID_W80_LV.cassette_separation  = 0.001 * mm; % diferente de zero para evitar singularidades nas express?es
+IDS.EPU80_2ID_W80_LV.block_separation     = 0  * mm;
+IDS.EPU80_2ID_W80_LV.block_width          = 80 * mm;
+IDS.EPU80_2ID_W80_LV.block_height         = 60 * mm;
+IDS.EPU80_2ID_W80_LV.phase_csd            = 40 * mm;
+IDS.EPU80_2ID_W80_LV.phase_cie            = 40 * mm;
+IDS.EPU80_2ID_W80_LV.chamfer              =  0 * mm;
+IDS.EPU80_2ID_W80_LV.magnetization        =  (0.9/0.7037) * 0.7634 * Tesla;
+IDS.EPU80_2ID_W80_LV.vchamber_thkness     = 1.00 * mm;
+IDS.EPU80_2ID_W80_LV.mech_tol             = 0.50 * mm;
+IDS.EPU80_2ID_W80_LV.physical_gap         = IDS.EPU80_2ID_W80_LV.magnetic_gap - 2 * (IDS.EPU80_2ID_W80_LV.vchamber_thkness + IDS.EPU80_2ID_W80_LV.mech_tol);
+
+IDS.EPU80_2ID_W80_CP.id_label             = 'EPU80_2ID_W80_CP';
+IDS.EPU80_2ID_W80_CP.period               = 80 * mm;
+IDS.EPU80_2ID_W80_CP.nr_periods           = 67;
+IDS.EPU80_2ID_W80_CP.magnetic_gap         = 16.0 * mm;
+IDS.EPU80_2ID_W80_CP.cassette_separation  = 0.001 * mm; % diferente de zero para evitar singularidades nas express?es
+IDS.EPU80_2ID_W80_CP.block_separation     = 0  * mm;
+IDS.EPU80_2ID_W80_CP.block_width          = 80 * mm;
+IDS.EPU80_2ID_W80_CP.block_height         = 60 * mm;
+IDS.EPU80_2ID_W80_CP.phase_csd            = 23.7 * mm;
+IDS.EPU80_2ID_W80_CP.phase_cie            = 23.7 * mm;
+IDS.EPU80_2ID_W80_CP.chamfer              =  0 * mm;
+IDS.EPU80_2ID_W80_CP.magnetization        =  (0.9/0.7037) * 0.7634 * Tesla;
+IDS.EPU80_2ID_W80_CP.vchamber_thkness     = 1.00 * mm;
+IDS.EPU80_2ID_W80_CP.mech_tol             = 0.50 * mm;
+IDS.EPU80_2ID_W80_CP.physical_gap         = IDS.EPU80_2ID_W80_CP.magnetic_gap - 2 * (IDS.EPU80_2ID_W80_CP.vchamber_thkness + IDS.EPU80_2ID_W80_CP.mech_tol);
+
+
 % --- epu50 ---
 IDS.EPU50_PH.id_label             = 'EPU50_PH';
 IDS.EPU50_PH.period               = 50 * mm;

@@ -54,8 +54,6 @@ function kicktables = calc_kicktables(id_def, id_model, id_field, grid)
 
 mm = 1;
 
-
-
 % parametros de calculo de U em cada linha (x,y)
 if false
     % calcula o menor numero de pontos em um periodo para que erro < 1% em todo grid (x,y).
