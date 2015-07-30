@@ -3,7 +3,7 @@ function [r, lattice_title] = sirius_si_lattice(varargin)
 %
 % r = sirius_si_lattice(mode) : Ateh o momento, pode ser 'AC10'(default) or 'AC20'.
 %
-% r = sirius_si_lattice(mode,mode_version): mode_version define o ponto de operacao 
+% r = sirius_si_lattice(mode,mode_version): mode_version define o ponto de operacao
 %      e a otimizacao sextupolar a ser usada. Exemplos: 'AC10_1', 'AC10_2',
 %      'AC10_5'(default)...
 %r = sirius_si_lattice(mode,mode_version, energy): energia em eV;
@@ -14,14 +14,14 @@ function [r, lattice_title] = sirius_si_lattice(varargin)
 % 2013-08-08: inseri marcadores de IDs de 2 m nos trechos retos. (xrr)
 % 2013-08-12: corretoras rapidas e atualizacao das lentas e dos BPMs (desenho CAD da Liu). (xrr)
 % 2013-10-02: adicionei o mode_version como parametro de input. (Fernando)
-% 2014-09-17: modificacao das corretoras para apenas uma par integrado de CV e CH rapidas e lentas no mesmo elemento. (Natalia) 
+% 2014-09-17: modificacao das corretoras para apenas uma par integrado de CV e CH rapidas e lentas no mesmo elemento. (Natalia)
 % 2014-10-07: atualizados nomes de alguns elementos. (xrr)
 % 2015-03-04: testes com ideia de colocar corretores skew fora dos sextupolos e junto com corretoras r??pidas
 
 global THERING;
 
 
-%% global parameters 
+%% global parameters
 %  =================
 
 % --- system parameters ---
@@ -91,7 +91,7 @@ LKK  = drift('lkk', 2.2700, 'DriftPass');
 LPMM = drift('lpmm',0.8100, 'DriftPass');
 LCF  = drift('lcf', 0.3329, 'DriftPass');
 
-% -- dipoles -- 
+% -- dipoles --
 deg2rad = pi/180.0;
 
 B1E = rbend_sirius('b1', 0.828/2,  2.7553*deg2rad/2, 1.4143*deg2rad/2, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
@@ -134,7 +134,7 @@ QF4  = quadrupole('qf4',  0.200, qf4_strength,  quad_pass_method);
 
 
 
-% -- sextupoles and slow correctors --         
+% -- sextupoles and slow correctors --
 SDA = sextupole('sda', 0.150, sda_strength, sext_pass_method); %
 SFA = sextupole('sfa', 0.150, sfa_strength, sext_pass_method); % chs/cvs
 SDB = sextupole('sdb', 0.150, sdb_strength, sext_pass_method); %
@@ -172,11 +172,11 @@ PMM     = marker('pmm','IdentityPass');
 
 %% transport lines
 
-M2A = [GIRDER,CF,L11,SFA,L12,BPM,L14,QFA,L24,QDA,L15,SDA,L19,GIRDER];                           % high beta xxM2 girder                                                                                  
+M2A = [GIRDER,CF,L11,SFA,L12,BPM,L14,QFA,L24,QDA,L15,SDA,L19,GIRDER];                           % high beta xxM2 girder
 M1A = fliplr(M2A);                                                                              % high beta xxM1 girder
-IDA = [GIRDER,LIA,MIDA,L50,L50,MIA,MOMACCEP,L50,L50,MIDA,LIA,GIRDER];                           % high beta ID straight section
-CAV = [GIRDER,LIA,L50,L50,MIA,MOMACCEP,RFC,L50,L50,LIA,GIRDER];                                 % high beta RF cavity straight section 
-INJ = [GIRDER,LIA,L50,L40,SEPT_IN,L10,END,START,MIA,MOMACCEP,LKK,KICK_IN,LPMM,PMM,LCF,GIRDER];  % high beta INJ straight section
+IDA = [GIRDER,LIA,MIDA,L50,L50,MIA,L50,L50,MIDA,LIA,GIRDER];                                    % high beta ID straight section
+CAV = [GIRDER,LIA,L50,L50,MIA,RFC,L50,L50,LIA,GIRDER];                                          % high beta RF cavity straight section
+INJ = [GIRDER,LIA,L50,L40,SEPT_IN,L10,END,START,MIA,LKK,KICK_IN,LPMM,PMM,LCF,GIRDER];           % high beta INJ straight section
 M1B = [GIRDER,L19,SDB,L15,QDB1,L24,QFB,L14,BPM,L12,SFB,L11,CF,L13,QDB2,GIRDER];                 % low beta xxM1 girder
 M2B = fliplr(M1B);                                                                              % low beta xxM2 girder
 IDB = [GIRDER,LIB,MIDB,L50,L50,MIB,MOMACCEP,L50,L50,MIDB,LIB,GIRDER];                           % low beta ID straight section
@@ -188,8 +188,7 @@ C5A = [GIRDER,L34,SD5,L17,QF2,L23,SF4,L12,BPM,L14,QF1,L17,SD6,L48,BPM,L13,GIRDER
 C1B = [GIRDER,L61,SD6,L17,QF1,L14,BPM,L12,SF4,L23,QF2,L17,SD5,L21,BPM,L13,GIRDER];              % arc sector in between B1-B2 (low beta even-numbered straight sections)
 C2B = [GIRDER,L46,SD4,L17,QF3,L23,SF3,L12,BPM,L14,QF4,L12,CF,L38,BPM,L13,GIRDER];               % arc sector in between B2-B3 (low beta even-numbered straight sections)
 C4B = [GIRDER,L73,QF4,L14,BPM,L12,SF2,L23,QF3,L17,SD3,L11,CF,L25,GIRDER];                       % arc sector in between B3-B2 (low beta even-numbered straight sections)
-C5B = [GIRDER,L34,SD2,L17,QF2,L23,SF1,L12,BPM,L14,QF1,L17,SD1,L48,BPM,L13,GIRDER];              % arc sector in between B2-B1 (low beta even-numbered straight sections)    
-
+C5B = [GIRDER,L34,SD2,L17,QF2,L23,SF1,L12,BPM,L14,QF1,L17,SD1,L48,BPM,L13,GIRDER];              % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
 %% GIRDERS
 
@@ -267,7 +266,7 @@ anel = [S01,S02,S03,S04,S05,S06,S07,S08,S09,S10,S11,S12,S13,S14,S15,S16,S17,S18,
 elist = anel;
 
 
-%% finalization 
+%% finalization
 
 THERING = buildlat(elist);
 THERING = setcellstruct(THERING, 'Energy', 1:length(THERING), energy);
@@ -296,8 +295,8 @@ rf_frequency = rev_freq * harmonic_number;
 THERING{rf_idx}.Frequency = rf_frequency;
 fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);
 
-% by default cavities and radiation is set to off 
-setcavity('off'); 
+% by default cavities and radiation is set to off
+setcavity('off');
 setradiation('off');
 
 % sets default NumIntSteps values for elements
@@ -351,4 +350,3 @@ quad_sext_nis = ceil(quad_sext_len / len_qs);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', quad_sext, quad_sext_nis);
 
 the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);
-
