@@ -64,27 +64,32 @@ sext_pass_method = 'StrMPoleSymplectic4Pass';
 MOMACCEP = marker('calc_mom_accep', 'IdentityPass');     % marker to define points where momentum acceptance will be calculated
 
 % -- drifts --
-LIA = drift('lia', 2.4129, 'DriftPass');
-LIB = drift('lib', 2.0429, 'DriftPass');
-LBC = drift('lbc', 0.0630, 'DriftPass');
-L11 = drift('l11', 0.1100, 'DriftPass');
-L12 = drift('l12', 0.1200, 'DriftPass');
-L13 = drift('l13', 0.1300, 'DriftPass');
-L14 = drift('l14', 0.1400, 'DriftPass');
-L15 = drift('l15', 0.1500, 'DriftPass');
-L17 = drift('l17', 0.1700, 'DriftPass');
-L19 = drift('l19', 0.1900, 'DriftPass');
-L21 = drift('l21', 0.2100, 'DriftPass');
-L23 = drift('l23', 0.2300, 'DriftPass');
-L24 = drift('l24', 0.2400, 'DriftPass');
-L25 = drift('l25', 0.2500, 'DriftPass');
-L34 = drift('l34', 0.3400, 'DriftPass');
-L38 = drift('l38', 0.3800, 'DriftPass');
-L46 = drift('l46', 0.4600, 'DriftPass');
-L48 = drift('l48', 0.4800, 'DriftPass');
-L50 = drift('l50', 0.5000, 'DriftPass');
-L61 = drift('l61', 0.6100, 'DriftPass');
-L73 = drift('l73', 0.7300, 'DriftPass');
+LIA  = drift('lia', 2.4129, 'DriftPass');
+LIB  = drift('lib', 2.0429, 'DriftPass');
+LBC  = drift('lbc', 0.0630, 'DriftPass');
+L10  = drift('l10', 0.1000, 'DriftPass');
+L11  = drift('l11', 0.1100, 'DriftPass');
+L12  = drift('l12', 0.1200, 'DriftPass');
+L13  = drift('l13', 0.1300, 'DriftPass');
+L14  = drift('l14', 0.1400, 'DriftPass');
+L15  = drift('l15', 0.1500, 'DriftPass');
+L17  = drift('l17', 0.1700, 'DriftPass');
+L19  = drift('l19', 0.1900, 'DriftPass');
+L21  = drift('l21', 0.2100, 'DriftPass');
+L23  = drift('l23', 0.2300, 'DriftPass');
+L24  = drift('l24', 0.2400, 'DriftPass');
+L25  = drift('l25', 0.2500, 'DriftPass');
+L34  = drift('l34', 0.3400, 'DriftPass');
+L38  = drift('l38', 0.3800, 'DriftPass');
+L40  = drift('l40', 0.4000, 'DriftPass');
+L46  = drift('l46', 0.4600, 'DriftPass');
+L48  = drift('l48', 0.4800, 'DriftPass');
+L50  = drift('l50', 0.5000, 'DriftPass');
+L61  = drift('l61', 0.6100, 'DriftPass');
+L73  = drift('l73', 0.7300, 'DriftPass');
+LKK  = drift('lkk', 2.2700, 'DriftPass');
+LPMM = drift('lpmm',0.8100, 'DriftPass');
+LCF  = drift('lcf', 0.3329, 'DriftPass');
 
 % -- dipoles -- 
 deg2rad = pi/180.0;
@@ -154,33 +159,36 @@ CF     = sextupole('cf', 0.100, 0.0, quad_pass_method);
 RFC = rfcavity('cav', 0, 2.5e6, 500e6, harmonic_number, 'CavityPass');
 
 % -- lattice markers --
-START  = marker('start',  'IdentityPass');     % start of the model
-END    = marker('end',  'IdentityPass');     % end of the model
-MIA    = marker('mia', 'IdentityPass');        % center of long straight sections (even-numbered)
-MIB    = marker('mib', 'IdentityPass');        % center of short straight sections (odd-numbered)
-GIRDER = marker('girder', 'IdentityPass');     % marker used to delimitate girders. one marker at begin and another at end of girder.
-MIDA   = marker('id_enda', 'IdentityPass');    % marker for the extremities of IDs in long straight sections
-MIDB   = marker('id_endb', 'IdentityPass');    % marker for the extremities of IDs in short straight sections
+START   = marker('start',  'IdentityPass');     % start of the model
+END     = marker('end',  'IdentityPass');     % end of the model
+MIA     = marker('mia', 'IdentityPass');        % center of long straight sections (even-numbered)
+MIB     = marker('mib', 'IdentityPass');        % center of short straight sections (odd-numbered)
+GIRDER  = marker('girder', 'IdentityPass');     % marker used to delimitate girders. one marker at begin and another at end of girder.
+MIDA    = marker('id_enda', 'IdentityPass');    % marker for the extremities of IDs in long straight sections
+MIDB    = marker('id_endb', 'IdentityPass');    % marker for the extremities of IDs in short straight sections
+SEPT_IN = marker('sept_in', 'IdentityPass');
+KICK_IN = marker('kick_in', 'IdentityPass');
+PMM     = marker('pmm','IdentityPass');
 
 %% transport lines
 
-M2A = [GIRDER,CF,L11,SFA,L12,BPM,L14,QFA,L24,QDA,L15,SDA,L19,GIRDER];               % high beta xxM2 girder                                                                                  
-M1A = fliplr(M2A);                                                                  % high beta xxM1 girder
-IDA = [GIRDER,LIA,MIDA,L50,L50,MIA,MOMACCEP,L50,L50,MIDA,LIA,GIRDER];               % high beta ID straight section
-CAV = [GIRDER,LIA,L50,L50,MIA,MOMACCEP,RFC,L50,L50,LIA,GIRDER];                     % high beta RF cavity straight section 
-INJ = [GIRDER,LIA,L50,L50,END,START,MIA,MOMACCEP,L50,L50,LIA,GIRDER];               % high beta INJ straight section
-M1B = [GIRDER,L19,SDB,L15,QDB1,L24,QFB,L14,BPM,L12,SFB,L11,CF,L13,QDB2,GIRDER];     % low beta xxM1 girder
-M2B = fliplr(M1B);                                                                  % low beta xxM2 girder
-IDB = [GIRDER,LIB,MIDB,L50,L50,MIB,MOMACCEP,L50,L50,MIDB,LIB,GIRDER];               % low beta ID straight section
-C3  = [LBC,BC,LBC];                                                                 % arc sector in between B3-B3
-C1A = [GIRDER,L61,SD1,L17,QF1,L14, BPM,L12,SF1,L23,QF2,L17,SD2,L21,BPM,L13,GIRDER]; % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C2A = [GIRDER,L46,SD3,L17,QF3,L23,SF2,L12,BPM,L14,QF4,L12,CF,L38,BPM,L13,GIRDER];   % arc sector in between B2-B3 (high beta odd-numbered straight sections)
-C4A = [GIRDER,L73,QF4,L14,BPM,L12,SF3,L23,QF3,L17,SD4,L11,CF,L25,GIRDER];           % arc sector in between B3-B2 (high beta odd-numbered straight sections)
-C5A = [GIRDER,L34,SD5,L17,QF2,L23,SF4,L12,BPM,L14,QF1,L17,SD6,L48,BPM,L13,GIRDER];  % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-C1B = [GIRDER,L61,SD6,L17,QF1,L14,BPM,L12,SF4,L23,QF2,L17,SD5,L21,BPM,L13,GIRDER];  % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C2B = [GIRDER,L46,SD4,L17,QF3,L23,SF3,L12,BPM,L14,QF4,L12,CF,L38,BPM,L13,GIRDER];   % arc sector in between B2-B3 (low beta even-numbered straight sections)
-C4B = [GIRDER,L73,QF4,L14,BPM,L12,SF2,L23,QF3,L17,SD3,L11,CF,L25,GIRDER];           % arc sector in between B3-B2 (low beta even-numbered straight sections)
-C5B = [GIRDER,L34,SD2,L17,QF2,L23,SF1,L12,BPM,L14,QF1,L17,SD1,L48,BPM,L13,GIRDER];  % arc sector in between B2-B1 (low beta even-numbered straight sections)    
+M2A = [GIRDER,CF,L11,SFA,L12,BPM,L14,QFA,L24,QDA,L15,SDA,L19,GIRDER];                           % high beta xxM2 girder                                                                                  
+M1A = fliplr(M2A);                                                                              % high beta xxM1 girder
+IDA = [GIRDER,LIA,MIDA,L50,L50,MIA,MOMACCEP,L50,L50,MIDA,LIA,GIRDER];                           % high beta ID straight section
+CAV = [GIRDER,LIA,L50,L50,MIA,MOMACCEP,RFC,L50,L50,LIA,GIRDER];                                 % high beta RF cavity straight section 
+INJ = [GIRDER,LIA,L50,L40,SEPT_IN,L10,END,START,MIA,MOMACCEP,LKK,KICK_IN,LPMM,PMM,LCF,GIRDER];  % high beta INJ straight section
+M1B = [GIRDER,L19,SDB,L15,QDB1,L24,QFB,L14,BPM,L12,SFB,L11,CF,L13,QDB2,GIRDER];                 % low beta xxM1 girder
+M2B = fliplr(M1B);                                                                              % low beta xxM2 girder
+IDB = [GIRDER,LIB,MIDB,L50,L50,MIB,MOMACCEP,L50,L50,MIDB,LIB,GIRDER];                           % low beta ID straight section
+C3  = [LBC,BC,LBC];                                                                             % arc sector in between B3-B3
+C1A = [GIRDER,L61,SD1,L17,QF1,L14, BPM,L12,SF1,L23,QF2,L17,SD2,L21,BPM,L13,GIRDER];             % arc sector in between B1-B2 (high beta odd-numbered straight sections)
+C2A = [GIRDER,L46,SD3,L17,QF3,L23,SF2,L12,BPM,L14,QF4,L12,CF,L38,BPM,L13,GIRDER];               % arc sector in between B2-B3 (high beta odd-numbered straight sections)
+C4A = [GIRDER,L73,QF4,L14,BPM,L12,SF3,L23,QF3,L17,SD4,L11,CF,L25,GIRDER];                       % arc sector in between B3-B2 (high beta odd-numbered straight sections)
+C5A = [GIRDER,L34,SD5,L17,QF2,L23,SF4,L12,BPM,L14,QF1,L17,SD6,L48,BPM,L13,GIRDER];              % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C1B = [GIRDER,L61,SD6,L17,QF1,L14,BPM,L12,SF4,L23,QF2,L17,SD5,L21,BPM,L13,GIRDER];              % arc sector in between B1-B2 (low beta even-numbered straight sections)
+C2B = [GIRDER,L46,SD4,L17,QF3,L23,SF3,L12,BPM,L14,QF4,L12,CF,L38,BPM,L13,GIRDER];               % arc sector in between B2-B3 (low beta even-numbered straight sections)
+C4B = [GIRDER,L73,QF4,L14,BPM,L12,SF2,L23,QF3,L17,SD3,L11,CF,L25,GIRDER];                       % arc sector in between B3-B2 (low beta even-numbered straight sections)
+C5B = [GIRDER,L34,SD2,L17,QF2,L23,SF1,L12,BPM,L14,QF1,L17,SD1,L48,BPM,L13,GIRDER];              % arc sector in between B2-B1 (low beta even-numbered straight sections)    
 
 
 %% GIRDERS
