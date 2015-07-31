@@ -1,4 +1,4 @@
-function [k, tab]=reson(ordre,period,fen)
+function [k, tab]=reson(ordre,period,fen,ax)
 % reson(ordre, period, fen)
 % Recherche des droites de resonance a x + b y = c
 % passant dans la fenetre [x1 x2 y1 y2]
@@ -59,7 +59,7 @@ for m1 = -ordre:ordre
                     if (d < d0)
                         k=k+1;
                         tab(k,:)=[m1 m2 m3];
-                        plot_reson(m1,m2,m3,fen)
+                        plot_reson(m1,m2,m3,fen,ax)
                     end
                     
                 end
@@ -68,7 +68,7 @@ for m1 = -ordre:ordre
     end
 end        
 
-axis(fen);
+axis(ax,fen);
 
 
 function d = distance(m1,m2,m3,fen)
@@ -108,85 +108,3 @@ end
 AP= P - A;
 
 d = norm(cross(AP,u),2);
-
-
-function plot_reson(a,b,c,fen)
-% plot_reson(a,b,c,fen)
-% plot resonance whose equation is: a*fx+ b*fz = c 
-% in a windows whose dimensions are in fen=[xmin xmax zmin zmax]
-% eg:
-% plot_reson(3,1,65,[18 19 10 11])
-
-% Laurent S. Nadolski, Synchrotron SOLEIL, 02/04
-
-%% Check input argument
-if nargin < 3
-    help reson
-    return
-end
-
-%% build straight line equation
-x=[fen(1) fen(2)];
-
-if (b ~=0)
-    y = (c-a*x)/b;
-elseif (a ==0 & b ==0)
-    % ne fait rien
-    return
-else
-    x = c/a*ones(2,1);
-    y = [fen(3) fen(4)];
-end
-
-%% define resonance order
-order = abs(a)+abs(b);
-
-%% appearance options depending on order
-% - for regular
-% -- for skew
-width = 1;
-style = '-';
-if ( mod(order-abs(a),2)==1 )
-    style= '--';
-end 
-switch order
-    case 1
-        color = 'k';
-        width = 4;
-    case 2
-        color = 'b';
-        width = 3 ;
-    case 3
-        color = 'r';
-        width = 2 ;
-    case 4
-        color = 'g';
-         width = 2 ;
-    case 5
-        color = 'm';
-    case 6
-        color = 'c';
-    case 7
-        color = 'y';
-    case 8
-        color = 'c';     
-    case 9
-        color = 'g';
-    case 10
-        color = [0.1 0.1 0.1];
-    case 11
-        color = [0.2 0.2 0.2];
-    case 12
-       color = [0.3 0.3 0.3];
-    case 13
-        color = [0.4 0.4 0.4];
-    case 14
-        color = [0.5 0.5 0.5];
-    case 15
-        color = [0.6 0.6 0.6];
-    otherwise
-       color = [0.7 0.7 0.7];
-end
-
-line(x,y,'LineWidth', width, 'LineStyle', style, 'Color',color);
-
