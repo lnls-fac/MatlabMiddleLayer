@@ -20,7 +20,7 @@ if ~exist('id_def','var')
     %id_def = ids.EPU200_PC;
     %id_def = ids.EPU200_PV;
     id_def = ids.EPU80_PH;
-%     id_def = ids.EPU80_PV;
+    %id_def = ids.EPU80_PV;
     %id_def = ids.UTEST;  
 end
 
@@ -30,6 +30,10 @@ diary_fname = [id_def.id_label ' - ID-SUMMARY.txt'];
 if exist(diary_fname, 'file'), delete(diary_fname); end;
 diary(diary_fname);
 
+original_nr_periods = id_def.nr_periods;
+
+% check convergence of fields within central period
+id_def.nr_periods = search_nr_periods_for_field_convergence(id_def);
 
 % created 3d model of the insertion device
 id_model = epu_create(id_def);
@@ -45,6 +49,7 @@ save_plots(id_def.id_label);
 
 % saves result to mat file
 ID.def = id_def;
+ID.def.nr_periods = original_nr_periods;
 ID.model = id_model;
 ID.field = field_parms;
 save([id_def.id_label ' - ID.mat'], 'ID');
