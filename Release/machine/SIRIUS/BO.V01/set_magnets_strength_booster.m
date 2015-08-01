@@ -25,8 +25,8 @@
 % chromy =  +0.5
 qf_strength =  1.882125768941849;
 qd_strength = -0.002846148623370;
-sf_strength = 12.334110297414080; 
-sd_strength =  5.717452258059838; 
+sf_strength = 11.9534110297414080; 
+sd_strength =  7.217452258059838; 
 
 % % 2014-10-29 ximenes
 % % with new segmented b model
