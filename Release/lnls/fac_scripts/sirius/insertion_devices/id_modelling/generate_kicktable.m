@@ -20,10 +20,12 @@ r = load(id_mat_file_name, 'ID'); ID = r.ID;
 
 % defines grid for kicktable calculation (mm units)
 kicktable_grid.symmetric = true; % reflection symmetry on x and y axis (only 1/4 of initial points are calculated)
+
 kicktable_grid.x = 12 * linspace(-1,1,81); 
 kicktable_grid.y = (ID.def.physical_gap/2) * linspace(-1,1,17);
+
 %kicktable_grid.x = 30 * linspace(-1,1,3); 
-%kicktable_grid.y = (ID.def.physical_gap/2) * linspace(-1,1,3);
+%kicktable_grid.y = (ID.def.physical_gap/2) * linspace(-1,1,17);
 
 % calcs kicktable
 ID.kicktables = calc_kicktables(ID.def, ID.model, ID.field, kicktable_grid);
@@ -203,8 +205,10 @@ for i=1:length(posz)
     y = f(i,:);
     xp = x + [0.2*diff(x) 0];
     xn = x - [0 0.2*diff(x)];
-    fp = interp1(x, y, xp, 'cubic');
-    fn = interp1(x, y, xn, 'cubic');
+%     fp = interp1(x, y, xp, 'cubic');
+%     fn = interp1(x, y, xn, 'cubic');
+    fp = interp1(x, y, xp, 'spline');
+    fn = interp1(x, y, xn, 'spline');
     dx = xp - xn;
     dfdx(i,:) = (fp - fn) ./ dx;
 end
@@ -215,8 +219,10 @@ for i=1:length(posx)
     y = f(:,i)';
     xp = x + [0.2*diff(x) 0];
     xn = x - [0 0.2*diff(x)];
-    fp = interp1(x, y, xp, 'cubic');
-    fn = interp1(x, y, xn, 'cubic');
+%     fp = interp1(x, y, xp, 'cubic');
+%     fn = interp1(x, y, xn, 'cubic');
+    fp = interp1(x, y, xp, 'spline');
+    fn = interp1(x, y, xn, 'spline');
     dx = xp - xn;
     dfdz(:,i) = ((fp - fn) ./ dx)';
 end

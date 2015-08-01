@@ -23,18 +23,62 @@ for i =1:length(ids_names)
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 8;
+        case 'inga'
+            ids{i}.label           = 'inga';
+            ids{i}.kicktable_file  = [path2kcktbls, 'U25_2ID/U25_2ID_kicktable.txt'];
+            ids{i}.nr_segs         = 40;
+            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_number = 9;
         case 'caterete'
             ids{i}.label           = 'caterete';
             ids{i}.kicktable_file  = [path2kcktbls, 'U19/U19_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 10;
+        case 'ipe_lh'
+            ids{i}.label           = 'ipe_hp';
+            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_HP_kicktable.txt'];
+            ids{i}.nr_segs         = 20;
+            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_number = 11;
+        case 'ipe_lv'
+            ids{i}.label           = 'ipe_vp';
+            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_VP_kicktable.txt'];
+            ids{i}.nr_segs         = 20;
+            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_number = 11;
+        case 'ipe_cp'
+            ids{i}.label           = 'ipe_cp';
+            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_CP_kicktable.txt'];
+            ids{i}.nr_segs         = 20;
+            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_number = 11;
+        case 'sabia_hp'
+            ids{i}.label           = 'sabia';
+            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_HP_kicktable.txt'];
+            ids{i}.nr_segs         = 20;
+            ids{i}.straight_label  = 'mib';
+            ids{i}.straight_number = 12;
+        case 'sabia_vp'
+            ids{i}.label           = 'sabia';
+            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_VP_kicktable.txt'];
+            ids{i}.nr_segs         = 20;
+            ids{i}.straight_label  = 'mib';
+            ids{i}.straight_number = 12;
+        case 'sabia_cp'
+            ids{i}.label           = 'sabia';
+            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_CP_kicktable.txt'];
+            ids{i}.nr_segs         = 20;
+            ids{i}.straight_label  = 'mib';
+            ids{i}.straight_number = 12;
         case 'manaca'
             ids{i}.label           = 'manaca';
             ids{i}.kicktable_file  = [path2kcktbls, 'U19/U19_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
-            ids{i}.straight_number = 12;
+            ids{i}.straight_number = 14;
+            
+            
         case 'caterete2'
             % --- phase 2 ---
             ids{i}.label           = 'caterete2';
@@ -81,24 +125,8 @@ for i =1:length(ids_names)
 %             ids{i}.nr_segs         = 20;
 %             ids{i}.straight_label  = 'mia';
 %             ids{i}.straight_number = 4;
-        case 'inga'
-            ids{i}.label           = 'inga';
-            ids{i}.kicktable_file  = [path2kcktbls, 'U25/U25_2ID_kicktable.txt'];
-            ids{i}.nr_segs         = 40;
-            ids{i}.straight_label  = 'mia';
-            ids{i}.straight_number = 9;
-        case 'ipe_ph'
-            ids{i}.label           = 'ipe';
-            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_2ID_PH_kicktable.txt'];
-            ids{i}.nr_segs         = 40;
-            ids{i}.straight_label  = 'mia';
-            ids{i}.straight_number = 11;
-        case 'ipe_pv'
-            ids{i}.label           = 'ipe';
-            ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_2ID_PV_kicktable.txt'];
-            ids{i}.nr_segs         = 40;
-            ids{i}.straight_label  = 'mia';
-            ids{i}.straight_number = 11;
+        
+        
         case 'sabia_ph'
             ids{i}.label           = 'sabia';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80/EPU80_2ID_PH_kicktable.txt'];
