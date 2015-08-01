@@ -1,7 +1,7 @@
-function plot_reson(a,b,c,fen)
-% function plot_reson(a,b,c,fen)
+function plot_reson(a,b,c,fen,ax)
+% function plot_reson(a,b,c,fen,ax)
 % plot resonance whose equation is: a*fx+ b*fz = c 
-% in a windows whose dimensions are in fen=[xmin xmax zmin zmax]
+% in axes ax, whose dimensions are in fen=[xmin xmax zmin zmax]
 % eg:
 % plot_reson(3,1,65,[18 19 10 11])
 %
@@ -13,12 +13,13 @@ if nargin < 3
     return
 end
 
+if ~exist('ax','var'), ax = gca; end
 %% build straight line equation
 x=[fen(1) fen(2)];
 
 if (b ~=0)
     y = (c-a*x)/b;
-elseif (a ==0 & b ==0)
+elseif (a ==0 && b ==0)
     % ne fait rien
     return
 else
@@ -30,7 +31,7 @@ end
 order = abs(a)+abs(b);
 
 %% appearance options depending on order
-width = 0.5;
+width = 1;
 style = '-';
 
 switch order
@@ -38,45 +39,49 @@ switch order
         color = 'k';
         width = 3;
     case 2
-        color = 'c';
+        color = 'k';
+        width = 2;
     case 3
-        color = 'm';
-        style = '--';
-    case 4
         color = 'r';
-    case 5
+        width = 2;
+    case 4
         color = 'b';
-    case 6
-        color = 'y';
-    case 7
+        width = 2;
+    case 5
         color = 'g';
-    case 8
+        width = 2;
+    case 6
+        color = 'm';
+    case 7
         color = 'c';
+    case 8
+        color = 'b';
         style = '-.';
     case 9
-        color = 'm';
-        style = '-.';
-    case 10
-        color = 'y';
-        style = '-.';
-    case 11
         color = 'r';
         style = '-.';
-    case 12
+    case 10
         color = 'g';
+        style = '-.';
+    case 11
+        color = 'k';
+        style = '-.';
+    case 12
+        color = 'm';
         style = '-.';
     case 13
         color = 'k';
-        style = '-.';
+        style = '--';
     case 14
-        color = 'b';
+        color = 'c';
         style = '-.';
     case 15
-        color = 'c';
+        color = 'r';
         style = '--';
     otherwise
         color ='k';
-        style = '--'
+        style = '--';
+        width = 0.5;
 end
 
-line(x,y,'LineWidth', width, 'LineStyle', style, 'Color',color);
+plot(ax,x,y,'LineWidth', width, 'LineStyle', style, 'Color',color);
