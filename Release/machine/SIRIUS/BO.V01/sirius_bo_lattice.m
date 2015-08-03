@@ -43,7 +43,6 @@ lenDif     = (b_len_seg - b_len_hdedge)/2.0;
 
 L0150    = drift('l0150', 0.1500, 'DriftPass');
 L0250    = drift('l0250', 0.2500, 'DriftPass');
-L0350    = drift('l0350', 0.3500, 'DriftPass');
 L0360    = drift('l0360', 0.3600, 'DriftPass');
 L0600    = drift('l0600', 0.6000, 'DriftPass');
 L0741    = drift('l0741', 0.7410, 'DriftPass');
@@ -52,7 +51,6 @@ L0805    = drift('l0805', 0.8050, 'DriftPass');
 L1000    = drift('l1000', 1.0000, 'DriftPass');
 L1096    = drift('l1096', 1.0960, 'DriftPass');
 L1146    = drift('l1146', 1.1460, 'DriftPass');
-L1446    = drift('l1446', 1.4460, 'DriftPass');
 L1486    = drift('l1486', 1.4860, 'DriftPass');
 L1546    = drift('l1546', 1.5460, 'DriftPass');
 L1796    = drift('l1796', 1.7960, 'DriftPass');
@@ -94,7 +92,7 @@ DW_RF = [GIR, L2146, RFC,                    D2146, GIR];
 
 UP_SF = [GIR, D2146, BPM,                       L1896, GIR, SF, L0150];
 UP_CC = [D0300, CV, GIR, L1846, BPM,            L1896, GIR, CH, L0250];
-UP_CS = [D0250, SD, L0350, CV, GIR, L1446, BPM, L1896, GIR, CH, L0250];
+UP_CS = [D0250, SD, L0250, CV, GIR, L1546, BPM, L1896, GIR, CH, L0250];
 UP_SS = [D0250, SD, GIR, L1796, BPM,            L1896, GIR, SF, L0150];
 UP_SE = [D0300, CV, GIR, L1486, SEX, L0360,     L1000, BPM, L1146, GIR];
 UP_SI = [D0300, CV, GIR, L1846, BPM,            L1096, SIN, L0800, GIR, CH, L0250];

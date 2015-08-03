@@ -249,6 +249,14 @@ finalizations();
                 multi.(family).nrsegs(j) = family_data.(labels{j}).nr_segs;
             end
         end
+         
+        % I have to do this for the booster, because the lattice begins at 
+        % the middle of the quadrupole:
+        idx = findcells(the_ring,'FamName','bpm'); idx = idx(end)-1;
+        the_ring = circshift(the_ring,[0,-idx]);
+        for i=1:length(machine)
+            machine{i} = circshift(machine{i},[0,-idx]);
+        end
         
         % adds systematic multipole errors to random machines
         for i=1:length(machine)
@@ -260,6 +268,10 @@ finalizations();
         cutoff_errors = 2;
         multi_errors  = lnls_latt_err_generate_multipole_errors(name, the_ring, multi, length(machine), cutoff_errors);
         machine = lnls_latt_err_apply_multipole_errors(name, machine, multi_errors, multi);
+        
+        for i=1:length(machine)
+            machine{i} = circshift(machine{i},[0,idx]);
+        end
         
         name_saved_machines = [name_saved_machines '_multi'];
         save([name_saved_machines '.mat'], 'machine');
