@@ -9,7 +9,7 @@ submachine = answer{1};
 unit = answer{2};
 symmetry = str2double(answer{3});
 plot_title = answer{4};
-if strcmpi(answer{5},'y'), corrected = True; else corrected = false; end
+if strcmpi(answer{5},'y'), corrected = true; else corrected = false; end
 size_font = 16;
 
 % selects file with random machines and loads it
