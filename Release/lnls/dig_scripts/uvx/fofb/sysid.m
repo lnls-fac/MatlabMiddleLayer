@@ -1,4 +1,4 @@
-function [m_bpm,r_bpm,m_corr,r_corr,comp_bpm,comp_corr,m_bpm_corr]=sysid(fadata, prbsperiod)
+function [m_bpm,m_bpm_,r_bpm,m_corr,r_corr,comp_bpm,comp_corr,m_bpm_corr,M,sel_corr,gain_bpm_corr,gain_corr]=sysid(fadata, prbsperiod)
 
 npts=10e3+1e3;
 npts2=10e3;
@@ -50,7 +50,7 @@ for i=1:length(dataset)
     for j=1:size(outdata_bpm,2)
         aux = reshape(outdata_bpm(:,j), prbsperiod, size(outdata_bpm,1)/prbsperiod);
         outdatam_bpm(:,j) = sum(aux(:,end-nperiods+1:end), 2)/nperiods;
-        %plot(aux); hold on; plot(outdatam(:,j),'y','LineWidth',5); hold off, pause
+        %plot(aux); hold on; plot(outdatam_bpm(:,j),'y','LineWidth',5); hold off, pause
     end
     
     aux = reshape(outdata_corr, prbsperiod, size(outdata_corr,1)/prbsperiod);
@@ -110,6 +110,7 @@ tau_corr = 2.5e-3;
 
 for i=1:42
     m_corr_{i} = ss(m_corr{i}('meas'));
+    gain_corr(i) = dcgain(m_corr_{i});
     m_corr_{i} = m_corr_{i}/dcgain(m_corr_{i});
     m_corr_{i}.name = fadata.corr_names{i};
     
@@ -127,14 +128,28 @@ tau_bpm = 4e-3;
 
 for i=1:50
     for j=1:42
-        M(i,j) = dcgain(ss(m_bpm{i,j}('meas')));
+        aux=tf(m_bpm{i,j}('meas'));
+        m_bpm_num{i,j} = aux.num{1};
+        m_bpm_den{i,j} = aux.den{1};
+        M(i,j) = dcgain(aux);
     end
 end
+
+m_bpm_ = tf(m_bpm_num,m_bpm_den,320e-6);
+
+for i=1:50
+for j=1:42
+
+end
+end
+
+
 [~,sel_corr] = max(abs(M),[],2);
 
 for i=1:50
     m_bpm_corr{i} = ss(m_bpm{i, sel_corr(i)}('meas'));
-    m_bpm_corr{i} = m_bpm_corr{i}/dcgain(m_bpm_corr{i});
+    gain_bpm_corr(i) = dcgain(m_bpm_corr{i});
+    m_bpm_corr{i} = m_bpm_corr{i}/gain_bpm_corr(i);
     m_bpm_corr{i}.name = fadata.bpm_names{i};
     m_bpm_corr{i}.OutputName = fadata.bpm_names{i};
     m_bpm_corr{i}.InputName = fadata.corr_names{sel_corr(i)};
@@ -146,4 +161,4 @@ for i=1:50
     comp_bpm{i} = balred(comp_bpm{i}, 3);
 end
 
-a=1;
+
