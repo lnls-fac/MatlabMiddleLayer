@@ -119,9 +119,7 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
     end
     function pick_color_callBack(hObj,event)
         h = uisetcolor;
-        if (size(h,2) ~=1)
-            set(hObj,'BackgroundColor',h);
-        end
+        if (size(h,2) ~=1), set(hObj,'BackgroundColor',h); end
     end
     function maptype_callBack(hObj,event)
         if ~isfield(data.(data.maptypes{get(hObj,'Value')}),'dados')
@@ -154,32 +152,24 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
         resx = str2double(get(handle.resx,'String'));
         resy = str2double(get(handle.resy,'String'));
         resO = str2double(get(handle.resO,'String'));
-        plot_reson(handle.ax_freq,resx,resy,resO,...
-            [get(handle.ax_freq,'Xlim'), get(handle.ax_freq,'Ylim')]);
+        lim_x = get(handle.ax_freq,'Xlim');
+        lim_y = get(handle.ax_freq,'Ylim');
+        plot_reson(resx, resy, resO, [lim_x, lim_y], handle.ax_freq);
     end
     function res_callBack(hObj, event)
-        if ~get(hObj,'Value'), return; end
-        
         order    = str2double(get(hObj,'String'));
         period   = str2double(get(handle.resPeri,'String'));
         ax       = handle.ax_freq;
-        cur_lims = [get(ax,'Xlim'), get(ax,'Ylim')];
-
-        [k, tab] =reson(order,period,cur_lims, ax);
-        if (k ~=0)
-            % Force the first coefficient to be positive
-            ind = tab(:,1) < 0;
-            tab(ind,:) = -tab(ind,:);
-            % If the first coefficient is zero, force the second positive
-            ind = (tab(:,2) < 0) & (tab(:,1) == 0);
-            tab(ind,:)=-tab(ind,:);
-            
-            %Find the greatest commom divisor of the three coefficients
-            greatCommDiv =gcd(gcd(tab(:,1),tab(:,2)),gcd(tab(:,2),tab(:,3)));
-            tab = tab./repmat(greatCommDiv,1,3);
-            tab = unique(tab,'rows');
-            fprintf('\nOrder: %2d\n',order);
-            fprintf('\t%02d * Qx  +  %02d * Qy  =  %03d\n',tab');
+        Tag = sprintf('Res-%03d',order);
+        if get(hObj,'Value')
+            cur_lims = [get(ax,'Xlim'), get(ax,'Ylim')];
+            [k, tab] =reson(order,period,cur_lims, ax, Tag);
+            if k
+                fprintf('\nOrder: %2d\n',order);
+                fprintf('\t%3d * Qx  +  %3d * Qy  =  %4d\n',tab');
+            end
+        else
+            delete(findobj(get(handle.ax_freq,'Children'),'Tag',Tag));
         end
     end
     function create_figure_callBack(hObj, event)
@@ -222,7 +212,6 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
         maptypes = data.maptypes;
         for i=1:length(maptypes)
             maptype = data.(maptypes{i});
-            data.path = path;
             dados = maptype.dados;
             y = dados(:,2)*1e3;
             if i == 1, x = dados(:,1)*1e3; %% x in mm
@@ -274,10 +263,10 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
         cla(ax);
         if get(handle.diffusion,'Value'),
             mesh(ax, maptype.fxgrid,maptype.fygrid, maptype.diffu,'Marker','.',...
-                'MarkerSize',5.0,'FaceColor','none','LineStyle','none','Tag','fspace');
+                'MarkerSize',5.0,'FaceColor','none','LineStyle','none');
             view(ax,2);
         else
-            plot(ax,maptype.fx,maptype.fy,'kd','MarkerSize',5.0,'MarkerFaceColor','k','Tag','fspace');
+            plot(ax,maptype.fx,maptype.fy,'kd','MarkerSize',5.0,'MarkerFaceColor','k');
         end
         grid(ax,'on'); hold(ax,'all');  box(ax,'on');
         xlabel(ax,'\nu_x');
@@ -291,7 +280,7 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
             pcolor(ax,maptype.xgrid,maptype.ygrid,maptype.diffu);
             shading(ax,'flat');
         else
-            plot(ax,maptype.x,maptype.y,'kd','MarkerSize',5.0,'MarkerFaceColor','k','Tag','cspace');
+            plot(ax,maptype.x,maptype.y,'kd','MarkerSize',5.0,'MarkerFaceColor','k');
         end
         xlabel(ax,strx); ylabel(ax,stry);
         axis(ax,[min(maptype.x) max(maptype.x) min(maptype.y) max(maptype.y)]);

@@ -134,32 +134,35 @@ end
 
 %%
 % Por fim, fazemos alguns graficos.
-scrsz = get(0,'ScreenSize');
-scrsz = scrsz.*[1, 1, 1/2, 1/2];
-figure1 = figure('OuterPosition', scrsz);
+f1 = figure('Position', [3,3,1282,420]);
 
 % Primeiro o espaco de fase x
-axes11 = subplot(1,3,1,'Parent',figure1,'FontSize',16);
-box(axes11,'on');
-hold(axes11,'all');
-ylabel(axes11,'xl [mrad]'); xlabel(axes11,'x [mm]');
-plot(coordx_x'*1e3,coordxl_x'*1e3,'b.','Parent',axes11);
-plot(coordx_y'*1e3,coordxl_y'*1e3,'r.','Parent',axes11);
+ax_x = axes('Parent',f1,'Units','pixels','Position',[70,60,350,350],...
+            'FontSize',16,'xGrid','on','yGrid','on');
+box(ax_x,'on');  hold(ax_x,'all');
+ylabel(ax_x,'x'' [mrad]'); xlabel(ax_x,'x [mm]');
+plot(coordx_x'*1e3,coordxl_x'*1e3,'b.','Parent',ax_x);
+plot(coordx_y'*1e3,coordxl_y'*1e3,'r.','Parent',ax_x);
 
 % Agora o y
-axes12 = subplot(1,3,2,'Parent',figure1,'FontSize',16);
-box(axes12,'on');
-hold(axes12,'all');
-ylabel(axes12,'yl [mrad]'); xlabel(axes12,'y [mm]');
-plot(coordy_y'*1e3,coordyl_y'*1e3,'r.','Parent',axes12);
-plot(coordy_x'*1e3,coordyl_x'*1e3,'b.','Parent',axes12);
+ax_y = axes('Parent',f1,'Units','pixels','Position',[497,60,350,350],...
+            'FontSize',16,'xGrid','on','yGrid','on');
+box(ax_y,'on');   hold(ax_y,'all');
+ylabel(ax_y,'y'' [mrad]'); xlabel(ax_y,'y [mm]');
+plot(coordy_y'*1e3,coordyl_y'*1e3,'r.','Parent',ax_y);
+plot(coordy_x'*1e3,coordyl_x'*1e3,'b.','Parent',ax_y);
 
 % e por fim o diagrama de sintonias
-axes13 = subplot(1,3,3,'Parent',figure1,'FontSize',16);
-ylabel(axes13,'\nu_y'); xlabel(axes13,'\nu_x');
-tunespaceplot(floor(tunes(1))+[-0.05 +0.55], floor(tunes(2))+[-0.05 +0.55],resons,axes13);
-hold(axes13,'all');
-plot(tunex_y,tuney_y,'r.','Parent',axes13);
-plot(tunex_x,tuney_x,'b.','Parent',axes13);
-plot(tunex_en,tuney_en,'m.','Parent',axes13);
+ax_e = axes('Parent',f1,'Units','pixels','Position',[924,60,350,350],...
+            'FontSize',16,'xGrid','on','yGrid','on');
+ylabel(ax_e,'\nu_y'); xlabel(ax_e,'\nu_x');
+hold(ax_e,'all');  box(ax_e,'on');
+lim_x = floor(tunes(1)) + [-0.05,0.55];
+lim_y = floor(tunes(2)) + [-0.05,0.55];
+for i=rot90(resons,2)
+    reson(i,1,[lim_x,lim_y],ax_e);
+end
+plot(tunex_y,tuney_y,'r.','Parent',ax_e);
+plot(tunex_x,tuney_x,'b.','Parent',ax_e);
+plot(tunex_en,tuney_en,'m.','Parent',ax_e);
 

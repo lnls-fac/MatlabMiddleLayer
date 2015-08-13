@@ -1,5 +1,5 @@
-function plot_reson(a,b,c,fen,ax)
-% function plot_reson(a,b,c,fen,ax)
+function plot_reson(a,b,c,fen,ax,Tag)
+% function plot_reson(a,b,c,fen,ax,Tag)
 % plot resonance whose equation is: a*fx+ b*fz = c 
 % in axes ax, whose dimensions are in fen=[xmin xmax zmin zmax]
 % eg:
@@ -84,4 +84,8 @@ switch order
         width = 0.5;
 end
 
-plot(ax,x,y,'LineWidth', width, 'LineStyle', style, 'Color',color);
+if exist('Tag','var')
+    plot(ax,x,y,'LineWidth', width, 'LineStyle', style, 'Color',color,'Tag', Tag);
+else
+    plot(ax,x,y,'LineWidth', width, 'LineStyle', style, 'Color',color);
+end

@@ -8,10 +8,9 @@ if isempty(answer), return; end;
 energy = str2double(answer{2});
 n_calls = round(str2double(answer{3}));
 
-xy = false; ma = false; ex = false;
-if any(strfind(answer{4},'xy')), xy = true;end
-if any(strfind(answer{4},'ex')), ex = true;end
-if any(strfind(answer{4},'ma')), ma = true;end
+xy = false; if any(strfind(answer{4},'xy')), xy = true;end
+ex = false; if any(strfind(answer{4},'ex')), ex = true;end
+ma = false; if any(strfind(answer{4},'ma')), ma = true;end
 
 if strcmpi(answer{1}, 'bo')
     if ~exist('path','var')
@@ -82,11 +81,9 @@ params.K     = str2double(answer{4})/100;
 params.I     = str2double(answer{5})/1000;
 params.nrBun = round(str2double(answer{6}));
 accepRF      = str2double(answer{7})/100;
-
 params.N     = params.I/params.nrBun/1.601e-19*ats.revTime;
 
 twi = calctwiss(the_ring);
-
 
 % parâmetros para a geração das figuras
 color_vec = {'b','r','g','m','c','k','y'};
@@ -142,14 +139,14 @@ while i < n_calls
             if rms_mode, pathname = fullfile(path,sprintf('rms%02d',k)); end
             
             if xy
-                if exist(fullfile(pathname,'dynap_xy_out.txt'),'file');
+                if exist(fullfile(pathname,'dynap_xy_out.txt'),'file')
                     [onda(j,:,:), ~] = trackcpp_load_dynap_xy(pathname,var_plane);
                     j = j + 1;
                 else fprintf('%-2d-%-3d: xy nao carregou\n',i,k);
                 end
             end
             if ex
-                if exist(fullfile(pathname, 'dynap_ex_out.txt'),'file');
+                if exist(fullfile(pathname, 'dynap_ex_out.txt'),'file')
                     [offda(m,:,:), ~] = trackcpp_load_dynap_ex(pathname);
                     m = m + 1;
                 else fprintf('%-2d-%-3d: ex nao carregou\n',i,k);
@@ -157,17 +154,17 @@ while i < n_calls
             end
             
             if ma
-                if exist(fullfile(pathname,'dynap_ma_out.txt'),'file');
-                    [spos, accep(l+1,:,:), ~, ~] = trackcpp_load_ma_data(pathname);
+                if exist(fullfile(pathname,'dynap_ma_out.txt'),'file')
                     l = l + 1;
-                else fprintf('%-2d-%-3d: ma nao carregou\n',i,k); break; 
+                    [spos, accep(l,:,:), ~, ~] = trackcpp_load_ma_data(pathname);
+                    Accep(1,:) = spos;
+                    Accep(2,:) = min(accep(l,1,:), accepRF);
+                    Accep(3,:) = max(accep(l,2,:), -accepRF);
+                    % não estou usando alguns outputs
+                    LT = lnls_tau_touschek_inverso(params,Accep,twi);
+                    lifetime(l) = 1/LT.AveRate/60/60; % em horas
+                else fprintf('%-2d-%-3d: ma nao carregou\n',i,k); break;
                 end
-                Accep(1,:) = spos;
-                Accep(2,:) = min(accep(l,1,:), accepRF);
-                Accep(3,:) = max(accep(l,2,:), -accepRF);
-                % não estou usando alguns outputs
-                LT = lnls_tau_touschek_inverso(params,Accep,twi);
-                lifetime(l) = 1/LT.AveRate/60/60; % em horas
             end
         end
         

@@ -106,27 +106,27 @@ B2M = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 0,   0, 0, 0, [0 0 0], [0
 B2S = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
 B2  = [MOMACCEP,B2E,MOMACCEP,B2M,MOMACCEP,B2S,MOMACCEP];
 
-B3C1  = rbend_sirius('bc_hf', 0.015, 0.2800*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.005 0], bend_pass_method); 
-B3C2  = rbend_sirius('bc_hf', 0.005, 0.0900*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.057 0], bend_pass_method); 
-B3C3  = rbend_sirius('bc_hf', 0.005, 0.0780*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.112 0], bend_pass_method); 
-B3C4  = rbend_sirius('bc_hf', 0.005, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.103 0], bend_pass_method); 
-B3C5  = rbend_sirius('bc_hf', 0.010, 0.0850*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.066 0], bend_pass_method); 
-B3C6  = rbend_sirius('bc_hf', 0.010, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.047 0], bend_pass_method); 
-B3C7  = rbend_sirius('bc_hf', 0.015, 0.0640*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.080 0], bend_pass_method); 
-B3C8  = rbend_sirius('bc_lf', 0.020, 0.0720*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.388 0], bend_pass_method); 
-B3C9  = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
-B3C10 = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
-B3C11 = rbend_sirius('bc_lf', 0.010, 0.0310*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.689 0], bend_pass_method); 
-B3C12 = rbend_sirius('bc_lf', 0.010, 0.0220*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.325 0], bend_pass_method); 
-B3C13 = rbend_sirius('bc_lf', 0.010, 0.0150*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.128 0], bend_pass_method); 
-B3C14 = rbend_sirius('bc_lf', 0.020, 0.0233*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0  0.009 0], bend_pass_method);
+BC1  = rbend_sirius('bc_hf', 0.015, 0.2800*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.005 0], bend_pass_method); 
+BC2  = rbend_sirius('bc_hf', 0.005, 0.0900*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.057 0], bend_pass_method); 
+BC3  = rbend_sirius('bc_hf', 0.005, 0.0780*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.112 0], bend_pass_method); 
+BC4  = rbend_sirius('bc_hf', 0.005, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.103 0], bend_pass_method); 
+BC5  = rbend_sirius('bc_hf', 0.010, 0.0850*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.066 0], bend_pass_method); 
+BC6  = rbend_sirius('bc_hf', 0.010, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.047 0], bend_pass_method); 
+BC7  = rbend_sirius('bc_hf', 0.015, 0.0640*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.080 0], bend_pass_method); 
+BC8  = rbend_sirius('bc_lf', 0.020, 0.0720*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.388 0], bend_pass_method); 
+BC9  = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
+BC10 = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
+BC11 = rbend_sirius('bc_lf', 0.010, 0.0310*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.689 0], bend_pass_method); 
+BC12 = rbend_sirius('bc_lf', 0.010, 0.0220*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.325 0], bend_pass_method); 
+BC13 = rbend_sirius('bc_lf', 0.010, 0.0150*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.128 0], bend_pass_method); 
+BC14 = rbend_sirius('bc_lf', 0.020, 0.0233*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0  0.009 0], bend_pass_method);
 
 MC = marker('mc', 'IdentityPass');
-B3CE = [B3C14, B3C13, B3C12, B3C11, MOMACCEP, B3C10, MOMACCEP, B3C9,...
-        MOMACCEP, B3C8, B3C7, B3C6, B3C5, B3C4, B3C3, B3C2, B3C1];
-B3CS = [B3C1, B3C2, B3C3, B3C4, B3C5, B3C6, B3C7, B3C8, MOMACCEP, ...
-        B3C9, MOMACCEP, B3C10, MOMACCEP, B3C11, B3C12, B3C13, B3C14];
-B3C  = [B3CE,MC, MOMACCEP,B3CS];
+BCE = [BC14, BC13, BC12, BC11, MOMACCEP, BC10, MOMACCEP, BC9,...
+        MOMACCEP, BC8, BC7, BC6, BC5, BC4, BC3, BC2, BC1];
+BCS = [BC1, BC2, BC3, BC4, BC5, BC6, BC7, BC8, MOMACCEP, ...
+        BC9, MOMACCEP, BC10, MOMACCEP, BC11, BC12, BC13, BC14];
+BC  = [BCE,MC, MOMACCEP,BCS];
 
 % -- quadrupoles --
 QFA  = quadrupole('qfa',  0.200, qfa_strength,  quad_pass_method);
@@ -243,26 +243,26 @@ C1_S20 = C1B; C2_S20 = C2B; C3_S20 = C3B; C4_S20 = C4B;
 
 %% SECTORS # 01..20
 
-S01 = [M1_S01, SS_S01, M2_S01, B1, C1_S01, B2, C2_S01, B3C, C3_S01, B2, C4_S01, B1];
-S02 = [M1_S02, SS_S02, M2_S02, B1, C1_S02, B2, C2_S02, B3C, C3_S02, B2, C4_S02, B1];
-S03 = [M1_S03, SS_S03, M2_S03, B1, C1_S03, B2, C2_S03, B3C, C3_S03, B2, C4_S03, B1];
-S04 = [M1_S04, SS_S04, M2_S04, B1, C1_S04, B2, C2_S04, B3C, C3_S04, B2, C4_S04, B1];
-S05 = [M1_S05, SS_S05, M2_S05, B1, C1_S05, B2, C2_S05, B3C, C3_S05, B2, C4_S05, B1];
-S06 = [M1_S06, SS_S06, M2_S06, B1, C1_S06, B2, C2_S06, B3C, C3_S06, B2, C4_S06, B1];
-S07 = [M1_S07, SS_S07, M2_S07, B1, C1_S07, B2, C2_S07, B3C, C3_S07, B2, C4_S07, B1];
-S08 = [M1_S08, SS_S08, M2_S08, B1, C1_S08, B2, C2_S08, B3C, C3_S08, B2, C4_S08, B1];
-S09 = [M1_S09, SS_S09, M2_S09, B1, C1_S09, B2, C2_S09, B3C, C3_S09, B2, C4_S09, B1];
-S10 = [M1_S10, SS_S10, M2_S10, B1, C1_S10, B2, C2_S10, B3C, C3_S10, B2, C4_S10, B1];
-S11 = [M1_S11, SS_S11, M2_S11, B1, C1_S11, B2, C2_S11, B3C, C3_S11, B2, C4_S11, B1];
-S12 = [M1_S12, SS_S12, M2_S12, B1, C1_S12, B2, C2_S12, B3C, C3_S12, B2, C4_S12, B1];
-S13 = [M1_S13, SS_S13, M2_S13, B1, C1_S13, B2, C2_S13, B3C, C3_S13, B2, C4_S13, B1];
-S14 = [M1_S14, SS_S14, M2_S14, B1, C1_S14, B2, C2_S14, B3C, C3_S14, B2, C4_S14, B1];
-S15 = [M1_S15, SS_S15, M2_S15, B1, C1_S15, B2, C2_S15, B3C, C3_S15, B2, C4_S15, B1];
-S16 = [M1_S16, SS_S16, M2_S16, B1, C1_S16, B2, C2_S16, B3C, C3_S16, B2, C4_S16, B1];
-S17 = [M1_S17, SS_S17, M2_S17, B1, C1_S17, B2, C2_S17, B3C, C3_S17, B2, C4_S17, B1];
-S18 = [M1_S18, SS_S18, M2_S18, B1, C1_S18, B2, C2_S18, B3C, C3_S18, B2, C4_S18, B1];
-S19 = [M1_S19, SS_S19, M2_S19, B1, C1_S19, B2, C2_S19, B3C, C3_S19, B2, C4_S19, B1];
-S20 = [M1_S20, SS_S20, M2_S20, B1, C1_S20, B2, C2_S20, B3C, C3_S20, B2, C4_S20, B1];
+S01 = [M1_S01, SS_S01, M2_S01, B1, C1_S01, B2, C2_S01, BC, C3_S01, B2, C4_S01, B1];
+S02 = [M1_S02, SS_S02, M2_S02, B1, C1_S02, B2, C2_S02, BC, C3_S02, B2, C4_S02, B1];
+S03 = [M1_S03, SS_S03, M2_S03, B1, C1_S03, B2, C2_S03, BC, C3_S03, B2, C4_S03, B1];
+S04 = [M1_S04, SS_S04, M2_S04, B1, C1_S04, B2, C2_S04, BC, C3_S04, B2, C4_S04, B1];
+S05 = [M1_S05, SS_S05, M2_S05, B1, C1_S05, B2, C2_S05, BC, C3_S05, B2, C4_S05, B1];
+S06 = [M1_S06, SS_S06, M2_S06, B1, C1_S06, B2, C2_S06, BC, C3_S06, B2, C4_S06, B1];
+S07 = [M1_S07, SS_S07, M2_S07, B1, C1_S07, B2, C2_S07, BC, C3_S07, B2, C4_S07, B1];
+S08 = [M1_S08, SS_S08, M2_S08, B1, C1_S08, B2, C2_S08, BC, C3_S08, B2, C4_S08, B1];
+S09 = [M1_S09, SS_S09, M2_S09, B1, C1_S09, B2, C2_S09, BC, C3_S09, B2, C4_S09, B1];
+S10 = [M1_S10, SS_S10, M2_S10, B1, C1_S10, B2, C2_S10, BC, C3_S10, B2, C4_S10, B1];
+S11 = [M1_S11, SS_S11, M2_S11, B1, C1_S11, B2, C2_S11, BC, C3_S11, B2, C4_S11, B1];
+S12 = [M1_S12, SS_S12, M2_S12, B1, C1_S12, B2, C2_S12, BC, C3_S12, B2, C4_S12, B1];
+S13 = [M1_S13, SS_S13, M2_S13, B1, C1_S13, B2, C2_S13, BC, C3_S13, B2, C4_S13, B1];
+S14 = [M1_S14, SS_S14, M2_S14, B1, C1_S14, B2, C2_S14, BC, C3_S14, B2, C4_S14, B1];
+S15 = [M1_S15, SS_S15, M2_S15, B1, C1_S15, B2, C2_S15, BC, C3_S15, B2, C4_S15, B1];
+S16 = [M1_S16, SS_S16, M2_S16, B1, C1_S16, B2, C2_S16, BC, C3_S16, B2, C4_S16, B1];
+S17 = [M1_S17, SS_S17, M2_S17, B1, C1_S17, B2, C2_S17, BC, C3_S17, B2, C4_S17, B1];
+S18 = [M1_S18, SS_S18, M2_S18, B1, C1_S18, B2, C2_S18, BC, C3_S18, B2, C4_S18, B1];
+S19 = [M1_S19, SS_S19, M2_S19, B1, C1_S19, B2, C2_S19, BC, C3_S19, B2, C4_S19, B1];
+S20 = [M1_S20, SS_S20, M2_S20, B1, C1_S20, B2, C2_S20, BC, C3_S20, B2, C4_S20, B1];
 
 anel = [S01,S02,S03,S04,S05,S06,S07,S08,S09,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19,S20];
 elist = anel;
