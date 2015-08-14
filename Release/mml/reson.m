@@ -1,5 +1,5 @@
-function [k, tab]=reson(ordre,period,fen,ax)
-% reson(ordre, period, fen)
+function [k, tab]=reson(ordre,period,fen,ax,Tag)
+% reson(ordre, period, fen, ax, Tag)
 % Recherche des droites de resonance a x + b y = c
 % passant dans la fenetre [x1 x2 y1 y2]
 % Ordre de la resonance |a| + |b|
@@ -59,7 +59,7 @@ for m1 = -ordre:ordre
                     if (d < d0)
                         k=k+1;
                         tab(k,:)=[m1 m2 m3];
-                        plot_reson(m1,m2,m3,fen,ax)
+                        plot_reson(m1,m2,m3,fen,ax, Tag)
                     end
                     
                 end
@@ -67,6 +67,20 @@ for m1 = -ordre:ordre
         end
     end
 end        
+
+if k
+    % Force the first coefficient to be positive
+    ind = tab(:,1) < 0;
+    tab(ind,:) = -tab(ind,:);
+    % If the first coefficient is zero, force the second positive
+    ind = (tab(:,2) < 0) & (tab(:,1) == 0);
+    tab(ind,:)=-tab(ind,:);
+    
+    %Find the greatest commom divisor of the three coefficients
+    greatCommDiv =gcd(gcd(tab(:,1),tab(:,2)),gcd(tab(:,2),tab(:,3)));
+    tab = tab./repmat(greatCommDiv,1,3);
+    tab = unique(tab,'rows');
+end
 
 axis(ax,fen);
 
