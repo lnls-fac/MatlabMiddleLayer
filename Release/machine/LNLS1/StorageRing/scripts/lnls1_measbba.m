@@ -15,8 +15,8 @@ bba_x_data{end+1} = {'AMP01B', 'AQF01B', delta_shunt_global, 'ACH07B', [-0.0825,
 bba_x_data{end+1} = {'AMP02A', 'AQF02A', delta_shunt_global, 'ACH09B', [-0.2675,+0.0937,7]};
 bba_x_data{end+1} = {'AMP02B', 'AQF02B', delta_shunt_global, 'ACH07A', [+0.0272,+0.4184,7]};
 bba_x_data{end+1} = {'AMP03A', 'AQF03A', delta_shunt_global, 'ACH09A', [-0.0770,+0.0910,7]};
+%%%bba_x_data{end+1} = {'AMP03C', 'AQF03B', delta_shunt_global, 'ACH09B', [-0.2190,+0.2190,7]};
 bba_x_data{end+1} = {'AMP03B', 'AQF03B', delta_shunt_global, 'ACH09B', [-0.0870,+0.0830,7]};
-bba_x_data{end+1} = {'AMP03C', 'AQF03B', delta_shunt_global, 'ACH09B', [-0.2190,+0.2190,7]};
 bba_x_data{end+1} = {'AMP04A', 'AQF04A', delta_shunt_global, 'ACH11B', [-0.0480,+0.3390,7]};
 bba_x_data{end+1} = {'AMP04B', 'AQF04B', delta_shunt_global, 'ACH09A', [-0.3100,+0.0470,7]};
 bba_x_data{end+1} = {'AMP05A', 'AQF05A', delta_shunt_global, 'ACH11A', [-0.108,+0.098,7]};
@@ -42,8 +42,8 @@ bba_y_data{end+1} = {'AMP01B', 'AQF01B', delta_shunt_global, 'ACV11A', [-0.0910,
 bba_y_data{end+1} = {'AMP02A', 'AQF02A', delta_shunt_global, 'ACV07B', [-0.1160,+0.1160,7]};
 bba_y_data{end+1} = {'AMP02B', 'AQF02B', delta_shunt_global, 'ACV09B', [-0.1350,+0.1190,7]};
 bba_y_data{end+1} = {'AMP03A', 'AQF03A', delta_shunt_global, 'ACV09A', [-0.0830,+0.0950,7]};
+%%%bba_y_data{end+1} = {'AMP03C', 'AQF03B', delta_shunt_global, 'ACV01A', [-0.1500,+0.0500,7]};
 bba_y_data{end+1} = {'AMP03B', 'AQF03B', delta_shunt_global, 'ACV09B', [-0.0980,+0.1090,7]};
-bba_y_data{end+1} = {'AMP03C', 'AQF03B', delta_shunt_global, 'ACV01A', [-0.1500,+0.0500,7]};
 bba_y_data{end+1} = {'AMP04A', 'AQF04A', delta_shunt_global, 'ACV03B', [-0.2300,+0.1340,7]};
 bba_y_data{end+1} = {'AMP04B', 'AQF04B', delta_shunt_global, 'ACV11A', [-0.1270,+0.1110,7]};
 bba_y_data{end+1} = {'AMP05A', 'AQF05A', delta_shunt_global, 'ACV11A', [-0.0870,+0.0730,7]};
@@ -74,7 +74,7 @@ for i=1:length(varargin)
     end
 end
 
-%% Pede ao usu�rio, se for o caso, que defina onde os dados da medidas ser�o gravados
+%% Pede ao usuario, se for o caso, que defina onde os dados da medidas serao gravados
 if ~exist('default_filename', 'var')
     default_dir      = fullfile(getfamilydata('Directory', 'DataRoot'), 'Optics', datestr(now, 'yyyy-mm-dd'));
     if ~exist(default_dir, 'dir')
@@ -144,7 +144,7 @@ if ~isfield(bba, 'final_machineconfig')
     
     % XRR 2012-01-05: codigo de ajuste dos IDs comentado temporariamente.
     
-    % volta IDs � config original
+    % volta IDs a config original
     % fprintf('%s: voltando dispositivos de inser��o � configura��o original\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
     % lnls1_set_id_configurations(init_IDS);
     
@@ -161,7 +161,16 @@ end
 save(default_filename, 'bba');
 
 
-%% faz an�lise das medidas
+%% measurement data has to be loaded manually at Matlab workspace at this point
+% bba.bpm_x(5) = [];
+% bba.bpm_y(5) = [];
+% default_filename = 'C:\Arq\fac_files\code\MatlabMiddleLayer\Release\machine\LNLS1\StorageRingData\User\Optics\2015-08-14\bba_2015-08-14_12-01-32.mat';
+% [pathstr, namef] = fileparts(default_filename);
+% if ~exist(pathstr, 'dir')
+%     mkdir(pathstr); 
+% end
+
+%% faz analise das medidas
 fprintf('\n%s: [ANALISE BBA HORIZONTAL]\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
 if isfield(bba, 'bpm_x'), bba.bpm_x = analysis_bba('BPMx', bba.bpm_x); end
 fprintf('\n%s: [ANALISE BBA VERTICAL]\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
