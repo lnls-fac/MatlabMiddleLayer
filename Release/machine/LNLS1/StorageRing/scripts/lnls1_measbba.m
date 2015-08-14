@@ -10,7 +10,6 @@ function bba = lnls1_measbba(varargin)
 
 delta_shunt_global = 3;  % [A]
 
-
 bba_x_data = {};
 bba_x_data{end+1} = {'AMP01B', 'AQF01B', delta_shunt_global, 'ACH07B', [-0.0825,+0.1025,7]};
 bba_x_data{end+1} = {'AMP02A', 'AQF02A', delta_shunt_global, 'ACH09B', [-0.2675,+0.0937,7]};
@@ -20,8 +19,8 @@ bba_x_data{end+1} = {'AMP03B', 'AQF03B', delta_shunt_global, 'ACH09B', [-0.0870,
 bba_x_data{end+1} = {'AMP03C', 'AQF03B', delta_shunt_global, 'ACH09B', [-0.2190,+0.2190,7]};
 bba_x_data{end+1} = {'AMP04A', 'AQF04A', delta_shunt_global, 'ACH11B', [-0.0480,+0.3390,7]};
 bba_x_data{end+1} = {'AMP04B', 'AQF04B', delta_shunt_global, 'ACH09A', [-0.3100,+0.0470,7]};
-bba_x_data{end+1} = {'AMP05A', 'AQF05A', delta_shunt_global, 'ACH11A', [+0.0290,+0.1980,7]};
-bba_x_data{end+1} = {'AMP05B', 'AQF05B', delta_shunt_global, 'ACH11B', [+0.0250,+0.1820,7]};
+bba_x_data{end+1} = {'AMP05A', 'AQF05A', delta_shunt_global, 'ACH11A', [-0.108,+0.098,7]};
+bba_x_data{end+1} = {'AMP05B', 'AQF05B', delta_shunt_global, 'ACH11B', [-0.076,+0.111,7]};
 bba_x_data{end+1} = {'AMP06A', 'AQF06A', delta_shunt_global, 'ACH01A', [-0.1930,+0.1830,7]};
 bba_x_data{end+1} = {'AMP06B', 'AQF06B', delta_shunt_global, 'ACH11A', [-0.1350,+0.2580,7]};
 bba_x_data{end+1} = {'AMP07A', 'AQF07A', delta_shunt_global, 'ACH01A', [-0.0690,+0.1050,7]};
@@ -32,13 +31,11 @@ bba_x_data{end+1} = {'AMP09A', 'AQF09A', delta_shunt_global, 'ACH03A', [-0.0850,
 bba_x_data{end+1} = {'AMP09B', 'AQF09B', delta_shunt_global, 'ACH03B', [-0.0730,+0.0990,7]};
 bba_x_data{end+1} = {'AMP10A', 'AQF10A', delta_shunt_global, 'ACH05B', [-0.2250,+0.1870,7]};
 bba_x_data{end+1} = {'AMP10B', 'AQF10B', delta_shunt_global, 'ACH03A', [-0.1340,+0.2410,7]};
-bba_x_data{end+1} = {'AMU11A', 'AQF11A', delta_shunt_global, 'ACH05A', [-0.0030,+0.1850,7]};
-bba_x_data{end+1} = {'AMU11B', 'AQF11B', delta_shunt_global, 'ACH05B', [-0.2460,-0.0400,7]};
+bba_x_data{end+1} = {'AMU11A', 'AQF11A', delta_shunt_global, 'ACH05A', [-0.143,+0.066,7]};
+bba_x_data{end+1} = {'AMU11B', 'AQF11B', delta_shunt_global, 'ACH05B', [-0.068,+0.143,7]};
 bba_x_data{end+1} = {'AMP12A', 'AQF12A', delta_shunt_global, 'ACH07B', [-0.2030,+0.1820,7]};
 bba_x_data{end+1} = {'AMP12B', 'AQF12B', delta_shunt_global, 'ACH05A', [-0.1780,+0.2380,7]};
-bba_x_data{end+1} = {'AMP01A', 'AQF01A', delta_shunt_global, 'ACH07A', [-0.0730,+0.1090,7]};
-
-
+bba_x_data{end+1} = {'AMP01A', 'AQF01A', delta_shunt_global, 'ACH07A', [-0.0730,+0.1090,7]}; 
 
 bba_y_data = {};
 bba_y_data{end+1} = {'AMP01B', 'AQF01B', delta_shunt_global, 'ACV11A', [-0.0910,+0.0670,7]};
@@ -111,7 +108,7 @@ if ~isfield(bba, 'final_machineconfig')
     
     % ajustes iniciais
     setbpmaverages(bba.configs.bpms.pause, bba.configs.bpms.nr_measurements);
-    fprintf('%s: desligando corre��o de �rbita autom�tica\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
+    fprintf('%s: desligando correcao de orbita automatica\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
     lnls1_slow_orbcorr_off;
     lnls1_fast_orbcorr_off;
     fprintf('%s: ligando shunts\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
@@ -138,7 +135,7 @@ if ~isfield(bba, 'final_machineconfig')
     
     % mede bba
     bba.initial_time_stamp    = datestr(now, 'yyyy-mm-dd_HH-MM-SS');
-    fprintf('%s: IN�CIO DE MEDIDAS BBA\n', bba.initial_time_stamp);
+    fprintf('%s: INICIO DE MEDIDAS BBA\n', bba.initial_time_stamp);
     bba.initial_machineconfig = getmachineconfig;
     if isfield(bba, 'bpm_x'), bba.bpm_x = do_bba('HCM', bba.bpm_x, bba.configs); end
     if isfield(bba, 'bpm_y'), bba.bpm_y = do_bba('VCM', bba.bpm_y, bba.configs); end
@@ -165,9 +162,9 @@ save(default_filename, 'bba');
 
 
 %% faz an�lise das medidas
-fprintf('\n%s: [AN�LISE BBA HORIZONTAL]\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
+fprintf('\n%s: [ANALISE BBA HORIZONTAL]\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
 if isfield(bba, 'bpm_x'), bba.bpm_x = analysis_bba('BPMx', bba.bpm_x); end
-fprintf('\n%s: [AN�LISE BBA VERTICAL]\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
+fprintf('\n%s: [ANALISE BBA VERTICAL]\n', datestr(now, 'yyyy-mm-dd_HH-MM-SS'));
 if isfield(bba, 'bpm_y'), bba.bpm_y = analysis_bba('BPMy', bba.bpm_y); end
 
 %% salva dados (Fiz alteracoes aqui e na funcao analysis_bba)
@@ -216,10 +213,10 @@ fprintf(idf,['Medida de BBA realizada em ' datestr(now,'yyyy-mm-dd')...
 fclose(idf);
 clear namef idf a orbfile;
 
-%% registra experimento no hist�rico
+%% registra experimento no historico
 registra_historico(bba);
 
-%% remove diret�rio se vazio
+%% remove diretorio se vazio
 files = dir(pathstr);
 if (length(files)<3) 
     rmdir(PathName); 
