@@ -20,10 +20,11 @@ function Resp = lnls_tau_touschek_inverso(params,Accep,optics)
 %           sigS  = comprimento do bunch [m]
 %           K     = fator de acoplamento (emity = K*emitx)
 %
-%       Accep([2 3],:) = aceitância de energia positiva(2) e negativa(3)
-%                    para uma seleção de pontos do anel.
+%       Accep = estrutura com campos:
+%           pos = aceitância positiva para uma seleção de pontos do anel;
+%           neg = aceitância negativa para uma seleção de pontos do anel;
 %                    (lembrar: min(accep_din, accep_rf))
-%       Accep(1,:) = posição longitudinal dos pontos para os quais a
+%           s   = posição longitudinal dos pontos para os quais a
 %                    aceitância foi calculada.
 %
 %       Optics = estrutura com as funções óticas ao longo do trecho 
@@ -58,11 +59,14 @@ end
 
 
 % calcular o tempo de vida a cada 10 cm do anel:
-npoints = ceil((Accep(1,end) - Accep(1,1))/0.1);
-s_calc = linspace(Accep(1,1), Accep(1,end), npoints);
+npoints = ceil((Accep.s(end) - Accep.s(1))/0.1);
+s_calc = linspace(Accep.s(1), Accep.s(end), npoints);
 
-d_accp  = interp1(Accep(1,:), Accep(2,:), s_calc);
-d_accn  = interp1(Accep(1,:), -Accep(3,:), s_calc);
+d_accp  = interp1(Accep.s, Accep.pos, s_calc);
+d_accn  = interp1(Accep.s,-Accep.neg, s_calc);
+% if momentum aperture is 0, set it to 1e-4:
+d_accp(~d_accp) = 1e-4;
+d_accn(~d_accn) = 1e-4;
 
 [~, ind, ~] = unique(optics.pos);
 
