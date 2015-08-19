@@ -133,7 +133,8 @@ while i < n_calls
         
         j=1;
         m=1;
-        l=0;
+        lt_suc=1;
+        lt_prob=0;
         for k=1:n_pastas; %min([n_pastas, nr_rms]);
             pathname = path;
             if rms_mode, pathname = fullfile(path,sprintf('rms%02d',k)); end
@@ -155,14 +156,19 @@ while i < n_calls
             
             if ma
                 if exist(fullfile(pathname,'dynap_ma_out.txt'),'file')
-                    l = l + 1;
-                    [spos, accep(l,:,:), ~, ~] = trackcpp_load_ma_data(pathname);
-                    Accep(1,:) = spos;
-                    Accep(2,:) = min(accep(l,1,:), accepRF);
-                    Accep(3,:) = max(accep(l,2,:), -accepRF);
-                    % não estou usando alguns outputs
-                    LT = lnls_tau_touschek_inverso(params,Accep,twi);
-                    lifetime(l) = 1/LT.AveRate/60/60; % em horas
+                    [spos, aceit, ~, ~] = trackcpp_load_ma_data(pathname);
+                    if any(~aceit(:))
+                        lt_prob = lt_prob + 1;
+                    else
+                        accep(lt_suc,:,:) = aceit;
+                        Accep.s   = spos;
+                        Accep.pos = min(aceit(1,:), accepRF);
+                        Accep.neg = max(aceit(2,:), -accepRF);
+                        % não estou usando alguns outputs
+                        LT = lnls_tau_touschek_inverso(params,Accep,twi);
+                        lifetime(lt_suc) = 1/LT.AveRate/60/60; % em horas
+                        lt_suc = lt_suc + 1;
+                    end
                 else fprintf('%-2d-%-3d: ma nao carregou\n',i,k); break;
                 end
             end
@@ -222,13 +228,22 @@ while i < n_calls
         if ma
             %imprime o tempo de vida
             if i==1, fprintf('\n%-20s %-15s \n','Configuração', 'Tempo de Vida'); end;
-            if rms_mode; fprintf(  '%-20s %7.2f \x00B1 %-5.2f h\n',upper(cell_leg_text{i}), aveLT, rmsLT);
-            else         fprintf(  '%-20s %7.2f h\n',upper(cell_leg_text{i}), aveLT); end;
+            if rms_mode
+                fprintf(  '%-20s %7.2f \x00B1 %-5.2f h',upper(cell_leg_text{i}), aveLT, rmsLT);
+                if lt_prob, 
+                    fprintf(['   *%02d máquinas desprezadas no cálculo',...
+                            ' por possuírem aceitancia nula.\n'],lt_prob);
+                else
+                    fprintf('\n');
+                end
+            else
+                fprintf(  '%-20s %7.2f h\n',upper(cell_leg_text{i}), aveLT);
+            end
             
             if i == 1
                 flt  = figure('Position',[1, 1, 1296, 553]);
                 falt = axes('Parent',flt,'YGrid','on','FontSize',size_font,...
-                            'Position',[0.10 0.17 0.84 0.80],'XGrid','on',...
+                            'Position',[0.10 0.17 0.84 0.73],'XGrid','on',...
                             'yTickLabel',{'-5','-2.5','0','2.5','5'},...
                             'YTick',[-5 -2.5 0 2.5 5]);
                 box(falt,'on');  hold(falt,'all'); 
@@ -262,8 +277,8 @@ if ex
 end
 if ma
     legend(pllt(:,1),'show',cell_leg_text, 'Location','Best');
-    title(falt,['MA - ' title_text{1}]);
     lnls_drawlattice(the_ring,10, 0, true,0.2, false, falt);
+    title(falt,['MA - ' title_text{1}]);
 end
 
 
