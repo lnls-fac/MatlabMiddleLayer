@@ -674,7 +674,7 @@ AO.sdb.Setpoint.DeltaRespMat  = 0.5;
 % chs
 AO.chs.FamilyName  = 'chs';
 AO.chs.MemberOf    = {'PlotFamily'; 'COR'; 'chs'; 'Magnet';'hcm';'hcm_slow';};
-AO.chs.DeviceList  = getDeviceList(10,16);
+AO.chs.DeviceList  = getDeviceList(10,12);
 AO.chs.ElementList = (1:size(AO.chs.DeviceList,1))';
 AO.chs.Status      = ones(size(AO.chs.DeviceList,1),1);
 AO.chs.Position    = [];
@@ -692,7 +692,7 @@ AO.chs.Setpoint.HWUnits      = 'Ampere';
 AO.chs.Setpoint.PhysicsUnits = 'Radian';
 AO.chs.Setpoint.Range        = [-10 10];
 AO.chs.Setpoint.Tolerance    = 0.00001;
-AO.chs.Setpoint.DeltaRespMat = 0.0005; 
+AO.chs.Setpoint.DeltaRespMat = 50e-6; 
 
 % cvs
 AO.cvs.FamilyName  = 'cvs';
@@ -715,7 +715,7 @@ AO.cvs.Setpoint.HWUnits      = 'Ampere';
 AO.cvs.Setpoint.PhysicsUnits = 'Radian';
 AO.cvs.Setpoint.Range        = [-10 10];
 AO.cvs.Setpoint.Tolerance    = 0.00001;
-AO.cvs.Setpoint.DeltaRespMat = 0.0005; 
+AO.cvs.Setpoint.DeltaRespMat = 50e-6; 
 
 % chf
 AO.chf.FamilyName  = 'chf';
@@ -962,29 +962,25 @@ AO.RF.PhaseCtrl.Tolerance         = 10;    % ???
 
 
 
-% %%%%%%%%%%%%%%
-% %    DCCT    %
-% %%%%%%%%%%%%%%
-% AO.DCCT.FamilyName               = 'DCCT';
-% AO.DCCT.MemberOf                 = {'Diagnostics'; 'DCCT'};
-% AO.DCCT.DeviceList               = [1 1];
-% AO.DCCT.ElementList              = 1;
-% AO.DCCT.Status                   = 1;
-% AO.DCCT.Position                 = 23.2555;
-% 
-% AO.DCCT.Monitor.MemberOf         = {};
-% AO.DCCT.Monitor.Mode             = 'Simulator';
-% AO.DCCT.Monitor.DataType         = 'Scalar';
-% AO.DCCT.Monitor.ChannelNames     = 'AMC03';    
-% AO.DCCT.Monitor.HW2PhysicsParams = 1;    
-% AO.DCCT.Monitor.Physics2HWParams = 1;
-% AO.DCCT.Monitor.Units            = 'Hardware';
-% AO.DCCT.Monitor.HWUnits          = 'Ampere';     
-% AO.DCCT.Monitor.PhysicsUnits     = 'Ampere';
+%%%%%%%%%%%%%%
+%    DCCT    %
+%%%%%%%%%%%%%%
+AO.DCCT.FamilyName               = 'DCCT';
+AO.DCCT.MemberOf                 = {'Diagnostics'; 'DCCT'};
+AO.DCCT.DeviceList               = [13,1; 14, 1];
+AO.DCCT.ElementList              = [1, 2];
+AO.DCCT.Status                   = 1;
+AO.DCCT.Position                 = [];
 
-
-
-
+AO.DCCT.Monitor.MemberOf         = {};
+AO.DCCT.Monitor.Mode             = 'Simulator';
+AO.DCCT.Monitor.DataType         = 'Scalar';
+AO.DCCT.Monitor.ChannelNames     = [];    
+AO.DCCT.Monitor.HW2PhysicsParams = 1;    
+AO.DCCT.Monitor.Physics2HWParams = 1;
+AO.DCCT.Monitor.Units            = 'Hardware';
+AO.DCCT.Monitor.HWUnits          = 'Ampere';     
+AO.DCCT.Monitor.PhysicsUnits     = 'Ampere';
 
 
 % The operational mode sets the path, filenames, and other important parameters
