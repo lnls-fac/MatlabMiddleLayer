@@ -1,4 +1,4 @@
-function ID = create_ID(id_def)
+function ID = create_ID(id_def, nr_periods_init)
 
 % cleanup
 clc; fclose('all'); close('all');
@@ -30,9 +30,17 @@ diary_fname = [id_def.id_label ' - ID-SUMMARY.txt'];
 if exist(diary_fname, 'file'), delete(diary_fname); end;
 diary(diary_fname);
 
+% check convergence of fields within central period
+if exist('nr_periods_init','var')
+    nr_periods = search_nr_periods_for_field_convergence(id_def, nr_periods_init);
+else
+    nr_periods = nr_periods_init;
+end;
 
 % created 3d model of the insertion device
-id_model = epu_create(id_def);
+model_id_def = id_def;
+model_id_def.nr_periods = nr_periods;
+id_model = epu_create(model_id_def);
 
 % calcs basic field parameters
 field_parms = get_field_summary(id_def, id_model);

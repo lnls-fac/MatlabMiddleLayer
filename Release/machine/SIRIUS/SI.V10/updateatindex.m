@@ -329,5 +329,14 @@ catch
     warning('RF cavity not found in the model.');
 end
 
+% DCCT
+try
+    AO.DCCT.AT.ATType = 'DCCT';
+    AO.DCCT.AT.ATIndex = [findcells(THERING, 'FamName', 'dcct1'); findcells(THERING, 'FamName', 'dcct2')];
+    AO.DCCT.Position = findspos(THERING, AO.DCCT.AT.ATIndex(:,1))';
+catch
+    warning('DCCT not found in the model.');
+end
+
 
 setao(AO);

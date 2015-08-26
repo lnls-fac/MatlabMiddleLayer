@@ -1,19 +1,20 @@
-function the_ring = lnls_insert_kicktable(the_ring0, idx_pos, id)
+function the_ring = lnls_insert_kicktable(the_ring0, idx_pos, id, strength)
 % the_ring = lnls_insert_kicktable(the_ring0, idx_pos, id)
 % INPUTS:
 %  the_ring - AT model of the lattice;
 %  idx_pos  - index of the element where to insert the kicktable;
+%  strength - fraction of the kick defined in the kicktable file
+%             which will be applied to the AT element to be inserted;
 %  id       - structure with information regarding the id. Fields:
 %    kicktable_file - path to the kicktable file;
 %    nr_segs        - number of segmets of the kicktable;
-%    strength       - fraction of the kick defined in the kicktable file
-%                     which will be applied to the AT element to be inserted;
 %    label          - family name of the element which will be inserted;
 
 file_name = id.kicktable_file;
 nsegs     = id.nr_segs;
-strength  = id.strength;
 famname   = id.label;
+
+if ~exist('strength','var'), strength = 1; end
 
 % reads kicktable
 [posx, posy, kickx, kicky, id_length] = lnls_read_kickmap_file(file_name);

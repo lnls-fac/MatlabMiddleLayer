@@ -510,11 +510,15 @@ else
                 
                 % New X-Kick, but the Y-Kick needs to be maintained (middle layer coordinates)
                 XKick = NewSP(i);
-                YKick = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
+                YKick = [-sin(Roll(1)) cos(Roll(1))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
+                %YKick = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
                 
                 % Superimpose the X and Y kicks
-                THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
-                THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
+                
+                THERING = lnls_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
+                THERING = lnls_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y');                
+                %THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
+                %THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
                 %fprintf('kick(%d,%d)=%g %g  AT=%g %g  Roll=%g  %g\n',DeviceList(i,:), XKick, YKick, THERING{ATIndexList(i)}.KickAngle, Roll);
                 
                 %% X only kick
@@ -558,12 +562,16 @@ else
                 end
                 
                 % New Y-Kick, but the X-Kick needs to be maintained (middle layer coordinates)
-                XKick = [cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
+                XKick = [cos(Roll(2)) sin(Roll(2))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
+                %XKick = [cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
                 YKick = NewSP(i);
                 
                 % Superimpose the X and Y kicks
-                THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
-                THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
+                
+                THERING = lnls_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
+                THERING = lnls_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y'); 
+                %THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
+                %THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
                 %fprintf('kick(%d,%d)=%g %g  AT=%g %g  Roll=%g  %g\n',DeviceList(i,:), XKick, YKick, THERING{ATIndexList(i)}.KickAngle, Roll);
                 
                 %% Y only kick
@@ -732,8 +740,12 @@ else
                     end
                     
                     % Roll it back to actual (measured) coordinates
-                    XKick = [ cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
-                    YKick = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
+
+                    XKick = [ cos(Roll(2)) sin(Roll(2))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
+                    YKick = [-sin(Roll(1)) cos(Roll(1))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
+                    
+                    %XKick = [ cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
+                    %YKick = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
                     
                     % Roll it forward to the new model coordinates
                     if strcmpi(AT.ATType, 'RollX')
@@ -742,8 +754,11 @@ else
                         Roll(2) = NewSP(i);
                     end
                     
-                    THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
-                    THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
+                    
+                    THERING = lnls_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
+                    THERING = lnls_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y');
+                    %THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
+                    %THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
                 else
                     error(sprintf('%s(%d,%d) must be a KickAngle field in the model to be rolled.', Family, DeviceList(i,:)));
                 end

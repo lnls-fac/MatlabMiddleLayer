@@ -1,7 +1,7 @@
 function show_changes_in_quadrupole_strengths_for_machine_with_id(the_ring1,the_ring2)
 
-if ~exist('the_ring1','var'), load('the_ring0.mat'); the_ring1 = the_ring0;end
-if ~exist('the_ring2','var'), load('the_ring_withids.mat'); the_ring2 = the_ring_glob; end
+if ~exist('the_ring1','var'), load('the_ring0.mat'); the_ring1 = the_ring; end
+if ~exist('the_ring2','var'), load('the_ring_withids.mat'); the_ring2 = the_ring; end
 if ~exist('knobs','var'), knobs = {'qda','qfa','qdb1','qdb2','qfb'};end
 
 idx1 = findcells(the_ring1,'FamName','mc'); idx1 = idx1(end);

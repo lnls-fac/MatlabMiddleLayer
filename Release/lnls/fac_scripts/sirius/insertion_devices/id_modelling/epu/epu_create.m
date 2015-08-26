@@ -142,11 +142,28 @@ end
 epu.cid = blocks;
 
 % centraliza EPU na longitudinal
+rotm = diag([1;1;1]);
 pos = sum([epu.csd.pos] + [epu.cse.pos] + [epu.cie.pos] + [epu.cid.pos], 2) / (length(epu.csd) + length(epu.cse) + length(epu.cie) + length(epu.cid));
-for i=1:length(epu.csd), epu.csd(i).pos(2) = epu.csd(i).pos(2) - pos(2); end;
-for i=1:length(epu.cse), epu.cse(i).pos(2) = epu.cse(i).pos(2) - pos(2); end;
-for i=1:length(epu.cie), epu.cie(i).pos(2) = epu.cie(i).pos(2) - pos(2); end;
-for i=1:length(epu.cid), epu.cid(i).pos(2) = epu.cid(i).pos(2) - pos(2); end;
+for i=1:length(epu.csd)
+    epu.csd(i).pos(2) = epu.csd(i).pos(2) - pos(2); 
+    epu.csd(i).rotc = [0;0;0];
+    epu.csd(i).rotm = rotm;
+end;
+for i=1:length(epu.cse)
+    epu.cse(i).pos(2) = epu.cse(i).pos(2) - pos(2); 
+    epu.cse(i).rotc = [0;0;0];
+    epu.cse(i).rotm = rotm;
+end;
+for i=1:length(epu.cie)
+    epu.cie(i).pos(2) = epu.cie(i).pos(2) - pos(2);
+    epu.cie(i).rotc = [0;0;0];
+    epu.cie(i).rotm = rotm;
+end;
+for i=1:length(epu.cid)
+    epu.cid(i).pos(2) = epu.cid(i).pos(2) - pos(2);
+    epu.cid(i).rotc = [0;0;0];
+    epu.cid(i).rotm = rotm;
+end;
 
 epu = epu_set_config(epu, epu.gap_upstream, epu.gap_downstream, epu.phase_csd, epu.phase_cie);
 
@@ -155,7 +172,7 @@ if epu.chamfer>0
     epu = create_chamfers(epu);
 end
 
-% adiciona tag único aos blocos
+% adiciona tag ï¿½nico aos blocos
 epu = epu_set_tags_all_blocks_independent(epu);
     
 

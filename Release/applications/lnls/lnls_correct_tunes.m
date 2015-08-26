@@ -1,4 +1,4 @@
-function [the_ring0, converged, tunesf, tunesi] = lnls_correct_tunes(the_ring, families, goal_tunes, max_iter, tolerancia)
+function [the_ring, converged, tunesf, tunesi] = lnls_correct_tunes(the_ring, families, goal_tunes, max_iter, tolerancia)
 % [the_ring0, converged, tunes] = lnls_correct_tune(the_ring, families, goal_tune, max_iter, tolerancia)
 % 
 % Correct tunes with specified quadrupole families.
@@ -12,7 +12,7 @@ function [the_ring0, converged, tunesf, tunesi] = lnls_correct_tunes(the_ring, f
 %                 for the definition of convergence of the algoritm;
 %
 % Outputs:
-%   the_ring0  : ring model with minimum distance from the desired solution
+%   the_ring  : ring model with minimum distance from the desired solution
 %   converged  : true if the euclidian distance between tunes0 and
 %                 goal_tunes is lower than tolerancia;
 %   tunesf     : tunes of the model the_ring0;
@@ -25,67 +25,73 @@ for ii=1:length(families)
     knobs{ii}  = findcells(the_ring, 'FamName', families{ii});
 end
 
-[~, tunes] = twissring(the_ring,0,1:length(the_ring)+1);
-res = sqrt((tunes-goal_tunes)*(tunes-goal_tunes)');
+calc_rms = @(x)norm(x)/sqrt(length(x));
 
-the_ring0 = the_ring;
+[~, tunes] = twissring(the_ring,0,1:length(the_ring)+1);
 tunesf = tunes;
 tunesi = tunes;
-
-calc_matrix = true;
-
+converged = false;
+[pseudoinv_mm, abort] = calc_tune_matrix(the_ring, knobs);
+if abort, return; end
+factor = 1;
+res_vec = (tunes-goal_tunes)';
+res = calc_rms(res_vec);
 ii = 0;
-while ii < max_iter && res > tolerancia
+while (res > tolerancia) && (ii <max_iter) && (factor > 0.001)
+    dK = - factor * pseudoinv_mm * res_vec;
     
-    if calc_matrix
-        % calcula matriz de variacao do residuo
-        dK = 1e-3;
-        mm = zeros(2,length(knobs));
-        for i=1:length(knobs)
-            calc_ring = the_ring;
-            K = getcellstruct(calc_ring, 'PolynomB', knobs{i},1,2);
-            calc_ring = setcellstruct(calc_ring, 'PolynomB', knobs{i}, K + dK/2, 1, 2);
-            [~, tunes_up] = twissring(calc_ring,0,1:length(calc_ring)+1);
-            calc_ring = setcellstruct(calc_ring, 'PolynomB', knobs{i}, K - dK/2, 1, 2);
-            [~, tunes_down] = twissring(calc_ring,0,1:length(calc_ring)+1);
-            mm(:,i) = -(tunes_up - tunes_down)/dK;
-        end
-        %sv = diag(S);
-        %sel = (sv ./ sv(1)) <= 0.01;
-        % inv_S = inv(S);
-        %inv_S(sel) = 0;
-
-        % calcula pseudo inversa da matriz de variacao do res�duo
-        [U,S,V] = svd(mm,'econ');
-        pseudoinv_mm = V*(S\U');
-    end
-    
-    % calcula solucao
-    deltaK = pseudoinv_mm * (tunes-goal_tunes)';
-    
-    % ajusta modelo AT com nova sintonia
+    new_the_ring = the_ring;
     for i=1:length(knobs)
-        K = getcellstruct(the_ring, 'PolynomB', knobs{i},1,2);
-        the_ring = setcellstruct(the_ring, 'PolynomB',knobs{i}, K + deltaK(i), 1, 2);
+        K = getcellstruct(new_the_ring, 'PolynomB', knobs{i},1,2);
+        new_the_ring = setcellstruct(new_the_ring, 'PolynomB',knobs{i}, K + dK(i), 1, 2);
     end
     
-    [~, tunes] = twissring(the_ring,0,1:length(the_ring)+1);
+    [~, tunes] = twissring(new_the_ring,0,1:length(new_the_ring)+1);
+    new_res_vec = (tunes-goal_tunes)';
+    new_res = calc_rms(new_res_vec);
     
-    new_res = sqrt((tunes-goal_tunes)*(tunes-goal_tunes)');
-    if new_res < res
-        the_ring0 = the_ring;
+    if (new_res < res)
+        [pseudoinv_mm, abort] = calc_tune_matrix(new_the_ring, knobs);
+        if abort, break; end
+        res_vec = new_res_vec;
         res = new_res;
+        the_ring = new_the_ring;
         tunesf = tunes;
-        calc_matrix = false;
+        factor = min([factor * 2, 1]);
     else
-        calc_matrix = true;
+        factor = factor / 2;
+%         [pseudoinv_mm, abort] = calc_tune_matrix(the_ring, knobs);
+%         if abort, break; end
     end
     ii = ii + 1;
 end
 
-converged = true;
-if (ii==max_iter && res > tolerancia) || isnan(res)
-    converged = false;
+converged = res < tolerancia;
+
+
+function [pseudoinv_mm, abort] = calc_tune_matrix(the_ring,knobs)
+
+% calcula matriz de variacao do residuo
+dK = 1e-4;
+mm = zeros(2,length(knobs));
+pseudoinv_mm = zeros(length(knobs),2);
+for i=1:length(knobs)
+    calc_ring = the_ring;
+    K = getcellstruct(calc_ring, 'PolynomB', knobs{i},1,2);
+    calc_ring = setcellstruct(calc_ring, 'PolynomB', knobs{i}, K + dK/2, 1, 2);
+    [~, tunes_up] = twissring(calc_ring,0,1:length(calc_ring)+1);
+    calc_ring = setcellstruct(calc_ring, 'PolynomB', knobs{i}, K - dK/2, 1, 2);
+    [~, tunes_down] = twissring(calc_ring,0,1:length(calc_ring)+1);
+    mm(:,i) = (tunes_up - tunes_down)/dK;
 end
 
+abort = any(isnan(mm(:)));
+if abort, return; end
+%sv = diag(S);
+%sel = (sv ./ sv(1)) <= 0.01;
+%inv_S = inv(S);
+%inv_S(sel) = 0;
 
+% calcula pseudo inversa da matriz de variacao do res�duo
+[U,S,V] = svd(mm,'econ');
+pseudoinv_mm = V*(S\U');

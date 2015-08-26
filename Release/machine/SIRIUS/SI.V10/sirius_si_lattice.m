@@ -83,14 +83,21 @@ L150 = drift('l150', 0.1500,'DriftPass');
 L155 = drift('l155', 0.1550,'DriftPass');
 L170 = drift('l170', 0.1700,'DriftPass');
 L185 = drift('l185', 0.1850,'DriftPass');
+L200 = drift('l200', 0.2000,'DriftPass');
 L230 = drift('l230', 0.2300,'DriftPass');
 L275 = drift('l275', 0.2750,'DriftPass');
+L300 = drift('l300', 0.3000,'DriftPass');
 L340 = drift('l340', 0.3400,'DriftPass');
 L460 = drift('l460', 0.4600,'DriftPass');
+L488 = drift('l488', 0.4880,'DriftPass');
 L500 = drift('l500', 0.5000,'DriftPass');
 L610 = drift('l610', 0.6100,'DriftPass');
 L788 = drift('l788', 0.7880,'DriftPass');
+L800 = drift('l800', 0.8000,'DriftPass');
 L888 = drift('l888', 0.8880,'DriftPass');
+LKK  = drift('lkk',  2.0250,'DriftPass');
+LPMU = drift('lpmu', 0.3070,'DriftPass');
+LPMD = drift('lpmd', 0.2359,'DriftPass');
 
 % -- dipoles -- 
 deg2rad = pi/180.0;
@@ -106,27 +113,27 @@ B2M = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 0,   0, 0, 0, [0 0 0], [0
 B2S = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
 B2  = [MOMACCEP,B2E,MOMACCEP,B2M,MOMACCEP,B2S,MOMACCEP];
 
-B3C1  = rbend_sirius('bc_hf', 0.015, 0.2800*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.005 0], bend_pass_method); 
-B3C2  = rbend_sirius('bc_hf', 0.005, 0.0900*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.057 0], bend_pass_method); 
-B3C3  = rbend_sirius('bc_hf', 0.005, 0.0780*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.112 0], bend_pass_method); 
-B3C4  = rbend_sirius('bc_hf', 0.005, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.103 0], bend_pass_method); 
-B3C5  = rbend_sirius('bc_hf', 0.010, 0.0850*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.066 0], bend_pass_method); 
-B3C6  = rbend_sirius('bc_hf', 0.010, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.047 0], bend_pass_method); 
-B3C7  = rbend_sirius('bc_hf', 0.015, 0.0640*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.080 0], bend_pass_method); 
-B3C8  = rbend_sirius('bc_lf', 0.020, 0.0720*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.388 0], bend_pass_method); 
-B3C9  = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
-B3C10 = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
-B3C11 = rbend_sirius('bc_lf', 0.010, 0.0310*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.689 0], bend_pass_method); 
-B3C12 = rbend_sirius('bc_lf', 0.010, 0.0220*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.325 0], bend_pass_method); 
-B3C13 = rbend_sirius('bc_lf', 0.010, 0.0150*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.128 0], bend_pass_method); 
-B3C14 = rbend_sirius('bc_lf', 0.020, 0.0233*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0  0.009 0], bend_pass_method);
+BC1  = rbend_sirius('bc_hf', 0.015, 0.2800*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.005 0], bend_pass_method); 
+BC2  = rbend_sirius('bc_hf', 0.005, 0.0900*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.057 0], bend_pass_method); 
+BC3  = rbend_sirius('bc_hf', 0.005, 0.0780*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.112 0], bend_pass_method); 
+BC4  = rbend_sirius('bc_hf', 0.005, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.103 0], bend_pass_method); 
+BC5  = rbend_sirius('bc_hf', 0.010, 0.0850*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.066 0], bend_pass_method); 
+BC6  = rbend_sirius('bc_hf', 0.010, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.047 0], bend_pass_method); 
+BC7  = rbend_sirius('bc_hf', 0.015, 0.0640*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.080 0], bend_pass_method); 
+BC8  = rbend_sirius('bc_lf', 0.020, 0.0720*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.388 0], bend_pass_method); 
+BC9  = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
+BC10 = rbend_sirius('bc_lf', 0.325/2, 1.2700/2*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.891 0], bend_pass_method); 
+BC11 = rbend_sirius('bc_lf', 0.010, 0.0310*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.689 0], bend_pass_method); 
+BC12 = rbend_sirius('bc_lf', 0.010, 0.0220*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.325 0], bend_pass_method); 
+BC13 = rbend_sirius('bc_lf', 0.010, 0.0150*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.128 0], bend_pass_method); 
+BC14 = rbend_sirius('bc_lf', 0.020, 0.0233*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0  0.009 0], bend_pass_method);
 
 MC = marker('mc', 'IdentityPass');
-B3CE = [B3C14, B3C13, B3C12, B3C11, MOMACCEP, B3C10, MOMACCEP, B3C9,...
-        MOMACCEP, B3C8, B3C7, B3C6, B3C5, B3C4, B3C3, B3C2, B3C1];
-B3CS = [B3C1, B3C2, B3C3, B3C4, B3C5, B3C6, B3C7, B3C8, MOMACCEP, ...
-        B3C9, MOMACCEP, B3C10, MOMACCEP, B3C11, B3C12, B3C13, B3C14];
-B3C  = [B3CE,MC, MOMACCEP,B3CS];
+BCE = [BC14, BC13, BC12, BC11, MOMACCEP, BC10, MOMACCEP, BC9,...
+        MOMACCEP, BC8, BC7, BC6, BC5, BC4, BC3, BC2, BC1];
+BCS = [BC1, BC2, BC3, BC4, BC5, BC6, BC7, BC8, MOMACCEP, ...
+        BC9, MOMACCEP, BC10, MOMACCEP, BC11, BC12, BC13, BC14];
+BC  = [BCE,MC, MOMACCEP,BCS];
 
 % -- quadrupoles --
 QFA  = quadrupole('qfa',  0.200, qfa_strength,  quad_pass_method);
@@ -156,6 +163,11 @@ SD2K = sextupole('sd2k', sext_len, sd2k_strength, sext_pass_method); % chs
 SD3K = sextupole('sd3k', sext_len, sd3k_strength, sext_pass_method); % cvs
 SF2K = sextupole('sf2k', sext_len, sf2k_strength, sext_pass_method); % chs
 
+% -- pulsed magnets --
+
+KICKIN = sextupole('kickin' , 0.5, 0, sext_pass_method); % injection kicker
+PMM    = sextupole('pmm' ,    0.5, 0, sext_pass_method); % pulsed multipole magnet
+
 % -- bpms and fast correctors --
 BPM    = marker('bpm', 'IdentityPass');
 CF     = sextupole('cf', 0.100, 0.0, quad_pass_method);
@@ -166,32 +178,38 @@ RFC = rfcavity('cav', 0, 3.0e6, 500e6, harmonic_number, 'CavityPass');
 
 % -- lattice markers --
 START  = marker('start',  'IdentityPass');     % start of the model
-END    = marker('end',  'IdentityPass');     % end of the model
+END    = marker('end',  'IdentityPass');       % end of the model
 MIA    = marker('mia', 'IdentityPass');        % center of long straight sections (even-numbered)
 MIB    = marker('mib', 'IdentityPass');        % center of short straight sections (odd-numbered)
 GIR    = marker('girder', 'IdentityPass');     % marker used to delimitate girders. one marker at begin and another at end of girder.
 MIDA   = marker('id_enda', 'IdentityPass');    % marker for the extremities of IDs in long straight sections
 MIDB   = marker('id_endb', 'IdentityPass');    % marker for the extremities of IDs in short straight sections
+SEPTIN = marker('sept_in', 'IdentityPass');    % end of injection septum
+DCCT1  = marker('dcct1', 'IdentityPass');      % dcct1 to measure beam current
+DCCT2  = marker('dcct2', 'IdentityPass');      % dcct2 to measure beam current
+
 
 %% transport lines
 
-M2A = [GIR,CF,L085,SFA,L150,QFA,L124,BPM,L116,SDA,L150,QDA,GIR,L170,GIR];                             % high beta xxM2 girder  
-M1A = fliplr(M2A);                                                                                      % high beta xxM1 girder
-IDA = [L500,RBPM,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,RBPM,L500]; % high beta ID straight section
-CAV = [L500,RBPM,LIA,L500,L500,L500,MIA,RFC,L500,L500,L500,LIA,RBPM,L500];       % high beta RF cavity straight section 
-INJ = [L500,RBPM,LIA,L500,L500,L500,END,START,MIA,L500,L500,L500,LIA,RBPM,L500]; % high beta INJ straight section
-M1B = [GIR,L170,GIR,QDB1,L150,SDB,L116,BPM,L124,QFB,L150,SFB,L050,CF,L035,QDB2,GIR];                  % low beta xxM1 girder
-M2B = fliplr(M1B);                                                                                      % low beta xxM2 girder
-IDB = [L500,RBPM,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,RBPM,L500]; % low beta ID straight section
-C1A = [GIR,L610,GIR,SD1J,L170,QF1,L135, BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L185];          % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C2A = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];        % arc sector in between B2-B3 (high beta odd-numbered straight sections)
-C3A = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2K,L077,CF,L083,QF3,L170,SD3K,GIR,L275,GIR,BPM,L185];             % arc sector in between B3-B2 (high beta odd-numbered straight sections)
-C4A = [GIR,L340,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L610,GIR];                    % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-C1B = [GIR,L610,GIR,SD1K,L170,QF1,L135, BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L185];          % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C2B = [GIR,L460,GIR,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];        % arc sector in between B2-B3 (low beta even-numbered straight sections)
-C3B = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2J,L077,CF,L083,QF3,L170,SD3J,GIR,L275,GIR,BPM,L185];             % arc sector in between B3-B2 (low beta even-numbered straight sections)
-C4B = [GIR,L340,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L610,GIR];                    % arc sector in between B2-B1 (low beta even-numbered straight sections)
+M2A = [GIR,CF,L085,SFA,L150,QFA,L124,BPM,L116,SDA,L150,QDA,GIR,L170,GIR];                           % high beta xxM2 girder  
+M1A = fliplr(M2A);                                                                                  % high beta xxM1 girder
+IDA = [L500,RBPM,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,RBPM,L500];                    % high beta ID straight section
+CAV = [L500,RBPM,LIA,L500,L500,L500,MIA,RFC,L500,L500,L500,LIA,RBPM,L500];                          % high beta RF cavity straight section 
+INJ = [L500,RBPM,LIA,L500,L200,SEPTIN,L800,END,START,MIA,   LKK, KICKIN, LPMU, PMM, LPMD];          % high beta INJ straight section
+M1B = [GIR,L170,GIR,QDB1,L150,SDB,L116,BPM,L124,QFB,L150,SFB,L050,CF,L035,QDB2,GIR];                % low beta xxM1 girder
+M2B = fliplr(M1B);                                                                                  % low beta xxM2 girder
+IDB = [L500,RBPM,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,RBPM,L500];                    % low beta ID straight section
+C1A = [GIR,L610,GIR,SD1J,L170,QF1,L135, BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L185];    % arc sector in between B1-B2 (high beta odd-numbered straight sections)
+C2A = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 (high beta odd-numbered straight sections)
+C3A = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2K,L077,CF,L083,QF3,L170,SD3K,GIR,L275,GIR,BPM,L185];  % arc sector in between B3-B2 (high beta odd-numbered straight sections)
+C4A = [GIR,L340,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L610,GIR];              % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C1B = [GIR,L610,GIR,SD1K,L170,QF1,L135, BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L185];    % arc sector in between B1-B2 (low beta even-numbered straight sections)
+C2B = [GIR,L460,GIR,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 (low beta even-numbered straight sections)
+C3B = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2J,L077,CF,L083,QF3,L170,SD3J,GIR,L275,GIR,BPM,L185];  % arc sector in between B3-B2 (low beta even-numbered straight sections)
+C4B = [GIR,L340,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L610,GIR];              % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
+C2A_DCCT = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L300,DCCT1,L488,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 with DCCT1 (high beta odd-numbered straight sections)
+C2B_DCCT = [GIR,L460,GIR,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,GIR,L300,DCCT2,L488,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 with DCCT2 (low beta even-numbered straight sections)
 
 %% GIRDERS
 
@@ -232,8 +250,8 @@ C1_S09 = C1A; C2_S09 = C2A; C3_S09 = C3A; C4_S09 = C4A;
 C1_S10 = C1B; C2_S10 = C2B; C3_S10 = C3B; C4_S10 = C4B;
 C1_S11 = C1A; C2_S11 = C2A; C3_S11 = C3A; C4_S11 = C4A;
 C1_S12 = C1B; C2_S12 = C2B; C3_S12 = C3B; C4_S12 = C4B;
-C1_S13 = C1A; C2_S13 = C2A; C3_S13 = C3A; C4_S13 = C4A;
-C1_S14 = C1B; C2_S14 = C2B; C3_S14 = C3B; C4_S14 = C4B;
+C1_S13 = C1A; C2_S13 = C2A_DCCT; C3_S13 = C3A; C4_S13 = C4A;
+C1_S14 = C1B; C2_S14 = C2B_DCCT; C3_S14 = C3B; C4_S14 = C4B;
 C1_S15 = C1A; C2_S15 = C2A; C3_S15 = C3A; C4_S15 = C4A;
 C1_S16 = C1B; C2_S16 = C2B; C3_S16 = C3B; C4_S16 = C4B;
 C1_S17 = C1A; C2_S17 = C2A; C3_S17 = C3A; C4_S17 = C4A;
@@ -243,26 +261,26 @@ C1_S20 = C1B; C2_S20 = C2B; C3_S20 = C3B; C4_S20 = C4B;
 
 %% SECTORS # 01..20
 
-S01 = [M1_S01, SS_S01, M2_S01, B1, C1_S01, B2, C2_S01, B3C, C3_S01, B2, C4_S01, B1];
-S02 = [M1_S02, SS_S02, M2_S02, B1, C1_S02, B2, C2_S02, B3C, C3_S02, B2, C4_S02, B1];
-S03 = [M1_S03, SS_S03, M2_S03, B1, C1_S03, B2, C2_S03, B3C, C3_S03, B2, C4_S03, B1];
-S04 = [M1_S04, SS_S04, M2_S04, B1, C1_S04, B2, C2_S04, B3C, C3_S04, B2, C4_S04, B1];
-S05 = [M1_S05, SS_S05, M2_S05, B1, C1_S05, B2, C2_S05, B3C, C3_S05, B2, C4_S05, B1];
-S06 = [M1_S06, SS_S06, M2_S06, B1, C1_S06, B2, C2_S06, B3C, C3_S06, B2, C4_S06, B1];
-S07 = [M1_S07, SS_S07, M2_S07, B1, C1_S07, B2, C2_S07, B3C, C3_S07, B2, C4_S07, B1];
-S08 = [M1_S08, SS_S08, M2_S08, B1, C1_S08, B2, C2_S08, B3C, C3_S08, B2, C4_S08, B1];
-S09 = [M1_S09, SS_S09, M2_S09, B1, C1_S09, B2, C2_S09, B3C, C3_S09, B2, C4_S09, B1];
-S10 = [M1_S10, SS_S10, M2_S10, B1, C1_S10, B2, C2_S10, B3C, C3_S10, B2, C4_S10, B1];
-S11 = [M1_S11, SS_S11, M2_S11, B1, C1_S11, B2, C2_S11, B3C, C3_S11, B2, C4_S11, B1];
-S12 = [M1_S12, SS_S12, M2_S12, B1, C1_S12, B2, C2_S12, B3C, C3_S12, B2, C4_S12, B1];
-S13 = [M1_S13, SS_S13, M2_S13, B1, C1_S13, B2, C2_S13, B3C, C3_S13, B2, C4_S13, B1];
-S14 = [M1_S14, SS_S14, M2_S14, B1, C1_S14, B2, C2_S14, B3C, C3_S14, B2, C4_S14, B1];
-S15 = [M1_S15, SS_S15, M2_S15, B1, C1_S15, B2, C2_S15, B3C, C3_S15, B2, C4_S15, B1];
-S16 = [M1_S16, SS_S16, M2_S16, B1, C1_S16, B2, C2_S16, B3C, C3_S16, B2, C4_S16, B1];
-S17 = [M1_S17, SS_S17, M2_S17, B1, C1_S17, B2, C2_S17, B3C, C3_S17, B2, C4_S17, B1];
-S18 = [M1_S18, SS_S18, M2_S18, B1, C1_S18, B2, C2_S18, B3C, C3_S18, B2, C4_S18, B1];
-S19 = [M1_S19, SS_S19, M2_S19, B1, C1_S19, B2, C2_S19, B3C, C3_S19, B2, C4_S19, B1];
-S20 = [M1_S20, SS_S20, M2_S20, B1, C1_S20, B2, C2_S20, B3C, C3_S20, B2, C4_S20, B1];
+S01 = [M1_S01, SS_S01, M2_S01, B1, C1_S01, B2, C2_S01, BC, C3_S01, B2, C4_S01, B1];
+S02 = [M1_S02, SS_S02, M2_S02, B1, C1_S02, B2, C2_S02, BC, C3_S02, B2, C4_S02, B1];
+S03 = [M1_S03, SS_S03, M2_S03, B1, C1_S03, B2, C2_S03, BC, C3_S03, B2, C4_S03, B1];
+S04 = [M1_S04, SS_S04, M2_S04, B1, C1_S04, B2, C2_S04, BC, C3_S04, B2, C4_S04, B1];
+S05 = [M1_S05, SS_S05, M2_S05, B1, C1_S05, B2, C2_S05, BC, C3_S05, B2, C4_S05, B1];
+S06 = [M1_S06, SS_S06, M2_S06, B1, C1_S06, B2, C2_S06, BC, C3_S06, B2, C4_S06, B1];
+S07 = [M1_S07, SS_S07, M2_S07, B1, C1_S07, B2, C2_S07, BC, C3_S07, B2, C4_S07, B1];
+S08 = [M1_S08, SS_S08, M2_S08, B1, C1_S08, B2, C2_S08, BC, C3_S08, B2, C4_S08, B1];
+S09 = [M1_S09, SS_S09, M2_S09, B1, C1_S09, B2, C2_S09, BC, C3_S09, B2, C4_S09, B1];
+S10 = [M1_S10, SS_S10, M2_S10, B1, C1_S10, B2, C2_S10, BC, C3_S10, B2, C4_S10, B1];
+S11 = [M1_S11, SS_S11, M2_S11, B1, C1_S11, B2, C2_S11, BC, C3_S11, B2, C4_S11, B1];
+S12 = [M1_S12, SS_S12, M2_S12, B1, C1_S12, B2, C2_S12, BC, C3_S12, B2, C4_S12, B1];
+S13 = [M1_S13, SS_S13, M2_S13, B1, C1_S13, B2, C2_S13, BC, C3_S13, B2, C4_S13, B1];
+S14 = [M1_S14, SS_S14, M2_S14, B1, C1_S14, B2, C2_S14, BC, C3_S14, B2, C4_S14, B1];
+S15 = [M1_S15, SS_S15, M2_S15, B1, C1_S15, B2, C2_S15, BC, C3_S15, B2, C4_S15, B1];
+S16 = [M1_S16, SS_S16, M2_S16, B1, C1_S16, B2, C2_S16, BC, C3_S16, B2, C4_S16, B1];
+S17 = [M1_S17, SS_S17, M2_S17, B1, C1_S17, B2, C2_S17, BC, C3_S17, B2, C4_S17, B1];
+S18 = [M1_S18, SS_S18, M2_S18, B1, C1_S18, B2, C2_S18, BC, C3_S18, B2, C4_S18, B1];
+S19 = [M1_S19, SS_S19, M2_S19, B1, C1_S19, B2, C2_S19, BC, C3_S19, B2, C4_S19, B1];
+S20 = [M1_S20, SS_S20, M2_S20, B1, C1_S20, B2, C2_S20, BC, C3_S20, B2, C4_S20, B1];
 
 anel = [S01,S02,S03,S04,S05,S06,S07,S08,S09,S10,S11,S12,S13,S14,S15,S16,S17,S18,S19,S20];
 elist = anel;
