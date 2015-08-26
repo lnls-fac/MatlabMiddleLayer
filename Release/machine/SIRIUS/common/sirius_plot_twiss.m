@@ -84,21 +84,31 @@ switch lower(maquina)
 end
 
 if ~tipo
-    figure1=figure('Color',[1 1 1],'Position', [1 1 1000 621]);
+    figure1=figure('Color',[1 1 1],'Position', [1 1 1000 500]);
     ax1 = axes('FontSize',FnSz);
     xlabel({'s [m]'},'FontSize',FnSz);
     ylabel({'\beta [m]'},'FontSize',FnSz);
     hold all;
     plot(twiss.pos(ini:fim),twiss.betax(ini:fim),'LineWidth',LnWd,'Color',BxCl);
     plot(twiss.pos(ini:fim),twiss.betay(ini:fim),'LineWidth',LnWd,'Color',ByCl);
-    legend({'\beta_x','\beta_y'},'Location','northwest','Box','off',...
+    plot(twiss.pos(ini:fim),10*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
+
+    legend({'\beta_x','\beta_y', '10 \eta_x'},'Location','northwest','Box','off',...
            'Color','none','XColor','w','YColor','w');
     
     %Creat grid
     grid(ax1,'on');
+  
     
-    offset=min(min(abs(twiss.betay(ini:fim)),abs(twiss.betax(ini:fim))));
+    %offset=min(min(abs(twiss.betay(ini:fim)),abs(twiss.betax(ini:fim))));
+    offset=0;
     top=max(max(abs(twiss.betay(ini:fim)),abs(twiss.betax(ini:fim))));
+
+    %Round to nice values (multiple of 5)
+    top=(round(top/5)+(mod(top,5)~=0))*5;
+    %Fixed top
+    %top=30;
+    nticks1=top/5;
     
     %Faz grafico da rede
     Delta=(top+offset)*0.1/3;
@@ -106,48 +116,65 @@ if ~tipo
     xlimit=[0 twiss.pos(fim)];
     switch lower(maquina)
         case 'si'
-            lnls_drawlattice(THERING,20,offset,1,Delta);
+            lnls_drawlattice(THERING,20,offset,true,0.8*Delta,true);
             xlim(xlimit);
         case 'bo'
-            lnls_drawlattice(THERING,10,offset,1,Delta);
+            lnls_drawlattice(THERING,10,offset,true,0.8*Delta,true);
             xlim(xlimit);
         otherwise
-            lnls_drawlattice(THERING,1,offset,1,Delta);
+            lnls_drawlattice(THERING,1,offset,true,0.8*Delta,true);
             xlim(xlimit);
     end
     offset=offset-2*Delta;
-    ylim([offset top+2]);
+    ylim([offset top]);
+        box on;
     
-
     %Define eixo y secund?rio
-    ax2 = axes('Parent',figure1,'Position',get(ax1(1),'Position'),...
-               'XAxisLocation','top','YAxisLocation','right',...
-               'Color','none','XTickLabel',[],'FontSize', FnSz,...
-               'XColor','k','YColor',DxCl);
-    linkaxes([ax1(1) ax2],'x');
-    hold on
-    plot(ax2,twiss.pos(ini:fim),100*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
-    ylabel(ax2,{'\eta_x [cm]'},'FontSize',FnSz,'Rot',-90);
-    set(get(ax2,'YLabel'),'Position',get(get(ax2,'YLabel'),'Position')+[1.2 0 0]);
+%    ax2 = axes('Parent',figure1,'Position',get(ax1(1),'Position'),...
+%               'XAxisLocation','top','YAxisLocation','right',...
+%               'Color','none','XTickLabel',[],'FontSize', FnSz,...
+%               'XColor','k','YColor',DxCl);
+%    linkaxes([ax1(1) ax2],'x');
+%    hold on
+%    plot(ax2,twiss.pos(ini:fim),100*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
+%    ylabel(ax2,{'\eta_x [cm]'},'FontSize',FnSz,'Rot',-90);
+%    set(get(ax2,'YLabel'),'Position',get(get(ax2,'YLabel'),'Position')+[1.2 0 0]);
     
     %Redefine extremos para casar escala com o eixo esquerdo
-    y2max=100*max(twiss.etax);
-    y2min=100*min(twiss.etax);
-    Deltay2=y2max-y2min;
-    y1max=max(max(twiss.betax),max(twiss.betay));
-    y1min=min(min(twiss.betax),min(twiss.betay));
-    Deltay1= y1max-y1min;
-    y1lim=get(ax1,'ylim');
-    Dmin=abs((y1lim(1)-y1min)/Deltay1*Deltay2);
-    Dmax=abs((y1lim(2)-y1max)/Deltay1*Deltay2);
-    ylim(ax2,[(y2min-Dmin) (y2max+Dmax)])
-    y1ticks=get(ax1,'YTick');
-    Dticks=(y2min-Dmin)+abs((y1ticks-y1lim(1))/Deltay1*Deltay2);
-    set(ax2,'Ytick',Dticks);
-    set(ax2,'YTickLabel',sprintf('%3.1f|',Dticks));
+%    y2max=100*max(twiss.etax);
+%    y2min=100*min(twiss.etax);
+%    if (y2min<0)
+%        y2max=max(y2max,-y2min);
+%        y2min=-y2max;
+%    else 
+%        y2min=0;
+%    end
+%    Deltay2=y2max-y2min;
+%    %Round to nice values
+%    dDeltay2=Deltay2/nticks1;
+%    dDeltay2=(round(dDeltay2/5)+(mod(dDeltay2,5)~=0))*5;
+%    Deltay2=dDeltay2*nticks1;
+%    if (y2min==0)
+%        y2max=Deltay2;
+%    else
+%        y2max=Deltay2/2;
+%        y2min=-y2max;
+%    end
+%    offset=y2min-4*Deltay2*0.1/3;
+    %y1max=max(max(twiss.betax),max(twiss.betay));
+    %y1min=min(min(twiss.betax),min(twiss.betay));
+    %Deltay1= y1max-y1min;
+    %y1lim=get(ax1,'ylim');
+    %Dmin=abs((y1lim(1)-y1min)/Deltay1*Deltay2);
+    %Dmax=abs((y1lim(2)-y1max)/Deltay1*Deltay2);
     
-    
-    
+%    ylim(ax2,[offset y2max]);
+%    Dticks=y2min:dDeltay2:y2max;
+%    %y1ticks=get(ax1,'YTick');
+%    %Dticks=(y2min-Dmin)+abs((y1ticks-y1lim(1))/Deltay1*Deltay2);
+%    set(ax2,'Ytick',Dticks);
+%    set(ax2,'YTickLabel',sprintf('%3.0f|',Dticks));
+%    
     %Insere titulo e legenda
     title({['Twiss functions - ' titulo]},'FontSize',FnSz,'FontWeight','bold');
         
@@ -160,17 +187,17 @@ else
     
     %Grafico dispersao horizontal
     axes('Units','pixels','Position',[70 380 780 230],'FontSize',FnSz);
-    title(['Beam Stay Clear - ' titulo], 'FontWeight','bold');
+    title(['Twiss functions - ' titulo], 'FontWeight','bold');
     hold all;
     plot(twiss.pos(ini:fim),100*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
-    xlim(xlimit); ylim([-0.1, 105*max(twiss.etax)]);
+    xlim(xlimit); ylim([-0.1+105*min(twiss.etax), 105*max(twiss.etax)]);
     ylabel('\eta_x [cm]', 'FontSize',FnSz);
     %         set(ylab, 'position', get(ylab,'position')+[0.6,0,0]);
     grid on;
     box on;
     
     %Grafico rede magnetica
-    axes('Units','pixels','Position',[70 300 780 50]);
+    axes('Units','pixels','Position',[70 70 780 50]);
     if strcmp(maquina,'si')
         lnls_drawlattice(THERING,20,0,true,1,true);
         xlim(xlimit);
@@ -186,7 +213,7 @@ else
     end
     
     %Grafico funcoes betatron
-    axes('Units','pixels','Position',[70 70 780 230],'FontSize',FnSz);
+    axes('Units','pixels','Position',[70 130 780 230],'FontSize',FnSz);
     hold all;
     xlim(xlimit);
     plot(twiss.pos(ini:fim),twiss.betax(ini:fim),'LineWidth',LnWd,'Color',BxCl);
