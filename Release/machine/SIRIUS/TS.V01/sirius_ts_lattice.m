@@ -9,7 +9,7 @@ function [r, lattice_title, IniCond] = sirius_ts_lattice(varargin)
 energy = 3e9;
 lattice_version = 'TS.V01';
 mode = 'M';
-version = '1';
+version = '2';
 mode_version = [mode version];
 
 % processamento de input (energia e modo de operacao)
@@ -120,7 +120,7 @@ h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
 h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
 mseptin_a = marker('bsepting', 'IdentityPass'); % marker at the center of thick septum
-septgr  = [h1, mseptin_a, h2];
+septgr  = [h1, mseptin_a, ch, h2];
 
 % -- sep fino --
 dip_nam =  'septinf';
@@ -134,7 +134,7 @@ h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
 mseptin_b = marker('mseptinf', 'IdentityPass'); % marker at the center of thin septum
 eseptin_b = marker('eseptinf', 'IdentityPass'); % marker at the end of thin septum
-septfi    = [h1, mseptin_b, ch, h2, eseptin_b];     % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
+septfi    = [h1, mseptin_b, h2, eseptin_b];     % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
            
 % --- lines ---

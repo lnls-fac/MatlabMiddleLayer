@@ -28,7 +28,6 @@ s=cat(1,t.SPos);
 beta=cat(1,t.beta);
 disp=[t.Dispersion];
 d=disp(1,:)';
-%figure;plot(s,beta(:,1),'b',s,beta(:,2),'r',s,d(:,1),'g');
 
 ind_bpm = findcells(ltlb, 'FamName', 'bpm');
 ind_ch = findcells(ltlb, 'FamName', 'hcm');
@@ -135,33 +134,30 @@ for nmaq=1:n_maquinas
     
     %Itera
     
-    for iter=1:1
-% Corre??o
-        dteta_ch(:,nmaq) = MCH * (xc_BPM(:,nmaq) + ebpmx');
-        dteta_cv(:,nmaq) = MCV * (yc_BPM(:,nmaq) + ebpmy');
+    dteta_ch(:,nmaq) = MCH * (xc_BPM(:,nmaq) + ebpmx');
+    dteta_cv(:,nmaq) = MCV * (yc_BPM(:,nmaq) + ebpmy');
 
-        for i=1:nch
-            tetaori=ltlb{ind_ch(i)}.KickAngle(1);
-            ltlb{ind_ch(i)}.KickAngle = [tetaori+dteta_ch(i,nmaq) 0];
-        end
+    for i=1:nch
+        tetaori=ltlb{ind_ch(i)}.KickAngle(1);
+        ltlb{ind_ch(i)}.KickAngle = [tetaori+dteta_ch(i,nmaq) 0];
+    end
 
-        for i=1:ncv
-            tetaori=ltlb{ind_cv(i)}.KickAngle(2);
-            ltlb{ind_cv(i)}.KickAngle = [0 dteta_cv(i,nmaq)+tetaori];
-        end
+    for i=1:ncv
+        tetaori=ltlb{ind_cv(i)}.KickAngle(2);
+        ltlb{ind_cv(i)}.KickAngle = [0 dteta_cv(i,nmaq)+tetaori];
+    end
 
 % Orbita corrigida
-        t=twissline(ltlb,dp0,Twiss0,1:length(ltlb)+1);
-        for i=1:length(t)
-            orbcx(i,nmaq)=t(i).ClosedOrbit(1);
-            orbcy(i,nmaq)=t(i).ClosedOrbit(3);
-        end
-        orb_corr_fim(:,nmaq)=t(end).ClosedOrbit;
+    t=twissline(ltlb,dp0,Twiss0,1:length(ltlb)+1);
+    for i=1:length(t)
+        orbcx(i,nmaq)=t(i).ClosedOrbit(1);
+        orbcy(i,nmaq)=t(i).ClosedOrbit(3);
+    end
+    orb_corr_fim(:,nmaq)=t(end).ClosedOrbit;
 
 % Orbita corrigida nos BPMs
-        xc_BPM(:,nmaq) = orbcx(ind_bpm,nmaq);
-        yc_BPM(:,nmaq) = orbcy(ind_bpm,nmaq);
-    end
+    xc_BPM(:,nmaq) = orbcx(ind_bpm,nmaq);
+    yc_BPM(:,nmaq) = orbcy(ind_bpm,nmaq);
 
 %    erroex = (-1+2*rand(1,length(idx))) * 1/1000;
 %    ltlb = lnls_add_excitation(erroex, idx, ltlb);
@@ -186,7 +182,7 @@ y_BPM_rms = std(y_BPM,0,2);
 xc_BPM_rms = std(xc_BPM,0,2);
 yc_BPM_rms = std(yc_BPM,0,2);
 orb_semcorr_fim_rms = std(orb_semcorr_fim,0,2);
-orb_ripple_fim_rms = std(orb_ripple_fim,0,2);
+%orb_ripple_fim_rms = std(orb_ripple_fim,0,2);
 
 %separando ch e septum
 dteta_sep = dteta_ch(end,:);       %ultimo
