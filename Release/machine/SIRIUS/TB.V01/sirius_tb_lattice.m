@@ -2,6 +2,7 @@ function [r, lattice_title, IniCond] = sirius_tb_lattice(varargin)
 % 2013-08-19 created  Fernando.
 % 2013-12-02 V200 - from OPA (Ximenes)
 % 2014-10-20 V300 - new version (Liu)
+% 2015-08-26 V01 - new version (Liu)
 
 %% global parameters 
 %  =================

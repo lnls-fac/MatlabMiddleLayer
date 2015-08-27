@@ -168,19 +168,19 @@ end
 try
     % BPMx
     AO.bpmx.AT.ATType = 'X';
-    AO.bpmx.AT.ATIndex = buildatindex(AO.bpmx.FamilyName, Indices.BPM);
+    AO.bpmx.AT.ATIndex = buildatindex(AO.bpmx.FamilyName, Indices.bpm);
     AO.bpmx.Position = findspos(THERING, AO.bpmx.AT.ATIndex(:,1))';   
 catch
-    warning('BPMx family not found in the model.');
+    warning('bpmx family not found in the model.');
 end
 
 try
     % BPMy
     AO.bpmy.AT.ATType = 'Y';
-    AO.bpmy.AT.ATIndex = buildatindex(AO.bpmy.FamilyName, Indices.BPM);
+    AO.bpmy.AT.ATIndex = buildatindex(AO.bpmy.FamilyName, Indices.bpm);
     AO.bpmy.Position = findspos(THERING, AO.bpmy.AT.ATIndex(:,1))';   
 catch
-    warning('BPMy family not found in the model.');
+    warning('bpmy family not found in the model.');
 end
 
 try

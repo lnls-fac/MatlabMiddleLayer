@@ -165,8 +165,8 @@ SF2K = sextupole('sf2k', sext_len, sf2k_strength, sext_pass_method); % chs
 
 % -- pulsed magnets --
 
-KICKIN = sextupole('kickin' , 0.5, 0, sext_pass_method); % injection kicker
-PMM    = sextupole('pmm' ,    0.5, 0, sext_pass_method); % pulsed multipole magnet
+KICKIN = sextupole('kick_in', 0.5, 0, sext_pass_method); % injection kicker
+PMM    = sextupole('pmm',     0.5, 0, sext_pass_method); % pulsed multipole magnet
 
 % -- bpms and fast correctors --
 BPM    = marker('bpm', 'IdentityPass');
@@ -200,16 +200,16 @@ M1B = [GIR,L170,GIR,QDB1,L150,SDB,L116,BPM,L124,QFB,L150,SFB,L050,CF,L035,QDB2,G
 M2B = fliplr(M1B);                                                                                  % low beta xxM2 girder
 IDB = [L500,RBPM,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,RBPM,L500];                    % low beta ID straight section
 C1A = [GIR,L610,GIR,SD1J,L170,QF1,L135, BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L185];    % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C2A = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 (high beta odd-numbered straight sections)
-C3A = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2K,L077,CF,L083,QF3,L170,SD3K,GIR,L275,GIR,BPM,L185];  % arc sector in between B3-B2 (high beta odd-numbered straight sections)
+C2A = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];  % arc sector in between B2-BC (high beta odd-numbered straight sections)
+C3A = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2K,L077,CF,L083,QF3,L170,SD3K,GIR,L275,GIR,BPM,L185];  % arc sector in between BC-B2 (high beta odd-numbered straight sections)
 C4A = [GIR,L340,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L610,GIR];              % arc sector in between B2-B1 (high beta odd-numbered straight sections)
 C1B = [GIR,L610,GIR,SD1K,L170,QF1,L135, BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L185];    % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C2B = [GIR,L460,GIR,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 (low beta even-numbered straight sections)
-C3B = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2J,L077,CF,L083,QF3,L170,SD3J,GIR,L275,GIR,BPM,L185];  % arc sector in between B3-B2 (low beta even-numbered straight sections)
+C2B = [GIR,L460,GIR,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,GIR,L788,GIR,BPM,RBPM,L100];  % arc sector in between B2-BC (low beta even-numbered straight sections)
+C3B = [GIR,L888,GIR,QF4,L112,RBPM,BPM,L118,SF2J,L077,CF,L083,QF3,L170,SD3J,GIR,L275,GIR,BPM,L185];  % arc sector in between BC-B2 (low beta even-numbered straight sections)
 C4B = [GIR,L340,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L610,GIR];              % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
-C2A_DCCT = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L300,DCCT1,L488,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 with DCCT1 (high beta odd-numbered straight sections)
-C2B_DCCT = [GIR,L460,GIR,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,GIR,L300,DCCT2,L488,GIR,BPM,RBPM,L100];  % arc sector in between B2-B3 with DCCT2 (low beta even-numbered straight sections)
+C2A_DCCT = [GIR,L460,GIR,SD3J,L170,QF3,L083,CF,L077,SF2J,L118,BPM,L112,QF4,GIR,L300,DCCT1,L488,GIR,BPM,RBPM,L100];  % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
+C2B_DCCT = [GIR,L460,GIR,SD3K,L170,QF3,L083,CF,L077,SF2K,L118,BPM,L112,QF4,GIR,L300,DCCT2,L488,GIR,BPM,RBPM,L100];  % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
 
 %% GIRDERS
 
