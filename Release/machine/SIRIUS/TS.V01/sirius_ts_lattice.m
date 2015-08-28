@@ -94,47 +94,45 @@ h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2,.
 bend      = [h1 mbend h2];      
 
 
-% -- extraction septum booster --
+% -- bo extraction septum --
 dip_nam =  'septex';
 dip_len =  0.85;
 dip_ang =  -3.6 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
-h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-bseptex = marker('bsetpex', 'IdentityPass'); % marker at the beginning of extraction septum
-mseptex = marker('msetpex', 'IdentityPass'); % marker at the center of extraction septum
+h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,   0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+bseptex = marker('bseptex', 'IdentityPass'); % marker at the beginning of extraction septum
+mseptex = marker('mseptex', 'IdentityPass'); % marker at the center of extraction septum
+eseptex = marker('eseptex', 'IdentityPass'); % marker at the end of extraction septum
 septum  = [h1, mseptex, h2];
-septex  = [bseptex, septum, l20, ch, septum];
+septex  = [bseptex, septum, l20, ch, septum, eseptex];
 
-% -- sep grosso --
-dip_nam =  'septing';
-dip_len =  1.10;
-dip_ang =  6.2 * deg_2_rad;
-dip_K   =  0.0;
-dip_S   =  0.00;
-h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-mseptin_a = marker('bsepting', 'IdentityPass'); % marker at the center of thick septum
-septgr  = [h1, mseptin_a, h2];
+% -- thick si injection septum --
+dip_nam  =  'septing';
+dip_len  =  1.10;
+dip_ang  =  6.2 * deg_2_rad;
+dip_K    =  0.0;
+dip_S    =  0.00;
+h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+bsepting = marker('bsepting', 'IdentityPass'); % marker at the beginning of thick septum
+msepting = marker('msepting', 'IdentityPass'); % marker at the center of thick septum
+esepting = marker('esepting', 'IdentityPass'); % marker at the end of thick septum
+septgr   = [bsepting, h1, msepting, h2, esepting];
 
-% -- sep fino --
-dip_nam =  'septinf';
-dip_len =  0.925;
-dip_ang =  3.13 * deg_2_rad;
-dip_K   =  0.00;
-dip_S   =  0.00;
-h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-mseptin_b = marker('mseptinf', 'IdentityPass'); % marker at the center of thin septum
-eseptin_b = marker('eseptinf', 'IdentityPass'); % marker at the end of thin septum
-septfi    = [h1, mseptin_b, ch, h2, eseptin_b];     % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
+% -- thin si injection septum --
+dip_nam  =  'septinf';
+dip_len  =  0.925;
+dip_ang  =  3.13 * deg_2_rad;
+dip_K    =  0.00;
+dip_S    =  0.00;
+h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+bseptinf = marker('bseptinf', 'IdentityPass');   % marker at the beginning of thin septum
+mseptinf = marker('mseptinf', 'IdentityPass');   % marker at the center of thin septum
+eseptinf = marker('eseptinf', 'IdentityPass');   % marker at the end of thin septum
+septfi   = [bseptinf, h1, mseptinf, ch, h2, eseptinf];   % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
            
 % --- lines ---
@@ -203,24 +201,36 @@ function the_ring = set_vacuum_chamber(the_ring0)
 
 % y = +/- y_lim * (1 - (x/x_lim)^n)^(1/n);
 
+
 the_ring = the_ring0;
-bends_vchamber = [0.016 0.016 100]; % n = 100: ~rectangular
-other_vchamber = [0.016 0.016 2];   % n = 2;   circular/eliptica
-ivu_vchamber   = [0.016 0.016 2];   
 
-bends = findcells(the_ring, 'BendingAngle');
-ivu   = findcells(the_ring, 'FamName', 'lia2');
-other = setdiff(1:length(the_ring), [bends ivu]);
+% -- default physical apertures --
+for i=1:length(the_ring)
+    the_ring{i}.VChamber = [0.012, 0.012, 2];
+end
 
-for i=1:length(bends)
-    the_ring{bends(i)}.VChamber = bends_vchamber;
+% -- bo extraction septum --
+mbeg = findcells(the_ring, 'FamName', 'bseptex');
+mend = findcells(the_ring, 'FamName', 'eseptex');
+for i=mbeg:mend
+    the_ring{i}.VChamber = [0.0015, 0.004, 2];
 end
-for i=1:length(ivu)
-    the_ring{ivu(i)}.VChamber = ivu_vchamber;
+
+% -- si thick injection septum --
+mbeg = findcells(the_ring, 'FamName', 'bsepting');
+mend = findcells(the_ring, 'FamName', 'esepting');
+for i=mbeg:mend
+    the_ring{i}.VChamber = [0.0045, 0.0035, 2];
 end
-for i=1:length(other)
-    the_ring{other(i)}.VChamber = other_vchamber;
+
+% -- si thin injection septum --
+mbeg = findcells(the_ring, 'FamName', 'bseptinf');
+mend = findcells(the_ring, 'FamName', 'eseptinf');
+for i=mbeg:mend
+    the_ring{i}.VChamber = [0.0015, 0.0035, 2];
 end
+
+
 
 
 function the_ring = set_num_integ_steps(the_ring0)
