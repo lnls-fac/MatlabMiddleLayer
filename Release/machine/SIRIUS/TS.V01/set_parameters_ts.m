@@ -9,14 +9,15 @@ if strcmpi(mode_version,'M1')
     IniCond.alpha= [-2.155, 2.22];
 
     %%% Quadrupoles
-    qf1a_strength =  1.684808484818;
-    qf1b_strength =  1.219399690114;
-    qd2_strength  = -3.517025640126;
-    qf2_strength  = 3.759461988653;
-    qf3_strength  = 3.244614087865;
-    qd4a_strength = -3.426138552933;
-    qf4_strength  = 4.154311086289;
-    qd4b_strength = -1.823603239212;
+    qf1a_strength =  1.688528648631;
+    qf1b_strength =  1.210772802151;
+    qd2_strength  = -3.520376313964;
+    qf2_strength  = 2.649990468945;
+    qf3_strength  = 3.245755500062;
+    qd4a_strength = -3.41825806902;
+    qf4_strength  = 4.154549899205;
+    qd4b_strength = -1.826959309409;
+    
     
 elseif strcmp(mode_version,'M2')
     
@@ -26,14 +27,14 @@ elseif strcmp(mode_version,'M2')
     IniCond.alpha= [-2.155, 2.22];
     
     %%% Quadrupoles
-    qf1a_strength = 2.051930439004;
-    qf1b_strength = 0.702915272007;
-    qd2_strength  = -3.147510154395;
-    qf2_strength  = 4.023324888575;
-    qf3_strength  = 3.164477543535;
-    qd4a_strength = -3.30415436161;
-    qf4_strength  = 3.852123122977;
-    qd4b_strength = -1.436723284084;
+    qf1a_strength = 2.065621057362;
+    qf1b_strength = 0.668302253919;
+    qd2_strength  = -3.190836498251;
+    qf2_strength  = 2.861614166104;
+    qf3_strength  = 3.166044768191;
+    qd4a_strength = -3.313624597572;
+    qf4_strength  = 3.845505089703;
+    qd4b_strength = -1.427650250322;
     
 else
     error('caso nao implementado');

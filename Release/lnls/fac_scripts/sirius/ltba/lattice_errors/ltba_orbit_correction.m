@@ -10,8 +10,8 @@ ip = strfind(Path,'/');
 Path = Path(1:ip(end));
 
 % Errors
-rms_alix = 0.3 * mm;
-rms_aliy = 0.3 * mm;
+rms_alix = 0.15 * mm;
+rms_aliy = 0.15 * mm;
 rms_roll = 0.4 * mrad;
 rms_ex   = 0.1 * pc;
 rms_x0   = 0.2 * mm;
@@ -19,7 +19,7 @@ rms_xp0  = 0.1 * mrad;
 rms_y0   = 0.2 * mm;
 rms_yp0  = 0.1 * mrad;
 rms_dp0  = 0.2 * pc;
-rms_bpm  = 0.5 * mm;
+rms_bpm  = 0.2 * mm;
 n_maquinas = 100;
 
 t=twissline(ltba,0.0,Twiss0,1:length(ltba)+1,'chrom');
@@ -214,7 +214,7 @@ Ycptp_mean = mean(orbcy_ptp);
 Xcptp_max = max(orbcx_ptp);
 Ycptp_max = max(orbcy_ptp);
 
-fout = fopen([Path 'Correction_summary.out'], 'w');
+fout = fopen([Path 'Correction_summary_' tit '.out'], 'w');
 fprintf(fout,'Correction_summary\n');
 fprintf(fout,['BTS Transfer Line - ' tit '\n']);
 fprintf(fout,'Uniform random errors for all dipoles, septa and quadrupoles\n');
@@ -276,7 +276,7 @@ fclose(fout);
 
 %Create Figure Horizontal correction
 figure1 = figure('Color',[1 1 1]);
-annotation('textbox', [0.3,0.88,0.1,0.1],...
+annotation('textbox', [0.2,0.88,0.1,0.1],...
            'FontSize',14,...
            'FontWeight','bold',...
            'LineStyle','none',...
@@ -329,7 +329,7 @@ text(1,ylimit(1)+0.2*ylimit(2),'Y after correction', 'FontSize',14,'Color','r');
 grid on;
 box on;
 
-plot2svg('orbit.svg');
+plot2svg(['orbit_' tit '.svg']);
 
 
 

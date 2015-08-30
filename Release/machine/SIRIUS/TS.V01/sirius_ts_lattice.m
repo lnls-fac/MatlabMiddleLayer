@@ -9,7 +9,7 @@ function [r, lattice_title, IniCond] = sirius_ts_lattice(varargin)
 energy = 3e9;
 lattice_version = 'TS.V01';
 mode = 'M';
-version = '2';
+version = '1';
 mode_version = [mode version];
 
 % processamento de input (energia e modo de operacao)
@@ -41,6 +41,7 @@ quad_pass_method = 'StrMPoleSymplectic4Pass';
 % --- drift spaces ---
 l15      = drift('l15', 0.15, 'DriftPass');
 l16      = drift('l16', 0.16, 'DriftPass');
+l17      = drift('l17', 0.17, 'DriftPass');
 l18      = drift('l18', 0.18, 'DriftPass');
 l20      = drift('l20', 0.20, 'DriftPass');
 l22      = drift('l22', 0.22, 'DriftPass');
@@ -48,7 +49,7 @@ l24      = drift('l24', 0.24, 'DriftPass');
 l25      = drift('l25', 0.25, 'DriftPass');
 
 la2p     = drift('la2p', 0.13777, 'DriftPass');
-lb3p     = drift('lb3p', 0.27883, 'DriftPass');
+lb3p     = drift('lb3p', 0.24883, 'DriftPass');
 lc1p     = drift('lc1p', 0.23400, 'DriftPass');
 lc2p     = drift('lc1p', 0.21215, 'DriftPass');
 ld2p     = drift('ld2p', 0.13933, 'DriftPass');
@@ -64,7 +65,7 @@ fim      = marker('end',    'IdentityPass');
 qf1a    = quadrupole('qf1a', 0.14, qf1a_strength, quad_pass_method); % qf
 qf1b    = quadrupole('qf1b', 0.14, qf1b_strength, quad_pass_method); % qf
 qd2     = quadrupole('qd2',  0.14, qd2_strength,  quad_pass_method); % qd
-qf2     = quadrupole('qf2',  0.14, qf2_strength,  quad_pass_method); % qf
+qf2     = quadrupole('qf2',  0.20, qf2_strength,  quad_pass_method); % qf
 qf3     = quadrupole('qf3',  0.20, qf3_strength,  quad_pass_method); % qf
 qd4a    = quadrupole('qd4a', 0.14, qd4a_strength, quad_pass_method); % qd
 qf4     = quadrupole('qf4',  0.20, qf4_strength,  quad_pass_method); % qf
@@ -141,7 +142,7 @@ septfi    = [h1, mseptin_b, h2, eseptin_b];     % we excluded ch to make it cons
 la1   = [l20, l18, cv, repmat(l20,1,5), l24];
 la2   = [la2p, repmat(l20,1,11), bpm, l20, ch, l25, cv, l20];
 la3   = [l16, l16];
-lb1   = [l20, l20, l20];
+lb1   = [l20, l20, l17];
 lb2   = [l20, l20, l20];
 lb3   = [lb3p, repmat(l20,1,18), bpm, l20, ch, l25, cv, l25];
 lc1   = [lc1p, repmat(l20,1,9)];
