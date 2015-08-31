@@ -120,7 +120,7 @@ h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0
 bsepting = marker('bsepting', 'IdentityPass'); % marker at the beginning of thick septum
 msepting = marker('msepting', 'IdentityPass'); % marker at the center of thick septum
 esepting = marker('esepting', 'IdentityPass'); % marker at the end of thick septum
-septgr   = [bsepting, h1, msepting, h2, esepting];
+septgr   = [bsepting, h1, msepting, ch, h2, esepting];
 
 % -- thin si injection septum --
 dip_nam  =  'septinf';
@@ -133,7 +133,7 @@ h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0
 bseptinf = marker('bseptinf', 'IdentityPass');   % marker at the beginning of thin septum
 mseptinf = marker('mseptinf', 'IdentityPass');   % marker at the center of thin septum
 eseptinf = marker('eseptinf', 'IdentityPass');   % marker at the end of thin septum
-septfi   = [bseptinf, h1, mseptinf, ch, h2, eseptinf];   % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
+septfi   = [bseptinf, h1, mseptinf, h2, eseptinf];   % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
            
 % --- lines ---
