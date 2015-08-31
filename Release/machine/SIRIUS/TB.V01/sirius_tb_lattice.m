@@ -70,14 +70,11 @@ bpm      = marker('bpm', 'IdentityPass');
 ch     = corrector('hcm',  0, [0 0], 'CorrectorPass');
 cv     = corrector('vcm',  0, [0 0], 'CorrectorPass');
 
-mch    = marker('mch',  'IdentityPass');
-mcv    = marker('mcv',  'IdentityPass');
-
 
 % --- quadrupoles ---
-q1a   = quadrupole('q1a', 0.05, q1a_strength, quad_pass_method);   %
-q1b   = quadrupole('q1b', 0.10, q1b_strength, quad_pass_method);   % LINAC TRIPLET
-q1c   = quadrupole('q1c', 0.05, q1c_strength, quad_pass_method);   %
+q1a   = quadrupole('q1a',  0.05, q1a_strength,  quad_pass_method);   %
+q1b   = quadrupole('q1b',  0.10, q1b_strength,  quad_pass_method);   % LINAC TRIPLET
+q1c   = quadrupole('q1c',  0.05, q1c_strength,  quad_pass_method);   %
 qd2   = quadrupole('qd2',  0.10, qd2_strength,  quad_pass_method); 
 qf2   = quadrupole('qf2',  0.10, qf2_strength,  quad_pass_method); 
 qd3a  = quadrupole('qd3a', 0.10, qd3a_strength, quad_pass_method); 
@@ -147,13 +144,11 @@ ld1   = [ld1p, repmat(l200,1,10)];
 ld3   = [ld3p, bpm, l150, ch, l200];
 le1   = [l200, cv, l200, l200, l200, l200, l200, l200, le1p];
 le3   = [l150, bpm, l150, cv, l100];
-
 line1 = [ch, cv, la1, q1a, l100, q1b, l100, q1a, l100, q1c, la2];
 arc1  = [lb1, qd2, lb2, qf2, lb3];
 line2 = [lc1, qd3a, lc2, qf3a, lc3, qf3b, lc4, qd3b, lc5];
 arc2  = [ld1, qf4, ld2, qd4, ld3];
 line3 = [le1, qf5, le2, qd5, le3];
-
 ltlb  = [inicio, line1, spec, arc1, bn, line2, bp, arc2, bp, line3, septin, bpm, fim];
 elist = ltlb;
 
