@@ -68,8 +68,8 @@ mbspec   = marker('mbspec', 'IdentityPass');
 mbn      = marker('mbn',    'IdentityPass');
 mbp      = marker('mbp',    'IdentityPass');
 msep     = marker('msep',   'IdentityPass');
-inicio   = marker('inicio', 'IdentityPass');
-fim      = marker('fim',    'IdentityPass');
+inicio   = marker('start',  'IdentityPass');
+fim      = marker('end',    'IdentityPass');
 fenda    = marker('fenda',  'IdentityPass');
 
 % --- beam position monitors ---
@@ -107,9 +107,8 @@ dip_len =  0.45003;
 dip_ang =  -15 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
-bspech      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0, 0,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-bspec   = [bspech bspech];
+bspech      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0, 0, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+bspec   = [bspech, bspech];
 
 % -- bn --
 dip_nam =  'bn';
@@ -117,11 +116,9 @@ dip_len =  0.300858;
 dip_ang =  -15 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
-bne     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-bns     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-bn      = [bne bns];
+bne     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+bns     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+bn      = [bne, bns];
       
 % -- bp --
 dip_nam =  'bp';
@@ -129,23 +126,21 @@ dip_len =  0.300858;
 dip_ang =  15 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
-bpe     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-bps     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-bp      = [bpe bps];      
+bpe     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+bps     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+bp      = [bpe, bps];      
 
-% -- sep --
-dip_nam =  'bseptinj';
+% -- bo injection septum --
+dip_nam =  'septin';
 dip_len =  0.50;
 dip_ang =  21.75 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
-bseptinje = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,...
-            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-bseptinjs = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2,...
-            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-bseptinj  = [bseptinje ch bseptinjs];
+septine = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+septins = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+bseptin = marker('bseptin','IdentityPass');
+eseptin = marker('eseptin','IdentityPass');
+septin  = [bseptin, septine, ch, septins,eseptin];
 
 %booster
 l800    = drift('l800', 0.80, 'DriftPass');
@@ -173,7 +168,7 @@ le3   = [ l150, bpm, l150, cv, l100];
 line1 = [ ch, cv, la1, qa1, l100, qa2, l100, qa1, l100, qa3, la2];
 arc1  = [ bspec, lb1, qb1, lb2, qb2, lb3, bn];
 line2 = [ lc1, qc1, lc2, qc2, lc3, qc3, lc4, qc4, lc5];
-arc2  = [ bp, ld1, qd1, ld2, qd2, ld3, bp, le1, qe1, le2, qe2, le3, bseptinj, bpm];
+arc2  = [ bp, ld1, qd1, ld2, qd2, ld3, bp, le1, qe1, le2, qe2, le3, septin, bpm];
 ltlb  = [inicio, line1, arc1, line2, arc2, fim];
 elist = ltlb;
 
@@ -182,8 +177,8 @@ elist = ltlb;
 the_line = buildlat(elist);
 the_line = setcellstruct(the_line, 'Energy', 1:length(the_line), energy);
 
-% shift lattice to start at the marker 'inicio'
-idx = findcells(the_line, 'FamName', 'inicio');
+% shift lattice to start at the marker 'start'
+idx = findcells(the_line, 'FamName', 'start');
 the_line = [the_line(idx:end) the_line(1:idx-1)];
 
 % checa se ha elementos com comprimentos negativos
@@ -207,24 +202,25 @@ r = the_line;
 function the_ring = set_vacuum_chamber(the_ring0)
 
 % y = +/- y_lim * (1 - (x/x_lim)^n)^(1/n);
-
 the_ring = the_ring0;
-bends_vchamber = [0.014 0.014 100]; % n = 100: ~rectangular
-other_vchamber = [0.014 0.014 2];   % n = 2;   circular/eliptica
-ivu_vchamber   = [0.014 0.014 2];   
 
-bends = findcells(the_ring, 'BendingAngle');
-ivu   = findcells(the_ring, 'FamName', 'lia2');
-other = setdiff(1:length(the_ring), [bends ivu]);
+% -- default physical apertures --
+for i=1:length(the_ring)
+    the_ring{i}.VChamber = [0.018, 0.018, 2];
+end
 
-for i=1:length(bends)
-    the_ring{bends(i)}.VChamber = bends_vchamber;
+% -- dipoles --
+bn = findcells(the_ring, 'FamName', 'bn');
+bp = findcells(the_ring, 'FamName', 'bp');
+for i=[bn, bp]
+    the_ring{i}.VChamber = [0.0117, 0.0117, 2];
 end
-for i=1:length(ivu)
-    the_ring{ivu(i)}.VChamber = ivu_vchamber;
-end
-for i=1:length(other)
-    the_ring{other(i)}.VChamber = other_vchamber;
+
+% -- bo injection septum --
+mbeg = findcells(the_ring, 'FamName', 'bseptin');
+mend = findcells(the_ring, 'FamName', 'eseptin');
+for i=mbeg:mend
+    the_ring{i}.VChamber = [0.0075, 0.008, 2];
 end
 
 
