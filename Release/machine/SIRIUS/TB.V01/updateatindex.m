@@ -46,13 +46,13 @@ catch
     warning('bn family not found in the model.');
 end
 try
-    % bseptinj
-    AO.bseptinj.AT.ATType = 'bseptinj';
-    AO.bseptinj.AT.ATIndex = buildatindex(AO.bseptinj.FamilyName, Indices.bseptinj);
-    AO.bseptinj.Position = findspos(THERING, AO.bseptinj.AT.ATIndex(:,1+floor(size(AO.bseptinj.AT.ATIndex,2)/2)))';
+    % septin
+    AO.septin.AT.ATType = 'septin';
+    AO.septin.AT.ATIndex = buildatindex(AO.septin.FamilyName, Indices.septin);
+    AO.septin.Position = findspos(THERING, AO.septin.AT.ATIndex(:,1+floor(size(AO.septin.AT.ATIndex,2)/2)))';
       
 catch
-    warning('bseptinj family not found in the model.');
+    warning('septin family not found in the model.');
 end
 
 try
