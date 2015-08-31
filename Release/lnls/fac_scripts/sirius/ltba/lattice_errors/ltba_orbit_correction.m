@@ -10,10 +10,10 @@ ip = strfind(Path,'/');
 Path = Path(1:ip(end));
 
 % Errors
-rms_alix = 0.15 * mm;
-rms_aliy = 0.15 * mm;
-rms_roll = 0.4 * mrad;
-rms_ex   = 0.1 * pc;
+rms_alix = 0.16 * mm;
+rms_aliy = 0.16 * mm;
+rms_roll = 0.5 * mrad;
+rms_ex   = 0.10 * pc;
 rms_x0   = 0.2 * mm;
 rms_xp0  = 0.1 * mrad;
 rms_y0   = 0.2 * mm;
@@ -81,11 +81,11 @@ for i=1:ncv
 end
 
 % Matrizes de correcao
-[UH,SH,VH] = svd(MH);
-MCH = -VH*inv(SH)*UH';
+[UH,SH,VH] = svd(MH,'econ');
+MCH = -VH*diag(1./diag(SH))*UH';
 
-[UV,SV,VV] = svd(MV);
-MCV = -VV*inv(SV)*UV';
+[UV,SV,VV] = svd(MV,'econ');
+MCV = -VV*diag(1./diag(SV))*UV';
 
 % Erros de alinhamento e excitacao em dipolos e quadrupolos
 idx = findcells(ltba,'K');
@@ -94,14 +94,23 @@ ltba_Ori = ltba;
 % Loop nas maquinas aleatorias
 for nmaq=1:n_maquinas
     ltba = ltba_Ori;
-    % Distribui??o uniforme de erros
-    errox = (-1+2*rand(1,length(idx))) * rms_alix;
-    erroy = (-1+2*rand(1,length(idx))) * rms_aliy;
-    erroex = (-1+2*rand(1,length(idx))) * rms_ex;
-    erroroll = (-1+2*rand(1,length(idx))) * rms_roll;
+    % Distribuicao gaussiana truncada
+    errox = lnls_trandn(length(idx),1) * rms_alix;
+    erroy = lnls_trandn(length(idx),1) * rms_aliy;
+    erroex = lnls_trandn(length(idx),1) * rms_ex;
+    erroroll = lnls_trandn(length(idx),1) * rms_roll;
     %erro de alinhamento de BPM
-    ebpmx = (-1+2*rand(1,nBPM)) * rms_bpm;
-    ebpmy = (-1+2*rand(1,nBPM)) * rms_bpm;
+    ebpmx = lnls_trandn(nBPM,1) * rms_bpm;
+    ebpmy = lnls_trandn(nBPM,1) * rms_bpm;
+
+    % Distribui??o uniforme de erros
+    %errox = (-1+2*rand(1,length(idx))) * rms_alix;
+    %erroy = (-1+2*rand(1,length(idx))) * rms_aliy;
+    %erroex = (-1+2*rand(1,length(idx))) * rms_ex;
+    %erroroll = (-1+2*rand(1,length(idx))) * rms_roll;
+    %erro de alinhamento de BPM
+    %ebpmx = (-1+2*rand(1,nBPM)) * rms_bpm;
+    %ebpmy = (-1+2*rand(1,nBPM)) * rms_bpm;
 
     ltba = lnls_add_misalignmentX(errox, idx, ltba);
     ltba = lnls_add_misalignmentY(erroy, idx, ltba);
@@ -110,13 +119,20 @@ for nmaq=1:n_maquinas
     
 % Orbit without correction
     % Error in lauching conditions
-    ex0 = (-1+2*rand(1)) * rms_x0;
-    exp0 = (-1+2*rand(1)) * rms_xp0;
-    ey0 = (-1+2*rand(1)) * rms_y0;
-    eyp0 = (-1+2*rand(1)) * rms_yp0;
+    %ex0 = (-1+2*rand(1)) * rms_x0;
+    %exp0 = (-1+2*rand(1)) * rms_xp0;
+    %ey0 = (-1+2*rand(1)) * rms_y0;
+    %eyp0 = (-1+2*rand(1)) * rms_yp0;
+    %Twiss0.ClosedOrbit=[ex0; exp0; ey0; eyp0];
+    %dp0 = (-1+2*rand(1)) * rms_dp0;
+
+    ex0 = trandn(1,1) * rms_x0;
+    exp0 = trandn(1,1) * rms_xp0;
+    ey0 = trandn(1,1) * rms_y0;
+    eyp0 = trandn(1,1) * rms_yp0;
     Twiss0.ClosedOrbit=[ex0; exp0; ey0; eyp0];
-    dp0 = (-1+2*rand(1)) * rms_dp0;
-    
+    dp0 = trandn(1,1) * rms_dp0;
+
     t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
     for i=1:length(t)
         orbx(i,nmaq)=t(i).ClosedOrbit(1);
@@ -217,16 +233,17 @@ Ycptp_max = max(orbcy_ptp);
 fout = fopen([Path 'Correction_summary_' tit '.out'], 'w');
 fprintf(fout,'Correction_summary\n');
 fprintf(fout,['BTS Transfer Line - ' tit '\n']);
-fprintf(fout,'Uniform random errors for all dipoles, septa and quadrupoles\n');
+fprintf(fout,'Gaussian random errors truncated at 1 sigma for all dipoles, septa and quadrupoles\n');
 fmt = 'X alignment = +-%g mm\n'; fprintf(fout,fmt,rms_alix/mm);
 fmt = 'y alignment = +-%g mm\n'; fprintf(fout,fmt,rms_aliy/mm);
 fmt = 'roll = +-%g mrad\n'; fprintf(fout,fmt,rms_roll/mrad);
 fmt = 'relative excitation = +-%g %%\n'; fprintf(fout,fmt,rms_ex/pc);
+fmt = 'x and y bpm offset = +-%g mm\n'; fprintf(fout,fmt,rms_bpm/mm);
 fmt = 'x launching condition = +-%g mm\n'; fprintf(fout,fmt,rms_x0/mm);
 fmt = 'xp launching condition = +-%g mrad\n'; fprintf(fout,fmt,rms_xp0/mrad);
 fmt = 'y launching condition = +-%g mm\n'; fprintf(fout,fmt,rms_y0/mm);
 fmt = 'yp launching condition = +-%g mrad\n'; fprintf(fout,fmt,rms_yp0/mrad);
-fmt = 'dp/p launching condition = +-%g %\n'; fprintf(fout,fmt,rms_dp0/pc);
+fmt = 'dp/p launching condition = +-%g %%\n'; fprintf(fout,fmt,rms_dp0/pc);
 fmt = 'number of machines = %i\n\n'; fprintf(fout,fmt,n_maquinas);
 
 fmt = '                          before   after \n'; fprintf(fout,fmt);
@@ -329,7 +346,7 @@ text(1,ylimit(1)+0.2*ylimit(2),'Y after correction', 'FontSize',14,'Color','r');
 grid on;
 box on;
 
-plot2svg(['orbit_' tit '.svg']);
+plot2svg([tit '_Orbit.svg'],figure1);
 
 
 
