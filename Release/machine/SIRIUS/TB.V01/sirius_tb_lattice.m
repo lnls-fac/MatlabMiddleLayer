@@ -41,33 +41,24 @@ quad_pass_method = 'StrMPoleSymplectic4Pass';
 %% elements
 %  ========
 % --- drift spaces ---
-l100     = drift('l100', 0.10, 'DriftPass');
-l150     = drift('l150', 0.15, 'DriftPass');
-l200     = drift('l200', 0.20, 'DriftPass');
-
-la1      = drift('la1', 0.115, 'DriftPass');
+l100     = drift('l100', 0.10,   'DriftPass');
+l150     = drift('l150', 0.15,   'DriftPass');
+l200     = drift('l200', 0.20,   'DriftPass');
+la1      = drift('la1',  0.115,  'DriftPass');
 la2p     = drift('la2p', 0.1588, 'DriftPass');
-
-lb1p     = drift('lb1p', 0.125, 'DriftPass');
-lb2p     = drift('lb2p', 0.275, 'DriftPass');
+lb1p     = drift('lb1p', 0.125,  'DriftPass');
+lb2p     = drift('lb2p', 0.275,  'DriftPass');
 lb3p     = drift('lb3p', 0.2765, 'DriftPass');
-
-lc2      = drift('lc2', 0.27, 'DriftPass');
+lc2      = drift('lc2',  0.27,   'DriftPass');
 lc3p     = drift('lc3p', 0.2138, 'DriftPass');
-lc4      = drift('lc4', 0.27, 'DriftPass');
-
+lc4      = drift('lc4',  0.27,   'DriftPass');
 ld1p     = drift('ld1p', 0.2892, 'DriftPass');
-ld2      = drift('ld2', 0.22, 'DriftPass');
-ld3p     = drift('ld3p', 0.18, 'DriftPass');
-
+ld2      = drift('ld2',  0.22,   'DriftPass');
+ld3p     = drift('ld3p', 0.18,   'DriftPass');
 le1p     = drift('le1p', 0.1856, 'DriftPass');
-le2      = drift('le2', 0.216, 'DriftPass');
+le2      = drift('le2',  0.216,  'DriftPass');
 
 % --- markers ---
-mbspec   = marker('mbspec', 'IdentityPass');
-mbn      = marker('mbn',    'IdentityPass');
-mbp      = marker('mbp',    'IdentityPass');
-msep     = marker('msep',   'IdentityPass');
 inicio   = marker('start',  'IdentityPass');
 fim      = marker('end',    'IdentityPass');
 fenda    = marker('fenda',  'IdentityPass');
@@ -84,31 +75,31 @@ mcv    = marker('mcv',  'IdentityPass');
 
 
 % --- quadrupoles ---
-qa1      = quadrupole('qa1', 0.05, qa1_strength, quad_pass_method);
-qa2      = quadrupole('qa2', 0.1,  qa2_strength, quad_pass_method);
-qa3      = quadrupole('qa3', 0.05, qa3_strength, quad_pass_method);
-qb1      = quadrupole('qb1', 0.1, qb1_strength, quad_pass_method);
-qb2      = quadrupole('qb2', 0.1, qb2_strength, quad_pass_method);
-qc1      = quadrupole('qc1', 0.1, qc1_strength, quad_pass_method);
-qc2      = quadrupole('qc2', 0.1, qc2_strength, quad_pass_method);
-qc3      = quadrupole('qc3', 0.1, qc3_strength, quad_pass_method);
-qc4      = quadrupole('qc4', 0.1, qc4_strength, quad_pass_method);
-qd1      = quadrupole('qd1', 0.1, qd1_strength, quad_pass_method);
-qd2      = quadrupole('qd2', 0.1, qd2_strength, quad_pass_method);
-qe1      = quadrupole('qe1', 0.1, qe1_strength, quad_pass_method);
-qe2      = quadrupole('qe2', 0.1, qe2_strength, quad_pass_method);
+q1a   = quadrupole('q1a', 0.05, q1a_strength, quad_pass_method);   %
+q1b   = quadrupole('q1b', 0.10, q1b_strength, quad_pass_method);   % LINAC TRIPLET
+q1c   = quadrupole('q1c', 0.05, q1c_strength, quad_pass_method);   %
+qd2   = quadrupole('qd2',  0.10, qd2_strength,  quad_pass_method); 
+qf2   = quadrupole('qf2',  0.10, qf2_strength,  quad_pass_method); 
+qd3a  = quadrupole('qd3a', 0.10, qd3a_strength, quad_pass_method); 
+qf3a  = quadrupole('qf3a', 0.10, qf3a_strength, quad_pass_method); 
+qf3b  = quadrupole('qf3b', 0.10, qf3b_strength, quad_pass_method); 
+qd3b  = quadrupole('qd3b', 0.10, qd3b_strength, quad_pass_method); 
+qf4   = quadrupole('qf4',  0.10, qf4_strength,  quad_pass_method); 
+qd4   = quadrupole('qd4',  0.10, qd4_strength,  quad_pass_method); 
+qf5   = quadrupole('qf5',  0.10, qf5_strength,  quad_pass_method);
+qd5   = quadrupole('qd5',  0.10, qd5_strength,  quad_pass_method);
 
 % --- bending magnets --- 
 deg_2_rad = (pi/180);
 
-% -- bspec --
-dip_nam =  'bspec';
+% -- spec --
+dip_nam =  'spec';
 dip_len =  0.45003;
 dip_ang =  -15 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
-bspech      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0, 0, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
-bspec   = [bspech, bspech];
+spech      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0, 0, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+spec   = [spech, spech];
 
 % -- bn --
 dip_nam =  'bn';
@@ -142,34 +133,28 @@ bseptin = marker('bseptin','IdentityPass');
 eseptin = marker('eseptin','IdentityPass');
 septin  = [bseptin, septine, ch, septins,eseptin];
 
-%booster
-l800    = drift('l800', 0.80, 'DriftPass');
-l600    = drift('l600', 0.60, 'DriftPass');
-l250    = drift('l250', 0.25, 'DriftPass');
-qf      = quadrupole('qf', 0.1, 1.8821, quad_pass_method);
-kick_in = marker('kick_in', 'IdentityPass');
-
-lbooster = [l800, l250, qf, qf, l600, kick_in];
-
 
 %% % --- lines ---
 
-la2   = [ la2p, l200, l200, l200];
-lb1   = [ lb1p, l200, l200, bpm, l150, ch, l100, cv, l150];
-lb2   = [ lb2p, l200];
-lb3   = [ l200, l200, l200, l200, l200, fenda, l200, bpm, l150, cv, l100, ch, l200, l200, lb3p];
-lc1   = [ l200, l200, l200, l200, l100];
-lc3   = [ l200, bpm, l150, cv, l100, ch, repmat(l200,1,26), lc3p];
-lc5   = [ l150, l150, l150, bpm, l150, ch, l100, cv, l200];
-ld1   = [ ld1p, repmat(l200,1,10)];
-ld3   = [ ld3p, bpm, l150, ch, l200];
-le1   = [ l200, cv, l200, l200, l200, l200, l200, l200, le1p];
-le3   = [ l150, bpm, l150, cv, l100];
-line1 = [ ch, cv, la1, qa1, l100, qa2, l100, qa1, l100, qa3, la2];
-arc1  = [ bspec, lb1, qb1, lb2, qb2, lb3, bn];
-line2 = [ lc1, qc1, lc2, qc2, lc3, qc3, lc4, qc4, lc5];
-arc2  = [ bp, ld1, qd1, ld2, qd2, ld3, bp, le1, qe1, le2, qe2, le3, septin, bpm];
-ltlb  = [inicio, line1, arc1, line2, arc2, fim];
+la2   = [la2p, l200, l200, l200];
+lb1   = [lb1p, l200, l200, bpm, l150, ch, l100, cv, l150];
+lb2   = [lb2p, l200];
+lb3   = [l200, l200, l200, l200, l200, fenda, l200, bpm, l150, cv, l100, ch, l200, l200, lb3p];
+lc1   = [l200, l200, l200, l200, l100];
+lc3   = [l200, bpm, l150, cv, l100, ch, repmat(l200,1,26), lc3p];
+lc5   = [l150, l150, l150, bpm, l150, ch, l100, cv, l200];
+ld1   = [ld1p, repmat(l200,1,10)];
+ld3   = [ld3p, bpm, l150, ch, l200];
+le1   = [l200, cv, l200, l200, l200, l200, l200, l200, le1p];
+le3   = [l150, bpm, l150, cv, l100];
+
+line1 = [ch, cv, la1, q1a, l100, q1b, l100, q1a, l100, q1c, la2];
+arc1  = [lb1, qd2, lb2, qf2, lb3];
+line2 = [lc1, qd3a, lc2, qf3a, lc3, qf3b, lc4, qd3b, lc5];
+arc2  = [ld1, qf4, ld2, qd4, ld3];
+line3 = [le1, qf5, le2, qd5, le3];
+
+ltlb  = [inicio, line1, spec, arc1, bn, line2, bp, arc2, bp, line3, septin, bpm, fim];
 elist = ltlb;
 
 
