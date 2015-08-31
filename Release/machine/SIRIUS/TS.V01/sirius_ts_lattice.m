@@ -47,7 +47,6 @@ l20      = drift('l20', 0.20, 'DriftPass');
 l22      = drift('l22', 0.22, 'DriftPass');
 l24      = drift('l24', 0.24, 'DriftPass');
 l25      = drift('l25', 0.25, 'DriftPass');
-
 la2p     = drift('la2p', 0.13777, 'DriftPass');
 lb3p     = drift('lb3p', 0.24883, 'DriftPass');
 lc1p     = drift('lc1p', 0.23400, 'DriftPass');
