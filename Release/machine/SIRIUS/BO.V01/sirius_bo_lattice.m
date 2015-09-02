@@ -42,12 +42,13 @@ b_len_hdedge     = 1.152; % [m]
 lenDif     = (b_len_seg - b_len_hdedge)/2.0;
 
 L0150    = drift('l0150', 0.1500, 'DriftPass');
+L0241    = drift('l0241', 0.2410, 'DriftPass');
 L0250    = drift('l0250', 0.2500, 'DriftPass');
+L0350    = drift('l0350', 0.3500, 'DriftPass');
 L0360    = drift('l0360', 0.3600, 'DriftPass');
+L0555    = drift('l0555', 0.5550, 'DriftPass');
 L0600    = drift('l0600', 0.6000, 'DriftPass');
-L0741    = drift('l0741', 0.7410, 'DriftPass');
 L0800    = drift('l0800', 0.8000, 'DriftPass');
-L0805    = drift('l0805', 0.8050, 'DriftPass');
 L1000    = drift('l1000', 1.0000, 'DriftPass');
 L1096    = drift('l1096', 1.0960, 'DriftPass');
 L1146    = drift('l1146', 1.1460, 'DriftPass');
@@ -57,6 +58,9 @@ L1796    = drift('l1796', 1.7960, 'DriftPass');
 L1846    = drift('l1846', 1.8460, 'DriftPass');
 L1896    = drift('l1896', 1.8960, 'DriftPass');
 L2146    = drift('l2146', 2.1460, 'DriftPass');
+
+
+
 % drifts affected by the dipole modelling:
 D0250    = drift('d0250', 0.2500-lenDif, 'DriftPass');
 D0300    = drift('d0300', 0.3000-lenDif, 'DriftPass');
@@ -66,10 +70,11 @@ STR  = marker('start',   'IdentityPass');     % start of the model
 FIM  = marker('end',     'IdentityPass');     % end of the model
 GIR  = marker('girder',  'IdentityPass');
 KIN  = marker('kick_in', 'IdentityPass');
-KEX  = marker('kick_ex', 'IdentityPass');
 SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
 mqf  = marker('mqf',     'IdentityPass');
+
+KEX  = quadrupole('kick_ex', 0.5, 0.0, quad_pass_method);
 
 QD   = quadrupole('qd', 0.100000, qd_strength, quad_pass_method);
 SF   = sextupole ('sf', 0.100000, sf_strength, sext_pass_method);
@@ -85,7 +90,9 @@ RFC = rfcavity('cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF fre
 
 DW    = [GIR, L2146,                         D2146, GIR];
 DW_QD = [GIR, L2146,                         L1796, GIR, QD, D0250];
-DW_KE = [GIR, L0600, KEX, L0741, KEX, L0805, L1796, GIR, QD, D0250];
+%DW_KE = [GIR, L0600, KEX, L0741, KEX, L0805, L1796, GIR, QD, D0250];
+DW_KE = [GIR, L0350, KEX, L0241, KEX, L0555, L1796, GIR, QD, D0250];
+
 DW_KI = [GIR, L0600, KIN, L1546,             D2146, GIR];
 DW_CH = [L0250, CH, GIR, L1896,              D2146, GIR];
 DW_RF = [GIR, L2146, RFC,                    D2146, GIR];

@@ -184,7 +184,7 @@ MIB    = marker('mib', 'IdentityPass');        % center of short straight sectio
 GIR    = marker('girder', 'IdentityPass');     % marker used to delimitate girders. one marker at begin and another at end of girder.
 MIDA   = marker('id_enda', 'IdentityPass');    % marker for the extremities of IDs in long straight sections
 MIDB   = marker('id_endb', 'IdentityPass');    % marker for the extremities of IDs in short straight sections
-SEPTIN = marker('sept_in', 'IdentityPass');    % end of injection septum
+SEPTIN = marker('eseptinf', 'IdentityPass');   % end of thin injection septum
 DCCT1  = marker('dcct1', 'IdentityPass');      % dcct1 to measure beam current
 DCCT2  = marker('dcct2', 'IdentityPass');      % dcct2 to measure beam current
 

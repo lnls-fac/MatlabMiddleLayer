@@ -2,14 +2,14 @@ function [outSR, Pert] = injection_sr(storage_ring, transfer_line, inj_bun, para
 
 n_part= param.n_part;
 
-sef_tl_ind = findcells(transfer_line,'FamName','sef');
+sef_tl_ind = findcells(transfer_line,'FamName','septinf');
 sef_ang = transfer_line{sef_tl_ind(1)}.BendingAngle;
 sef_len = transfer_line{sef_tl_ind(1)}.Length;
 sef_polb= transfer_line{sef_tl_ind(1)}.PolynomB(1);
 
 
 % first we set the thin septum leakage field:
-sef_sr_ind = findcells(storage_ring,'FamName','sef');
+sef_sr_ind = findcells(storage_ring,'FamName','eseptinf');
 sef_leakpolb   = (1+err.sef)*(sef_polb*sef_len + sef_ang)*param.sr.sef_leak/storage_ring{sef_sr_ind}.Length;
 storage_ring{sef_sr_ind}.PolynomB = sef_leakpolb;
 
@@ -23,7 +23,7 @@ RinSR(6,:) = RinSR(6,:)*cos(xp_sef) - RinSR(1,:)*sin(xp_sef);
 RinSR = bsxfun(@plus,[x_sef;xp_sef;0;0;0;0],RinSR);
 
 %shift the lattice to begin at the injection point:
-inj_ind = findcells(storage_ring,'FamName','inj');
+inj_ind = findcells(storage_ring,'FamName','eseptinf');
 ind = [(inj_ind+1):length(storage_ring) 1:(inj_ind)];
 storage_ring = storage_ring(ind);
 
