@@ -1,81 +1,94 @@
-function trackcpp_run_dynap_calc_random_machines(default_dir)
+function trackcpp_run_dynap_calc_random_machines(path, use_default, inpfile)
+
+if ~exist('use_default','var'), use_default = false; end
 
 % users selects submachine
 prompt = {'Submachine (bo/si)', 'dynap_xy (yes/no)', 'dynap_ex (yes/no)', 'dynap_ma (yes/no)'};
-bo_defaultanswer = {'si', 'yes', 'yes', 'yes'};
-answer = inputdlg(prompt,'Select submachine and trackcpp algorithms to run',1,bo_defaultanswer);
-if isempty(answer), return; end;
-if strcmpi(answer{1}, 'bo')
+gen_answer = {'si', 'yes', 'yes', 'yes'};
+if ~use_default
+    gen_answer = inputdlg(prompt,'Select submachine and trackcpp algorithms to run',1,gen_answer);
+end
+if isempty(gen_answer), return; end;
+if strcmpi(gen_answer{1}, 'bo')
     % booster default parm values
-    accelerator_defaultanswer = {'0.15', '828', 'on', 'on', 'on'};
-    dynap_xy_defaultanswer    = {'5000', '0',     '100', '-0.018','+0.018','30','0','0.006'};
-    dynap_ex_defaultanswer    = {'5000', '0.001', '80', '-0.03','+0.03','50','-0.018','0'};
-    dynap_ma_defaultanswer    = {'5000', '0.01', '0.001', '0', '49.681', 'pb mb'};
+    acc_answer = {'0.15', '828', 'on', 'on', 'on'};
+    dynap_xy_answer    = {'5000', '0',     '100', '-0.018','+0.018','30','0','0.006'};
+    dynap_ex_answer    = {'5000', '0.001', '80', '-0.03','+0.03','50','-0.018','0'};
+    dynap_ma_answer    = {'5000', '0.01', '0.001', '0', '49.681', 'pb mb'};
 else
     % storage ring default parm values
-    accelerator_defaultanswer = {'3.00', '864', 'on', 'on', 'on'};
-    dynap_xy_defaultanswer    = {'5000', '0', '120', '-0.012','+0.012','30','0','0.003'}; % to be changed
-    dynap_ex_defaultanswer    = {'3500', '0.001', '40', '-0.05','+0.05','55','-0.012','0'}; % to be changed
-    dynap_ma_defaultanswer    = {'2000', '0.02', '0.001', '0', '52', 'calc_mom_accep mia mib'};
+    acc_answer = {'3.00', '864', 'on', 'on', 'on'};
+    dynap_xy_answer    = {'5000', '0', '120', '-0.012','+0.012','30','0','0.003'}; % to be changed
+    dynap_ex_answer    = {'3500', '0.001', '40', '-0.05','+0.05','55','-0.012','0'}; % to be changed
+    dynap_ma_answer    = {'2000', '0.02', '0.001', '0', '52', 'calc_mom_accep mia mib'};
 end
 
-% user defines accelerator
+%% user defines accelerator
 prompt = {'energy[GeV]', 'harmonic_number', 'cavity_state', 'radiation_state', 'vchamber_state'};
-acc_answer = inputdlg(prompt,'Specify accelerator parameters', 1, accelerator_defaultanswer);
+if ~use_default
+    acc_answer = inputdlg(prompt,'Specify accelerator parameters', 1, acc_answer);
+end
 if isempty(acc_answer), return; end;
 
 % user defines dynap_xy parms, if the case.
-if strcmpi(answer{2}, 'yes')
-    prompt = {'dynap_xy_nr_turns', 'dynap_xy_de', 'dynap_xy_x_nrpts', 'dynap_xy_x_min[m]', 'dynap_xy_x_max[m]', 'dynap_xy_y_nrpts', 'dynap_xy_y_min[m]', 'dynap_xy_y_max[m]'};
-    dynap_xy_answer = inputdlg(prompt,'Specify dynap_xy parameters', 1, dynap_xy_defaultanswer);
+if strcmpi(gen_answer{2}, 'yes')
+    prompt = {'dynap_xy_nr_turns', 'dynap_xy_de', 'dynap_xy_x_nrpts',...
+              'dynap_xy_x_min[m]', 'dynap_xy_x_max[m]', 'dynap_xy_y_nrpts',...
+              'dynap_xy_y_min[m]', 'dynap_xy_y_max[m]'};
+    if ~use_default
+        dynap_xy_answer = inputdlg(prompt,'Specify dynap_xy parameters', 1, dynap_xy_answer);
+    end
     if isempty(dynap_xy_answer), return; end;
-else
-    dynap_xy_answer = [];
 end
 
 % user defines dynap_ex parms, if the case.
-if strcmpi(answer{3}, 'yes')
-    prompt = {'dynap_ex_nr_turns', 'dynap_ex_y', 'dynap_ex_e_nrpts', 'dynap_ex_e_min[m]', 'dynap_ex_e_max[m]', 'dynap_ex_x_nrpts', 'dynap_ex_x_min[m]', 'dynap_ex_x_max[m]'};
-    dynap_ex_answer = inputdlg(prompt,'Specify dynap_ex parameters', 1, dynap_ex_defaultanswer);
+if strcmpi(gen_answer{3}, 'yes')
+    prompt = {'dynap_ex_nr_turns', 'dynap_ex_y', 'dynap_ex_e_nrpts',...
+              'dynap_ex_e_min[m]', 'dynap_ex_e_max[m]', 'dynap_ex_x_nrpts',...
+              'dynap_ex_x_min[m]', 'dynap_ex_x_max[m]'};
+    if ~use_default
+        dynap_ex_answer = inputdlg(prompt,'Specify dynap_ex parameters', 1, dynap_ex_answer);
+    end
     if isempty(dynap_ex_answer), return; end;
-else
-    dynap_ex_answer = [];
 end
 
 % user defines dynap_ma parms, if the case.
-if strcmpi(answer{4}, 'yes')
-    prompt = {'dynap_ma_nr_turns', 'dynap_ma_e_e0', 'dynap_ma_e_tol', 'dynap_ma_s_min[m]', 'dynap_ma_s_max[m]', 'dynap_ma_fam_names'};
-    dynap_ma_answer = inputdlg(prompt,'Specify dynap_ma parameters', 1, dynap_ma_defaultanswer);
+if strcmpi(gen_answer{4}, 'yes')
+    prompt = {'dynap_ma_nr_turns', 'dynap_ma_e_e0', 'dynap_ma_e_tol',...
+              'dynap_ma_s_min[m]', 'dynap_ma_s_max[m]', 'dynap_ma_fam_names'};
+    if ~use_default
+        dynap_ma_answer = inputdlg(prompt,'Specify dynap_ma parameters', 1, dynap_ma_answer);
+    end
     if isempty(dynap_ma_answer), return; end;
-else
-    dynap_ma_answer = [];
 end
 
 % selects input file with random machine
-if ~exist('default_dir','var')
-    default_dir = fullfile(lnls_get_root_folder(), 'data', 'sirius', answer{1}, 'beam_dynamics');
+if ~exist('path','var')
+    path = fullfile(lnls_get_root_folder(), 'data', 'sirius', gen_answer{1}, 'beam_dynamics');
 end
-[inpfile,path,~] = uigetfile('*.mat','Select input file with random machines', fullfile(default_dir, '*.mat'));
+if ~use_default
+    [inpfile,path,~] = uigetfile('*.mat','Select input file with random machines', fullfile(path, '*.mat'));
+end
 if isnumeric(inpfile), return; end
 machine_fname = fullfile(path, inpfile);
 data = load(machine_fname); machine = data.machine;
 
-% creates trackcpp folder, rms subfolders and input.py files
+%% creates trackcpp folder, rms subfolders and input.py files
 trackcpp_path = fullfile(path, '..', 'trackcpp');
 system(['rm -rf ', trackcpp_path]);
 system(['mkdir ', trackcpp_path]);
 
-if ~isempty(dynap_xy_answer)
+if strcmpi(gen_answer{2}, 'yes')
     fh = fopen(fullfile(trackcpp_path, 'runjob_xy.sh'),'w');
     fprintf(fh,'#!/bin/bash\n\nsource ~/.bashrc\n\npytrack.py input_xy.py > run_xy.log');
     fclose(fh); system(['chmod gu+wx ' fullfile(trackcpp_path, 'runjob_xy.sh')]);
 end
-if ~isempty(dynap_ex_answer)
+if strcmpi(gen_answer{3}, 'yes')
     fh = fopen(fullfile(trackcpp_path, 'runjob_ex.sh'),'w');
     fprintf(fh,'#!/bin/bash\n\nsource ~/.bashrc\n\npytrack.py input_ex.py > run_ex.log');
     fclose(fh); system(['chmod gu+wx ' fullfile(trackcpp_path, 'runjob_ex.sh')]);
 end
-if ~isempty(dynap_ma_answer)
+if strcmpi(gen_answer{4}, 'yes')
     fh = fopen(fullfile(trackcpp_path, 'runjob_ma.sh'),'w');
     fprintf(fh,'#!/bin/bash\n\nsource ~/.bashrc\n\npytrack.py input_ma.py > run_ma.log');
     fclose(fh); system(['chmod gu+wx ' fullfile(trackcpp_path, 'runjob_ma.sh')]);
@@ -86,15 +99,15 @@ for i=1:length(machine)
     fprintf('creating %s ...\n', rmsdir);
     system(['mkdir ', rmsdir]); 
     flatfilename =  'flatfile.txt';
-    if ~isempty(dynap_xy_answer)
+    if strcmpi(gen_answer{2}, 'yes')
         inputfilename = fullfile(rmsdir, 'input_xy.py');
         create_pytrack_input_daxy(inputfilename, flatfilename, acc_answer, dynap_xy_answer);
     end
-    if ~isempty(dynap_ex_answer)
+    if strcmpi(gen_answer{3}, 'yes')
         inputfilename = fullfile(rmsdir, 'input_ex.py');
         create_pytrack_input_daex(inputfilename, flatfilename, acc_answer, dynap_ex_answer);
     end
-    if ~isempty(dynap_ma_answer)
+    if strcmpi(gen_answer{4}, 'yes')
         inputfilename = fullfile(rmsdir, 'input_ma.py');
         create_pytrack_input_ma(inputfilename, flatfilename, acc_answer, dynap_ma_answer);
     end
@@ -102,27 +115,33 @@ for i=1:length(machine)
     lnls_twiss_save2file(machine{i}, fullfile(rmsdir, 'twiss.txt')); % saves twiss into file (used to calculate IBS)
 end
 
-% submit jobs
-prompt = {'Description', 'possible hosts', 'extra input files','Priority - XY','Priority - MA','Priority - EX'};
+%% submit jobs
+prompt = {'Description', 'possible hosts', 'extra input files',...
+          'Priority - XY','Priority - MA','Priority - EX'};
 comment = strrep(trackcpp_path, '/home/fac_files/data/','');
-comment = strrep(comment, '/beam_dynamics',''); 
-comment = strrep(comment, 'cod_matlab/../trackcpp','');
-defaultanswer = {comment, 'all', '','1','2','0'};
-answer = inputdlg(prompt,'Parameters for pyjob submission',1,defaultanswer);
-if isempty(answer), return; end;
-if ~isempty(answer{3}), answer{3} = [',',answer{3}]; end
+comment = strrep(comment, 'sirius/',''); 
+comment = strrep(comment, 'beam_dynamics/',''); 
+comment = strrep(comment, 'study.',''); 
+comment = strrep(comment, '/cod_matlab/../trackcpp','');
+comment = strrep(comment, '/','-');
+sub_answer = {comment, 'all', '','1','2','0'};
+if ~use_default
+    sub_answer = inputdlg(prompt,'Parameters for pyjob submission',1,sub_answer);
+end
+if isempty(sub_answer), return; end;
+if ~isempty(sub_answer{3}), sub_answer{3} = [',',sub_answer{3}]; end
 
-if ~isempty(dynap_xy_answer)
-    trackcpp_submit_jobs(['XY: ',answer{1}],trackcpp_path,['input_xy.py',answer{3}],...
-                                '../runjob_xy.sh',answer{2},answer{4});
+if strcmpi(gen_answer{2}, 'yes')
+    trackcpp_submit_jobs(['XY: ',sub_answer{1}],trackcpp_path,['input_xy.py',sub_answer{3}],...
+                                '../runjob_xy.sh',sub_answer{2},sub_answer{4});
 end
-if ~isempty(dynap_ma_answer)
-    trackcpp_submit_jobs(['MA: ',answer{1}],trackcpp_path,['input_ma.py',answer{3}],...
-                                '../runjob_ma.sh',answer{2},answer{5});
+if strcmpi(gen_answer{3}, 'yes')
+    trackcpp_submit_jobs(['MA: ',sub_answer{1}],trackcpp_path,['input_ma.py',sub_answer{3}],...
+                                '../runjob_ma.sh',sub_answer{2},sub_answer{5});
 end
-if ~isempty(dynap_ex_answer)
-    trackcpp_submit_jobs(['EX: ',answer{1}],trackcpp_path,['input_ex.py',answer{3}],...
-                                '../runjob_ex.sh',answer{2},answer{6});
+if strcmpi(gen_answer{4}, 'yes')
+    trackcpp_submit_jobs(['EX: ',sub_answer{1}],trackcpp_path,['input_ex.py',sub_answer{3}],...
+                                '../runjob_ex.sh',sub_answer{2},sub_answer{6});
 end
 
 

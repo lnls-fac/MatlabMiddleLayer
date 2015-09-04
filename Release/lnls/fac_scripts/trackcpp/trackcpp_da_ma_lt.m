@@ -169,7 +169,7 @@ while i < n_calls
                         lifetime(lt_suc) = 1/LT.AveRate/60/60; % em horas
                         lt_suc = lt_suc + 1;
                     end
-                else fprintf('%-2d-%-3d: ma nao carregou\n',i,k); break;
+                else fprintf('%-2d-%-3d: ma nao carregou\n',i,k);
                 end
             end
         end

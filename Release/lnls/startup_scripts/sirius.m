@@ -66,7 +66,10 @@ for i=1:length(mmlpaths)
     end
 end
 
-setpathsirius('SIRIUS', default_version, 'sirius_link');
+% Luana 2015-08-25
+setpathsirius('SIRIUS', default_version, 'LABCA');
+%setpathsirius('SIRIUS', default_version, 'sirius_link');
+
 cd(cdir);
 clear cdir;
 
