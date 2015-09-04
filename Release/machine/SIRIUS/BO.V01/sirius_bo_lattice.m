@@ -57,14 +57,21 @@ L1546    = drift('l1546', 1.5460, 'DriftPass');
 L1796    = drift('l1796', 1.7960, 'DriftPass');
 L1846    = drift('l1846', 1.8460, 'DriftPass');
 L1896    = drift('l1896', 1.8960, 'DriftPass');
+
+L17935  = drift('l17935', 1.7935, 'DriftPass');
+L01475  = drift('l01475', 0.1475, 'DriftPass');
+L18935  = drift('l18935', 1.8935, 'DriftPass');
+L02475  = drift('l02475', 0.2475, 'DriftPass');
+
 L2146    = drift('l2146', 2.1460, 'DriftPass');
 
 
 
 % drifts affected by the dipole modelling:
-D0250    = drift('d0250', 0.2500-lenDif, 'DriftPass');
-D0300    = drift('d0300', 0.3000-lenDif, 'DriftPass');
-D2146    = drift('d2146', 2.1460-lenDif, 'DriftPass');
+D0250    = drift('d0250',  0.2500-lenDif, 'DriftPass');
+D0300    = drift('d0300',  0.3000-lenDif, 'DriftPass');
+D2146    = drift('d2146',  2.1460-lenDif, 'DriftPass');
+D02475   = drift('d02475', 0.2475-lenDif, 'DriftPass');
 
 STR  = marker('start',   'IdentityPass');     % start of the model
 FIM  = marker('end',     'IdentityPass');     % end of the model
@@ -77,8 +84,9 @@ mqf  = marker('mqf',     'IdentityPass');
 KEX  = quadrupole('kick_ex', 0.5, 0.0, quad_pass_method);
 
 QD   = quadrupole('qd', 0.100000, qd_strength, quad_pass_method);
-SF   = sextupole ('sf', 0.100000, sf_strength, sext_pass_method);
-SD   = sextupole ('sd', 0.100000, sd_strength, sext_pass_method);
+%SF   = sextupole ('sf', 0.100000, sf_strength, sext_pass_method);
+SF   = sextupole ('sf', 0.105000, sf_strength, sext_pass_method);   
+SD   = sextupole ('sd', 0.105000, sd_strength, sext_pass_method);
 QFI  = quadrupole('qf', 0.100000, qf_strength, quad_pass_method);
 QF   = [QFI,mqf,QFI];
 
@@ -88,21 +96,19 @@ CV   = corrector('cv', 0, [0, 0], 'CorrectorPass');
 
 RFC = rfcavity('cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
 
-DW    = [GIR, L2146,                         D2146, GIR];
-DW_QD = [GIR, L2146,                         L1796, GIR, QD, D0250];
-%DW_KE = [GIR, L0600, KEX, L0741, KEX, L0805, L1796, GIR, QD, D0250];
-DW_KE = [GIR, L0350, KEX, L0241, KEX, L0555, L1796, GIR, QD, D0250];
-
-DW_KI = [GIR, L0600, KIN, L1546,             D2146, GIR];
-DW_CH = [L0250, CH, GIR, L1896,              D2146, GIR];
-DW_RF = [GIR, L2146, RFC,                    D2146, GIR];
-
-UP_SF = [GIR, D2146, BPM,                       L1896, GIR, SF, L0150];
+DW    = [GIR, L2146,                            D2146, GIR];
+DW_QD = [GIR, L2146,                            L1796, GIR, QD, D0250];
+DW_KE = [GIR, L0350, KEX, L0241, KEX, L0555,    L1796, GIR, QD, D0250];
+DW_KI = [GIR, L0600, KIN, L1546,                D2146, GIR];
+DW_CH = [L0250, CH, GIR, L1896,                 D2146, GIR];
+DW_RF = [GIR, L2146, RFC,                       D2146, GIR];
+UP_SF = [GIR, D2146, BPM,                       L18935, GIR, SF, L01475];
 UP_CC = [D0300, CV, GIR, L1846, BPM,            L1896, GIR, CH, L0250];
-UP_CS = [D0250, SD, L0250, CV, GIR, L1546, BPM, L1896, GIR, CH, L0250];
-UP_SS = [D0250, SD, GIR, L1796, BPM,            L1896, GIR, SF, L0150];
+UP_CS = [D02475, SD, L02475, CV, GIR, L1546, BPM, L1896, GIR, CH, L0250];
+UP_SS = [D02475, SD, GIR, L17935, BPM,           L18935, GIR, SF, L01475];
 UP_SE = [D0300, CV, GIR, L1486, SEX, L0360,     L1000, BPM, L1146, GIR];
 UP_SI = [D0300, CV, GIR, L1846, BPM,            L1096, SIN, L0800, GIR, CH, L0250];
+
 
 UP_01 = UP_SI;        DW_01 = DW_KI;        S01 = [UP_01, QFI, FIM, STR, mqf, QFI, DW_01, B];      
 UP_02 = UP_SF;        DW_02 = DW_QD;        S02 = [UP_02, QF, DW_02, B];

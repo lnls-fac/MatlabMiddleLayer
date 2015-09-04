@@ -17,17 +17,6 @@
 % sd_strength = 7.051860735882379/2;
 
 
-% 2014-12-01 ximenes
-% final fildmap analysis of model6
-% tunex  = 19.20433
-% tuney  =  7.31417
-% chromx =  +0.5
-% chromy =  +0.5
-qf_strength =  1.882125768941849;
-qd_strength = -0.002846148623370;
-sf_strength = 11.9534110297414080; 
-sd_strength =  7.217452258059838; 
-
 % % 2014-10-29 ximenes
 % % with new segmented b model
 % % tunes corrected to [19.20475, 7.30744]
@@ -36,3 +25,26 @@ sd_strength =  7.217452258059838;
 % qd_strength = -0.883587030955089e-3;
 % sf_strength = 6.167352183794390; 
 % sd_strength = 2.989839869932359; 
+
+% % 2014-12-01 ximenes
+% % final fildmap analysis of model6
+% % tunex  = 19.20433
+% % tuney  =  7.31417
+% % chromx =  +0.5
+% % chromy =  +0.5
+% qf_strength =  1.882125768941849;
+% qd_strength = -0.002846148623370;
+% sf_strength = 11.9534110297414080; 
+% sd_strength =  7.217452258059838; 
+
+% 2015-09-03 ximenes
+% final fildmap analysis of new_model1 (100 mm physical length)
+% tunex  = 19.20433
+% tuney  =  7.31417
+% chromx =  +0.
+% chromy =  +0.5
+qf_strength =  1.882125768941849;
+qd_strength = -0.002846148623370;
+sf_strength = 11.349989133773295;
+sd_strength = 7.206900815548799;
+
