@@ -43,6 +43,12 @@ if strcmpi(answer{1}, 'bo')
         params.nrBun = 1;
         accepRF      = ats.energyacceptance;
     end 
+    
+    limx = 18;
+    limy = 6.0;
+    lime = 3.0;
+    limeLT=2.3;
+    limsLT=496.8/10;
 else
     if ~exist('path','var')
         path = '/home/fac_files/data/sirius/si/beam_dynamics';
@@ -63,6 +69,12 @@ else
     params.I     = 100;
     params.nrBun = 864;
     accepRF      = ats.energyacceptance;
+    
+    limx = 12;
+    limy = 3.0;
+    lime = 5.0;
+    limeLT=6.0;
+    limsLT=518.396/10;
 end
 
 
@@ -87,10 +99,6 @@ twi = calctwiss(the_ring);
 
 size_font = 16;
 type_colormap = 'Jet';
-limx = 12;
-limy = 3.0;
-lime = 5.0;
-limeLT=6.0;
 
 mostra = 0; % 0 = porcentagem de part perdidas
 % 1 = número medio de voltas
@@ -110,7 +118,8 @@ if isempty(path), return; end
 n_pastas = str2double(result);
 
 Ltime = []; accep = []; Accep = []; LossRate = [];
-l = 0;
+lt_suc = 1;
+lt_prob= 0;
 for i=1:n_pastas
     pathname = fullfile(path,sprintf('rms%02d',i));
     if xy
@@ -141,16 +150,21 @@ for i=1:n_pastas
     end
     if ma
         if exist(fullfile(pathname,'dynap_ma_out.txt'),'file')
-            l = l + 1;
-            [spos, accep(l,:,:), ~, ~] = trackcpp_load_ma_data(pathname);
-            Accep(1,:) = spos;
-            Accep(2,:) = min(accep(l,1,:), accepRF);
-            Accep(3,:) = max(accep(l,2,:), -accepRF);
-            % não estou usando alguns outputs
-            LT = lnls_tau_touschek_inverso(params,Accep,twi);
-            Ltime(l) = 1/LT.AveRate/60/60; % em horas
-            LossRate(l,:) = LT.Rate;
-        else fprintf('%-3d: ma nao carregou\n',i);
+            [spos, aceit, ~, ~] = trackcpp_load_ma_data(pathname);
+            if any(~aceit(:))
+                lt_prob = lt_prob + 1;
+            else
+                accep(lt_suc,:,:) = aceit;
+                Accep.s   = spos;
+                Accep.pos = min(aceit(1,:), accepRF);
+                Accep.neg = max(aceit(2,:), -accepRF);
+                % não estou usando alguns outputs
+                LT = lnls_tau_touschek_inverso(params,Accep,twi);
+                Ltime(lt_suc) = 1/LT.AveRate/60/60; % em horas
+                LossRate(lt_suc,:) = LT.Rate;
+                lt_suc = lt_suc + 1;
+            end
+            else fprintf('%-3d: ma nao carregou\n',i);
         end
     end
 end
@@ -214,9 +228,9 @@ if ma
     plot(falt,spos,squeeze(accep(:,1,:))*100,'Color',[0.6 0.6 1.0]);
     plot(falt,spos,squeeze(accep(:,2,:))*100,'Color',[0.6 0.6 1.0]);
     plot(falt,spos,aveAccep,'LineWidth',3,'Color',[0,0,1]);
-    if plot_LR, plot(falt,LT.Pos,2.5*LossRate/max(LossRate(:)),'Color',[0,0,0]); end
+    if plot_LR, plot(falt,LT.Pos,limeLT/2*LossRate/max(LossRate(:)),'Color',[0,0,0]); end
     lnls_drawlattice(the_ring,10, 0, true,0.2);
-    xlim([0, 52]); ylim([-limeLT-0.3, limeLT+0.3]);
+    xlim([0, limsLT]); ylim([-limeLT-0.3, limeLT+0.3]);
     
     string = {sprintf('%-10s = %3.1f GeV','Energy',params.E/1e9),...
         sprintf('%-10s = %5.3f mA','I/bunch',params.N*1.601e-19/1.72e-6*1e3),...

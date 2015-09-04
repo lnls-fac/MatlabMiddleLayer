@@ -70,7 +70,7 @@ data.chs.ATIndex = reshape(idx,data.chs.nr_segs,[]);
 data.chs.ATIndex = data.chs.ATIndex';
 data.chs.ATFamilies = {'sfa','sd1j','sf2j','sf2k','sd1k','sfb'};
 
-% cvs - slow horizontal correctors
+% cvs - slow vertical correctors
 idx = [];
 idx = [idx; data.('sfa').ATIndex];
 idx = [idx; data.('sd1j').ATIndex];

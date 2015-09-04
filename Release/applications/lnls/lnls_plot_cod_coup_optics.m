@@ -11,11 +11,15 @@ if strcmpi(answer{4}, 'mm'), factor = 1e3; else factor = 1e6; end
 
 size_font = 16;
 
-STRFTM = ' %12s';
-DBLFTM = ' %12.2f';
-fprintf(['\n%-20s',STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM, '\n'],...
-        'Configuração', 'codx [um]', 'kickx [urad]','cody [um]', 'kicky [urad]',...
-        'dbetax [%]', 'dbetay [%]','qn [1/km]','Ey/Ex [%]','qs [1/km]');
+STRFTM = ' %8s';
+DBLFTM = ' %8.2f';
+fprintf(['\n%-15s',STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM, '\n'],...
+        'Configuração', 'codx', 'kickx','cody', 'kicky',...
+        'dbetax', 'dbetay','qn','Ey/Ex','qs');
+
+fprintf(['%-15s',STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM,STRFTM, '\n'],...
+        ' ', '[um]', '[urad]','[um]', '[urad]', '[%]', '[%]','[1/km]','[%]','[1/km]');
+    
 for ii=1:num_mac
     % selects file with random machines and loads it
     if ~exist('default_path','var')
@@ -37,8 +41,8 @@ for ii=1:num_mac
     
     codrx = zeros(length(machine), length(machine{1}));
     codry = zeros(length(machine), length(machine{1}));
-    dbetax = zeros(length(machine), length(machine{1}));
-    dbetay = zeros(length(machine), length(machine{1}));
+    dbetax = zeros(length(machine));
+    dbetay = zeros(length(machine));
     EmitRto = zeros(1,length(machine));
     
     if strcmp(submachine,'si')
@@ -68,8 +72,8 @@ for ii=1:num_mac
         kicky(i,:) = factor * lnls_get_kickangle(machine{i}, vcms,'y');
         
         twiss      = calctwiss(machine{i});
-        dbetax(i,:) = 100*(abs(twiss.betax - twiss0.betax))./twiss0.betax;
-        dbetay(i,:) = 100*(abs(twiss.betay - twiss0.betay))./twiss0.betay;
+        dbetax(i,:) = sqrt(lnls_meansqr(100*(abs(twiss.betax - twiss0.betax))./twiss0.betax));
+        dbetay(i,:) = sqrt(lnls_meansqr(100*(abs(twiss.betay - twiss0.betay))./twiss0.betay));
         qnstr = getcellstruct(machine{i}, 'PolynomB', qn_idx(:), 1, 2);
         qnstr = (qnstr-qn_init).*getcellstruct(machine{i}, 'Length', qn_idx(:));
         qn(1,:) = 1e3*sum(reshape(qnstr, size(qn_idx,1), []), 2)';
@@ -80,10 +84,10 @@ for ii=1:num_mac
         qsstr = qsstr.*getcellstruct(machine{i}, 'Length', qs_idx(:));
         qs(i,:) = 1e3*sum(reshape(qsstr, size(qs_idx,1), []), 2)';
     end
-    fprintf(['%-20s',DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,'\n'],...
+    fprintf(['%-15s',DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,DBLFTM,'\n'],...
         upper(leg_text{1}),...
         std(codrx(:)), std(kickx(:)),...
-        std(codry(:)), std(kicky(:)), ...
-        std(dbetax(:)), std(dbetay(:)), std(qn(:)),...
-        std(EmitRto*100), std(qs(:)));
+        std(codry(:)), std(kicky(:)),...
+        mean(dbetax(:)), mean(dbetay(:)), std(qn(:)),...
+        mean(EmitRto*100), std(qs(:)));
 end

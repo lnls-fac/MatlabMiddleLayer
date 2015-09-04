@@ -2,8 +2,8 @@ function lnls_fmap_analysis
 
 data.path = pwd;
 data.maptypes = {'fmap','fmapdp'};
-data.fmap.fname   = 'fmap.out';
-data.fmapdp.fname = 'fmapdp.out';
+data.track_codes = {'trackcpp','tracy3'};
+
 
 %% Creation of the Figure
 
@@ -26,7 +26,10 @@ uicontrol('Style','text','Position',[1280 760 40 20],'String','Qy:');
 
 %buttons related to data loading
 uicontrol('Style', 'pushbutton', 'String', 'LOAD DATA',...
-    'Position', [1320 820 100 20],'Callback', {@loadData_callBack});
+    'Position', [1360 820 100 20],'Callback', {@loadData_callBack});
+handle.track_code = uicontrol('Style', 'popup', 'String', {'trackcpp','tracy3'},...
+    'Position', [1280 820 70 20], 'Callback',{@track_code_callBack});
+track_code_callBack(handle.track_code,[]);
 handle.maptype = uicontrol('Style', 'popup', 'String', data.maptypes,...
     'Position', [1480 760 100 20], 'Callback',{@maptype_callBack});
 handle.diffusion = uicontrol('Style','checkbox','String','Diffusion','Min',0,...
@@ -75,6 +78,7 @@ end
 %Create Figure
 uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
     'Position', [1390 195 100 20],'Callback', {@create_figure_callBack});
+
 
 %% Call Back functions
     function tune_callBack(hObj,event)
@@ -130,6 +134,19 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
                 set(handle.diffusion,'Value',0);
             end
             plotData();
+        end
+    end
+    function track_code_callBack(hObj,event)
+        if strcmp('trackcpp',data.track_codes{get(hObj,'Value')})
+            data.fmap.fname   = 'dynap_xyfmap_out.txt';
+            data.fmap.columns = [6,7,12,13,14,15];
+            data.fmapdp.fname = 'dynap_exfmap_out.txt';
+            data.fmapdp.columns = [8,6,12,13,14,15];
+        else
+            data.fmap.fname   = 'fmap.out';
+            data.fmap.columns = 1:6;
+            data.fmapdp.fname = 'fmapdp.out.';
+            data.fmapdp.columns = 1:6;
         end
     end
     function diffusion_callBack(hObj,event)
@@ -189,11 +206,19 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
         found_any = false;
         for i=1:length(maptypes)
             maptype.fname = data.(maptypes{i}).fname;
+            maptype.columns = data.(maptypes{i}).columns;
             if exist(fullfile(path,maptype.fname),'file')
                 found_any = true;
                 data.path = path;
-                [~, dados]=hdrload(fullfile(path,maptype.fname));
-                
+
+                if strcmp('trackcpp',data.track_codes{get(handle.track_code,'Value')})
+                    head_lin = 13;
+                    dados = importdata(fullfile(path,maptype.fname), ' ', head_lin);
+                    dados = dados.data;
+                    dados = dados(:,maptype.columns);
+                else
+                    [~, dados]=hdrload(fullfile(path,maptype.fname));
+                end
                 %ordena os dados para pcolor funcionar corretamente.
                 [~, ind] = sort(dados(:,2)); dados = dados(ind,:);
                 [~, ind] = sort(dados(:,1)); dados = dados(ind,:);
@@ -232,7 +257,13 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
             if size(dados,2) == 6;
                 %%% Data for color printing
                 ny = sum(x==x(1));    nx = size(x,1)/ny;
-                dfx=dados(:,5);       dfy=dados(:,6);
+                if strcmp('trackcpp',data.track_codes{get(handle.track_code,'Value')})
+                    dfx=abs(dados(:,3) - dados(:,5));
+                    dfy=abs(dados(:,4) - dados(:,6));
+                else
+                    dfx=dados(:,5);
+                    dfy=dados(:,6);
+                end
                 
                 xgrid   = reshape(x,ny,nx);   ygrid   = reshape(y,ny,nx);
                 fxgrid  = reshape(fx,ny,nx);  fygrid  = reshape(fy,ny,nx);
