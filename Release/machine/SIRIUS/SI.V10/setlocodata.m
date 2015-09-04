@@ -74,10 +74,10 @@ bpmxDeviceListTotal = family2dev('bpmx',0);
 bpmyDeviceList = family2dev('bpmy');
 bpmyDeviceListTotal = family2dev('bpmy',0);
 
-hcmDeviceList = family2dev('hcm');
-hcmDeviceListTotal = family2dev('hcm',0);
-vcmDeviceList = family2dev('vcm');
-vcmDeviceListTotal = family2dev('vcm',0);
+chsDeviceList = family2dev('chs');
+chsDeviceListTotal = family2dev('chs',0);
+vcmDeviceList = family2dev('cvs');
+vcmDeviceListTotal = family2dev('cvs',0);
 
 
 if any(strcmpi(CommandInput, 'Nominal'))
@@ -94,9 +94,9 @@ if any(strcmpi(CommandInput, 'Nominal'))
     AO.bpmx.Crunch = zeros(size(bpmxDeviceListTotal,1),1);
     AO.bpmy.Crunch = zeros(size(bpmyDeviceListTotal,1),1);
 
-    AO.hcm.Gain = ones(size(hcmDeviceListTotal,1),1);
+    AO.chs.Gain = ones(size(chsDeviceListTotal,1),1);
     AO.vcm.Gain = ones(size(vcmDeviceListTotal,1),1);
-    AO.hcm.Roll = zeros(size(hcmDeviceListTotal,1),1);
+    AO.chs.Roll = zeros(size(chsDeviceListTotal,1),1);
     AO.vcm.Roll = zeros(size(vcmDeviceListTotal,1),1);
 
     % Magnet gains set to unity (rolls are set in the AT model)
@@ -124,12 +124,12 @@ if any(strcmpi(CommandInput, 'Nominal'))
     % Make sure the Roll field is 1x2 even for single plane correctors
 
     % First set the cross planes to zero
-    setatfield('hcm', 'Roll', 0*AO.hcm.Roll, hcmDeviceListTotal, 1, 2);
-    setatfield('vcm', 'Roll', 0*AO.vcm.Roll, vcmDeviceListTotal, 1, 1);
+    setatfield('chs', 'Roll', 0*AO.chs.Roll, chsDeviceListTotal, 1, 2);
+    setatfield('cvs', 'Roll', 0*AO.vcm.Roll, vcmDeviceListTotal, 1, 1);
 
     % Then set the roll field
-    setatfield('hcm', 'Roll', AO.hcm.Roll, hcmDeviceListTotal, 1, 1);
-    setatfield('vcm', 'Roll', AO.vcm.Roll, vcmDeviceListTotal, 1, 2);
+    setatfield('chs', 'Roll', AO.chs.Roll, chsDeviceListTotal, 1, 1);
+    setatfield('cvs', 'Roll', AO.vcm.Roll, vcmDeviceListTotal, 1, 2);
 
     setao(AO);
 
@@ -159,7 +159,7 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
     % Get the device list from the LOCO file
     bpmxDeviceList = LocoMeasData.HBPM.DeviceList;
     bpmyDeviceList = LocoMeasData.VBPM.DeviceList;
-    hcmDeviceList  = LocoMeasData.hcm.DeviceList;
+    chsDeviceList  = LocoMeasData.chs.DeviceList;
     vcmDeviceList  = LocoMeasData.vcm.DeviceList;
 
 
@@ -192,23 +192,23 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
     %%%%%%%%%%%%%%
 
     % Kick strength (LOCO is in milliradian)
-    % LOCO is run with the original gain in hw2physics (stored in LocoMeasData.vcmGain/LocoMeasData.hcmGain).
+    % LOCO is run with the original gain in hw2physics (stored in LocoMeasData.vcmGain/LocoMeasData.chsGain).
     % The new gain must combine the new CM gain and the one used in buildlocoinput.
     % hw2physics:  Rad = G * amps   (original)
     % LOCO gain:   Gloco = KickNew/KickStart
     % New hw2physics gain: Gloco * G
 
-    % hcm
-    i = findrowindex(hcmDeviceList, hcmDeviceListTotal);
+    % chs
+    i = findrowindex(chsDeviceList, chsDeviceListTotal);
 
-    hcmGainOldLOCO = LocoMeasData.hcmGain .* cos(LocoMeasData.hcmRoll);
+    chsGainOldLOCO = LocoMeasData.chsGain .* cos(LocoMeasData.chsRoll);
 
-    hcmGainLOCO     = hcmGainOldLOCO .* CMData(end).hcmKicks ./ CMData(1).hcmKicks;
-    hcmCouplingLOCO = CMData(end).hcmCoupling;
+    chsGainLOCO     = chsGainOldLOCO .* CMData(end).chsKicks ./ CMData(1).chsKicks;
+    chsCouplingLOCO = CMData(end).chsCoupling;
 
-    %AO.hcm.Roll(i) = atan2(-hcmCouplingLOCO, hcmGainLOCO);
-    AO.hcm.Roll(i) = atan(hcmCouplingLOCO ./ abs(hcmGainLOCO));
-    AO.hcm.Gain(i) = sign(hcmGainLOCO) .* sqrt(hcmCouplingLOCO.^2 + hcmGainLOCO.^2);
+    %AO.chs.Roll(i) = atan2(-chsCouplingLOCO, chsGainLOCO);
+    AO.chs.Roll(i) = atan(chsCouplingLOCO ./ abs(chsGainLOCO));
+    AO.chs.Gain(i) = sign(chsGainLOCO) .* sqrt(chsCouplingLOCO.^2 + chsGainLOCO.^2);
 
 
     % vcm
@@ -230,11 +230,11 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
     % Make sure the Roll field is 1x2 even for single plane correctors
 
     % First set the cross planes to zero
-    setatfield('hcm', 'Roll', 0*AO.hcm.Roll, hcmDeviceListTotal, 1, 2);
+    setatfield('chs', 'Roll', 0*AO.chs.Roll, chsDeviceListTotal, 1, 2);
     setatfield('vcm', 'Roll', 0*AO.vcm.Roll, vcmDeviceListTotal, 1, 1);
 
     % Then set the roll field
-    setatfield('hcm', 'Roll', AO.hcm.Roll, hcmDeviceListTotal, 1, 1);
+    setatfield('chs', 'Roll', AO.chs.Roll, chsDeviceListTotal, 1, 1);
     setatfield('vcm', 'Roll', AO.vcm.Roll, vcmDeviceListTotal, 1, 2);
 
 
