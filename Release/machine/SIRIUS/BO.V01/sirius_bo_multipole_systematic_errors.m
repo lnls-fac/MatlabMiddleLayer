@@ -10,14 +10,26 @@ fam_data = sirius_bo_family_data(the_ring);
 %Already applied while building the lattice model
 
 
-% QUADRUPOLES: VALUES BASED ON MEASUREMENTS
-% ======================
+% QF QUADRUPOLES
+% ==============
+% values based on rotating coil measurements of QF prototypes
 r0         = 17.5/1000;
 monoms     = [   5,   9,   13];
 Bn_normal  = [-1.0, 1.1, 0.08]*1e-3;
 Bn_skew    = [ 0.0, 0.0, 0.00];
 main_monom = {1, 'normal'}; 
-fams       = {'qf','qd'};
+fams       = {'qf'};
+the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+% QD QUADRUPOLES
+% ==============
+% updated values in 2015-09-03 for model1 of QD quads with 100 mm physical length (XRR) (@ 3GeV excitation)
+r0         = 17.5/1000;
+monoms     = [   5,   9,   13];
+Bn_normal  = [-4.7, 1.2, 1.2]*1e-3;
+Bn_skew    = [ 0.0, 0.0, 0.00];
+main_monom = {1, 'normal'}; 
+fams       = {'qd'};
 the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % SEXTUPOLES

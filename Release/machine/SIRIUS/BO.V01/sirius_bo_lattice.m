@@ -41,37 +41,34 @@ b_len_hdedge     = 1.152; % [m]
 % b_length_segmented = 1.538; % [m]
 lenDif     = (b_len_seg - b_len_hdedge)/2.0;
 
-L0150    = drift('l0150', 0.1500, 'DriftPass');
-L0241    = drift('l0241', 0.2410, 'DriftPass');
-L0250    = drift('l0250', 0.2500, 'DriftPass');
-L0350    = drift('l0350', 0.3500, 'DriftPass');
-L0360    = drift('l0360', 0.3600, 'DriftPass');
-L0555    = drift('l0555', 0.5550, 'DriftPass');
-L0600    = drift('l0600', 0.6000, 'DriftPass');
-L0800    = drift('l0800', 0.8000, 'DriftPass');
-L1000    = drift('l1000', 1.0000, 'DriftPass');
-L1096    = drift('l1096', 1.0960, 'DriftPass');
-L1146    = drift('l1146', 1.1460, 'DriftPass');
-L1486    = drift('l1486', 1.4860, 'DriftPass');
-L1546    = drift('l1546', 1.5460, 'DriftPass');
-L1796    = drift('l1796', 1.7960, 'DriftPass');
-L1846    = drift('l1846', 1.8460, 'DriftPass');
-L1896    = drift('l1896', 1.8960, 'DriftPass');
-
-L17935  = drift('l17935', 1.7935, 'DriftPass');
-L01475  = drift('l01475', 0.1475, 'DriftPass');
-L18935  = drift('l18935', 1.8935, 'DriftPass');
-L02475  = drift('l02475', 0.2475, 'DriftPass');
-
-L2146    = drift('l2146', 2.1460, 'DriftPass');
+L01475   = drift('l01475',  0.14750, 'DriftPass');
+L0241    = drift('l0241',   0.24100, 'DriftPass');
+L02475   = drift('l02475',  0.24750, 'DriftPass');
+L0250    = drift('l0250',   0.25000, 'DriftPass');
+L0350    = drift('l0350',   0.35000, 'DriftPass');
+L0360    = drift('l0360',   0.36000, 'DriftPass');
+L0555    = drift('l0555',   0.55500, 'DriftPass');
+L0600    = drift('l0600',   0.60000, 'DriftPass');
+L0800    = drift('l0800',   0.80000, 'DriftPass');
+L1000    = drift('l1000',   1.00000, 'DriftPass');
+L1096    = drift('l1096',   1.09600, 'DriftPass');
+L1146    = drift('l1146',   1.14600, 'DriftPass');
+L1486    = drift('l1486',   1.48600, 'DriftPass');
+L1546    = drift('l1546',   1.54600, 'DriftPass');
+L17935   = drift('l17935',  1.79350, 'DriftPass');
+L179563  = drift('l179563', 1.79563, 'DriftPass');
+L1846    = drift('l1846',   1.84600, 'DriftPass');
+L18935   = drift('l18935',  1.89350, 'DriftPass');
+L1896    = drift('l1896',   1.89600, 'DriftPass');
+L2146    = drift('l2146',   2.14600, 'DriftPass');
 
 
 
 % drifts affected by the dipole modelling:
-D0250    = drift('d0250',  0.2500-lenDif, 'DriftPass');
-D0300    = drift('d0300',  0.3000-lenDif, 'DriftPass');
-D2146    = drift('d2146',  2.1460-lenDif, 'DriftPass');
-D02475   = drift('d02475', 0.2475-lenDif, 'DriftPass');
+D02475   = drift('d02475', 0.2475-lenDif,  'DriftPass');
+D024963  = drift('d0250',  0.24963-lenDif, 'DriftPass');
+D0300    = drift('d0300',  0.3000-lenDif,  'DriftPass');
+D2146    = drift('d2146',  2.1460-lenDif,  'DriftPass');
 
 STR  = marker('start',   'IdentityPass');     % start of the model
 FIM  = marker('end',     'IdentityPass');     % end of the model
@@ -83,12 +80,11 @@ mqf  = marker('mqf',     'IdentityPass');
 
 KEX  = quadrupole('kick_ex', 0.5, 0.0, quad_pass_method);
 
-QD   = quadrupole('qd', 0.100000, qd_strength, quad_pass_method);
-%SF   = sextupole ('sf', 0.100000, sf_strength, sext_pass_method);
-SF   = sextupole ('sf', 0.105000, sf_strength, sext_pass_method);   
-SD   = sextupole ('sd', 0.105000, sd_strength, sext_pass_method);
+QD   = quadrupole('qd', 0.100740, qd_strength, quad_pass_method);
 QFI  = quadrupole('qf', 0.100000, qf_strength, quad_pass_method);
 QF   = [QFI,mqf,QFI];
+SF   = sextupole ('sf', 0.105000, sf_strength, sext_pass_method);   
+SD   = sextupole ('sd', 0.105000, sd_strength, sext_pass_method);
 
 BPM  = marker('bpm', 'IdentityPass');
 CH   = corrector('ch', 0, [0, 0], 'CorrectorPass');
@@ -97,8 +93,8 @@ CV   = corrector('cv', 0, [0, 0], 'CorrectorPass');
 RFC = rfcavity('cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
 
 DW    = [GIR, L2146,                            D2146, GIR];
-DW_QD = [GIR, L2146,                            L1796, GIR, QD, D0250];
-DW_KE = [GIR, L0350, KEX, L0241, KEX, L0555,    L1796, GIR, QD, D0250];
+DW_QD = [GIR, L2146,                            L179563, GIR, QD, D024963];
+DW_KE = [GIR, L0350, KEX, L0241, KEX, L0555,    L179563, GIR, QD, D024963];
 DW_KI = [GIR, L0600, KIN, L1546,                D2146, GIR];
 DW_CH = [L0250, CH, GIR, L1896,                 D2146, GIR];
 DW_RF = [GIR, L2146, RFC,                       D2146, GIR];
