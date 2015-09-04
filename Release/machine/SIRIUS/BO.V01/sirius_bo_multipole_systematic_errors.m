@@ -22,10 +22,10 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 
 % SEXTUPOLES
 % ==========
-% systematic multipoles from model3
+% updated in 2015-09-03 for model1 of SD/SF with 100 mm physical length (XRR)
 r0         = 17.5/1000;
 monoms     = [   8,   14];
-Bn_normal  = [-2.4, -1.7]*1e-2;
+Bn_normal  = [-2.5, -1.5]*1e-2;    
 Bn_skew    = [ 0.0,  0.0];
 main_monom = {2, 'normal'}; 
 fams       = {'sd','sf'};

@@ -714,7 +714,8 @@ else
                             Roll = [0 0];
                         end
                     end
-                    AM(i,1) = [cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
+                    AM(i,1) = [cos(Roll(2)) sin(Roll(2))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
+                    %AM(i,1) = [cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
 
                     if size(AT.ATIndex,2) > 1
                         AM(i,1) = Nsplits(i) * AM(i,1);
@@ -763,8 +764,9 @@ else
                             Roll = [0 0];
                         end
                     end
-
-                    AM(i,1) = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
+                    
+                    AM(i,1) = [-sin(Roll(1)) cos(Roll(1))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2))); 
+                    %AM(i,1) = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
 
                     if size(AT.ATIndex,2) > 1
                         AM(i,1) = Nsplits(i) * AM(i,1);
@@ -911,7 +913,7 @@ else
             if any(strcmpi(Field,{'Setpoint','Monitor'}))
                 % KickAngle
                 for i=1:length(ATIndexList)
-                    AM(i,1) = THERING{ATIndexList(i)}.KickAngle(1);  % This only allows for a horizontal kick
+                    AM(i,1) = lnls_get_kickangle(THERING, ATIndexList(i), 'x');  % This only allows for a horizontal kick
                 end
             else
                 if isfield(THERING{ATIndexList(1)}, Field)

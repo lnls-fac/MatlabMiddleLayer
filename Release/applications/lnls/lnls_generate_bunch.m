@@ -1,4 +1,4 @@
-function Rin = lnls_generate_bunch(emitx, emity, sigmae, sigmas,twiss, n_part, cutoff)
+function Rin = lnls_generate_bunch(emitx, emity, sigmae, sigmas, twiss, n_part, cutoff)
 %Rin = lnls_generate_bunch(emitx, emity, sigmae, sigmas,twiss, n_part, cutoff)
 %
 % emitx = horizontal emittance;

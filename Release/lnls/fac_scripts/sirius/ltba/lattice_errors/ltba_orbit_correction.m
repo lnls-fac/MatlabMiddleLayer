@@ -10,15 +10,16 @@ ip = strfind(Path,'/');
 Path = Path(1:ip(end));
 
 % Errors
-rms_alix = 0.3 * mm;
-rms_aliy = 0.3 * mm;
-rms_roll = 0.4 * mrad;
-rms_ex   = 0.1 * pc;
-rms_x0   = 0.1 * mm;
+rms_alix = 0.16 * mm;
+rms_aliy = 0.16 * mm;
+rms_roll = 0.5 * mrad;
+rms_ex   = 0.10 * pc;
+rms_x0   = 0.2 * mm;
 rms_xp0  = 0.1 * mrad;
-rms_y0   = 0.1 * mm;
+rms_y0   = 0.2 * mm;
 rms_yp0  = 0.1 * mrad;
-rms_dp0  = 0.1 * pc;
+rms_dp0  = 0.2 * pc;
+rms_bpm  = 0.2 * mm;
 n_maquinas = 100;
 
 t=twissline(ltba,0.0,Twiss0,1:length(ltba)+1,'chrom');
@@ -28,13 +29,13 @@ beta=cat(1,t.beta);
 disp=[t.Dispersion];
 d=disp(1,:)';
 
-ind_BPM = findcells(ltba, 'FamName', 'bpm');
+ind_bpm = findcells(ltba, 'FamName', 'bpm');
 ind_ch = findcells(ltba, 'FamName', 'hcm');
 ind_cv = findcells(ltba, 'FamName', 'vcm');
 
-sBPM = s(ind_BPM);
+sBPM = s(ind_bpm);
 
-nBPM = length(ind_BPM);
+nBPM = length(ind_bpm);
 nch = length(ind_ch);
 ncv = length(ind_cv);
 
@@ -57,8 +58,8 @@ orb_semcorr_fim = zeros(4,n_maquinas);
 for i=1:nch
     for j=1:nBPM
         %sub-linha de corretor a BPM
-        if (ind_ch(i) < ind_BPM(j));
-            line = ltba(ind_ch(i):ind_BPM(j));
+        if (ind_ch(i) < ind_bpm(j));
+            line = ltba(ind_ch(i):ind_bpm(j));
             t1=twissline(line,0,Twiss0,1:length(line));
             M=cat(1,t1.M44);
             MH(j,i)=M(end-3,2);
@@ -70,8 +71,8 @@ end
 for i=1:ncv
     for j=1:nBPM
         %sublinha de corretor a BPM
-        if (ind_cv(i)<ind_BPM(j))
-            line = ltba(ind_cv(i):ind_BPM(j));
+        if (ind_cv(i)<ind_bpm(j))
+            line = ltba(ind_cv(i):ind_bpm(j));
             t1=twissline(line,0,Twiss0,1:length(line));
             M=cat(1,t1.M44);
             MV(j,i)=M(end-1,4);
@@ -79,25 +80,37 @@ for i=1:ncv
     end
 end
 
-% Matrizes de corre??o
-[UH,SH,VH] = svd(MH);
-MCH = -VH*inv(SH)*UH';
+% Matrizes de correcao
+[UH,SH,VH] = svd(MH,'econ');
+MCH = -VH*diag(1./diag(SH))*UH';
 
-[UV,SV,VV] = svd(MV);
-MCV = -VV*inv(SV)*UV';
+[UV,SV,VV] = svd(MV,'econ');
+MCV = -VV*diag(1./diag(SV))*UV';
 
-% Erros de alinhamento e excita??o em dipolos e quadrupolos
+% Erros de alinhamento e excitacao em dipolos e quadrupolos
 idx = findcells(ltba,'K');
 ltba_Ori = ltba;
 
-% Loop nas m?quinas aleatorias
+% Loop nas maquinas aleatorias
 for nmaq=1:n_maquinas
     ltba = ltba_Ori;
+    % Distribuicao gaussiana truncada
+    errox = lnls_trandn(length(idx),1) * rms_alix;
+    erroy = lnls_trandn(length(idx),1) * rms_aliy;
+    erroex = lnls_trandn(length(idx),1) * rms_ex;
+    erroroll = lnls_trandn(length(idx),1) * rms_roll;
+    %erro de alinhamento de BPM
+    ebpmx = lnls_trandn(nBPM,1) * rms_bpm;
+    ebpmy = lnls_trandn(nBPM,1) * rms_bpm;
+
     % Distribui??o uniforme de erros
-    errox = (-1+2*rand(1,length(idx))) * rms_alix;
-    erroy = (-1+2*rand(1,length(idx))) * rms_aliy;
-    erroex = (-1+2*rand(1,length(idx))) * rms_ex;
-    erroroll = (-1+2*rand(1,length(idx))) * rms_roll;
+    %errox = (-1+2*rand(1,length(idx))) * rms_alix;
+    %erroy = (-1+2*rand(1,length(idx))) * rms_aliy;
+    %erroex = (-1+2*rand(1,length(idx))) * rms_ex;
+    %erroroll = (-1+2*rand(1,length(idx))) * rms_roll;
+    %erro de alinhamento de BPM
+    %ebpmx = (-1+2*rand(1,nBPM)) * rms_bpm;
+    %ebpmy = (-1+2*rand(1,nBPM)) * rms_bpm;
 
     ltba = lnls_add_misalignmentX(errox, idx, ltba);
     ltba = lnls_add_misalignmentY(erroy, idx, ltba);
@@ -106,13 +119,20 @@ for nmaq=1:n_maquinas
     
 % Orbit without correction
     % Error in lauching conditions
-    ex0 = (-1+2*rand(1)) * rms_x0;
-    exp0 = (-1+2*rand(1)) * rms_xp0;
-    ey0 = (-1+2*rand(1)) * rms_y0;
-    eyp0 = (-1+2*rand(1)) * rms_yp0;
+    %ex0 = (-1+2*rand(1)) * rms_x0;
+    %exp0 = (-1+2*rand(1)) * rms_xp0;
+    %ey0 = (-1+2*rand(1)) * rms_y0;
+    %eyp0 = (-1+2*rand(1)) * rms_yp0;
+    %Twiss0.ClosedOrbit=[ex0; exp0; ey0; eyp0];
+    %dp0 = (-1+2*rand(1)) * rms_dp0;
+
+    ex0 = trandn(1,1) * rms_x0;
+    exp0 = trandn(1,1) * rms_xp0;
+    ey0 = trandn(1,1) * rms_y0;
+    eyp0 = trandn(1,1) * rms_yp0;
     Twiss0.ClosedOrbit=[ex0; exp0; ey0; eyp0];
-    dp0 = (-1+2*rand(1)) * rms_dp0;
-    
+    dp0 = trandn(1,1) * rms_dp0;
+
     t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
     for i=1:length(t)
         orbx(i,nmaq)=t(i).ClosedOrbit(1);
@@ -122,48 +142,42 @@ for nmaq=1:n_maquinas
     
     
 % Orbita nos BPMs
-    x_BPM(:,nmaq) = orbx(ind_BPM,nmaq);
-    y_BPM(:,nmaq) = orby(ind_BPM,nmaq);
+    x_BPM(:,nmaq) = orbx(ind_bpm,nmaq);
+    y_BPM(:,nmaq) = orby(ind_bpm,nmaq);
     
     xc_BPM(:,nmaq) = x_BPM(:,nmaq);
     yc_BPM(:,nmaq) = y_BPM(:,nmaq);
     
-    %Itera
-    
-    for iter=1:1
-% Corre??o
-        dteta_ch(:,nmaq) = MCH * xc_BPM(:,nmaq);
-        dteta_cv(:,nmaq) = MCV * yc_BPM(:,nmaq);
+% Correcao
+    dteta_ch(:,nmaq) = MCH * (xc_BPM(:,nmaq) + ebpmx');
+    dteta_cv(:,nmaq) = MCV * (yc_BPM(:,nmaq) + ebpmy');
 
-        for i=1:nch
-            tetaori=ltba{ind_ch(i)}.KickAngle(1);
-            ltba{ind_ch(i)}.KickAngle = [tetaori+dteta_ch(i,nmaq) 0];
-        end
+    for i=1:nch
+        tetaori=ltba{ind_ch(i)}.KickAngle(1);
+        ltba{ind_ch(i)}.KickAngle = [tetaori+dteta_ch(i,nmaq) 0];
+    end
 
-        for i=1:ncv
-            tetaori=ltba{ind_cv(i)}.KickAngle(2);
-            ltba{ind_cv(i)}.KickAngle = [0 dteta_cv(i,nmaq)+tetaori];
-        end
+    for i=1:ncv
+        tetaori=ltba{ind_cv(i)}.KickAngle(2);
+        ltba{ind_cv(i)}.KickAngle = [0 dteta_cv(i,nmaq)+tetaori];
+    end
 
 % Orbita corrigida
-        t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
-        for i=1:length(t)
-            orbcx(i,nmaq)=t(i).ClosedOrbit(1);
-            orbcy(i,nmaq)=t(i).ClosedOrbit(3);
-        end
-        orb_corr_fim(:,nmaq)=t(end).ClosedOrbit;
+    t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
+    for i=1:length(t)
+        orbcx(i,nmaq)=t(i).ClosedOrbit(1);
+        orbcy(i,nmaq)=t(i).ClosedOrbit(3);
+    end
+    orb_corr_fim(:,nmaq)=t(end).ClosedOrbit;
 
 % Orbita corrigida nos BPMs
-        xc_BPM(:,nmaq) = orbcx(ind_BPM,nmaq);
-        yc_BPM(:,nmaq) = orbcy(ind_BPM,nmaq);
-    end
-    
-    
-%erro de ripple, ajustados em cima da ?rbita corrigida
-    erroex = (-1+2*rand(1,length(idx))) * 1/1000;
-    ltba = lnls_add_excitation(erroex, idx, ltba);
-    t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
-    orb_ripple_fim(:,nmaq)=t(end).ClosedOrbit - orb_corr_fim(:,nmaq);
+    xc_BPM(:,nmaq) = orbcx(ind_bpm,nmaq);
+    yc_BPM(:,nmaq) = orbcy(ind_bpm,nmaq);
+     
+%    erroex = (-1+2*rand(1,length(idx))) * 1/1000;
+%    ltba = lnls_add_excitation(erroex, idx, ltba);
+%    t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
+%    orb_ripple_fim(:,nmaq)=t(end).ClosedOrbit - orb_corr_fim(:,nmaq);
         
 end
 
@@ -183,10 +197,10 @@ y_BPM_rms = std(y_BPM,0,2);
 xc_BPM_rms = std(xc_BPM,0,2);
 yc_BPM_rms = std(yc_BPM,0,2);
 orb_semcorr_fim_rms = std(orb_semcorr_fim,0,2);
-orb_ripple_fim_rms = std(orb_ripple_fim,0,2);
+%orb_ripple_fim_rms = std(orb_ripple_fim,0,2);
 
 %separando ch e septa
-dteta_sep = [ dteta_ch(1,:) ; dteta_ch(end,:) ]; % primeiro e ?ltimo
+dteta_sep = [ dteta_ch(1,:) ; dteta_ch(end,:) ]; % primeiro e ultimo
 dteta_cch = dteta_ch(2:end-1,:);                 % todos os outros
 teta_cch_rms = std(dteta_cch(:));
 teta_sep_rms = std(dteta_sep(:));
@@ -216,19 +230,20 @@ Ycptp_mean = mean(orbcy_ptp);
 Xcptp_max = max(orbcx_ptp);
 Ycptp_max = max(orbcy_ptp);
 
-fout = fopen([Path 'Correction_summary.out'], 'w');
+fout = fopen([Path 'Correction_summary_' tit '.out'], 'w');
 fprintf(fout,'Correction_summary\n');
 fprintf(fout,['BTS Transfer Line - ' tit '\n']);
-fprintf(fout,'Uniform random errors for all dipoles, septa and quadrupoles\n');
+fprintf(fout,'Gaussian random errors truncated at 1 sigma for all dipoles, septa and quadrupoles\n');
 fmt = 'X alignment = +-%g mm\n'; fprintf(fout,fmt,rms_alix/mm);
 fmt = 'y alignment = +-%g mm\n'; fprintf(fout,fmt,rms_aliy/mm);
 fmt = 'roll = +-%g mrad\n'; fprintf(fout,fmt,rms_roll/mrad);
 fmt = 'relative excitation = +-%g %%\n'; fprintf(fout,fmt,rms_ex/pc);
+fmt = 'x and y bpm offset = +-%g mm\n'; fprintf(fout,fmt,rms_bpm/mm);
 fmt = 'x launching condition = +-%g mm\n'; fprintf(fout,fmt,rms_x0/mm);
 fmt = 'xp launching condition = +-%g mrad\n'; fprintf(fout,fmt,rms_xp0/mrad);
 fmt = 'y launching condition = +-%g mm\n'; fprintf(fout,fmt,rms_y0/mm);
 fmt = 'yp launching condition = +-%g mrad\n'; fprintf(fout,fmt,rms_yp0/mrad);
-fmt = 'dp/p launching condition = +-%g %\n'; fprintf(fout,fmt,rms_dp0/pc);
+fmt = 'dp/p launching condition = +-%g %%\n'; fprintf(fout,fmt,rms_dp0/pc);
 fmt = 'number of machines = %i\n\n'; fprintf(fout,fmt,n_maquinas);
 
 fmt = '                          before   after \n'; fprintf(fout,fmt);
@@ -261,24 +276,24 @@ for i=1:ncv
     fmt = 'CV%i  %5.3f   %5.3f  \n'; fprintf(fout,fmt,i,tetai_cv_rms(i)/mrad,tetai_cv_max(i)/mrad);
 end
     
-fmt = '\n Vibration study - rms position at line end without correction\n'; fprintf(fout,fmt);
-fmt = 'rms_x : %5.3f mm\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(1)/mm);
-fmt = 'rms_xp: %5.3f mrad\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(2)/mrad);
-fmt = 'rms_y : %5.3f mm\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(3)/mm);
-fmt = 'rms_yp: %5.3f mrad\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(4)/mrad);
+%fmt = '\n Vibration study - rms position at line end without correction\n'; fprintf(fout,fmt);
+%fmt = 'rms_x : %5.3f mm\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(1)/mm);
+%fmt = 'rms_xp: %5.3f mrad\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(2)/mrad);
+%fmt = 'rms_y : %5.3f mm\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(3)/mm);
+%fmt = 'rms_yp: %5.3f mrad\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(4)/mrad);
 
-fmt = '\n Ripple study \n'; fprintf(fout,fmt);
-fmt = 'rms_x : %5.3f mm\n'; fprintf(fout,fmt,orb_ripple_fim_rms(1)/mm);
-fmt = 'rms_xp: %5.3f mrad\n'; fprintf(fout,fmt,orb_ripple_fim_rms(2)/mrad);
-fmt = 'rms_y : %5.3f mm\n'; fprintf(fout,fmt,orb_ripple_fim_rms(3)/mm);
-fmt = 'rms_yp: %5.3f mrad\n'; fprintf(fout,fmt,orb_ripple_fim_rms(4)/mrad);
+%fmt = '\n Ripple study \n'; fprintf(fout,fmt);
+%fmt = 'rms_x : %5.3f mm\n'; fprintf(fout,fmt,orb_ripple_fim_rms(1)/mm);
+%fmt = 'rms_xp: %5.3f mrad\n'; fprintf(fout,fmt,orb_ripple_fim_rms(2)/mrad);
+%%fmt = 'rms_y : %5.3f mm\n'; fprintf(fout,fmt,orb_ripple_fim_rms(3)/mm);
+%fmt = 'rms_yp: %5.3f mrad\n'; fprintf(fout,fmt,orb_ripple_fim_rms(4)/mrad);
 
 fclose(fout);
 
 
 %Create Figure Horizontal correction
 figure1 = figure('Color',[1 1 1]);
-annotation('textbox', [0.3,0.88,0.1,0.1],...
+annotation('textbox', [0.2,0.88,0.1,0.1],...
            'FontSize',14,...
            'FontWeight','bold',...
            'LineStyle','none',...
@@ -331,9 +346,7 @@ text(1,ylimit(1)+0.2*ylimit(2),'Y after correction', 'FontSize',14,'Color','r');
 grid on;
 box on;
 
-plot2svg('orbit.svg');
+plot2svg([tit '_Orbit.svg'],figure1);
 
-%Plot Twiss functions
-sirius_plot_twiss('ts',1,1);
 
 
