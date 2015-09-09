@@ -600,9 +600,12 @@ else
             
             AllDevices = family2dev(Family);
             if size(DeviceList, 1) ~= size(AllDevices, 1)              
-                
                 for i = 1:size(ATIndexList,1)
-                    THERING{ATIndexList(i)}.Shunt = THERING{ATIndexList(i)}.Shunt + NewHardwareValue(i) - PrevHardwareValue(i);
+                    if isfield(THERING{ATIndexList(i)}, 'Shunt')
+                        THERING{ATIndexList(i)}.Shunt = THERING{ATIndexList(i)}.Shunt + NewHardwareValue(i) - PrevHardwareValue(i);
+                    else
+                        THERING{ATIndexList(i)}.Shunt = NewHardwareValue(i) - PrevHardwareValue(i);
+                    end      
                 end
             end
             

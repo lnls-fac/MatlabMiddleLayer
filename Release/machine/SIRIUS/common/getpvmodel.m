@@ -801,7 +801,7 @@ else
             AM = physics2hw(AT.ATMagnet, Field, AM, DeviceList, getenergymodel);    
             
             for i = 1:length(ATIndexList)
-                if isfield(THERING{ATIndexList(1)}, 'Shunt')
+                if isfield(THERING{ATIndexList(i)}, 'Shunt')
                     AM(i,1) = AM(i,1) - THERING{ATIndexList(i)}.Shunt;
                 end
             end
