@@ -68,6 +68,7 @@ end
 
 % Luana 2015-08-25
 setpathsirius('SIRIUS', default_version, 'LABCA');
+lcaSetTimeout(.005);
 %setpathsirius('SIRIUS', default_version, 'sirius_link');
 
 cd(cdir);
