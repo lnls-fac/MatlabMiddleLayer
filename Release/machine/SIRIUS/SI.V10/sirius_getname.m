@@ -89,7 +89,7 @@ switch Family
             error('Don''t know how to make the channel name for family %s', Family);
         end
         
-	case  'qfa-fam'
+	case  'qfa_fam'
 		ChannelName = 'SIPS-QFA-FAM';
 
 	case  'qfa'
@@ -101,7 +101,7 @@ switch Family
 			'SIPS-QFA-17M2'; 'SIPS-QFA-18M2'; 'SIPS-QFA-19M2'; 'SIPS-QFA-20M2' ;...
 			];
 
-	case  'qda-fam'
+	case  'qda_fam'
 		ChannelName = 'SIPS-QDA-FAM';
 
 	case  'qda'
@@ -113,7 +113,7 @@ switch Family
 			'SIPS-QDA-17M2'; 'SIPS-QDA-18M2'; 'SIPS-QDA-19M2'; 'SIPS-QDA-20M2' ;...
 			];
 
-	case  'qf1-fam'
+	case  'qf1_fam'
 		ChannelName = 'SIPS-QF1-FAM';
 
 	case  'qf1'
@@ -130,7 +130,7 @@ switch Family
 			'SIPS-QF1-19C1'; 'SIPS-QF1-19C4'; 'SIPS-QF1-20C1'; 'SIPS-QF1-20C4' ;...
 			];
 
-	case  'qf2-fam'
+	case  'qf2_fam'
 		ChannelName = 'SIPS-QF2-FAM';
 
 	case  'qf2'
@@ -147,7 +147,7 @@ switch Family
 			'SIPS-QF2-19C1'; 'SIPS-QF2-19C4'; 'SIPS-QF2-20C1'; 'SIPS-QF2-20C4' ;...
 			];
 
-	case  'qf3-fam'
+	case  'qf3_fam'
 		ChannelName = 'SIPS-QF3-FAM';
 
 	case  'qf3'
@@ -164,7 +164,7 @@ switch Family
 			'SIPS-QF3-19C2'; 'SIPS-QF3-19C3'; 'SIPS-QF3-20C2'; 'SIPS-QF3-20C3' ;...
 			];
 
-	case  'qf4-fam'
+	case  'qf4_fam'
 		ChannelName = 'SIPS-QF4-FAM';
 
 	case  'qf4'
@@ -181,7 +181,7 @@ switch Family
 			'SIPS-QF4-19C2'; 'SIPS-QF4-19C3'; 'SIPS-QF4-20C2'; 'SIPS-QF4-20C3' ;...
 			];
 
-	case  'qdb1-fam'
+	case  'qdb1_fam'
 		ChannelName = 'SIPS-QDB1-FAM';
 
 	case  'qdb1'
@@ -193,7 +193,7 @@ switch Family
 			'SIPS-QDB1-18M1'; 'SIPS-QDB1-19M1'; 'SIPS-QDB1-20M1'; 'SIPS-QDB1-01M1' ;...
 			];
 
-	case  'qfb-fam'
+	case  'qfb_fam'
 		ChannelName = 'SIPS-QFB-FAM';
 
 	case  'qfb'
@@ -205,7 +205,7 @@ switch Family
 			'SIPS-QFB-18M1'; 'SIPS-QFB-19M1'; 'SIPS-QFB-20M1'; 'SIPS-QFB-01M1' ;...
 			];
 
-	case  'qdb2-fam'
+	case  'qdb2_fam'
 		ChannelName = 'SIPS-QDB2-FAM';
 
 	case  'qdb2'
@@ -217,7 +217,7 @@ switch Family
 			'SIPS-QDB2-18M1'; 'SIPS-QDB2-19M1'; 'SIPS-QDB2-20M1'; 'SIPS-QDB2-01M1' ;...
 			];
 
-	case  'sfa-fam'
+	case  'sfa_fam'
 		ChannelName = 'SIPS-SFA-FAM';
 
 	case  'sfa'
@@ -229,7 +229,7 @@ switch Family
 			'SIPS-SFA-17M2'; 'SIPS-SFA-18M2'; 'SIPS-SFA-19M2'; 'SIPS-SFA-20M2' ;...
 			];
 
-	case  'sda-fam'
+	case  'sda_fam'
 		ChannelName = 'SIPS-SDA-FAM';
 
 	case  'sda'
@@ -241,7 +241,7 @@ switch Family
 			'SIPS-SDA-17M2'; 'SIPS-SDA-18M2'; 'SIPS-SDA-19M2'; 'SIPS-SDA-20M2' ;...
 			];
 
-	case  'sd1j-fam'
+	case  'sd1j_fam'
 		ChannelName = 'SIPS-SD1J-FAM';
 
 	case  'sd1j'
@@ -253,7 +253,7 @@ switch Family
 			'SIPS-SD1J-17C1'; 'SIPS-SD1J-18C1'; 'SIPS-SD1J-19C1'; 'SIPS-SD1J-20C1' ;...
 			];
 
-	case  'sf1j-fam'
+	case  'sf1j_fam'
 		ChannelName = 'SIPS-SF1J-FAM';
 
 	case  'sf1j'
@@ -265,7 +265,7 @@ switch Family
 			'SIPS-SF1J-17C1'; 'SIPS-SF1J-18C1'; 'SIPS-SF1J-19C1'; 'SIPS-SF1J-20C1' ;...
 			];
 
-	case  'sd2j-fam'
+	case  'sd2j_fam'
 		ChannelName = 'SIPS-SD2J-FAM';
 
 	case  'sd2j'
@@ -277,7 +277,7 @@ switch Family
 			'SIPS-SD2J-17C1'; 'SIPS-SD2J-18C1'; 'SIPS-SD2J-19C1'; 'SIPS-SD2J-20C1' ;...
 			];
 
-	case  'sd3j-fam'
+	case  'sd3j_fam'
 		ChannelName = 'SIPS-SD3J-FAM';
 
 	case  'sd3j'
@@ -289,7 +289,7 @@ switch Family
 			'SIPS-SD3J-17C2'; 'SIPS-SD3J-18C2'; 'SIPS-SD3J-19C2'; 'SIPS-SD3J-20C2' ;...
 			];
 
-	case  'sf2j-fam'
+	case  'sf2j_fam'
 		ChannelName = 'SIPS-SF2J-FAM';
 
 	case  'sf2j'
@@ -301,7 +301,7 @@ switch Family
 			'SIPS-SF2J-17C2'; 'SIPS-SF2J-18C2'; 'SIPS-SF2J-19C2'; 'SIPS-SF2J-20C2' ;...
 			];
 
-	case  'sf2k-fam'
+	case  'sf2k_fam'
 		ChannelName = 'SIPS-SF2K-FAM';
 
 	case  'sf2k'
@@ -313,7 +313,7 @@ switch Family
 			'SIPS-SF2K-17C3'; 'SIPS-SF2K-18C3'; 'SIPS-SF2K-19C3'; 'SIPS-SF2K-20C3' ;...
 			];
 
-	case  'sd3k-fam'
+	case  'sd3k_fam'
 		ChannelName = 'SIPS-SD3K-FAM';
 
 	case  'sd3k'
@@ -325,7 +325,7 @@ switch Family
 			'SIPS-SD3K-17C3'; 'SIPS-SD3K-18C3'; 'SIPS-SD3K-19C3'; 'SIPS-SD3K-20C3' ;...
 			];
 
-	case  'sd2k-fam'
+	case  'sd2k_fam'
 		ChannelName = 'SIPS-SD2K-FAM';
 
 	case  'sd2k'
@@ -337,7 +337,7 @@ switch Family
 			'SIPS-SD2K-17C4'; 'SIPS-SD2K-18C4'; 'SIPS-SD2K-19C4'; 'SIPS-SD2K-20C4' ;...
 			];
 
-	case  'sf1k-fam'
+	case  'sf1k_fam'
 		ChannelName = 'SIPS-SF1K-FAM';
 
 	case  'sf1k'
@@ -349,7 +349,7 @@ switch Family
 			'SIPS-SF1K-17C4'; 'SIPS-SF1K-18C4'; 'SIPS-SF1K-19C4'; 'SIPS-SF1K-20C4' ;...
 			];
 
-	case  'sd1k-fam'
+	case  'sd1k_fam'
 		ChannelName = 'SIPS-SD1K-FAM';
 
 	case  'sd1k'
@@ -361,7 +361,7 @@ switch Family
 			'SIPS-SD1K-17C4'; 'SIPS-SD1K-18C4'; 'SIPS-SD1K-19C4'; 'SIPS-SD1K-20C4' ;...
 			];
 
-	case  'sdb-fam'
+	case  'sdb_fam'
 		ChannelName = 'SIPS-SDB-FAM';
 
 	case  'sdb'
@@ -373,7 +373,7 @@ switch Family
 			'SIPS-SDB-18M1'; 'SIPS-SDB-19M1'; 'SIPS-SDB-20M1'; 'SIPS-SDB-01M1' ;...
 			];
 
-	case  'sfb-fam'
+	case  'sfb_fam'
 		ChannelName = 'SIPS-SFB-FAM';
 
 	case  'sfb'
@@ -525,16 +525,19 @@ switch Family
             'SIPS-QS-20M2'; 'SIPS-QS-20C1'; 'SIPS-QS-20C4'; 'SIPS-QS-01M1';...
             ];  
         
+    otherwise
+        error('Don''t know how to make the channel name for family %s', Family);
+        
 end
 
-% if any(strcmpi(Family, {'HCM', 'VCM', 'QF', 'QF_Shunts', 'QF_Families', 'QFC', 'QFC_Shunts', 'QFC_Families', 'QD', 'QD_Shunts', 'QD_Families', 'SKEWQUAD', 'SF', 'SD', 'BEND','RF'}))
-%     if strcmpi(Field, 'Monitor')
-%         ChannelName = strcat(ChannelName, '_AM');
-%     elseif strcmpi(Field, 'Setpoint')
-%         ChannelName = strcat(ChannelName, '_SP');
-%     elseif strcmpi(Field, 'CommonNames')
-%     else
-%         error('Don''t know how to make the channel name for family %s', Family);
-%     end
+if any(strcmpi(Family, {'BPMx','BPMy', 'bpmx', 'bpmy'}))
+    
+else
+    if strcmpi(Field, 'Monitor')
+        ChannelName = strcat(ChannelName, '-RB');
+    elseif strcmpi(Field, 'Setpoint')
+        ChannelName = strcat(ChannelName, '-SP');
+    end
+end
 
 end

@@ -76,8 +76,8 @@ bpmyDeviceListTotal = family2dev('bpmy',0);
 
 chsDeviceList = family2dev('chs');
 chsDeviceListTotal = family2dev('chs',0);
-vcmDeviceList = family2dev('cvs');
-vcmDeviceListTotal = family2dev('cvs',0);
+cvsDeviceList = family2dev('cvs');
+cvsDeviceListTotal = family2dev('cvs',0);
 
 
 if any(strcmpi(CommandInput, 'Nominal'))
@@ -95,9 +95,9 @@ if any(strcmpi(CommandInput, 'Nominal'))
     AO.bpmy.Crunch = zeros(size(bpmyDeviceListTotal,1),1);
 
     AO.chs.Gain = ones(size(chsDeviceListTotal,1),1);
-    AO.vcm.Gain = ones(size(vcmDeviceListTotal,1),1);
+    AO.cvs.Gain = ones(size(cvsDeviceListTotal,1),1);
     AO.chs.Roll = zeros(size(chsDeviceListTotal,1),1);
-    AO.vcm.Roll = zeros(size(vcmDeviceListTotal,1),1);
+    AO.cvs.Roll = zeros(size(cvsDeviceListTotal,1),1);
 
     % Magnet gains set to unity (rolls are set in the AT model)
     mlist = findmemberof('QUAD');
@@ -125,11 +125,11 @@ if any(strcmpi(CommandInput, 'Nominal'))
 
     % First set the cross planes to zero
     setatfield('chs', 'Roll', 0*AO.chs.Roll, chsDeviceListTotal, 1, 2);
-    setatfield('cvs', 'Roll', 0*AO.vcm.Roll, vcmDeviceListTotal, 1, 1);
+    setatfield('cvs', 'Roll', 0*AO.cvs.Roll, cvsDeviceListTotal, 1, 1);
 
     % Then set the roll field
     setatfield('chs', 'Roll', AO.chs.Roll, chsDeviceListTotal, 1, 1);
-    setatfield('cvs', 'Roll', AO.vcm.Roll, vcmDeviceListTotal, 1, 2);
+    setatfield('cvs', 'Roll', AO.cvs.Roll, cvsDeviceListTotal, 1, 2);
 
     setao(AO);
 
@@ -160,7 +160,7 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
     bpmxDeviceList = LocoMeasData.HBPM.DeviceList;
     bpmyDeviceList = LocoMeasData.VBPM.DeviceList;
     chsDeviceList  = LocoMeasData.chs.DeviceList;
-    vcmDeviceList  = LocoMeasData.vcm.DeviceList;
+    cvsDeviceList  = LocoMeasData.cvs.DeviceList;
 
 
     % Should get the device list from the LOCO file???
@@ -192,7 +192,7 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
     %%%%%%%%%%%%%%
 
     % Kick strength (LOCO is in milliradian)
-    % LOCO is run with the original gain in hw2physics (stored in LocoMeasData.vcmGain/LocoMeasData.chsGain).
+    % LOCO is run with the original gain in hw2physics (stored in LocoMeasData.cvsGain/LocoMeasData.chsGain).
     % The new gain must combine the new CM gain and the one used in buildlocoinput.
     % hw2physics:  Rad = G * amps   (original)
     % LOCO gain:   Gloco = KickNew/KickStart
@@ -211,17 +211,17 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
     AO.chs.Gain(i) = sign(chsGainLOCO) .* sqrt(chsCouplingLOCO.^2 + chsGainLOCO.^2);
 
 
-    % vcm
-    i = findrowindex(vcmDeviceList, vcmDeviceListTotal);
+    % cvs
+    i = findrowindex(cvsDeviceList, cvsDeviceListTotal);
 
-    vcmGainOldLOCO = LocoMeasData.vcmGain .* cos(LocoMeasData.vcmRoll);
+    cvsGainOldLOCO = LocoMeasData.cvsGain .* cos(LocoMeasData.cvsRoll);
 
-    vcmGainLOCO     = vcmGainOldLOCO .* CMData(end).vcmKicks ./ CMData(1).vcmKicks;
-    vcmCouplingLOCO = CMData(end).vcmCoupling;
+    cvsGainLOCO     = cvsGainOldLOCO .* CMData(end).cvsKicks ./ CMData(1).cvsKicks;
+    cvsCouplingLOCO = CMData(end).cvsCoupling;
 
-    %AO.vcm.Roll(i) = atan2(-vcmCouplingLOCO, vcmGainLOCO);
-    AO.vcm.Roll(i) = atan(-vcmCouplingLOCO ./ abs(vcmGainLOCO));
-    AO.vcm.Gain(i) = sign(vcmGainLOCO) .* sqrt(vcmCouplingLOCO.^2 + vcmGainLOCO.^2);
+    %AO.cvs.Roll(i) = atan2(-cvsCouplingLOCO, cvsGainLOCO);
+    AO.cvs.Roll(i) = atan(-cvsCouplingLOCO ./ abs(cvsGainLOCO));
+    AO.cvs.Gain(i) = sign(cvsGainLOCO) .* sqrt(cvsCouplingLOCO.^2 + cvsGainLOCO.^2);
    
     % Set the roll, crunch to the AT model to be used by getpvmodel, setpvmodel, etc
     setatfield('bpmx', 'GCR', [AO.bpmx.Gain AO.bpmy.Gain AO.bpmx.Crunch AO.bpmx.Roll], bpmxDeviceListTotal);
@@ -231,11 +231,11 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
 
     % First set the cross planes to zero
     setatfield('chs', 'Roll', 0*AO.chs.Roll, chsDeviceListTotal, 1, 2);
-    setatfield('vcm', 'Roll', 0*AO.vcm.Roll, vcmDeviceListTotal, 1, 1);
+    setatfield('cvs', 'Roll', 0*AO.cvs.Roll, cvsDeviceListTotal, 1, 1);
 
     % Then set the roll field
     setatfield('chs', 'Roll', AO.chs.Roll, chsDeviceListTotal, 1, 1);
-    setatfield('vcm', 'Roll', AO.vcm.Roll, vcmDeviceListTotal, 1, 2);
+    setatfield('cvs', 'Roll', AO.cvs.Roll, cvsDeviceListTotal, 1, 2);
 
 
     % Should set the magnet rolls in the AT model???

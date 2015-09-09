@@ -111,8 +111,8 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 2000e-6;
-AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
+AD.DeltaRFDisp         = 100e-6;
+AD.DeltaRFChro         = 1e-6 * linspace(-100,100,11);
 
 AD.TuneDelay           = 0;
 AD.ATModel             = 'sirius_si_lattice';
@@ -148,8 +148,8 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 2000e-6;
-AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
+AD.DeltaRFDisp         = 100e-6;
+AD.DeltaRFChro         =  1e-6 * linspace(-100,100,11);
 
 AD.TuneDelay           = 0;
 AD.ATModel             = 'sirius_si_lattice';
@@ -185,8 +185,8 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 2000e-6;
-AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
+AD.DeltaRFDisp         = 100e-6;
+AD.DeltaRFChro         =  1e-6 * linspace(-100,100,11);
 
 AD.TuneDelay           = 0;
 AD.ATModel             = 'sirius_si_lattice';
