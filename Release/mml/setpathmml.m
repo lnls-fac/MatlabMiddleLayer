@@ -51,6 +51,9 @@ for i = length(varargin):-1:1
     elseif strcmpi(varargin{i},'UCODE')
         LinkFlag = 'UCODE';
         varargin(i) = [];
+    elseif strcmpi(varargin{i}, 'None')
+        LinkFlag = 'None';
+        varargin(i) = [];
     end
 end
 
@@ -342,7 +345,8 @@ if ~isdeployed_local
             fprintf('   Appending MATLAB path for OPC control \n');
             addpath(fullfile(MMLROOT,'links','opc'), '-begin');
             addpath(fullfile(MMLROOT,'mml', 'links', 'opc'), '-begin');
-
+        case 'NONE'
+            fprintf('   Only simulator mode will work.\n');
         otherwise
             fprintf('   Unknown type for the Online connection method.  Only simulator mode will work.\n');
     end

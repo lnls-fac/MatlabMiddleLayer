@@ -14,6 +14,7 @@ default_si_version = 'SI.V10';
 default_bo_version = 'BO.V01';
 default_tb_version = 'TB.V01';
 default_ts_version = 'TS.V01';
+default_link       = 'NONE';
 
 default_version = default_si_version;
 for i=length(varargin):-1:1
@@ -31,6 +32,8 @@ for i=length(varargin):-1:1
                 default_version = default_ts_version;
             elseif strfind(varargin{i}, 'SI')
                 default_version = default_si_version;
+            elseif strcmpi(varargin{i}, 'LABCA')
+                default_link = 'LABCA';
             end
         else
             default_version = varargin{i};
@@ -66,10 +69,14 @@ for i=1:length(mmlpaths)
     end
 end
 
-% Luana 2015-08-25
-%setpathsirius('SIRIUS', default_version, 'LABCA');
-%lcaSetTimeout(.005);
-setpathsirius('SIRIUS', default_version, 'sirius_link');
+% Ximenes 2015-09-09
+if strcmpi(default_link, 'LABCA')
+    % Luana 2015-08-25
+    setpathsirius('SIRIUS', default_version, 'LABCA');
+    lcaSetTimeout(.005);
+else
+    setpathsirius('SIRIUS', default_version, 'NONE');
+end
 
 cd(cdir);
 clear cdir;
