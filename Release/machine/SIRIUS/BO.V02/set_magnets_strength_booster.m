@@ -55,10 +55,20 @@
 % tuney  =  7.31417
 % chromx =  +0.5
 % chromy =  +0.5
-qf_strength =  1.882125768941849;
-qd_strength = -0.002825241833800;
-sf_strength = 11.349989133773295;
-sd_strength = 7.206900815548799;
+% 
+% qf_strength =  1.882125768941849;
+% qd_strength = -0.002825241833800;
+% sf_strength = 11.349989133773295;
+% sd_strength = 7.206900815548799;
+
+% 2015-09-08 ximenes
+% changes eff. length of QF to match the one from fieldmap analysis.
+% corrected tunes and chormaticies
+qf_strength =  1.657897577214302;
+qd_strength = -0.010004424317613;
+sf_strength = 11.327922565223286;
+sd_strength =  7.330541690089150;
+
 
 
 

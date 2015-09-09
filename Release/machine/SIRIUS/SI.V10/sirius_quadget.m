@@ -4,17 +4,16 @@ function [AM, tout, DataTime, ErrorFlag] = sirius_quadget(FamilyName, Field, Dev
 % Starting time
 t0 = clock;
 
-Family = strcat(FamilyName, '_fam');
-Shunt  = strcat(FamilyName, '_shunt');
+FamPS   = strcat(FamilyName, '_fam');
+ShuntPS = strcat(FamilyName, '_shunt');
 
-FamilyChannelNames = family2channel(Family, Field, DeviceList);
-ShuntChannelNames  = family2channel(Shunt, Field, DeviceList); 
+FamilyChannelNames = family2channel(FamPS, Field, DeviceList);
+ShuntChannelNames  = family2channel(ShuntPS, Field, DeviceList); 
 
 FamilyValues = getpv(FamilyChannelNames);
 ShuntValues  = getpv(ShuntChannelNames); 
 
-AM = FamilyValues;
-AM = AM + ShuntValues;
+AM = FamilyValues + ShuntValues;
   
 tout = etime(clock, t0);
 DataTime = [];
