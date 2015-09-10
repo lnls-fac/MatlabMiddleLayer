@@ -607,6 +607,11 @@ else
                         THERING{ATIndexList(i)}.Shunt = NewHardwareValue(i) - PrevHardwareValue(i);
                     end      
                 end
+            else 
+                FamilyValue = mean(NewHardwareValue);
+                for i = 1:size(ATIndexList,1)
+                    THERING{ATIndexList(i)}.Shunt = NewHardwareValue(i) - FamilyValue;
+                end
             end
             
 %             for i = 1:size(NewSP,1)
@@ -638,19 +643,28 @@ else
             end
             
             
-        elseif any(strcmpi(AT.ATType, {'FamPS'}))
-        
-            NewHardwareValue = NewSP;
-            AllDevices = family2dev(Family); 
-            THERING = sirius_setpolynom(THERING, Family, Field, NewHardwareValue, AllDevices);
-                   
+        elseif any(strcmpi(AT.ATType, {'FamilyPS'}))
+            
+            AllDevices = family2dev(Family);
+            if size(NewSP, 1) ~= size(AllDevices, 1)  
+                NewSP = ones(size(AllDevices, 1),1)*NewSP(1);
+            end
+            
+            PrevFamilyValue  = getpvmodel(Family, Field, AllDevices, 'Hardware');
+            PrevTotalValue   = getpvmodel(AT.ATMagnet, Field, AllDevices, 'Hardware');
+            NewHardwareValue = PrevTotalValue - PrevFamilyValue + NewSP;
+            THERING = sirius_setpolynom(THERING, AT.ATMagnet, Field, NewHardwareValue, AllDevices);
+            
+            
         elseif any(strcmpi(AT.ATType, {'ShuntPS'}))
-        
-            NewHardwareValue = NewSP;
-            THERING = sirius_setpolynom(THERING, Family, Field, NewHardwareValue, DeviceList);
+            
+            PrevShuntValue   = getpvmodel(Family, Field, DeviceList, 'Hardware');
+            PrevTotalValue   = getpvmodel(AT.ATMagnet, Field, DeviceList, 'Hardware');
+            NewHardwareValue = PrevTotalValue - PrevShuntValue + NewSP;
+            THERING = sirius_setpolynom(THERING, AT.ATMagnet, Field, NewHardwareValue, DeviceList);
             
             for i = 1:size(ATIndexList,1)
-                THERING{ATIndexList(i)}.Shunt = NewHardwareValue(i);
+                THERING{ATIndexList(i)}.Shunt = NewSP(i);
             end
             
 %         elseif any(strcmpi(AT.ATType, {'Shunt'}))

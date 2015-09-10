@@ -72,7 +72,7 @@ end
 
 try
     % qfa_fam
-    AO.qfa_fam.AT.ATType   = 'FamPS';
+    AO.qfa_fam.AT.ATType   = 'FamilyPS';
     AO.qfa_fam.AT.ATMagnet = 'qfa';
     AO.qfa_fam.AT.ATIndex  = buildatindex(AO.qfa.FamilyName, Indices.qfa);
     AO.qfa_fam.Position    = findspos(THERING, AO.qfa_fam.AT.ATIndex(:,1))';
@@ -101,7 +101,7 @@ end
 
 try
 	% qda_fam
-	AO.qda_fam.AT.ATType = 'FamPS';
+	AO.qda_fam.AT.ATType = 'FamilyPS';
     AO.qda_fam.AT.ATMagnet = 'qda';
 	AO.qda_fam.AT.ATIndex = buildatindex(AO.qda.FamilyName, Indices.qda);
 	AO.qda_fam.Position = findspos(THERING, AO.qda_fam.AT.ATIndex(:,1));
@@ -130,7 +130,7 @@ end
 
 try
 	% qfb_fam
-	AO.qfb_fam.AT.ATType = 'FamPS';
+	AO.qfb_fam.AT.ATType = 'FamilyPS';
     AO.qfb_fam.AT.ATMagnet = 'qfb';
 	AO.qfb_fam.AT.ATIndex = buildatindex(AO.qfb.FamilyName, Indices.qfb);
 	AO.qfb_fam.Position = findspos(THERING, AO.qfb_fam.AT.ATIndex(:,1));
@@ -159,7 +159,7 @@ end
 
 try
 	% qdb2_fam
-	AO.qdb2_fam.AT.ATType = 'FamPS';
+	AO.qdb2_fam.AT.ATType = 'FamilyPS';
     AO.qdb2_fam.AT.ATMagnet = 'qdb2';
 	AO.qdb2_fam.AT.ATIndex = buildatindex(AO.qdb2.FamilyName, Indices.qdb2);
 	AO.qdb2_fam.Position = findspos(THERING, AO.qdb2_fam.AT.ATIndex(:,1));
@@ -188,7 +188,7 @@ end
 
 try
 	% qdb1_fam
-	AO.qdb1_fam.AT.ATType = 'FamPS';
+	AO.qdb1_fam.AT.ATType = 'FamilyPS';
     AO.qdb1_fam.AT.ATMagnet = 'qdb1';
 	AO.qdb1_fam.AT.ATIndex = buildatindex(AO.qdb1.FamilyName, Indices.qdb1);
 	AO.qdb1_fam.Position = findspos(THERING, AO.qdb1_fam.AT.ATIndex(:,1));
@@ -229,22 +229,22 @@ end
 
 try
 	% qf1_fam
-	AO.qf1_fam.AT.ATType = 'FamPS';
+	AO.qf1_fam.AT.ATType = 'FamilyPS';
     AO.qf1_fam.AT.ATMagnet = 'qf1';
 	AO.qf1_fam.AT.ATIndex = buildatindex(AO.qf1.FamilyName, Indices.qf1);
 	AO.qf1_fam.Position = findspos(THERING, AO.qf1_fam.AT.ATIndex(:,1));
 	% qf2_fam
-	AO.qf2_fam.AT.ATType = 'FamPS';
+	AO.qf2_fam.AT.ATType = 'FamilyPS';
     AO.qf2_fam.AT.ATMagnet = 'qf2';
 	AO.qf2_fam.AT.ATIndex = buildatindex(AO.qf2.FamilyName, Indices.qf2);
 	AO.qf2_fam.Position = findspos(THERING, AO.qf2_fam.AT.ATIndex(:,1));
 	% qf3_fam
-	AO.qf3_fam.AT.ATType = 'FamPS';
+	AO.qf3_fam.AT.ATType = 'FamilyPS';
     AO.qf3_fam.AT.ATMagnet = 'qf3';
 	AO.qf3_fam.AT.ATIndex = buildatindex(AO.qf3.FamilyName, Indices.qf3);
 	AO.qf3_fam.Position = findspos(THERING, AO.qf3_fam.AT.ATIndex(:,1));
 	% qf4_fam
-	AO.qf4_fam.AT.ATType = 'FamPS';
+	AO.qf4_fam.AT.ATType = 'FamilyPS';
     AO.qf4_fam.AT.ATMagnet = 'qf4';
 	AO.qf4_fam.AT.ATIndex = buildatindex(AO.qf4.FamilyName, Indices.qf4);
 	AO.qf4_fam.Position = findspos(THERING, AO.qf4_fam.AT.ATIndex(:,1));

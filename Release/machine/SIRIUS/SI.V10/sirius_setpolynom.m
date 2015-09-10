@@ -19,7 +19,7 @@ PrevHardwareValue = getpvmodel(Family, Field, DeviceList, 'Hardware');
 Energy        = getenergy;
 Brho          = getbrho(Energy);
 ElementsIndex = dev2elem(Family,DeviceList);
-ATIndexList   = family2atindex(Family);
+ATIndexList   = family2atindex(Family, DeviceList);
 EffLength     = getleff(Family, DeviceList); 
 
 ExcData       = getfamilydata(Family, 'ExcitationCurves');

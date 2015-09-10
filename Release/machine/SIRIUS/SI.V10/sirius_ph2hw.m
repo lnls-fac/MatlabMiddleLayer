@@ -102,7 +102,16 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
             Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), k(i) * Brho);
         end
         
-    elseif any(strcmpi(Family, findmemberof('QUAD'))) || any(strcmpi(Family, findmemberof('SKEWQUAD')))
+    elseif any(strcmpi(Family, findmemberof('QUAD')))            
+        EffLength = getleff(Family, DeviceList); 
+        ExcData = getfamilydata(Family, 'ExcitationCurves');
+        Amps=zeros(size(k,1),1);
+        for i=1:length(ElementsIndex)
+            idx = ElementsIndex(i);
+            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), k(i) * EffLength(i) * Brho);
+        end
+        
+    elseif any(strcmpi(Family, findmemberof('SKEWQUAD')))
         EffLength = getleff(Family, DeviceList); 
         ExcData = getfamilydata(Family, 'ExcitationCurves');
         Amps=zeros(size(k,1),1);

@@ -793,7 +793,7 @@ else
             % Add noise
             %AM = AM + 1e-3*randn(length(AM),1);
 
-        elseif any(strcmpi(AT.ATType,{'FamPS'}))           
+        elseif any(strcmpi(AT.ATType,{'FamilyPS'}))           
             
             for i = 1:length(ATIndexList)
                 AM(i,1) = THERING{ATIndexList(i)}.NPB(2);
