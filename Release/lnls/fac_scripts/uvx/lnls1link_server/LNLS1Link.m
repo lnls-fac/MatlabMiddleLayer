@@ -1,14 +1,14 @@
 function LNLS1Link
 % Emulador MATLAB do dervidor LNLS1LinkS
 %
-% Esta função emula o servidor LNLS1LinkS dando acesso a seus clientes
-% conectados via TCP/IP sockets às leituras e ajustes da máquina, que é um
+% Esta funï¿½ï¿½o emula o servidor LNLS1LinkS dando acesso a seus clientes
+% conectados via TCP/IP sockets ï¿½s leituras e ajustes da mï¿½quina, que ï¿½ um
 % modelo AT/MML (simulator).
 %
-% Histórico
+% Histï¿½rico
 % 
-% 2011-04-06: modificada rotina que retorna Família a partir do ChannelName
-% 2010-09-16: comentários iniciais no código (Ximenes R. Resende)
+% 2011-04-06: modificada rotina que retorna Famï¿½lia a partir do ChannelName
+% 2010-09-16: comentï¿½rios iniciais no cï¿½digo (Ximenes R. Resende)
 
 import java.io.*;
 import java.net.*;
@@ -24,7 +24,14 @@ default_IP_port = '53131';
 %rmappdata(0, 'PVServer');
 % inicializa estruturas do MML
 cdir = pwd;
-cd('C:\Arq\MatlabMiddleLayer\Release\mml\');
+
+pos = strfind(computer, 'PCWIN'); % check whether we are in Windows
+if isempty(pos)
+    cd('/home/fac_files/code/MatlabMiddleLayer/Release/mml/');
+else
+    cd('C:\Arq\MatlabMiddleLayer\Release\mml\');
+end
+
 setpathlnls('LNLS1', 'StorageRing', 'lnls1_link');
 cd(cdir);
 clear cdir;
@@ -148,14 +155,14 @@ end
 
 function [Family, Field, DeviceList, ErrorFlag] = my_channel2dev(ChannelName)
 
-% esta função foi escrita para retornar a familia correta a partir do
-% ChannelName. Mais de uma família pode ter o mesmo ChannelName (mesmo harware controlado
+% esta funï¿½ï¿½o foi escrita para retornar a familia correta a partir do
+% ChannelName. Mais de uma famï¿½lia pode ter o mesmo ChannelName (mesmo harware controlado
 % por mais de uma familia). Para um dado ChannelName a familia selecionada
-% é aquela em que o número de elementos é menor. Por exemplo, para o
-% ChannelName 'A2QF01_SP' há duas famílias 'QF' e 'A2QF01'. Esta função
-% retorna os parâmetros da 'A2QF01' que tem apenas dois elementos e não 6,
+% ï¿½ aquela em que o nï¿½mero de elementos ï¿½ menor. Por exemplo, para o
+% ChannelName 'A2QF01_SP' hï¿½ duas famï¿½lias 'QF' e 'A2QF01'. Esta funï¿½ï¿½o
+% retorna os parï¿½metros da 'A2QF01' que tem apenas dois elementos e nï¿½o 6,
 % como no caso do 'QF'. Este algoritmo funciona para ajustes de quadrupolos
-% quando os shunts são levados em consideração...
+% quando os shunts sï¿½o levados em consideraï¿½ï¿½o...
 
 Family = {};
 Field = {};
