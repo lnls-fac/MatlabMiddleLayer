@@ -1,4 +1,4 @@
-function  [ChannelName, ErrorFlag] = sirius_getname(Family, Field, DeviceList)
+function  [ChannelName, ErrorFlag] = sirius_si_getname(Family, Field, DeviceList)
 % ChannelName = getname_sirius(Family, Field, DeviceList)
 %
 %   INPUTS

@@ -1,4 +1,4 @@
-function ErrorFlag = sirius_quadset(Family, Field, AM, DeviceList, WaitFlag)
+function ErrorFlag = sirius_si_quadset(Family, Field, AM, DeviceList, WaitFlag)
 %SIRIUS_QUADGET - Decompose values of magnet excitation of individual quadrupoles into families and shunts power supply values.
 %
 %Hist�ria
