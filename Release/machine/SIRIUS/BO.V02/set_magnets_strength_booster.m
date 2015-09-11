@@ -61,14 +61,22 @@
 % sf_strength = 11.349989133773295;
 % sd_strength = 7.206900815548799;
 
-% 2015-09-08 ximenes
-% changes eff. length of QF to match the one from fieldmap analysis.
-% corrected tunes and chormaticies
-qf_strength =  1.657897577214302;
-qd_strength = -0.010004424317613;
-sf_strength = 11.327922565223286;
-sd_strength =  7.330541690089150;
+% % 2015-09-08 ximenes
+% % changes eff. length of QF to match the one from fieldmap analysis.
+% % corrected tunes and chormaticies
+% qf_strength =  1.657897577214302;
+% qd_strength = -0.010004424317613;
+% sf_strength = 11.327922565223286;
+% sd_strength =  7.330541690089150;
 
+% 2015-09-10 ximenes
+% updated dipole model multipoles. 
+% corrected tunes  = [19.204378646902239   7.314313778087979]
+% corrected chroms = [0.5 0.5] 
+qf_strength =  1.657881617545217;
+qd_strength = -0.009637589230525;
+sf_strength = 11.327508716063402;
+sd_strength =  7.064290473083006;
 
 
 

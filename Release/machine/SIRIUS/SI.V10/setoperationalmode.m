@@ -2,9 +2,6 @@ function setoperationalmode(ModeNumber)
 %SETOPERATIONALMODE - Switches between the various operational modes
 %  setoperationalmode(ModeNumber)
 %
-%  ModeNumber = 1.  3 GeV, AC20 {Default}
-%               2.  3 GeV, AC10 betax = 4m
-%               3.  3 GeV, AC10 betax = 1.5m
 %
 % History
 %
@@ -19,7 +16,7 @@ checkforao;
 ModeCell = { ...
     '3 GeV - A', ...
     '3 GeV - B', ...
-    '3 GeV - C', ...
+    '3 GeV - C (default)', ...
     };
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
