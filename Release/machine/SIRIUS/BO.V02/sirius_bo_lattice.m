@@ -6,6 +6,7 @@ function [the_ring, lattice_title] = sirius_bo_lattice(varargin)
 %
 % 2015-09-03 novo modelo QD: Leff = 100.74 mm - Ximenes.
 % 2015-09-08 novo modelo QF: Leff = 227.46 mm - Ximenes.
+% 2015-09-14 novos modelos de corretoras com Leff = 150.18 mm - Ximenes.
 
 %%% HEADER SECTION %%%
 
@@ -46,20 +47,20 @@ lenDif       = (b_len_seg - b_len_hdedge)/2.0;
 L013377  = drift('l013377', 0.13377, 'DriftPass');
 L016118  = drift('l016118', 0.16118, 'DriftPass');
 L017241  = drift('l017241', 0.17241, 'DriftPass');
-L024100  = drift('l0241',   0.24100, 'DriftPass');
+L024100  = drift('l024100', 0.24100, 'DriftPass');
 L033627  = drift('l033627', 0.33627, 'DriftPass');
-L036000  = drift('l0360',   0.36000, 'DriftPass');
-L055500  = drift('l0555',   0.55500, 'DriftPass');
+L036000  = drift('l036000', 0.36000, 'DriftPass');
+L055500  = drift('l055500', 0.55500, 'DriftPass');
 L058627  = drift('L058627', 0.58627, 'DriftPass');
 L072491  = drift('l072491', 0.72491, 'DriftPass');
-L100000  = drift('l1000',   1.00000, 'DriftPass');
-L109600  = drift('l1096',   1.09600, 'DriftPass');
+L100000  = drift('l100000', 1.00000, 'DriftPass');
+L109600  = drift('l109600', 1.09600, 'DriftPass');
 L113227  = drift('L113227', 1.13227, 'DriftPass');
 L141091  = drift('l141091', 1.41091, 'DriftPass');
 L147091  = drift('l147091', 1.47091, 'DriftPass');
-L154600  = drift('l1546',   1.54600, 'DriftPass');
+L154600  = drift('l154600', 1.54600, 'DriftPass');
 L177091  = drift('l177091', 1.77091, 'DriftPass');
-L179350  = drift('l17935',  1.79350, 'DriftPass');
+L179350  = drift('l179350', 1.79350, 'DriftPass');
 L179563  = drift('l179563', 1.79563, 'DriftPass');
 L182091  = drift('l182091', 1.82091, 'DriftPass');
 L189350  = drift('l18935',  1.89350, 'DriftPass');
