@@ -4,10 +4,10 @@ function the_ring = sirius_bo_multipole_systematic_errors(the_ring)
    
 fam_data = sirius_bo_family_data(the_ring);
 
+
 % DIPOLES
 % =======
-
-%Already applied while building the lattice model
+% Already applied while building the lattice model
 
 
 % QF QUADRUPOLES
