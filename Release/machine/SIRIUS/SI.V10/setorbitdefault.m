@@ -38,7 +38,7 @@ end
 
 
 % Get BPM and CM structures
-CM  = {getsp('hcm','struct'),getsp('vcm','struct')};
+CM  = {getsp('chs','struct'),getsp('cvs','struct')};
 BPM = {getx('struct'), gety('struct')};
 
 

@@ -18,6 +18,10 @@ function Amps = gev2bend(varargin)
 %  Written by Greg Portmann
 
 
+global THERING
+
+const = lnls_constants;
+
 % Default
 Family = '';
 Field = '';
@@ -90,7 +94,7 @@ end
 
 
 if isempty(Family)
-    Family = 'BEND';
+    Family = 'b1';
 end
 if isempty(Field)
     Field = 'Setpoint';
@@ -147,11 +151,24 @@ if BranchFlag == getenergymodel, GeV = BranchFlag; end
 % End of input checking
 % Machine dependant stuff below
 
-
-
 ElementsIndex = dev2elem(Family,DeviceList);
+ATIndex       = family2atindex(Family, DeviceList);
 
-Amps = GeV;
+DipoleDeflectionAngles = zeros(size(ATIndex,1),1);
+for i = 1:size(ATIndex,1)
+    for j = 1:size(ATIndex,2)
+        DipoleDeflectionAngles(i) = DipoleDeflectionAngles(i) + THERING{ATIndex(i,j)}.BendingAngle;
+    end
+end
+
+ExcData = getfamilydata(Family, 'ExcitationCurves');
+Amps = zeros(size(ElementsIndex,1),1);
+for i=1:length(ElementsIndex)
+    idx = ElementsIndex(i);
+    IntegratedField = - GeV * (DipoleDeflectionAngles(i) / (const.c/1e9));
+    Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), IntegratedField);
+end
+
 
 
 

@@ -30,12 +30,42 @@ catch
 end
 
 try
+    % septex
+    AO.septex.AT.ATType = 'Septum';
+    AO.septex.AT.ATIndex = buildatindex(AO.septex.FamilyName, Indices.septex);
+    AO.septex.Position = findspos(THERING, AO.septex.AT.ATIndex(:,1+floor(size(AO.septex.AT.ATIndex,2)/2)))';
+      
+catch
+    warning('septex family not found in the model.');
+end
+
+try
+    % septing
+    AO.septing.AT.ATType = 'Septum';
+    AO.septing.AT.ATIndex = buildatindex(AO.septing.FamilyName, Indices.septing);
+    AO.septing.Position = findspos(THERING, AO.septing.AT.ATIndex(:,1+floor(size(AO.septing.AT.ATIndex,2)/2)))';
+      
+catch
+    warning('septing family not found in the model.');
+end
+
+try
+    % septinf
+    AO.septinf.AT.ATType = 'Septum';
+    AO.septinf.AT.ATIndex = buildatindex(AO.septinf.FamilyName, Indices.septinf);
+    AO.septinf.Position = findspos(THERING, AO.septinf.AT.ATIndex(:,1+floor(size(AO.septinf.AT.ATIndex,2)/2)))';
+      
+catch
+    warning('septinf family not found in the model.');
+end
+
+try
     % qf1a
     AO.qf1a.AT.ATType = 'Quad';
     AO.qf1a.AT.ATIndex = buildatindex(AO.qf1a.FamilyName, Indices.qf1a);
     AO.qf1a.Position = findspos(THERING, AO.qf1a.AT.ATIndex(:,1))';
 catch
-    warning('qf01 family not found in the model.');
+    warning('qf1a family not found in the model.');
 end
 try
     % qf1b

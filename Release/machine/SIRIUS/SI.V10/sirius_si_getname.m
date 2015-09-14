@@ -20,17 +20,11 @@ if nargin < 3
     DeviceList = [];
 end
 
-%if isempty(DeviceList)
-%   DeviceList = getlist(Family);
-%elseif (size(DeviceList,2) == 1)
-%   DeviceList = elem2dev(Family, DeviceList);
-%end
-
 ChannelName = [];
 
-switch Family
+switch lower(Family)
           
-    case {'BPMx','BPMy', 'bpmx', 'bpmy'}
+    case {'bpmx', 'bpmy'}
         if (strcmpi(Field, 'Monitor') || strcmpi(Field, 'CommonNames'))
             ChannelName = [
                 'SIDI-BPM-01M2  '; 'SIDI-BPM-01C1-A'; 'SIDI-BPM-01C1-B'; 'SIDI-BPM-01C2-A' ;...
@@ -80,7 +74,7 @@ switch Family
                 'SIDI-BPM-20C3-A'; 'SIDI-BPM-20C3-B'; 'SIDI-BPM-20C4  '; 'SIDI-BPM-01M1  ' ;...
                 ];
 
-            if strcmpi(Family, 'BPMx')
+            if strcmpi(Family, 'bpmx') 
                 ChannelName = strcat(ChannelName, '-X');
             else
                 ChannelName = strcat(ChannelName, '-Y');                
@@ -385,7 +379,7 @@ switch Family
 			'SIPS-SFB-18M1'; 'SIPS-SFB-19M1'; 'SIPS-SFB-20M1'; 'SIPS-SFB-01M1' ;...
 			];
         
-    case {'HCM', 'chs'}
+    case {'hcm', 'chs'}
         ChannelName = [
             'SIPS-CHS-01M2  '; 'SIPS-CHS-01C1-A'; 'SIPS-CHS-01C1-B'; 'SIPS-CHS-01C4-A' ;...
             'SIPS-CHS-01C4-B'; 'SIPS-CHS-02M1  '; 'SIPS-CHS-02M2  '; 'SIPS-CHS-02C1-A' ;...
@@ -419,7 +413,7 @@ switch Family
             'SIPS-CHS-20C1-B'; 'SIPS-CHS-20C4-A'; 'SIPS-CHS-20C4-B'; 'SIPS-CHS-01M1  ' ;...
             ];
 
-    case {'VCM', 'cvs'}
+    case {'vcm', 'cvs'}
         ChannelName = [
             'SIPS-CVS-01M2'; 'SIPS-CVS-01C1'; 'SIPS-CVS-01C2'; 'SIPS-CVS-01C3' ;...
             'SIPS-CVS-01C4'; 'SIPS-CVS-02M1'; 'SIPS-CVS-02M2'; 'SIPS-CVS-02C1' ;...
@@ -501,7 +495,7 @@ switch Family
 			'SIPS-CVF-20M2'; 'SIPS-CVF-20C2'; 'SIPS-CVF-20C3'; 'SIPS-CVF-01M1' ;...
 			]; 
    
-    case  {'SKEWQUAD', 'qs'}
+    case  {'skewquad', 'qs'}
         ChannelName = [
             'SIPS-QS-01M2'; 'SIPS-QS-01C1'; 'SIPS-QS-01C4'; 'SIPS-QS-02M1';...
             'SIPS-QS-02M2'; 'SIPS-QS-02C1'; 'SIPS-QS-02C4'; 'SIPS-QS-03M1';...
@@ -524,13 +518,22 @@ switch Family
             'SIPS-QS-19M2'; 'SIPS-QS-19C1'; 'SIPS-QS-19C4'; 'SIPS-QS-20M1';...
             'SIPS-QS-20M2'; 'SIPS-QS-20C1'; 'SIPS-QS-20C4'; 'SIPS-QS-01M1';...
             ];  
+    
+    case 'rf'
+        ChannelName = 'SIRF-FREQUENCY';
+    
+    case {'b1', 'b2'}
+        ChannelName = 'SIPS-BEND-FAM';
+    
+    case 'dcct'
+        ChannelName = 'SIDI-CURRENT';
         
     otherwise
         error('Don''t know how to make the channel name for family %s', Family);
         
 end
 
-if any(strcmpi(Family, {'BPMx','BPMy', 'bpmx', 'bpmy'}))
+if any(strcmpi(Family, {'bpmx', 'bpmy', 'DCCT'}))
     
 else
     if strcmpi(Field, 'Monitor')
