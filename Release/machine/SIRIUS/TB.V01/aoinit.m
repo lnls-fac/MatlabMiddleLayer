@@ -11,7 +11,7 @@ end
 % Modo default de carregamento
 OperationalMode = 1;
 
-init;
+sirius_tb_init;
 setoperationalmode(OperationalMode);
 
 

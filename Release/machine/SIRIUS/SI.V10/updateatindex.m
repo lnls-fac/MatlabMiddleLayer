@@ -42,23 +42,13 @@ catch
 end
 
 try
-    % BC_LF
-    AO.bc_lf.AT.ATType = 'BEND';
-    AO.bc_lf.AT.ATIndex = buildatindex(AO.bc_lf.FamilyName, Indices.bc_lf);
-    AO.bc_lf.Position = findspos(THERING, AO.bc_lf.AT.ATIndex(:,1+floor(size(AO.bc_lf.AT.ATIndex,2)/2)))';
+    % BC
+    AO.bc.AT.ATType = 'BEND';
+    AO.bc.AT.ATIndex = buildatindex(AO.bc.FamilyName, sort([Indices.bc_lf, Indices.bc_hf]));
+    AO.bc.Position = findspos(THERING, AO.bc.AT.ATIndex(:,1+floor(size(AO.bc.AT.ATIndex,2)/2)))';
       
 catch
-    warning('bc_lf family not found in the model.');
-end
-
-try
-    % BC_HF
-    AO.bc_hf.AT.ATType = 'BEND';
-    AO.bc_hf.AT.ATIndex = buildatindex(AO.bc_hf.FamilyName, Indices.bc_hf);
-    AO.bc_hf.Position = findspos(THERING, AO.bc_hf.AT.ATIndex(:,1+floor(size(AO.bc_hf.AT.ATIndex,2)/2)))';
-      
-catch
-    warning('bc_hf family not found in the model.');
+    warning('bc family not found in the model.');
 end
 
 try

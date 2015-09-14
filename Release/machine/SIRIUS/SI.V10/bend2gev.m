@@ -19,6 +19,7 @@ function GeV = bend2gev(varargin)
 %             Ximenes Resende
 %  2012-07-06 'bo' changed to 'b1' - Afonso 
 
+global THERING
 
 const = lnls_constants;
 
@@ -152,20 +153,25 @@ end
 % End of input checking
 % Machine dependent stuff below
 
-
 % Amps should be in hardware units
 if strcmpi(UnitsFlag,'Physics')
     Amps = physics2hw(Family, 'Setpoint', Amps, DeviceList);
 end
 
 ElementsIndex = dev2elem(Family,DeviceList);
+ATIndex       = family2atindex(Family, DeviceList);
 
-DipoleDeflectionAngle = pi/6;
+DipoleDeflectionAngles = zeros(size(ATIndex,1),1);
+for i = 1:size(ATIndex,1)
+    for j = 1:size(ATIndex,2)
+        DipoleDeflectionAngles(i) = DipoleDeflectionAngles(i) + THERING{ATIndex(i,j)}.BendingAngle;
+    end
+end
 
 ExcData = getfamilydata(Family, 'ExcitationCurves');
 GeV = zeros(size(Amps,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
     IntegratedField = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i));
-    GeV(i) = ((const.c/1e9) / DipoleDeflectionAngle) * IntegratedField;
+    GeV(i) = ((const.c/1e9) / DipoleDeflectionAngles(i)) * (abs(IntegratedField));
 end

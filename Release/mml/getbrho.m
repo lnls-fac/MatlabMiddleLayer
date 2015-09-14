@@ -52,9 +52,9 @@ end
 
 % Exact formula is mandatory for low energy like in transfer lines
 E0 = .51099906e-3;    % Electron rest mass in GeV
-%brho = (10/2.99792458) * sqrt(Energy.^2 - E0.^2);
+brho = (10/2.99792458) * sqrt(Energy.^2 - E0.^2);
 % WARNING AT and other tracking code give kinetic energy and not total energy
-brho = (10/2.99792458) * sqrt((Energy+E0).^2 - E0.^2);
+%brho = (10/2.99792458) * sqrt((Energy+E0).^2 - E0.^2);
 
 
 % if nargin == 0
