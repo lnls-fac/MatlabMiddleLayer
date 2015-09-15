@@ -1126,11 +1126,10 @@ L0_tot = findspos(THERING, length(THERING)+1);
 fprintf('   Length: %.6f m   (design length 93.1999 m)\n', L0_tot);
 
 % Just in case...
-not_ready = true;
-while not_ready
+num_iter_max = 10;
+for i=1:num_iter_max
     try
         atpass(THERING, [0 0 0 0 0 0]',1,1);
-        not_ready = false;
     catch
        %if isempty(strfind(lasterr,'Library or function could not be loaded'))
        %     rethrow(lasterror);
