@@ -115,7 +115,7 @@ AO.bn.Setpoint.DeltaRespMat = .01;
 
 AO.septin.FamilyName  = 'septin';
 AO.septin.MemberOf    = {'PlotFamily'; 'septin'; 'BEND'; 'Magnet';};
-AO.septin.DeviceList  = getDeviceList(1,2);
+AO.septin.DeviceList  = getDeviceList(1,1);
 AO.septin.ElementList = (1:size(AO.septin.DeviceList,1))';
 AO.septin.Status      = ones(size(AO.septin.DeviceList,1),1);
 AO.septin.Position    = [];

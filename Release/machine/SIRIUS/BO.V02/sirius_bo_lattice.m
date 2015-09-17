@@ -199,6 +199,13 @@ fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);
 setcavity('off'); 
 setradiation('off');
 
+% Luana
+pb = findcells(THERING, 'PolynomB');
+for i=1:length(pb)
+    THERING{pb(i)}.NPA = THERING{pb(i)}.PolynomA;
+    THERING{pb(i)}.NPB = THERING{pb(i)}.PolynomB;
+end
+
 % sets default NumIntSteps values for elements
 THERING = set_num_integ_steps(THERING);
 
