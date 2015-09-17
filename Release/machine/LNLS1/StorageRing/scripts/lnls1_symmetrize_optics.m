@@ -176,7 +176,7 @@ while ~converged
     SymData = lnls1_symmetrize_simulation_optics('QuadElements', 'AllSymmetries', r.Mode);
     bb = lnls1_calc_beta_beating;
     fprintf('Tunes: [%6.4f (H) %6.4f (V)], Beta beating: [%5.2f%% (H) %5.2f%% (V)]\n', bb.tunex, bb.tuney, bb.betax_beating, bb.betay_beating);
-    if 100*(abs(sum(SymData.Residue.^2) - residue)/residue) < 0.1, converged = true; end
+    if (100*(abs(sum(SymData.Residue.^2) - residue)/residue) < 0.1) || ((bb.betax_beating < 0.1) && (bb.betay_beating < 0.1)), converged = true; end
     residue = sum(SymData.Residue.^2);
     drawnow;
 end

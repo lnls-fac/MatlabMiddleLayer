@@ -7,7 +7,7 @@ fam_data = sirius_bo_family_data(the_ring);
 
 % DIPOLES
 % =======
-% Already applied while building the lattice model
+% Already applied while building AT lattice with segmented dipole model.
 
 
 % QF QUADRUPOLES
@@ -23,7 +23,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 
 % QD QUADRUPOLES
 % ==============
-% updated values in 2015-09-03 for model1 of QD quads with 100 mm physical length (XRR) (@ 3GeV excitation)
+% updated values in 2015-09-03 for model1 of QD quads with 85 mm physical length (XRR) (@ 3GeV excitation)
 r0         = 17.5/1000;
 monoms     = [   5,   9,   13];
 Bn_normal  = [-4.7, 1.2, 1.2]*1e-3;
@@ -42,6 +42,29 @@ Bn_skew    = [ 0.0,  0.0];
 main_monom = {2, 'normal'}; 
 fams       = {'sd','sf'};
 the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+% CORRECTOR CH
+% ============
+% updated in 2015-09-14 for model1 with 112-mm physical length (XRR)
+r0         = 17.5/1000;
+monoms     = [      1,       2,       3,       4        5,       6];
+Bn_normal  = [-3.0e-4, +3.0e-3, +1.3e-4, -3.3e-3, +6.2e-4, -3.2e-3];
+Bn_skew    = [    0.0,     0.0,     0.0,     0.0,     0.0,     0.0];
+main_monom = {0, 'normal'}; 
+fams       = {'ch'};
+the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+% CORRECTOR CV
+% ============
+% updated in 2015-09-14 for model1 with 112-mm physical length (XRR)
+r0         = 17.5/1000;
+monoms     = [      1,       2,       3,       4        5,       6];
+Bn_normal  = [-3.1e-4,     0.0, +3.7e-4,     0.0, +4.6e-4,     0.0];
+Bn_skew    = [    0.0, -3.1e-3,     0.0, -1.1e-3,     0.0, +2.8e-3];
+main_monom = {0, 'skew'}; 
+fams       = {'cv'};
+the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
 
 
 function the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0,fam_data)

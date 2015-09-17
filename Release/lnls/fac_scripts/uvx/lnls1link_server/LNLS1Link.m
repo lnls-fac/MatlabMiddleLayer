@@ -29,7 +29,11 @@ pos = strfind(computer, 'PCWIN'); % check whether we are in Windows
 if isempty(pos)
     cd('/home/fac_files/code/MatlabMiddleLayer/Release/mml/');
 else
-    cd('C:\Arq\MatlabMiddleLayer\Release\mml\');
+    try
+        cd('C:\Arq\MatlabMiddleLayer\Release\mml\');
+    catch
+        cd('C:\Arq\fac_files\code\MatlabMiddleLayer\Release\mml');
+    end
 end
 
 setpathlnls('LNLS1', 'StorageRing', 'lnls1_link');

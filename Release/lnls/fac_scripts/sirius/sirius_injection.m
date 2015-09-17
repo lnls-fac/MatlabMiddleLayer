@@ -12,13 +12,13 @@ bo = sirius_bo_lattice(3.0);
 
 % loads TS model
 addpath(fullfile(sirius_path, 'TS.V01'));
-ts = sirius_bo_lattice();
+ts = sirius_ts_lattice();
 
 % loads SI model
 addpath(fullfile(sirius_path, 'SI.V10'));
-si = sirius_bo_lattice();
+si = sirius_si_lattice();
 
-% shift BO model so that ot starts at extraction kicker
+% shift BO model so that BO starts at extraction kicker
 bo_kickex_idx = findcells(bo, 'FamName', 'kick_ex');
 bo = [bo(bo_kickex_idx(1):end) bo(1:bo_kickex_idx(1)-1)];
 
@@ -30,4 +30,15 @@ bo_eqparms = atsummary(bo);
 emitx =  1 * bo_eqparms.naturalEmittance / (1.0 + bo_coupling);
 emity =  bo_coupling * bo_eqparms.naturalEmittance / (1.0 + bo_coupling);
 bunch = [zeros(6,1) lnls_generate_bunch(emitx, emity, bo_eqparms.naturalEnergySpread, bo_eqparms.bunchlength, bo_twiss(1), nr_particles-1, 30)];
-figure; plot(1e3*bunch(1,:), 1e3*bunch(2,:), '.'); xlabel('rx/mm'); ylabel('px/mrad');
+create_new_x_phase_space_plot(bunch, 'bunch at entrance of BO extraction kicker')
+
+% kicks bunch 
+% propagates bunch till ts to the 
+
+
+function create_new_x_phase_space_plot(bunch, ptitle)
+
+figure; hold all;
+plot(1e3*bunch(1,:), 1e3*bunch(2,:), '.'); 
+plot(1e3*bunch(1,1), 1e3*bunch(2,1), 'rO');
+xlabel('rx/mm'); ylabel('px/mrad'); title(ptitle);
