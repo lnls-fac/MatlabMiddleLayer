@@ -1,8 +1,7 @@
 function r = lnls1_goldenorbit
 
 
-% Órbita de Offset (corretotas desligadas)
-% A SER MEDIDA!!!
+% Ã“rbita de Offset (corretotas desligadas)
 r.OffsetOrbit = [ ...
  0.000000	 0.000000	; ... %AMP01B	OK		OK
  0.000000	 0.000000	; ... %AMP02A	OK		OK
@@ -30,12 +29,41 @@ r.OffsetOrbit = [ ...
  0.000000	 0.000000	; ... %AMP12B	OK		OK
  0.000000	 0.000000	; ... %AMP01A	OK		OK
 ];
+% % Medida de BBA realizada em 2015-02-26
+% % ConcatenaÃ§Ã£o de duas medidas de BBA.
+% r.OffsetOrbit = [ ...
+% -0.9365716 -0.3334768	; ... %AMP01B	OK	OK
+%  0.1225380 -0.0366537	; ... %AMP02A	OK	OK
+% -0.9564253  0.4724522	; ... %AMP02B	OK	OK
+% -0.5341880  0.4306527	; ... %AMP03A	OK	OK
+% -1.1524156  2.0764482	; ... %AMP03C	nOK	nOK
+% -2.2309089  0.2793114	; ... %AMP03B	OK	nOK
+%  1.3185356  0.2364415	; ... %AMP04A	OK	OK
+% -0.6370442 -0.2418800	; ... %AMP04B	OK	OK
+% -1.5732040  0.9743941	; ... %AMP05A	nOK	OK
+% -0.4952068  0.7979751	; ... %AMP05B	nOK	OK
+%  0.5202473  1.2377025	; ... %AMP06A	OK	OK
+% -0.7707832 -0.8559964	; ... %AMP06B	OK	OK
+% -0.6114101  0.4607482	; ... %AMP07A	OK	nOK
+%  0.2404982  0.7023321	; ... %AMP07B	OK	nOK
+% -0.3605435  0.6357776	; ... %AMP08A	OK	nOK
+%  0.1907246 -0.0260786	; ... %AMP08B	nOK	OK
+% -0.1514388  0.2965240	; ... %AMP09A	OK	OK
+%  0.1208965 -0.0658346	; ... %AMP09B	OK	OK
+% -0.3479924  0.5636016	; ... %AMP10A	OK	OK
+% -0.4811674  0.2846497	; ... %AMP10B	nOK	OK
+%  0.1576533  0.9418818	; ... %AMU11A	nOK	OK
+%  1.1805060  1.4966465	; ... %AMU11B	nOK	nOK
+% -0.5432942  0.4242663	; ... %AMP12A	OK	OK
+% -1.0066415  0.6279579	; ... %AMP12B	OK	OK
+% -0.5159179  0.4230508	; ... %AMP01A	OK	OK
+% ];
 
 
 % 2011-10-17
 
 % Medida de BBA realizada em 2011-03-26.
-% Redefinição de novos intervalos para alguns BPMs foi necessária.
+% Redefiniï¿½ï¿½o de novos intervalos para alguns BPMs foi necessï¿½ria.
 % r.BBAOffsetOrbit = [ ...
 % -0.897357	-0.417449	; ... %AMP01B	OK		OK
 %  0.011939	-0.022774	; ... %AMP02A	OK		OK
@@ -99,10 +127,10 @@ r.OffsetOrbit = [ ...
 
 % 2015-09-16
 
-% Orbita de referência do OPR1.
+% Orbita de referï¿½ncia do OPR1.
 % Baseada no arquivo Referencia.orb do OPR1
-% Correção da ordem dos bpms 03C e 03B 
-% No MML a ordem é 03C, 03B e o contrário no OPR1
+% Correï¿½ï¿½o da ordem dos bpms 03C e 03B 
+% No MML a ordem ï¿½ 03C, 03B e o contrï¿½rio no OPR1
 r.GoldenOrbit = [...
 -1.23439498152766      -0.282738821669682 ; ... %AMP01B
  0.96135800846605      -0.0895494276016962 ; ... %AMP02A
