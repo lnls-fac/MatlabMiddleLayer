@@ -303,6 +303,7 @@ if any(lens < 0)
     error(['AT model with negative drift in ' mfilename ' !\n']);
 end
 
+% Luana
 pb = findcells(THERING, 'PolynomB');
 for i=1:length(pb)
     THERING{pb(i)}.NPA = THERING{pb(i)}.PolynomA;

@@ -29,9 +29,9 @@ end
 
 ChannelName = [];
 
-switch Family
+switch lower(Family)
     
-    case {'BPMx','BPMy', 'bpmx', 'bpmy'}
+    case {'bpmx', 'bpmy'}
         if (strcmpi(Field, 'Monitor') || strcmpi(Field, 'CommonNames'))
             ChannelName = [
                 'BODI-BPM-01-U'; 'BODI-BPM-02-U'; 'BODI-BPM-03-U'; 'BODI-BPM-04-U' ;...
@@ -47,7 +47,7 @@ switch Family
                 'BODI-BPM-41-U'; 'BODI-BPM-42-U'; 'BODI-BPM-43-U'; 'BODI-BPM-44-U' ;...
                 'BODI-BPM-45-U'; 'BODI-BPM-46-U'; 'BODI-BPM-47-U'; 'BODI-BPM-48-U' ;...
                 'BODI-BPM-49-U'; 'BODI-BPM-50-U'; ];
-            if strcmpi(Family, 'BPMx')
+            if strcmpi(Family, 'bpmx')
                 ChannelName = strcat(ChannelName, '-X');
             else
                 ChannelName = strcat(ChannelName, '-Y');                
@@ -56,10 +56,10 @@ switch Family
             error('Don''t know how to make the channel name for family %s', Family);
         end
         
-	case  {'QD_FAM', 'qd_fam'}
+	case 'qd_fam'
 		ChannelName = 'BOPS-QD-FAM';
 
-	case  {'qd', 'QD'}
+	case 'qd'
 		ChannelName = [
 			'BOPS-QD-02-D'; 'BOPS-QD-04-D'; 'BOPS-QD-06-D'; 'BOPS-QD-08-D' ;...
 			'BOPS-QD-10-D'; 'BOPS-QD-12-D'; 'BOPS-QD-14-D'; 'BOPS-QD-16-D' ;...
@@ -69,10 +69,10 @@ switch Family
 			'BOPS-QD-42-D'; 'BOPS-QD-44-D'; 'BOPS-QD-46-D'; 'BOPS-QD-48-D' ;...
 			'BOPS-QD-50-D'; ];
 
-	case  {'QF_FAM', 'qf_fam'}
+	case 'qf_fam'
 		ChannelName = 'BOPS-QF-FAM';
 
-	case  {'QF', 'qf'}
+	case 'qf'
 		ChannelName = [
 			'BOPS-QF-01'; 'BOPS-QF-02'; 'BOPS-QF-03'; 'BOPS-QF-04' ;...
 			'BOPS-QF-05'; 'BOPS-QF-06'; 'BOPS-QF-07'; 'BOPS-QF-08' ;...
@@ -88,10 +88,10 @@ switch Family
 			'BOPS-QF-45'; 'BOPS-QF-46'; 'BOPS-QF-47'; 'BOPS-QF-48' ;...
 			'BOPS-QF-49'; 'BOPS-QF-50'; ];
 
-	case  {'SF_FAM', 'sf_fam'}
+	case 'sf_fam'
 		ChannelName = 'BOPS-SF-FAM';
 
-	case  {'SF', 'sf'}
+	case 'sf'
 		ChannelName = [
 			'BOPS-SF-02-U'; 'BOPS-SF-04-U'; 'BOPS-SF-06-U'; 'BOPS-SF-08-U' ;...
 			'BOPS-SF-10-U'; 'BOPS-SF-12-U'; 'BOPS-SF-14-U'; 'BOPS-SF-16-U' ;...
@@ -101,16 +101,16 @@ switch Family
 			'BOPS-SF-42-U'; 'BOPS-SF-44-U'; 'BOPS-SF-46-U'; 'BOPS-SF-48-U' ;...
 			'BOPS-SF-50-U'; ];
 
-	case  {'SD_FAM', 'sd_fam'}
+	case 'sd_fam'
 		ChannelName = 'BOPS-SD-FAM';
 
-	case  {'SD', 'sd'}
+	case 'sd'
 		ChannelName = [
 			'BOPS-SD-03-U'; 'BOPS-SD-08-U'; 'BOPS-SD-13-U'; 'BOPS-SD-18-U' ;...
 			'BOPS-SD-23-U'; 'BOPS-SD-28-U'; 'BOPS-SD-33-U'; 'BOPS-SD-38-U' ;...
 			'BOPS-SD-43-U'; 'BOPS-SD-48-U'; ];
 
-	case  {'VC', 'cv', 'VCM'}
+	case  {'cv', 'vcm'}
 		ChannelName = [
 			'BOPS-CV-01-U'; 'BOPS-CV-03-U'; 'BOPS-CV-05-U'; 'BOPS-CV-07-U' ;...
 			'BOPS-CV-09-U'; 'BOPS-CV-11-U'; 'BOPS-CV-13-U'; 'BOPS-CV-15-U' ;...
@@ -120,7 +120,7 @@ switch Family
 			'BOPS-CV-41-U'; 'BOPS-CV-43-U'; 'BOPS-CV-45-U'; 'BOPS-CV-47-U' ;...
 			'BOPS-CV-49-U'; ];
 
-	case  {'CH', 'ch', 'HCM'}
+	case  {'ch', 'hcm'}
 		ChannelName = [
 			'BOPS-CH-01-U'; 'BOPS-CH-03-U'; 'BOPS-CH-05-U'; 'BOPS-CH-07-U' ;...
 			'BOPS-CH-09-U'; 'BOPS-CH-11-U'; 'BOPS-CH-13-U'; 'BOPS-CH-15-U' ;...
@@ -130,13 +130,16 @@ switch Family
 			'BOPS-CH-41-U'; 'BOPS-CH-43-U'; 'BOPS-CH-45-U'; 'BOPS-CH-47-U' ;...
 			'BOPS-CH-49-D'; ];
         
-    case {'RF', 'rf'}
+    case 'rf'
         ChannelName = 'BORF-FREQUENCY';
     
-    case {'BEND', 'bend', 'b'}
-		ChannelName = ['BOPS-BEND-FAM-A'; 'BOPS-BEND-FAM-B'];
-    
-    case 'DCCT'
+    case 'bend_a'
+		ChannelName = 'BOPS-BEND-FAM-A';
+ 
+    case 'bend_b'
+		ChannelName ='BOPS-BEND-FAM-B';
+        
+    case 'dcct'
         ChannelName = 'BODI-CURRENT';
                
     otherwise
@@ -144,7 +147,7 @@ switch Family
         
 end
 
-if any(strcmpi(Family, {'BPMx','BPMy', 'bpmx', 'bpmy', 'DCCT'}))
+if any(strcmpi(Family, {'bpmx', 'bpmy', 'DCCT'}))
     
 else
     if strcmpi(Field, 'Monitor')

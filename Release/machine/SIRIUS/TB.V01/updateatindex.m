@@ -20,7 +20,7 @@ AO = getao;
 
 try
     % spec
-    AO.spec.AT.ATType = 'spec';
+    AO.spec.AT.ATType = 'BEND';
     AO.spec.AT.ATIndex = buildatindex(AO.spec.FamilyName, Indices.spec);
     AO.spec.Position = findspos(THERING, AO.spec.AT.ATIndex(:,1+floor(size(AO.spec.AT.ATIndex,2)/2)))';
       
@@ -29,7 +29,7 @@ catch
 end
 try
     % bp
-    AO.bp.AT.ATType = 'bp';
+    AO.bp.AT.ATType = 'BEND';
     AO.bp.AT.ATIndex = buildatindex(AO.bp.FamilyName, Indices.bp);
     AO.bp.Position = findspos(THERING, AO.bp.AT.ATIndex(:,1+floor(size(AO.bp.AT.ATIndex,2)/2)))';
       
@@ -38,7 +38,7 @@ catch
 end
 try
     % bn
-    AO.bn.AT.ATType = 'bn';
+    AO.bn.AT.ATType = 'BEND';
     AO.bn.AT.ATIndex = buildatindex(AO.bn.FamilyName, Indices.bn);
     AO.bn.Position = findspos(THERING, AO.bn.AT.ATIndex(:,1+floor(size(AO.bn.AT.ATIndex,2)/2)))';
       
@@ -47,7 +47,7 @@ catch
 end
 try
     % septin
-    AO.septin.AT.ATType = 'septin';
+    AO.septin.AT.ATType = 'Septum';
     AO.septin.AT.ATIndex = buildatindex(AO.septin.FamilyName, Indices.septin);
     AO.septin.Position = findspos(THERING, AO.septin.AT.ATIndex(:,1+floor(size(AO.septin.AT.ATIndex,2)/2)))';
       
@@ -193,7 +193,7 @@ end
 
 try
     % HCM
-    AO.hcm.AT.ATType = 'hcm';
+    AO.hcm.AT.ATType = 'HCM';
     li = [];
     if isfield(Indices, 'cm'), li = [li Indices.cm]; end;
     if isfield(Indices, 'hcm'), li = [li Indices.hcm]; end;
@@ -206,7 +206,7 @@ end
 
 try
     % VCM
-    AO.vcm.AT.ATType = 'vcm';
+    AO.vcm.AT.ATType = 'VCM';
     li = [];
     if isfield(Indices, 'cm'), li = [li Indices.cm]; end;
     if isfield(Indices, 'vcm'), li = [li Indices.vcm]; end;

@@ -1,27 +1,27 @@
 function lnls1_measbpmresp(varargin)
 %Faz medida de matriz resposta do anel.
 %
-%História: 
+%Histï¿½ria:
 %
-%2010-09-13: comentários iniciais no código.
+%2010-09-13: comentï¿½rios iniciais no cï¿½digo.
 
 nr_points = 5;
 reading_interval = 0.5;
 
 if ~strcmpi(getmode('BEND'), 'Online'), switch2online; end
 if strcmpi(getmode('BEND'), 'Online')
-    lnls1_slow_orbcorr_off;  
-    lnls1_fast_orbcorr_off;  
+    lnls1_slow_orbcorr_off;
+    lnls1_fast_orbcorr_off;
 end
 setbpmaverages(reading_interval,nr_points);
 
 
-% calcula variação de excitação das corretoras para gerar kicks de 0.1 mrad
+% calcula variaï¿½ï¿½o de excitaï¿½ï¿½o das corretoras para gerar kicks de 0.1 mrad
 
-DeltaHCM = 0.0001 / 1.5; % rad  % dividido por fator de forma a gerar COD que não acionam intertravamento de órbita do AWG09...
+DeltaHCM = 0.0001 / 1.5; % rad  % dividido por fator de forma a gerar COD que nï¿½o acionam intertravamento de ï¿½rbita do AWG09...
 DeltaVCM = 0.0001 / 1.5; % rad
 
-DeltaHCM = 0.0001 / 1.5 / 2; % rad  % dividido por fator de forma a gerar COD que não acionam intertravamento de órbita do AWG09...
+DeltaHCM = 0.0001 / 1.5 / 2; % rad  % dividido por fator de forma a gerar COD que nï¿½o acionam intertravamento de ï¿½rbita do AWG09...
 DeltaVCM = 0.0001 / 1.5 / 2; % rad
 
 HCMValuesHW = getsp('HCM');
@@ -38,7 +38,7 @@ setfamilydata(HCMDelta, 'HCM', 'Setpoint', 'DeltaRespMat');
 setfamilydata(VCMDelta, 'VCM', 'Setpoint', 'DeltaRespMat');
 
 
-disp([get_date_str ': início da medida de matriz resposta']);
+disp([get_date_str ': inï¿½cio da medida de matriz resposta']);
 
 if isempty(varargin),
     measbpmresp;
@@ -47,8 +47,3 @@ else
 end
 
 disp([get_date_str ': fim da medida de matriz resposta']);
-
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS'); 
-

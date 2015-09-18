@@ -21,12 +21,30 @@ AO = getao;
 
 
 try
-    % BD
+    % BEND
     AO.b.AT.ATType = 'BEND';
     AO.b.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
     AO.b.Position = findspos(THERING, AO.b.AT.ATIndex(:,1));
 catch
     warning('B family not found in the model.');
+end
+
+try
+    % bend_a
+    AO.bend_a.AT.ATType = 'BendPS';
+    AO.bend_a.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
+    AO.bend_a.Position = findspos(THERING, AO.bend_a.AT.ATIndex(:,1));
+catch
+    warning('bend_a family not found in the model.');
+end
+
+try
+    % bend_b
+    AO.bend_b.AT.ATType = 'BendPS';
+    AO.bend_b.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
+    AO.bend_b.Position = findspos(THERING, AO.bend_b.AT.ATIndex(:,1));
+catch
+    warning('bend_b family not found in the model.');
 end
 
 try
