@@ -4,7 +4,7 @@ function lnls1_measoptics
 %Este script se encarrega de realizar um série de medidas de
 %caracterização da ótica do anel.
 %
-%História: 
+%História:
 %
 %2010-09-13: comentários iniciais no código.
 %
@@ -56,10 +56,3 @@ file_name = fullfile(data_dir, ['BBA_' date_str '.mat']);
 lnls1_measbba('Archive', file_name);
 
 disp([get_date_str ': fim das medidas de caracterização da ótica.']);
-
-
-
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS'); 
-

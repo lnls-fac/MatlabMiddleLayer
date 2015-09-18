@@ -21,6 +21,3 @@ else
 end
 
 disp([get_date_str ': fim da medida de cromaticidade']);
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS'); 

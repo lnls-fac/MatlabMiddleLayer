@@ -1,7 +1,7 @@
 function lnls1_monmags(varargin)
 %Diagnóstico de fontes
 %
-%História: 
+%História:
 %
 %2010-09-13: comentários iniciais no código.
 %
@@ -15,7 +15,7 @@ lnls1_slow_orbcorr_off;
 lnls1_fast_orbcorr_off;
 setbpmaverages(reading_interval,nr_points);
 
-disp([get_date_str ': início da medida de flutuação das fontes']);
+disp([get_date_str ': in?cio da medida de flutuação das fontes']);
 
 if isempty(varargin)
     monmags([], 'Archive', '');
@@ -25,7 +25,3 @@ else
 end
 
 disp([get_date_str ': fim da medida de flutuação das fontes']);
-
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS');

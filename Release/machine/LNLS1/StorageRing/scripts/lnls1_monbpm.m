@@ -1,7 +1,7 @@
 function lnls1_monbpm(varargin)
 %Mede flutuação dos BPMs
 %
-%História: 
+%História:
 %
 %2010-09-13: comentários iniciais no código.
 %
@@ -13,7 +13,7 @@ reading_interval = 0.0;
 
 if strcmpi(getmode('BEND'), 'Online')
     lnls1_slow_orbcorr_off;
-    lnls1_fast_orbcorr_off;  
+    lnls1_fast_orbcorr_off;
 end
 setbpmaverages(reading_interval,nr_points);
 
@@ -26,6 +26,3 @@ else
 end
 
 disp([get_date_str ': fim da medida de flutuação dos bpms']);
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS');
