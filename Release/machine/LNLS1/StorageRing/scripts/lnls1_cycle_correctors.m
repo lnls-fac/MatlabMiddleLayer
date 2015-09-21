@@ -1,7 +1,7 @@
 function r = lnls1_cycle_correctors(varargin)
 %Faz ciclagens de corretoras de �rbita do anel.
 %
-%History: 
+%History:
 %
 %2011-05-02: alterado o time_step para 1.5s de forma a n�o sobrecarregar o OPR1...
 %2010-09-13: coment�rios iniciais no c�digo.
@@ -12,7 +12,7 @@ if ~strcmpi(getmode('BEND'), 'Online'), switch2online; end
 r.initial_phase             = 0;
 r.nr_points_in_one_period   = 21;
 r.nr_periods                = 8;
-r.tau_over_period           = 2; 
+r.tau_over_period           = 2;
 r.time_step                 = 1.5;
 r.HCM_excluded              = [];
 r.VCM_excluded              = [ ...
@@ -42,7 +42,7 @@ for i=1:length(varargin)
     elseif ischar(varargin{i}) && strcmpi(varargin{i},'TimeStep')
         r.time_step = varargin{i+1};
     elseif ischar(varargin{i})
-    end 
+    end
 end
 
 
@@ -51,7 +51,7 @@ if strcmpi(getmode('BEND'), 'simulator')
 end
 
 pts  = 1:(r.nr_periods * r.nr_points_in_one_period);
-r.ramp = exp(- pts / (r.tau_over_period * r.nr_points_in_one_period)) .* sin(r.initial_phase + 2 * pi * pts / r.nr_points_in_one_period); 
+r.ramp = exp(- pts / (r.tau_over_period * r.nr_points_in_one_period)) .* sin(r.initial_phase + 2 * pi * pts / r.nr_points_in_one_period);
 figure;
 plot(r.ramp);
 
@@ -141,7 +141,3 @@ sleep(r.time_step);
 toc;
 
 disp([get_date_str ': fim da ciclagem de corretotas']);
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS'); 
-
