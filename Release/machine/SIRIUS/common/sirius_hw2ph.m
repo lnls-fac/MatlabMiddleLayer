@@ -17,7 +17,8 @@ function k = sirius_hw2ph(Family, Field, Amps, DeviceList, Energy)
 %  1. K - "K-value" (AT convention)
 %     For dipole:      K = B / Brho
 %     For quadrupole:  K = B'/ Brho
-%     For sextupole:   K = B"/ Brho / 2
+%     For sextupole:   K = B"/ Brho
+%     For corrector:   K = BL/ Brho
 %
 %  See also lnls1_ph2hw, hw2physics, physics2hw
 %
@@ -114,10 +115,19 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         k=zeros(size(Amps,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (2 * Brho * EffLength(i));
+            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
         end
                
     elseif any(strcmpi(Family, findmemberof('SKEWCORR')))
+        EffLength = getleff(Family, DeviceList); 
+        ExcData = getfamilydata(Family, 'ExcitationCurves');
+        k=zeros(size(Amps,1),1);
+        for i=1:length(ElementsIndex)
+            idx = ElementsIndex(i);
+            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
+        end
+
+    elseif any(strcmpi(Family, findmemberof('SEPTUM')))
         EffLength = getleff(Family, DeviceList); 
         ExcData = getfamilydata(Family, 'ExcitationCurves');
         k=zeros(size(Amps,1),1);

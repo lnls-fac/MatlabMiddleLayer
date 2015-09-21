@@ -45,6 +45,13 @@ AD = getad;
 setmmldirectories(AD.Machine, AD.SubMachine, AD.ModeName, AD.OpsFileExtension);
 % Updates the AT indices in the MiddleLayer with the present AT lattice
 updateatindex;
+
+% 2015-09-18 Luana
+if AD.SetMultipolesErrors
+    fprintf('   Setting initial values of multipoles errors.\n');
+    sirius_init_multipoles_errors;
+end
+
 % Set the model energy
 setenergymodel(AD.Energy);
 % Cavity and radiation
@@ -108,8 +115,8 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 100e-6;
-AD.DeltaRFChro         = 1e-6 * linspace(-100,100,11);
+AD.DeltaRFDisp         = 100;
+AD.DeltaRFChro         = linspace(-100,100,11);
 
 AD.TuneDelay           = 0;
 AD.ATModel             = 'sirius_si_lattice';
@@ -121,6 +128,10 @@ AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.010;
 AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
 AD.AveragePressure     = 1.333e-9; % [mbar]
+
+% 2015-09-18 Luana
+AD.SetMultipolesErrors = false;
+AD.SIRIUSParams        = sirius_params;
 
 setad(AD);
 switch2sim;
@@ -145,8 +156,8 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 100e-6;
-AD.DeltaRFChro         =  1e-6 * linspace(-100,100,11);
+AD.DeltaRFDisp         = 100;
+AD.DeltaRFChro         = linspace(-100,100,11);
 
 AD.TuneDelay           = 0;
 AD.ATModel             = 'sirius_si_lattice';
@@ -158,6 +169,10 @@ AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.010;
 AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
 AD.AveragePressure     = 1.333e-9; % [mbar]
+
+% 2015-09-18 Luana
+AD.SetMultipolesErrors = false;
+AD.SIRIUSParams        = sirius_params;
 
 setad(AD);
 switch2sim;
@@ -182,8 +197,8 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 100e-6;
-AD.DeltaRFChro         =  1e-6 * linspace(-100,100,11);
+AD.DeltaRFDisp         = 100;
+AD.DeltaRFChro         = linspace(-100,100,11);
 
 AD.TuneDelay           = 0;
 AD.ATModel             = 'sirius_si_lattice';
@@ -195,6 +210,10 @@ AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.010;
 AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
 AD.AveragePressure     = 1.333e-9; % [mbar]
+
+% 2015-09-18 Luana
+AD.SetMultipolesErrors = false;
+AD.SIRIUSParams        = sirius_params;
 
 setad(AD);
 switch2sim;

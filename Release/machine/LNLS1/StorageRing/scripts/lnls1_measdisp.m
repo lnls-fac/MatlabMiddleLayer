@@ -1,15 +1,15 @@
 function lnls1_measdisp(varargin)
-%Medida de função dispersão.
+%Medida de funo disperso.
 %
-%História: 
+%Histria:
 %
 %2011-04-05: comentada linha que coloca MML no modo online.
-%2010-09-13: comentários iniciais no código.
+%2010-09-13: comentrios iniciais no cdigo.
 %
 
 %if ~strcmpi(getmode('BEND'), 'Online'), switch2online; end
 
-disp([get_date_str ': início da medida de função de dispersão']);
+disp([get_date_str ': incio da medida de funo de disperso']);
 
 if strcmpi(getmode('BEND'), 'Online')
     lnls1_slow_orbcorr_off;  % turn auto orbit correction at OPR1 off
@@ -27,7 +27,4 @@ else
     measdisp(varargin{:});
 end
 
-disp([get_date_str ': fim da medida de função de dispersão']);
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS'); 
+disp([get_date_str ': fim da medida de funo de disperso']);

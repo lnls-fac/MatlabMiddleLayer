@@ -29,7 +29,11 @@ pos = strfind(computer, 'PCWIN'); % check whether we are in Windows
 if isempty(pos)
     cd('/home/fac_files/code/MatlabMiddleLayer/Release/mml/');
 else
-    cd('C:\Arq\MatlabMiddleLayer\Release\mml\');
+    try
+        cd('C:\Arq\MatlabMiddleLayer\Release\mml\');
+    catch
+        cd('C:\Arq\fac_files\code\MatlabMiddleLayer\Release\mml');
+    end
 end
 
 setpathlnls('LNLS1', 'StorageRing', 'lnls1_link');
@@ -112,14 +116,29 @@ if strcmpi(command, 'READ')
             ChannelName = fields{i};
             [Family, Field, DeviceList, ErrorFlag] = channel2family(ChannelName);
             if ErrorFlag ~= 0, continue; end;
-            ElementList = dev2elem(Family, DeviceList);
-        
+            ElementList = dev2elem(Family, DeviceList);           
+            
+            % 2015-09-17 Luana
+            AllElements = dev2elem(Family);
+            List = [];
+            for j=1:size(ElementList,1)
+                List = [List; find(AllElements == ElementList(j))];
+            end
+            
             if any(strcmpi(Family, {'BPMx'}))
                 if isempty(model.orbitx), model.orbitx = getx; end;
-                pv_value = model.orbitx(ElementList);
+                
+                % 2015 -09-17 Luana
+                pv_value = model.orbitx(List);
+                %pv_value = model.orbitx(ElementList);
+            
             elseif any(strcmpi(Family, {'BPMy'}))
                 if isempty(model.orbity), model.orbity = gety; end;
-                pv_value = model.orbity(ElementList);
+                
+                % 2015 -09-17 Luana
+                pv_value = model.orbity(List);
+                %pv_value = model.orbity(ElementList);
+                
             elseif any(strcmpi(Family, {'TUNE'}))
                 if isempty(model.tunes), model.tunes = gettune; end;
                 pv_value = model.tunes(ElementList);

@@ -1,34 +1,34 @@
 function r = lnls1_symmetrize_optics(varargin)
 % function r = lnls1_symmetrize_optics(varargin)
 %
-% Faz simetrização da ótica do anel a partir da análise LOCO;
+% Faz simetriza??o da ?tica do anel a partir da an?lise LOCO;
 %
-% Parâmetros de argumento:
-%   'DataInFiles'              : medidas usadas pelo LOCO já estão em arquivos.
-%   'NoSymmImplementation'     : não implementar na máquina real a simetrização.
-%   'FamiliesShuntsSeparately' : implementa variações nas famílias e nos shunts separadamente.
-%   'FamiliesOnly'             : implementa  variações apenas nas famílias
-%   'BEDI'                     : faz simetrização do modo BEDI.
-%   NR_STEPS (integer)         : número de steps na implementação da simetrização.
+% Par?metros de argumento:
+%   'DataInFiles'              : medidas usadas pelo LOCO j? est?o em arquivos.
+%   'NoSymmImplementation'     : n?o implementar na m?quina real a simetriza??o.
+%   'FamiliesShuntsSeparately' : implementa varia??es nas fam?lias e nos shunts separadamente.
+%   'FamiliesOnly'             : implementa  varia??es apenas nas fam?lias
+%   'BEDI'                     : faz simetriza??o do modo BEDI.
+%   NR_STEPS (integer)         : n?mero de steps na implementa??o da simetriza??o.
 %
 % Exemplo:
 %
 % 1) lnls1_symmetrize_optics
-%    Faz medidas, faz análise LOCO e implementa uma iteração do processo de
-%    simetrização na máquina real
+%    Faz medidas, faz an?lise LOCO e implementa uma itera??o do processo de
+%    simetriza??o na m?quina real
 %
 % 2) lnls1_symmetrize_optics('DataInFiles')
-%    Lê medidas de arquivos, faz análise LOCO e implementa uma iteração do processo de
-%    simetrização na máquina real
+%    L? medidas de arquivos, faz an?lise LOCO e implementa uma itera??o do processo de
+%    simetriza??o na m?quina real
 %
 % 3) lnls1_symmetrize_optics('DataInFiles', 'NoSymmImplementation')
-%    Lê medidas de arquivos, faz análise LOCO , calcula dados de simetrização mas não implementa
+%    L? medidas de arquivos, faz an?lise LOCO , calcula dados de simetriza??o mas n?o implementa
 %
-% História
+% Hist?ria
 %
-% 2011-05-16:   alterado trecho que renomeia diretório com medidas.
-% 2011-04-27:   adicionada opção para simetrização do modo BEDI
-% 2011-04-02:   criação do script (Ximenes)
+% 2011-05-16:   alterado trecho que renomeia diret?rio com medidas.
+% 2011-04-27:   adicionada op??o para simetriza??o do modo BEDI
+% 2011-04-02:   cria??o do script (Ximenes)
 
 
 global THERING;
@@ -36,7 +36,7 @@ global THERING;
 
 
 
-% parâmetros default do script
+% par?metros default do script
 r.DataInFiles = false;
 r.DataDir = [];
 r.SymmImplementation = true;
@@ -44,7 +44,7 @@ r.ImplementationType = 'FamiliesShunts';
 r.ImplementationSteps = 10;
 r.Mode = 'BBY6T';
 
-% processa parâmetros de inpput
+% processa par?metros de inpput
 for i=length(varargin):-1:1
     if ischar(varargin{i})
         if any(strcmpi(varargin{i},{'DataInFiles', 'DataInFile'}))
@@ -71,41 +71,41 @@ end
 
 % MEDIDAS
 if r.DataInFiles
-    
+
     if isempty(r.DataDir)
         data_dir = fullfile(getfamilydata('Directory', 'DataRoot'), 'Optics', 'docs');
-        r.DataDir = uigetdir(data_dir, 'Diretório onde estão arquivos com medidas');
+        r.DataDir = uigetdir(data_dir, 'Diret?rio onde est?o arquivos com medidas');
         if ~ischar(r.DataDir), return; end;
     end
-    
+
 else
-    
+
     date_str = get_date_str;
-    
+
     DataDir = datestr(now, 'yyyy-mm-dd');
     r.DataDir = fullfile(getfamilydata('Directory', 'DataRoot'), 'Optics',['SYMM-' DataDir]);
-    
-    % medida de flutuações dos BPMs
+
+    % medida de flutua??es dos BPMs
     interval  = 180; % seconds
     period    = 1.0; % seconds
     file_name = fullfile(r.DataDir, ['BPMData_' date_str '.mat']);
     lnls1_monbpm(0:period:interval, 'Archive', file_name, 'NoDisplay');
-    
-    % medida de função dispersão
+
+    % medida de fun??o dispers?o
     file_name = fullfile(r.DataDir, ['Disp_' date_str '.mat']);
     lnls1_measdisp('NoDisplay', 'Archive', file_name);
-    
+
     % medida de matriz resposta
     file_name = fullfile(r.DataDir, ['BPMRespMat_' date_str '.mat']);
     lnls1_measbpmresp('Archive', file_name);
-    
+
 end
 
 % gera arquivo de input para o LOCO
 try
     buildlocoinput(r.DataDir, 1);
 catch
-    fprintf('Problema ao construir o input do LOCO: arquivos com dados não encontrados no diretório especificado.\n');
+    fprintf('Problema ao construir o input do LOCO: arquivos com dados n?o encontrados no diret?rio especificado.\n');
     return;
 end
 OutputFileName = fullfile(r.DataDir, 'LOCODataFileSLM');
@@ -116,7 +116,7 @@ else
 end
 
 
-% copia medidas de diretório temporário para permanente
+% copia medidas de diret?rio tempor?rio para permanente
 if strfind(r.DataDir, 'SYMM-')
     DataDir1 = r.DataDir;
     DataDir2 = strrep(r.DataDir, 'SYMM-', '');
@@ -130,9 +130,9 @@ end
 [BPMData, CMData, LocoMeasData, LocoModel, FitParameters, LocoFlags, RINGData] = locofilecheck(OutputFileName);
 
 
-% ajusta campo dos IDs no modelo de acordo com info do usuário.
+% ajusta campo dos IDs no modelo de acordo com info do usu?rio.
 switch2sim;
-ids = inputdlg({'Campo do AWG01 [T]', 'Campo do AWG09 [T]', 'Campo do AON11 [T]'}, 'Dispositivos de Inserção', [1 1 1], {'0','0.2','0'});
+ids = inputdlg({'Campo do AWG01 [T]', 'Campo do AWG09 [T]', 'Campo do AON11 [T]'}, 'Dispositivos de Inser??o', [1 1 1], {'0','0.2','0'});
 lnls1_set_id_field('AWG01', str2double(ids{1}));
 lnls1_set_id_field('AWG09', str2double(ids{2}));
 lnls1_set_id_field('AON11', str2double(ids{3}));
@@ -140,7 +140,7 @@ RINGData.Lattice = THERING;
 
 % executa analise LOCO de calibracao do modelo baseado na medida de eta e
 % matriz resposta
-disp([get_date_str ': análise LOCO...']);
+disp([get_date_str ': an?lise LOCO...']);
 converged = false;
 while ~converged
     drawnow;
@@ -160,10 +160,10 @@ r.LOCO.RINGData = RINGData(end);
 THERING = RINGData(end).Lattice;
 
 
-% faz simetrização da ótica registrando as forças quadrupolares antes e depois
-% da simetrização.
+% faz simetriza??o da ?tica registrando as for?as quadrupolares antes e depois
+% da simetriza??o.
 
-disp([get_date_str ': simetrização da ótica...']);
+disp([get_date_str ': simetriza??o da ?tica...']);
 kQF1 = getsp('QF', 'Hardware');
 kQD1 = getsp('QD', 'Hardware');
 kQFC1 = getsp('QFC', 'Hardware');
@@ -176,7 +176,7 @@ while ~converged
     SymData = lnls1_symmetrize_simulation_optics('QuadElements', 'AllSymmetries', r.Mode);
     bb = lnls1_calc_beta_beating;
     fprintf('Tunes: [%6.4f (H) %6.4f (V)], Beta beating: [%5.2f%% (H) %5.2f%% (V)]\n', bb.tunex, bb.tuney, bb.betax_beating, bb.betay_beating);
-    if 100*(abs(sum(SymData.Residue.^2) - residue)/residue) < 0.1, converged = true; end
+    if (100*(abs(sum(SymData.Residue.^2) - residue)/residue) < 0.1) || ((bb.betax_beating < 0.1) && (bb.betay_beating < 0.1)), converged = true; end
     residue = sum(SymData.Residue.^2);
     drawnow;
 end
@@ -186,19 +186,19 @@ kQF2 = getsp('QF', 'Hardware');
 kQD2 = getsp('QD', 'Hardware');
 kQFC2 = getsp('QFC', 'Hardware');
 
-% separa ajustes de famílias e shunts
+% separa ajustes de fam?lias e shunts
 [r.QF_delta r.QD_delta r.QFC_delta r.SHUNTS_delta] = get_family_shunt_k_variations(kQF2-kQF1, kQD2-kQD1, kQFC2-kQFC1);
 
 
-% se não é para implementar simetrização retorna.
+% se n?o ? para implementar simetriza??o retorna.
 if ~r.SymmImplementation, return; end
 
-%% ---- A PARTIR DESTE PONTO AJUSTES SÃO ENVIADOS NO MODO ONLINE ----
+%% ---- A PARTIR DESTE PONTO AJUSTES S?O ENVIADOS NO MODO ONLINE ----
 
-% implementa ajuste de simetrização na máquina real em steps suaves
+% implementa ajuste de simetriza??o na m?quina real em steps suaves
 switch2online;
 nr_steps = r.ImplementationSteps;
-disp([get_date_str ': implementação no anel...']);
+disp([get_date_str ': implementa??o no anel...']);
 r.InitMachineConfig = getmachineconfig;
 
 if strcmpi(r.ImplementationType, 'FamiliesShuntsSeparately')
@@ -241,7 +241,7 @@ else
 end
 
 r.FinalMachineConfig = getmachineconfig;
-disp([get_date_str ': fim de simetrização...']);
+disp([get_date_str ': fim de simetriza??o...']);
 
 function [QF_delta QD_delta QFC_delta SHUNTS_delta] = get_family_shunt_k_variations(QF_dK, QD_dK, QFC_dK)
 
@@ -281,8 +281,3 @@ ind = [getfamilydata('QF', 'AT', 'ATIndex'); getfamilydata('QD', 'AT', 'ATIndex'
 [~, idx] = sort(ind(:,1));
 SHUNTS_delta = [shunt_dQF; shunt_dQD; shunt_dQFC];
 SHUNTS_delta = SHUNTS_delta(idx,1);
-
-function r = get_date_str
-r = datestr(now, 'yyyy-mm-dd_HH-MM-SS');
-
-

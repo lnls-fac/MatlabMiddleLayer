@@ -1,4 +1,4 @@
-function [x, integ_field, kickx, polynomb] = sirius_si_pmm_kick(strength, fit_monomials)
+function [x, integ_field, kickx, LPolyB] = sirius_si_pmm_kick(strength, fit_monomials)
 
 maxfield = [ ...
 % posx[mm] field[T.m]
@@ -67,8 +67,9 @@ kickx = integ_field / brho;
 [coeffs, fit_kickx] = lnls_polyfit(x, kickx, fit_monomials);
 figure; hold all; plot(1000*x, 1000*kickx); plot(1000*x,1000*fit_kickx);
 xlabel('x / mm'); ylabel('kick / mrad');
-legend({'data points', 'fitted curve'});
+title('PMM kick'); legend({'data points', 'fitted curve'});
 
 
-polynomb = zeros(1,1+max(fit_monomials));
-polynomb(1+fit_monomials) = -coeffs;
+% LPolyB = PolynomB * L
+LPolyB = zeros(1,1+max(fit_monomials));
+LPolyB(1+fit_monomials) = -coeffs;
