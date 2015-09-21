@@ -1,35 +1,35 @@
-%   LNLS_CALCULA_ACEITANCIAS calcula as aceitâncias horizontal e vertical
-%   devido à câmara de vácuo.
+%   LNLS_CALCULA_ACEITANCIAS calcula as aceitancias horizontal e vertical
+%   devido a camara de vacuo.
 %
 %   [EA_x,EA_y,R,err] = LNLS_CALCULA_ACEITANCIAS(r,Bx,By,vacc) com vacc do
-%   tipo string usa o perfil de câmara de vácuo cujo arquivo (caminho e
-%   nome) é vacc; com vacc = [Vx Vy], considera um perfil de câmara de
-%   vácuo constante com valores de meia abertura horizontal e vertical
+%   tipo string usa o perfil de cï¿½mara de vacuo cujo arquivo (caminho e
+%   nome) ï¿½ vacc; com vacc = [Vx Vy], considera um perfil de cï¿½mara de
+%   vï¿½cuo constante com valores de meia abertura horizontal e vertical
 %   iguais a Vx e Vy, respectivamente; com vacc vazio, abre uma interface
-%   para seleção de um arquivo; com vacc==-1, usa os valores de perfil de
-%   câmara de vácuo no modelo (VChamber em THERING), sem interpolação.
+%   para seleï¿½ï¿½o de um arquivo; com vacc==-1, usa os valores de perfil de
+%   cï¿½mara de vï¿½cuo no modelo (VChamber em THERING), sem interpolaï¿½ï¿½o.
 %
 %   ENTRADA
-%       r       posição [m]
-%       Bx      função betatron horizontal [m]
-%       By      função betatron vertical [m]
-%       vacc    nome do arquivo .txt com o perfil da câmara de vácuo ou
-%               valores médios de meia abertura [Vx Vy] ou -1 para valores
+%       r       posicao [m]
+%       Bx      funcao betatron horizontal [m]
+%       By      funcao betatron vertical [m]
+%       vacc    nome do arquivo .txt com o perfil da cï¿½mara de vï¿½cuo ou
+%               valores mï¿½dios de meia abertura [Vx Vy] ou -1 para valores
 %               fornecidos no modelo (VChamber em THERING) [m]
-%   SAÍDA
-%       EA_x    aceitância horizontal [mm mrad]
-%       EA_y    aceitância vertical [mm mrad]
-%       R       razão entre os ângulos máximos de espalhamento vertical e
+%   SAï¿½DA
+%       EA_x    aceitancia horizontal [mm mrad]
+%       EA_y    aceitancia vertical [mm mrad]
+%       R       razao entre os angulos maximos de espalhamento vertical e
 %               horizontal
 %       err     verdadeiro se ocorreu erro
 
-function [EA_x,EA_y,R,err] = lnls_calcula_aceitancias(the_ring, r,Bx,By,vacc)
+function [EA_x,EA_y,R,err] = lnls_calcula_aceitancias(the_ring,r,Bx,By,vacc)
 
 err = false;
 
 idx_fim = length(r);
 
-% Seleciona o perfil de câmara de vácuo
+% Seleciona o perfil de cï¿½mara de vacuo
 if(vacc == -1)
     flag_interp = 0;
     N = length(the_ring);
@@ -76,7 +76,7 @@ if(flag_interp)
     Vx1 = Vx1(idx);
     Vy1 = Vy1(idx);
     
-    % Normaliza a posição
+    % Normaliza a posiï¿½ï¿½o
     s_V = s_V - s_V(1);
     s_V = s_V / s_V(length(s_V)) * r(idx_fim);
     
@@ -84,7 +84,7 @@ if(flag_interp)
     Vy = interp1(s_V,Vy1,r,'linear');
 end
 
-% Calcula aceitâncias com os valores de beta no início e final do elemento
+% Calcula aceitï¿½ncias com os valores de beta no inï¿½cio e final do elemento
 Bx2   = [Bx(2:idx_fim);Bx(1)]; % desloca beta x
 EA_x1 = 1e6*Vx.^2 ./ Bx;
 EA_x2 = 1e6*Vx.^2 ./ Bx2;
