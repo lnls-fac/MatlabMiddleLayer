@@ -183,7 +183,10 @@ uicontrol('Style', 'pushbutton', 'String', 'CREATE FIGURE',...
             [k, tab] =reson(order,period,cur_lims, ax, Tag);
             if k
                 fprintf('\nOrder: %2d\n',order);
-                fprintf('\t%3d * Qx  +  %3d * Qy  =  %4d\n',tab');
+                firsty = (tab(:,3)-tab(:,1)*cur_lims(1))./tab(:,2);
+                firstx = (tab(:,3)-tab(:,2)*cur_lims(3))./tab(:,1);
+                tab_ext = [tab,firstx,firsty]';
+                fprintf('\t%3d * Qx  +  %3d * Qy  =  %4d   (firstx = %5.2f, firsty = %5.2f)\n',tab_ext);
             end
         else
             delete(findobj(get(handle.ax_freq,'Children'),'Tag',Tag));

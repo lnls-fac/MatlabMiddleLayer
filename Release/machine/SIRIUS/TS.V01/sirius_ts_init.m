@@ -57,7 +57,7 @@ AO.bend.Setpoint.DeltaRespMat = .01;
 % Septa
 
 AO.septex.FamilyName  = 'septex';
-AO.septex.MemberOf    = {'PlotFamily'; 'septex'; 'BEND'; 'Magnet';};
+AO.septex.MemberOf    = {'PlotFamily'; 'septex'; 'SEPTUM'; 'Magnet';};
 AO.septex.DeviceList  = getDeviceList(1,1);
 AO.septex.ElementList = (1:size(AO.septex.DeviceList,1))';
 AO.septex.Status      = ones(size(AO.septex.DeviceList,1),1);
@@ -68,28 +68,24 @@ AO.septex.Monitor.MemberOf = {};
 AO.septex.Monitor.Mode = 'Simulator';
 AO.septex.Monitor.DataType = 'Scalar';
 AO.septex.Monitor.ChannelNames = sirius_ts_getname(AO.septex.FamilyName, 'Monitor', AO.septex.DeviceList);
-AO.septex.Monitor.HW2PhysicsParams = 1;
-AO.septex.Monitor.Physics2HWParams = 1;
 AO.septex.Monitor.Units        = 'Hardware';
 AO.septex.Monitor.HWUnits      = 'Ampere';
-AO.septex.Monitor.PhysicsUnits = 'GeV';
+AO.septex.Monitor.PhysicsUnits = 'meter^-1';
 
 AO.septex.Setpoint.MemberOf = {'MachineConfig';};
 AO.septex.Setpoint.Mode = 'Simulator';
 AO.septex.Setpoint.DataType = 'Scalar';
 AO.septex.Setpoint.ChannelNames = sirius_ts_getname(AO.septex.FamilyName, 'Setpoint', AO.septex.DeviceList);
-AO.septex.Setpoint.HW2PhysicsParams = 1;
-AO.septex.Setpoint.Physics2HWParams = 1;
 AO.septex.Setpoint.Units        = 'Hardware';
 AO.septex.Setpoint.HWUnits      = 'Ampere';
-AO.septex.Setpoint.PhysicsUnits = 'GeV';
+AO.septex.Setpoint.PhysicsUnits = 'meter^-1';
 AO.septex.Setpoint.Range        = [0 300];
 AO.septex.Setpoint.Tolerance    = .1;
 AO.septex.Setpoint.DeltaRespMat = .01;
 
 
 AO.septing.FamilyName  = 'septing';
-AO.septing.MemberOf    = {'PlotFamily'; 'septing'; 'BEND'; 'Magnet';};
+AO.septing.MemberOf    = {'PlotFamily'; 'septing'; 'SEPTUM'; 'Magnet';};
 AO.septing.DeviceList  = getDeviceList(1,1);
 AO.septing.ElementList = (1:size(AO.septing.DeviceList,1))';
 AO.septing.Status      = ones(size(AO.septing.DeviceList,1),1);
@@ -100,28 +96,24 @@ AO.septing.Monitor.MemberOf = {};
 AO.septing.Monitor.Mode = 'Simulator';
 AO.septing.Monitor.DataType = 'Scalar';
 AO.septing.Monitor.ChannelNames = sirius_ts_getname(AO.septing.FamilyName, 'Monitor', AO.septing.DeviceList);
-AO.septing.Monitor.HW2PhysicsParams = 1;
-AO.septing.Monitor.Physics2HWParams = 1;
 AO.septing.Monitor.Units        = 'Hardware';
 AO.septing.Monitor.HWUnits      = 'Ampere';
-AO.septing.Monitor.PhysicsUnits = 'GeV';
+AO.septing.Monitor.PhysicsUnits = 'meter^-1';
 
 AO.septing.Setpoint.MemberOf = {'MachineConfig';};
 AO.septing.Setpoint.Mode = 'Simulator';
 AO.septing.Setpoint.DataType = 'Scalar';
 AO.septing.Setpoint.ChannelNames = sirius_ts_getname(AO.septing.FamilyName, 'Setpoint', AO.septing.DeviceList);
-AO.septing.Setpoint.HW2PhysicsParams = 1;
-AO.septing.Setpoint.Physics2HWParams = 1;
 AO.septing.Setpoint.Units        = 'Hardware';
 AO.septing.Setpoint.HWUnits      = 'Ampere';
-AO.septing.Setpoint.PhysicsUnits = 'GeV';
+AO.septing.Setpoint.PhysicsUnits = 'meter^-1';
 AO.septing.Setpoint.Range        = [0 300];
 AO.septing.Setpoint.Tolerance    = .1;
 AO.septing.Setpoint.DeltaRespMat = .01;
 
 
 AO.septinf.FamilyName  = 'septinf';
-AO.septinf.MemberOf    = {'PlotFamily'; 'septinf'; 'BEND'; 'Magnet';};
+AO.septinf.MemberOf    = {'PlotFamily'; 'septinf'; 'SEPTUM'; 'Magnet';};
 AO.septinf.DeviceList  = getDeviceList(1,1);
 AO.septinf.ElementList = (1:size(AO.septinf.DeviceList,1))';
 AO.septinf.Status      = ones(size(AO.septinf.DeviceList,1),1);
@@ -132,21 +124,17 @@ AO.septinf.Monitor.MemberOf = {};
 AO.septinf.Monitor.Mode = 'Simulator';
 AO.septinf.Monitor.DataType = 'Scalar';
 AO.septinf.Monitor.ChannelNames = sirius_ts_getname(AO.septinf.FamilyName, 'Monitor', AO.septinf.DeviceList);
-AO.septinf.Monitor.HW2PhysicsParams = 1;
-AO.septinf.Monitor.Physics2HWParams = 1;
 AO.septinf.Monitor.Units        = 'Hardware';
 AO.septinf.Monitor.HWUnits      = 'Ampere';
-AO.septinf.Monitor.PhysicsUnits = 'GeV';
+AO.septinf.Monitor.PhysicsUnits = 'meter^-1';
 
 AO.septinf.Setpoint.MemberOf = {'MachineConfig';};
 AO.septinf.Setpoint.Mode = 'Simulator';
 AO.septinf.Setpoint.DataType = 'Scalar';
 AO.septinf.Setpoint.ChannelNames = sirius_ts_getname(AO.septinf.FamilyName, 'Setpoint', AO.septinf.DeviceList);
-AO.septinf.Setpoint.HW2PhysicsParams = 1;
-AO.septinf.Setpoint.Physics2HWParams = 1;
 AO.septinf.Setpoint.Units        = 'Hardware';
 AO.septinf.Setpoint.HWUnits      = 'Ampere';
-AO.septinf.Setpoint.PhysicsUnits = 'GeV';
+AO.septinf.Setpoint.PhysicsUnits = 'meter^-1';
 AO.septinf.Setpoint.Range        = [0 300];
 AO.septinf.Setpoint.Tolerance    = .1;
 AO.septinf.Setpoint.DeltaRespMat = .01;

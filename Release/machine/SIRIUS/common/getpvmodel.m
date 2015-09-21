@@ -695,24 +695,27 @@ else
                     if isfield(THERING{ATIndexList(i)}, 'Roll')
                         Roll = THERING{ATIndexList(i)}.Roll;
                     else
+                        % 2015-09-18 Luana
                         % Knowing the cross-plane family name can be a problem
                         % If the VCM family has the same AT index, then use it.
-                        try
-                            VCMFamily = getvcmfamily;
-                            Roll = [getroll(Family, Field, DeviceList(i,:))  0];
-                            VCMDevList = family2dev(VCMFamily);
-                            iVCM = findrowindex(DeviceList(i,:), VCMDevList);
-                            if ~isempty(iVCM)
-                                ATIndexVCM = family2atindex(VCMFamily, DeviceList(i,:));
-                                if ATIndexVCM == ATIndexList(i)
-                                    Roll = [Roll(1) getroll(VCMFamily, Field, DeviceList(i,:))];
-                                else
-                                    Roll = [0 0];
-                                end
-                            end
-                        catch
-                            Roll = [0 0];
-                        end
+                        %try
+                        %    VCMFamily = getvcmfamily;
+                        %    Roll = [getroll(Family, Field, DeviceList(i,:))  0];
+                        %    VCMDevList = family2dev(VCMFamily);
+                        %    iVCM = findrowindex(DeviceList(i,:), VCMDevList);
+                        %    if ~isempty(iVCM)sirius
+                        %        ATIndexVCM = family2atindex(VCMFamily, DeviceList(i,:));
+                        %        if ATIndexVCM == ATIndexList(i)
+                        %            Roll = [Roll(1) getroll(VCMFamily, Field, DeviceList(i,:))];
+                        %        else
+                        %            Roll = [0 0];
+                        %        end
+                        %    end
+                        %catch
+                        %    Roll = [0 0];
+                        %end
+                        
+                        Roll = [0 0];
                     end
                     
                     % 2015-09-17 Luana
@@ -751,28 +754,32 @@ else
                     if isfield(THERING{ATIndexList(i)}, 'Roll')
                         Roll = THERING{ATIndexList(i)}.Roll;
                     else
+                        
+                        % 2015-09-18 Luana
                         % Knowing the cross-plane family name can be a problem
                         % If the VCM family has the same AT index, then use it.
-                        try
-                            HCMFamily = getvcmfamily;
-                            Roll = [0 getroll(Family, Field, DeviceList(i,:))];
-                            HCMDevList = family2dev(HCMFamily);
-                            iHCM = findrowindex(DeviceList(i,:), HCMDevList);
-                            if ~isempty(iHCM)
-                                ATIndexHCM = family2atindex(HCMFamily, DeviceList(i,:));
-                                if ATIndexHCM == ATIndexList(i)
-                                    Roll = [getroll(HCMFamily, Field, DeviceList(i,:)) Roll(2)];
-                                else
-                                    Roll = [0 0];
-                                end
-                            end
-                        catch
-                            Roll = [0 0];
-                        end
+                        %try
+                        %    HCMFamily = getvcmfamily;
+                        %    Roll = [0 getroll(Family, Field, DeviceList(i,:))];
+                        %    HCMDevList = family2dev(HCMFamily);
+                        %    iHCM = findrowindex(DeviceList(i,:), HCMDevList);
+                        %    if ~isempty(iHCM)
+                        %        ATIndexHCM = family2atindex(HCMFamily, DeviceList(i,:));
+                        %        if ATIndexHCM == ATIndexList(i)
+                        %            Roll = [getroll(HCMFamily, Field, DeviceList(i,:)) Roll(2)];
+                        %        else
+                        %            Roll = [0 0];
+                        %        end
+                        %    end
+                        %catch
+                        %    Roll = [0 0];
+                        %end
+                        
+                        Roll = [0 0];
                     end
                     
                     % 2015-09-17 Luana
-                    AM(i,1) = [-sin(Roll(1)) cos(Roll(1))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2))); 
+                    AM(i,1) = [-sin(Roll(1)) cos(Roll(1))] * [sirius_get_kickangle(THERING, ATIndexList(i), 'x'); sirius_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2))); 
                     
                     % % 2015-08-24 Luana
                     %AM(i,1) = [-sin(Roll(1)) cos(Roll(1))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2))); 
@@ -944,7 +951,7 @@ else
                 % KickAngle
                 for i=1:length(ATIndexList)
                     % 2015-09-17 Luana
-                    AM(i,1) = lnls_get_kickangle(THERING, ATIndexList(i), 'x');  % This only allows for a horizontal kick
+                    AM(i,1) = sirius_get_kickangle(THERING, ATIndexList(i), 'x');  % This only allows for a horizontal kick
                     
                     %AM(i,1) = lnls_get_kickangle(THERING, ATIndexList(i), 'x');  % This only allows for a horizontal kick
                 end
@@ -991,7 +998,7 @@ else
                 end
             end
             
-        % % 2015-09-17 Luana -Begin
+        % % 2015-09-17 Luana
         %elseif strcmpi(AT.ATType, 'RollX') || strcmpi(AT.ATType, 'RollY')
         %    % Roll or Tilt
         %    for i=1:length(ATIndexList)
@@ -1013,7 +1020,6 @@ else
         %            error(sprintf('%s(%d,%d) must be a KickAngle field in the model to be rolled.', Family, DeviceList(i,:)));
         %        end
         %    end
-        % % Luana - End
 
         elseif any(strcmpi(AT.ATType,{'FirstTurn','LinePass','Turns', 'xTurns','PxTurns','yTurns','PyTurns','dPTurns','dLTurns'}))
             % Turn-by-turn data
@@ -1092,13 +1098,24 @@ else
         % 2015-09-17 Luana
         elseif strcmpi(AT.ATType, 'Septum')
             % Septum
-            for i = 1:length(ATIndexList)
-                % Verificar Tamanho AM
+
+            SeptumField = zeros(size(AT.ATIndex, 1), 1);
+            for i = 1:size(AT.ATIndex, 1)
+                SeptumLength = 0;
+                BendingAngle = 0; 
+                for j = 1:Nsplit
+                    SeptumLength = SeptumLength + THERING{AT.ATIndex(i,j)}.Length;
+                    BendingAngle = BendingAngle + THERING{AT.ATIndex(i,j)}.BendingAngle;
+                end
+                SeptumField(i) = BendingAngle/SeptumLength;
+            end
+
+	    AM = zeros(size(AT.ATIndex,1),1);	
+            for i = 1:size(AT.ATIndex, 1)               
                 AM(i,1) = 0; 
                 for j = 1:size(AT.ATIndex, 2)
-                    AM(i,1) = AM(i,1) + THERING{AT.ATIndex(i,j)}.BendingAngle + THERING{AT.ATIndex(i,j)}.NPB(1) ;
-                end;
-                
+                    AM(i,1) = AM(i,1) + SeptumField(i) + THERING{AT.ATIndex(i,j)}.NPB(1);
+                end               
             end
 
         elseif strcmpi(AT.ATType, 'null')
@@ -1129,7 +1146,7 @@ if strcmpi(UnitsFlag, 'Hardware')
         AM = physics2hw(Family, Field, AM, DeviceList, getenergymodel);
         
         
-        % % 2015-09-17 Luana - Begin
+        % % 2015-09-17 Luana
         % % subtracts shunt current
         %if ~ismemberof(Family, 'Shunt') && exist('ATIndexList', 'var')
         %    for i = 1:length(ATIndexList)
@@ -1138,7 +1155,7 @@ if strcmpi(UnitsFlag, 'Hardware')
         %        end
         %    end
         % end
-        % % Luana - End
+        
         
     else
         persistent WarningFlag

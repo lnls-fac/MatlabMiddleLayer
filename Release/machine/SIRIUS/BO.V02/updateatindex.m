@@ -32,6 +32,7 @@ end
 try
     % bend_a
     AO.bend_a.AT.ATType = 'BendPS';
+    AO.bend_a.Magnet    = 'BEND';
     AO.bend_a.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
     AO.bend_a.Position = findspos(THERING, AO.bend_a.AT.ATIndex(:,1));
 catch
@@ -41,6 +42,7 @@ end
 try
     % bend_b
     AO.bend_b.AT.ATType = 'BendPS';
+    AO.bend_b.Magnet    = 'BEND';
     AO.bend_b.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
     AO.bend_b.Position = findspos(THERING, AO.bend_b.AT.ATIndex(:,1));
 catch

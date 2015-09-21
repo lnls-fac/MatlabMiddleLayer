@@ -142,6 +142,10 @@ AD.Coupling            = 0.0002;
 AD.OpsData.PrsProfFile = 'sirius_bo_pressure_profile.txt';
 AD.AveragePressure     = 1.5e-8; % [mbar]
 
+% 2015-09-21 Luana
+AD.SetMultipolesErrors = false;
+AD.SIRIUSParams        = sirius_params;
+
 setad(AD);
 switch2sim;
 switch2hw; 
@@ -176,6 +180,10 @@ AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.0002;
 AD.OpsData.PrsProfFile = 'sirius_bo_pressure_profile.txt';
 AD.AveragePressure     = 1.5e-8; % [mbar]
+
+% 2015-09-21 Luana
+AD.SetMultipolesErrors = false;
+AD.SIRIUSParams        = sirius_params;
 
 setad(AD);
 switch2sim;
