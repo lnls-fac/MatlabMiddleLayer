@@ -1,9 +1,20 @@
-function NewRing = sirius_init_multipoles_errors(OldRing)
-%SIRIUS_SET_MULTIPOLES_ERRORS - Set the multipoles errors from excitation curve in PolynomA and PolynomB 
+function sirius_init_multipoles_errors
+%SIRIUS_INIT_MULTIPOLES_ERRORS - Set initial values of the multipoles errors in AT model 
 %
 %2015-09-03
 
-NewRing = OldRing;
+global THERING;
+
+indices = findcells(THERING, 'PolynomB');
+for i=1:length(indices)   
+    if isfield(THERING{indices(i)}, 'NPB')
+        THERING{indices(i)}.PolynomB = THERING{indices(i)}.NPB;
+    end
+    if isfield(THERING{indices(i)}, 'NPA')
+        THERING{indices(i)}.PolynomA = THERING{indices(i)}.NPA;
+    end
+end
+
 Families = getfamilylist;
 
 for i=1:size(Families, 1)
@@ -50,24 +61,24 @@ for i=1:size(Families, 1)
                         DeltaPolynomB(MainHarmonic{idx}) = 0;
                     end
 
-                    LenA= length(NewRing{ATIndex(i,j)}.PolynomA) - length(DeltaPolynomA);
-                    NewRing{ATIndex(i,j)}.PolynomA = [NewRing{ATIndex(i,j)}.PolynomA, zeros(1,-LenA)] + [DeltaPolynomA, zeros(1,LenA)];
+                    LenA= length(THERING{ATIndex(i,j)}.PolynomA) - length(DeltaPolynomA);
+                    THERING{ATIndex(i,j)}.PolynomA = [THERING{ATIndex(i,j)}.PolynomA, zeros(1,-LenA)] + [DeltaPolynomA, zeros(1,LenA)];
 
-                    LenB = length(NewRing{ATIndex(i,j)}.PolynomB) - length(DeltaPolynomB);
-                    NewRing{ATIndex(i,j)}.PolynomB = [NewRing{ATIndex(i,j)}.PolynomB, zeros(1,-LenB)] + [DeltaPolynomB, zeros(1,LenB)];     
+                    LenB = length(THERING{ATIndex(i,j)}.PolynomB) - length(DeltaPolynomB);
+                    THERING{ATIndex(i,j)}.PolynomB = [THERING{ATIndex(i,j)}.PolynomB, zeros(1,-LenB)] + [DeltaPolynomB, zeros(1,LenB)];     
 
-                    LenDiff = length(NewRing{ATIndex(i,j)}.PolynomA) - length(NewRing{ATIndex(i,j)}.PolynomB);
+                    LenDiff = length(THERING{ATIndex(i,j)}.PolynomA) - length(THERING{ATIndex(i,j)}.PolynomB);
                     if LenDiff ~= 0
-                        NewRing{ATIndex(i,j)}.PolynomA = [NewRing{ATIndex(i,j)}.PolynomA, zeros(1,-LenDiff)];
-                        NewRing{ATIndex(i,j)}.PolynomB = [NewRing{ATIndex(i,j)}.PolynomB, zeros(1, LenDiff)];
+                        THERING{ATIndex(i,j)}.PolynomA = [THERING{ATIndex(i,j)}.PolynomA, zeros(1,-LenDiff)];
+                        THERING{ATIndex(i,j)}.PolynomB = [THERING{ATIndex(i,j)}.PolynomB, zeros(1, LenDiff)];
                     end
 
-                    if isfield(NewRing{ATIndex(i,j)}, 'K')
-                        NewRing{ATIndex(i,j)}.K = NewRing{ATIndex(i,j)}.PolynomB(2);
+                    if isfield(THERING{ATIndex(i,j)}, 'K')
+                        THERING{ATIndex(i,j)}.K = THERING{ATIndex(i,j)}.PolynomB(2);
                     end
 
-                    if isfield(NewRing{ATIndex(i,j)}, 'MaxOrder')
-                        NewRing{ATIndex(i,j)}.MaxOrder = length(NewRing{ATIndex(i,j)}.PolynomB) - 1;
+                    if isfield(THERING{ATIndex(i,j)}, 'MaxOrder')
+                        THERING{ATIndex(i,j)}.MaxOrder = length(THERING{ATIndex(i,j)}.PolynomB) - 1;
                     end
 
                 end     

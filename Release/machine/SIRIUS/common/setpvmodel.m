@@ -437,6 +437,7 @@ else
     
     % 2015-09-17 Luana
     NewPhysicsValue = NewSP;
+    SetMultipolesErrors = getfamilydata('SetMultipolesErrors');
     
     % Check for a split magnet
     Nsplit = size(AT.ATIndex,2);
@@ -446,7 +447,7 @@ else
         NewSP = NewSP';
         NewSP = NewSP(:);
         
-        % % 2015-09-17 Luana - Begin 
+        % % 2015-09-17 Luana 
         % % The kick is divide amoung the splits in the functions
         % % lnls_set_kickangle and sirius_set_kickangle
         % if strcmpi(AT.ATType, 'HCM') || strcmpi(AT.ATType, 'VCM')
@@ -470,7 +471,6 @@ else
         %   ATIndexList(iNaN) = [];
         %   NewSP(iNaN) = [];
         %end
-        % % Luana - End
         
         ATIndexList = AT.ATIndex(DeviceIndex,:)';
         ATIndexList = ATIndexList(:);
@@ -499,6 +499,12 @@ else
     else
         if any(strcmpi(AT.ATType, {'HCM','Kicker'}))
             % HCM
+            
+            if SetMultipolesErrors
+                NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
+                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);     
+            end
+            
             for i = 1:size(NewSP,1)
                 % Coupling: Magnet roll is part of the AT model
                 %           The gain is part of hw2physics/physics2hw
@@ -508,7 +514,7 @@ else
                     % Knowing the cross-plane family name can be a problem
                     % If the VCM family has the same AT index, then use it.
                     
-                    % % 2015-09-17 Luana - Begin 
+                    % % 2015-09-17 Luana 
                     %Roll = [getroll(Family, Field, DeviceList(i,:))  0];
                     %VCMDevList = family2dev('VCM');
                     %iVCM = findrowindex(DeviceList(i,:), VCMDevList);
@@ -526,9 +532,7 @@ else
                     %end
                     
                     Roll = [0 0];
-                    
-                    % % Luana - End
-                    
+                                       
                 end
                 
                 % New X-Kick, but the Y-Kick needs to be maintained (middle layer coordinates)
@@ -558,12 +562,16 @@ else
                 %THERING{ATIndexList(i)}.KickAngle(2) = NewSP(i) * sin(Roll(1));
             end
                     
-            % Colocar if antes disso!!!
-            NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-            THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);     
             
         elseif strcmpi(AT.ATType, 'VCM')
             % VCM
+            
+            % 2015-09-18 Luana
+            if SetMultipolesErrors
+                NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
+                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
+            end
+            
             for i = 1:size(NewSP,1)
                 % Coupling: Magnet roll is part of the model
                 %           The gain is part of hw2physics/physics2hw
@@ -582,7 +590,7 @@ else
                     % Knowing the cross-plane family name can be a problem
                     % If the VCM family has the same AT index, then use it.
                       
-                    % % 2015-09-17 Luana - Begin 
+                    % % 2015-09-17 Luana
                     %Roll = [0 getroll(Family, Field, DeviceList(i,:))];
                     %HCMDevList = family2dev('HCM');
                     %iHCM = findrowindex(DeviceList(i,:), HCMDevList);
@@ -599,8 +607,6 @@ else
                     %end
                     
                     Roll = [0 0];
-                    
-                    % % Luana - End
                     
                 end
                 
@@ -634,11 +640,7 @@ else
                 %THERING{ATIndexList(i)}.KickAngle(2) =      NewSP(i) * cos(Roll(2));
                 
             end
-            
-            % Colocar if antes disso!!!
-            NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-            THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
-            
+                        
         elseif any(strcmpi(AT.ATType,{'K','Quad','Quadrupole'}))
             % K - Quadrupole
             
@@ -646,8 +648,9 @@ else
             PrevHardwareValue = getpvmodel(Family, Field, DeviceList, 'Hardware');
             NewHardwareValue  = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
             
-            % Colocar if aqui!
-            THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
+            if SetMultipolesErrors
+                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
+            end
             
             for i = 1:size(NewSP,1)
                 if isfield(THERING{ATIndexList(i)}, 'K')
@@ -691,8 +694,9 @@ else
             end
             NewTotalValue = PrevTotalValue - PrevFamilyValue + NewFamilyValue;
             
-            % colocar if aqui!
-            THERING = sirius_set_multipoles_errors(THERING, AT.ATMagnet, Field,  NewTotalValue, AllDevices); 
+            if SetMultipolesErrors
+                THERING = sirius_set_multipoles_errors(THERING, AT.ATMagnet, Field,  NewTotalValue, AllDevices);
+            end
             
             NewTotalValue = hw2physics(AT.ATMagnet, Field, NewTotalValue, AllDevices); 
             for i = 1:size(NewTotalValue, 1)
@@ -714,8 +718,9 @@ else
             NewShuntValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);    
             NewTotalValue = PrevTotalValue - PrevShuntValue + NewShuntValue;
             
-            % colocar if aqui!
-            THERING = sirius_set_multipoles_errors(THERING, AT.ATMagnet, Field, NewTotalValue, DeviceList);
+            if SetMultipolesErrors
+                THERING = sirius_set_multipoles_errors(THERING, AT.ATMagnet, Field, NewTotalValue, DeviceList);
+            end
             
             NewTotalvalue = hw2physics(AT.ATMagnet, Field, NewTotalValue, DeviceList);
             for i = 1:size(NewTotalValue, 1)
@@ -729,46 +734,50 @@ else
                 end                
             end  
             
-            
+        % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType,{'K2','Sext','Sextupole'}))
             % K2 - Sextupole
-            for i = 1:size(NewSP,1)
-                THERING{ATIndexList(i)}.PolynomB(3) = NewSP(i);
+            
+            if SetMultipolesErrors
+                NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
+                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
             end
             
-            % 2015-09-17 Luana
-            % Colocar if aqui!
-            NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-            THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
-            
-            
+            for i = 1:size(NewSP,1)
+                THERING{ATIndexList(i)}.PolynomB(3) = NewSP(i);
+            end           
+        
+        % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType,{'K3','OCTU','Octupole'}))
             % K3 - Octupole
+            
+            if SetMultipolesErrors
+                NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
+                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
+            end
+            
             for i = 1:size(NewSP,1)
                 THERING{ATIndexList(i)}.PolynomB(4) = NewSP(i);
                 THERING{ATIndexList(i)}.NPB(4)      = NewSP(i);
             end
-            
-            % 2015-09-17 Luana
-            % Colocar if aqui!
-            NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-            THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
-            
-            
+
+        % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType,{'KS','KS1','SkewQ','SkewQuad', 'SKEWCORR', 'SkewCorrector'}))
             % KS1 - Skew Quadrupole
+            
+            if SetMultipolesErrors
+                NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
+                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
+            end
+            
             for i = 1:size(NewSP,1)
                 THERING{ATIndexList(i)}.PolynomA(2) = NewSP(i);
                 THERING{ATIndexList(i)}.NPA(2)      = NewSP(i);
             end
-            
-            % 2015-09-17 Luana
-            % Colocar if aqui!
-            NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-            THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
-        
+                    
+        % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType, {'BendPS'}))
-            % ?? 
+            % ??
             
         % needs to implement Gap/Field/Phase changes in AT model!
              
@@ -895,6 +904,12 @@ else
         % 2015-09-17 Luana
         elseif strcmpi(AT.ATType, 'Septum')
             % Septum
+            
+            if SetMultipolesErrors
+                NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
+                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
+            end
+            
             SeptumField = zeros(size(AT.ATIndex, 1), 1);
             for i = 1:size(AT.ATIndex, 1)
                 SeptumLength = 0;
@@ -914,10 +929,6 @@ else
                     THERING{AT.ATIndex(i,j)}.NPB(1)      = DeltaPB(i);
                 end
             end
-            
-            % colocar if aqui!
-            NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-            THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);      
             
         elseif strcmpi(AT.ATType, 'null')
             % JR - do nothing behaviour
