@@ -4,8 +4,12 @@ bends = findcells(the_ring, 'BendingAngle');
 sexts = setdiff(findcells(the_ring, 'PolynomB'), bends);
 sexts = sexts(getcellstruct(the_ring, 'PolynomB', sexts, 1, 3) ~= 0);
 quads = setdiff(findcells(the_ring, 'K'), [bends, sexts]);
-quads_qf = (getcellstruct(the_ring, 'K', quads) >= 0);
-bpms  = findcells(the_ring, 'FamName', 'BPM');
+if ~isempty(quads)
+    quads_qf = (getcellstruct(the_ring, 'K', quads) >= 0);
+else
+    quads_qf = [];
+end
+%bpms  = findcells(the_ring, 'FamName', 'BPM');
 
 s = findspos(the_ring, 1:length(the_ring)+1);
 bends_pos = [s(bends)' s(bends+1)'];

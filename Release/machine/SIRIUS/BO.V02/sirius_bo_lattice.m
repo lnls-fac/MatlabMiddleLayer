@@ -222,16 +222,35 @@ function the_ring = set_vacuum_chamber(the_ring)
 
 % y = +/- y_lim * sqrt(1 - (x/x_lim)^n);
 
-bends_vchamber = [0.0117 0.0117 1]; % n = 100: ~rectangular
-other_vchamber = [0.018  0.018  1];   % n = 1;   circular/eliptica
+bends_vchamber =      [0.0117 0.0117 1];   % n = 100: ~rectangular
+other_vchamber =      [0.018  0.018  1];   % n = 1;   circular/eliptica
+extraction_vchamber = [0.026  0.018  1];   % n = 1;   circular/eliptica
 
+
+% default
 for i=1:length(the_ring)
-    if isfield(the_ring{i}, 'BendingAngle')
-        the_ring{i}.VChamber = bends_vchamber;
-    else
-        the_ring{i}.VChamber = other_vchamber;
-    end
+    the_ring{i}.VChamber = other_vchamber;
 end
+
+% bends
+b = [findcells(the_ring, 'FamName', 'b') findcells(the_ring, 'FamName', 'mb')];
+for i=b
+    the_ring{i}.VChamber = bends_vchamber;
+end
+
+% extraction bend
+kick_ex = findcells(the_ring, 'FamName', 'kick_ex');
+sept_ex = findcells(the_ring, 'FamName', 'sept_ex');
+b_ex = b((b > kick_ex(end)) & (b < sept_ex(1)));
+for i=b_ex
+    the_ring{i}.VChamber = other_vchamber;
+end
+
+% sector from extraction bend to extraction septum
+for i=b_ex(end):sept_ex(1)
+    the_ring{i}.VChamber = extraction_vchamber;
+end
+    
 
 function the_ring = set_girders(the_ring)
 idx = findcells(the_ring,'FamName','bpm'); idx = idx(end);
