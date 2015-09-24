@@ -144,8 +144,7 @@ fprintf('\n')
 fprintf('<PMM kick\n');
 
 % turns PMM kick on
-pmm_strength = 0.265;
-[~, ~, ~, LPolyB] = sirius_si_pmm_kick(pmm_strength);
+[~, ~, ~, LPolyB] = sirius_si_pmm_kick(p.si_pmm_strength);
 si = sets_pmm(si, si_pmm_idx, 1.0, LPolyB);
 
 % transports bunch from injection point to PMM and plots bunch right after PMM kick
@@ -240,6 +239,7 @@ if plot_flag
     %yaxis([3*ymin,ymax]);
     %plot(s, 1000*y');
     %xlabel('s / m'); ylabel('ry / mm'); title(['Vertical trajectories: ', ptitle]);
+    drawnow;
 end
 
 [xr,xc] = find(xlost);
@@ -284,3 +284,4 @@ if ~isempty(accept) && ~isempty(twiss)
     figure(handle); plot(1e3*rx,1e3*px, 'r');
 end
 figure(handle); xlabel('rx / mm'); ylabel('px / mrad'); title(ptitle);
+drawnow;
