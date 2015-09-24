@@ -115,10 +115,10 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 100;
-AD.DeltaRFChro         = linspace(-100,100,11);
+AD.DeltaRFDisp         = 1000;
+AD.DeltaRFChro         = linspace(-500,500,11);
 
-AD.TuneDelay           = 0;
+AD.TuneDelay           = 2;
 AD.ATModel             = 'sirius_si_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
@@ -156,10 +156,10 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 100;
-AD.DeltaRFChro         = linspace(-100,100,11);
+AD.DeltaRFDisp         = 1000;
+AD.DeltaRFChro         = linspace(-500,500,11);
 
-AD.TuneDelay           = 0;
+AD.TuneDelay           = 2;
 AD.ATModel             = 'sirius_si_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
@@ -197,10 +197,10 @@ sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
 
 AD.Circumference       = findspos(THERING,length(THERING)+1);
 AD.HarmonicNumber      = 864;
-AD.DeltaRFDisp         = 100;
-AD.DeltaRFChro         = linspace(-100,100,11);
+AD.DeltaRFDisp         = 1000;
+AD.DeltaRFChro         = linspace(-500,500,11);
 
-AD.TuneDelay           = 0;
+AD.TuneDelay           = 2;
 AD.ATModel             = 'sirius_si_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');

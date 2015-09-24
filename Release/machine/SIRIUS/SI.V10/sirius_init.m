@@ -859,7 +859,7 @@ AO.qf4_fam.Setpoint.DeltaRespMat = 0.5;
 %% sextupoles
 
 AO.sda.FamilyName = 'sda';
-AO.sda.MemberOf    = {'PlotFamily'; 'sda'; 'SEXT'; 'Magnet';};
+AO.sda.MemberOf    = {'PlotFamily'; 'sda'; 'SEXT'; 'Magnet'; 'Chromaticity Corrector'};
 AO.sda.DeviceList  = getDeviceList(10, 2);
 AO.sda.ElementList = (1:size(AO.sda.DeviceList,1))';
 AO.sda.Status      = ones(size(AO.sda.DeviceList,1),1);
@@ -887,7 +887,7 @@ AO.sda.Setpoint.Tolerance     = 0.2;
 AO.sda.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sfa.FamilyName = 'sfa';
-AO.sfa.MemberOf    = {'PlotFamily'; 'sfa'; 'SEXT'; 'Magnet';};
+AO.sfa.MemberOf    = {'PlotFamily'; 'sfa'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sfa.DeviceList  = getDeviceList(10, 2);
 AO.sfa.ElementList = (1:size(AO.sfa.DeviceList,1))';
 AO.sfa.Status      = ones(size(AO.sfa.DeviceList,1),1);
@@ -916,7 +916,7 @@ AO.sfa.Setpoint.Tolerance     = 0.2;
 AO.sfa.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sd1j.FamilyName = 'sd1j';
-AO.sd1j.MemberOf    = {'PlotFamily'; 'sd1j'; 'SEXT'; 'Magnet';};
+AO.sd1j.MemberOf    = {'PlotFamily'; 'sd1j'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sd1j.DeviceList  = getDeviceList(10,2);
 AO.sd1j.ElementList = (1:size(AO.sd1j.DeviceList,1))';
 AO.sd1j.Status      = ones(size(AO.sd1j.DeviceList,1),1);
@@ -945,7 +945,7 @@ AO.sd1j.Setpoint.Tolerance     = 0.2;
 AO.sd1j.Setpoint.DeltaRespMat  = 0.5;
 
 AO.sf1j.FamilyName = 'sf1j';
-AO.sf1j.MemberOf    = {'PlotFamily'; 'sf1j'; 'SEXT'; 'Magnet';};
+AO.sf1j.MemberOf    = {'PlotFamily'; 'sf1j'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sf1j.DeviceList  = getDeviceList(10,2);
 AO.sf1j.ElementList = (1:size(AO.sf1j.DeviceList,1))';
 AO.sf1j.Status      = ones(size(AO.sf1j.DeviceList,1),1);
@@ -974,7 +974,7 @@ AO.sf1j.Setpoint.Tolerance     = 0.2;
 AO.sf1j.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sd2j.FamilyName = 'sd2j';
-AO.sd2j.MemberOf    = {'PlotFamily'; 'sd2j'; 'SEXT'; 'Magnet';};
+AO.sd2j.MemberOf    = {'PlotFamily'; 'sd2j'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sd2j.DeviceList  = getDeviceList(10,2);
 AO.sd2j.ElementList = (1:size(AO.sd2j.DeviceList,1))';
 AO.sd2j.Status      = ones(size(AO.sd2j.DeviceList,1),1);
@@ -1003,7 +1003,7 @@ AO.sd2j.Setpoint.Tolerance     = 0.2;
 AO.sd2j.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sd3j.FamilyName = 'sd3j';
-AO.sd3j.MemberOf    = {'PlotFamily'; 'sd3j'; 'SEXT'; 'Magnet';};
+AO.sd3j.MemberOf    = {'PlotFamily'; 'sd3j'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sd3j.DeviceList  = getDeviceList(10,2);
 AO.sd3j.ElementList = (1:size(AO.sd3j.DeviceList,1))';
 AO.sd3j.Status      = ones(size(AO.sd3j.DeviceList,1),1);
@@ -1032,7 +1032,7 @@ AO.sd3j.Setpoint.Tolerance     = 0.2;
 AO.sd3j.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sf2j.FamilyName = 'sf2j';
-AO.sf2j.MemberOf    = {'PlotFamily'; 'sf2j'; 'SEXT'; 'Magnet';};
+AO.sf2j.MemberOf    = {'PlotFamily'; 'sf2j'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sf2j.DeviceList  = getDeviceList(10,2);
 AO.sf2j.ElementList = (1:size(AO.sf2j.DeviceList,1))';
 AO.sf2j.Status      = ones(size(AO.sf2j.DeviceList,1),1);
@@ -1061,7 +1061,7 @@ AO.sf2j.Setpoint.Tolerance     = 0.2;
 AO.sf2j.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sd1k.FamilyName = 'sd1k';
-AO.sd1k.MemberOf    = {'PlotFamily'; 'sd1k'; 'SEXT'; 'Magnet';};
+AO.sd1k.MemberOf    = {'PlotFamily'; 'sd1k'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sd1k.DeviceList  = getDeviceList(10,2);
 AO.sd1k.ElementList = (1:size(AO.sd1k.DeviceList,1))';
 AO.sd1k.Status      = ones(size(AO.sd1k.DeviceList,1),1);
@@ -1090,7 +1090,7 @@ AO.sd1k.Setpoint.Tolerance     = 0.2;
 AO.sd1k.Setpoint.DeltaRespMat  = 0.5;
 
 AO.sf1k.FamilyName = 'sf1k';
-AO.sf1k.MemberOf    = {'PlotFamily'; 'sf1k'; 'SEXT'; 'Magnet';};
+AO.sf1k.MemberOf    = {'PlotFamily'; 'sf1k'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sf1k.DeviceList  = getDeviceList(10,2);
 AO.sf1k.ElementList = (1:size(AO.sf1k.DeviceList,1))';
 AO.sf1k.Status      = ones(size(AO.sf1k.DeviceList,1),1);
@@ -1119,7 +1119,7 @@ AO.sf1k.Setpoint.Tolerance     = 0.2;
 AO.sf1k.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sd2k.FamilyName = 'sd2k';
-AO.sd2k.MemberOf    = {'PlotFamily'; 'sd2k'; 'SEXT'; 'Magnet';};
+AO.sd2k.MemberOf    = {'PlotFamily'; 'sd2k'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sd2k.DeviceList  = getDeviceList(10,2);
 AO.sd2k.ElementList = (1:size(AO.sd2k.DeviceList,1))';
 AO.sd2k.Status      = ones(size(AO.sd2k.DeviceList,1),1);
@@ -1148,7 +1148,7 @@ AO.sd2k.Setpoint.Tolerance     = 0.2;
 AO.sd2k.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sd3k.FamilyName = 'sd3k';
-AO.sd3k.MemberOf    = {'PlotFamily'; 'sd3k'; 'SEXT'; 'Magnet';};
+AO.sd3k.MemberOf    = {'PlotFamily'; 'sd3k'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sd3k.DeviceList  = getDeviceList(10,2);
 AO.sd3k.ElementList = (1:size(AO.sd3k.DeviceList,1))';
 AO.sd3k.Status      = ones(size(AO.sd3k.DeviceList,1),1);
@@ -1177,7 +1177,7 @@ AO.sd3k.Setpoint.Tolerance     = 0.2;
 AO.sd3k.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sf2k.FamilyName = 'sf2k';
-AO.sf2k.MemberOf    = {'PlotFamily'; 'sf2k'; 'SEXT'; 'Magnet';};
+AO.sf2k.MemberOf    = {'PlotFamily'; 'sf2k'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sf2k.DeviceList  = getDeviceList(10,2);
 AO.sf2k.ElementList = (1:size(AO.sf2k.DeviceList,1))';
 AO.sf2k.Status      = ones(size(AO.sf2k.DeviceList,1),1);
@@ -1206,7 +1206,7 @@ AO.sf2k.Setpoint.Tolerance     = 0.2;
 AO.sf2k.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sfb.FamilyName = 'sfb';
-AO.sfb.MemberOf    = {'PlotFamily'; 'sfb'; 'SEXT'; 'Magnet';};
+AO.sfb.MemberOf    = {'PlotFamily'; 'sfb'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sfb.DeviceList  = getDeviceList(10,2);
 AO.sfb.ElementList = (1:size(AO.sfb.DeviceList,1))';
 AO.sfb.Status      = ones(size(AO.sfb.DeviceList,1),1);
@@ -1235,7 +1235,7 @@ AO.sfb.Setpoint.Tolerance     = 0.2;
 AO.sfb.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.sdb.FamilyName = 'sdb';
-AO.sdb.MemberOf    = {'PlotFamily'; 'sdb'; 'SEXT'; 'Magnet';};
+AO.sdb.MemberOf    = {'PlotFamily'; 'sdb'; 'SEXT'; 'Magnet';'Chromaticity Corrector'};
 AO.sdb.DeviceList  = getDeviceList(10,2);
 AO.sdb.ElementList = (1:size(AO.sdb.DeviceList,1))';
 AO.sdb.Status      = ones(size(AO.sdb.DeviceList,1),1);
