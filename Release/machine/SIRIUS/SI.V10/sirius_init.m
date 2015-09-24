@@ -1468,14 +1468,14 @@ AO.TUNE.Status = [1; 1; 0];
 AO.TUNE.CommonNames = ['TuneX'; 'TuneY'; 'TuneS'];
 
 AO.TUNE.Monitor.MemberOf   = {'TUNE'};
+AO.TUNE.Monitor.ChannelNames = sirius_si_getname(AO.TUNE.FamilyName, 'Monitor');
 AO.TUNE.Monitor.Mode = 'Simulator'; 
 AO.TUNE.Monitor.DataType = 'Scalar';
 AO.TUNE.Monitor.HW2PhysicsParams = 1;
 AO.TUNE.Monitor.Physics2HWParams = 1;
 AO.TUNE.Monitor.Units        = 'Hardware';
-AO.TUNE.Monitor.HWUnits      = 'kHz';
+AO.TUNE.Monitor.HWUnits      = 'Tune';
 AO.TUNE.Monitor.PhysicsUnits = 'Tune';
-AO.TUNE.Monitor.SpecialFunctionGet = @bfreq2tune;
 
 
 %%%%%%%%%%
