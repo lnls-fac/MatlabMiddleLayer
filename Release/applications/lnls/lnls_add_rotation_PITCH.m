@@ -3,7 +3,7 @@ function new_ring = lnls_add_rotation_PITCH(errors, indices, old_ring)
 new_ring = old_ring;
 
 for i=1:size(indices,1)
-    ang = -errors(i);
+    ang = -errors(i); %positive angle follows right hand convention 
 %     if size(indices,2) ~= 1
 %         disp('ok');
 %     end
@@ -11,10 +11,11 @@ for i=1:size(indices,1)
     for j=1:size(indices,2)
         idx = indices(i,j);
         if (j == 1)
-            new_ring{idx}.T1 = new_ring{idx}.T1 + [0 0 -(len/2)*ang ang 0 0];
+            old_ang = new_ring{idx}.T1(4);
+            new_ring{idx}.T1 = new_ring{idx}.T1 + [0, 0, -(len/2)*ang, ang, 0, 0];
         end
-        if (j == size(indices,2))
-            new_ring{idx}.T2 = new_ring{idx}.T2 - [0 0 -(len/2)*ang ang 0 0];
+        if (j == size(indices,2)) % the last term compensates the path length difference introduced by this artifice:
+            new_ring{idx}.T2 = new_ring{idx}.T2 + [0, 0, -(len/2)*ang, -ang, 0, -(len/2)*((ang+old_ang)^2-old_ang^2)];
         end
     end
 end
