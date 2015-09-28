@@ -52,6 +52,8 @@ if AD.SetMultipolesErrors
     sirius_init_multipoles_errors;
 end
 
+sirius_set_delays('AT')
+
 % Set the model energy
 setenergymodel(AD.Energy);
 % Cavity and radiation
@@ -118,7 +120,6 @@ AD.HarmonicNumber      = 864;
 AD.DeltaRFDisp         = 1000;
 AD.DeltaRFChro         = linspace(-500,500,11);
 
-AD.TuneDelay           = 2;
 AD.ATModel             = 'sirius_si_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
@@ -131,7 +132,6 @@ AD.AveragePressure     = 1.333e-9; % [mbar]
 
 % 2015-09-18 Luana
 AD.SetMultipolesErrors = false;
-AD.SIRIUSParams        = sirius_params;
 
 setad(AD);
 switch2sim;
@@ -159,7 +159,6 @@ AD.HarmonicNumber      = 864;
 AD.DeltaRFDisp         = 1000;
 AD.DeltaRFChro         = linspace(-500,500,11);
 
-AD.TuneDelay           = 2;
 AD.ATModel             = 'sirius_si_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
@@ -172,7 +171,6 @@ AD.AveragePressure     = 1.333e-9; % [mbar]
 
 % 2015-09-18 Luana
 AD.SetMultipolesErrors = false;
-AD.SIRIUSParams        = sirius_params;
 
 setad(AD);
 switch2sim;
@@ -200,7 +198,6 @@ AD.HarmonicNumber      = 864;
 AD.DeltaRFDisp         = 1000;
 AD.DeltaRFChro         = linspace(-500,500,11);
 
-AD.TuneDelay           = 2;
 AD.ATModel             = 'sirius_si_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
@@ -213,7 +210,6 @@ AD.AveragePressure     = 1.333e-9; % [mbar]
 
 % 2015-09-18 Luana
 AD.SetMultipolesErrors = false;
-AD.SIRIUSParams        = sirius_params;
 
 setad(AD);
 switch2sim;
