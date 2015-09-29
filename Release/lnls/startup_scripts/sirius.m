@@ -73,7 +73,7 @@ end
 if strcmpi(default_link, 'LABCA')
     % Luana 2015-08-25
     setpathsirius('SIRIUS', default_version, 'LABCA');
-    lcaSetTimeout(.005);
+    lcaSetTimeout(.01);
 else
     setpathsirius('SIRIUS', default_version, 'NONE');
 end

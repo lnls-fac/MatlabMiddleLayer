@@ -94,7 +94,15 @@ ElementsIndex = dev2elem(Family,DeviceList);
  
 if any(strcmpi(Field, {'Setpoint','Monitor'}))
     Brho = getbrho(Energy);
-    if any(strcmpi(Family, findmemberof('COR'))) || any(strcmpi(Family, findmemberof('KICKER')))
+    if any(strcmpi(Family, findmemberof('HCM'))) || any(strcmpi(Family, findmemberof('KICKER')))
+        ExcData = getfamilydata(Family, 'ExcitationCurves');
+        Amps=zeros(size(k,1),1);
+        for i=1:length(ElementsIndex)
+            idx = ElementsIndex(i);
+            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), - k(i) * Brho);
+        end
+ 
+    elseif any(strcmpi(Family, findmemberof('VCM'))) 
         ExcData = getfamilydata(Family, 'ExcitationCurves');
         Amps=zeros(size(k,1),1);
         for i=1:length(ElementsIndex)

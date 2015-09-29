@@ -908,19 +908,23 @@ else
             %AM = AM + 1e-3*randn(length(AM),1);
 
         elseif strcmpi(AT.ATType, 'BEND')
-            % BEND
-            for i = 1:length(ATIndexList)
-                
-                % AM(i,1) = THERING{ATIndexList(i)}.BendingAngle;
-                
-                % For split dipoles, Bending angles should be added;
-                % X. Resende @ LNLS, 09-09-22
-                AM(i,1) = 0; 
-                for j = 1:size(AT.ATIndex, 2)
-                    AM(i,1) = AM(i,1) + THERING{AT.ATIndex(i,j)}.BendingAngle;
-                end;
-                
+            % 2015-09-29 Luana
+            if strcmpi(UnitsFlag, 'Physics') 
+                fprintf('\n   WARNING: Get bend in physics units not implemented yet!\n');
             end
+            AM = NaN * ones(length(ATIndexList),1);
+%             % BEND
+%             for i = 1:length(ATIndexList)
+%                 
+%                 % AM(i,1) = THERING{ATIndexList(i)}.BendingAngle;
+%                 
+%                 % For split dipoles, Bending angles should be added;
+%                 % X. Resende @ LNLS, 09-09-22
+%                 AM(i,1) = 0; 
+%                 for j = 1:size(AT.ATIndex, 2)
+%                     AM(i,1) = AM(i,1) + THERING{AT.ATIndex(i,j)}.BendingAngle;
+%                 end;   
+%            end
             % Add noise
             %AM = AM + 1e-3*randn(length(AM),1);
 

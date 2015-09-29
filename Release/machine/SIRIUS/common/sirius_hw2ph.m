@@ -18,7 +18,6 @@ function k = sirius_hw2ph(Family, Field, Amps, DeviceList, Energy)
 %     For dipole:      K = B / Brho
 %     For quadrupole:  K = B'/ Brho
 %     For sextupole:   K = B"/ Brho
-%     For corrector:   K = BL/ Brho
 %
 %  See also lnls1_ph2hw, hw2physics, physics2hw
 %
@@ -92,7 +91,15 @@ ElementsIndex = dev2elem(Family,DeviceList);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if any(strcmpi(Field, {'Setpoint','Monitor'}))
     Brho = getbrho(Energy);
-    if any(strcmpi(Family, findmemberof('COR'))) || any(strcmpi(Family, findmemberof('KICKER')))
+    if any(strcmpi(Family, findmemberof('HCM'))) || any(strcmpi(Family, findmemberof('KICKER')))
+        ExcData = getfamilydata(Family, 'ExcitationCurves');
+        k=zeros(size(Amps,1),1);
+        for i=1:length(ElementsIndex)
+            idx = ElementsIndex(i);
+            k(i) = - interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho);
+        end
+   
+    elseif any(strcmpi(Family, findmemberof('VCM'))) 
         ExcData = getfamilydata(Family, 'ExcitationCurves');
         k=zeros(size(Amps,1),1);
         for i=1:length(ElementsIndex)
