@@ -1,4 +1,4 @@
-function sirius_plot_twiss(maquina,tipo,save_fig)
+function sirius_plot_twiss(maquina,junto,save_fig)
 %Funcao que faz o grafico dos parametros de twiss
 % Antes de executar esse script e necessario rodar o camando
 % sirius('versao') para carregar os caminhos no matlab
@@ -6,8 +6,8 @@ function sirius_plot_twiss(maquina,tipo,save_fig)
 %   maquina - string indicando a maquina que deseja fazer os grafico, pode
 %    ser 'si' para o Anel de armazenamento, 'bo' para o booster e 'tb' ou
 %    'ts' para as linhas de trasnporte linac-booster ou booster-anel.
-%   tipo - fazer o grafico de todas as funcoes de twiss juntas (0) ou
-%   separadas (1). O Default e fazer tudo junto.
+%   junto - fazer o grafico de todas as funcoes de twiss juntas, true, ou
+%   separadas, false. O Default e fazer tudo junto.
 %   save_fig - flag que indica o desejo de salvar a figure sempre em
 %   formato svg.
 %Para utilizar o script e necessario rodas ANTES um comamndo carregando a
@@ -20,7 +20,7 @@ ByCl = [1 0 0];
 BxCl = [0 0 0.8];
 DxCl = [0 0.8 0];
 
-if ~exist('tipo', 'var'), tipo = 0; end
+if ~exist('junto', 'var'), junto = 1; end
 if ~exist('maquina', 'var'), maquina = 'si'; end
 if ~exist('save_fig','var'), save_fig = false; end
 
@@ -37,6 +37,7 @@ switch lower(maquina)
         mib = findcells(THERING,'FamName','mib');
         ini=1;
         fim=mib(1);
+        sym = 20;
     case 'bo'
         [THERING titulo]=sirius_bo_lattice;
         titulo=regexprep(titulo,'_','-');
@@ -47,7 +48,8 @@ switch lower(maquina)
         %Define inicio e fim para o grafico (5 periodos)
         mqf = findcells(THERING,'FamName','qf');
         ini=1;
-        fim=mqf(10);
+        fim=mqf(40);
+        sym = 5;
     case 'tb'
         [THERING titulo Twiss0]=sirius_tb_lattice;
         titulo=regexprep(titulo,'_','-');
@@ -56,6 +58,7 @@ switch lower(maquina)
         %Define inicio e fim para o grafico (linha de transporte completa)
         ini=1;
         fim=length(twiss_tb);
+        sym = 1;
         %Redefine a estrutura de twiss
         twiss.pos=cat(1,twiss_tb.SPos);
         beta=cat(1,twiss_tb.beta);
@@ -71,6 +74,7 @@ switch lower(maquina)
         %Define inicio e fim para o grafico (linha de transporte completa)
         ini=1;
         fim=length(twiss_ts);
+        sym = 1;
         %Redefine a estrutura de twiss
         twiss.pos=cat(1,twiss_ts.SPos);
         beta=cat(1,twiss_ts.beta);
@@ -83,8 +87,8 @@ switch lower(maquina)
         %break;
 end
 
-if ~tipo
-    figure1=figure('Color',[1 1 1],'Position', [1 1 1000 500]);
+if junto
+    f1=figure('Color',[1 1 1],'Position', [1 1 1000 500]);
     ax1 = axes('FontSize',FnSz);
     xlabel({'s [m]'},'FontSize',FnSz);
     ylabel({'\beta [m]'},'FontSize',FnSz);
@@ -183,10 +187,10 @@ else
     xlimit=[0 twiss.pos(fim)];
 
     %Create Figure
-    figure1 = figure('Color',[1 1 1],'Position', [1 1 900 650]);
+    f1 = figure('Color',[1 1 1],'Position', [1 1 900 650]);
     
     %Grafico dispersao horizontal
-    axes('Units','pixels','Position',[70 380 780 230],'FontSize',FnSz);
+    axes('Units','pixels','Position',[70 365 780 245],'XTickLabel',{},'FontSize',FnSz);
     title(['Twiss functions - ' titulo], 'FontWeight','bold');
     hold all;
     plot(twiss.pos(ini:fim),100*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
@@ -197,23 +201,13 @@ else
     box on;
     
     %Grafico rede magnetica
-    axes('Units','pixels','Position',[70 70 780 50]);
-    if strcmp(maquina,'si')
-        lnls_drawlattice(THERING,20,0,true,1,true);
-        xlim(xlimit);
-        axis off;
-    elseif strcmp(maquina,'bo')
-        lnls_drawlattice(THERING,10,0,true,1,true);
-        xlim(xlimit);
-        axis off;
-    else
-        lnls_drawlattice(THERING,1,0,true,1,true);
-        xlim(xlimit);
-        axis off;
-    end
+    axes('Units','pixels','Position',[70 315 780 50]);
+    lnls_drawlattice(THERING,sym,0,true,1,true);
+    xlim(xlimit);
+    axis off;
     
     %Grafico funcoes betatron
-    axes('Units','pixels','Position',[70 130 780 230],'FontSize',FnSz);
+    axes('Units','pixels','Position',[70 70 780 245],'FontSize',FnSz);
     hold all;
     xlim(xlimit);
     plot(twiss.pos(ini:fim),twiss.betax(ini:fim),'LineWidth',LnWd,'Color',BxCl);
@@ -231,8 +225,8 @@ if save_fig
     %    print('-dpdf',[maquina 'twiss.pdf']);
     %else
     %    print('-dpng',[maquina 'twiss.png']);
-    plot2svg([maquina '_twiss.svg'],figure1);
-    saveas(figure1, [maquina '_twiss']);
+    plot2svg([maquina '_twiss.svg'],f1);
+    saveas(f1, [maquina '_twiss']);
 end
 
 end
