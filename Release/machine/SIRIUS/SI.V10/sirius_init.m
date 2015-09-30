@@ -1294,7 +1294,7 @@ AO.chs.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.chs.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.chs.Setpoint.Range        = [-10 10];
 AO.chs.Setpoint.Tolerance    = 0.00001;
-AO.chs.Setpoint.DeltaRespMat = 50e-6; 
+AO.chs.Setpoint.DeltaRespMat = 5e-4; 
 
 % cvs
 AO.cvs.FamilyName  = 'cvs';
@@ -1324,7 +1324,7 @@ AO.cvs.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.cvs.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.cvs.Setpoint.Range        = [-10 10];
 AO.cvs.Setpoint.Tolerance    = 0.00001;
-AO.cvs.Setpoint.DeltaRespMat = 50e-6; 
+AO.cvs.Setpoint.DeltaRespMat = 5e-4; 
 
 % chf
 AO.chf.FamilyName  = 'chf';
@@ -1354,7 +1354,7 @@ AO.chf.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.chf.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.chf.Setpoint.Range        = [-10 10];
 AO.chf.Setpoint.Tolerance    = 0.00001;
-AO.chf.Setpoint.DeltaRespMat = 50e-6; 
+AO.chf.Setpoint.DeltaRespMat = 5e-4; 
 
 % cvf
 AO.cvf.FamilyName  = 'cvf';
@@ -1384,7 +1384,7 @@ AO.cvf.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.cvf.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.cvf.Setpoint.Range        = [-10 10];
 AO.cvf.Setpoint.Tolerance    = 0.00001;
-AO.cvf.Setpoint.DeltaRespMat = 50e-6; 
+AO.cvf.Setpoint.DeltaRespMat = 5e-4; 
 
 % qs
 AO.qs.FamilyName  = 'qs';
@@ -1414,7 +1414,7 @@ AO.qs.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.qs.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.qs.Setpoint.Range        = [-10 10];
 AO.qs.Setpoint.Tolerance    = 0.00001;
-AO.qs.Setpoint.DeltaRespMat = 50e-6; 
+AO.qs.Setpoint.DeltaRespMat = 5e-4; 
 
 % bpmx
 AO.bpmx.FamilyName  = 'bpmx';

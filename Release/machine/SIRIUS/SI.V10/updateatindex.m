@@ -424,7 +424,7 @@ end
 try
     % cvs
     AO.cvs.AT.ATType = 'VCM';
-    AO.cvs.AT.ATIndex = family_data.chs.ATIndex;
+    AO.cvs.AT.ATIndex = family_data.cvs.ATIndex;
     AO.cvs.Position   = findspos(THERING, AO.cvs.AT.ATIndex(:,1))';   
 catch
     warning('cvs family not found in the model.');

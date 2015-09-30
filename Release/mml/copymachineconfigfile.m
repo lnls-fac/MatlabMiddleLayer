@@ -43,7 +43,7 @@ if strcmpi(ToFileName, 'Golden')
     % Get the production file name (full path)
     % AD.OpsData.LatticeFile could have the full path else default to AD.Directory.OpsData
     FileName = getfamilydata('OpsData','LatticeFile');
-    [DirectoryName, FileName, Ext, VerNumber] = fileparts(FileName);
+    [DirectoryName, FileName, Ext] = fileparts(FileName);
     if isempty(DirectoryName)
         DirectoryName = getfamilydata('Directory', 'OpsData');
     end
