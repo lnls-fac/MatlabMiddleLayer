@@ -52,7 +52,3 @@ for i=1:nr_mach
         machine{i}  = lnls_add_multipoles(machine{i}, Bn_norm, An_norm, main_monomial, r0, idx);
     end
 end
-
-
-
-
