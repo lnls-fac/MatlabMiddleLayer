@@ -157,8 +157,8 @@ ax_e = axes('Parent',f1,'Units','pixels','Position',[924,60,350,350],...
             'FontSize',16,'xGrid','on','yGrid','on');
 ylabel(ax_e,'\nu_y'); xlabel(ax_e,'\nu_x');
 hold(ax_e,'all');  box(ax_e,'on');
-lim_x = floor(tunes(1)) + [-0.05,0.55];
-lim_y = floor(tunes(2)) + [-0.05,0.55];
+lim_x = floor(tunes(1)*2)/2 + [-0.05,0.55];
+lim_y = floor(tunes(2)*2)/2 + [-0.05,0.55];
 for i=rot90(resons,2)
     reson(i,1,[lim_x,lim_y],ax_e);
 end
