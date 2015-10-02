@@ -93,8 +93,9 @@ L185 = drift('l185', 0.1850,'DriftPass');
 L200 = drift('l200', 0.2000,'DriftPass');
 L230 = drift('l230', 0.2300,'DriftPass');
 L240 = drift('l240', 0.2400,'DriftPass');
+L229 = drift('l229', 0.2290,'DriftPass');
 L275 = drift('l275', 0.2750,'DriftPass');
-L300 = drift('l300', 0.3000,'DriftPass');
+L260 = drift('l260', 0.2600,'DriftPass');
 L304 = drift('l304', 0.3040,'DriftPass');
 L340 = drift('l340', 0.3400,'DriftPass');
 L460 = drift('l460', 0.4600,'DriftPass');
@@ -216,16 +217,16 @@ M1B = [GIR,L170,GIR,QDB1,L150,SDB,L240,QFB,L150,SFB,L050,CF,L035,QDB2,L140,BPM,R
 M2B = fliplr(M1B);                                                                                  % low beta xxM2 girder
 IDB = [L500,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,L500];                    % low beta ID straight section
 C1A = [GIR,L610,GIR,SD1J,L170,QF1,L135,BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L185];    % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C2A = [GIR,L460,GIR,SD3J,L170,QF3,L230,SF2J,L127,BPM,L133,QF4,GIR,L533,GIR,CV,L105,BPM,RBPM,L100];  % arc sector in between B2-BC (high beta odd-numbered straight sections)
+C2A = [GIR,L460,GIR,SD3J,L170,QF3,L230,SF2J,L260,QF4,GIR,L533,GIR,CV,L105,BPM,RBPM,L100];  % arc sector in between B2-BC (high beta odd-numbered straight sections)
 C3A = [GIR,L776,GIR,BPM,RBPM,L112,QF4,L083,CF,L077,SF2K,L230,QF3,L170,SD3K,GIR,L275,GIR,BPM,L185];  % arc sector in between BC-B2 (high beta odd-numbered straight sections)
 C4A = [GIR,L340,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L610,GIR];              % arc sector in between B2-B1 (high beta odd-numbered straight sections)
 C1B = [GIR,L610,GIR,SD1K,L170,QF1,L135, BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L185];    % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C2B = [GIR,L460,GIR,SD3K,L170,QF3,L230,SF2K,L127,BPM,L133,QF4,GIR,L533,GIR,CV,L105,BPM,RBPM,L100];  % arc sector in between B2-BC (low beta even-numbered straight sections)
+C2B = [GIR,L460,GIR,SD3K,L170,QF3,L230,SF2K,L260,QF4,GIR,L533,GIR,CV,L105,BPM,RBPM,L100];  % arc sector in between B2-BC (low beta even-numbered straight sections)
 C3B = [GIR,L776,GIR,BPM,RBPM,L112,QF4,L083,CF,L077,SF2J,L230,QF3,L170,SD3J,GIR,L275,GIR,BPM,L185];  % arc sector in between BC-B2 (low beta even-numbered straight sections)
 C4B = [GIR,L340,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L610,GIR];              % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
-C2A_DCCT = [GIR,L460,GIR,SD3J,L170,QF3,L230,SF2J,L127,BPM,L133,QF4,GIR,L304,DCCT1,L304,GIR,CV,L180,BPM,RBPM,L100];  % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
-C2B_DCCT = [GIR,L460,GIR,SD3K,L170,QF3,L230,SF2K,L127,BPM,L133,QF4,GIR,L304,DCCT2,L304,GIR,CV,L180,BPM,RBPM,L100];  % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
+C2A_DCCT = [GIR,L460,GIR,SD3J,L170,QF3,L230,SF2J,L260,QF4,GIR,L304,DCCT1,L229,GIR,CV,L105,BPM,RBPM,L100];  % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
+C2B_DCCT = [GIR,L460,GIR,SD3K,L170,QF3,L230,SF2K,L260,QF4,GIR,L304,DCCT2,L229,GIR,CV,L105,BPM,RBPM,L100];  % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
 
 %% GIRDERS
 

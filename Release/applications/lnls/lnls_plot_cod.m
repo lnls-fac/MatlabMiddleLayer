@@ -41,7 +41,7 @@ codpy = zeros(length(machine), length(machine{1}));
 
 try
     fam_data = sirius_si_family_data(machine{1});
-    ch = 'chs';cv = 'cvs';
+    ch = 'ch';cv = 'cv';
 catch
     fam_data = sirius_bo_family_data(machine{1});
     ch = 'ch';cv = 'cv';
