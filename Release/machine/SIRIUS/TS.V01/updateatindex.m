@@ -21,7 +21,7 @@ AO = getao;
 
 try
     % BEND
-    AO.bend.AT.ATType = 'bend';
+    AO.bend.AT.ATType = 'BEND';
     AO.bend.AT.ATIndex = buildatindex(AO.bend.FamilyName, Indices.bend);
     AO.bend.Position = findspos(THERING, AO.bend.AT.ATIndex(:,1+floor(size(AO.bend.AT.ATIndex,2)/2)))';
       

@@ -536,6 +536,7 @@ else
 
         % For split magnet reduce the get to the first magnet in the split
         % If K*Leff (not K) is being varied then use Nsplits as a multiplier
+        Nsplits = 1;
         if size(AT.ATIndex,2) > 1
             Nsplits = ones(size(AT.ATIndex));
             Nsplits(find(isnan(AT.ATIndex)))=0;
@@ -837,13 +838,8 @@ else
         
         % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType,{'BendPS'}))
-            for i = 1:length(ATIndexList)
-                AM(i,1) = 0; 
-                for j = 1:size(AT.ATIndex, 2)
-                    AM(i,1) = AM(i,1) + THERING{AT.ATIndex(i,j)}.BendingAngle;
-                end
-                AM(i,1) = AM(i,1)/2.0;
-            end
+           % Booster Bend Power Supply
+           AM = getpvmodel(AT.ATMagnet, Field, DeviceList, 'Hardware');
             
         % needs to implement Gap/Field/Phase changes in AT model!!!!
         
@@ -909,22 +905,10 @@ else
 
         elseif strcmpi(AT.ATType, 'BEND')
             % 2015-09-29 Luana
-            if strcmpi(UnitsFlag, 'Physics') 
-                fprintf('\n   WARNING: Get bend in physics units not implemented yet!\n');
+            % BEND
+            for i = 1:length(ATIndexList)
+                AM(i,1) = THERING{ATIndexList(i)}.Energy/1e9;
             end
-            AM = NaN * ones(length(ATIndexList),1);
-%             % BEND
-%             for i = 1:length(ATIndexList)
-%                 
-%                 % AM(i,1) = THERING{ATIndexList(i)}.BendingAngle;
-%                 
-%                 % For split dipoles, Bending angles should be added;
-%                 % X. Resende @ LNLS, 09-09-22
-%                 AM(i,1) = 0; 
-%                 for j = 1:size(AT.ATIndex, 2)
-%                     AM(i,1) = AM(i,1) + THERING{AT.ATIndex(i,j)}.BendingAngle;
-%                 end;   
-%            end
             % Add noise
             %AM = AM + 1e-3*randn(length(AM),1);
 
@@ -1103,25 +1087,25 @@ else
         elseif strcmpi(AT.ATType, 'Septum')
             % Septum
 
-            SeptumField = zeros(size(AT.ATIndex, 1), 1);
-            for i = 1:size(AT.ATIndex, 1)
-                SeptumLength = 0;
-                BendingAngle = 0; 
-                for j = 1:Nsplit
-                    SeptumLength = SeptumLength + THERING{AT.ATIndex(i,j)}.Length;
-                    BendingAngle = BendingAngle + THERING{AT.ATIndex(i,j)}.BendingAngle;
-                end
-                SeptumField(i) = BendingAngle/SeptumLength;
-            end
-
-	    AM = zeros(size(AT.ATIndex,1),1);	
+            AM = zeros(size(AT.ATIndex,1),1);	
             for i = 1:size(AT.ATIndex, 1)               
                 AM(i,1) = 0; 
                 for j = 1:size(AT.ATIndex, 2)
-                    AM(i,1) = AM(i,1) + SeptumField(i) + THERING{AT.ATIndex(i,j)}.NPB(1);
+                    AM(i,1) = AM(i,1) + THERING{AT.ATIndex(i,j)}.NPB(1)*THERING{AT.ATIndex(i,j)}.Length;
                 end               
             end
+            
+            BendingAngle = zeros(size(AT.ATIndex, 1), 1);
+            SeptumLength = zeros(size(AT.ATIndex, 1), 1);
+            for i = 1:size(AT.ATIndex, 1)
+                for j = 1:Nsplits
+                    SeptumLength(i) = SeptumLength(i) + THERING{AT.ATIndex(i,j)}.Length;
+                    BendingAngle(i) = BendingAngle(i) + THERING{AT.ATIndex(i,j)}.BendingAngle;
+                end
+                AM(i) = AM(i) + BendingAngle(i);
+            end
 
+            
         elseif strcmpi(AT.ATType, 'null')
             % JR default do-nothing behaviour
             AM = NaN;

@@ -135,18 +135,13 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         end
 
     elseif any(strcmpi(Family, findmemberof('SEPTUM')))
-        EffLength = getleff(Family, DeviceList); 
         ExcData = getfamilydata(Family, 'ExcitationCurves');
         k=zeros(size(Amps,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
+            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho) ;
         end
-            
-    elseif any(strcmpi(Family, {'TUNE'}))
-        [Tune, tout, DataTime, ErrorFlag] = lnls1_freq2tune(Family, Field, Amps, DeviceList);
-        k = Tune;
-    
+              
     else
         k = Amps;
     end

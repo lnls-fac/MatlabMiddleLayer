@@ -15,12 +15,15 @@ if size(AM,1) ~= size(DeviceList,1)
     end
 end
 
-PowerSupplies = getfamilydata(Family, 'PowerSupplies');
+PowerSupplies = findmemberof('BendPS');
 bend_a = PowerSupplies(1,:);
 bend_b = PowerSupplies(2,:);
 
-setpv(bend_a, Field, AM/2.0);
-setpv(bend_b, Field, AM/2.0);
+ChannelNamesA = family2channel(bend_a, Field);
+ChannelNamesB = family2channel(bend_b, Field);
+
+setpv(ChannelNamesA, AM);
+setpv(ChannelNamesB, AM);
 
 if ~isempty(WaitFlag) && WaitFlag>0,  pause(WaitFlag); end
 

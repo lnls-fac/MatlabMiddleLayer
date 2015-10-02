@@ -94,7 +94,8 @@ end
 
 
 if isempty(Family)
-    Family = 'b1';
+    BendFamilies = findmemberof('BEND');
+    Family = BendFamilies(1,:);
 end
 if isempty(Field)
     Field = 'Setpoint';

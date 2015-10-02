@@ -66,18 +66,22 @@ if nargin < 2
     FileName = getfamilydata('OpsData','LOCOFile');
 end
 
+BPMxFamily = gethbpmfamily;
+BPMyFamily = getvbpmfamily;
+HCMFamily = gethcmfamily; 
+VCMFamily = getvcmfamily; 
 
 % Device list
-bpmxDeviceList = family2dev('bpmx');
-bpmxDeviceListTotal = family2dev('bpmx',0);
+BPMxDeviceList = family2dev(BPMxFamily);
+BPMxDeviceListTotal = family2dev(BPMxFamily,0);
 
-bpmyDeviceList = family2dev('bpmy');
-bpmyDeviceListTotal = family2dev('bpmy',0);
+BPMyDeviceList = family2dev(BPMyFamily);
+BPMyDeviceListTotal = family2dev(BPMyFamily,0);
 
-chsDeviceList = family2dev('chs');
-chsDeviceListTotal = family2dev('chs',0);
-cvsDeviceList = family2dev('cvs');
-cvsDeviceListTotal = family2dev('cvs',0);
+HCMDeviceList = family2dev(HCMFamily);
+HCMDeviceListTotal = family2dev(HCMFamily,0);
+VCMDeviceList = family2dev(VCMFamily);
+VCMDeviceListTotal = family2dev(VCMFamily,0);
 
 
 if any(strcmpi(CommandInput, 'Nominal'))
@@ -87,17 +91,17 @@ if any(strcmpi(CommandInput, 'Nominal'))
     AO = getao;
 
     % Zero or one the gains and rolls
-    AO.bpmx.Gain = ones(size(bpmxDeviceListTotal,1),1);
-    AO.bpmy.Gain = ones(size(bpmyDeviceListTotal,1),1);
-    AO.bpmx.Roll = zeros(size(bpmxDeviceListTotal,1),1);
-    AO.bpmy.Roll = zeros(size(bpmyDeviceListTotal,1),1);
-    AO.bpmx.Crunch = zeros(size(bpmxDeviceListTotal,1),1);
-    AO.bpmy.Crunch = zeros(size(bpmyDeviceListTotal,1),1);
+    AO.(BPMxFamily).Gain = ones(size(BPMxDeviceListTotal,1),1);
+    AO.(BPMyFamily).Gain = ones(size(BPMyDeviceListTotal,1),1);
+    AO.(BPMxFamily).Roll = zeros(size(BPMxDeviceListTotal,1),1);
+    AO.(BPMyFamily).Roll = zeros(size(BPMyDeviceListTotal,1),1);
+    AO.(BPMxFamily).Crunch = zeros(size(BPMxDeviceListTotal,1),1);
+    AO.(BPMyFamily).Crunch = zeros(size(BPMyDeviceListTotal,1),1);
 
-    AO.chs.Gain = ones(size(chsDeviceListTotal,1),1);
-    AO.cvs.Gain = ones(size(cvsDeviceListTotal,1),1);
-    AO.chs.Roll = zeros(size(chsDeviceListTotal,1),1);
-    AO.cvs.Roll = zeros(size(cvsDeviceListTotal,1),1);
+    AO.(HCMFamily).Gain = ones(size(HCMDeviceListTotal,1),1);
+    AO.(VCMFamily).Gain = ones(size(VCMDeviceListTotal,1),1);
+    AO.(HCMFamily).Roll = zeros(size(HCMDeviceListTotal,1),1);
+    AO.(VCMFamily).Roll = zeros(size(VCMDeviceListTotal,1),1);
 
     % Magnet gains set to unity (rolls are set in the AT model)
     mlist = findmemberof('QUAD');
@@ -118,18 +122,18 @@ if any(strcmpi(CommandInput, 'Nominal'))
 
 
     % Set the roll, crunch to the AT model to be used by getpvmodel, setpvmodel, etc
-    setatfield('bpmx', 'GCR', [AO.bpmx.Gain AO.bpmy.Gain AO.bpmx.Crunch AO.bpmx.Roll], bpmxDeviceListTotal);
+    setatfield(BPMxFamily, 'GCR', [AO.(BPMxFamily).Gain AO.(BPMyFamily).Gain AO.(BPMxFamily).Crunch AO.(BPMxFamily).Roll], BPMxDeviceListTotal);
 
     % Set the gains to the AT model to be used by getpvmodel, setpvmodel, etc
     % Make sure the Roll field is 1x2 even for single plane correctors
 
     % First set the cross planes to zero
-    setatfield('chs', 'Roll', 0*AO.chs.Roll, chsDeviceListTotal, 1, 2);
-    setatfield('cvs', 'Roll', 0*AO.cvs.Roll, cvsDeviceListTotal, 1, 1);
+    setatfield(HCMFamily, 'Roll', 0*AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 2);
+    setatfield(VCMFamily, 'Roll', 0*AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 1);
 
     % Then set the roll field
-    setatfield('chs', 'Roll', AO.chs.Roll, chsDeviceListTotal, 1, 1);
-    setatfield('cvs', 'Roll', AO.cvs.Roll, cvsDeviceListTotal, 1, 2);
+    setatfield(HCMFamily, 'Roll', AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 1);
+    setatfield(VCMFamily, 'Roll', AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 2);
 
     setao(AO);
 
@@ -157,34 +161,34 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
 
 
     % Get the device list from the LOCO file
-    bpmxDeviceList = LocoMeasData.HBPM.DeviceList;
-    bpmyDeviceList = LocoMeasData.VBPM.DeviceList;
-    chsDeviceList  = LocoMeasData.chs.DeviceList;
-    cvsDeviceList  = LocoMeasData.cvs.DeviceList;
+    BPMxDeviceList = LocoMeasData.HBPM.DeviceList;
+    BPMyDeviceList = LocoMeasData.VBPM.DeviceList;
+    HCMDeviceList  = LocoMeasData.HCM.DeviceList;
+    VCMDeviceList  = LocoMeasData.VCM.DeviceList;
 
 
     % Should get the device list from the LOCO file???
     % RemoveBPMDeviceList = [3 11; 3 12; 10 11; 10 12];
     RemoveBPMDeviceList = [];
-    i = findrowindex(RemoveBPMDeviceList, bpmyDeviceList);
-    bpmxDeviceList(i,:) = [];
-    bpmyDeviceList(i,:) = [];
+    i = findrowindex(RemoveBPMDeviceList, BPMyDeviceList);
+    BPMxDeviceList(i,:) = [];
+    BPMyDeviceList(i,:) = [];
 
 
     % Get the full list
-    i = findrowindex(bpmxDeviceList, bpmxDeviceListTotal);
-    Xgain = getgain('bpmx', bpmxDeviceListTotal);
-    Ygain = getgain('bpmy', bpmyDeviceListTotal);
+    i = findrowindex(BPMxDeviceList, BPMxDeviceListTotal);
+    Xgain = getgain(BPMxFamily, BPMxDeviceListTotal);
+    Ygain = getgain(BPMyFamily, BPMyDeviceListTotal);
 
     % Change to Gain, Roll, Crunch system
     for j = 1:length(BPMData(end).HBPMGain)
         MLOCO = [BPMData(end).HBPMGain(j)     BPMData(end).HBPMCoupling(j)
             BPMData(end).VBPMCoupling(j) BPMData(end).VBPMGain(j) ];
 
-        [AO.bpmx.Gain(i(j),:), AO.bpmy.Gain(i(j),:), AO.bpmx.Crunch(i(j),:), AO.bpmx.Roll(i(j),:)] = loco2gcr(MLOCO);
+        [AO.(BPMxFamily).Gain(i(j),:), AO.(BPMyFamily).Gain(i(j),:), AO.(BPMxFamily).Crunch(i(j),:), AO.(BPMxFamily).Roll(i(j),:)] = loco2gcr(MLOCO);
     end
-    AO.bpmy.Roll   = AO.bpmx.Roll;
-    AO.bpmy.Crunch = AO.bpmx.Crunch;
+    AO.(BPMyFamily).Roll   = AO.(BPMxFamily).Roll;
+    AO.(BPMyFamily).Crunch = AO.(BPMxFamily).Crunch;
 
 
     %%%%%%%%%%%%%%
@@ -192,50 +196,50 @@ elseif any(strcmpi(CommandInput, 'SetGains'))
     %%%%%%%%%%%%%%
 
     % Kick strength (LOCO is in milliradian)
-    % LOCO is run with the original gain in hw2physics (stored in LocoMeasData.cvsGain/LocoMeasData.chsGain).
+    % LOCO is run with the original gain in hw2physics (stored in LocoMeasData.VCMGain/LocoMeasData.HCMGain).
     % The new gain must combine the new CM gain and the one used in buildlocoinput.
     % hw2physics:  Rad = G * amps   (original)
     % LOCO gain:   Gloco = KickNew/KickStart
     % New hw2physics gain: Gloco * G
 
-    % chs
-    i = findrowindex(chsDeviceList, chsDeviceListTotal);
+    % HCM
+    i = findrowindex(HCMDeviceList, HCMDeviceListTotal);
 
-    chsGainOldLOCO = LocoMeasData.chsGain .* cos(LocoMeasData.chsRoll);
+    HCMGainOldLOCO = LocoMeasData.HCMGain .* cos(LocoMeasData.HCMRoll);
 
-    chsGainLOCO     = chsGainOldLOCO .* CMData(end).chsKicks ./ CMData(1).chsKicks;
-    chsCouplingLOCO = CMData(end).chsCoupling;
+    HCMGainLOCO     = HCMGainOldLOCO .* CMData(end).HCMKicks ./ CMData(1).HCMKicks;
+    HCMCouplingLOCO = CMData(end).HCMCoupling;
 
-    %AO.chs.Roll(i) = atan2(-chsCouplingLOCO, chsGainLOCO);
-    AO.chs.Roll(i) = atan(chsCouplingLOCO ./ abs(chsGainLOCO));
-    AO.chs.Gain(i) = sign(chsGainLOCO) .* sqrt(chsCouplingLOCO.^2 + chsGainLOCO.^2);
+    %AO.HCM.Roll(i) = atan2(-HCMCouplingLOCO, HCMGainLOCO);
+    AO.HCM.Roll(i) = atan(HCMCouplingLOCO ./ abs(HCMGainLOCO));
+    AO.HCM.Gain(i) = sign(HCMGainLOCO) .* sqrt(HCMCouplingLOCO.^2 + HCMGainLOCO.^2);
 
 
-    % cvs
-    i = findrowindex(cvsDeviceList, cvsDeviceListTotal);
+    % VCM
+    i = findrowindex(VCMDeviceList, VCMDeviceListTotal);
 
-    cvsGainOldLOCO = LocoMeasData.cvsGain .* cos(LocoMeasData.cvsRoll);
+    VCMGainOldLOCO = LocoMeasData.VCMGain .* cos(LocoMeasData.VCMRoll);
 
-    cvsGainLOCO     = cvsGainOldLOCO .* CMData(end).cvsKicks ./ CMData(1).cvsKicks;
-    cvsCouplingLOCO = CMData(end).cvsCoupling;
+    VCMGainLOCO     = VCMGainOldLOCO .* CMData(end).VCMKicks ./ CMData(1).VCMKicks;
+    VCMCouplingLOCO = CMData(end).VCMCoupling;
 
-    %AO.cvs.Roll(i) = atan2(-cvsCouplingLOCO, cvsGainLOCO);
-    AO.cvs.Roll(i) = atan(-cvsCouplingLOCO ./ abs(cvsGainLOCO));
-    AO.cvs.Gain(i) = sign(cvsGainLOCO) .* sqrt(cvsCouplingLOCO.^2 + cvsGainLOCO.^2);
+    %AO.VCM.Roll(i) = atan2(-VCMCouplingLOCO, VCMGainLOCO);
+    AO.VCM.Roll(i) = atan(-VCMCouplingLOCO ./ abs(VCMGainLOCO));
+    AO.VCM.Gain(i) = sign(VCMGainLOCO) .* sqrt(VCMCouplingLOCO.^2 + VCMGainLOCO.^2);
    
     % Set the roll, crunch to the AT model to be used by getpvmodel, setpvmodel, etc
-    setatfield('bpmx', 'GCR', [AO.bpmx.Gain AO.bpmy.Gain AO.bpmx.Crunch AO.bpmx.Roll], bpmxDeviceListTotal);
+    setatfield(BPMxFamily, 'GCR', [AO.(BPMxFamily).Gain AO.(BPMyFamily).Gain AO.(BPMxFamily).Crunch AO.(BPMxFamily).Roll], BPMxDeviceListTotal);
 
     % Set the gains to the AT model to be used by getpvmodel, setpvmodel, etc
     % Make sure the Roll field is 1x2 even for single plane correctors
 
     % First set the cross planes to zero
-    setatfield('chs', 'Roll', 0*AO.chs.Roll, chsDeviceListTotal, 1, 2);
-    setatfield('cvs', 'Roll', 0*AO.cvs.Roll, cvsDeviceListTotal, 1, 1);
+    setatfield(HCMFamily, 'Roll', 0*AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 2);
+    setatfield(VCMFamily, 'Roll', 0*AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 1);
 
     % Then set the roll field
-    setatfield('chs', 'Roll', AO.chs.Roll, chsDeviceListTotal, 1, 1);
-    setatfield('cvs', 'Roll', AO.cvs.Roll, cvsDeviceListTotal, 1, 2);
+    setatfield(HCMFamily, 'Roll', AO.(HCMFamily).Roll, HCMDeviceListTotal, 1, 1);
+    setatfield(VCMFamily, 'Roll', AO.(VCMFamily).Roll, VCMDeviceListTotal, 1, 2);
 
 
     % Should set the magnet rolls in the AT model???
@@ -311,7 +315,8 @@ elseif any(strcmpi(CommandInput, 'CorrectCoupling'))
 %     setpv(MachineConfig.SkewQuad.Setpoint);
 
     % Apply the negative of the fit in hardware units
-    SkewQuadhw = physics2hw('SkewQuad', 'Setpoint', -Skewfit);
+    SkewQuadFamily = findmemberof('SkewQuad');
+    SkewQuadhw = physics2hw(SkewQuadFamily, 'Setpoint', -Skewfit);
 
     stepsp('SkewQuad', SkewQuadhw);
 
