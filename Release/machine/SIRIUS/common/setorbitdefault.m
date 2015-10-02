@@ -36,9 +36,11 @@ if isempty(DisplayFlag)
     DisplayFlag = 'Display';
 end
 
+HCMFamily = gethcmfamily; 
+VCMFamily = getvcmfamily; 
 
 % Get BPM and CM structures
-CM  = {getsp('chs','struct'),getsp('cvs','struct')};
+CM  = {getsp(HCMFamily,'struct'),getsp(VCMFamily,'struct')};
 BPM = {getx('struct'), gety('struct')};
 
 

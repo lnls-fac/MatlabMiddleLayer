@@ -1,22 +1,23 @@
-function Amps = gev2bend(varargin)
-%GEV2BEND - Compute the energy based on the ramp tables
-% Bend = gev2bend(Family, Field, GeV, DeviceList, BranchFlag)
+function GeV = bend2gev(varargin)
+%BEND2GEV - Compute the energy based on the ramp tables
+% GeV = bend2gev(Family, Field, Amps, DeviceList, BranchFlag)
 %
 %  INPUTS
 %  1. Bend - Bend magnet family {Optional}
 %  2. Field - Field {Optional}
-%  3. GeV - Electron beam energy [GeV]
+%  3. Amps - Bend magnet current
 %  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}
 %  5. BranchFlag - 1 -> Lower branch
 %                  2 -> Upper branch {Default}
 %
 %  OUTPUTS
-%  1. Bend - Bend magnet current [Amps]
+%  1. GeV - Electron beam energy [GeV]
 %
-%  See also bend2gev, getenergy
+%  See also gev2bend, getenergy
 
 %  Written by Greg Portmann
-
+%             Ximenes Resende
+%  2012-07-06 'bo' changed to 'b1' - Afonso 
 
 global THERING
 
@@ -25,9 +26,10 @@ const = lnls_constants;
 % Default
 Family = '';
 Field = '';
-GeV = [];
+Amps = [];
 DeviceList = [];
 BranchFlag = [];
+
 ModeFlag = '';  % model, online, manual
 UnitsFlag = ''; % hardware, physics
 for i = length(varargin):-1:1
@@ -40,7 +42,7 @@ for i = length(varargin):-1:1
     elseif strcmpi(varargin{i},'numeric')
         varargin(i) = [];
     elseif strcmpi(varargin{i},'physics')
-        UnitsFlag = varargin{i};
+        UnitsFlag = 'Physics';
         varargin(i) = [];
     elseif strcmpi(varargin{i},'hardware')
         UnitsFlag = varargin{i};
@@ -63,7 +65,7 @@ if length(varargin) >= 1
         Family = varargin{1};
         varargin(1) = [];
     else
-        GeV = varargin{1};
+        Amps = varargin{1};
         varargin(1) = [];
         if length(varargin) >= 1
             DeviceList = varargin{1};
@@ -80,7 +82,7 @@ if length(varargin) >= 1 && ischar(varargin{1})
     varargin(1) = [];
 end
 if length(varargin) >= 1
-    GeV = varargin{1};
+    Amps = varargin{1};
     varargin(1) = [];
 end
 if length(varargin) >= 1
@@ -94,30 +96,19 @@ end
 
 
 if isempty(Family)
-    Family = 'b';
+    BendFamilies = findmemberof('BEND');
+    Family = BendFamilies(1,:);
 end
+if isempty(ModeFlag)
+    ModeFlag = getmode(Family);
+end
+
 if isempty(Field)
     Field = 'Setpoint';
 end
-
-if isempty(UnitsFlag)
-    UnitsFlag = getunits(Family);
-end
-
-if isempty(GeV)
-    if isempty(ModeFlag)
-        ModeFlag = getmode(Family);
-    end
-    if strcmpi(ModeFlag,'simulator') || strcmpi(ModeFlag,'model')
-        GeV = getenergymodel;
-    else
-        error('GeV input required');
-    end
-end
-
 if isempty(DeviceList)
     DeviceList = family2dev(Family);
-    if all(size(GeV)==[1 1])
+    if all(size(Amps)==[1 1]) || isempty(Amps)
         DeviceList = DeviceList(1,:);
     end
 end
@@ -144,12 +135,29 @@ else
     end
 end
 
-% Ximenes Resende - 09-09-23
-% This may be called by getpvmodel with 'BranchFlag'=1.37. In this case GeV is a vector with bending angles of dipoles.
-if BranchFlag == getenergymodel, GeV = BranchFlag; end
+
+if isempty(Amps)
+    if strcmpi(ModeFlag,'simulator') || strcmpi(ModeFlag,'model')
+        % The model energy is used only if Amps is empty
+        GeV = getenergymodel;
+        return;
+    else 
+        Amps = getpv(Family, Field, [1 1], 'Hardware', ModeFlag);
+        UnitsFlag = 'UnitsFlag';
+    end
+end
+
+if size(Amps,1) == 1 && size(DeviceList,1) > 1
+    Amps = ones(size(DeviceList,1),1) * Amps;
+end
 
 % End of input checking
-% Machine dependant stuff below
+% Machine dependent stuff below
+
+% Amps should be in hardware units
+if strcmpi(UnitsFlag,'Physics')
+    Amps = physics2hw(Family, 'Setpoint', Amps, DeviceList);
+end
 
 ElementsIndex = dev2elem(Family,DeviceList);
 ATIndex       = family2atindex(Family, DeviceList);
@@ -162,13 +170,9 @@ for i = 1:size(ATIndex,1)
 end
 
 ExcData = getfamilydata(Family, 'ExcitationCurves');
-Amps = zeros(size(ElementsIndex,1),1);
+GeV = zeros(size(Amps,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
-    IntegratedField = - GeV * (DipoleDeflectionAngles(i) / (const.c/1e9));
-    Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), IntegratedField);
+    IntegratedField = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i));
+    GeV(i) = ((const.c/1e9) / DipoleDeflectionAngles(i)) * (IntegratedField);
 end
-
-
-
-

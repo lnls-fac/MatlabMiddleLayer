@@ -141,13 +141,16 @@ switch lower(Family)
         
     case 'dcct'
         ChannelName = 'BODI-CURRENT';
-               
+            
+    case 'tune'
+        ChannelName = ['BODI-TUNEH'; 'BODI-TUNEV'; 'BODI-TUNES'];
+        
     otherwise
         error('Don''t know how to make the channel name for family %s', Family);
         
 end
 
-if any(strcmpi(Family, {'bpmx', 'bpmy', 'DCCT'}))
+if any(strcmpi(Family, {'bpmx', 'bpmy', 'DCCT', 'tune'}))
     
 else
     if strcmpi(Field, 'Monitor')

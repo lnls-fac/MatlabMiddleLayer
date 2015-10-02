@@ -1,9 +1,9 @@
 function QMS = quadcenterinit(QuadFamily, QuadDev, QuadPlane)
 %QUADCENTERINIT - MML BBA routine. (not implemented for LNLS yet).
 %
-%História
+%Histï¿½ria
 %
-%2010-09-13: código fonte com comentários iniciais.
+%2010-09-13: cï¿½digo fonte com comentï¿½rios iniciais.
 
 % QMS = quadcenterinit(Family, Device, QuadPlane)
 %
@@ -90,7 +90,7 @@ QMS.CorrectOrbit = 'no';  % 'yes' or 'no';
 
 
 % Note: DataDirectory must start with the root of the tree and end with filesep or be '.'
-QMSDirectory = [getfamilydata('Directory','DataRoot') 'QMS\'];
+QMSDirectory = [getfamilydata('Directory','DataRoot') 'QMS' filesep];
 if isempty(QMSDirectory)
     QMS.DataDirectory = '.';
 else
@@ -105,10 +105,15 @@ QMS.CreatedBy = 'quadcenterinit';
 QMS.NumberOfPoints = 5;
 QMS.ModulationMethod = 'bipolar';
 
+BPMxFamily = gethbpmfamily;
+BPMyFamily = getvbpmfamily;
+HCMFamily = gethcmfamily; 
+VCMFamily = getvcmfamily; 
+
 if QMS.QuadPlane==1        
     % Default families
-    QMS.BPMFamily  = 'BPMx';
-    QMS.CorrFamily = 'HCM';
+    QMS.BPMFamily  = BPMxFamily;
+    QMS.CorrFamily = HCMFamily;
     
     % Quad delta
     %SPquad = maxsp(QMS.QuadFamily, QMS.QuadDev);
@@ -130,7 +135,7 @@ if QMS.QuadPlane==1
     
     % Corrector delta
     QMS.CorrDelta = (1/m(j)) * .5e-3;   % .5 mm change
-    if strcmpi(getunits('HCM'), 'Hardware')
+    if strcmpi(getunits(HCMFamily), 'Hardware')
         QMS.CorrDelta = physics2hw('HCM', 'Setpoint', QMS.CorrDelta, QMS.CorrDevList);
     end
     
@@ -144,8 +149,8 @@ if QMS.QuadPlane==1
 
 elseif QMS.QuadPlane==2       
     % Default families
-    QMS.BPMFamily  = 'BPMy';
-    QMS.CorrFamily = 'VCM';
+    QMS.BPMFamily  = BPMyFamily;
+    QMS.CorrFamily = VCMFamily;
     
     % Quad delta
     %SPquad = maxsp(QMS.QuadFamily, QMS.QuadDev);
@@ -167,8 +172,8 @@ elseif QMS.QuadPlane==2
     
     % Corrector delta
     QMS.CorrDelta = (1/m(j)) * .5e-3;  % .5 mm change
-    if strcmpi(getunits('VCM'), 'Hardware')
-        QMS.CorrDelta = physics2hw('VCM', 'Setpoint', QMS.CorrDelta, QMS.CorrDevList);
+    if strcmpi(getunits(VCMFamily), 'Hardware')
+        QMS.CorrDelta = physics2hw(VCMFamily, 'Setpoint', QMS.CorrDelta, QMS.CorrDevList);
     end
     
     % Check the phase advance between the BPM and Quad in the model

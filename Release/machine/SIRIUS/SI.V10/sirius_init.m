@@ -162,7 +162,7 @@ AO.bc.Position    = [];
 %% quadrupoles 
 
 AO.qfa.FamilyName = 'qfa';
-AO.qfa.MemberOf    = {'PlotFamily'; 'qfa'; 'QUAD'; 'Magnet';'q20';};
+AO.qfa.MemberOf    = {'PlotFamily'; 'qfa'; 'QUAD'; 'Magnet';'q20'; 'Tune Corrector'};
 AO.qfa.DeviceList  = getDeviceList(10, 2);
 AO.qfa.ElementList = (1:size(AO.qfa.DeviceList,1))';
 AO.qfa.Status      = ones(size(AO.qfa.DeviceList,1),1);
@@ -195,7 +195,7 @@ AO.qfa.Setpoint.Tolerance    = 0.2;
 AO.qfa.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qfa_shunt.FamilyName = 'qfa_shunt';
-AO.qfa_shunt.MemberOf    = {'PlotFamily'; 'qfa_shunt'; };
+AO.qfa_shunt.MemberOf    = {'PlotFamily'; 'qfa_shunt'; 'PowerSupply'};
 AO.qfa_shunt.DeviceList  = getDeviceList(10, 2);
 AO.qfa_shunt.ElementList = (1:size(AO.qfa_shunt.DeviceList,1))';
 AO.qfa_shunt.Status      = ones(size(AO.qfa_shunt.DeviceList,1),1);
@@ -217,7 +217,7 @@ AO.qfa_shunt.Setpoint.Tolerance    = 0.2;
 AO.qfa_shunt.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qfa_fam.FamilyName = 'qfa_fam';
-AO.qfa_fam.MemberOf    = {'PlotFamily'; 'qfa_fam'; };
+AO.qfa_fam.MemberOf    = {'PlotFamily'; 'qfa_fam'; 'PowerSupply'};
 AO.qfa_fam.DeviceList  = getDeviceList(10, 2);
 AO.qfa_fam.ElementList = (1:size(AO.qfa_fam.DeviceList,1))';
 AO.qfa_fam.Status      = ones(size(AO.qfa_fam.DeviceList,1),1);
@@ -239,7 +239,7 @@ AO.qfa_fam.Setpoint.Tolerance    = 0.2;
 AO.qfa_fam.Setpoint.DeltaRespMat = 0.5;
 
 AO.qdb2.FamilyName = 'qdb2';
-AO.qdb2.MemberOf    = {'PlotFamily'; 'qdb2'; 'QUAD'; 'Magnet';'q14';};
+AO.qdb2.MemberOf    = {'PlotFamily'; 'qdb2'; 'QUAD'; 'Magnet';'q14'; 'Tune Corrector'};
 AO.qdb2.DeviceList  = getDeviceList(10,2);
 AO.qdb2.ElementList = (1:size(AO.qdb2.DeviceList,1))';
 AO.qdb2.Status      = ones(size(AO.qdb2.DeviceList,1),1);
@@ -272,7 +272,7 @@ AO.qdb2.Setpoint.Tolerance    = 0.2;
 AO.qdb2.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qdb2_shunt.FamilyName = 'qdb2_shunt';
-AO.qdb2_shunt.MemberOf    = {'PlotFamily'; 'qdb2_shunt'; };
+AO.qdb2_shunt.MemberOf    = {'PlotFamily'; 'qdb2_shunt'; 'PowerSupply'};
 AO.qdb2_shunt.DeviceList  = getDeviceList(10,2);
 AO.qdb2_shunt.ElementList = (1:size(AO.qdb2_shunt.DeviceList,1))';
 AO.qdb2_shunt.Status      = ones(size(AO.qdb2_shunt.DeviceList,1),1);
@@ -294,7 +294,7 @@ AO.qdb2_shunt.Setpoint.Tolerance    = 0.2;
 AO.qdb2_shunt.Setpoint.DeltaRespMat = 0.5;
 
 AO.qdb2_fam.FamilyName = 'qdb2_fam';
-AO.qdb2_fam.MemberOf    = {'PlotFamily'; 'qdb2_fam'; };
+AO.qdb2_fam.MemberOf    = {'PlotFamily'; 'qdb2_fam'; 'PowerSupply'};
 AO.qdb2_fam.DeviceList  = getDeviceList(10,2);
 AO.qdb2_fam.ElementList = (1:size(AO.qdb2_fam.DeviceList,1))';
 AO.qdb2_fam.Status      = ones(size(AO.qdb2_fam.DeviceList,1),1);
@@ -316,7 +316,7 @@ AO.qdb2_fam.Setpoint.Tolerance    = 0.2;
 AO.qdb2_fam.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qfb.FamilyName = 'qfb';
-AO.qfb.MemberOf    = {'PlotFamily'; 'qfb'; 'QUAD'; 'Magnet';'q30';};
+AO.qfb.MemberOf    = {'PlotFamily'; 'qfb'; 'QUAD'; 'Magnet';'q30'; 'Tune Corrector'};
 AO.qfb.DeviceList  = getDeviceList(10,2);
 AO.qfb.ElementList = (1:size(AO.qfb.DeviceList,1))';
 AO.qfb.Status      = ones(size(AO.qfb.DeviceList,1),1);
@@ -349,7 +349,7 @@ AO.qfb.Setpoint.Tolerance    = 0.2;
 AO.qfb.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qfb_shunt.FamilyName = 'qfb_shunt';
-AO.qfb_shunt.MemberOf    = {'PlotFamily'; 'qfb_shunt';};
+AO.qfb_shunt.MemberOf    = {'PlotFamily'; 'qfb_shunt'; 'PowerSupply'};
 AO.qfb_shunt.DeviceList  = getDeviceList(10,2);
 AO.qfb_shunt.ElementList = (1:size(AO.qfb_shunt.DeviceList,1))';
 AO.qfb_shunt.Status      = ones(size(AO.qfb_shunt.DeviceList,1),1);
@@ -371,7 +371,7 @@ AO.qfb_shunt.Setpoint.Tolerance    = 0.2;
 AO.qfb_shunt.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qfb_fam.FamilyName = 'qfb_fam';
-AO.qfb_fam.MemberOf    = {'PlotFamily'; 'qfb_fam'; };
+AO.qfb_fam.MemberOf    = {'PlotFamily'; 'qfb_fam'; 'PowerSupply'};
 AO.qfb_fam.DeviceList  = getDeviceList(10,2);
 AO.qfb_fam.ElementList = (1:size(AO.qfb_fam.DeviceList,1))';
 AO.qfb_fam.Status      = ones(size(AO.qfb_fam.DeviceList,1),1);
@@ -393,7 +393,7 @@ AO.qfb_fam.Setpoint.Tolerance    = 0.2;
 AO.qfb_fam.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qdb1.FamilyName = 'qdb1';
-AO.qdb1.MemberOf    = {'PlotFamily'; 'qdb1'; 'QUAD'; 'Magnet';'q14';};
+AO.qdb1.MemberOf    = {'PlotFamily'; 'qdb1'; 'QUAD'; 'Magnet';'q14'; 'Tune Corrector'};
 AO.qdb1.DeviceList  = getDeviceList(10,2);
 AO.qdb1.ElementList = (1:size(AO.qdb1.DeviceList,1))';
 AO.qdb1.Status      = ones(size(AO.qdb1.DeviceList,1),1);
@@ -426,7 +426,7 @@ AO.qdb1.Setpoint.Tolerance    = 0.2;
 AO.qdb1.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qdb1_shunt.FamilyName = 'qdb1_shunt';
-AO.qdb1_shunt.MemberOf    = {'PlotFamily'; 'qdb1_shunt'; };
+AO.qdb1_shunt.MemberOf    = {'PlotFamily'; 'qdb1_shunt'; 'PowerSupply'};
 AO.qdb1_shunt.DeviceList  = getDeviceList(10,2);
 AO.qdb1_shunt.ElementList = (1:size(AO.qdb1_shunt.DeviceList,1))';
 AO.qdb1_shunt.Status      = ones(size(AO.qdb1_shunt.DeviceList,1),1);
@@ -448,7 +448,7 @@ AO.qdb1_shunt.Setpoint.Tolerance     = 0.2;
 AO.qdb1_shunt.Setpoint.DeltaRespMat  = 0.5; 
 
 AO.qdb1_fam.FamilyName = 'qdb1_fam';
-AO.qdb1_fam.MemberOf    = {'PlotFamily'; 'qdb1_fam'; };
+AO.qdb1_fam.MemberOf    = {'PlotFamily'; 'qdb1_fam'; 'PowerSupply'};
 AO.qdb1_fam.DeviceList  = getDeviceList(10,2);
 AO.qdb1_fam.ElementList = (1:size(AO.qdb1_fam.DeviceList,1))';
 AO.qdb1_fam.Status      = ones(size(AO.qdb1_fam.DeviceList,1),1);
@@ -470,7 +470,7 @@ AO.qdb1_fam.Setpoint.Tolerance    = 0.2;
 AO.qdb1_fam.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qda.FamilyName = 'qda';
-AO.qda.MemberOf    = {'PlotFamily'; 'qda'; 'QUAD'; 'Magnet';'q14';};
+AO.qda.MemberOf    = {'PlotFamily'; 'qda'; 'QUAD'; 'Magnet';'q14'; 'Tune Corrector'};
 AO.qda.DeviceList  = getDeviceList(10, 2);
 AO.qda.ElementList = (1:size(AO.qda.DeviceList,1))';
 AO.qda.Status      = ones(size(AO.qda.DeviceList,1),1);
@@ -503,7 +503,7 @@ AO.qda.Setpoint.Tolerance    = 0.2;
 AO.qda.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qda_shunt.FamilyName = 'qda_shunt';
-AO.qda_shunt.MemberOf    = {'PlotFamily'; 'qda_shunt'; };
+AO.qda_shunt.MemberOf    = {'PlotFamily'; 'qda_shunt'; 'PowerSupply'};
 AO.qda_shunt.DeviceList  = getDeviceList(10, 2);
 AO.qda_shunt.ElementList = (1:size(AO.qda_shunt.DeviceList,1))';
 AO.qda_shunt.Status      = ones(size(AO.qda_shunt.DeviceList,1),1);
@@ -525,7 +525,7 @@ AO.qda_shunt.Setpoint.Tolerance    = 0.2;
 AO.qda_shunt.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qda_fam.FamilyName = 'qda_fam';
-AO.qda_fam.MemberOf    = {'PlotFamily'; 'qda_fam'; };
+AO.qda_fam.MemberOf    = {'PlotFamily'; 'qda_fam'; 'PowerSupply'};
 AO.qda_fam.DeviceList  = getDeviceList(10, 2);
 AO.qda_fam.ElementList = (1:size(AO.qda_fam.DeviceList,1))';
 AO.qda_fam.Status      = ones(size(AO.qda_fam.DeviceList,1),1);
@@ -547,7 +547,7 @@ AO.qda_fam.Setpoint.Tolerance    = 0.2;
 AO.qda_fam.Setpoint.DeltaRespMat = 0.5;
 
 AO.qf1.FamilyName = 'qf1';
-AO.qf1.MemberOf    = {'PlotFamily'; 'qf1'; 'QUAD'; 'Magnet';'q20';};
+AO.qf1.MemberOf    = {'PlotFamily'; 'qf1'; 'QUAD'; 'Magnet';'q20'; 'Tune Corrector'};
 AO.qf1.DeviceList  = getDeviceList(10,4);
 AO.qf1.ElementList = (1:size(AO.qf1.DeviceList,1))';
 AO.qf1.Status      = ones(size(AO.qf1.DeviceList,1),1);
@@ -580,7 +580,7 @@ AO.qf1.Setpoint.Tolerance    = 0.2;
 AO.qf1.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qf1_shunt.FamilyName = 'qf1_shunt';
-AO.qf1_shunt.MemberOf    = {'PlotFamily'; 'qf1_shunt'; };
+AO.qf1_shunt.MemberOf    = {'PlotFamily'; 'qf1_shunt'; 'PowerSupply'};
 AO.qf1_shunt.DeviceList  = getDeviceList(10,4);
 AO.qf1_shunt.ElementList = (1:size(AO.qf1_shunt.DeviceList,1))';
 AO.qf1_shunt.Status      = ones(size(AO.qf1_shunt.DeviceList,1),1);
@@ -602,7 +602,7 @@ AO.qf1_shunt.Setpoint.Tolerance     = 0.2;
 AO.qf1_shunt.Setpoint.DeltaRespMat  = 0.5;
 
 AO.qf1_fam.FamilyName = 'qf1_fam';
-AO.qf1_fam.MemberOf    = {'PlotFamily'; 'qf1_fam'; };
+AO.qf1_fam.MemberOf    = {'PlotFamily'; 'qf1_fam'; 'PowerSupply'};
 AO.qf1_fam.DeviceList  = getDeviceList(10,4);
 AO.qf1_fam.ElementList = (1:size(AO.qf1_fam.DeviceList,1))';
 AO.qf1_fam.Status      = ones(size(AO.qf1_fam.DeviceList,1),1);
@@ -624,7 +624,7 @@ AO.qf1_fam.Setpoint.Tolerance    = 0.2;
 AO.qf1_fam.Setpoint.DeltaRespMat = 0.5;
 
 AO.qf2.FamilyName = 'qf2';
-AO.qf2.MemberOf    = {'PlotFamily'; 'qf2'; 'QUAD'; 'Magnet';'q20';};
+AO.qf2.MemberOf    = {'PlotFamily'; 'qf2'; 'QUAD'; 'Magnet';'q20'; 'Tune Corrector'};
 AO.qf2.DeviceList  = getDeviceList(10,4);
 AO.qf2.ElementList = (1:size(AO.qf2.DeviceList,1))';
 AO.qf2.Status      = ones(size(AO.qf2.DeviceList,1),1);
@@ -657,7 +657,7 @@ AO.qf2.Setpoint.Tolerance    = 0.2;
 AO.qf2.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qf2_shunt.FamilyName = 'qf2_shunt';
-AO.qf2_shunt.MemberOf    = {'PlotFamily'; 'qf2_shunt'; };
+AO.qf2_shunt.MemberOf    = {'PlotFamily'; 'qf2_shunt'; 'PowerSupply'};
 AO.qf2_shunt.DeviceList  = getDeviceList(10,4);
 AO.qf2_shunt.ElementList = (1:size(AO.qf2_shunt.DeviceList,1))';
 AO.qf2_shunt.Status      = ones(size(AO.qf2_shunt.DeviceList,1),1);
@@ -679,7 +679,7 @@ AO.qf2_shunt.Setpoint.Tolerance     = 0.2;
 AO.qf2_shunt.Setpoint.DeltaRespMat  = 0.5;
 
 AO.qf2_fam.FamilyName = 'qf2_fam';
-AO.qf2_fam.MemberOf    = {'PlotFamily'; 'qf2_fam'; };
+AO.qf2_fam.MemberOf    = {'PlotFamily'; 'qf2_fam'; 'PowerSupply'};
 AO.qf2_fam.DeviceList  = getDeviceList(10,4);
 AO.qf2_fam.ElementList = (1:size(AO.qf2_fam.DeviceList,1))';
 AO.qf2_fam.Status      = ones(size(AO.qf2_fam.DeviceList,1),1);
@@ -701,7 +701,7 @@ AO.qf2_fam.Setpoint.Tolerance    = 0.2;
 AO.qf2_fam.Setpoint.DeltaRespMat = 0.5;
 
 AO.qf3.FamilyName = 'qf3';
-AO.qf3.MemberOf    = {'PlotFamily'; 'qf3'; 'QUAD'; 'Magnet';'q20';};
+AO.qf3.MemberOf    = {'PlotFamily'; 'qf3'; 'QUAD'; 'Magnet';'q20'; 'Tune Corrector'};
 AO.qf3.DeviceList  = getDeviceList(10,4);
 AO.qf3.ElementList = (1:size(AO.qf3.DeviceList,1))';
 AO.qf3.Status      = ones(size(AO.qf3.DeviceList,1),1);
@@ -735,7 +735,7 @@ AO.qf3.Setpoint.DeltaRespMat = 0.5;
 
 
 AO.qf3_shunt.FamilyName = 'qf3_shunt';
-AO.qf3_shunt.MemberOf    = {'PlotFamily'; 'qf3_shunt'; };
+AO.qf3_shunt.MemberOf    = {'PlotFamily'; 'qf3_shunt'; 'PowerSupply'};
 AO.qf3_shunt.DeviceList  = getDeviceList(10,4);
 AO.qf3_shunt.ElementList = (1:size(AO.qf3_shunt.DeviceList,1))';
 AO.qf3_shunt.Status      = ones(size(AO.qf3_shunt.DeviceList,1),1);
@@ -757,7 +757,7 @@ AO.qf3_shunt.Setpoint.Tolerance     = 0.2;
 AO.qf3_shunt.Setpoint.DeltaRespMat  = 0.5;
 
 AO.qf3_fam.FamilyName = 'qf3_fam';
-AO.qf3_fam.MemberOf    = {'PlotFamily'; 'qf3_fam'; };
+AO.qf3_fam.MemberOf    = {'PlotFamily'; 'qf3_fam'; 'PowerSupply'};
 AO.qf3_fam.DeviceList  = getDeviceList(10,4);
 AO.qf3_fam.ElementList = (1:size(AO.qf3_fam.DeviceList,1))';
 AO.qf3_fam.Status      = ones(size(AO.qf3_fam.DeviceList,1),1);
@@ -779,7 +779,7 @@ AO.qf3_fam.Setpoint.Tolerance    = 0.2;
 AO.qf3_fam.Setpoint.DeltaRespMat = 0.5;
 
 AO.qf4.FamilyName = 'qf4';
-AO.qf4.MemberOf    = {'PlotFamily'; 'qf4'; 'QUAD'; 'Magnet';'q20';};
+AO.qf4.MemberOf    = {'PlotFamily'; 'qf4'; 'QUAD'; 'Magnet';'q20'; 'Tune Corrector'};
 AO.qf4.DeviceList  = getDeviceList(10,4);
 AO.qf4.ElementList = (1:size(AO.qf4.DeviceList,1))';
 AO.qf4.Status      = ones(size(AO.qf4.DeviceList,1),1);
@@ -812,7 +812,7 @@ AO.qf4.Setpoint.Tolerance    = 0.2;
 AO.qf4.Setpoint.DeltaRespMat = 0.5; 
 
 AO.qf4_shunt.FamilyName = 'qf4_shunt';
-AO.qf4_shunt.MemberOf    = {'PlotFamily'; 'qf4_shunt'; };
+AO.qf4_shunt.MemberOf    = {'PlotFamily'; 'qf4_shunt'; 'PowerSupply'};
 AO.qf4_shunt.DeviceList  = getDeviceList(10,4);
 AO.qf4_shunt.ElementList = (1:size(AO.qf4_shunt.DeviceList,1))';
 AO.qf4_shunt.Status      = ones(size(AO.qf4_shunt.DeviceList,1),1);
@@ -834,7 +834,7 @@ AO.qf4_shunt.Setpoint.Tolerance     = 0.2;
 AO.qf4_shunt.Setpoint.DeltaRespMat  = 0.5;
 
 AO.qf4_fam.FamilyName = 'qf4_fam';
-AO.qf4_fam.MemberOf    = {'PlotFamily'; 'qf4_fam';};
+AO.qf4_fam.MemberOf    = {'PlotFamily'; 'qf4_fam'; 'PowerSupply'};
 AO.qf4_fam.DeviceList  = getDeviceList(10,4);
 AO.qf4_fam.ElementList = (1:size(AO.qf4_fam.DeviceList,1))';
 AO.qf4_fam.Status      = ones(size(AO.qf4_fam.DeviceList,1),1);
@@ -1268,7 +1268,7 @@ AO.sdb.Setpoint.DeltaRespMat  = 0.5;
 
 % chs
 AO.chs.FamilyName  = 'chs';
-AO.chs.MemberOf    = {'PlotFamily'; 'COR'; 'chs'; 'Magnet';'hcm';'hcm_slow';};
+AO.chs.MemberOf    = {'PlotFamily'; 'COR'; 'chs'; 'Magnet';'hcm';'hcm_slow'};
 AO.chs.DeviceList  = getDeviceList(10, 12);
 AO.chs.ElementList = (1:size(AO.chs.DeviceList,1))';
 AO.chs.Status      = ones(size(AO.chs.DeviceList,1),1);
@@ -1298,7 +1298,7 @@ AO.chs.Setpoint.DeltaRespMat = 5e-4;
 
 % cvs
 AO.cvs.FamilyName  = 'cvs';
-AO.cvs.MemberOf    = {'PlotFamily'; 'COR'; 'cvs'; 'Magnet';'vcm';'vcm_slow';};
+AO.cvs.MemberOf    = {'PlotFamily'; 'COR'; 'cvs'; 'Magnet';'vcm';'vcm_slow'};
 AO.cvs.DeviceList  = getDeviceList(10, 12);
 AO.cvs.ElementList = (1:size(AO.cvs.DeviceList,1))';
 AO.cvs.Status      = ones(size(AO.cvs.DeviceList,1),1);
@@ -1328,7 +1328,7 @@ AO.cvs.Setpoint.DeltaRespMat = 5e-4;
 
 % chf
 AO.chf.FamilyName  = 'chf';
-AO.chf.MemberOf    = {'PlotFamily'; 'COR'; 'chf'; 'Magnet';'hcm';'hcm_fast';};
+AO.chf.MemberOf    = {'PlotFamily'; 'COR'; 'chf'; 'Magnet';'hcm';'hcm_fast'};
 AO.chf.DeviceList  = getDeviceList(10, 8);
 AO.chf.ElementList = (1:size(AO.chf.DeviceList,1))';
 AO.chf.Status      = ones(size(AO.chf.DeviceList,1),1);
@@ -1358,7 +1358,7 @@ AO.chf.Setpoint.DeltaRespMat = 5e-4;
 
 % cvf
 AO.cvf.FamilyName  = 'cvf';
-AO.cvf.MemberOf    = {'PlotFamily'; 'COR'; 'cvf'; 'Magnet';'vcm';'vcm_fast';};
+AO.cvf.MemberOf    = {'PlotFamily'; 'COR'; 'cvf'; 'Magnet';'vcm';'vcm_fast'};
 AO.cvf.DeviceList  = getDeviceList(10, 8);
 AO.cvf.ElementList = (1:size(AO.cvf.DeviceList,1))';
 AO.cvf.Status      = ones(size(AO.cvf.DeviceList,1),1);
@@ -1388,7 +1388,7 @@ AO.cvf.Setpoint.DeltaRespMat = 5e-4;
 
 % qs
 AO.qs.FamilyName  = 'qs';
-AO.qs.MemberOf    = {'PlotFamily'; 'COR'; 'qs'; 'Magnet';};
+AO.qs.MemberOf    = {'PlotFamily'; 'COR'; 'qs'; 'Magnet'; 'SkewQuad'};
 AO.qs.DeviceList  = getDeviceList(10, 8);
 AO.qs.ElementList = (1:size(AO.qs.DeviceList,1))';
 AO.qs.Status      = ones(size(AO.qs.DeviceList,1),1);
@@ -1571,8 +1571,8 @@ AO.RF.PhaseCtrl.Tolerance         = 10;    % ???
 %%%%%%%%%%%%%%
 AO.DCCT.FamilyName               = 'DCCT';
 AO.DCCT.MemberOf                 = {'Diagnostics'; 'DCCT'};
-AO.DCCT.DeviceList               = [13,1; 14, 1];
-AO.DCCT.ElementList              = [1; 2];
+AO.DCCT.DeviceList               = [13, 1]; %; 14, 1];
+AO.DCCT.ElementList              = [1];%; 2];
 AO.DCCT.Status                   = 1;
 AO.DCCT.Position                 = [];
 

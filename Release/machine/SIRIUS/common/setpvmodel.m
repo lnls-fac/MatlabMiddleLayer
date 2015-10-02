@@ -777,7 +777,9 @@ else
                     
         % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType, {'BendPS'}))
-            % ??
+            % Booster Bend Power Supply
+            NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
+            ErrorFlag = setpvmodel(AT.ATMagnet, Field, NewHardwareValue, DeviceList, 'Hardware');
             
         % needs to implement Gap/Field/Phase changes in AT model!
              
@@ -800,53 +802,59 @@ else
             end
         
         elseif strcmpi(AT.ATType, 'BEND')
-            % 2015-09-29 Luana
-            fprintf('\n   WARNING: Set bend not implemented yet. No change made in the model!\n');     
-%             % BEND
-%             % The BEND simulates very differently:
-%             % 1. The BEND radians does not change
-%             % 2. The energy comes from the hw2physics (bend2gev)
-%             % 3. All the other magnets have a "K" change
-%             % 4. The underlying assumption is that the RF cavity provides the necessary energy
-%             
-%             % Since this takes a relatively long time, only do it once.  Setting each BEND to
-%             % different setpoints will not work anyways.
-%             
-%             if isempty(NewSP_HW)
-%                 fprintf('\n   WARNING: Must set the BEND magnet in the model in hardware units\n');
-%                 fprintf('   since the BEND magnet in physics units does not usually change.\n');
-%                 fprintf('   No change made to the BEND family in the model!\n');
-%                 return
-%             end
-%             
-%             % Get the energy of the model
-%             GeVPresent = getenergy('Simulator');
-%             
-%             % Get the desired energy of the model
-%             GeVDesired = bend2gev(Family, Field, NewSP_HW(i), DeviceList(i,:));
-%             
-%             if abs(GeVPresent - GeVDesired) < 1e-9  % GeV
-%                 % No change needed
-%                 return;
-%             end
-%             
-%             % Get the present machine config in hardware units
-%             SP = getmachineconfig('Hardware', 'Simulator');
-%             
-%             % Set energy in the model
-%             setenergymodel(GeVDesired);            % Sets the model energy which is stored in AT
-%             setfamilydata(GeVDesired, 'Energy');   % Set design energy in the middle layer
-%             
-%             % Set the new "K" values (physics values)
-%             % The amperes does not change, but the "K" values do
-%             % because the energy was change between hw2physics/physics2hw calls
-%             if isfield(SP,'BEND')
-%                 SP = rmfield(SP, 'BEND');  % or anything with a BEND ATType
-%             end
-%             if isfield(SP,'BEND_Setpoint')
-%                 SP = rmfield(SP, 'BEND_Setpoint');  % or anything with a BEND ATType
-%             end
-%             setmachineconfig(SP, 'Hardware', 'Simulator');
+            % BEND
+            % The BEND simulates very differently:
+            % 1. The BEND radians does not change
+            % 2. The energy comes from the hw2physics (bend2gev)
+            % 3. All the other magnets have a "K" change
+            % 4. The underlying assumption is that the RF cavity provides the necessary energy
+            
+            % Since this takes a relatively long time, only do it once.  Setting each BEND to
+            % different setpoints will not work anyways.
+            
+            if isempty(NewSP_HW)
+                fprintf('\n   WARNING: Must set the BEND magnet in the model in hardware units\n');
+                fprintf('   since the BEND magnet in physics units does not usually change.\n');
+                fprintf('   No change made to the BEND family in the model!\n');
+                return
+            end
+            
+            % Get the energy of the model
+            GeVPresent = getenergy('Simulator');
+            
+            % Get the desired energy of the model
+            GeVDesired = bend2gev(Family, Field, NewSP_HW(i), DeviceList(i,:));
+            
+            if abs(GeVPresent - GeVDesired) < 1e-9  % GeV
+                % No change needed
+                return;
+            end
+            
+            % Get the present machine config in hardware units
+            SP = getmachineconfig('Hardware', 'Simulator');
+            
+            % Set energy in the model
+            setenergymodel(GeVDesired);            % Sets the model energy which is stored in AT
+            setfamilydata(GeVDesired, 'Energy');   % Set design energy in the middle layer
+            
+            % Set the new "K" values (physics values)
+            % The amperes does not change, but the "K" values do
+            % because the energy was change between hw2physics/physics2hw calls
+            
+            % 2015-10-01 Luana
+            Families = fieldnames(SP);
+            Bends = findmemberof('BEND');
+            PowerSupplies = findmemberof('PowerSupply');
+            for i=1:size(Families,1)
+                if any(strcmpi(Families(i,:), Bends))
+                    SP = rmfield(SP, Families(i,:));
+                end
+                if any(strcmpi(Families(i,:), PowerSupplies))
+                    SP = rmfield(SP, Families(i,:));
+                end
+            end
+            
+            setmachineconfig(SP, 'Hardware', 'Simulator');
             
         elseif strcmpi(AT.ATType, 'Roll')
             % Roll or Tilt
@@ -912,18 +920,16 @@ else
                 THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
             end
             
-            SeptumField = zeros(size(AT.ATIndex, 1), 1);
+            SeptumLength = zeros(size(AT.ATIndex, 1), 1);
+            BendingAngle = zeros(size(AT.ATIndex, 1), 1);
+            DeltaPB      = zeros(size(AT.ATIndex, 1), 1);
             for i = 1:size(AT.ATIndex, 1)
-                SeptumLength = 0;
-                BendingAngle = 0; 
                 for j = 1:Nsplit
-                    SeptumLength = SeptumLength + THERING{AT.ATIndex(i,j)}.Length;
-                    BendingAngle = BendingAngle + THERING{AT.ATIndex(i,j)}.BendingAngle;
+                    SeptumLength(i) = SeptumLength(i) + THERING{AT.ATIndex(i,j)}.Length;
+                    BendingAngle(i) = BendingAngle(i) + THERING{AT.ATIndex(i,j)}.BendingAngle;
                 end
-                SeptumField(i) = BendingAngle/SeptumLength;
+                DeltaPB(i) = (NewPhysicsValue(i) - BendingAngle(i))/SeptumLength(i);
             end
-            
-            DeltaPB = NewPhysicsValue - SeptumField;
             
             for i=1:size(DeltaPB,1)
                 for j = 1:Nsplit

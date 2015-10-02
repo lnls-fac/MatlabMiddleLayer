@@ -44,6 +44,15 @@ AD = getad;
 setmmldirectories(AD.Machine, AD.SubMachine, AD.ModeName, AD.OpsFileExtension);
 % Updates the AT indices in the MiddleLayer with the present AT lattice
 updateatindex;
+
+% 2015-10-01 Luana
+if AD.SetMultipolesErrors
+    fprintf('   Setting initial values of multipoles errors.\n');
+    sirius_init_multipoles_errors;
+end
+
+sirius_set_delays('AT')
+
 % Set the model energy
 setenergymodel(AD.Energy);
 % Cavity and radiation
@@ -109,6 +118,9 @@ AD.BeamCurrent         = 0.500; % [A]
 AD.Coupling            = 0.010;
 %AD.OpsData.PrsProfFile = 'sirius_V02_pressure_profile.txt';
 
+% 2015-10-01 Luana
+AD.SetMultipolesErrors = false;
+
 setad(AD);
 switch2sim;
 switch2hw;
@@ -133,6 +145,9 @@ AD.ATModel             = 'sirius_ts_lattice';
 AD.BeamCurrent         = 0.500; % [A]
 AD.Coupling            = 0.010;
 %AD.OpsData.PrsProfFile = 'sirius_V02_pressure_profile.txt';
+
+% 2015-10-01 Luana
+AD.SetMultipolesErrors = false;
 
 setad(AD);
 switch2sim;
