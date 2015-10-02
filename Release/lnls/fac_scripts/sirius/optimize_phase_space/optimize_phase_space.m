@@ -1,35 +1,29 @@
-clear all;
 RandStream.setGlobalStream(RandStream('mt19937ar','seed', 131071));
 % first, we load the lattice
-storage_ring_ref = sirius_si_lattice('tests');
-[~, storage_ring_ref] = setcavity('on', storage_ring_ref);
-[~, ~, ~, ~, ~, ~, storage_ring_ref] = setradiation('on', storage_ring_ref);
-% lattice_errors([pwd '/home/fac_files/data/sirius_tracy/sr/calcs/v500/ac10_5/possible_change/low_2chrom/multi_cod_tune/cod_matlab']);
-machines = load('/home/fac_files/data/sirius_tracy/sr/calcs/v500/ac10_5/possible_change/low_2chrom374/multi_cod_tune/cod_matlab/CONFIG_machines_cod_corrected.mat');
-storage_ring = machines.machine{3};
-[~, storage_ring] = setcavity('on', storage_ring);
-[~, ~, ~, ~, ~, ~, storage_ring] = setradiation('on', storage_ring);
+ring = sirius_local_lattice();
+mia = findcells(ring,'FamName','mia');
+ring = ring(1:mia(2));
 
 % now, we define which families will be used to optimize the phase space
 % and which will be used to correct chromaticity;
-opt.fam = {'sa1','sa2','sb1','sb2','sd2','sd3','sf2'};
-chr.fam = {'sd1','sf1'};
+opt.fam = {'sfa','sda','sfb','sdb','sfm','sdm','sd2j','sd3j','sf2j','sd1k','sf1k','sd2k','sd3k','sf2k'};
+chr.fam = {'sd1j','sf1j'};
 
 %what is our target chromaticity?
-chr.value = [0,0];
+chr.value = [0.5,0.5];
 
-% now we find the indexes of the elements in the ring:
+% now we find the indices of the elements in the ring:
 opt.ind = cell(1,length(opt.fam));
 opt.vec_ini = zeros(1,length(opt.fam));
 opt.size = zeros(length(opt.fam),1);
 chr.ind = cell(1,length(chr.fam));
 for ii=1:length(opt.fam)
-    opt.ind{ii} = findcells(storage_ring,'FamName',opt.fam{ii});
-    opt.vec_ini(ii) = getcellstruct(storage_ring_ref,'PolynomB',opt.ind{ii}(1),3);
+    opt.ind{ii} = findcells(ring,'FamName',opt.fam{ii});
+    opt.vec_ini(ii) = getcellstruct(ring,'PolynomB',opt.ind{ii}(1),3);
     opt.size(ii) = length(opt.ind{ii}); % get the number of elements in each family
 end
 for ii=1:length(chr.fam)
-    chr.ind{ii} = findcells(storage_ring,'FamName',chr.fam{ii});
+    chr.ind{ii} = findcells(ring,'FamName',chr.fam{ii});
 end
 opt.ind = cell2mat(opt.ind); % transform to vector;
 
@@ -47,19 +41,23 @@ opt.ind = cell2mat(opt.ind); % transform to vector;
 vec = opt.vec_ini;
  
 % what will be our error level:
-err_level = 5/100;
+err_level = 2/100;
 
 %% now we begin the optimization:
 
 % first we calculate the initial parameters 
-[res chr.val] = optimize_fun(storage_ring, storage_ring_ref, vec, opt, chr);
+[res chr.val] = optimize_fun(ring, vec, opt, chr);
 
 % and begin the main loop
 fp = fopen('solucoes.txt','w');
+figure; axes; hold('all');grid('on');
+plot(0,res,'.r');
 for ii=1:1000000
     err = lnls_generate_random_numbers(err_level, length(opt.fam),'uniform',1,0);
     newvec = vec.*(1+err);
-    [newres newval] = optimize_fun(storage_ring, storage_ring_ref, newvec, opt, chr);
+    [newres, newval,cur_ring] = optimize_fun(ring, newvec, opt, chr);
+    plot(ii,newres,'.b');
+    drawnow();
     if newres < res
         res = newres;
         vec = newvec;
