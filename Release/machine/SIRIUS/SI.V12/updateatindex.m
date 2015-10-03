@@ -413,39 +413,39 @@ catch
 end
 
 try
-    % chs
-    AO.chs.AT.ATType = 'HCM';
-    AO.chs.AT.ATIndex = family_data.chs.ATIndex;
-    AO.chs.Position   = findspos(THERING, AO.chs.AT.ATIndex(:,1))';   
+    % ch
+    AO.ch.AT.ATType = 'HCM';
+    AO.ch.AT.ATIndex = family_data.ch.ATIndex;
+    AO.ch.Position   = findspos(THERING, AO.ch.AT.ATIndex(:,1))';   
 catch
-    warning('chs family not found in the model.');
+    warning('ch family not found in the model.');
 end
 
 try
-    % cvs
-    AO.cvs.AT.ATType = 'VCM';
-    AO.cvs.AT.ATIndex = family_data.chs.ATIndex;
-    AO.cvs.Position   = findspos(THERING, AO.cvs.AT.ATIndex(:,1))';   
+    % cv
+    AO.cv.AT.ATType = 'VCM';
+    AO.cv.AT.ATIndex = family_data.cv.ATIndex;
+    AO.cv.Position   = findspos(THERING, AO.cv.AT.ATIndex(:,1))';   
 catch
-    warning('cvs family not found in the model.');
+    warning('cv family not found in the model.');
 end
 
 try
-    % chf
-    AO.chf.AT.ATType = 'HCM';
-    AO.chf.AT.ATIndex = family_data.chf.ATIndex;
-    AO.chf.Position   = findspos(THERING, AO.chf.AT.ATIndex(:,1))';   
+    % fch
+    AO.fch.AT.ATType = 'HCM';
+    AO.fch.AT.ATIndex = family_data.fch.ATIndex;
+    AO.fch.Position   = findspos(THERING, AO.fch.AT.ATIndex(:,1))';   
 catch
-    warning('chf family not found in the model.');
+    warning('fch family not found in the model.');
 end
 
 try
-    % cvf
-    AO.cvf.AT.ATType = 'VCM';
-    AO.cvf.AT.ATIndex = family_data.cvf.ATIndex;
-    AO.cvf.Position   = findspos(THERING, AO.cvf.AT.ATIndex(:,1))';   
+    % fcv
+    AO.fcv.AT.ATType = 'VCM';
+    AO.fcv.AT.ATIndex = family_data.fcv.ATIndex;
+    AO.fcv.Position   = findspos(THERING, AO.fcv.AT.ATIndex(:,1))';   
 catch
-    warning('cvf family not found in the model.');
+    warning('fcv family not found in the model.');
 end
 
 try

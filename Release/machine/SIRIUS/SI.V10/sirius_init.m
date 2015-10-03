@@ -1571,8 +1571,8 @@ AO.RF.PhaseCtrl.Tolerance         = 10;    % ???
 %%%%%%%%%%%%%%
 AO.DCCT.FamilyName               = 'DCCT';
 AO.DCCT.MemberOf                 = {'Diagnostics'; 'DCCT'};
-AO.DCCT.DeviceList               = [13, 1]; %; 14, 1];
-AO.DCCT.ElementList              = [1];%; 2];
+AO.DCCT.DeviceList               = [13, 1; 14, 1];
+AO.DCCT.ElementList              = [1; 2];
 AO.DCCT.Status                   = 1;
 AO.DCCT.Position                 = [];
 
