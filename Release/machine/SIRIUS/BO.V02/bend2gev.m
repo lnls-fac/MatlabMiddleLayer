@@ -97,7 +97,7 @@ end
 
 if isempty(Family)
     BendFamilies = findmemberof('BEND');
-    Family = BendFamilies(1,:);
+    Family = BendFamilies{1};
 end
 if isempty(ModeFlag)
     ModeFlag = getmode(Family);
@@ -162,10 +162,10 @@ end
 ElementsIndex = dev2elem(Family,DeviceList);
 ATIndex       = family2atindex(Family, DeviceList);
 
-DipoleDeflectionAngles = zeros(size(ATIndex,1),1);
+DeflectionAngle = zeros(size(ATIndex,1),1);
 for i = 1:size(ATIndex,1)
     for j = 1:size(ATIndex,2)
-        DipoleDeflectionAngles(i) = DipoleDeflectionAngles(i) + THERING{ATIndex(i,j)}.BendingAngle;
+        DeflectionAngle(i) = DeflectionAngle(i) + THERING{ATIndex(i,j)}.BendingAngle + THERING{ATIndex(i,j)}.NPB(1)*THERING{ATIndex(i,j)}.Length;
     end
 end
 
@@ -174,5 +174,5 @@ GeV = zeros(size(Amps,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
     IntegratedField = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i));
-    GeV(i) = ((const.c/1e9) / DipoleDeflectionAngles(i)) * (IntegratedField);
+    GeV(i) = ((const.c/1e9) / DeflectionAngle(i)) * (IntegratedField);
 end

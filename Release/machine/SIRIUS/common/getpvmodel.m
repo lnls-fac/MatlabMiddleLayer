@@ -906,9 +906,11 @@ else
         elseif strcmpi(AT.ATType, 'BEND')
             % 2015-09-29 Luana
             % BEND
-            for i = 1:length(ATIndexList)
-                AM(i,1) = THERING{ATIndexList(i)}.Energy/1e9;
+            AM = sirius_modelbendget(THERING, Family, Field, DeviceList); % AM in Hardware Units
+            if strcmpi(UnitsFlag, 'Physics')
+                AM = hw2physics(Family, Field, AM, DeviceList, getenergymodel);               
             end
+            
             % Add noise
             %AM = AM + 1e-3*randn(length(AM),1);
 
@@ -1131,9 +1133,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if strcmpi(UnitsFlag, 'Hardware') 
     if isfamily(Family, Field)
-        AM = physics2hw(Family, Field, AM, DeviceList, getenergymodel);
-        
-        
+        if ~ismemberof(Family, 'BEND')
+            AM = physics2hw(Family, Field, AM, DeviceList, getenergymodel);
+        end
+                
         % % 2015-09-17 Luana
         % % subtracts shunt current
         %if ~ismemberof(Family, 'Shunt') && exist('ATIndexList', 'var')
@@ -1143,7 +1146,6 @@ if strcmpi(UnitsFlag, 'Hardware')
         %        end
         %    end
         % end
-        
         
     else
         persistent WarningFlag

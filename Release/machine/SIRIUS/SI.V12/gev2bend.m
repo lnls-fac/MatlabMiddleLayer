@@ -1,24 +1,21 @@
 function Amps = gev2bend(varargin)
 %GEV2BEND - Compute the energy based on the ramp tables
-% Bend = gev2bend(Family, Field, GeV, DeviceList, BranchFlag)
+% Amps = gev2bend(Family, Field, GeV, DeviceList)
 %
 %  INPUTS
 %  1. Bend - Bend magnet family {Optional}
 %  2. Field - Field {Optional}
 %  3. GeV - Electron beam energy [GeV]
 %  4. DeviceList - Bend magnet device list to reference energy to {Default: BEND(1,1)}
-%  5. BranchFlag - 1 -> Lower branch
-%                  2 -> Upper branch {Default}
 %
 %  OUTPUTS
-%  1. Bend - Bend magnet current [Amps]
+%  1. Amps - Bend magnet current [Amps]
 %
 %  See also bend2gev, getenergy
 
 %  Written by Greg Portmann
 
-
-global THERING
+global THERING;
 
 const = lnls_constants;
 
@@ -27,9 +24,7 @@ Family = '';
 Field = '';
 GeV = [];
 DeviceList = [];
-BranchFlag = [];
 ModeFlag = '';  % model, online, manual
-UnitsFlag = ''; % hardware, physics
 for i = length(varargin):-1:1
     if isstruct(varargin{i})
         % Ignor structures
@@ -38,12 +33,6 @@ for i = length(varargin):-1:1
     elseif strcmpi(varargin{i},'struct')
         varargin(i) = [];
     elseif strcmpi(varargin{i},'numeric')
-        varargin(i) = [];
-    elseif strcmpi(varargin{i},'physics')
-        UnitsFlag = varargin{i};
-        varargin(i) = [];
-    elseif strcmpi(varargin{i},'hardware')
-        UnitsFlag = varargin{i};
         varargin(i) = [];
     elseif strcmpi(varargin{i},'simulator') || strcmpi(varargin{i},'model')
         ModeFlag = varargin{i};
@@ -69,10 +58,6 @@ if length(varargin) >= 1
             DeviceList = varargin{1};
             varargin(1) = [];
         end
-        if length(varargin) >= 1
-            BranchFlag = varargin{1};
-            varargin(1:end) = [];
-        end
     end
 end
 if length(varargin) >= 1 && ischar(varargin{1})
@@ -87,28 +72,19 @@ if length(varargin) >= 1
     DeviceList = varargin{1};
     varargin(1) = [];
 end
-if length(varargin) >= 1
-    BranchFlag = varargin{1};
-    varargin(1) = [];
-end
-
 
 if isempty(Family)
     BendFamilies = findmemberof('BEND');
-    Family = BendFamilies(1,:);
+    Family = BendFamilies{1};
 end
 if isempty(Field)
     Field = 'Setpoint';
 end
-
-if isempty(UnitsFlag)
-    UnitsFlag = getunits(Family);
+if isempty(ModeFlag)
+    ModeFlag = getmode(Family);
 end
 
 if isempty(GeV)
-    if isempty(ModeFlag)
-        ModeFlag = getmode(Family);
-    end
     if strcmpi(ModeFlag,'simulator') || strcmpi(ModeFlag,'model')
         GeV = getenergymodel;
     else
@@ -123,53 +99,65 @@ if isempty(DeviceList)
     end
 end
 
-
-% Hysteresis branch
-if isempty(BranchFlag)
-    if strcmpi(getfamilydata('HysteresisBranch'),'Lower')
-        % Lower branch
-        BranchFlag = 1;
-    else
-        % Upper branch (default)
-        BranchFlag = 2;
-    end
-else
-    if char(BranchFlag)
-        if strcmpi(BranchFlag, 'Lower')
-            % Lower branch
-            BranchFlag = 1;
-        elseif strcmpi(BranchFlag, 'Upper')
-            % Upper branch
-            BranchFlag = 2;
+if isfamily('bc')  
+    BCIndex = family2atindex('bc');
+    BCAngle = 0;
+    for i=1:size(BCIndex,1)
+        for j=1:size(BCIndex,2)
+            BCAngle = BCAngle + THERING{BCIndex(i,j)}.BendingAngle;
         end
     end
+else
+    fprintf('\n   WARNING: BC family not found in the model!\n');
+    BCAngle = 0;
 end
 
-% Ximenes Resende - 09-09-23
-% This may be called by getpvmodel with 'BranchFlag'=1.37. In this case GeV is a vector with bending angles of dipoles.
-if BranchFlag == getenergymodel, GeV = BranchFlag; end
+BendFamilies = findmemberof('BEND');
+SumIntegratedFields = 0;
 
-% End of input checking
-% Machine dependant stuff below
+for i=1:size(BendFamilies,1)
+    FamName         = BendFamilies{i};
+    ElemIndex       = family2elem(FamName);
+    ExcData         = getfamilydata(FamName, 'ExcitationCurves');    
+    
+    if strcmpi(ModeFlag,'simulator') || strcmpi(ModeFlag,'model')
+        brho = getbrho(ModeFlag);
+        IntegratedField = zeros(size(ElemIndex, 1),1);
+        ATIndex = family2atindex(FamName);
+        for j=1:length(ElemIndex)
+            for k=1:size(ATIndex,2)
+                DeflectionAngle = THERING{ATIndex(j,k)}.BendingAngle + THERING{ATIndex(j,k)}.PolynomB(1)*THERING{ATIndex(j,k)}.Length;
+                IntegratedField(j) = IntegratedField(j) + DeflectionAngle*brho;
+            end
+        end
+        
+    else
+        Current = getpv(FamName, Field, 'Hardware', ModeFlag);
+        IntegratedField = zeros(size(ElemIndex, 1),1);
+        for j=1:length(ElemIndex)
+            idx = ElemIndex(i);
+            IntegratedField(j) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Current(j));
+        end
+    end
+    
+    SumIntegratedFields = SumIntegratedFields + sum(IntegratedField);
+    if strcmpi(FamName, Family)
+        FamilyExcData = ExcData;
+        FamilyIntegratedField = IntegratedField;
+    end
+end  
+
+alpha = (2*pi - BCAngle)*(1/const.c)*(sqrt((GeV*1e9).^2 - (const.E0*1e6)^2))/ SumIntegratedFields;
 
 ElementsIndex = dev2elem(Family,DeviceList);
-ATIndex       = family2atindex(Family, DeviceList);
-
-DipoleDeflectionAngles = zeros(size(ATIndex,1),1);
-for i = 1:size(ATIndex,1)
-    for j = 1:size(ATIndex,2)
-        DipoleDeflectionAngles(i) = DipoleDeflectionAngles(i) + THERING{ATIndex(i,j)}.BendingAngle;
-    end
-end
-
-ExcData = getfamilydata(Family, 'ExcitationCurves');
+IntegratedField = alpha.*FamilyIntegratedField;
 Amps = zeros(size(ElementsIndex,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
-    IntegratedField = GeV * (DipoleDeflectionAngles(i) / (const.c/1e9));
-    Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), IntegratedField);
+    Amps(i) = interp1(FamilyExcData.data{idx}(:,2), FamilyExcData.data{idx}(:,1), IntegratedField(idx));
 end
 
+end
 
 
 

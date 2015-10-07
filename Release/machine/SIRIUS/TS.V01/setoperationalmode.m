@@ -102,8 +102,9 @@ function set_operationalmode_mode1
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TS.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TS.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M1';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;
@@ -130,8 +131,9 @@ function set_operationalmode_mode2
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TS.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TS.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M2';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;

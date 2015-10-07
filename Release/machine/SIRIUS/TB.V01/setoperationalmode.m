@@ -104,8 +104,9 @@ function set_operationalmode_mode1
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TB.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TB.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M1';
 AD.Energy              = 0.150;
 AD.InjectionEnergy     = 0.150;
@@ -132,8 +133,9 @@ function set_operationalmode_mode2
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TB.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TB.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M2';
 AD.Energy              = 0.150;
 AD.InjectionEnergy     = 0.150;
@@ -160,8 +162,9 @@ function set_operationalmode_mode3
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TB.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TB.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M3';
 AD.Energy              = 0.150;
 AD.InjectionEnergy     = 0.150;
@@ -188,8 +191,9 @@ function set_operationalmode_mode4
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TB.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TB.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M4';
 AD.Energy              = 0.150;
 AD.InjectionEnergy     = 0.150;
@@ -216,8 +220,9 @@ function set_operationalmode_mode5
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TB.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TB.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M5';
 AD.Energy              = 0.150;
 AD.InjectionEnergy     = 0.150;
@@ -244,8 +249,9 @@ function set_operationalmode_mode6
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS';  % Will already be defined if setpathmml was used
-AD.SubMachine          = 'TB.V01';  % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS';         % Will already be defined if setpathmml was used
+AD.SubMachine          = 'TB.V01';         % Will already be defined if setpathmml was used
+AD.MachineType         = 'TransportLine';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'M6';
 AD.Energy              = 0.150;
 AD.InjectionEnergy     = 0.150;
