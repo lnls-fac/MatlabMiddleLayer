@@ -9,7 +9,11 @@ cts = lnls_constants;
 L = findspos(lattice, length(lattice)+1);
 rv_freq = cts.c / L;
 idx = findcells(lattice, 'Frequency');
-h = round(lattice{idx(1)}.Frequency / rv_freq);
+if isempty(idx)
+    h = NaN;
+else
+    h = round(lattice{idx(1)}.Frequency / rv_freq);
+end
 
 energy   = lattice{1}.Energy;
 pmethods = unique(getcellstruct(lattice, 'PassMethod', 1:length(lattice)));
