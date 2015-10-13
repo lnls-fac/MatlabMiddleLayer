@@ -87,6 +87,14 @@ else
             m = m+2;
         end
         
+        for j=1:Nsplit
+            % resize PolynomB and PolynomA 
+            LenA = length(DeltaIntegratedFieldA) - length(NewRing{ATIndex(i,j)}.PolynomA);
+            NewRing{ATIndex(i,j)}.PolynomA = [NewRing{ATIndex(i,j)}.PolynomA, zeros(1,LenA)];
+            LenB = length(DeltaIntegratedFieldB) - length(NewRing{ATIndex(i,j)}.PolynomB);
+            NewRing{ATIndex(i,j)}.PolynomB = [NewRing{ATIndex(i,j)}.PolynomB, zeros(1,LenB)];     
+        end 
+
         nr_harmonics = Harmonics{idx}(length(Harmonics{idx}));
         ProfileA = zeros(Nsplit, nr_harmonics);
         ProfileB = zeros(Nsplit, nr_harmonics);
@@ -131,12 +139,11 @@ else
             else
                 DeltaPolynomB(MainHarmonic{idx}) = 0;
             end
-
-            LenA= length(NewRing{ATIndex(i,j)}.PolynomA) - length(DeltaPolynomA);
-            NewRing{ATIndex(i,j)}.PolynomA = [NewRing{ATIndex(i,j)}.PolynomA, zeros(1,-LenA)] + [DeltaPolynomA, zeros(1,LenA)];
-
-            LenB = length(NewRing{ATIndex(i,j)}.PolynomB) - length(DeltaPolynomB);
-            NewRing{ATIndex(i,j)}.PolynomB = [NewRing{ATIndex(i,j)}.PolynomB, zeros(1,-LenB)] + [DeltaPolynomB, zeros(1,LenB)];     
+            
+            LenA = length(NewRing{ATIndex(i,j)}.PolynomA) - length(DeltaPolynomA);
+            NewRing{ATIndex(i,j)}.PolynomA = NewRing{ATIndex(i,j)}.PolynomA + [DeltaPolynomA, zeros(1,LenA)];   
+            LenB = length(NewRing{ATIndex(i,j)}.PolynomB) - length(DeltaPolynomB);                  
+            NewRing{ATIndex(i,j)}.PolynomB = NewRing{ATIndex(i,j)}.PolynomB + [DeltaPolynomB, zeros(1,LenB)];          
 
             LenDiff = length(NewRing{ATIndex(i,j)}.PolynomA) - length(NewRing{ATIndex(i,j)}.PolynomB);
             if LenDiff ~= 0
