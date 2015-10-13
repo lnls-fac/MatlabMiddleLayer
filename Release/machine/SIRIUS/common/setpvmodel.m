@@ -862,7 +862,7 @@ else
                 NewSP_HW = NewSP_HW(1);
                 for k = 1:size(Dipoles,1)
                     FamName = Dipoles{k};
-                    fprintf('   Setting all magnets of family %s to %.2f Amperes\n', FamName, NewSP_HW);
+                    fprintf('   Setting all magnets of family %s to %.4f Amperes\n', FamName, NewSP_HW);
                     if SetMultipolesErrors
                         THERING = sirius_set_multipoles_errors(THERING, FamName, Field, NewSP_HW);
                     end

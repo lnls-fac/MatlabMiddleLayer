@@ -104,7 +104,7 @@ function set_operationalmode_a
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS_V10';   % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS_V12';   % Will already be defined if setpathmml was used
 AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'V10_A00';
@@ -144,7 +144,7 @@ function set_operationalmode_b
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS_V10';   % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS_V12';   % Will already be defined if setpathmml was used
 AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'V10_B00';
@@ -184,10 +184,10 @@ function set_operationalmode_c
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS.V10';   % Will already be defined if setpathmml was used
+AD.Machine             = 'SIRIUS.V12';   % Will already be defined if setpathmml was used
 AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
-AD.OperationalMode     = 'V10.C01';
+AD.OperationalMode     = 'V12.C01';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;
 AD.ModeName            = 'C';

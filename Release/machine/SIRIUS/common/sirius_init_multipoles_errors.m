@@ -17,8 +17,8 @@ end
 
 Families = getfamilylist;
 
-for i=1:size(Families, 1)
-    Family = deblank(Families(i,:));
+for l=1:size(Families, 1)
+    Family = deblank(Families(l,:));
     if ismemberof(Family, 'Magnet')
         HardwareValue = getpvmodel(Family, 'Hardware');
 
@@ -41,19 +41,45 @@ for i=1:size(Families, 1)
                 idx = ElementsIndex(i);
 
                 IntegratedFields  = interp1(Data{idx}(:,1), Data{idx}(:, 2:length(Data{idx})), HardwareValue(i));
-
-                DeltaPolynomA = zeros(1, Harmonics{idx}(length(Harmonics{idx})));
-                DeltaPolynomB = zeros(1, Harmonics{idx}(length(Harmonics{idx})));
-                j = 1;
+                IntegratedFieldB = zeros(1, Harmonics{idx}(length(Harmonics{idx})));
+                IntegratedFieldA = zeros(1, Harmonics{idx}(length(Harmonics{idx})));
+                m = 1;
                 for k=1:length(Harmonics{idx})
                     n = Harmonics{idx}(k);
-                    DeltaPolynomB(n) = IntegratedFields(j)/(EffLength(i) * Brho);
-                    DeltaPolynomA(n) = IntegratedFields(j+1)/(EffLength(i) * Brho);
-                    j = j+2;
+                    IntegratedFieldB(n) = IntegratedFields(m);
+                    IntegratedFieldA(n) = IntegratedFields(m+1);
+                    m = m+2;
+                end
+
+                nr_harmonics = Harmonics{idx}(length(Harmonics{idx}));
+                profile = zeros(Nsplit, nr_harmonics);
+                if Nsplit == 1
+                    profile(:,:) = 1;
+                else
+                    for j=1:Nsplit
+                        for n=1:nr_harmonics
+                            if isfield(THERING{ATIndex(i,j)}, 'BendingAngle')
+                                profile(j,n) = THERING{ATIndex(i,j)}.PolynomB(n)*THERING{ATIndex(i,j)}.Length + THERING{ATIndex(i,j)}.BendingAngle;
+                            else
+                                profile(j,n) = THERING{ATIndex(i,j)}.PolynomB(n)*THERING{ATIndex(i,j)}.Length;
+                            end
+                        end
+                    end
+
+                    for n=1:nr_harmonics
+                        if any(find(profile(:,n)))
+                            profile(:,n) = profile(:,n)/sum(profile(:,n));
+                        else
+                            profile(:,n) = 1/Nsplit;
+                        end
+                    end
                 end
 
                 for j=1:Nsplit
 
+                    DeltaPolynomB = profile(j,:).*IntegratedFieldB/(THERING{ATIndex(i,j)}.Length * Brho);
+                    DeltaPolynomA = profile(j,:).*IntegratedFieldA/(THERING{ATIndex(i,j)}.Length * Brho);
+                    
                     % Don't change the main harmonic value, set only the errors in PolynomA and PolynomB
                     if ExcData.skew{idx} 
                         DeltaPolynomA(MainHarmonic{idx}) = 0;
