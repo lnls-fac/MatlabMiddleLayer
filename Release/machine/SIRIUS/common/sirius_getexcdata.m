@@ -16,10 +16,10 @@ for i=1:length(CommonNames(:,1))
             if ~isempty(strfind(line, '#'))
                 if ~isempty(regexpi(line, 'main_harmonic', 'match'))
                    main_harmonic = regexpi(line, 'main_harmonic', 'split');
-                   ExcData.main_harmonic{i} = sscanf(main_harmonic{length(main_harmonic)}, '%f');
+                   ExcData.main_harmonic{i} = sscanf(main_harmonic{end}, '%f');
                 elseif ~isempty(regexpi(line, 'harmonics', 'match'))
                    harmonics = regexpi(line, 'harmonics', 'split');
-                   ExcData.harmonics{i} = sscanf(harmonics{length(harmonics)}, '%f');
+                   ExcData.harmonics{i} = sscanf(harmonics{end}, '%f');
                 elseif ~isempty(regexpi(line, 'skew', 'match')) || ~isempty(regexpi(line, 'vertical', 'match'))
                     ExcData.skew{i} = true;
                 end

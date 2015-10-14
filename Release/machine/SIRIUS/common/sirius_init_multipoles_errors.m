@@ -17,8 +17,8 @@ end
 
 Families = getfamilylist;
 
-for i=1:size(Families, 1)
-    Family = deblank(Families(i,:));
+for l=1:size(Families, 1)
+    Family = deblank(Families(l,:));
     if ismemberof(Family, 'Magnet')
         HardwareValue = getpvmodel(Family, 'Hardware');
 
@@ -40,47 +40,88 @@ for i=1:size(Families, 1)
             for i=1:size(ATIndex, 1)
                 idx = ElementsIndex(i);
 
-                IntegratedFields  = interp1(Data{idx}(:,1), Data{idx}(:, 2:length(Data{idx})), HardwareValue(i));
-
-                DeltaPolynomA = zeros(1, Harmonics{idx}(length(Harmonics{idx})));
-                DeltaPolynomB = zeros(1, Harmonics{idx}(length(Harmonics{idx})));
-                j = 1;
+                IntegratedFields  = interp1(Data{idx}(:,1), Data{idx}(:,2:length(Data{idx})), HardwareValue(i));
+                
+                nr_harmonics = Harmonics{idx}(end);
+                IntegratedFieldB = zeros(1, nr_harmonics + 1);
+                IntegratedFieldA = zeros(1, nr_harmonics + 1);
+                m = 1;
                 for k=1:length(Harmonics{idx})
                     n = Harmonics{idx}(k);
-                    DeltaPolynomB(n) = IntegratedFields(j)/(EffLength(i) * Brho);
-                    DeltaPolynomA(n) = IntegratedFields(j+1)/(EffLength(i) * Brho);
-                    j = j+2;
-                end
-
+                    IntegratedFieldB(n+1) = IntegratedFields(m);
+                    IntegratedFieldA(n+1) = IntegratedFields(m+1);
+                    m = m+2;
+                end               
+                
                 for j=1:Nsplit
-
-                    % Don't change the main harmonic value, set only the errors in PolynomA and PolynomB
-                    if ExcData.skew{idx} 
-                        DeltaPolynomA(MainHarmonic{idx}) = 0;
-                    else
-                        DeltaPolynomB(MainHarmonic{idx}) = 0;
+                    % resize PolynomB and PolynomA 
+                    LenA = length(IntegratedFieldA) - length(THERING{ATIndex(i,j)}.PolynomA);
+                    LenB = length(IntegratedFieldB) - length(THERING{ATIndex(i,j)}.PolynomB);
+                    THERING{ATIndex(i,j)}.PolynomA = [THERING{ATIndex(i,j)}.PolynomA, zeros(1,LenA)];
+                    THERING{ATIndex(i,j)}.PolynomB = [THERING{ATIndex(i,j)}.PolynomB, zeros(1,LenB)];     
+                end 
+                
+                ProfileA = zeros(Nsplit, nr_harmonics + 1);
+                ProfileB = zeros(Nsplit, nr_harmonics + 1);
+                if Nsplit == 1
+                    ProfileA(:,:) = 1;
+                    ProfileB(:,:) = 1;
+                else
+                    for j=1:Nsplit
+                        for n = 0:nr_harmonics
+                            ProfileA(j,n+1) = THERING{ATIndex(i,j)}.PolynomA(n+1)*THERING{ATIndex(i,j)}.Length;
+                            if isfield(THERING{ATIndex(i,j)}, 'BendingAngle')
+                                ProfileB(j,n+1) = THERING{ATIndex(i,j)}.PolynomB(n+1)*THERING{ATIndex(i,j)}.Length + THERING{ATIndex(i,j)}.BendingAngle;
+                            else
+                                ProfileB(j,n+1) = THERING{ATIndex(i,j)}.PolynomB(n+1)*THERING{ATIndex(i,j)}.Length;
+                            end
+                        end
                     end
 
-                    LenA= length(THERING{ATIndex(i,j)}.PolynomA) - length(DeltaPolynomA);
-                    THERING{ATIndex(i,j)}.PolynomA = [THERING{ATIndex(i,j)}.PolynomA, zeros(1,-LenA)] + [DeltaPolynomA, zeros(1,LenA)];
+                    for n=0:nr_harmonics
+                        if any(find(ProfileA(:,n+1)))
+                            ProfileA(:,n+1) = ProfileA(:,n+1)/sum(ProfileA(:,n+1));
+                        else
+                            ProfileA(:,n+1) = 1/Nsplit;
+                        end
 
-                    LenB = length(THERING{ATIndex(i,j)}.PolynomB) - length(DeltaPolynomB);
-                    THERING{ATIndex(i,j)}.PolynomB = [THERING{ATIndex(i,j)}.PolynomB, zeros(1,-LenB)] + [DeltaPolynomB, zeros(1,LenB)];     
-
+                        if any(find(ProfileB(:,n+1)))
+                            ProfileB(:,n+1) = ProfileB(:,n+1)/sum(ProfileB(:,n+1));
+                        else
+                            ProfileB(:,n+1) = 1/Nsplit;
+                        end            
+                    end
+                end
+                
+                for j=1:Nsplit
+                    DeltaPolynomB = ProfileB(j,:).*IntegratedFieldB/(THERING{ATIndex(i,j)}.Length * Brho);
+                    DeltaPolynomA = ProfileA(j,:).*IntegratedFieldA/(THERING{ATIndex(i,j)}.Length * Brho);
+                    
+                    % Don't change the main harmonic value, set only the errors in PolynomA and PolynomB
+                    if ExcData.skew{idx} 
+                        DeltaPolynomA(MainHarmonic{idx}+1) = 0;
+                    else
+                        DeltaPolynomB(MainHarmonic{idx}+1) = 0;
+                    end
+                    
+                    LenA = length(THERING{ATIndex(i,j)}.PolynomA) - length(DeltaPolynomA); 
+                    LenB = length(THERING{ATIndex(i,j)}.PolynomB) - length(DeltaPolynomB);        
+                    THERING{ATIndex(i,j)}.PolynomA = THERING{ATIndex(i,j)}.PolynomA + [DeltaPolynomA, zeros(1,LenA)];   
+                    THERING{ATIndex(i,j)}.PolynomB = THERING{ATIndex(i,j)}.PolynomB + [DeltaPolynomB, zeros(1,LenB)];                
+                    
                     LenDiff = length(THERING{ATIndex(i,j)}.PolynomA) - length(THERING{ATIndex(i,j)}.PolynomB);
                     if LenDiff ~= 0
                         THERING{ATIndex(i,j)}.PolynomA = [THERING{ATIndex(i,j)}.PolynomA, zeros(1,-LenDiff)];
                         THERING{ATIndex(i,j)}.PolynomB = [THERING{ATIndex(i,j)}.PolynomB, zeros(1, LenDiff)];
                     end
 
-                    if isfield(THERING{ATIndex(i,j)}, 'K')
-                        THERING{ATIndex(i,j)}.K = THERING{ATIndex(i,j)}.PolynomB(2);
-                    end
-
                     if isfield(THERING{ATIndex(i,j)}, 'MaxOrder')
                         THERING{ATIndex(i,j)}.MaxOrder = length(THERING{ATIndex(i,j)}.PolynomB) - 1;
                     end
-
+                    
+                    if isfield(THERING{ATIndex(i,j)}, 'K')
+                        THERING{ATIndex(i,j)}.K = THERING{ATIndex(i,j)}.PolynomB(2);
+                    end
                 end     
 
             end
