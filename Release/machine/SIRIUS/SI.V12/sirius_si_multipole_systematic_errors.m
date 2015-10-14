@@ -70,7 +70,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 
 % CHS
 % ===
-model_name = 'chs';
+model_name = 'ch';
 r0         = 12/1000;
 % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CH_Modelo 1_-12_12mm_-500_500mm.txt'
 monoms     =   [ 4,       6,       8,       14];
@@ -82,7 +82,7 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 
 % CVS
 % ===
-model_name = 'cvs';
+model_name = 'cv';
 r0         = 12/1000;
 % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CV_Modelo 1_-12_12mm_-500_500mm.txt'
 monoms     =   [ 4,       6,       8,       10     ];

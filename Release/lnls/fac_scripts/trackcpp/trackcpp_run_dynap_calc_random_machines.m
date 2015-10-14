@@ -21,17 +21,19 @@ if strcmpi(gen_answer{1}, 'bo')
     acc_answer = {'0.15', '828', 'on', 'on', 'on'};
     dynap_xy_answer    = {'5000','0',     '100', '-0.018','+0.018','30','0','0.006','1'};
     dynap_ex_answer    = {'5000','0.001', '80', '-0.03','+0.03','50','-0.018','0','1'};
-    dynap_ma_answer    = {'5000','1e-5','0.01','5e-3','2','0.25','2','0','49.681','1','pb mb'};
-    dynap_pxa_answer   = {'5000','1e-5','0.00','1e-4','1','0.25','2','0','49.681','1','pb mb'};
-    dynap_pya_answer   = {'5000','1e-5','0.00','1e-4','1','0.25','2','0','49.681','1','pb mb'};
+    %                     turns    y0    e0      de   st_bk rescl  nit s0   sf  tr    fams
+    dynap_ma_answer    = {'5000','1e-5','0.01','5e-3','1'  ,'0.33','3','0','49.681','1','pb mb'};
+    dynap_pxa_answer   = {'5000','1e-5','0.00','1e-4','1'  ,'0.25','3','0','49.681','1','pb mb'};
+    dynap_pya_answer   = {'5000','1e-5','0.00','1e-4','1'  ,'0.25','3','0','49.681','1','pb mb'};
 else
     % storage ring default parm values
     acc_answer = {'3.00', '864', 'on', 'on', 'on'};
     dynap_xy_answer    = {'5000', '0', '120', '-0.012','+0.012','30','0','0.003','1'}; % to be changed
     dynap_ex_answer    = {'3500', '0.001', '40', '-0.05','+0.05','55','-0.012','0','1'}; % to be changed
-    dynap_ma_answer    = {'2000','1e-5','0.01','5e-3','2','0.25','2','0','52','1','calc_mom_accep mia mib'};
-    dynap_pxa_answer   = {'2000','1e-5','0.00','5e-5','1','0.25','2','0','52','1','calc_mom_accep mia mib'};
-    dynap_pya_answer   = {'2000','1e-5','0.00','5e-5','1','0.25','2','0','52','1','calc_mom_accep mia mib'};
+    %                     turns    y0    e0      de   st_bk rescl  nit s0   sf  tr    fams
+    dynap_ma_answer    = {'2000','1e-5','0.02','5e-3','1'  ,'0.33','3','0','52','1','calc_mom_accep mia mib'};
+    dynap_pxa_answer   = {'2000','1e-5','0.00','5e-5','1'  ,'0.33','3','0','52','1','calc_mom_accep mia mib'};
+    dynap_pya_answer   = {'2000','1e-5','0.00','5e-5','1'  ,'0.33','3','0','52','1','calc_mom_accep mia mib'};
 end
 
 %% user defines accelerator

@@ -185,7 +185,7 @@ while i < n_calls
         
         %% exposição dos resultados
         
-        color = color_vec{i};
+        color = color_vec{mod(i-1,length(color_vec))+1};
         
         if xy
             if i == 1
