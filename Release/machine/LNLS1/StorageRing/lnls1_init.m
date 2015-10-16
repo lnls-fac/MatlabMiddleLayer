@@ -191,7 +191,7 @@ AO.SF.Setpoint.Units         = 'Hardware';
 AO.SF.Setpoint.HWUnits       = 'Ampere';
 AO.SF.Setpoint.PhysicsUnits  = 'meter^-3';
 AO.SF.Setpoint.Range         = [0 220];
-AO.SF.Setpoint.Tolerance     = 1.0; % 2015-10-16  currently there is a big diff between setpoint and readback
+AO.SF.Setpoint.Tolerance     = 1.0;   % 2015-10-16 large diff between setpoint and readback
 AO.SF.Setpoint.DeltaRespMat  = .1;
 
 AO.SD.FamilyName             = 'SD';
@@ -220,7 +220,7 @@ AO.SD.Setpoint.Units         = 'Hardware';
 AO.SD.Setpoint.HWUnits       = 'Ampere';
 AO.SD.Setpoint.PhysicsUnits  = 'meter^-3';
 AO.SD.Setpoint.Range         = [0 125];
-AO.SD.Setpoint.Tolerance     = 0.1;    
+AO.SD.Setpoint.Tolerance     = .1;
 AO.SD.Setpoint.DeltaRespMat  = .1;
 
 
@@ -674,7 +674,7 @@ AO.A6SF.Setpoint.Units         = 'Hardware';
 AO.A6SF.Setpoint.HWUnits       = 'Ampere';
 AO.A6SF.Setpoint.PhysicsUnits  = 'meter^-3';
 AO.A6SF.Setpoint.Range         = [0 220];
-AO.A6SF.Setpoint.Tolerance     = 1.0; % 2015-10-16  currently there is a big diff between setpoint and readback
+AO.A6SF.Setpoint.Tolerance     = 1.0;
 AO.A6SF.Setpoint.DeltaRespMat  = .1;
 
 AO.A6SD01.FamilyName             = 'A6SD01';
@@ -1150,35 +1150,34 @@ AO.VCM.Setpoint.Tolerance    = .1;
 AO.VCM.Setpoint.DeltaRespMat = [0.654 2.0 2.0 0.654 0.654 2.0 2.0 0.654 0.654 2.0 2.0 0.654 0.654 2.0 2.0 0.654 0.654 2.0 2.0 0.654 0.654 2.0 2.0 0.654]';  % 0.654 Amp -> 0.1 mrad @ 1.37GeV
 
 
+% --- BPMS ---
 
 Orbit = lnls1_goldenorbit;
-
-
+BPMCommonNames = [
+    'AMP01B'; 'AMP02A'; 'AMP02B'; 'AMP03A'; ...              % sector 01 : center of 01 -> center of 03
+    'AMP03C'; 'AMP03B'; 'AMP04A'; 'AMP04B'; 'AMP05A'; ...    % sector 02 : center of 03 -> center of 05
+    'AMP05B'; 'AMP06A'; 'AMP06B'; 'AMP07A'; ...              % sector 03 : center of 05 -> center of 07
+    'AMP07B'; 'AMP08A'; 'AMP08B'; 'AMP09A'; ...              % sector 04 : center of 07 -> center of 09
+    'AMP09B'; 'AMP10A'; 'AMP10B'; 'AMU11A'; ...              % sector 05 : center of 09 -> center of 11
+    'AMU11B'; 'AMP12A'; 'AMP12B'; 'AMP01A'                   % sector 06 : center of 11 -> center of 01
+];
+BPMDeviceList  = [1 1; 1 2; 1 3; 1 4; ...
+                  2 1; 2 2; 2 3; 2 4; 2 5; ...
+                  3 1; 3 2; 3 3; 3 4; ...
+                  4 1; 4 2; 4 3; 4 4; ...
+                  5 1; 5 2; 5 3; 5 4; ...
+                  6 1; 6 2; 6 3; 6 4];
 % BPMx
 AO.BPMx.FamilyName  = 'BPMx';
 AO.BPMx.MemberOf    = {'PlotFamily'; 'BPM'; 'BPMx'; 'Diagnostics'};
-AO.BPMx.DeviceList = [1 1; 1 2; 1 3; 1 4; 2 1; 2 2; 2 3; 2 4; 2 5; 3 1; 3 2; 3 3; 3 4; 4 1; 4 2; 4 3; 4 4; 5 1; 5 2; 5 3; 5 4; 6 1; 6 2; 6 3; 6 4];
+AO.BPMx.DeviceList  = BPMDeviceList;
 AO.BPMx.ElementList = (1:size(AO.BPMx.DeviceList,1))';
+AO.BPMx.CommonNames = BPMCommonNames;
 AO.BPMx.Status      = ones(size(AO.BPMx.DeviceList,1),1);
-%AO.BPMx.Status([20 23])  = [0 0]; % AMP11A and AMP11B OFF
+AO.BPMx.Status(5)   = 0; % AMP03C off
 AO.BPMx.Offset      = Orbit.OffsetOrbit(:,1);
 AO.BPMx.Golden      = Orbit.GoldenOrbit(:,1);
-%AO.BPMx.Status(6)   = 0; % Desliga AMP03C   
-
-
-
 AO.BPMx.Position    = [];
-AO.BPMx.CommonNames = [
-    'AMP01B'; ...
-    'AMP02A'; 'AMP02B'; 'AMP03A'; 'AMP03C'; 'AMP03B'; ...
-    'AMP04A'; 'AMP04B'; 'AMP05A'; 'AMP05B'; ...
-    'AMP06A'; 'AMP06B'; 'AMP07A'; 'AMP07B'; ...
-    'AMP08A'; 'AMP08B'; 'AMP09A'; 'AMP09B'; ...
-    'AMP10A'; 'AMP10B'; 'AMU11A'; ...
-    'AMU11B'; 'AMP12A'; 'AMP12B'; ...
-    'AMP01A'
-];
-
 AO.BPMx.Monitor.MemberOf = {'BPMx'; 'Monitor';};
 AO.BPMx.Monitor.Mode = 'Simulator';
 AO.BPMx.Monitor.DataType = 'Scalar';
@@ -1190,20 +1189,17 @@ AO.BPMx.Monitor.HWUnits      = 'mm';
 AO.BPMx.Monitor.PhysicsUnits = 'meter';
 AO.BPMx.Monitor.SpecialFunctionGet = @getbpmlnls;
 
-
 % BPMy
 AO.BPMy.FamilyName  = 'BPMy';
 AO.BPMy.MemberOf    = {'PlotFamily'; 'BPM'; 'BPMy'; 'Diagnostics'};
-AO.BPMy.DeviceList  = AO.BPMx.DeviceList;
+AO.BPMy.DeviceList  = BPMDeviceList;
 AO.BPMy.ElementList = (1:size(AO.BPMy.DeviceList,1))';
+AO.BPMy.CommonNames = BPMCommonNames;
 AO.BPMy.Status      = ones(size(AO.BPMy.DeviceList,1),1);
-%AO.BPMy.Status([20 23])  = [0 0]; % AMP11A and AMP11B OFF
+AO.BPMy.Status(5)   = 0; % AMP03C off
 AO.BPMy.Offset      = Orbit.OffsetOrbit(:,2);
 AO.BPMy.Golden      = Orbit.GoldenOrbit(:,2);
 AO.BPMy.Position    = [];
-AO.BPMy.CommonNames = AO.BPMx.CommonNames;
-%AO.BPMy.Status(6)   = 0; % Desliga AMP03C   
-
 AO.BPMy.Monitor.MemberOf = {'BPMy'; 'Monitor';};
 AO.BPMy.Monitor.Mode = 'Simulator';
 AO.BPMy.Monitor.DataType = 'Scalar';
