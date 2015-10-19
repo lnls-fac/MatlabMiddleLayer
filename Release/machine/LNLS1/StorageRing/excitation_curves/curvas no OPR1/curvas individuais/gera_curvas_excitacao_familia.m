@@ -1,5 +1,7 @@
 function r = gera_curvas_excitacao_familia(lista_elementos, nome_familia)
 
+lista_elementos = {'ASD02A.TXT', 'ASD04B.TXT', 'ASD06B.TXT', 'ASD08B.TXT', 'ASD10A.TXT', 'ASD12B.TXT'};
+nome_familia = 'A6SD01.TXT';
 data = [];
 amps = [];
 minv = -1000;
