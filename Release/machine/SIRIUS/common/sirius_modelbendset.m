@@ -62,8 +62,8 @@ end
 
 for i = 1:size(ATIndex, 1)
     for j = 1:size(ATIndex, 2)
-        THERING{ATIndex(i,j)}.PolynomB(1) = f(i,j)*(IntegratedField(i)/Brho - Angle(i))/THERING{ATIndex(i,j)}.Length;
-        THERING{ATIndex(i,j)}.NPB(1)      = f(i,j)*(IntegratedField(i)/Brho - Angle(i))/THERING{ATIndex(i,j)}.Length;
+        THERING{ATIndex(i,j)}.PolynomB(1) = f(i,j)*((-IntegratedField(i)/Brho) - Angle(i))/THERING{ATIndex(i,j)}.Length;
+        THERING{ATIndex(i,j)}.NPB(1)      = f(i,j)*((-IntegratedField(i)/Brho) - Angle(i))/THERING{ATIndex(i,j)}.Length;
     end
 end
 

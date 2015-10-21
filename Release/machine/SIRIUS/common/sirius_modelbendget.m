@@ -41,7 +41,7 @@ end
 Brho      = getbrho('Model');
 ExcData   = getfamilydata(Family, 'ExcitationCurves');
 ElemATIndex = dev2elem(Family, DeviceList);
-IntegratedField = BendingAngle*Brho;
+IntegratedField = - BendingAngle*Brho;
 AMPS = zeros(size(ElemATIndex,1),1);
 for i=1:size(ElemATIndex,1)
     idx = ElemATIndex(i);

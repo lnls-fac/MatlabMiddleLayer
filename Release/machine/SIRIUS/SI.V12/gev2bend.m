@@ -127,7 +127,7 @@ for i=1:size(BendFamilies,1)
         for j=1:length(ElemIndex)
             for k=1:size(ATIndex,2)
                 DeflectionAngle = THERING{ATIndex(j,k)}.BendingAngle + THERING{ATIndex(j,k)}.PolynomB(1)*THERING{ATIndex(j,k)}.Length;
-                IntegratedField(j) = IntegratedField(j) + DeflectionAngle*brho;
+                IntegratedField(j) = IntegratedField(j) - DeflectionAngle*brho;
             end
         end
         
@@ -147,7 +147,7 @@ for i=1:size(BendFamilies,1)
     end
 end  
 
-alpha = (2*pi - BCAngle)*(1/const.c)*(sqrt((GeV*1e9).^2 - (const.E0*1e6)^2))/ SumIntegratedFields;
+alpha = (2*pi - BCAngle)*(1/const.c)*(sqrt((GeV*1e9).^2 - (const.E0*1e6)^2))/ abs(SumIntegratedFields);
 
 ElementsIndex = dev2elem(Family,DeviceList);
 IntegratedField = alpha.*FamilyIntegratedField;
