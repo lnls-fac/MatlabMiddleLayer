@@ -45,7 +45,7 @@ Angle   = zeros(size(ATIndex, 1),1);
 f = zeros(size(ATIndex, 1), size(ATIndex, 2));
 for i = 1:size(ATIndex, 1)
     for j = 1:size(ATIndex, 2)
-        f(i,j) = THERING{ATIndex(i,j)}.BendingAngle + THERING{ATIndex(i,j)}.NPB(1)*THERING{ATIndex(i,j)}.Length;
+        f(i,j) = THERING{ATIndex(i,j)}.BendingAngle + THERING{ATIndex(i,j)}.PolynomB(1)*THERING{ATIndex(i,j)}.Length;
         Angle(i) = Angle(i) + THERING{ATIndex(i,j)}.BendingAngle;
     end
     f(i,:) = f(i,:)/sum(f(i,:));
@@ -63,7 +63,6 @@ end
 for i = 1:size(ATIndex, 1)
     for j = 1:size(ATIndex, 2)
         THERING{ATIndex(i,j)}.PolynomB(1) = f(i,j)*((-IntegratedField(i)/Brho) - Angle(i))/THERING{ATIndex(i,j)}.Length;
-        THERING{ATIndex(i,j)}.NPB(1)      = f(i,j)*((-IntegratedField(i)/Brho) - Angle(i))/THERING{ATIndex(i,j)}.Length;
     end
 end
 

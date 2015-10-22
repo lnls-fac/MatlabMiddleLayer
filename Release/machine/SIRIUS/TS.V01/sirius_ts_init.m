@@ -62,7 +62,7 @@ AO.septex.DeviceList  = getDeviceList(1,1);
 AO.septex.ElementList = (1:size(AO.septex.DeviceList,1))';
 AO.septex.Status      = ones(size(AO.septex.DeviceList,1),1);
 AO.septex.Position    = [];
-AO.septex.ExcitationCurves = sirius_getexcdata(repmat('tspm-sep', size(AO.septex.DeviceList,1), 1)); 
+AO.septex.ExcitationCurves = sirius_getexcdata(repmat('tspm-septex', size(AO.septex.DeviceList,1), 1)); 
 
 AO.septex.Monitor.MemberOf = {};
 AO.septex.Monitor.Mode = 'Simulator';
@@ -94,7 +94,7 @@ AO.septing.DeviceList  = getDeviceList(1,1);
 AO.septing.ElementList = (1:size(AO.septing.DeviceList,1))';
 AO.septing.Status      = ones(size(AO.septing.DeviceList,1),1);
 AO.septing.Position    = [];
-AO.septing.ExcitationCurves = sirius_getexcdata(repmat('tspm-sep', size(AO.septing.DeviceList,1), 1)); 
+AO.septing.ExcitationCurves = sirius_getexcdata(repmat('tspm-septin', size(AO.septing.DeviceList,1), 1)); 
 
 AO.septing.Monitor.MemberOf = {};
 AO.septing.Monitor.Mode = 'Simulator';
@@ -126,7 +126,7 @@ AO.septinf.DeviceList  = getDeviceList(1,1);
 AO.septinf.ElementList = (1:size(AO.septinf.DeviceList,1))';
 AO.septinf.Status      = ones(size(AO.septinf.DeviceList,1),1);
 AO.septinf.Position    = [];
-AO.septinf.ExcitationCurves = sirius_getexcdata(repmat('tspm-sep', size(AO.septinf.DeviceList,1), 1)); 
+AO.septinf.ExcitationCurves = sirius_getexcdata(repmat('tspm-septin', size(AO.septinf.DeviceList,1), 1)); 
 
 AO.septinf.Monitor.MemberOf = {};
 AO.septinf.Monitor.Mode = 'Simulator';

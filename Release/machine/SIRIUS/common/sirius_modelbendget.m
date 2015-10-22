@@ -34,7 +34,7 @@ ATIndex = family2atindex(Family, DeviceList);
 BendingAngle = zeros(size(ATIndex, 1), 1);
 for i = 1:size(ATIndex, 1)
     for j = 1:size(ATIndex, 2)
-        BendingAngle(i) = BendingAngle(i) + THERING{ATIndex(i,j)}.BendingAngle + THERING{ATIndex(i,j)}.NPB(1)*THERING{ATIndex(i,j)}.Length;
+        BendingAngle(i) = BendingAngle(i) + THERING{ATIndex(i,j)}.BendingAngle + THERING{ATIndex(i,j)}.PolynomB(1)*THERING{ATIndex(i,j)}.Length;
     end
 end
 
