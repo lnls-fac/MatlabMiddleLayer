@@ -116,7 +116,7 @@ while i < n_calls
         if i >= n_calls, break; end
         i=i+1;
         
-        onda =  []; offda = [];
+        area = []; onda =  []; offda = [];
         lifetime = []; accep = []; Accep = [];
         
         [~, result] = system(['ls -la ' path ' | grep ''^d'' | grep rms | wc -l']);
@@ -141,7 +141,7 @@ while i < n_calls
             
             if xy
                 if exist(fullfile(pathname,'dynap_xy_out.txt'),'file')
-                    [onda(j,:,:), ~] = trackcpp_load_dynap_xy(pathname,var_plane);
+                    [onda(j,:,:),area(j), ~] = trackcpp_load_dynap_xy(pathname,var_plane);
                     j = j + 1;
                 else fprintf('%-2d-%-3d: xy nao carregou\n',i,k);
                 end
@@ -174,11 +174,11 @@ while i < n_calls
             end
         end
         
-        if xy, aveOnda = mean(onda,1); end
+        if xy, aveOnda = mean(onda,1); aveYatNegX = aveOnda(1,3,1); aveArea = mean(area); end
         if ex, aveOffda = mean(offda,1); end
         if ma, aveAccep = squeeze(mean(accep,1))*100; aveLT = mean(lifetime); end
         if rms_mode
-            if xy, rmsOnda = std(onda,1); end
+            if xy, rmsOnda = std(onda,1); rmsYatNegX = rmsOnda(1,3,1); rmsArea = std(area); end
             if ex, rmsOffda = std(offda,1); end
             if ma, rmsAccep = squeeze(std(accep,0,1))*100; rmsLT = std(lifetime); end
         end
@@ -186,6 +186,17 @@ while i < n_calls
         %% exposição dos resultados
         
         color = color_vec{mod(i-1,length(color_vec))+1};
+        
+        if i==1
+            if xy && ma
+                fprintf('\n%-20s %-15s %-15s %-15s\n','Config', 'Dynap XY [mm^2]', 'Aper@y=0.2 [mm]', 'Lifetime [h]');
+            elseif ma
+                fprintf('\n%-20s %-15s\n','Config', 'Lifetime [h]');
+            elseif xy
+                fprintf('\n%-20s %-15s\n','Config', 'Dynap XY [mm^2]', 'Aper@y=0.2 [mm]');
+            end
+        end
+        if xy || ma, fprintf('%-20s ',upper(cell_leg_text{i})); end
         
         if xy
             if i == 1
@@ -199,10 +210,14 @@ while i < n_calls
             pl(i,2) = plot(fa, 1000*aveOnda(1,:,1), 1000*aveOnda(1,:,2), ...
                 'Marker','.','LineWidth',esp_lin,'Color',color, 'LineStyle','-');
             if rms_mode
+                fprintf('%5.2f \x00B1 %-5.2f   %5.1f \x00B1 %-5.1f   ',...
+                        aveArea*1e6, rmsArea*1e6, aveYatNegX*1e3, rmsYatNegX*1e3);
                 pl(i,1) = plot(fa, 1000*(rmsOnda(1,:,1)+aveOnda(1,:,1)),1000*(rmsOnda(1,:,2)+aveOnda(1,:,2)),...
                     'Marker','.','LineWidth',2,'LineStyle','--','Color', color);
                 pl(i,3) = plot(fa, 1000*(aveOnda(1,:,1)-rmsOnda(1,:,1)),1000*(aveOnda(1,:,2)-rmsOnda(1,:,2)),...
                     'Marker','.','LineWidth',2,'LineStyle','--','Color', color);
+            else
+                fprintf('%5.2f           %5.1f           ', aveArea*1e6, aveYatNegX*1e3);
             end
         end
         
@@ -227,17 +242,14 @@ while i < n_calls
         
         if ma
             %imprime o tempo de vida
-            if i==1, fprintf('\n%-20s %-15s \n','Configuração', 'Tempo de Vida'); end;
             if rms_mode
-                fprintf(  '%-20s %7.2f \x00B1 %-5.2f h',upper(cell_leg_text{i}), aveLT, rmsLT);
+                fprintf('%5.2f \x00B1 %-5.2f ', aveLT, rmsLT);
                 if lt_prob, 
                     fprintf(['   *%02d máquinas desprezadas no cálculo',...
-                            ' por possuírem aceitancia nula.\n'],lt_prob);
-                else
-                    fprintf('\n');
+                            ' por possuírem aceitancia nula.'],lt_prob);
                 end
             else
-                fprintf(  '%-20s %7.2f h\n',upper(cell_leg_text{i}), aveLT);
+                fprintf('%5.2f ', aveLT);
             end
             
             if i == 1
@@ -260,6 +272,7 @@ while i < n_calls
                       color,'LineWidth',2,'LineStyle','--');
             end
         end
+        if xy || ma, fprintf('\n'); end
         drawnow;
     end
 end
