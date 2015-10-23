@@ -1,4 +1,4 @@
-function sirius_init(OperationalMode)
+function sirius_init
 %SIRIUSINIT - MML initialization file for the VUV ring at sirius3
 % 
 %  See also setoperationalmode
@@ -6,15 +6,11 @@ function sirius_init(OperationalMode)
 % 2012-07-10 Modificado para sirius3_lattice_e025 - Afonso
 
 
-if nargin < 1
-    OperationalMode = 1;
-end
-
 setao([]);
 setad([]);
 
 % Base on the location of this file
-[SIRIUS_ROOT, FileName, ExtentionName] = fileparts(mfilename('fullpath'));
+[SIRIUS_ROOT, ~, ~] = fileparts(mfilename('fullpath'));
 
 AD.Directory.ExcDataDir  = '/home/fac_files/siriusdb/excitation_curves';
 
@@ -23,7 +19,7 @@ AD.Directory.LatticesDef = [SIRIUS_ROOT, filesep, 'lattices_def'];
 setad(AD);
 
 % Add additional directories with SIRIUS_V03 specific stuff.
-MMLROOT = getmmlroot('IgnoreTheAD');
+%MMLROOT = getmmlroot('IgnoreTheAD');
 %addpath(fullfile(MMLROOT,'machine','SIRIUS_V03','StorageRing','scripts'), '-begin');
 
 
@@ -93,6 +89,7 @@ AO.b2.Setpoint.Tolerance    = .1;
 AO.b2.Setpoint.DeltaRespMat = .01;
 
 AO.bc.FamilyName  = 'bc';
+AO.bc.MemberOf    = {'si-bc'; }; 
 AO.bc.DeviceList  = getDeviceList(10,2);
 AO.bc.ElementList = (1:size(AO.bc.DeviceList,1))';
 AO.bc.Status      = ones(size(AO.bc.DeviceList,1),1);
@@ -808,6 +805,7 @@ AO.sda.Monitor.MemberOf = {};
 AO.sda.Monitor.Mode = 'Simulator';
 AO.sda.Monitor.DataType = 'Scalar';
 AO.sda.Monitor.ChannelNames = repmat(sirius_si_getname('sda_fam', 'Monitor'), size(AO.sda.DeviceList,1),1); 
+AO.sda.Monitor.Units       = 'Hardware';
 AO.sda.Monitor.HWUnits      = 'Ampere';
 AO.sda.Monitor.PhysicsUnits = 'meter^-3';
 AO.sda.Monitor.HW2PhysicsFcn  = @sirius_hw2ph;
