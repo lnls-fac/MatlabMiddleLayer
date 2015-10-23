@@ -1,10 +1,10 @@
 function  [ChannelName, ErrorFlag] = sirius_tb_getname(Family, Field, DeviceList)
-% ChannelName = getname_sirius(Family, Field, DeviceList)
+% ChannelName = getname_tb_sirius(Family, Field, DeviceList)
 %
 %   INPUTS
 %   1. Family name
 %   2. Field
-%   3. DeviceList ([Sector Device #] or [element #]) (default: whole family)
+%   3. DeviceList ([Sector Device #] or [element #])
 %
 %   OUTPUTS
 %   1. ChannelName = IOC channel name corresponding to the family and DeviceList
@@ -27,7 +27,7 @@ switch lower(Family)
     case {'bpmx', 'bpmy'}
         if (strcmpi(Field, 'Monitor') || strcmpi(Field, 'CommonNames'))
             ChannelName = [
-                'TBDI-BPM-02  '; 'TBDI-BPM-03-A'; 
+                'TBDI-BPM-02-A'; 'TBDI-BPM-02-B';  'TBDI-BPM-03-A'; 
                 'TBDI-BPM-03-B'; 'TBDI-BPM-04  '; 'TBDI-BPM-05  ']; 
     
             if strcmpi(Family, 'bpmx')
@@ -91,7 +91,9 @@ switch lower(Family)
         ChannelName = 'TBPS-QD-05';  
         
     case {'hcm', 'ch'}
-        ChannelName = 'TBPS-CH-03';
+        ChannelName = [
+            'TBPS-CH-02-A'; 'TBPS-CH-02-B';  
+            'TBPS-CH-03-A'; 'TBPS-CH-03-B'; 'TBPS-CH-04  '];
         
     case {'vcm', 'cv'}
         ChannelName = [
@@ -112,6 +114,7 @@ else
         ChannelName = strcat(ChannelName, '-SP');
     end
 end
+
 
 end
 

@@ -47,13 +47,12 @@ setmmldirectories(AD.Machine, AD.SubMachine, AD.ModeName, AD.OpsFileExtension);
 updateatindex;
 
 
-% 2015-10-01 Luana
+% 2015-10-23 Luana
 if AD.SetMultipolesErrors
-    fprintf('   Setting initial values of multipoles errors.\n');
     sirius_init_multipoles_errors;
 end
-
-sirius_set_delays('AT')
+sirius_set_delays('AT');
+sirius_tb_settwissdata(AD.ModeName);
 
 % Set the model energy
 setenergymodel(AD.Energy);
@@ -62,27 +61,6 @@ setcavity off;
 setradiation off;
 fprintf('   Radiation and cavities are off. Use setradiation / setcavity to modify.\n');
 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%
-% Final mode changes %
-%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Add LOCO Parameters to AO and AT-Model %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  'Nominal'    - Sets nominal gains (1) / rolls (0) to the model.
-%  'SetGains'   - Set gains/coupling from a LOCO file.
-%  'SetModel'   - Set the model from a LOCO file.  But it only changes
-%                 the part of the model that does not get corrected
-%                 in 'Symmetrize' (also does a SetGains).
-%  'LOCO2Model' - Set the model from a LOCO file (also does a SetGains).
-%                 This uses the LOCO AT model!!! And sets all lattice
-%                 machines fit in the LOCO run to the model.
-%
-%   Basically, use 'SetGains' or 'SetModel' if the LOCO run was applied to the accelerator
-%              use 'LOCO2Model' if the LOCO run was made after the final setup.  Of couse,
-%              setlocodata must be written properly for all this to work correctly.
 
 try
     % I typically place to store the calibration LOCO file in the StorageRingOpsData directory
@@ -119,7 +97,6 @@ AD.DeltaRFDisp         = 2000e-6;
 AD.ATModel             = 'sirius_tb_lattice';
 AD.BeamCurrent         = 0.01; % [A]
 AD.Coupling            = 0.50;
-%AD.OpsData.PrsProfFile = 'sirius_V500_pressure_profile.txt';
 
 % 2015-10-01 Luana
 AD.SetMultipolesErrors = false;
@@ -148,7 +125,6 @@ AD.DeltaRFDisp         = 2000e-6;
 AD.ATModel             = 'sirius_tb_lattice';
 AD.BeamCurrent         = 0.010; % [A]
 AD.Coupling            = 0.50;
-%AD.OpsData.PrsProfFile = 'sirius_V500_pressure_profile.txt';
 
 % 2015-10-01 Luana
 AD.SetMultipolesErrors = false;
@@ -177,7 +153,6 @@ AD.DeltaRFDisp         = 2000e-6;
 AD.ATModel             = 'sirius_tb_lattice';
 AD.BeamCurrent         = 0.010; % [A]
 AD.Coupling            = 0.50;
-%AD.OpsData.PrsProfFile = 'sirius_V500_pressure_profile.txt';
 
 % 2015-10-01 Luana
 AD.SetMultipolesErrors = false;
@@ -206,7 +181,6 @@ AD.DeltaRFDisp         = 2000e-6;
 AD.ATModel             = 'sirius_tb_lattice';
 AD.BeamCurrent         = 0.010; % [A]
 AD.Coupling            = 0.50;
-%AD.OpsData.PrsProfFile = 'sirius_V500_pressure_profile.txt';
 
 % 2015-10-01 Luana
 AD.SetMultipolesErrors = false;
@@ -235,7 +209,6 @@ AD.DeltaRFDisp         = 2000e-6;
 AD.ATModel             = 'sirius_tb_lattice';
 AD.BeamCurrent         = 0.010; % [A]
 AD.Coupling            = 0.50;
-%AD.OpsData.PrsProfFile = 'sirius_V500_pressure_profile.txt';
 
 % 2015-10-01 Luana
 AD.SetMultipolesErrors = false;
@@ -264,7 +237,6 @@ AD.DeltaRFDisp         = 2000e-6;
 AD.ATModel             = 'sirius_tb_lattice';
 AD.BeamCurrent         = 0.010; % [A]
 AD.Coupling            = 0.50;
-%AD.OpsData.PrsProfFile = 'sirius_V500_pressure_profile.txt';
 
 % 2015-10-01 Luana
 AD.SetMultipolesErrors = false;

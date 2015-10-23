@@ -116,7 +116,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         Amps=zeros(size(k,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), k(i) * EffLength(i) * Brho);
+            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), -k(i) * EffLength(i) * Brho);
         end
         
     elseif any(strcmpi(Family, findmemberof('SKEWQUAD')))
@@ -125,7 +125,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         Amps=zeros(size(k,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), k(i) * EffLength(i) * Brho);
+            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), -k(i) * EffLength(i) * Brho);
         end
         
     elseif any(strcmpi(Family, findmemberof('SEXT')))
@@ -134,7 +134,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         Amps=zeros(size(k,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), k(i) * EffLength(i) * Brho);
+            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), -k(i) * EffLength(i) * Brho);
         end
         
     elseif any(strcmpi(Family, findmemberof('SKEWCORR')))
@@ -143,7 +143,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         Amps=zeros(size(k,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), k(i) * EffLength(i) * Brho);
+            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), -k(i) * EffLength(i) * Brho);
         end
 
     elseif any(strcmpi(Family, findmemberof('SEPTUM')))
@@ -151,7 +151,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         Amps=zeros(size(k,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), k(i) * Brho);
+            Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), -k(i) * Brho);
         end
            
     else

@@ -34,11 +34,13 @@ set_parameters_ts;
 
 bend_pass_method = 'BndMPoleSymplectic4Pass';
 quad_pass_method = 'StrMPoleSymplectic4Pass';
+sext_pass_method = 'StrMPoleSymplectic4Pass';
 
 
 %% elements
 %  ========
 % --- drift spaces ---
+l13      = drift('l13', 0.13, 'DriftPass');
 l15      = drift('l15', 0.15, 'DriftPass');
 l16      = drift('l16', 0.16, 'DriftPass');
 l17      = drift('l17', 0.17, 'DriftPass');
@@ -71,11 +73,11 @@ qf4     = quadrupole('qf4',  0.20, qf4_strength,  quad_pass_method); % qf
 qd4b    = quadrupole('qd4b', 0.14, qd4b_strength, quad_pass_method); % qd
 
 % --- beam position monitors ---
-bpm    = marker('bpm', 'IdentityPass');
+bpm  = marker('bpm', 'IdentityPass');
 
 % --- correctors ---
-ch     = corrector('hcm',  0, [0 0], 'CorrectorPass');
-cv     = corrector('vcm',  0, [0 0], 'CorrectorPass');
+ch   = sextupole ('ch', 0.1, 0.0, sext_pass_method);
+cv   = sextupole ('cv', 0.1, 0.0, sext_pass_method);
 
 % --- bending magnets --- 
 
@@ -106,7 +108,7 @@ bseptex = marker('bseptex', 'IdentityPass'); % marker at the beginning of extrac
 mseptex = marker('mseptex', 'IdentityPass'); % marker at the center of extraction septum
 eseptex = marker('eseptex', 'IdentityPass'); % marker at the end of extraction septum
 septum  = [h1, mseptex, h2];
-septex  = [bseptex, septum, l20, ch, septum, eseptex];
+septex  = [bseptex, septum, l20, septum, eseptex];  % excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
 % -- thick si injection septum --
 dip_nam  =  'septing';
@@ -119,7 +121,7 @@ h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0
 bsepting = marker('bsepting', 'IdentityPass'); % marker at the beginning of thick septum
 msepting = marker('msepting', 'IdentityPass'); % marker at the center of thick septum
 esepting = marker('esepting', 'IdentityPass'); % marker at the end of thick septum
-septgr   = [bsepting, h1, msepting, ch, h2, esepting];
+septgr   = [bsepting, h1, msepting, h2, esepting];  % excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
 % -- thin si injection septum --
 dip_nam  =  'septinf';
@@ -136,18 +138,18 @@ septfi   = [bseptinf, h1, mseptinf, h2, eseptinf];   % we excluded ch to make it
 
            
 % --- lines ---
-la1   = [l20, l18, cv, repmat(l20,1,5), l24];
-la2   = [la2p, repmat(l20,1,11), bpm, l20, ch, l25, cv, l20];
+la1   = [l20, l13, cv, l15, repmat(l20,1,4), l24];
+la2   = [la2p, repmat(l20,1,11), bpm, l15, ch, l15, cv, l15];
 la3   = [l16, l16];
 lb1   = [l20, l20, l17];
 lb2   = [l20, l20, l20];
-lb3   = [lb3p, repmat(l20,1,18), bpm, l20, ch, l25, cv, l25];
+lb3   = [lb3p, repmat(l20,1,18), bpm, l15, ch, l15, cv, l20];
 lc1   = [lc1p, repmat(l20,1,9)];
-lc2   = [lc2p, bpm, l20, ch, l25, cv, l25];
+lc2   = [lc2p, bpm, l15, ch, l15, cv, l20];
 ld1   = [repmat(l20,1,5), l15, l15];
-ld2   = [ld2p, l20, l20, bpm, l20, cv, l25, ch, l20];
+ld2   = [ld2p, l20, l20, bpm, l15, cv, l15, ch, l15];
 ld3   = [l15, l15];
-ld4   = [l15, repmat(l20,1,7), bpm, l20, cv, l25];
+ld4   = [l15, repmat(l20,1,7), bpm, l15, cv, l20];
 line1 = [septex, la1, qf1a, la2, qf1b, la3];
 line2 = [bend, lb1, qd2, lb2, qf2, lb3];
 line3 = [bend, lc1, qf3, lc2];
@@ -181,13 +183,6 @@ the_line = [the_line(idx:end) the_line(1:idx-1)];
 lens = getcellstruct(the_line, 'Length', 1:length(the_line));
 if any(lens < 0)
     error(['AT model with negative drift in ' mfilename ' !\n']);
-end
-
-% Luana
-pb = findcells(the_line, 'PolynomB');
-for i=1:length(pb)
-    the_line{pb(i)}.NPA = the_line{pb(i)}.PolynomA;
-    the_line{pb(i)}.NPB = the_line{pb(i)}.PolynomB;
 end
 
 % Ajusta NumIntSteps

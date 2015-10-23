@@ -1,9 +1,10 @@
 function data = sirius_si_family_data(the_ring)
 
-data.b1.nr_segs   = 2;
-data.b2.nr_segs   = 3;
-data.bc_lf.nr_segs   = 7;
-data.bc_hf.nr_segs   = 14;
+data.b1.nr_segs    = 2;
+data.b2.nr_segs    = 3;
+data.bc_lf.nr_segs = 14;
+data.bc_hf.nr_segs = 14;
+data.bc.nr_segs    = 28;
 
 data.qfa.nr_segs  = 1;
 data.qda.nr_segs  = 1;
@@ -104,6 +105,10 @@ end
 idx = sort(idx);
 data.cv.ATIndex = reshape(idx,data.cv.nr_segs,[]);
 data.cv.ATIndex = data.cv.ATIndex';
+
+% bc 
+idx = [data.('bc_lf').ATIndex, data.('bc_hf').ATIndex];
+data.bc.ATIndex = sort(idx);
 
 % fch - fast horizontal correctors
 idx = [];

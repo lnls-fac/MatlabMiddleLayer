@@ -15,6 +15,12 @@ if strcmpi(mode,'C')
     else
         error('version not implemented');
     end
+elseif strcmpi(mode, 'bc_model3')
+    [path, ~, ~] = fileparts(mfilename('fullpath'));
+    cur = pwd;
+    cd(fullfile(path,'opt_results/'));
+    eval('bc_model3');
+    cd(cur);
 else
     error('mode not implemented');
 end

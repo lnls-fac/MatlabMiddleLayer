@@ -1,4 +1,4 @@
-function sirius_init(OperationalMode)
+function sirius_init
 %SIRIUSINIT - MML initialization file for the VUV ring at sirius3
 % 
 %  See also setoperationalmode
@@ -6,15 +6,11 @@ function sirius_init(OperationalMode)
 % 2012-07-10 Modificado para sirius3_lattice_e025 - Afonso
 
 
-if nargin < 1
-    OperationalMode = 1;
-end
-
 setao([]);
 setad([]);
 
 % Base on the location of this file
-[SIRIUS_ROOT, FileName, ExtentionName] = fileparts(mfilename('fullpath'));
+[SIRIUS_ROOT, ~, ~] = fileparts(mfilename('fullpath'));
 
 AD.Directory.ExcDataDir  = '/home/fac_files/siriusdb/excitation_curves';
 
@@ -23,7 +19,7 @@ AD.Directory.LatticesDef = [SIRIUS_ROOT, filesep, 'lattices_def'];
 setad(AD);
 
 % Add additional directories with SIRIUS_V03 specific stuff.
-MMLROOT = getmmlroot('IgnoreTheAD');
+%MMLROOT = getmmlroot('IgnoreTheAD');
 %addpath(fullfile(MMLROOT,'machine','SIRIUS_V03','StorageRing','scripts'), '-begin');
 
 
@@ -93,6 +89,7 @@ AO.b2.Setpoint.Tolerance    = .1;
 AO.b2.Setpoint.DeltaRespMat = .01;
 
 AO.bc.FamilyName  = 'bc';
+AO.bc.MemberOf    = {'si-bc'; }; 
 AO.bc.DeviceList  = getDeviceList(10,2);
 AO.bc.ElementList = (1:size(AO.bc.DeviceList,1))';
 AO.bc.Status      = ones(size(AO.bc.DeviceList,1),1);
@@ -803,11 +800,12 @@ AO.sda.DeviceList  = getDeviceList(10, 2);
 AO.sda.ElementList = (1:size(AO.sda.DeviceList,1))';
 AO.sda.Status      = ones(size(AO.sda.DeviceList,1),1);
 AO.sda.Position    = [];
-AO.sda.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sda.DeviceList,1),1));
+AO.sda.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sda.DeviceList,1),1));
 AO.sda.Monitor.MemberOf = {};
 AO.sda.Monitor.Mode = 'Simulator';
 AO.sda.Monitor.DataType = 'Scalar';
-AO.sda.Monitor.ChannelNames = repmat(sirius_si_getname('sda_fam', 'Monitor'), size(AO.sda.DeviceList,1),1); 
+AO.sda.Monitor.ChannelNames = repmat(sirius_si_getname('sda_fam', 'Monitor'), size(AO.sda.DeviceList,1),1);
+AO.sda.Monitor.Units        = 'Hardware';
 AO.sda.Monitor.HWUnits      = 'Ampere';
 AO.sda.Monitor.PhysicsUnits = 'meter^-3';
 AO.sda.Monitor.HW2PhysicsFcn  = @sirius_hw2ph;
@@ -831,7 +829,7 @@ AO.sfa.DeviceList  = getDeviceList(10, 2);
 AO.sfa.ElementList = (1:size(AO.sfa.DeviceList,1))';
 AO.sfa.Status      = ones(size(AO.sfa.DeviceList,1),1);
 AO.sfa.Position    = [];
-AO.sfa.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sfa.DeviceList,1),1));  
+AO.sfa.ExcitationCurves = sirius_getexcdata(repmat('sima-sf',size(AO.sfa.DeviceList,1),1));  
 AO.sfa.Monitor.MemberOf = {};
 AO.sfa.Monitor.Mode = 'Simulator';
 AO.sfa.Monitor.DataType = 'Scalar';
@@ -860,7 +858,7 @@ AO.sd1j.DeviceList  = getDeviceList(10,2);
 AO.sd1j.ElementList = (1:size(AO.sd1j.DeviceList,1))';
 AO.sd1j.Status      = ones(size(AO.sd1j.DeviceList,1),1);
 AO.sd1j.Position    = [];
-AO.sd1j.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sd1j.DeviceList,1),1));
+AO.sd1j.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sd1j.DeviceList,1),1));
 AO.sd1j.Monitor.MemberOf = {};
 AO.sd1j.Monitor.Mode = 'Simulator';
 AO.sd1j.Monitor.DataType = 'Scalar';
@@ -889,7 +887,7 @@ AO.sf1j.DeviceList  = getDeviceList(10,2);
 AO.sf1j.ElementList = (1:size(AO.sf1j.DeviceList,1))';
 AO.sf1j.Status      = ones(size(AO.sf1j.DeviceList,1),1);
 AO.sf1j.Position    = [];
-AO.sf1j.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sf1j.DeviceList,1),1));
+AO.sf1j.ExcitationCurves = sirius_getexcdata(repmat('sima-sf',size(AO.sf1j.DeviceList,1),1));
 AO.sf1j.Monitor.MemberOf = {};
 AO.sf1j.Monitor.Mode = 'Simulator';
 AO.sf1j.Monitor.DataType = 'Scalar';
@@ -918,7 +916,7 @@ AO.sd2j.DeviceList  = getDeviceList(10,2);
 AO.sd2j.ElementList = (1:size(AO.sd2j.DeviceList,1))';
 AO.sd2j.Status      = ones(size(AO.sd2j.DeviceList,1),1);
 AO.sd2j.Position    = [];
-AO.sd2j.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sd2j.DeviceList,1),1));
+AO.sd2j.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sd2j.DeviceList,1),1));
 AO.sd2j.Monitor.MemberOf = {};
 AO.sd2j.Monitor.Mode = 'Simulator';
 AO.sd2j.Monitor.DataType = 'Scalar';
@@ -947,7 +945,7 @@ AO.sd3j.DeviceList  = getDeviceList(10,2);
 AO.sd3j.ElementList = (1:size(AO.sd3j.DeviceList,1))';
 AO.sd3j.Status      = ones(size(AO.sd3j.DeviceList,1),1);
 AO.sd3j.Position    = [];
-AO.sd3j.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sd3j.DeviceList,1),1));
+AO.sd3j.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sd3j.DeviceList,1),1));
 AO.sd3j.Monitor.MemberOf = {};
 AO.sd3j.Monitor.Mode = 'Simulator';
 AO.sd3j.Monitor.DataType = 'Scalar';
@@ -976,7 +974,7 @@ AO.sf2j.DeviceList  = getDeviceList(10,2);
 AO.sf2j.ElementList = (1:size(AO.sf2j.DeviceList,1))';
 AO.sf2j.Status      = ones(size(AO.sf2j.DeviceList,1),1);
 AO.sf2j.Position    = [];
-AO.sf2j.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sf2j.DeviceList,1),1));
+AO.sf2j.ExcitationCurves = sirius_getexcdata(repmat('sima-sf',size(AO.sf2j.DeviceList,1),1));
 AO.sf2j.Monitor.MemberOf = {};
 AO.sf2j.Monitor.Mode = 'Simulator';
 AO.sf2j.Monitor.DataType = 'Scalar';
@@ -1005,7 +1003,7 @@ AO.sd1k.DeviceList  = getDeviceList(10,2);
 AO.sd1k.ElementList = (1:size(AO.sd1k.DeviceList,1))';
 AO.sd1k.Status      = ones(size(AO.sd1k.DeviceList,1),1);
 AO.sd1k.Position    = [];
-AO.sd1k.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sd1k.DeviceList,1),1));
+AO.sd1k.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sd1k.DeviceList,1),1));
 AO.sd1k.Monitor.MemberOf = {};
 AO.sd1k.Monitor.Mode = 'Simulator';
 AO.sd1k.Monitor.DataType = 'Scalar';
@@ -1034,7 +1032,7 @@ AO.sf1k.DeviceList  = getDeviceList(10,2);
 AO.sf1k.ElementList = (1:size(AO.sf1k.DeviceList,1))';
 AO.sf1k.Status      = ones(size(AO.sf1k.DeviceList,1),1);
 AO.sf1k.Position    = [];
-AO.sf1k.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sf1k.DeviceList,1),1));
+AO.sf1k.ExcitationCurves = sirius_getexcdata(repmat('sima-sf',size(AO.sf1k.DeviceList,1),1));
 AO.sf1k.Monitor.MemberOf = {};
 AO.sf1k.Monitor.Mode = 'Simulator';
 AO.sf1k.Monitor.DataType = 'Scalar';
@@ -1063,7 +1061,7 @@ AO.sd2k.DeviceList  = getDeviceList(10,2);
 AO.sd2k.ElementList = (1:size(AO.sd2k.DeviceList,1))';
 AO.sd2k.Status      = ones(size(AO.sd2k.DeviceList,1),1);
 AO.sd2k.Position    = [];
-AO.sd2k.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sd2k.DeviceList,1),1));
+AO.sd2k.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sd2k.DeviceList,1),1));
 AO.sd2k.Monitor.MemberOf = {};
 AO.sd2k.Monitor.Mode = 'Simulator';
 AO.sd2k.Monitor.DataType = 'Scalar';
@@ -1092,7 +1090,7 @@ AO.sd3k.DeviceList  = getDeviceList(10,2);
 AO.sd3k.ElementList = (1:size(AO.sd3k.DeviceList,1))';
 AO.sd3k.Status      = ones(size(AO.sd3k.DeviceList,1),1);
 AO.sd3k.Position    = [];
-AO.sd3k.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sd3k.DeviceList,1),1));
+AO.sd3k.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sd3k.DeviceList,1),1));
 AO.sd3k.Monitor.MemberOf = {};
 AO.sd3k.Monitor.Mode = 'Simulator';
 AO.sd3k.Monitor.DataType = 'Scalar';
@@ -1121,7 +1119,7 @@ AO.sf2k.DeviceList  = getDeviceList(10,2);
 AO.sf2k.ElementList = (1:size(AO.sf2k.DeviceList,1))';
 AO.sf2k.Status      = ones(size(AO.sf2k.DeviceList,1),1);
 AO.sf2k.Position    = [];
-AO.sf2k.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sf2k.DeviceList,1),1));
+AO.sf2k.ExcitationCurves = sirius_getexcdata(repmat('sima-sf',size(AO.sf2k.DeviceList,1),1));
 AO.sf2k.Monitor.MemberOf = {};
 AO.sf2k.Monitor.Mode = 'Simulator';
 AO.sf2k.Monitor.DataType = 'Scalar';
@@ -1150,7 +1148,7 @@ AO.sfb.DeviceList  = getDeviceList(10,2);
 AO.sfb.ElementList = (1:size(AO.sfb.DeviceList,1))';
 AO.sfb.Status      = ones(size(AO.sfb.DeviceList,1),1);
 AO.sfb.Position    = [];
-AO.sfb.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sfb.DeviceList,1),1));  
+AO.sfb.ExcitationCurves = sirius_getexcdata(repmat('sima-sf',size(AO.sfb.DeviceList,1),1));  
 AO.sfb.Monitor.MemberOf = {};
 AO.sfb.Monitor.Mode = 'Simulator';
 AO.sfb.Monitor.DataType = 'Scalar';
@@ -1179,7 +1177,7 @@ AO.sdb.DeviceList  = getDeviceList(10,2);
 AO.sdb.ElementList = (1:size(AO.sdb.DeviceList,1))';
 AO.sdb.Status      = ones(size(AO.sdb.DeviceList,1),1);
 AO.sdb.Position    = [];
-AO.sdb.ExcitationCurves = sirius_getexcdata(repmat('sima-s',size(AO.sdb.DeviceList,1),1));
+AO.sdb.ExcitationCurves = sirius_getexcdata(repmat('sima-sd',size(AO.sdb.DeviceList,1),1));
 AO.sdb.Monitor.MemberOf = {};
 AO.sdb.Monitor.Mode = 'Simulator';
 AO.sdb.Monitor.DataType = 'Scalar';
