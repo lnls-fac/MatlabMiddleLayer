@@ -1032,10 +1032,8 @@ else
             end
             
             BendingAngle = zeros(size(AT.ATIndex, 1), 1);
-            SeptumLength = zeros(size(AT.ATIndex, 1), 1);
             for i = 1:size(AT.ATIndex, 1)
                 for j = 1:Nsplits
-                    SeptumLength(i) = SeptumLength(i) + THERING{AT.ATIndex(i,j)}.Length;
                     BendingAngle(i) = BendingAngle(i) + THERING{AT.ATIndex(i,j)}.BendingAngle;
                 end
                 AM(i) = AM(i) + BendingAngle(i);

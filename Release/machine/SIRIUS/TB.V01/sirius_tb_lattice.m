@@ -11,7 +11,7 @@ function [r, lattice_title, IniCond] = sirius_tb_lattice(varargin)
 energy = 0.15e9;
 lattice_version = 'TB.V01';
 mode = 'M';
-version = '6';
+version = '1';
 mode_version = [mode version];
 
 % processamento de input (energia e modo de operacao)
@@ -36,7 +36,9 @@ set_parameters_tb;
 
 bend_pass_method = 'BndMPoleSymplectic4Pass';
 quad_pass_method = 'StrMPoleSymplectic4Pass';
+sext_pass_method = 'StrMPoleSymplectic4Pass';
 
+corr_length = 0.07;
 
 %% elements
 %  ========
@@ -58,6 +60,11 @@ ld3p     = drift('ld3p', 0.18,   'DriftPass');
 le1p     = drift('le1p', 0.1856, 'DriftPass');
 le2      = drift('le2',  0.216,  'DriftPass');
 
+l100c  = drift('l100c', 0.1000 - corr_length/2, 'DriftPass');
+l150c  = drift('l150c', 0.1500 - corr_length/2, 'DriftPass');
+l200c  = drift('l200c', 0.2000 - corr_length/2, 'DriftPass');
+l100cc = drift('l100c', 0.1000 - corr_length, 'DriftPass');
+
 % --- markers ---
 inicio   = marker('start',  'IdentityPass');
 fim      = marker('end',    'IdentityPass');
@@ -67,8 +74,12 @@ fenda    = marker('fenda',  'IdentityPass');
 bpm      = marker('bpm', 'IdentityPass');
 
 % --- correctors ---
-ch     = corrector('hcm',  0, [0 0], 'CorrectorPass');
-cv     = corrector('vcm',  0, [0 0], 'CorrectorPass');
+ch   = sextupole ('ch', corr_length, 0.0, sext_pass_method);
+cv   = sextupole ('cv', corr_length, 0.0, sext_pass_method);
+
+% --- linac correctors ---
+lch  = corrector('ch',  0, [0 0], 'CorrectorPass');
+lcv  = corrector('cv',  0, [0 0], 'CorrectorPass');
 
 
 % --- quadrupoles ---
@@ -128,23 +139,23 @@ septine = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,
 septins = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
 bseptin = marker('bseptin','IdentityPass');
 eseptin = marker('eseptin','IdentityPass');
-septin  = [bseptin, septine, ch, septins,eseptin];
+septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
 
 %% % --- lines ---
 
 la2   = [la2p, l200, l200, l200];
-lb1   = [lb1p, l200, l200, bpm, l150, ch, l100, cv, l150];
+lb1   = [lb1p, l200, l200, bpm, l150c, ch, l100cc, cv, l150c];
 lb2   = [lb2p, l200];
-lb3   = [l200, l200, l200, l200, l200, fenda, l200, bpm, l150, cv, l100, ch, l200, l200, lb3p];
+lb3   = [l200, l200, l200, l200, l200, fenda, l200, bpm, l150c, cv, l100cc, ch, l200c, l200, lb3p];
 lc1   = [l200, l200, l200, l200, l100];
-lc3   = [l200, bpm, l150, cv, l100, ch, repmat(l200,1,26), lc3p];
-lc5   = [l150, l150, l150, bpm, l150, ch, l100, cv, l200];
+lc3   = [l200, bpm, l150c, cv, l100cc, ch, l200c, repmat(l200,1,25), lc3p];
+lc5   = [l150, l150, l150, bpm, l150c, ch, l100cc, cv, l200c];
 ld1   = [ld1p, repmat(l200,1,10)];
-ld3   = [ld3p, bpm, l150, ch, l200];
-le1   = [l200, cv, l200, l200, l200, l200, l200, l200, le1p];
-le3   = [l150, bpm, l150, cv, l100];
-line1 = [ch, cv, la1, q1a, l100, q1b, l100, q1a, l100, q1c, la2];
+ld3   = [ld3p, bpm, l150c, ch, l200c];
+le1   = [l200c, cv, l200c, l200, l200, l200, l200, l200, le1p];
+le3   = [l150, bpm, l150c, cv, l100c];
+line1 = [lch, lcv, la1, q1a, l100, q1b, l100, q1a, l100, q1c, la2]; 
 arc1  = [lb1, qd2, lb2, qf2, lb3];
 line2 = [lc1, qd3a, lc2, qf3a, lc3, qf3b, lc4, qd3b, lc5];
 arc2  = [ld1, qf4, ld2, qd4, ld3];

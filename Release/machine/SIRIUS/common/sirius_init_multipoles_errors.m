@@ -7,8 +7,6 @@ global THERING;
 
 sirius_set_field_profile;
 setfamilydata(1, 'SetMultipolesErrors');
-THERING = delete_errors(THERING);
-
 Families = findmemberof('Magnet');
 
 ModeFlag = getmode(deblank(Families{1}));
@@ -44,6 +42,7 @@ for l=1:size(Families, 1)
         for i=1:size(ATIndex, 1)
             idx = ElementsIndex(i);
             Index = ATIndex(i,:);
+            THERING = delete_errors(THERING, Index, MainHarmonic{idx}, Skew{idx});
             IntegratedFields  = interp1(MultipolesData{idx}(:,1), MultipolesData{idx}(:,2:end), HardwareValue(i));          
             THERING = set_errors(THERING, IntegratedFields, Index, Brho, ProfileA, ProfileB, Harmonics{idx}, MainHarmonic{idx}, Skew{idx});
         end          
@@ -53,52 +52,40 @@ end
 end
 
 
-function Ring = delete_errors(Ring)
+function Ring = delete_errors(Ring, Index, MainHarmonic, Skew)
 
-Families = findmemberof('Magnet');
-for k=1:size(Families,1)
-    Family        = deblank(Families{k});
-    ExcData       = getfamilydata(Family, 'ExcitationCurves');
-    MainHarmonic  = ExcData.main_harmonic;
-    Skew          = ExcData.skew;
-    ElemIndex     = dev2elem(Family);
-    ATIndex       = family2atindex(Family);
-    for i=1:size(ATIndex, 1)
-        idx = ElemIndex(i);
-        for j=1:size(ATIndex,2)
-            NewPolynomA = zeros(size(Ring{ATIndex(i,j)}.PolynomA));
-            NewPolynomB = zeros(size(Ring{ATIndex(i,j)}.PolynomB));
-            if Skew{idx}
-                NewPolynomA(MainHarmonic{idx}+1) = Ring{ATIndex(i,j)}.PolynomA(MainHarmonic{idx}+1);
-            else
-                NewPolynomB(MainHarmonic{idx}+1) = Ring{ATIndex(i,j)}.PolynomB(MainHarmonic{idx}+1);
-            end
-            Ring{ATIndex(i,j)}.PolynomB = NewPolynomB;
-            Ring{ATIndex(i,j)}.PolynomA = NewPolynomA;
+for i=1:length(Index)
+    if isfield(Ring{Index(i)}, 'PolynomA') && isfield(Ring{Index(i)}, 'PolynomB')
+        NewPolynomA = zeros(size(Ring{Index(i)}.PolynomA));
+        NewPolynomB = zeros(size(Ring{Index(i)}.PolynomB));
+        if Skew
+            NewPolynomA(MainHarmonic+1) = Ring{Index(i)}.PolynomA(MainHarmonic+1);
+        else
+            NewPolynomB(MainHarmonic+1) = Ring{Index(i)}.PolynomB(MainHarmonic+1);
         end
-    end
-end
-
-indices = findcells(Ring, 'PolynomB');
-for i=1:length(indices)   
-    if isfield(Ring{indices(i)}, 'CH')
-        Ring{indices(i)}.PolynomB(1) = Ring{indices(i)}.CH;
-    end
-    if isfield(Ring{indices(i)}, 'CV')
-        Ring{indices(i)}.PolynomA(1) = Ring{indices(i)}.CV;
-    end
-
-    if isfield(Ring{indices(i)}, 'SX')
-        Ring{indices(i)}.PolynomB(3) = Ring{indices(i)}.SX;
+        Ring{Index(i)}.PolynomB = NewPolynomB;
+        Ring{Index(i)}.PolynomA = NewPolynomA;
     end
     
-    if isfield(Ring{indices(i)}, 'QS')
-        Ring{indices(i)}.PolynomA(2) = Ring{indices(i)}.QS;
+    if isfield(Ring{Index(i)}, 'CH')
+        Ring{Index(i)}.PolynomB(1) = Ring{Index(i)}.CH;
+    end
+    if isfield(Ring{Index(i)}, 'CV')
+        Ring{Index(i)}.PolynomA(1) = Ring{Index(i)}.CV;
+    end
+
+    if isfield(Ring{Index(i)}, 'SX')
+        Ring{Index(i)}.PolynomB(3) = Ring{Index(i)}.SX;
     end
     
-    if isfield(Ring{indices(i)}, 'K')
-        Ring{indices(i)}.K = Ring{indices(i)}.PolynomB(2);
+    if isfield(Ring{Index(i)}, 'QS')
+        Ring{Index(i)}.PolynomA(2) = Ring{Index(i)}.QS;
     end
+    
+    if isfield(Ring{Index(i)}, 'K')
+        Ring{Index(i)}.K = Ring{Index(i)}.PolynomB(2);
+    end
+    
 end
 
 end
