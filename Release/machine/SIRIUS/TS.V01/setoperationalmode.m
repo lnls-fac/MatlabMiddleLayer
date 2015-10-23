@@ -47,7 +47,6 @@ updateatindex;
 
 % 2015-10-01 Luana
 if AD.SetMultipolesErrors
-    fprintf('   Setting initial values of multipoles errors.\n');
     sirius_init_multipoles_errors;
 end
 

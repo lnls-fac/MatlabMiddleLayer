@@ -51,14 +51,13 @@ L024100  = drift('l024100', 0.24100, 'DriftPass');
 L033627  = drift('l033627', 0.33627, 'DriftPass');
 L036000  = drift('l036000', 0.36000, 'DriftPass');
 L055500  = drift('l055500', 0.55500, 'DriftPass');
-L058627  = drift('L058627', 0.58627, 'DriftPass');
 L072491  = drift('l072491', 0.72491, 'DriftPass');
 L100000  = drift('l100000', 1.00000, 'DriftPass');
 L109600  = drift('l109600', 1.09600, 'DriftPass');
-L113227  = drift('L113227', 1.13227, 'DriftPass');
+L129600  = drift('l129600', 1.29600, 'DriftPass');
+L113227  = drift('l113227', 1.13227, 'DriftPass');
 L141091  = drift('l141091', 1.41091, 'DriftPass');
 L147091  = drift('l147091', 1.47091, 'DriftPass');
-L154600  = drift('l154600', 1.54600, 'DriftPass');
 L177091  = drift('l177091', 1.77091, 'DriftPass');
 L179350  = drift('l179350', 1.79350, 'DriftPass');
 L179563  = drift('l179563', 1.79563, 'DriftPass');
@@ -75,12 +74,12 @@ D022491 = drift('d022491',  0.22491-lenDif, 'DriftPass');
 STR  = marker('start',   'IdentityPass');     % start of the model
 FIM  = marker('end',     'IdentityPass');     % end of the model
 GIR  = marker('girder',  'IdentityPass');
-KIN  = marker('kick_in', 'IdentityPass');
 SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
 mqf  = marker('mqf',     'IdentityPass');
 BPM  = marker('bpm', 'IdentityPass');
 
+KIN  = quadrupole('kick_in', 0.50000, 0.0,         quad_pass_method);
 KEX  = quadrupole('kick_ex', 0.50000, 0.0,         quad_pass_method);
 SF   = sextupole ('sf',      0.10500, sf_strength, sext_pass_method);   
 SD   = sextupole ('sd',      0.10500, sd_strength, sext_pass_method);
@@ -103,7 +102,7 @@ DW    = [GIR, L213227,                                D214600, GIR];
 DW_QD = [GIR, L213227,                                L179563, GIR, QD, D024963];
 DW_KE = [GIR, L033627, KEX, L024100, KEX, L055500,    L179563, GIR, QD, D024963];
 DW_RF = [GIR, L213227, RFC,                           D214600, GIR];
-DW_KI = [GIR, L058627, KIN, L154600,                  D214600, GIR];
+DW_KI = [GIR, L033627, KIN, L129600,                  D214600, GIR];
 DW_CH = [L016118, CH, GIR, L182091,                   D214600, GIR];
 
 UP_01 = UP_SI;        DW_01 = DW_KI;        S01 = [UP_01, QFI, FIM, STR, mqf, QFI, DW_01, B];      
@@ -195,13 +194,6 @@ fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);
 % by default cavities and radiation is set to off 
 setcavity('off'); 
 setradiation('off');
-
-% Luana
-pb = findcells(THERING, 'PolynomB');
-for i=1:length(pb)
-    THERING{pb(i)}.NPA = THERING{pb(i)}.PolynomA;
-    THERING{pb(i)}.NPB = THERING{pb(i)}.PolynomB;
-end
 
 % sets default NumIntSteps values for elements
 THERING = set_num_integ_steps(THERING);

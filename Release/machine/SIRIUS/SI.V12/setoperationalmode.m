@@ -47,8 +47,9 @@ setmmldirectories(AD.Machine, AD.SubMachine, AD.ModeName, AD.OpsFileExtension);
 updateatindex;
 
 % 2015-09-18 Luana
+sirius_set_sextupole_fields;
+
 if AD.SetMultipolesErrors
-    fprintf('   Setting initial values of multipoles errors.\n');
     sirius_init_multipoles_errors;
 end
 

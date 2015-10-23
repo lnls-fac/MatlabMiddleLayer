@@ -167,13 +167,6 @@ if any(lens < 0)
     error(['AT model with negative drift in ' mfilename ' !\n']);
 end
 
-% Luana
-pb = findcells(the_line, 'PolynomB');
-for i=1:length(pb)
-    the_line{pb(i)}.NPA = the_line{pb(i)}.PolynomA;
-    the_line{pb(i)}.NPB = the_line{pb(i)}.PolynomB;
-end
-
 % Ajusta NumIntSteps
 the_line = set_num_integ_steps(the_line);
 

@@ -105,7 +105,7 @@ end
 
 try
     % HCM
-    AO.ch.AT.ATType = 'ch';
+    AO.ch.AT.ATType = 'HCM';
     AO.ch.AT.ATIndex = buildatindex(AO.ch.FamilyName, Indices.ch);
     AO.ch.Position = findspos(THERING, AO.ch.AT.ATIndex(:,1))';   
 catch
@@ -114,7 +114,7 @@ end
 
 try
     % VCM
-    AO.cv.AT.ATType = 'cv';
+    AO.cv.AT.ATType = 'VCM';
     AO.cv.AT.ATIndex = buildatindex(AO.cv.FamilyName, Indices.cv);
     AO.cv.Position = findspos(THERING, AO.cv.AT.ATIndex(:,1))';   
 catch

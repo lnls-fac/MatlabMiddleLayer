@@ -191,7 +191,7 @@ AO.SF.Setpoint.Units         = 'Hardware';
 AO.SF.Setpoint.HWUnits       = 'Ampere';
 AO.SF.Setpoint.PhysicsUnits  = 'meter^-3';
 AO.SF.Setpoint.Range         = [0 220];
-AO.SF.Setpoint.Tolerance     = .1;
+AO.SF.Setpoint.Tolerance     = 1.0;   % 2015-10-16 large diff between setpoint and readback
 AO.SF.Setpoint.DeltaRespMat  = .1;
 
 AO.SD.FamilyName             = 'SD';
@@ -219,7 +219,7 @@ AO.SD.Setpoint.Physics2HWFcn = @lnls1_ph2hw;
 AO.SD.Setpoint.Units         = 'Hardware';
 AO.SD.Setpoint.HWUnits       = 'Ampere';
 AO.SD.Setpoint.PhysicsUnits  = 'meter^-3';
-AO.SD.Setpoint.Range         = [0 220];
+AO.SD.Setpoint.Range         = [0 125];
 AO.SD.Setpoint.Tolerance     = .1;
 AO.SD.Setpoint.DeltaRespMat  = .1;
 
@@ -674,7 +674,7 @@ AO.A6SF.Setpoint.Units         = 'Hardware';
 AO.A6SF.Setpoint.HWUnits       = 'Ampere';
 AO.A6SF.Setpoint.PhysicsUnits  = 'meter^-3';
 AO.A6SF.Setpoint.Range         = [0 220];
-AO.A6SF.Setpoint.Tolerance     = .1;
+AO.A6SF.Setpoint.Tolerance     = 1.0;
 AO.A6SF.Setpoint.DeltaRespMat  = .1;
 
 AO.A6SD01.FamilyName             = 'A6SD01';
@@ -703,7 +703,7 @@ AO.A6SD01.Setpoint.Physics2HWFcn = @lnls1_ph2hw;
 AO.A6SD01.Setpoint.Units         = 'Hardware';
 AO.A6SD01.Setpoint.HWUnits       = 'Ampere';
 AO.A6SD01.Setpoint.PhysicsUnits  = 'meter^-3';
-AO.A6SD01.Setpoint.Range         = [0 220];
+AO.A6SD01.Setpoint.Range         = [0 125];
 AO.A6SD01.Setpoint.Tolerance     = .1;
 AO.A6SD01.Setpoint.DeltaRespMat  = .1;
 
@@ -733,7 +733,7 @@ AO.A6SD02.Setpoint.Physics2HWFcn = @lnls1_ph2hw;
 AO.A6SD02.Setpoint.Units         = 'Hardware';
 AO.A6SD02.Setpoint.HWUnits       = 'Ampere';
 AO.A6SD02.Setpoint.PhysicsUnits  = 'meter^-3';
-AO.A6SD02.Setpoint.Range         = [0 220];
+AO.A6SD02.Setpoint.Range         = [0 125];
 AO.A6SD02.Setpoint.Tolerance     = .1;
 AO.A6SD02.Setpoint.DeltaRespMat  = .1;
 

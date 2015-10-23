@@ -169,7 +169,7 @@ for i=1:size(BendFamilies,1)
 
 end
 
-Energy_Gev = (1e-9)*sqrt((const.c^2)*(IntegField/(2*pi-BCAngle))^2 + (const.E0*1e6)^2);
+Energy_Gev = (1e-9)*sqrt((const.c^2)*(-IntegField/(2*pi-BCAngle))^2 + (const.E0*1e6)^2);
 GeV = repmat(Energy_Gev,size(DeviceList,1),1);
 
 end

@@ -158,7 +158,7 @@ ATIndex       = family2atindex(Family, DeviceList);
 DeflectionAngle = zeros(size(ATIndex,1),1);
 for i = 1:size(ATIndex,1)
     for j = 1:size(ATIndex,2)
-        DeflectionAngle(i) = DeflectionAngle(i) + THERING{ATIndex(i,j)}.BendingAngle + THERING{ATIndex(i,j)}.NPB(1)*THERING{ATIndex(i,j)}.Length;
+        DeflectionAngle(i) = DeflectionAngle(i) + THERING{ATIndex(i,j)}.BendingAngle + THERING{ATIndex(i,j)}.PolynomB(1)*THERING{ATIndex(i,j)}.Length;
     end
 end
 
@@ -166,7 +166,7 @@ ExcData = getfamilydata(Family, 'ExcitationCurves');
 Amps = zeros(size(ElementsIndex,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
-    IntegratedField = GeV * (DeflectionAngle(i) / (const.c/1e9));
+    IntegratedField = -GeV * (DeflectionAngle(i) / (const.c/1e9));
     Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), IntegratedField);
 end
 

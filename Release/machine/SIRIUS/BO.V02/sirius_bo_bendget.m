@@ -11,12 +11,6 @@ bend_b = PowerSupplies(2,:);
 FamilyValueA = getpv(bend_a, Field, DeviceList, 'Hardware');
 FamilyValueB = getpv(bend_b, Field, DeviceList, 'Hardware');
 
-% if FamilyValueA == FamilyValueB
-%     AM = FamilyValueA;
-% else
-%     fprintf('\n   WARNING: Bend power supplies with different values! \n');
-% end
-
 AM = FamilyValueA;
 
 tout = etime(clock, t0);
