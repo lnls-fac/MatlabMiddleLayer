@@ -21,18 +21,29 @@ fams       = findmemberof(model_name);
 the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 
-% BC
-% ==
-% Model3: 2015-10-16_Dipolo_Anel_BC_B3_Modelo3_gap_lateral_0mm_peca_-1.4mm_-90_12mm_-2000_2000mm.txt
-model_name = 'si-bc';
-r0         = 12/1000;
-monoms     =   [ 2,       3,       4,       5,       6,       7,       8,       10];
-Bn_normal  = 0*[-3.8e-4*1, +1.4e-4, -1.3e-3, +7.6e-5, -5.7e-3, +4.7e-5, +6.3e-3, -3.7e-3];
-Bn_skew    = 1*[ 0.0      0.0      0.0      0.0      0.0      0.0      0.0      0.0]; 
-main_monom = {0, 'normal'}; 
-fams       = findmemberof(model_name);
-the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% % BC
+% % ==
+% % Model3: 2015-10-16_Dipolo_Anel_BC_B3_Modelo3_gap_lateral_0mm_peca_-1.4mm_-90_12mm_-2000_2000mm.txt
+% model_name = 'si-bc';
+% r0         = 12/1000;
+% monoms     =   [ 2,         3,       4,       5,       6,       7,       8,       10];
+% Bn_normal  = 0*[-3.8e-4*1, +1.4e-4, -1.3e-3, +7.6e-5, -5.7e-3, +4.7e-5, +6.3e-3, -3.7e-3];
+% Bn_skew    = 1*[ 0.0        0.0      0.0      0.0      0.0      0.0      0.0      0.0]; 
+% main_monom = {0, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
+% % BC
+% % ==
+% % Model5: 2015-10-26_Dipolo_Anel_BC_B3_Modelo3_gap_lateral_0.25mm_peca_3.5mm_-90_12mm_-2000_2000mm.txt
+% model_name = 'si-bc';
+% r0         = 12/1000;
+% monoms     =   [ 2,         3,       4,       5,       6,       7,       8,       10];
+% Bn_normal  = 1*[-2.7e-3*0, +2.5e-4, -7.1e-4, -4.8e-5, -8.8e-3, +1.1e-4, +1.2e-2, -6.7e-3]; % sextupole already included in nominal model
+% Bn_skew    = 1*[ 0.0        0.0      0.0      0.0      0.0      0.0      0.0      0.0]; 
+% main_monom = {0, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % QUADRUPOLES Q14 MODEL2
 % ======================

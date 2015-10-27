@@ -4,7 +4,7 @@ function sirius_injection
 
 p.bo_version = 'BO.V02';
 p.ts_version = 'TS.V01';
-p.si_version = 'SI.V10';
+p.si_version = 'SI.V12';
 p.ts_mode    = 'M1';
 p.nr_particles    = 1000;     % nr_particles in simulation
 p.bo_coupling     = 0.10;     % booster transverse coupling (<1.0)

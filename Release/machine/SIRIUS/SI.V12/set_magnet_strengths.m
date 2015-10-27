@@ -15,6 +15,12 @@ elseif strcmpi(mode, 'bc_model3')
     cd(fullfile(path,'opt_results/'));
     eval('bc_model3');
     cd(cur);
+elseif strcmpi(mode, 'bc_model5')
+    [path, ~, ~] = fileparts(mfilename('fullpath'));
+    cur = pwd;
+    cd(fullfile(path,'opt_results/'));
+    eval('bc_model5');
+    cd(cur);
 else
     error('mode not implemented');
 end

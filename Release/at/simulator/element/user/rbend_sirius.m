@@ -33,7 +33,7 @@ ElemData.PolynomB       = PolyB;
 ElemData.FullGap   		= gap;
 ElemData.FringeInt1		= fint1; 
 ElemData.FringeInt2		= fint2; 
-ElemData.K      		= PolyB(2);
+%ElemData.K      		= PolyB(2);
 
 ElemData.R1 = diag(ones(6,1));
 ElemData.R2 = diag(ones(6,1));

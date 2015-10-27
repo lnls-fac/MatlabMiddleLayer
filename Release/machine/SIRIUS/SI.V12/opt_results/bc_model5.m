@@ -2,22 +2,15 @@
 %  QUADRUPOLOS
 %  ===========
 
-qfa_strength	= 3.781546267116; % original
-qda_strength	=-1.724861679102;
-qdb2_strength	=-3.610352029005;
-qfb_strength	= 4.278824038372;
-qdb1_strength	=-2.110673214423;
-
-% qfa_strength	= 3.782047688077775;  % same tune as C1
-% qda_strength	=-1.731901771845652;
-% qdb2_strength	=-3.611970859969574;
-% qfb_strength	= 4.280793599163645;
-% qdb1_strength	=-2.117686863701636;
-
-qf1_strength	= 2.990961985911;
-qf2_strength	= 4.225161819526;
-qf3_strength	= 3.294338790849;
-qf4_strength	= 3.95388361043;
+qfa_strength	= 3.781216174112; % original
+qda_strength	=-1.727023504738;
+qdb2_strength	=-3.463970921245;
+qfb_strength	= 4.256336758225;
+qdb1_strength	=-2.166195280249;
+qf1_strength	= 3.08704787837;
+qf2_strength	= 4.152094565265;
+qf3_strength	= 3.238939835933;
+qf4_strength	= 3.99281375493;
 
 
 %  SEXTUPOLOS

@@ -1,9 +1,9 @@
-function data = sirius_si_family_data_bc_model3(the_ring)
+function data = sirius_si_family_data_bc_model5(the_ring)
 
-data.b1.nr_segs   = 2;
-data.b2.nr_segs   = 3;
-data.bc_lf.nr_segs   = 14;
-data.bc_hf.nr_segs   = 16;
+data.b1.nr_segs     = 2;
+data.b2.nr_segs     = 3;
+data.bc_lf.nr_segs  = 14;
+data.bc_hf.nr_segs  = 16;
 data.bc.nr_segs     = 30;
 
 data.qfa.nr_segs  = 1;
@@ -109,7 +109,6 @@ data.cv.ATIndex = data.cv.ATIndex';
 % bc 
 idx = [data.('bc_lf').ATIndex, data.('bc_hf').ATIndex];
 data.bc.ATIndex = sort(idx);
-
 
 % fch - fast horizontal correctors
 idx = [];

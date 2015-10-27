@@ -22,7 +22,7 @@ PolyB(1:length(PolynomB)) = PolynomB;
 
 ElemData.FamName = fname;  % add check for existing identical family names
 ElemData.Length  = L;
-ElemData.K       = PolyB(2);
+%ElemData.K       = PolyB(2);
 ElemData.MaxOrder       = length(PolyA)-1;
 ElemData.NumIntSteps = 10;
 ElemData.PolynomA = PolyA;
