@@ -9,8 +9,9 @@ m_accep = 4; types{end+1} = struct('fam_name', 'calc_mom_accep', 'passmethod', '
 % dipole model 2015-10-27
 % =======================
 % this model is based on fieldmap
+% /home/fac_files/data/sirius/si/magnet_modelling/si-bc/bc-model5
 % '2015-10-26_Dipolo_Anel_BC_B3_Modelo5_gap_lateral_0.25mm_peca_3.5mm_-90_12mm_-2000_2000mm.txt'
-%
+
 monomials = [0,1,2,3,4,5,6,7,8,10];
 segmodel = [ ...
 %type    len[m]    angle[deg]               PolynomB(n=0)            PolynomB(n=1)            PolynomB(n=2)            PolynomB(n=3)            PolynomB(n=4)           PolynomB(n=5)           PolynomB(n=6)           PolynomB(n=7)           PolynomB(n=8)          PolynomB(n=10)      
@@ -37,16 +38,16 @@ bc_lf,   0.03500,  +1.9005956303470142e-02, -2.8911543418873900e-04, -1.21110513
 
 % builds half of the magnet model
 d2r = pi/180.0;
-b = [];
+b = zeros(1,size(segmodel,1));
 maxorder = 1+max(monomials);
 for i=1:size(segmodel,1)
     type = types{segmodel(i,1)};
     if strcmpi(type.passmethod, 'IdentityPass')
-        b = [b marker(type.fam_name, 'IdentityPass')];
+        b(i) = marker(type.fam_name, 'IdentityPass');
     else
         PolyB = zeros(1,maxorder); PolyA = zeros(1,maxorder);
         PolyB(monomials+1) = segmodel(i,4:end); 
-        b = [b rbend_sirius(type.fam_name, segmodel(i,2), d2r * segmodel(i,3), 0, 0, 0, 0, 0, PolyA, PolyB, 'BndMPoleSymplectic4Pass')];
+        b(i) = rbend_sirius(type.fam_name, segmodel(i,2), d2r * segmodel(i,3), 0, 0, 0, 0, 0, PolyA, PolyB, 'BndMPoleSymplectic4Pass');
     end
 end
 

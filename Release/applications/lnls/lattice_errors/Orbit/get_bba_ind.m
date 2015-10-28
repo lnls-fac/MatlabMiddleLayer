@@ -1,9 +1,10 @@
-function ind_bba = get_bba_ind(the_ring)
+function ind_bba = get_bba_ind(the_ring, quad_idx)
 
 % Determinando indices dos quadrupolos na rede
-mag_idx = findcells(the_ring,'K');
-dip_idx = findcells(the_ring,'BendingAngle');
-quad_idx = setdiff(mag_idx,dip_idx);
+% mag_idx = findcells(the_ring,'K');
+% dip_idx = findcells(the_ring,'BendingAngle');
+% quad_idx = setdiff(mag_idx,dip_idx);
+
 %determinando indice dos bpms na rede
 bpm_idx = findcells(the_ring,'FamName','bpm');
 %descobrindo qual a posicao dos elementos na rede

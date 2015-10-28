@@ -312,13 +312,6 @@ if any(lens < 0)
     error(['AT model with negative drift in ' mfilename ' !\n']);
 end
 
-% Luana
-pb = findcells(THERING, 'PolynomB');
-for i=1:length(pb)
-    THERING{pb(i)}.NPA = THERING{pb(i)}.PolynomA;
-    THERING{pb(i)}.NPB = THERING{pb(i)}.PolynomB;
-end
-
 % adjusts RF frequency according to lattice length and synchronous condition
 %[beta, ~, ~] = lnls_beta_gamma(energy/1e9);
 const  = lnls_constants;

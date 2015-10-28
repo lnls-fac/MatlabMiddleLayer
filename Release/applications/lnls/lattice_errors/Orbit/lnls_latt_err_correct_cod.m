@@ -87,7 +87,8 @@ fprintf('   | (max)   (rms) | (max)   (rms) | (max)   (rms) | (max)   (rms) | (m
 fprintf('%7.5f ', orbit.sext_ramp); fprintf('\n');
 fprintf('---|---------------------------------------------------------------|-------------------------------| \n');
 if orbit.correct2bba_orbit
-    ind_bba = get_bba_ind(machine{1});
+    ind_bba = orbit.ind_bba;
+    %ind_bba = get_bba_ind(machine{1});
 end
 
 sext_idx = findcells(machine{1},'PolynomB');
@@ -95,7 +96,9 @@ random_cod = zeros(2,length(orbit.bpm_idx));
 ids_idx = findcells(machine{1}, 'PassMethod', 'LNLSThickEPUPass');
 
 for i=1:nr_machines
-    sext_str = getcellstruct(machine{i}, 'PolynomB', sext_idx, 1, 3);
+    
+    %sext_str = getcellstruct(machine{i}, 'PolynomB', sext_idx, 1, 3);
+    polynomb_orig = getcellstruct(machine{i}, 'PolynomB', sext_idx);
     
     if orbit.simul_bpm_err
         random_cod = getcellstruct(machine{i},'Offsets',orbit.bpm_idx);
@@ -123,7 +126,14 @@ for i=1:nr_machines
         if (j == length(orbit.sext_ramp))
             machine{i} = turn_ids_on(machine{i}, ids_idx);
         end
-        machine{i} = setcellstruct(machine{i},'PolynomB',sext_idx,orbit.sext_ramp(j)*sext_str, 1, 3);
+        
+        %machine{i} = setcellstruct(machine{i},'PolynomB',sext_idx,orbit.sext_ramp(j)*sext_str, 1, 3);
+        for k=1:length(polynomb_orig);
+            PolyB = machine{i}{sext_idx(k)}.PolynomB; % necessary so that correctors kicks are not lost
+            PolyB(3:end) = polynomb_orig{k}(3:end) * orbit.sext_ramp(j);
+            machine{i} = setcellstruct(machine{i},'PolynomB',sext_idx(k),{PolyB});
+        end
+        
         if calc_respm
             orbit.respm = calc_respm_cod(machine{i}, orbit.bpm_idx, orbit.hcm_idx, orbit.vcm_idx, 1, false);
             orbit.respm = orbit.respm.respm;
@@ -155,6 +165,7 @@ the_ring = the_ring_original;
 for i=idx
     the_ring{i}.PassMethod = 'DriftPass';
 end
+
 
 function the_ring = turn_ids_on(the_ring_original, idx)
 the_ring = the_ring_original;
