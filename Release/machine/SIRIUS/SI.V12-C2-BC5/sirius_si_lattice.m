@@ -1,4 +1,4 @@
-function [r, lattice_title] = sirius_si_lattice_bc_model5(varargin)
+function [r, lattice_title] = sirius_si_lattice(varargin)
 % the_ring = sirius_si_lattice       : retorna o modelo atual do anel;
 %
 % the_ring = sirius_si_lattice(mode) : Ateh o momento, pode ser 'A', 'B' or 'C'(default).
@@ -32,7 +32,7 @@ version = '';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
 
-lattice_version = 'SI.V12.2';
+lattice_version = 'SI.V12';
 % processamento de input (energia e modo de operacao)
 for i=1:length(varargin)
     if ischar(varargin{i}) && length(varargin{i})==1
@@ -115,34 +115,36 @@ MB1 = marker('mb1', 'IdentityPass');
 B1S = rbend_sirius('b1', 0.828/2,  2.7553*deg2rad/2, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
 B1  = [MOMACCEP,B1E,MOMACCEP,MB1,B1S,MOMACCEP];
 
-
 B2E = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 1.4143*deg2rad/2, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
 B2M = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
 B2S = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
 B2  = [MOMACCEP,B2E,MOMACCEP,B2M,MOMACCEP,B2S,MOMACCEP];
 
-BC1  = rbend_sirius('bc_hf', 0.005, 0.0900*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0  0.002 -38.636], bend_pass_method);
-BC2  = rbend_sirius('bc_hf', 0.005, 0.0810*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.021 -23.157], bend_pass_method);
-BC3  = rbend_sirius('bc_hf', 0.005, 0.0690*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.024 -15.040], bend_pass_method);
-BC4  = rbend_sirius('bc_hf', 0.005, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.027 -10.030], bend_pass_method);
-BC5  = rbend_sirius('bc_hf', 0.010, 0.0980*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.027 -6.5350], bend_pass_method);
-BC6  = rbend_sirius('bc_hf', 0.010, 0.0760*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.027 -4.7470], bend_pass_method);
-BC7  = rbend_sirius('bc_hf', 0.010, 0.0570*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.026 -3.1770], bend_pass_method);
-BC8  = rbend_sirius('bc_hf', 0.010, 0.0430*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.018 -1.6380], bend_pass_method);
-BC9  = rbend_sirius('bc_lf', 0.064, 0.2190*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.064  0.0540], bend_pass_method);
-BC10 = rbend_sirius('bc_lf', 0.160, 0.6270*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.921  0.3780], bend_pass_method);
-BC11 = rbend_sirius('bc_lf', 0.160, 0.6280*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.934  0.0230], bend_pass_method);
-BC12 = rbend_sirius('bc_lf', 0.012, 0.0380*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.495 -6.2990], bend_pass_method);
-BCPL = marker('bc_edge', 'IdentityPass');
-BC13 = rbend_sirius('bc_lf', 0.014, 0.0280*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.144 -4.2610], bend_pass_method);
-BC14 = rbend_sirius('bc_lf', 0.016, 0.0170*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.045 -1.7530], bend_pass_method);
-BC15 = rbend_sirius('bc_lf', 0.035, 0.0183*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.001 -0.0580], bend_pass_method);
-MC = marker('mc', 'IdentityPass');
-BCE = [BC15, BC14, BC13, BCPL, BC12, BC11, MOMACCEP, BC10, MOMACCEP, BC9,...
-        MOMACCEP, BC8, BC7, BC6, BC5, BC4, BC3, BC2, BC1];
-BCS = [BC1, BC2, BC3, BC4, BC5, BC6, BC7, BC8, MOMACCEP, ...
-        BC9, MOMACCEP, BC10, MOMACCEP, BC11, BC12, BCPL, BC13, BC14, BC15];
-BC  = [BCE,MC, MOMACCEP,BCS];
+[BC, BC_length] = sirius_si_bc_segmented_model;
+% % ORIGINAL MODEL
+% % ==============
+% BC1  = rbend_sirius('bc_hf', 0.005, 0.0900*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0  0.002 -38.636], bend_pass_method);
+% BC2  = rbend_sirius('bc_hf', 0.005, 0.0810*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.021 -23.157], bend_pass_method);
+% BC3  = rbend_sirius('bc_hf', 0.005, 0.0690*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.024 -15.040], bend_pass_method);
+% BC4  = rbend_sirius('bc_hf', 0.005, 0.0590*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.027 -10.030], bend_pass_method);
+% BC5  = rbend_sirius('bc_hf', 0.010, 0.0980*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.027 -6.5350], bend_pass_method);
+% BC6  = rbend_sirius('bc_hf', 0.010, 0.0760*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.027 -4.7470], bend_pass_method);
+% BC7  = rbend_sirius('bc_hf', 0.010, 0.0570*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.026 -3.1770], bend_pass_method);
+% BC8  = rbend_sirius('bc_hf', 0.010, 0.0430*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.018 -1.6380], bend_pass_method);
+% BC9  = rbend_sirius('bc_lf', 0.064, 0.2190*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.064  0.0540], bend_pass_method);
+% BC10 = rbend_sirius('bc_lf', 0.160, 0.6270*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.921  0.3780], bend_pass_method);
+% BC11 = rbend_sirius('bc_lf', 0.160, 0.6280*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.934  0.0230], bend_pass_method);
+% BC12 = rbend_sirius('bc_lf', 0.012, 0.0380*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.495 -6.2990], bend_pass_method);
+% BCPL = marker('bc_edge', 'IdentityPass');
+% BC13 = rbend_sirius('bc_lf', 0.014, 0.0280*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.144 -4.2610], bend_pass_method);
+% BC14 = rbend_sirius('bc_lf', 0.016, 0.0170*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.045 -1.7530], bend_pass_method);
+% BC15 = rbend_sirius('bc_lf', 0.035, 0.0183*deg2rad, 0, 0, 0, 0, 0, [0 0 0], [0 -0.001 -0.0580], bend_pass_method);
+% MC = marker('mc', 'IdentityPass');
+% BCE = [BC15, BC14, BC13, BCPL, BC12, BC11, MOMACCEP, BC10, MOMACCEP, BC9,...
+%         MOMACCEP, BC8, BC7, BC6, BC5, BC4, BC3, BC2, BC1];
+% BCS = [BC1, BC2, BC3, BC4, BC5, BC6, BC7, BC8, MOMACCEP, ...
+%         BC9, MOMACCEP, BC10, MOMACCEP, BC11, BC12, BCPL, BC13, BC14, BC15];
+% BC  = [BCE,MC, MOMACCEP,BCS];
 
 % -- quadrupoles --
 QFA  = quadrupole('qfa',  0.200, qfa_strength,  quad_pass_method);

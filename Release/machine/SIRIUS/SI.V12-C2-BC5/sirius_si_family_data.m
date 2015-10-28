@@ -1,9 +1,9 @@
-function data = sirius_si_family_data_bc_model5(the_ring)
+function data = sirius_si_family_data(the_ring)
 
 data.b1.nr_segs     = 2;
 data.b2.nr_segs     = 3;
-data.bc_lf.nr_segs  = 14;
 data.bc_hf.nr_segs  = 16;
+data.bc_lf.nr_segs  = 14;
 data.bc.nr_segs     = 30;
 
 data.qfa.nr_segs  = 1;
@@ -53,6 +53,7 @@ for i=1:length(the_ring)
         data.(Fam).ATIndex = [data.(Fam).ATIndex; i];
     end
 end
+data.bc.ATIndex = sort([data.bc_lf.ATIndex; data.bc_hf.ATIndex]);
 for i=1:length(fams)
     data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
 end
