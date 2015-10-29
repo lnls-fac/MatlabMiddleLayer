@@ -1,10 +1,10 @@
 function data = sirius_si_family_data(the_ring)
 
-data.b1.nr_segs     = 2;
-data.b2.nr_segs     = 3;
-data.bc_hf.nr_segs  = 16;
-data.bc_lf.nr_segs  = 14;
-data.bc.nr_segs     = 30;
+data.b1.nr_segs    = 2;
+data.b2.nr_segs    = 3;
+data.bc_hf.nr_segs = 16;
+data.bc_lf.nr_segs = 14;
+data.bc.nr_segs    = 30;
 
 data.qfa.nr_segs  = 1;
 data.qda.nr_segs  = 1;
@@ -16,10 +16,10 @@ data.qf2.nr_segs  = 1;
 data.qf3.nr_segs  = 1;
 data.qf4.nr_segs  = 1;
 
-data.sda.nr_segs = 1;
-data.sfa.nr_segs = 1;
-data.sdb.nr_segs = 1;
-data.sfb.nr_segs = 1;
+data.sda.nr_segs  = 1;
+data.sfa.nr_segs  = 1;
+data.sdb.nr_segs  = 1;
+data.sfb.nr_segs  = 1;
 data.sd1j.nr_segs = 1;
 data.sf1j.nr_segs = 1;
 data.sd2j.nr_segs = 1;
@@ -39,7 +39,7 @@ data.fcv.nr_segs  = 1;
 data.qs.nr_segs   = 1;
 data.ch.nr_segs   = 1;
 data.cv.nr_segs   = 1;
-data.qn.nr_segs  = 1;
+data.qn.nr_segs   = 1;
 
 
 fams = fields(data);
