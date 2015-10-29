@@ -125,18 +125,18 @@ B2M = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 0,   0, 0, 0, [0 0 0], [0
 B2S = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
 B2  = [MOMACCEP,B2E,MOMACCEP,B2M,MOMACCEP,B2S,MOMACCEP];
 
-[BC, BC_length] = sirius_si_bc_segmented_model(bend_pass_method, m_accep_fam_name);
+[BC, ~] = sirius_si_bc_segmented_model(bend_pass_method, m_accep_fam_name);
 
 % -- quadrupoles --
-QFA  = quadrupole('qfa',  0.200, qfa_strength,  quad_pass_method);
-QDA  = quadrupole('qda',  0.140, qda_strength,  quad_pass_method);
-QDB2 = quadrupole('qdb2', 0.140, qdb2_strength, quad_pass_method);
-QFB  = quadrupole('qfb',  0.300, qfb_strength,  quad_pass_method);
-QDB1 = quadrupole('qdb1', 0.140, qdb1_strength, quad_pass_method);
-QF1  = quadrupole('qf1',  0.200, qf1_strength,  quad_pass_method);
-QF2  = quadrupole('qf2',  0.200, qf2_strength,  quad_pass_method);
-QF3  = quadrupole('qf3',  0.200, qf3_strength,  quad_pass_method);
-QF4  = quadrupole('qf4',  0.200, qf4_strength,  quad_pass_method);
+[QFA,  ~] = sirius_si_q20_segmented_model('qfa',  qfa_strength,  quad_pass_method);
+[QDA,  ~] = sirius_si_q14_segmented_model('qda',  qda_strength,  quad_pass_method);
+[QDB2, ~] = sirius_si_q14_segmented_model('qdb2', qdb2_strength, quad_pass_method);
+[QFB,  ~] = sirius_si_q30_segmented_model('qfb',  qfb_strength,  quad_pass_method);
+[QDB1, ~] = sirius_si_q14_segmented_model('qdb1', qdb1_strength, quad_pass_method);
+[QF1,  ~] = sirius_si_q20_segmented_model('qf1',  qf1_strength,  quad_pass_method);
+[QF2,  ~] = sirius_si_q20_segmented_model('qf2',  qf2_strength,  quad_pass_method);
+[QF3,  ~] = sirius_si_q20_segmented_model('qf3',  qf3_strength,  quad_pass_method);
+[QF4,  ~] = sirius_si_q20_segmented_model('qf4',  qf4_strength,  quad_pass_method);
 
 % -- sextupoles and slow correctors --
 SFA  = sextupole('sfa',   0.147, sfa_strength,  sext_pass_method); % CH-CV

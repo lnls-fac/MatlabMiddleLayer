@@ -8,7 +8,7 @@ m_accep = 4; types{end+1} = struct('fam_name', m_accep_fam_name, 'passmethod', '
 
 % dipole model 2015-10-27
 % =======================
-% this model is based on fieldmap
+% this (half) model is based on fieldmap
 % /home/fac_files/data/sirius/si/magnet_modelling/si-bc/bc-model5
 % '2015-10-26_Dipolo_Anel_BC_B3_Modelo5_gap_lateral_0.25mm_peca_3.5mm_-90_12mm_-2000_2000mm.txt'
 
@@ -47,7 +47,7 @@ for i=1:size(segmodel,1)
     else
         PolyB = zeros(1,maxorder); PolyA = zeros(1,maxorder);
         PolyB(monomials+1) = segmodel(i,4:end); 
-        b(i) = rbend_sirius(type.fam_name, segmodel(i,2), d2r * segmodel(i,3), 0, 0, 0, 0, 0, PolyA, PolyB, 'BndMPoleSymplectic4Pass');
+        b(i) = rbend_sirius(type.fam_name, segmodel(i,2), d2r * segmodel(i,3), 0, 0, 0, 0, 0, PolyA, PolyB, passmethod);
     end
 end
 
