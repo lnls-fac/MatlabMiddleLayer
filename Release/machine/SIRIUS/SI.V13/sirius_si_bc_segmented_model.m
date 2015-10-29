@@ -1,10 +1,10 @@
-function [model, model_length] = sirius_si_bc_segmented_model
+function [model, model_length] = sirius_si_bc_segmented_model(passmethod, m_accep_fam_name)
 
 types = {};
-bc_hf   = 1; types{end+1} = struct('fam_name', 'bc_hf', 'passmethod', 'BndMPoleSymplectic4Pass');
-bc_lf   = 2; types{end+1} = struct('fam_name', 'bc_lf', 'passmethod', 'BndMPoleSymplectic4Pass');
+bc_hf   = 1; types{end+1} = struct('fam_name', 'bc_hf', 'passmethod', passmethod);
+bc_lf   = 2; types{end+1} = struct('fam_name', 'bc_lf', 'passmethod', passmethod);
 bc_edge = 3; types{end+1} = struct('fam_name', 'bc_edge', 'passmethod', 'IdentityPass');
-m_accep = 4; types{end+1} = struct('fam_name', 'calc_mom_accep', 'passmethod', 'IdentityPass');
+m_accep = 4; types{end+1} = struct('fam_name', m_accep_fam_name, 'passmethod', 'IdentityPass');
 
 % dipole model 2015-10-27
 % =======================

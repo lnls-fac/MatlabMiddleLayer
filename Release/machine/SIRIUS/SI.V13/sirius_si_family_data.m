@@ -31,14 +31,14 @@ data.sd2k.nr_segs = 1;
 data.sd3k.nr_segs = 1;
 data.sf2k.nr_segs = 1;
 
-data.bpm.nr_segs = 1;
-data.rbpm.nr_segs= 1;
-data.cf.nr_segs  = 1;
-data.fch.nr_segs = 1;
-data.fcv.nr_segs = 1;
-data.qs.nr_segs  = 1;
-data.ch.nr_segs = 1;
-data.cv.nr_segs = 1;
+data.bpm.nr_segs  = 1;
+data.rbpm.nr_segs = 1;
+data.fc.nr_segs   = 1;
+data.fch.nr_segs  = 1;
+data.fcv.nr_segs  = 1;
+data.qs.nr_segs   = 1;
+data.ch.nr_segs   = 1;
+data.cv.nr_segs   = 1;
 data.qn.nr_segs  = 1;
 
 
@@ -64,9 +64,9 @@ idx = [];
 idx = [idx; data.('sfa').ATIndex];
 idx = [idx; data.('sd1j').ATIndex];
 idx = [idx; data.('sf2j').ATIndex];
-idx = [idx; data.('sfb').ATIndex];
-idx = [idx; data.('sd1k').ATIndex];
 idx = [idx; data.('sf2k').ATIndex];
+idx = [idx; data.('sd1k').ATIndex];
+idx = [idx; data.('sfb').ATIndex];
 idx = sort(idx);
 data.ch.ATIndex = reshape(idx,data.ch.nr_segs,[]);
 data.ch.ATIndex = data.ch.ATIndex';
@@ -80,6 +80,8 @@ idx = [idx; data.('sfb').ATIndex];
 idx = [idx; data.('sd1k').ATIndex];
 idx = [idx; data.('sd3k').ATIndex];
 idx = [idx; data.('cv').ATIndex];
+
+
 % In this version of the lattice, there is a cv corrector in the sextupoles
 % sf2 of every sector C3 of the arc the lattice. It means the corrector
 % alternates between a SF2J and SF2K. The logic bellow uses the dipoles B2 
@@ -113,14 +115,14 @@ data.bc.ATIndex = sort(idx);
 
 % fch - fast horizontal correctors
 idx = [];
-idx = [idx; data.('cf').ATIndex];
+idx = [idx; data.('fc').ATIndex];
 idx = sort(idx);
 data.fch.ATIndex = reshape(idx,data.fch.nr_segs,[]);
 data.fch.ATIndex = data.fch.ATIndex';
 
 % fcv - fast vertical correctors
 idx = [];
-idx = [idx; data.('cf').ATIndex];
+idx = [idx; data.('fc').ATIndex];
 idx = sort(idx);
 data.fcv.ATIndex = reshape(idx,data.fcv.nr_segs,[]);
 data.fcv.ATIndex = data.fcv.ATIndex';
