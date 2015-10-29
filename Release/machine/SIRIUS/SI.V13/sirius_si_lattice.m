@@ -67,9 +67,9 @@ MOMACCEP = marker(m_accep_fam_name, 'IdentityPass');  %
 
 % -- drifts --
 
-LKK  = drift('lkk',  2.0250,'DriftPass');
-LPMU = drift('lpmu', 0.3070,'DriftPass');
-LPMD = drift('lpmd', 0.2859,'DriftPass');
+LKK  = drift('lkk',  1.8630,'DriftPass');
+LPMU = drift('lpmu', 0.3220,'DriftPass');
+LPMD = drift('lpmd', 0.4629,'DriftPass');
 LIA  = drift('lia2', 1.6179,'DriftPass');
 LIB  = drift('lib2', 1.1879,'DriftPass');
 
@@ -77,6 +77,7 @@ L0350 = drift('l0350', 0.0350, 'DriftPass');
 L0420 = drift('l0400', 0.0420, 'DriftPass');
 L0770 = drift('l0887', 0.0770, 'DriftPass');
 L0740 = drift('l0740', 0.0740, 'DriftPass');
+L0810 = drift('l0830', 0.0810, 'DriftPass');
 L0830 = drift('l0830', 0.0830, 'DriftPass');
 L1050 = drift('l1050', 0.1050,'DriftPass');
 L1120 = drift('l1120', 0.1120, 'DriftPass');
@@ -87,6 +88,7 @@ L1850 = drift('l1850', 0.1850, 'DriftPass');
 L2000 = drift('l2000', 0.2000, 'DriftPass');
 L2400 = drift('l2400', 0.2400,'DriftPass');
 L2550 = drift('l2550', 0.2550, 'DriftPass');
+L4190 = drift('l4190', 0.4190,'DriftPass');
 L4950 = drift('l4950', 0.4950,'DriftPass');
 L5000 = drift('l5000', 0.5000, 'DriftPass');
 L7150 = drift('l7150', 0.7150, 'DriftPass');
@@ -158,7 +160,7 @@ CV   = sextupole('cv',    0.150, 0.0,           sext_pass_method); % same model 
 % -- pulsed magnets --
 
 KICKIN = sextupole('kick_in', 0.5, 0, sext_pass_method); % injection kicker
-PMM    = sextupole('pmm',     0.5, 0, sext_pass_method); % pulsed multipole magnet
+PMM    = sextupole('pmm',     0.47, 0, sext_pass_method); % pulsed multipole magnet
 
 % -- bpms and fast correctors --
 BPM    = marker('bpm', 'IdentityPass');
@@ -189,7 +191,7 @@ M1A_FC   = fliplr(M2A_FC);                                                      
 M1A      = fliplr(M2A);                                                                                                       % high beta xxM1 girder
 IDA      = [L5000,LIA,L5000,MIDA,L5000,L5000,MIA,L5000,L5000,MIDA,L5000,LIA,L5000];                                           % high beta ID straight section
 CAV      = [L5000,LIA,L5000,L5000,L5000,MIA,RFC,L5000,L5000,L5000,LIA,L5000];                                                 % high beta RF cavity straight section 
-INJ      = [L5000,LIA,L5000,L2000,SEPTIN,L8000,END,START,MIA, LKK, KICKIN, LPMU, PMM, LPMD];                                  % high beta INJ straight section
+INJ      = [L5000,LIA,L4190,SEPTIN,L5000,L5000,L0810,END,START,MIA, LKK, KICKIN, LPMU, PMM, LPMD];                                  % high beta INJ straight section
 M1B      = [GIR,L1700,GIR,QDB1,L1515,SDB,L2415,QFB,L1515,SFB,L0515,FC,L0350,QDB2,L1400,BPM,RBPM,GIR];                         % low beta xxM1 girder
 M2B      = fliplr(M1B);                                                                                                       % low beta xxM2 girder
 IDB      = [L5000,LIB,L5000,MIDB,L5000,L5000,MIB,L5000,L5000,MIDB,L5000,LIB,L5000];                                           % low beta ID straight section
