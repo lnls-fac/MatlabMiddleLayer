@@ -33,41 +33,44 @@ the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom
 % fams       = findmemberof(model_name);
 % the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
-% QUADRUPOLES Q14 MODEL2
-% ======================
-model_name = 'q14';
-r0         = 12/1000;
-% systematic multipoles from '2015-01-27 Quadrupolo_Anel_QC_Modelo 2_-12_12mm_-500_500mm.txt'
-monoms     =   [ 5,       9,       13,       17];
-Bn_normal  = 1*[-3.6e-4, +1.4e-3, -5.9e-04, +5.7e-5];
-Bn_skew    = 1*[ 0.0,     0.0,     0.0,      0.0];
-main_monom = {1, 'normal'}; 
-fams       = findmemberof(model_name);
-the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% % QUADRUPOLES Q14 MODEL2
+% % ======================
+% % !!! Now all multipoles are in the nominal lattice !!!
+% model_name = 'q14';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-01-27 Quadrupolo_Anel_QC_Modelo 2_-12_12mm_-500_500mm.txt'
+% monoms     =   [ 5,       9,       13,       17];
+% Bn_normal  = 1*[-3.6e-4, +1.4e-3, -5.9e-04, +5.7e-5];
+% Bn_skew    = 1*[ 0.0,     0.0,     0.0,      0.0];
+% main_monom = {1, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
-% QUADRUPOLES Q20 MODEL3
-% ======================
-model_name = 'q20';
-r0         = 12/1000;
-% systematic multipoles from '2015-02-10 Quadrupolo_Anel_QM_Modelo 3_-12_12mm_-500_500mm.txt'
-monoms     =   [ 5,       9,       13,       17];
-Bn_normal  = 1*[-3.7e-4, +1.4e-3, -5.7e-04, +3.8e-5];
-Bn_skew    = 1*[ 0.0,     0.0,     0.0,      0.0];
-main_monom = {1, 'normal'}; 
-fams       = findmemberof(model_name);
-the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% % QUADRUPOLES Q20 MODEL3
+% % ======================
+% % !!! Now all multipoles are in the nominal lattice !!!
+% model_name = 'q20';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-02-10 Quadrupolo_Anel_QM_Modelo 3_-12_12mm_-500_500mm.txt'
+% monoms     =   [ 5,       9,       13,       17];
+% Bn_normal  = 1*[-3.7e-4, +1.4e-3, -5.7e-04, +3.8e-5];
+% Bn_skew    = 1*[ 0.0,     0.0,     0.0,      0.0];
+% main_monom = {1, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
-% QUADRUPOLES Q30 MODEL4
-% ======================
-model_name = 'q30';
-r0         = 12/1000;
-% systematic multipoles from '2015-02-13 Quadrupolo_Anel_QL_Modelo 4_-12_12mm_-500_500mm.txt'
-monoms     =   [ 5,       9,       13,       17];
-Bn_normal  = 1*[-3.9e-4, +1.5e-3, -6.0e-04, +4.8e-5];
-Bn_skew    = 1*[ 0.0,     0.0,     0.0,      0.0];
-main_monom = {1, 'normal'}; 
-fams       = findmemberof(model_name);
-the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% % QUADRUPOLES Q30 MODEL4
+% % ======================
+% % !!! Now all multipoles are in the nominal lattice !!!
+% model_name = 'q30';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-02-13 Quadrupolo_Anel_QL_Modelo 4_-12_12mm_-500_500mm.txt'
+% monoms     =   [ 5,       9,       13,       17];
+% Bn_normal  = 1*[-3.9e-4, +1.5e-3, -6.0e-04, +4.8e-5];
+% Bn_skew    = 1*[ 0.0,     0.0,     0.0,      0.0];
+% main_monom = {1, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % SEXTUPOLES
 % ==========
