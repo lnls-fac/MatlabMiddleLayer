@@ -8,10 +8,10 @@ quad   = 1; types{end+1} = struct('fam_name', fam_name, 'passmethod', passmethod
 % this (half) model is based on fieldmap
 % /home/fac_files/data/sirius/si/magnet_modelling/si-q30/model5/
 % '11-05-2015 Quadrupolo_Anel_Q30_Modelo 5_-14_14mm_-500_500mm.txt'
-monomials = [1,5,9,13,17];
+monomials = [1,5,9,13];
 segmodel = [ ...
 %len[m]              angle[deg]             PolynomB(n=1)           PolynomB(n=5)           PolynomB(n=9)          PolynomB(n=13)          PolynomB(n=17) 
-quad, 0.15000  +0.0000000000000000e+00 -4.8094118405370176e+00 +1.0563800793035635e+05 -2.0525547903119117e+13 +4.1376047948347376e+20 -1.2260123399423674e+27 
+quad  0.15000  +0.0000000000000000e+00 -4.8094092760891334e+00 +1.0262416626168450e+05 -1.9838940265974629e+13 +3.6202345204266068e+20
 ];
 
 % hardedge quadrupole strength of the fieldmap
