@@ -194,15 +194,15 @@ M1B_FC   = [GIR,L1700,GIR,QDB1,L1515,SDB,L2415,QFB,L1515,SFB,L0515,FC,L0350,QDB2
 M2B_FC   = fliplr(M1B_FC);                                                                                                       % low beta xxM2 girder
 IDB      = [L5000,LIB,L5000,MIDB,L5000,L5000,MIB,L5000,L5000,MIDB,L5000,LIB,L5000];                                              % low beta ID straight section
 C1A      = [GIR,L6115,GIR,SD1J,L1715,QF1,L1350,BPM,L1265,SF1J,L2315,QF2,L1715,SD2J,GIR,L1565,GIR,BPM,L1850];                     % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C3A      = [GIR,L7150,GIR,BPM,RBPM,L1120,QF4,L0830,FC,L0785,SF2K,L2315,QF3,L1715,SD3K,GIR,L2765,GIR,BPM,L1850];                  % arc sector in between BC-B2 (high beta odd-numbered straight sections)
-C4A      = [GIR,L3415,GIR,SD2K,L1715,QF2,L2315,SF1K,L1265,BPM,L1350,QF1,L1715,SD1K,GIR,L6115,GIR];                               % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-C1B      = [GIR,L6115,GIR,SD1K,L1715,QF1,L1350, BPM,L1265,SF1K,L2315,QF2,L1715,SD2K,GIR,L1565,GIR,BPM,L1850];                    % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C3B      = [GIR,L7150,GIR,BPM,RBPM,L1120,QF4,L0830,FC,L0785,SF2J,L2315,QF3,L1715,SD3J,GIR,L2765,GIR,BPM,L1850];                  % arc sector in between BC-B2 (low beta even-numbered straight sections)
-C4B      = [GIR,L3415,GIR,SD2J,L1715,QF2,L2315,SF1J,L1265,BPM,L1350,QF1,L1715,SD1J,GIR,L6115,GIR];                               % arc sector in between B2-B1 (low beta even-numbered straight sections)
+C1B      = [GIR,L6115,GIR,SD1K,L1715,QF1,L1350,BPM,L1265,SF1K,L2315,QF2,L1715,SD2K,GIR,L1565,GIR,BPM,L1850];                     % arc sector in between B1-B2 (low beta even-numbered straight sections)
 C2A      = [GIR,L4615,GIR,SD3J,L1715,QF3,L2315,SF2J,L0780,FC,L0835,QF4,GIR,L4950,GIR,CV,L1050,L0420,BPM,RBPM,L0350];             % arc sector in between B2-BC (high beta odd-numbered straight sections)
-C2B      = [GIR,L4615,GIR,SD3K,L1715,QF3,L2315,SF2K,L0780,FC,L0835,QF4,GIR,L4950,GIR,CV,L1050,BPM,RBPM,L0770];                   % arc sector in between B2-BC (low beta even-numbered straight sections)
+C2B      = [GIR,L4615,GIR,SD3K,L1715,QF3,L2315,SF2K,L0780,FC,L0835,QF4,GIR,L4950,GIR,CV,L1050,L0420,BPM,RBPM,L0350];             % arc sector in between B2-BC (low beta even-numbered straight sections)
 C2A_DCCT = [GIR,L4615,GIR,SD3J,L1715,QF3,L2315,SF2J,L0780,FC,L0835,QF4,GIR,L2550,DCCT1,L2400,GIR,CV,L1050,L0420,BPM,RBPM,L0350]; % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
 C2B_DCCT = [GIR,L4615,GIR,SD3K,L1715,QF3,L2315,SF2K,L0780,FC,L0835,QF4,GIR,L2550,DCCT2,L2400,GIR,CV,L1050,L0420,BPM,RBPM,L0350]; % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
+C3A      = [GIR,L7150,GIR,BPM,RBPM,L1120,QF4,L0830,FC,L0785,SF2K,L2315,QF3,L1715,SD3K,GIR,L2765,GIR,BPM,L1850];                  % arc sector in between BC-B2 (high beta odd-numbered straight sections)
+C3B      = [GIR,L7150,GIR,BPM,RBPM,L1120,QF4,L0830,FC,L0785,SF2J,L2315,QF3,L1715,SD3J,GIR,L2765,GIR,BPM,L1850];                  % arc sector in between BC-B2 (low beta even-numbered straight sections)
+C4A      = [GIR,L3415,GIR,SD2K,L1715,QF2,L2315,SF1K,L1265,BPM,L1350,QF1,L1715,SD1K,GIR,L6115,GIR];                               % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C4B      = [GIR,L3415,GIR,SD2J,L1715,QF2,L2315,SF1J,L1265,BPM,L1350,QF1,L1715,SD1J,GIR,L6115,GIR];                               % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
 
 
