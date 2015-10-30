@@ -18,19 +18,18 @@ qf4_strength     = 3.99281375493;
 %% Sextupoles
 %% ===============
 
-f = 146.6/147;
-sda_strength     =  -78.2234*f;
-sfa_strength     =   52.0364*f;
-sdb_strength     =  -58.1022*f;
-sfb_strength     =   76.0027*f;
-sd1j_strength    = -177.4914*f;
-sf1j_strength    =  197.7428*f;
-sd2j_strength    =  -95.6511*f;
-sd3j_strength    = -124.5333*f;
-sf2j_strength    =  156.0761*f;
-sd1k_strength    = -131.1118*f;
-sf1k_strength    =  228.7555*f;
-sd2k_strength    = -125.9740*f;
-sd3k_strength    = -179.6652*f;
-sf2k_strength    =  218.7230*f;
+sda_strength     =  -79.8198;
+sfa_strength     =   53.0984;
+sdb_strength     =  -59.2880;
+sfb_strength     =   77.5538;
+sd1j_strength    = -181.1137;
+sf1j_strength    =  201.7784;
+sd2j_strength    =  -97.6032;
+sd3j_strength    = -127.0748;
+sf2j_strength    =  159.2613;
+sd1k_strength    = -133.7876;
+sf1k_strength    =  233.4240;
+sd2k_strength    = -128.5449;
+sd3k_strength    = -183.3318;
+sf2k_strength    =  223.1867;
 
