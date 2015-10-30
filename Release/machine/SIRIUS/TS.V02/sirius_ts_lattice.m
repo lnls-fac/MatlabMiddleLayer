@@ -81,8 +81,8 @@ qd4b    = quadrupole('qd4b', 0.14, qd4b_strength, quad_pass_method); % qd
 bpm    = marker('bpm', 'IdentityPass');
 
 % --- correctors ---
-ch     = corrector('hcm',  0, [0 0], 'CorrectorPass');
-cv     = corrector('vcm',  0, [0 0], 'CorrectorPass');
+ch     = corrector('ch',  0, [0 0], 'CorrectorPass');
+cv     = corrector('cv',  0, [0 0], 'CorrectorPass');
 
 % --- bending magnets --- 
 
