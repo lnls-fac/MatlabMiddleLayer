@@ -4,11 +4,21 @@
 %% QUADRUPOLES
 %% ===============
 
-qfa_strength     = 3.781127255639479;   % quads fitted for tune [48.094076551431819  13.117516956683698] and new BC seg. model 5
-qda_strength     = -1.727450426951440;
-qdb2_strength    = -3.464186498121693;
-qfb_strength     = 4.255836760752442;
-qdb1_strength    = -2.166621192701850;
+% qfa_strength     = 3.781127255639479;   % quads fitted for tune [48.094076551431819  13.117516956683698] and new BC seg. model 5
+% qda_strength     = -1.727450426951440;
+% qdb2_strength    = -3.464186498121693;
+% qfb_strength     = 4.255836760752442;
+% qdb1_strength    = -2.166621192701850;
+% qf1_strength     = 3.08704787837;
+% qf2_strength     = 4.152094565265;
+% qf3_strength     = 3.238939835933;
+% qf4_strength     = 3.99281375493;
+
+qfa_strength     = 3.781428367439702;   % quads fitted for tune [48.094076551431819  13.117516956683698] 
+qda_strength     = -1.727883171047120;  % and new BC seg. model 5 (without dipolar error in BC)
+qdb2_strength    = -3.464188404735297;
+qfb_strength     = 4.256394915910803;
+qdb1_strength    = -2.167053702616425;
 qf1_strength     = 3.08704787837;
 qf2_strength     = 4.152094565265;
 qf3_strength     = 3.238939835933;
