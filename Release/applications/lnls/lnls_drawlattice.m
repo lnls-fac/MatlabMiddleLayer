@@ -1,4 +1,4 @@
-function lnls_drawlattice(the_ring, nper, offset, unset_names, scale, bpms_and_cms, girders, h)
+function lnls_drawlattice(the_ring, nper, offset, unset_names, scale, bpms, cms, girders, h)
 % lnls_drawlattice(the_ring, nper, offset, unset_names, scale, bpms_and_cms, h)
 %
 % INPUTS:
@@ -7,7 +7,8 @@ function lnls_drawlattice(the_ring, nper, offset, unset_names, scale, bpms_and_c
 %                 beginning of the_ring up to smax/nper;
 %   offset      - offset the drawing in the vertical axis (default: 0)
 %   unset_names - boolean. Disables display of the family names (default: true)
-%   bpms_and_cms- boolean. Plot BPMs and Correctors (default: false)
+%   bpms        - boolean. Plot BPMs and Correctors (default: false)
+%   cms         - boolean. Plot BPMs and Correctors (default: false)
 %   scale       - scales the rectangles and lines to mach the plot scale
 %                 (default: 1)
 %   girders     - boolean. Plot Girders (default: false)
@@ -25,8 +26,11 @@ if ~exist('h','var'), h = gca;end
 if exist('girders','var') && girders
     draw_girders(the_ring, nper, offset, 1.5*scale, h);
 end
-if exist('bpms_and_cms', 'var') && bpms_and_cms
-    draw_bpms_cms(the_ring, nper, offset, scale, h);
+if exist('cms', 'var') && cms
+    draw_cms(the_ring, nper, offset, scale, h);
+end
+if exist('bpms', 'var') && bpms
+    draw_bpms(the_ring, nper, offset, scale, h);
 end
 
 idx = findcells(the_ring, 'PassMethod', 'IdentityPass');
@@ -47,15 +51,15 @@ for i=1:(length(pos)-1)
     if isfield(the_ring{i}, 'BendingAngle')
         rectangle('Position',[s,-1*scale+offset,len,2*scale], 'FaceColor', [0 0.535 0.711], 'EdgeColor', [0 0.535 0.711],'Parent',h);
         print_name = true;
-    elseif isfield(the_ring{i}, 'K')
-        rectangle('Position',[s,-1*scale+offset,len,2*scale], 'FaceColor', [0.918 0.609 0.32], 'EdgeColor', [0.918 0.609 0.32],'Parent',h);
-        print_name = true;
     elseif isfield(the_ring{i}, 'PolynomB')
-        if ~any(strcmpi(the_ring{i}.FamName,{'pmm','cf'}))
+        if any(strcmpi(the_ring{i}.FamName,{'kick_in','pmm','cf','cv'}))
+            line([s s+len], [0+offset 0+offset], 'Color', [0 0 0],'Parent',h);
+        elseif the_ring{i}.PolynomB(3) ~= 0 && the_ring{i}.PolynomB(2) == 0
             rectangle('Position',[s,-1*scale+offset,len,2*scale], 'FaceColor', [0.539 0.598 0.465], 'EdgeColor', [0.539 0.598 0.465],'Parent',h);
             print_name = true;
-        else
-            line([s s+len], [0+offset 0+offset], 'Color', [0 0 0],'Parent',h);
+        elseif the_ring{i}.PolynomB(2) ~= 0
+            rectangle('Position',[s,-1*scale+offset,len,2*scale], 'FaceColor', [0.918 0.609 0.32], 'EdgeColor', [0.918 0.609 0.32],'Parent',h);
+            print_name = true;
         end
     else
         line([s s+len], [0+offset 0+offset], 'Color', [0 0 0],'Parent',h);
@@ -105,7 +109,25 @@ for i=1:length(gir_names)
 end    
 
 
-function draw_bpms_cms(the_ring, nper, offset, scale, h)
+function draw_cms(the_ring, nper, offset, scale, h)
+
+pos = findspos(the_ring, 1:(length(the_ring)+1));
+max_pos = pos(end) / (nper - 0.001);
+hcms = findcells(the_ring, 'FamName', 'ch');
+for i=1:length(hcms)
+    s = pos(hcms(i));
+    if (s > max_pos), break; end;
+    line([s s], [0+offset -1.5*scale+offset], 'Color', [0 0 1],'Parent',h)
+end
+vcms = findcells(the_ring, 'FamName', 'cv');
+for i=1:length(vcms)
+    s = pos(vcms(i));
+    if (s > max_pos), break; end;
+    line([s s], [0+offset -1.5*scale+offset], 'Color', [1 0 0],'Parent',h)
+end
+
+
+function draw_bpms(the_ring, nper, offset, scale, h)
 
 pos = findspos(the_ring, 1:(length(the_ring)+1));
 max_pos = pos(end) / (nper - 0.001);
@@ -114,16 +136,4 @@ for i=1:length(bpms)
     s = pos(bpms(i));
     if (s > max_pos), break; end;
     line([s s], [0+offset scale*1.5+offset], 'Color', [0 0 0],'Parent',h)
-end
-hcms = findcells(the_ring, 'FamName', 'hcm');
-for i=1:length(hcms)
-    s = pos(hcms(i));
-    if (s > max_pos), break; end;
-    line([s s], [0+offset -1.5*scale+offset], 'Color', [0 0 1],'Parent',h)
-end
-vcms = findcells(the_ring, 'FamName', 'vcm');
-for i=1:length(vcms)
-    s = pos(vcms(i));
-    if (s > max_pos), break; end;
-    line([s s], [0+offset -1.5*scale+offset], 'Color', [1 0 0],'Parent',h)
 end
