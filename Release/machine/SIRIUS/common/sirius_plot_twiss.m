@@ -120,13 +120,13 @@ if junto
     xlimit=[0 twiss.pos(fim)];
     switch lower(maquina)
         case 'si'
-            lnls_drawlattice(THERING,20,offset,true,0.8*Delta,true);
+            lnls_drawlattice(THERING,20,offset,true,0.8*Delta,true,true);
             xlim(xlimit);
         case 'bo'
-            lnls_drawlattice(THERING,10,offset,true,0.8*Delta,true);
+            lnls_drawlattice(THERING,10,offset,true,0.8*Delta,true,true);
             xlim(xlimit);
         otherwise
-            lnls_drawlattice(THERING,1,offset,true,0.8*Delta,true);
+            lnls_drawlattice(THERING,1,offset,true,0.8*Delta,true,true);
             xlim(xlimit);
     end
     offset=offset-2*Delta;
@@ -202,7 +202,7 @@ else
     
     %Grafico rede magnetica
     axes('Units','pixels','Position',[70 315 780 50]);
-    lnls_drawlattice(THERING,sym,0,true,1,true);
+    lnls_drawlattice(THERING,sym,0,true,1,true,true);
     xlim(xlimit);
     axis off;
     
