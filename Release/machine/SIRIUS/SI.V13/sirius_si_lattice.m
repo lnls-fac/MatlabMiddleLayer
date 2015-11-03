@@ -18,6 +18,7 @@ function [r, lattice_title] = sirius_si_lattice(varargin)
 % 2013-10-02: adicionei o mode_version como parametro de input. (Fernando)
 % 2014-09-17: modificacao das corretoras para apenas uma par integrado de CV e CH rapidas e lentas no mesmo elemento. (Natalia) 
 % 2014-10-07: atualizados nomes de alguns elementos. (xrr)
+% 2015-11-03: agora modelo do BC é segmentado
 
 global THERING;
 

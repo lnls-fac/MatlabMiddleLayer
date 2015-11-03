@@ -14,11 +14,21 @@
 % qf3_strength     = 3.238939835933;
 % qf4_strength     = 3.99281375493;
 
-qfa_strength     = 3.781428367439702;   % quads fitted for tune [48.094076551431819  13.117516956683698] 
-qda_strength     = -1.727883171047120;  % and new BC seg. model 5 (without dipolar error in BC)
-qdb2_strength    = -3.464188404735297;
-qfb_strength     = 4.256394915910803;
-qdb1_strength    = -2.167053702616425;
+% qfa_strength     = 3.781428367439702;   % quads fitted for tune [48.094076551431819  13.117516956683698] 
+% qda_strength     = -1.727883171047120;  % and new BC seg. model 5 (without dipolar error in BC)
+% qdb2_strength    = -3.464188404735297;
+% qfb_strength     = 4.256394915910803;
+% qdb1_strength    = -2.167053702616425;
+% qf1_strength     = 3.08704787837;
+% qf2_strength     = 4.152094565265;
+% qf3_strength     = 3.238939835933;
+% qf4_strength     = 3.99281375493;
+
+qfa_strength     = 3.781377934050076;   % quads fitted for tune [48.094076551431819  13.117516956683698] 
+qda_strength     = -1.729510957743298;  % and new BC seg. model 5 (without dipolar error in BC)
+qdb2_strength    = -3.464582579589413;  % corrected model 6 (2015-11-03)
+qfb_strength     = 4.256608447646975;
+qdb1_strength    = -2.168696073532848;
 qf1_strength     = 3.08704787837;
 qf2_strength     = 4.152094565265;
 qf3_strength     = 3.238939835933;
