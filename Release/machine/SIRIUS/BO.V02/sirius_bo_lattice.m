@@ -8,6 +8,7 @@ function [the_ring, lattice_title] = sirius_bo_lattice(varargin)
 % 2015-09-08 novo modelo QF: Leff = 227.46 mm - Ximenes.
 % 2015-09-14 novos modelos de corretoras com Leff = 150.18 mm - Ximenes.
 % 2015-11-04 modelos com comprimentos multiplos de milímetros - Ximenes.
+% 2015-11-04 segmented model of B corrected (last element had 5 mm, instead of 50 mm)
 
 %%% HEADER SECTION %%%
 

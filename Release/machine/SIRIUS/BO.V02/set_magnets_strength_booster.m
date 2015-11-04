@@ -85,11 +85,20 @@
 % sf_strength = 11.327508716063402;
 % sd_strength =  6.669827683440462;
 
+% % 2015-11-04 ximenes
+% % elements length multiple of milimeters
+% qf_strength =  1.657883953509854 * (0.227/0.22746);
+% qd_strength = -0.009872230069252 * (0.101/0.10074);
+% sf_strength = 11.327508716063402;
+% sd_strength =  6.669827683440462;
+
 % 2015-11-04 ximenes
-% elements length multiple of milimeters
-qf_strength =  1.657883953509854 * (0.227/0.22746);
-qd_strength = -0.009872230069252 * (0.101/0.10074);
+% after segmented model of dipole was corrected (last element was 5 mm long, instead of 50 mm)
+qf_strength =  1.654531766801048;
+qd_strength = -0.009834018323292;
 sf_strength = 11.327508716063402;
 sd_strength =  6.669827683440462;
+
+
 
 
