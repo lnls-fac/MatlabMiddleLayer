@@ -14,7 +14,7 @@ global THERING
 
 energy = 0.15e9; % eV
 
-lattice_version = 'BO.V02';
+lattice_version = 'BO.V02B';
 for i=1:length(varargin)
 	energy = varargin{i} * 1e9;
 end
@@ -39,37 +39,37 @@ set_magnets_strength_booster;
 % approved fieldmap. The segmented model has a longer length 
 % and the difference has to be accomodated.
 % loads dipole segmented model:
+b_len_hdedge   = 1.152; % [m]
 [B, b_len_seg] = dipole_segmented_model(bend_pass_method);
+lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 
-b_len_hdedge = 1.152; % [m]
-lenDif       = (b_len_seg - b_len_hdedge)/2.0;
-
-L013377  = drift('l013377', 0.13377, 'DriftPass');
-L016118  = drift('l016118', 0.16118, 'DriftPass');
-L017241  = drift('l017241', 0.17241, 'DriftPass');
-L024100  = drift('l024100', 0.24100, 'DriftPass');
-L033627  = drift('l033627', 0.33627, 'DriftPass');
-L036000  = drift('l036000', 0.36000, 'DriftPass');
-L055500  = drift('l055500', 0.55500, 'DriftPass');
-L072491  = drift('l072491', 0.72491, 'DriftPass');
-L100000  = drift('l100000', 1.00000, 'DriftPass');
-L109600  = drift('l109600', 1.09600, 'DriftPass');
-L129600  = drift('l129600', 1.29600, 'DriftPass');
-L113227  = drift('l113227', 1.13227, 'DriftPass');
-L141091  = drift('l141091', 1.41091, 'DriftPass');
-L147091  = drift('l147091', 1.47091, 'DriftPass');
-L177091  = drift('l177091', 1.77091, 'DriftPass');
-L179350  = drift('l179350', 1.79350, 'DriftPass');
-L179563  = drift('l179563', 1.79563, 'DriftPass');
-L182091  = drift('l182091', 1.82091, 'DriftPass');
-L189350  = drift('l18935',  1.89350, 'DriftPass');
-L213227  = drift('l213227', 2.13227, 'DriftPass');
+L01340  = drift('l01340', 0.1340, 'DriftPass');
+L01615  = drift('l01615', 0.1615, 'DriftPass');
+L01725  = drift('l01725', 0.1725, 'DriftPass');
+L02410  = drift('l02410', 0.2410, 'DriftPass');
+L03365  = drift('l03365', 0.3365, 'DriftPass');
+L03600  = drift('l03600', 0.3600, 'DriftPass');
+L05550  = drift('l05550', 0.5550, 'DriftPass');
+L07250  = drift('l07250', 0.7250, 'DriftPass');
+L10000  = drift('l10000', 1.0000, 'DriftPass');
+L10960  = drift('l10960', 1.0960, 'DriftPass');
+L11325  = drift('l11325', 1.1325, 'DriftPass');
+L12960  = drift('l12960', 1.2960, 'DriftPass');
+L14110  = drift('l14110', 1.4110, 'DriftPass');
+L14710  = drift('l14710', 1.4710, 'DriftPass');
+L17710  = drift('l17710', 1.7710, 'DriftPass');
+L17935  = drift('l17935', 1.7935, 'DriftPass');
+L17955  = drift('l17955', 1.7955, 'DriftPass');
+L18210  = drift('l18210', 1.8210, 'DriftPass');
+L18935  = drift('l18935', 1.8935, 'DriftPass');
+L21325  = drift('l21325', 2.1325, 'DriftPass');
 
 % drifts affected by the dipole modelling:
-D024750 = drift('d024750',  0.24750-lenDif, 'DriftPass');
-D024963 = drift('d024963',  0.24963-lenDif, 'DriftPass');
-D214600 = drift('d214600',  2.14600-lenDif, 'DriftPass');
-D022491 = drift('d022491',  0.22491-lenDif, 'DriftPass');
+
+D02250 = drift('d02250',  0.2250-lenDif, 'DriftPass');
+D02475 = drift('d02475',  0.2475-lenDif, 'DriftPass');
+D02495 = drift('d02495',  0.2495-lenDif, 'DriftPass');
+D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 
 STR  = marker('start',   'IdentityPass');     % start of the model
 FIM  = marker('end',     'IdentityPass');     % end of the model
@@ -77,84 +77,84 @@ GIR  = marker('girder',  'IdentityPass');
 SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
 mqf  = marker('mqf',     'IdentityPass');
-BPM  = marker('bpm', 'IdentityPass');
+BPM  = marker('bpm',     'IdentityPass');
 
-KIN  = quadrupole('kick_in', 0.50000, 0.0,         quad_pass_method);
-KEX  = quadrupole('kick_ex', 0.50000, 0.0,         quad_pass_method);
-SF   = sextupole ('sf',      0.10500, sf_strength, sext_pass_method);   
-SD   = sextupole ('sd',      0.10500, sd_strength, sext_pass_method);
-CH   = sextupole ('ch',      0.15018, 0.0,         sext_pass_method);
-CV   = sextupole ('cv',      0.15018, 0.0,         sext_pass_method);
-QD   = quadrupole('qd',      0.10074, qd_strength, quad_pass_method);
-QFI  = quadrupole('qf',      0.11373, qf_strength, quad_pass_method);
-QF   = [QFI,mqf,QFI];
+KIN  = quadrupole('kick_in', 0.500,     0.0,         quad_pass_method);
+KEX  = quadrupole('kick_ex', 0.500,     0.0,         quad_pass_method);
+SF   = sextupole ('sf',      0.105,     sf_strength, sext_pass_method);   
+SD   = sextupole ('sd',      0.105,     sd_strength, sext_pass_method);
+CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);
+CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
+QD   = quadrupole('qd',      0.101,     qd_strength, quad_pass_method);
+QFI2 = quadrupole('qf',      0.227/2.0, qf_strength, quad_pass_method);
+QF  = [QFI2,mqf,QFI2];
 
 RFC = rfcavity('cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
 
-UP_SF = [GIR, D214600, BPM,                           L189350, GIR, SF, L013377];  
-UP_SS = [D024750, SD, GIR, L179350, BPM,              L189350, GIR, SF, L013377];
-UP_SI = [D022491, CV, GIR, L177091, BPM,              L109600, SIN, L072491, GIR, CH, L016118];
-UP_CS = [D024750, SD, L017241, CV, GIR, L147091, BPM, L182091, GIR, CH, L016118];
-UP_CC = [D022491, CV, GIR, L177091, BPM,              L182091, GIR, CH, L016118];
-UP_SE = [D022491, CV, GIR, L141091, SEX, L036000,     L100000, BPM, L113227, GIR];
+US_SF = [GIR, D21460, BPM, L18935, GIR, SF, L01340];  
+US_SS = [D02475, SD, GIR, L17935, BPM, L18935, GIR, SF, L01340];
+US_SI = [D02250, CV, GIR, L17710, BPM, L10960, SIN, L07250, GIR, CH, L01615];
+US_CS = [D02475, SD, L01725, CV, GIR, L14710, BPM, L18210, GIR, CH, L01615];
+US_CC = [D02250, CV, GIR, L17710, BPM, L18210, GIR, CH, L01615];
+US_SE = [D02250, CV, GIR, L14110, SEX, L03600, L10000, BPM, L11325, GIR];
 
-DW    = [GIR, L213227,                                D214600, GIR];
-DW_QD = [GIR, L213227,                                L179563, GIR, QD, D024963];
-DW_KE = [GIR, L033627, KEX, L024100, KEX, L055500,    L179563, GIR, QD, D024963];
-DW_RF = [GIR, L213227, RFC,                           D214600, GIR];
-DW_KI = [GIR, L033627, KIN, L129600,                  D214600, GIR];
-DW_CH = [L016118, CH, GIR, L182091,                   D214600, GIR];
+DS    = [GIR, L21325, D21460, GIR];
+DS_QD = [GIR, L21325, L17955, GIR, QD, D02495];
+DS_KE = [GIR, L03365, KEX, L02410, KEX, L05550, L17955, GIR, QD, D02495];
+DS_RF = [GIR, L21325, RFC, D21460, GIR];
+DS_KI = [GIR, L03365, KIN, L12960, D21460, GIR];
+DS_CH = [L01615, CH, GIR, L18210, D21460, GIR];
 
-UP_01 = UP_SI;        DW_01 = DW_KI;        S01 = [UP_01, QFI, FIM, STR, mqf, QFI, DW_01, B];      
-UP_02 = UP_SF;        DW_02 = DW_QD;        S02 = [UP_02, QF, DW_02, B];
-UP_03 = UP_CS;        DW_03 = DW;           S03 = [UP_03, QF, DW_03, B];   
-UP_04 = UP_SF;        DW_04 = DW_QD;        S04 = [UP_04, QF, DW_04, B];
-UP_05 = UP_CC;        DW_05 = DW_RF;        S05 = [UP_05, QF, DW_05, B];      
-UP_06 = UP_SF;        DW_06 = DW_QD;        S06 = [UP_06, QF, DW_06, B];
-UP_07 = UP_CC;        DW_07 = DW;           S07 = [UP_07, QF, DW_07, B];   
-UP_08 = UP_SS;        DW_08 = DW_QD;        S08 = [UP_08, QF, DW_08, B];
-UP_09 = UP_CC;        DW_09 = DW;           S09 = [UP_09, QF, DW_09, B];   
-UP_10 = UP_SF;        DW_10 = DW_QD;        S10 = [UP_10, QF, DW_10, B];
-UP_11 = UP_CC;        DW_11 = DW;           S11 = [UP_11, QF, DW_11, B];   
-UP_12 = UP_SF;        DW_12 = DW_QD;        S12 = [UP_12, QF, DW_12, B];
-UP_13 = UP_CS;        DW_13 = DW;           S13 = [UP_13, QF, DW_13, B];   
-UP_14 = UP_SF;        DW_14 = DW_QD;        S14 = [UP_14, QF, DW_14, B];
-UP_15 = UP_CC;        DW_15 = DW;           S15 = [UP_15, QF, DW_15, B];   
-UP_16 = UP_SF;        DW_16 = DW_QD;        S16 = [UP_16, QF, DW_16, B];
-UP_17 = UP_CC;        DW_17 = DW;           S17 = [UP_17, QF, DW_17, B];   
-UP_18 = UP_SS;        DW_18 = DW_QD;        S18 = [UP_18, QF, DW_18, B];
-UP_19 = UP_CC;        DW_19 = DW;           S19 = [UP_19, QF, DW_19, B];   
-UP_20 = UP_SF;        DW_20 = DW_QD;        S20 = [UP_20, QF, DW_20, B];
-UP_21 = UP_CC;        DW_21 = DW;           S21 = [UP_21, QF, DW_21, B];   
-UP_22 = UP_SF;        DW_22 = DW_QD;        S22 = [UP_22, QF, DW_22, B];
-UP_23 = UP_CS;        DW_23 = DW;           S23 = [UP_23, QF, DW_23, B];   
-UP_24 = UP_SF;        DW_24 = DW_QD;        S24 = [UP_24, QF, DW_24, B];
-UP_25 = UP_CC;        DW_25 = DW;           S25 = [UP_25, QF, DW_25, B];   
-UP_26 = UP_SF;        DW_26 = DW_QD;        S26 = [UP_26, QF, DW_26, B];
-UP_27 = UP_CC;        DW_27 = DW;           S27 = [UP_27, QF, DW_27, B];   
-UP_28 = UP_SS;        DW_28 = DW_QD;        S28 = [UP_28, QF, DW_28, B];
-UP_29 = UP_CC;        DW_29 = DW;           S29 = [UP_29, QF, DW_29, B];   
-UP_30 = UP_SF;        DW_30 = DW_QD;        S30 = [UP_30, QF, DW_30, B];
-UP_31 = UP_CC;        DW_31 = DW;           S31 = [UP_31, QF, DW_31, B];   
-UP_32 = UP_SF;        DW_32 = DW_QD;        S32 = [UP_32, QF, DW_32, B];
-UP_33 = UP_CS;        DW_33 = DW;           S33 = [UP_33, QF, DW_33, B];   
-UP_34 = UP_SF;        DW_34 = DW_QD;        S34 = [UP_34, QF, DW_34, B];
-UP_35 = UP_CC;        DW_35 = DW;           S35 = [UP_35, QF, DW_35, B];   
-UP_36 = UP_SF;        DW_36 = DW_QD;        S36 = [UP_36, QF, DW_36, B];
-UP_37 = UP_CC;        DW_37 = DW;           S37 = [UP_37, QF, DW_37, B];   
-UP_38 = UP_SS;        DW_38 = DW_QD;        S38 = [UP_38, QF, DW_38, B];
-UP_39 = UP_CC;        DW_39 = DW;           S39 = [UP_39, QF, DW_39, B];   
-UP_40 = UP_SF;        DW_40 = DW_QD;        S40 = [UP_40, QF, DW_40, B];
-UP_41 = UP_CC;        DW_41 = DW;           S41 = [UP_41, QF, DW_41, B];   
-UP_42 = UP_SF;        DW_42 = DW_QD;        S42 = [UP_42, QF, DW_42, B];
-UP_43 = UP_CS;        DW_43 = DW;           S43 = [UP_43, QF, DW_43, B];   
-UP_44 = UP_SF;        DW_44 = DW_QD;        S44 = [UP_44, QF, DW_44, B];
-UP_45 = UP_CC;        DW_45 = DW;           S45 = [UP_45, QF, DW_45, B];   
-UP_46 = UP_SF;        DW_46 = DW_QD;        S46 = [UP_46, QF, DW_46, B];
-UP_47 = UP_CC;        DW_47 = DW;           S47 = [UP_47, QF, DW_47, B];   
-UP_48 = UP_SS;        DW_48 = DW_KE;        S48 = [UP_48, QF, DW_48, B];
-UP_49 = UP_SE;        DW_49 = DW_CH;        S49 = [UP_49, QF, DW_49, B];      
-UP_50 = UP_SF;        DW_50 = DW_QD;        S50 = [UP_50, QF, DW_50, B];
+US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QFI2, FIM, STR, mqf, QFI2, DS_01, B];      
+US_02 = US_SF;        DS_02 = DS_QD;        S02 = [US_02, QF, DS_02, B];
+US_03 = US_CS;        DS_03 = DS;           S03 = [US_03, QF, DS_03, B];   
+US_04 = US_SF;        DS_04 = DS_QD;        S04 = [US_04, QF, DS_04, B];
+US_05 = US_CC;        DS_05 = DS_RF;        S05 = [US_05, QF, DS_05, B];      
+US_06 = US_SF;        DS_06 = DS_QD;        S06 = [US_06, QF, DS_06, B];
+US_07 = US_CC;        DS_07 = DS;           S07 = [US_07, QF, DS_07, B];   
+US_08 = US_SS;        DS_08 = DS_QD;        S08 = [US_08, QF, DS_08, B];
+US_09 = US_CC;        DS_09 = DS;           S09 = [US_09, QF, DS_09, B];   
+US_10 = US_SF;        DS_10 = DS_QD;        S10 = [US_10, QF, DS_10, B];
+US_11 = US_CC;        DS_11 = DS;           S11 = [US_11, QF, DS_11, B];   
+US_12 = US_SF;        DS_12 = DS_QD;        S12 = [US_12, QF, DS_12, B];
+US_13 = US_CS;        DS_13 = DS;           S13 = [US_13, QF, DS_13, B];   
+US_14 = US_SF;        DS_14 = DS_QD;        S14 = [US_14, QF, DS_14, B];
+US_15 = US_CC;        DS_15 = DS;           S15 = [US_15, QF, DS_15, B];   
+US_16 = US_SF;        DS_16 = DS_QD;        S16 = [US_16, QF, DS_16, B];
+US_17 = US_CC;        DS_17 = DS;           S17 = [US_17, QF, DS_17, B];   
+US_18 = US_SS;        DS_18 = DS_QD;        S18 = [US_18, QF, DS_18, B];
+US_19 = US_CC;        DS_19 = DS;           S19 = [US_19, QF, DS_19, B];   
+US_20 = US_SF;        DS_20 = DS_QD;        S20 = [US_20, QF, DS_20, B];
+US_21 = US_CC;        DS_21 = DS;           S21 = [US_21, QF, DS_21, B];   
+US_22 = US_SF;        DS_22 = DS_QD;        S22 = [US_22, QF, DS_22, B];
+US_23 = US_CS;        DS_23 = DS;           S23 = [US_23, QF, DS_23, B];   
+US_24 = US_SF;        DS_24 = DS_QD;        S24 = [US_24, QF, DS_24, B];
+US_25 = US_CC;        DS_25 = DS;           S25 = [US_25, QF, DS_25, B];   
+US_26 = US_SF;        DS_26 = DS_QD;        S26 = [US_26, QF, DS_26, B];
+US_27 = US_CC;        DS_27 = DS;           S27 = [US_27, QF, DS_27, B];   
+US_28 = US_SS;        DS_28 = DS_QD;        S28 = [US_28, QF, DS_28, B];
+US_29 = US_CC;        DS_29 = DS;           S29 = [US_29, QF, DS_29, B];   
+US_30 = US_SF;        DS_30 = DS_QD;        S30 = [US_30, QF, DS_30, B];
+US_31 = US_CC;        DS_31 = DS;           S31 = [US_31, QF, DS_31, B];   
+US_32 = US_SF;        DS_32 = DS_QD;        S32 = [US_32, QF, DS_32, B];
+US_33 = US_CS;        DS_33 = DS;           S33 = [US_33, QF, DS_33, B];   
+US_34 = US_SF;        DS_34 = DS_QD;        S34 = [US_34, QF, DS_34, B];
+US_35 = US_CC;        DS_35 = DS;           S35 = [US_35, QF, DS_35, B];   
+US_36 = US_SF;        DS_36 = DS_QD;        S36 = [US_36, QF, DS_36, B];
+US_37 = US_CC;        DS_37 = DS;           S37 = [US_37, QF, DS_37, B];   
+US_38 = US_SS;        DS_38 = DS_QD;        S38 = [US_38, QF, DS_38, B];
+US_39 = US_CC;        DS_39 = DS;           S39 = [US_39, QF, DS_39, B];   
+US_40 = US_SF;        DS_40 = DS_QD;        S40 = [US_40, QF, DS_40, B];
+US_41 = US_CC;        DS_41 = DS;           S41 = [US_41, QF, DS_41, B];   
+US_42 = US_SF;        DS_42 = DS_QD;        S42 = [US_42, QF, DS_42, B];
+US_43 = US_CS;        DS_43 = DS;           S43 = [US_43, QF, DS_43, B];   
+US_44 = US_SF;        DS_44 = DS_QD;        S44 = [US_44, QF, DS_44, B];
+US_45 = US_CC;        DS_45 = DS;           S45 = [US_45, QF, DS_45, B];   
+US_46 = US_SF;        DS_46 = DS_QD;        S46 = [US_46, QF, DS_46, B];
+US_47 = US_CC;        DS_47 = DS;           S47 = [US_47, QF, DS_47, B];   
+US_48 = US_SS;        DS_48 = DS_KE;        S48 = [US_48, QF, DS_48, B];
+US_49 = US_SE;        DS_49 = DS_CH;        S49 = [US_49, QF, DS_49, B];      
+US_50 = US_SF;        DS_50 = DS_QD;        S50 = [US_50, QF, DS_50, B];
 
 
 elist = [S01,S02,S03,S04,S05,S06,S07,S08,S09,S10,...
@@ -184,6 +184,8 @@ end
 const  = lnls_constants;
 %[beta, ~, ~] = lnls_beta_gamma(energy/1e9);
 L0_tot = findspos(THERING, length(THERING)+1);
+fprintf('   Circumference: %.5f m\n', L0_tot);
+
 %rev_freq     = beta * const.c / L0_tot;
 rev_freq     = const.c / L0_tot;
 rf_idx       = findcells(THERING, 'FamName', 'cav');

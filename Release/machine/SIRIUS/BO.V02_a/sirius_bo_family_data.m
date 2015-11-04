@@ -1,6 +1,6 @@
 function data = sirius_bo_family_data(the_ring)
 
-data.b.nr_segs   = 20;
+data.b.nr_segs   = 14;
 
 data.qf.nr_segs  = 2;
 data.qd.nr_segs  = 1;
