@@ -18,14 +18,16 @@ for i=1:20
     
     idx = findcells(the_line2,'XGrid');
     if ~isempty(idx), id_name = ['<',the_line2{idx(1)}.FamName, '>'];
-    else id_name = 'No ID'; end
-    if mod(i,2), fprintf('[ %02d-MIB ] --> %s\n', i, id_name);
-    else fprintf('[ %02d-MIA ] --> %s\n', i, id_name); end
+    else              id_name = 'No ID'; end
+    if mod(i,2), fprintf('[ %02d-MIA ] --> %s\n', i, id_name);
+    else         fprintf('[ %02d-MIB ] --> %s\n', i, id_name); end
     
-    idx1 = setdiff(findcells(the_line1, 'K'), findcells(the_line1, 'BendingAngle'));
-    idx2 = setdiff(findcells(the_line2, 'K'), findcells(the_line2, 'BendingAngle'));
+    idx1 = findcells(the_line1, 'PolynomB');
+    idx2 = findcells(the_line2, 'PolynomB');
     K1 = getcellstruct(the_line1, 'PolynomB', idx1, 1, 2);
     K2 = getcellstruct(the_line2, 'PolynomB', idx2, 1, 2);
+    ind = K1 - K2 ~= 0;
+    K1 = K1(ind); K2 = K2(ind); idx2 = idx2(ind);
     fam_name = getcellstruct(the_line2, 'FamName', idx2);
     
     for ii=1:length(K1)
