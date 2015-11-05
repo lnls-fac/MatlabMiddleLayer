@@ -69,35 +69,30 @@
 % sf_strength = 11.327922565223286;
 % sd_strength =  7.330541690089150;
 
-% 2015-09-10 ximenes
-% updated dipole model multipoles. 
-% corrected tunes  = [19.204378646902239   7.314313778087979]
-% corrected chroms = [0.5 0.5] 
+% % 2015-09-10 ximenes
+% % updated dipole model multipoles. 
+% % corrected tunes  = [19.204378646902239   7.314313778087979]
+% % corrected chroms = [0.5 0.5] 
 % qf_strength =  1.657881617545217;
 % qd_strength = -0.009637589230525;
 % sf_strength = 11.327508716063402;
 % sd_strength =  7.064290473083006;
 
-% % 2015-10-27 ximenes
-% % new segmented B model
-% qf_strength =  1.657883953509854;
-% qd_strength = -0.009872230069252;
-% sf_strength = 11.327508716063402;
-% sd_strength =  6.669827683440462;
-
 % % 2015-11-04 ximenes
-% % elements length multiple of milimeters
-% qf_strength =  1.657883953509854 * (0.227/0.22746);
-% qd_strength = -0.009872230069252 * (0.101/0.10074);
+% % after segmented model of dipole was corrected (last element was 5 mm long, instead of 50 mm)
+% qf_strength =  1.654531766801048;
+% qd_strength = -0.009834018323292;
 % sf_strength = 11.327508716063402;
 % sd_strength =  6.669827683440462;
 
-% 2015-11-04 ximenes
-% after segmented model of dipole was corrected (last element was 5 mm long, instead of 50 mm)
-qf_strength =  1.654531766801048;
-qd_strength = -0.009834018323292;
-sf_strength = 11.327508716063402;
-sd_strength =  6.669827683440462;
+% 2015-11-05 ximenes
+% tunes fitted to [19.20433 7.31417]
+% chroms fitted to [0.5 0.5]
+qf_strength = 1.661204884438163;
+qd_strength = -0.009683797310216;
+sf_strength = 11.327047617231438;
+sd_strength = 6.700042815533210;
+
 
 
 

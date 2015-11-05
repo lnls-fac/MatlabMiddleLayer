@@ -1,4 +1,4 @@
-function [bd, b_length_segmented, b_model] = dipole_segmented_model(bend_pass_method)
+function [bd, b_length_segmented, b_model] = sirius_bo_b_segmented_model(bend_pass_method)
 
 % dipole model 2015-10-27
 % =======================
@@ -24,14 +24,14 @@ b_model = [ ...
 0.05000  +1.1935489464422026e-02 -9.9691022253933781e-06 +5.4550851042850122e-03 -4.4683152517904506e-01 +3.5661984588676275e-02 +1.7969583278960037e+01 -2.0934072258968956e+02 +8.1582971615794559e+03 
 ];
 
-% dipole model 2015-09-16
-% =======================
-% this model is based on the same approved model6 dipole
-% new python script was used to derived integrated multipoles around
-% trajectory centered in good-field region. init_rx is set to +9.045 mm
-% *** intertpolation of fields is now cubic ***
-% *** dipole angles were normalized to better close 360 degrees ***
-%--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m],[T] for polynom_b ---
+% % dipole model 2015-09-16
+% % =======================
+% % this model is based on the same approved model6 dipole
+% % new python script was used to derived integrated multipoles around
+% % trajectory centered in good-field region. init_rx is set to +9.045 mm
+% % *** intertpolation of fields is now cubic ***
+% % *** dipole angles were normalized to better close 360 degrees ***
+% %--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m],[T] for polynom_b ---
 % b_model = [ ...
 % %len[m]   angle[rad]   PolynomB(n=0)  PolynomB(n=1)  PolynomB(n=2)  PolynomB(n=3)  PolynomB(n=4)  PolynomB(n=5)  PolynomB(n=6)  
 % 0.1960,  d2r* 1.1572,  +0.000000e+00,  -2.272565e-01,  -1.982429e+00,  -6.357730e+00,  -3.090667e+02,  -2.050288e+04,  -7.485474e+05;...   
@@ -133,7 +133,6 @@ b_model = [ ...
 % ];
 
 d2r = pi/180.0;
-
 b_model(:,3) = 0.0; % convenience of having a nominal model with zero 4d closed orbit;
 
 b = [];
@@ -145,5 +144,5 @@ for i=1:size(b_model,1)
 end
 pb = marker('pb', 'IdentityPass');
 mb = marker('mb', 'IdentityPass');
-bd = [pb, fliplr(b) , mb, b, pb];
+bd = [pb, fliplr(b), mb, b, pb];
 b_length_segmented = 2*sum(b_model(:,1));

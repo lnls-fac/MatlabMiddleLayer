@@ -42,7 +42,7 @@ set_magnets_strength_booster;
 % and the difference has to be accomodated.
 % loads dipole segmented model:
 b_len_hdedge   = 1.152; % [m]
-[B, b_len_seg] = dipole_segmented_model(bend_pass_method);
+[B, b_len_seg] = sirius_bo_b_segmented_model(bend_pass_method);
 lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 
 L01340  = drift('l01340', 0.1340, 'DriftPass');
@@ -87,9 +87,13 @@ SF   = sextupole ('sf',      0.105,     sf_strength, sext_pass_method);
 SD   = sextupole ('sd',      0.105,     sd_strength, sext_pass_method);
 CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);
 CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
-QD   = quadrupole('qd',      0.101,     qd_strength, quad_pass_method);
-QFI2 = quadrupole('qf',      0.227/2.0, qf_strength, quad_pass_method);
-QF  = [QFI2,mqf,QFI2];
+%QD   = quadrupole('qd',      0.101,     qd_strength, quad_pass_method);
+%QFI  = quadrupole('qf',      0.227/2.0, qf_strength, quad_pass_method);
+%QF   = [QFI,mqf,QFI];
+
+QD  = sirius_bo_qd_segmented_model('qd', qd_strength, quad_pass_method);
+QF  = sirius_bo_qf_segmented_model('qf', qf_strength, quad_pass_method);
+QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
 
 RFC = rfcavity('cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
 
@@ -107,7 +111,8 @@ DS_RF = [GIR, L21325, RFC, D21460, GIR];
 DS_KI = [GIR, L03365, KIN, L12960, D21460, GIR];
 DS_CH = [L01615, CH, GIR, L18210, D21460, GIR];
 
-US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QFI2, FIM, STR, mqf, QFI2, DS_01, B];      
+%US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QFI, FIM, STR, mqf, QFI, DS_01, B];      
+US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QF0,DS_01, B];      
 US_02 = US_SF;        DS_02 = DS_QD;        S02 = [US_02, QF, DS_02, B];
 US_03 = US_CS;        DS_03 = DS;           S03 = [US_03, QF, DS_03, B];   
 US_04 = US_SF;        DS_04 = DS_QD;        S04 = [US_04, QF, DS_04, B];
@@ -286,4 +291,6 @@ quad_sext_nis = ceil(quad_sext_len / len_qs);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', quad_sext, quad_sext_nis);
 
 the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);
+
+
 
