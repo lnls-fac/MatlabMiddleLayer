@@ -40,23 +40,13 @@ catch
 end
 
 try
-    % septing
-    AO.septing.AT.ATType = 'Septum';
-    AO.septing.AT.ATIndex = buildatindex(AO.septing.FamilyName, Indices.septing);
-    AO.septing.Position = findspos(THERING, AO.septing.AT.ATIndex(:,1+floor(size(AO.septing.AT.ATIndex,2)/2)))';
+    % septin
+    AO.septin.AT.ATType = 'Septum';
+    AO.septin.AT.ATIndex = buildatindex(AO.septin.FamilyName, Indices.septin);
+    AO.septin.Position = findspos(THERING, AO.septin.AT.ATIndex(:,1+floor(size(AO.septin.AT.ATIndex,2)/2)))';
       
 catch
-    warning('septing family not found in the model.');
-end
-
-try
-    % septinf
-    AO.septinf.AT.ATType = 'Septum';
-    AO.septinf.AT.ATIndex = buildatindex(AO.septinf.FamilyName, Indices.septinf);
-    AO.septinf.Position = findspos(THERING, AO.septinf.AT.ATIndex(:,1+floor(size(AO.septinf.AT.ATIndex,2)/2)))';
-      
-catch
-    warning('septinf family not found in the model.');
+    warning('septin family not found in the model.');
 end
 
 try
@@ -147,28 +137,27 @@ catch
 end
 
 try
-    % HCM
+    % CH
     AO.hcm.AT.ATType = 'HCM';
     li = [];
-    if isfield(Indices, 'cm'), li = [li Indices.cm]; end;
-    if isfield(Indices, 'hcm'), li = [li Indices.hcm]; end;
-    AO.hcm.AT.ATIndex = buildatindex(AO.hcm.FamilyName, sort(li));
-    AO.hcm.Position = findspos(THERING, AO.hcm.AT.ATIndex(:,1))';   
+    if isfield(Indices, 'ch'), li = [li Indices.ch]; end;
+    AO.ch.AT.ATIndex = buildatindex(AO.ch.FamilyName, sort(li));
+    AO.ch.Position = findspos(THERING, AO.ch.AT.ATIndex(:,1))';   
 catch
-    warning('HCM family not found in the model.');
+    warning('CV family not found in the model.');
 end
 
 
 try
-    % VCM
-    AO.vcm.AT.ATType = 'VCM';
+    % CV
+    AO.cv.AT.ATType = 'VCM';
     li = [];
-    if isfield(Indices, 'cm'), li = [li Indices.cm]; end;
-    if isfield(Indices, 'vcm'), li = [li Indices.vcm]; end;
-    AO.vcm.AT.ATIndex = buildatindex(AO.vcm.FamilyName, sort(li));
-    AO.vcm.Position = findspos(THERING, AO.vcm.AT.ATIndex(:,1))';   
+    if isfield(Indices, 'cv'), li = [li Indices.cv]; end;
+    if isfield(Indices, 'cv'), li = [li Indices.cv]; end;
+    AO.cv.AT.ATIndex = buildatindex(AO.cv.FamilyName, sort(li));
+    AO.cv.Position = findspos(THERING, AO.cv.AT.ATIndex(:,1))';   
 catch
-    warning('VCM family not found in the model.');
+    warning('CV family not found in the model.');
 end
 
 

@@ -4,6 +4,7 @@ function [r, lattice_title, IniCond] = sirius_ts_lattice(varargin)
 %% global parameters 
 %  =================
 
+d2r = pi/180;
 
 % --- system parameters ---
 energy = 3e9;
@@ -99,23 +100,23 @@ cv     = corrector('cv',  0, [0 0], 'CorrectorPass');
 %           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
 %bend      = [h1 mbend h2];      
 
-h1 = rbend_sirius('bend', 0.196, deg2rad(0.8597), 0, 0, 0, 0, 0, [0 0 0], [0 -0.163 -1.443 0], bend_pass_method);
-h2 = rbend_sirius('bend', 0.192, deg2rad(0.8467), 0, 0, 0, 0, 0, [0 0 0], [0 -0.154 -1.418 0], bend_pass_method);
-h3 = rbend_sirius('bend', 0.182, deg2rad(0.8099), 0, 0, 0, 0, 0, [0 0 0], [0 -0.14 -1.403 0], bend_pass_method);
-h4 = rbend_sirius('bend', 0.01, deg2rad(0.0379), 0, 0, 0, 0, 0, [0 0 0], [0 -0.175 -1.245 0], bend_pass_method);
-h5 = rbend_sirius('bend', 0.01, deg2rad(0.0274), 0, 0, 0, 0, 0, [0 0 0], [0 -0.115 -0.902 0], bend_pass_method);
-h6 = rbend_sirius('bend', 0.013, deg2rad(0.0244), 0, 0, 0, 0, 0, [0 0 0], [0 -0.042 -1.194 0], bend_pass_method);
-h7 = rbend_sirius('bend', 0.017, deg2rad(0.0216), 0, 0, 0, 0, 0, [0 0 0], [0 -0.008 -1.408 0], bend_pass_method);
-h8 = rbend_sirius('bend', 0.02, deg2rad(0.0166), 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0], bend_pass_method);
-h9 = rbend_sirius('bend', 0.03, deg2rad(0.0136), 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0], bend_pass_method);
-h10 = rbend_sirius('bend', 0.05, deg2rad(0.0089), 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0], bend_pass_method);
+h1  = rbend_sirius('bend', 0.196, d2r * 0.8597, 0, 0, 0, 0, 0, [0 0 0], [0 -0.163 -1.443 0], bend_pass_method);
+h2  = rbend_sirius('bend', 0.192, d2r * 0.8467, 0, 0, 0, 0, 0, [0 0 0], [0 -0.154 -1.418 0], bend_pass_method);
+h3  = rbend_sirius('bend', 0.182, d2r * 0.8099, 0, 0, 0, 0, 0, [0 0 0], [0 -0.14 -1.403 0], bend_pass_method);
+h4  = rbend_sirius('bend', 0.010, d2r * 0.0379, 0, 0, 0, 0, 0, [0 0 0], [0 -0.175 -1.245 0], bend_pass_method);
+h5  = rbend_sirius('bend', 0.010, d2r * 0.0274, 0, 0, 0, 0, 0, [0 0 0], [0 -0.115 -0.902 0], bend_pass_method);
+h6  = rbend_sirius('bend', 0.013, d2r * 0.0244, 0, 0, 0, 0, 0, [0 0 0], [0 -0.042 -1.194 0], bend_pass_method);
+h7  = rbend_sirius('bend', 0.017, d2r * 0.0216, 0, 0, 0, 0, 0, [0 0 0], [0 -0.008 -1.408 0], bend_pass_method);
+h8  = rbend_sirius('bend', 0.020, d2r * 0.0166, 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0], bend_pass_method);
+h9  = rbend_sirius('bend', 0.030, d2r * 0.0136, 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0], bend_pass_method);
+h10 = rbend_sirius('bend', 0.05,  d2r * 0.0089, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0], bend_pass_method);
 
 bend = [h10 h9 h8 h7 h6 h5 h4 h3 h2 h1 mbend h1 h2 h3 h4 h5 h6 h7 h8 h9 h10];
 
 % -- bo extraction septum --
 dip_nam =  'septex';
 dip_len =  0.85;
-dip_ang =  deg2rad(-3.6);
+dip_ang =  -3.6 * d2r;
 dip_K   =  0.0;
 dip_S   =  0.00;
 h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,   0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
@@ -134,10 +135,11 @@ dip_K    =  0.0;
 dip_S    =  0.00;
 h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
 h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+
 bseptin = marker('bseptin', 'IdentityPass'); % marker at the beginning of thick septum
 mseptin = marker('mseptin', 'IdentityPass'); % marker at the center of thick septum
 eseptin = marker('eseptin', 'IdentityPass'); % marker at the end of thick septum
-septin   = [bseptin, h1, mseptin, h2, eseptin];
+septin  = [bseptin, h1, mseptin, h2, eseptin];
            
 % --- lines ---
 la1   = [l20, l18, cv, repmat(l20,1,4), l13];

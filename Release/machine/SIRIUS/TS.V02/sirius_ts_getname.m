@@ -46,11 +46,8 @@ switch lower(Family)
     case 'septex'
         ChannelName = 'TSPU-SEPTUMEXT-01';
     
-    case 'septing'
-        ChannelName = 'TSPU-SEPTUMTHICK-04';
-    
-    case 'septinf'
-        ChannelName = 'TSPU-SEPTUMTHIN-04';
+    case 'septin'
+        ChannelName = 'TSPU-SEPTUMINJ-04';
     
     case 'qf1a'
         ChannelName = 'TSPS-QF-01-A';
