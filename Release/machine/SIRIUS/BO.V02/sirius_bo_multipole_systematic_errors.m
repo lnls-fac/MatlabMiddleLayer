@@ -10,9 +10,14 @@ fam_data = sirius_bo_family_data(the_ring);
 % Already applied while building AT lattice with segmented dipole model.
 
 
-% QUADURPOLES
+% QUADRUPOLES
 % ===========
 % Already applied while building AT lattice with segmented quadrupole models.
+
+% SEXTUPOLES
+% ==========
+% Already applied while building AT lattice with segmented sextupole models.
+
 
 
 % % QF QUADRUPOLES
@@ -37,16 +42,16 @@ fam_data = sirius_bo_family_data(the_ring);
 % fams       = {'qd'};
 % the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
-% SEXTUPOLES
-% ==========
-% updated in 2015-09-03 for model1 of SD/SF with 100 mm physical length (XRR)
-r0         = 17.5/1000;
-monoms     = [   8,   14];
-Bn_normal  = [-2.5, -1.5]*1e-2;    
-Bn_skew    = [ 0.0,  0.0];
-main_monom = {2, 'normal'}; 
-fams       = {'sd','sf'};
-the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% % SEXTUPOLES
+% % ==========
+% % updated in 2015-09-03 for model1 of SD/SF with 100 mm physical length (XRR)
+% r0         = 17.5/1000;
+% monoms     = [   8,   14];
+% Bn_normal  = [-2.5, -1.5]*1e-2;    
+% Bn_skew    = [ 0.0,  0.0];
+% main_monom = {2, 'normal'}; 
+% fams       = {'sd','sf'};
+% the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % CORRECTOR CH
 % ============
