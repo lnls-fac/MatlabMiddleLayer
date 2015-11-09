@@ -40,9 +40,10 @@ set_magnets_strength_booster;
 % a segmented model for the dipole has been created from the
 % approved fieldmap. The segmented model has a longer length 
 % and the difference has to be accomodated.
+
 % loads dipole segmented model:
 b_len_hdedge   = 1.152; % [m]
-[B, b_len_seg] = sirius_bo_b_segmented_model(bend_pass_method);
+[B, b_len_seg] = sirius_bo_b_segmented_model('b', bend_pass_method);
 lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 
 L01340  = drift('l01340', 0.1340, 'DriftPass');
@@ -78,7 +79,6 @@ FIM  = marker('end',     'IdentityPass');     % end of the model
 GIR  = marker('girder',  'IdentityPass');
 SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
-mqf  = marker('mqf',     'IdentityPass');
 BPM  = marker('bpm',     'IdentityPass');
 
 KIN  = quadrupole('kick_in', 0.500,     0.0,         quad_pass_method);
@@ -87,12 +87,9 @@ SF   = sextupole ('sf',      0.105,     sf_strength, sext_pass_method);
 SD   = sextupole ('sd',      0.105,     sd_strength, sext_pass_method);
 CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);
 CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
-%QD   = quadrupole('qd',      0.101,     qd_strength, quad_pass_method);
-%QFI  = quadrupole('qf',      0.227/2.0, qf_strength, quad_pass_method);
-%QF   = [QFI,mqf,QFI];
 
-QD  = sirius_bo_qd_segmented_model('qd', qd_strength, quad_pass_method);
-QF  = sirius_bo_qf_segmented_model('qf', qf_strength, quad_pass_method);
+QD  = sirius_bo_qd_segmented_model(energy, 'qd', quad_pass_method, qd_strength * 0.101);
+QF  = sirius_bo_qf_segmented_model(energy, 'qf', quad_pass_method, qf_strength * 0.227);
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
 
 RFC = rfcavity('cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
