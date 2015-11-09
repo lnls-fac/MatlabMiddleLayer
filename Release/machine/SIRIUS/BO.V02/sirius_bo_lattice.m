@@ -83,11 +83,11 @@ BPM  = marker('bpm',     'IdentityPass');
 
 KIN  = quadrupole('kick_in', 0.500,     0.0,         quad_pass_method);
 KEX  = quadrupole('kick_ex', 0.500,     0.0,         quad_pass_method);
-SF   = sextupole ('sf',      0.105,     sf_strength, sext_pass_method);   
-SD   = sextupole ('sd',      0.105,     sd_strength, sext_pass_method);
+
 CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);
 CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
-
+SF  = sirius_bo_sx_segmented_model(energy, 'sf', sext_pass_method, sf_strength * 0.105);
+SD  = sirius_bo_sx_segmented_model(energy, 'sd', sext_pass_method, sd_strength * 0.105);
 QD  = sirius_bo_qd_segmented_model(energy, 'qd', quad_pass_method, qd_strength * 0.101);
 QF  = sirius_bo_qf_segmented_model(energy, 'qf', quad_pass_method, qf_strength * 0.227);
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
