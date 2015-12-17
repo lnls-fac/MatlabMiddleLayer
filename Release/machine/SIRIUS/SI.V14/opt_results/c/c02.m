@@ -36,33 +36,33 @@
 %qf4_strength     = 3.99281375493;
 
 
-%teste afastando quadrupolo QDB1 em 10 cm
-qfa_strength     = 3.813149197067;  
-qda_strength     = -1.769924117015; 
-qdb2_strength    = -4.119872400799;  
-qfb_strength     = 4.276081250456;
-qdb1_strength    = -1.887790102074;
-qf1_strength     = 3.087828113908;
-qf2_strength     = 4.133406211252;
-qf3_strength     = 3.453487687561;
-qf4_strength     = 3.77902850044;
+%teste afastando quadrupolo QDB1 e QDA em 10 cm
+qfa_strength     = 3.584185616158;  
+qda_strength     = -1.587708140876; 
+qdb2_strength    = -3.193232839348;  
+qfb_strength     = 4.096372744197;
+qdb1_strength    = -2.053805207398;
+qf1_strength     = 2.918518207272;
+qf2_strength     = 4.262436526991;
+qf3_strength     = 3.358150687686;
+qf4_strength     = 3.85835339558;
 
 
 %% Sextupoles
 %% ===============
 
-sda_strength     =  -79.8198;
-sfa_strength     =   53.0984;
-sdb_strength     =  -59.2880;
-sfb_strength     =   77.5538;
-sd1j_strength    = -181.1137;
-sf1j_strength    =  201.7784;
-sd2j_strength    =  -97.6032;
-sd3j_strength    = -127.0748;
-sf2j_strength    =  159.2613;
-sd1k_strength    = -133.7876;
-sf1k_strength    =  233.4240;
-sd2k_strength    = -128.5449;
-sd3k_strength    = -183.3318;
-sf2k_strength    =  223.1867;
+sda_strength     =  -79.8198 * 0.147/0.15;
+sfa_strength     =   53.0984 * 0.147/0.15;
+sdb_strength     =  -59.2880 * 0.147/0.15;
+sfb_strength     =   77.5538 * 0.147/0.15;
+sd1j_strength    = -181.1137 * 0.147/0.15;
+sf1j_strength    =  201.7784 * 0.147/0.15;
+sd2j_strength    =  -97.6032 * 0.147/0.15;
+sd3j_strength    = -127.0748 * 0.147/0.15;
+sf2j_strength    =  159.2613 * 0.147/0.15;
+sd1k_strength    = -133.7876 * 0.147/0.15;
+sf1k_strength    =  233.4240 * 0.147/0.15;
+sd2k_strength    = -128.5449 * 0.147/0.15;
+sd3k_strength    = -183.3318 * 0.147/0.15;
+sf2k_strength    =  223.1867 * 0.147/0.15;
 
