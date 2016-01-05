@@ -36,16 +36,41 @@
 %qf4_strength     = 3.99281375493;
 
 
-%teste afastando quadrupolo QDB1 e QDA em 10 cm
-qfa_strength     = 3.584185616158;  
-qda_strength     = -1.587708140876; 
-qdb2_strength    = -3.193232839348;  
-qfb_strength     = 4.096372744197;
-qdb1_strength    = -2.053805207398;
+% %teste afastando quadrupolo QDB1 e QDA em 10 cm
+% qfa_strength     = 3.584185616158;  
+% qda_strength     = -1.587708140876; 
+% qdb2_strength    = -3.193232839348;  
+% qfb_strength     = 4.096372744197;
+% qdb1_strength    = -2.053805207398;
+% qf1_strength     = 2.918518207272;
+% qf2_strength     = 4.262436526991;
+% qf3_strength     = 3.358150687686;
+% qf4_strength     = 3.85835339558;
+
+% % segmented model for B1 as well
+% qfa_strength     = 3.583675275499860;  
+% qda_strength     = -1.597862157138684; 
+% qdb2_strength    = -3.195379662786408;  
+% qfb_strength     = 4.097771564171441;
+% qdb1_strength    = -2.063764476828708;
+% 
+% qf1_strength     = 2.918518207272;
+% qf2_strength     = 4.262436526991;
+% qf3_strength     = 3.358150687686;
+% qf4_strength     = 3.85835339558;
+
+% segmented model for B1 and B2
+qfa_strength     = 3.582380981465105;  
+qda_strength     = -1.595394234609090; 
+qdb2_strength    = -3.195336688655247;  
+qfb_strength     = 4.095124510037063;
+qdb1_strength    = -2.061344569238887;
+
 qf1_strength     = 2.918518207272;
 qf2_strength     = 4.262436526991;
 qf3_strength     = 3.358150687686;
 qf4_strength     = 3.85835339558;
+
 
 
 %% Sextupoles

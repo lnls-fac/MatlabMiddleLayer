@@ -4,21 +4,21 @@ function the_ring = sirius_si_multipole_systematic_errors(the_ring)
    
 fam_data = sirius_si_family_data(the_ring);
 
-% B1 and B2
-% =========
-% The default systematic multipoles for the dipoles were changed.
-% Now we are using the values of a standard pole dipole which Ricardo
-% optimized (2015/02/02) as base for comparison with the other alternative with
-% incrusted coils in the poles for independent control of que gradient.
-
-model_name = 'BEND';
-r0         = 12/1000;
-monoms     =   [2,      3,      4,     5,     6];
-Bn_normal  = 1*[1.4e-4 -6.7e-5 -5.1e-4 5.9e-5 3.3e-4];  
-Bn_skew    = 1*[0.0     0.0     0.0    0.0    0.0]; 
-main_monom = {0, 'normal'}; 
-fams       = findmemberof(model_name);
-the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% % B1 and B2
+% % =========
+% % The default systematic multipoles for the dipoles were changed.
+% % Now we are using the values of a standard pole dipole which Ricardo
+% % optimized (2015/02/02) as base for comparison with the other alternative with
+% % incrusted coils in the poles for independent control of que gradient.
+% 
+% model_name = 'BEND';
+% r0         = 12/1000;
+% monoms     =   [2,      3,      4,     5,     6];
+% Bn_normal  = 1*[1.4e-4 -6.7e-5 -5.1e-4 5.9e-5 3.3e-4];  
+% Bn_skew    = 1*[0.0     0.0     0.0    0.0    0.0]; 
+% main_monom = {0, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % % BC
 % % ==
