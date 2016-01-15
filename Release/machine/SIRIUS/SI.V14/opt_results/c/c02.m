@@ -59,18 +59,29 @@
 % qf3_strength     = 3.358150687686;
 % qf4_strength     = 3.85835339558;
 
-% segmented model for B1 and B2
-qfa_strength     = 3.582380981465105;  
-qda_strength     = -1.595394234609090; 
-qdb2_strength    = -3.195336688655247;  
-qfb_strength     = 4.095124510037063;
-qdb1_strength    = -2.061344569238887;
+% % segmented model for B1 and B2
+% qfa_strength     = 3.582380981465105;  
+% qda_strength     = -1.595394234609090; 
+% qdb2_strength    = -3.195336688655247;  
+% qfb_strength     = 4.095124510037063;
+% qdb1_strength    = -2.061344569238887;
+% 
+% qf1_strength     = 2.918518207272;
+% qf2_strength     = 4.262436526991;
+% qf3_strength     = 3.358150687686;
+% qf4_strength     = 3.85835339558;
+
+% new model8 of BC 2016-01-13
+qfa_strength     = 3.582402761707271;  
+qda_strength     = -1.592173442669248; 
+qdb2_strength    = -3.194683812547515;  
+qfb_strength     = 4.094525289627284;
+qdb1_strength    = -2.058170877944139;
 
 qf1_strength     = 2.918518207272;
 qf2_strength     = 4.262436526991;
 qf3_strength     = 3.358150687686;
 qf4_strength     = 3.85835339558;
-
 
 
 %% Sextupoles
