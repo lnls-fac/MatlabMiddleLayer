@@ -12,6 +12,12 @@ if strcmpi(mode,'C')
         cd(fullfile(path,'opt_results/c/'));
         eval('c02');
         cd(cur);
+    elseif strcmpi(version,'03')
+        [path, ~, ~] = fileparts(mfilename('fullpath'));
+        cur = pwd;
+        cd(fullfile(path,'opt_results/c/'));
+        eval('c03');
+        cd(cur);
     else
         error('version not implemented');
     end

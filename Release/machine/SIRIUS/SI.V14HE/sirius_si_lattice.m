@@ -29,11 +29,11 @@ global THERING;
 % --- system parameters ---
 energy = 3e9;
 mode   = 'C';   % a = ac20, b = ac10(beta=4m), c = ac10(beta=1.5m)
-version = '02';
+version = '03';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
 
-lattice_version = 'SI.V14';
+lattice_version = 'SI.V14HE';
 % processamento de input (energia e modo de operacao)
 for i=1:length(varargin)
     if ischar(varargin{i}) && length(varargin{i})==1

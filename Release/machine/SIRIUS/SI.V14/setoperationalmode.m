@@ -188,11 +188,11 @@ AD = getad;
 AD.Machine             = 'SIRIUS.V14';   % Will already be defined if setpathmml was used
 AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
-AD.OperationalMode     = 'V14.C02';
+AD.OperationalMode     = 'V14.C03';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;
 AD.ModeName            = 'C';
-AD.ModeVersion         = '02';
+AD.ModeVersion         = '03';
 AD.OpsFileExtension    = '';
 
 sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
