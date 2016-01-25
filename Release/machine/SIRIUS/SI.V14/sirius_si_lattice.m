@@ -186,16 +186,16 @@ M2B      = fliplr(M1B);                                                         
 IDB      = [L500,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,L500];                                          % low beta ID straight section
 
 
-C1Al      = [GIR,L474,GIR,SD1J,L170,QF1,L135,BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L061];                 % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C1Bl      = [GIR,L474,GIR,SD1K,L170,QF1,L135,BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L061];                 % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C2Al      = [GIR,L336,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];               % arc sector in between B2-BC (high beta odd-numbered straight sections)
-C2Bl      = [GIR,L336,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];               % arc sector in between B2-BC (low beta even-numbered straight sections)
-C2Al_DCCT = [GIR,L336,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L270,DCCT1,L267,GIR,CV,L105,BPM,RBPM,L035];    % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
-C2Bl_DCCT = [GIR,L336,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L270,DCCT2,L267,GIR,CV,L105,BPM,RBPM,L035];    % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
-C3Al      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2K,L230,QF3,L170,SD3K,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (high beta odd-numbered straight sections)
-C3Bl      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2J,L230,QF3,L170,SD3J,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
-C4Al      = [GIR,L216,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L474,GIR];                          % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-C4Bl      = [GIR,L216,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L474,GIR];                          % arc sector in between B2-B1 (low beta even-numbered straight sections)
+C1A      = [GIR,L474,GIR,SD1J,L170,QF1,L135,BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L061];                 % arc sector in between B1-B2 (high beta odd-numbered straight sections)
+C1B      = [GIR,L474,GIR,SD1K,L170,QF1,L135,BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L061];                 % arc sector in between B1-B2 (low beta even-numbered straight sections)
+C2A      = [GIR,L336,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];               % arc sector in between B2-BC (high beta odd-numbered straight sections)
+C2B      = [GIR,L336,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];               % arc sector in between B2-BC (low beta even-numbered straight sections)
+C2A_DCCT = [GIR,L336,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L270,DCCT1,L267,GIR,CV,L105,BPM,RBPM,L035];    % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
+C2B_DCCT = [GIR,L336,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L270,DCCT2,L267,GIR,CV,L105,BPM,RBPM,L035];    % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
+C3A      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2K,L230,QF3,L170,SD3K,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (high beta odd-numbered straight sections)
+C3B      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2J,L230,QF3,L170,SD3J,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
+C4A      = [GIR,L216,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L474,GIR];                          % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C4B      = [GIR,L216,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L474,GIR];                          % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
 
 %% GIRDERS
@@ -236,27 +236,27 @@ M1_S18 = M1B;  M2_S18 = M2B;
 M1_S20 = M1B;  M2_S20 = M2B;
 
 % dispersive arcs
-C1_S01 = C1Al; C2_S01 = C2Al; C3_S01 = C3Al; C4_S01 = C4Al;
-C1_S03 = C1Al; C2_S03 = C2Al; C3_S03 = C3Al; C4_S03 = C4Al;
-C1_S05 = C1Al; C2_S05 = C2Al; C3_S05 = C3Al; C4_S05 = C4Al;
-C1_S07 = C1Al; C2_S07 = C2Al; C3_S07 = C3Al; C4_S07 = C4Al;
-C1_S09 = C1Al; C2_S09 = C2Al; C3_S09 = C3Al; C4_S09 = C4Al;
-C1_S11 = C1Al; C2_S11 = C2Al; C3_S11 = C3Al; C4_S11 = C4Al;
-C1_S13 = C1Al; C2_S13 = C2Al_DCCT; C3_S13 = C3Al; C4_S13 = C4Al;
-C1_S15 = C1Al; C2_S15 = C2Al; C3_S15 = C3Al; C4_S15 = C4Al;
-C1_S17 = C1Al; C2_S17 = C2Al; C3_S17 = C3Al; C4_S17 = C4Al;
-C1_S19 = C1Al; C2_S19 = C2Al; C3_S19 = C3Al; C4_S19 = C4Al;
+C1_S01 = C1A; C2_S01 = C2A; C3_S01 = C3A; C4_S01 = C4A;
+C1_S03 = C1A; C2_S03 = C2A; C3_S03 = C3A; C4_S03 = C4A;
+C1_S05 = C1A; C2_S05 = C2A; C3_S05 = C3A; C4_S05 = C4A;
+C1_S07 = C1A; C2_S07 = C2A; C3_S07 = C3A; C4_S07 = C4A;
+C1_S09 = C1A; C2_S09 = C2A; C3_S09 = C3A; C4_S09 = C4A;
+C1_S11 = C1A; C2_S11 = C2A; C3_S11 = C3A; C4_S11 = C4A;
+C1_S13 = C1A; C2_S13 = C2A_DCCT; C3_S13 = C3A; C4_S13 = C4A;
+C1_S15 = C1A; C2_S15 = C2A; C3_S15 = C3A; C4_S15 = C4A;
+C1_S17 = C1A; C2_S17 = C2A; C3_S17 = C3A; C4_S17 = C4A;
+C1_S19 = C1A; C2_S19 = C2A; C3_S19 = C3A; C4_S19 = C4A;
 
-C1_S02 = C1Bl; C2_S02 = C2Bl; C3_S02 = C3Bl; C4_S02 = C4Bl;
-C1_S04 = C1Bl; C2_S04 = C2Bl; C3_S04 = C3Bl; C4_S04 = C4Bl;
-C1_S06 = C1Bl; C2_S06 = C2Bl; C3_S06 = C3Bl; C4_S06 = C4Bl;
-C1_S08 = C1Bl; C2_S08 = C2Bl; C3_S08 = C3Bl; C4_S08 = C4Bl;
-C1_S10 = C1Bl; C2_S10 = C2Bl; C3_S10 = C3Bl; C4_S10 = C4Bl;
-C1_S12 = C1Bl; C2_S12 = C2Bl; C3_S12 = C3Bl; C4_S12 = C4Bl;
-C1_S14 = C1Bl; C2_S14 = C2Bl_DCCT; C3_S14 = C3Bl; C4_S14 = C4Bl;
-C1_S16 = C1Bl; C2_S16 = C2Bl; C3_S16 = C3Bl; C4_S16 = C4Bl;
-C1_S18 = C1Bl; C2_S18 = C2Bl; C3_S18 = C3Bl; C4_S18 = C4Bl;
-C1_S20 = C1Bl; C2_S20 = C2Bl; C3_S20 = C3Bl; C4_S20 = C4Bl;
+C1_S02 = C1B; C2_S02 = C2B; C3_S02 = C3B; C4_S02 = C4B;
+C1_S04 = C1B; C2_S04 = C2B; C3_S04 = C3B; C4_S04 = C4B;
+C1_S06 = C1B; C2_S06 = C2B; C3_S06 = C3B; C4_S06 = C4B;
+C1_S08 = C1B; C2_S08 = C2B; C3_S08 = C3B; C4_S08 = C4B;
+C1_S10 = C1B; C2_S10 = C2B; C3_S10 = C3B; C4_S10 = C4B;
+C1_S12 = C1B; C2_S12 = C2B; C3_S12 = C3B; C4_S12 = C4B;
+C1_S14 = C1B; C2_S14 = C2B_DCCT; C3_S14 = C3B; C4_S14 = C4B;
+C1_S16 = C1B; C2_S16 = C2B; C3_S16 = C3B; C4_S16 = C4B;
+C1_S18 = C1B; C2_S18 = C2B; C3_S18 = C3B; C4_S18 = C4B;
+C1_S20 = C1B; C2_S20 = C2B; C3_S20 = C3B; C4_S20 = C4B;
 
 %% SECTORS # 01..20
 
