@@ -33,15 +33,15 @@ b = 1; types{end+1} = struct('fam_name', fam_name, 'passmethod', passmethod);
 
 
 % ---------------------------------------------------------------
-% QF model 2015-11-05
+% QF model 2016-01-25
 % ====================
 % this (half) model is based on fieldmap
 % /home/fac_files/data/sirius/bo/magnet_modelling/qf/fieldmaps/
 % '2014-11-04 Quadrupolo_Booster_QF_Modelo 4_-32_32mm_-450_450mm.txt'
 fmap_monomials = [1,5,9,13];
 fmap_model = [ ...
-%len[m]              angle[deg]             PolynomB(n=1)           PolynomB(n=5)           PolynomB(n=9)          PolynomB(n=13)          
-b  0.11350  +0.0000000000000000e+00 +2.0678629110439761e+00 -2.2703958540960379e+04 +2.7720759751229974e+11 +6.9579670640156496e+16
+ %type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
+b,     0.1135 ,  +0.00000 ,  +2.07e+00 ,  -2.27e+04 ,  +2.77e+11 ,  +6.96e+16 ;
 ];
 
 % ROTATING COIL MEASUREMENT
