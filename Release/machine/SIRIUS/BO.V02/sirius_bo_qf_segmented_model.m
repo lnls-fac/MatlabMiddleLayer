@@ -47,7 +47,7 @@ b,     0.1135 ,  +0.00000 ,  +2.07e+00 ,  -2.27e+04 ,  +2.77e+11 ,  +6.96e+16 ;
 % ROTATING COIL MEASUREMENT
 % =========================
 % data based on quadrupole prototype
-% Rescale multipolar profile according to rotating coild measurement
+% Rescale multipolar profile according to rotating coil measurement
 rcoil_monomials  = [1,5,9,13];
 rcoil_integrated_multipoles = [1,-1.066222407330279e+04,1.250513244082492e+11,9.696910847302045e+16]; % based on relative [1.0, -1.0e-3, 1.1e-3, 0.08e-3];
 % ---------------------------------------------------------------
