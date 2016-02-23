@@ -8,7 +8,7 @@ b2      = 1; types{end+1} = struct('fam_name', 'b2', 'passmethod', passmethod);
 b2_edge = 2; types{end+1} = struct('fam_name', 'b2_edge', 'passmethod', 'IdentityPass');
 m_accep = 3; types{end+1} = struct('fam_name', m_accep_fam_name, 'passmethod', 'IdentityPass');
 
-% dipole model 2016-01-05
+% dipole model 2016-02-23
 % =======================
 % this (half) model is based on fieldmap
 % /home/fac_files/data/sirius/si/magnet_modelling/si-b2/b2-model3 
