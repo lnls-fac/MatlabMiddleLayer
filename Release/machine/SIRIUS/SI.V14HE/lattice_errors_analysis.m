@@ -142,12 +142,7 @@ finalizations();
         % <dipole pieces> alignment, rotation and excitation
         % errors for each 
         config.fams.bendblocks.labels       = {'b1','b2'};
-        b1_nrsegs = family_data.b1.nr_segs;
-        b2_nrsegs = family_data.b2.nr_segs;
-        if mod(b1_nrsegs,2) || mod(b2_nrsegs,3)
-            error('nrsegs of b1/b2 must be a multiple of 2/3.');
-        end
-        config.fams.bendblocks.nrsegs       = [b1_nrsegs/2,b2_nrsegs/3];
+        config.fams.bendblocks.nrsegs       = [1,1];
         config.fams.bendblocks.sigma_x      = 40 * um * 1;
         config.fams.bendblocks.sigma_y      = 40 * um * 1;
         config.fams.bendblocks.sigma_roll   = 0.30 * mrad * 1;

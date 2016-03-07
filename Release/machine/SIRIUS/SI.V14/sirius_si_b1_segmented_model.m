@@ -1,5 +1,8 @@
 function [model, model_length] = sirius_si_b1_segmented_model(passmethod, m_accep_fam_name)
 
+if ~exist('passmethod','var'), passmethod = 'BndMPoleSymplectic4Pass'; end
+if ~exist('m_accep_fam_name','var'), m_accep_fam_name = 'calc_mom_accep'; end
+
 types = {};
 b1      = 1; types{end+1} = struct('fam_name', 'b1', 'passmethod', passmethod);
 b1_edge = 2; types{end+1} = struct('fam_name', 'b1_edge', 'passmethod', 'IdentityPass');

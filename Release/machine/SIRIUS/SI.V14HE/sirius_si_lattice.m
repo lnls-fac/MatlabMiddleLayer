@@ -33,7 +33,7 @@ version = '03';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
 
-lattice_version = 'SI.V14';
+lattice_version = 'SI.V14HE';
 % processamento de input (energia e modo de operacao)
 for i=1:length(varargin)
     if ischar(varargin{i}) && length(varargin{i})==1
@@ -64,73 +64,74 @@ sext_pass_method = 'StrMPoleSymplectic4Pass';
 %  ========
 % marker to define points where momentum acceptance will be calculated
 m_accep_fam_name = 'calc_mom_accep';
-%MOMACCEP = marker(m_accep_fam_name, 'IdentityPass');  %    
+MOMACCEP = marker(m_accep_fam_name, 'IdentityPass');  %    
 
 % -- drifts --
 
-LKK   = drift('lkk',  1.7630, 'DriftPass');
-LPMU  = drift('lpmu', 0.3220, 'DriftPass');
-LPMD  = drift('lpmd', 0.4629, 'DriftPass');
-LIA   = drift('lia2', 1.5179, 'DriftPass');
-LIB   = drift('lib2', 1.0879, 'DriftPass');
+LKK   = drift('lkk',   1.7630, 'DriftPass');
+LPMU  = drift('lpmu',  0.3220, 'DriftPass');
+LPMD  = drift('lpmd',  0.4629, 'DriftPass');
+LIA   = drift('lia2',  1.5179, 'DriftPass');
+LIB   = drift('lib2',  1.0879, 'DriftPass');
 
-L035  = drift('l035', 0.035, 'DriftPass');
-L050  = drift('l050', 0.050, 'DriftPass');
-L061  = drift('l061', 0.061, 'DriftPass');
-L066  = drift('l066', 0.066, 'DriftPass');
-L074  = drift('l074', 0.074, 'DriftPass');
-L077  = drift('l077', 0.077, 'DriftPass');
-L081  = drift('l081', 0.081, 'DriftPass');
-L083  = drift('l083', 0.083, 'DriftPass');
-L105  = drift('l105', 0.105, 'DriftPass');
-L112  = drift('l112', 0.112, 'DriftPass');
-L125  = drift('l125', 0.125, 'DriftPass');
-L134  = drift('l134', 0.134, 'DriftPass');
-L135  = drift('l135', 0.135, 'DriftPass');
-L140  = drift('l140', 0.140, 'DriftPass');
-L150  = drift('l150', 0.150, 'DriftPass');
-L155  = drift('l155', 0.155, 'DriftPass');
-L170  = drift('l170', 0.170, 'DriftPass');
-L216  = drift('l216', 0.216, 'DriftPass');
-L230  = drift('l230', 0.230, 'DriftPass');
-L240  = drift('l240', 0.240, 'DriftPass');
-L267  = drift('l267', 0.267, 'DriftPass');
-L270  = drift('l270', 0.270, 'DriftPass');
-L275  = drift('l275', 0.275, 'DriftPass');
-L336  = drift('l336', 0.336, 'DriftPass');
-L419  = drift('l419', 0.419, 'DriftPass');
-L474  = drift('l474', 0.474, 'DriftPass');
-L500  = drift('l500', 0.500, 'DriftPass');
-L537  = drift('l537', 0.537, 'DriftPass');
-L715  = drift('l715', 0.715, 'DriftPass');
+L035 = drift('l035', 0.035, 'DriftPass');
+L050 = drift('l050', 0.050, 'DriftPass');
+L066 = drift('l066', 0.066, 'DriftPass');
+L074 = drift('l074', 0.074, 'DriftPass');
+L077 = drift('l077', 0.077, 'DriftPass');
+L081 = drift('l081', 0.081, 'DriftPass');
+L083 = drift('l083', 0.083, 'DriftPass');
+L100 = drift('l100', 0.100, 'DriftPass');
+L105 = drift('l105', 0.105, 'DriftPass');
+L112 = drift('l112', 0.112, 'DriftPass');
+L125 = drift('l125', 0.125, 'DriftPass');
+L135 = drift('l135', 0.135, 'DriftPass');
+L140 = drift('l140', 0.140, 'DriftPass');
+L150 = drift('l150', 0.150, 'DriftPass');
+L155 = drift('l155', 0.155, 'DriftPass');
+L170 = drift('l170', 0.170, 'DriftPass');
+L185 = drift('l185', 0.185, 'DriftPass');
+L230 = drift('l230', 0.230, 'DriftPass');
+L240 = drift('l240', 0.240, 'DriftPass');
+L267 = drift('l267', 0.267, 'DriftPass');
+L270 = drift('l270', 0.270, 'DriftPass');
+L275 = drift('l275', 0.275, 'DriftPass');
+L340 = drift('l340', 0.340, 'DriftPass');
+L419 = drift('l419', 0.419, 'DriftPass');
+L460 = drift('l460', 0.460, 'DriftPass');
+L500 = drift('l500', 0.500, 'DriftPass');
+L537 = drift('l537', 0.537, 'DriftPass');
+L610 = drift('l610', 0.610, 'DriftPass');
+L715 = drift('l715', 0.715, 'DriftPass');
 
 
 % -- dipoles -- 
+deg2rad = pi/180.0;
 
-%deg2rad = pi/180.0;
-% B2E = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 1.4143*deg2rad/2, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
-% B2M = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
-% B2S = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
-% B2  = [MOMACCEP,B2E,MOMACCEP,B2M,MOMACCEP,B2S,MOMACCEP];
+B1E = rbend_sirius('b1', 0.828/2,  2.7553*deg2rad/2, 1.4143*deg2rad/2, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
+MB1 = marker('mb1', 'IdentityPass');
+B1S = rbend_sirius('b1', 0.828/2,  2.7553*deg2rad/2, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
+B1  = [MOMACCEP,B1E,MOMACCEP,MB1,B1S,MOMACCEP];
+
+B2E = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 1.4143*deg2rad/2, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
+B2M = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
+B2S = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
+B2  = [MOMACCEP,B2E,MOMACCEP,B2M,MOMACCEP,B2S,MOMACCEP];
 
 [BC, ~] = sirius_si_bc_segmented_model(bend_pass_method, m_accep_fam_name);
-[B1, ~] = sirius_si_b1_segmented_model(bend_pass_method, m_accep_fam_name);
-[B2, ~] = sirius_si_b2_segmented_model(bend_pass_method, m_accep_fam_name);
-
 
 % -- quadrupoles --
-
+[QFA,  ~] = sirius_si_q20_segmented_model('qfa',  qfa_strength,  quad_pass_method);
 [QDA,  ~] = sirius_si_q14_segmented_model('qda',  qda_strength,  quad_pass_method);
 [QDB2, ~] = sirius_si_q14_segmented_model('qdb2', qdb2_strength, quad_pass_method);
+[QFB,  ~] = sirius_si_q30_segmented_model('qfb',  qfb_strength,  quad_pass_method);
 [QDB1, ~] = sirius_si_q14_segmented_model('qdb1', qdb1_strength, quad_pass_method);
-[QFA,  ~] = sirius_si_q20_segmented_model('qfa',  qfa_strength,  quad_pass_method);
 [QF1,  ~] = sirius_si_q20_segmented_model('qf1',  qf1_strength,  quad_pass_method);
 [QF2,  ~] = sirius_si_q20_segmented_model('qf2',  qf2_strength,  quad_pass_method);
 [QF3,  ~] = sirius_si_q20_segmented_model('qf3',  qf3_strength,  quad_pass_method);
 [QF4,  ~] = sirius_si_q20_segmented_model('qf4',  qf4_strength,  quad_pass_method);
-[QFB,  ~] = sirius_si_q30_segmented_model('qfb',  qfb_strength,  quad_pass_method);
 
-% -- sextupoles --
+% -- sextupoles and slow correctors --
 SFA  = sextupole('sfa',   0.150, sfa_strength,  sext_pass_method); % CH-CV
 SDA  = sextupole('sda',   0.150, sda_strength,  sext_pass_method); % QS
 SD1J = sextupole('sd1j',  0.150, sd1j_strength, sext_pass_method); % CH-CV
@@ -145,13 +146,12 @@ SF1K = sextupole('sf1k',  0.150, sf1k_strength, sext_pass_method); % QS
 SD1K = sextupole('sd1k',  0.150, sd1k_strength, sext_pass_method); % CH-CV
 SDB  = sextupole('sdb',   0.150, sdb_strength,  sext_pass_method); % QS
 SFB  = sextupole('sfb',   0.150, sfb_strength,  sext_pass_method); % CH-CV
-
-% --- slow correctors ---
-CV   = sextupole('cv',        0.150, 0.0, sext_pass_method); % same model as BO correctors
+CV   = sextupole('cv',    0.150, 0.0,           sext_pass_method); % same model as BO correctors
 
 % -- pulsed magnets --
-KICKIN = sextupole('kick_in', 0.500, 0.0, sext_pass_method); % injection kicker
-PMM    = sextupole('pmm',     0.470, 0.0, sext_pass_method); % pulsed multipole magnet
+
+KICKIN = sextupole('kick_in', 0.5, 0, sext_pass_method); % injection kicker
+PMM    = sextupole('pmm',     0.47, 0, sext_pass_method); % pulsed multipole magnet
 
 % -- bpms and fast correctors --
 BPM    = marker('bpm', 'IdentityPass');
@@ -176,26 +176,25 @@ DCCT2  = marker('dcct2',    'IdentityPass'); % dcct2 to measure beam current
 
 %% transport lines
 
-M2A      = [GIR,BPM,RBPM,L135,SFA,L150,QFA,L074,FC,L066,SDA,L150,QDA,GIR,L134,GIR];                                  % high beta xxM2 girder (with fasc corrector)
-M1A      = fliplr(M2A);                                                                                              % high beta xxM1 girder (with fast correctors)
-IDA      = [L500,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];                                          % high beta ID straight section
-CAV      = [L500,LIA,L500,L500,L500,MIA,RFC,L500,L500,L500,LIA,L500];                                                % high beta RF cavity straight section 
-INJ      = [L500,LIA,L419,SEPTIN,L500,L500,L081,END,START,MIA, LKK, KICKIN, LPMU, PMM, LPMD];                        % high beta INJ straight section
-M1B      = [GIR,L134,GIR,QDB1,L150,SDB,L240,QFB,L150,SFB,L050,FC,L035,QDB2,L140,BPM,RBPM,GIR];                       % low beta xxM1 girder
-M2B      = fliplr(M1B);                                                                                              % low beta xxM2 girder
-IDB      = [L500,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,L500];                                          % low beta ID straight section
+M2A      = [GIR,BPM,RBPM,L135,SFA,L150,QFA,L074,FC,L066,SDA,L150,QDA,GIR,L170,L100,GIR];                           % high beta xxM2 girder (with fasc corrector)
+M1A      = fliplr(M2A);                                                                                            % high beta xxM1 girder (with fast correctors)
+IDA      = [L500,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];                                        % high beta ID straight section
+CAV      = [L500,LIA,L500,L500,L500,MIA,RFC,L500,L500,L500,LIA,L500];                                              % high beta RF cavity straight section 
+INJ      = [L500,LIA,L419,SEPTIN,L500,L500,L081,END,START,MIA, LKK, KICKIN, LPMU, PMM, LPMD];                      % high beta INJ straight section
+M1B      = [GIR,L170,L100,GIR,QDB1,L150,SDB,L240,QFB,L150,SFB,L050,FC,L035,QDB2,L140,BPM,RBPM,GIR];                % low beta xxM1 girder
+M2B      = fliplr(M1B);                                                                                            % low beta xxM2 girder
+IDB      = [L500,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,L500];                                        % low beta ID straight section
+C1A      = [GIR,L610,GIR,SD1J,L170,QF1,L135,BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L185];               % arc sector in between B1-B2 (high beta odd-numbered straight sections)
+C1B      = [GIR,L610,GIR,SD1K,L170,QF1,L135,BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L185];               % arc sector in between B1-B2 (low beta even-numbered straight sections)
+C2A      = [GIR,L460,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];             % arc sector in between B2-BC (high beta odd-numbered straight sections)
+C2B      = [GIR,L460,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];             % arc sector in between B2-BC (low beta even-numbered straight sections)
+C2A_DCCT = [GIR,L460,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L270,DCCT1,L267,GIR,CV,L105,BPM,RBPM,L035];  % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
+C2B_DCCT = [GIR,L460,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L270,DCCT2,L267,GIR,CV,L105,BPM,RBPM,L035];  % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
+C3A      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2K,L230,QF3,L170,SD3K,GIR,L275,GIR,BPM,L185];            % arc sector in between BC-B2 (high beta odd-numbered straight sections)
+C3B      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2J,L230,QF3,L170,SD3J,GIR,L275,GIR,BPM,L185];            % arc sector in between BC-B2 (low beta even-numbered straight sections)
+C4A      = [GIR,L340,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L610,GIR];                        % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C4B      = [GIR,L340,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L610,GIR];                        % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
-
-C1A      = [GIR,L474,GIR,SD1J,L170,QF1,L135,BPM,L125,SF1J,L230,QF2,L170,SD2J,GIR,L155,GIR,BPM,L061];                 % arc sector in between B1-B2 (high beta odd-numbered straight sections)
-C1B      = [GIR,L474,GIR,SD1K,L170,QF1,L135,BPM,L125,SF1K,L230,QF2,L170,SD2K,GIR,L155,GIR,BPM,L061];                 % arc sector in between B1-B2 (low beta even-numbered straight sections)
-C2A      = [GIR,L336,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];               % arc sector in between B2-BC (high beta odd-numbered straight sections)
-C2B      = [GIR,L336,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L537,GIR,CV,L105,BPM,RBPM,L035];               % arc sector in between B2-BC (low beta even-numbered straight sections)
-C2A_DCCT = [GIR,L336,GIR,SD3J,L170,QF3,L230,SF2J,L077,FC,L083,QF4,GIR,L270,DCCT1,L267,GIR,CV,L105,BPM,RBPM,L035];    % arc sector in between B2-BC with DCCT1 (high beta odd-numbered straight sections)
-C2B_DCCT = [GIR,L336,GIR,SD3K,L170,QF3,L230,SF2K,L077,FC,L083,QF4,GIR,L270,DCCT2,L267,GIR,CV,L105,BPM,RBPM,L035];    % arc sector in between B2-BC with DCCT2 (low beta even-numbered straight sections)
-C3A      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2K,L230,QF3,L170,SD3K,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (high beta odd-numbered straight sections)
-C3B      = [GIR,L715,GIR,BPM,RBPM,L112,QF4,L083,FC,L077,SF2J,L230,QF3,L170,SD3J,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
-C4A      = [GIR,L216,GIR,SD2K,L170,QF2,L230,SF1K,L125,BPM,L135,QF1,L170,SD1K,GIR,L474,GIR];                          % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-C4B      = [GIR,L216,GIR,SD2J,L170,QF2,L230,SF1J,L125,BPM,L135,QF1,L170,SD1J,GIR,L474,GIR];                          % arc sector in between B2-B1 (low beta even-numbered straight sections)
 
 
 %% GIRDERS
@@ -213,49 +212,37 @@ SS_S17 = IDA; SS_S18 = IDB;
 SS_S19 = IDA; SS_S20 = IDB;
 
 % down and upstream straight sections
-M1_S01 = M1A;  M2_S01 = M2A;  
-M1_S03 = M1A;  M2_S03 = M2A;  
-M1_S05 = M1A;  M2_S05 = M2A;  
-M1_S07 = M1A;  M2_S07 = M2A;  
-M1_S09 = M1A;  M2_S09 = M2A;  
-M1_S11 = M1A;  M2_S11 = M2A;  
-M1_S13 = M1A;  M2_S13 = M2A;  
-M1_S15 = M1A;  M2_S15 = M2A;  
-M1_S17 = M1A;  M2_S17 = M2A;  
-M1_S19 = M1A;  M2_S19 = M2A;  
-
-M1_S02 = M1B;  M2_S02 = M2B;
-M1_S04 = M1B;  M2_S04 = M2B;
-M1_S06 = M1B;  M2_S06 = M2B;
-M1_S08 = M1B;  M2_S08 = M2B;
-M1_S10 = M1B;  M2_S10 = M2B;
-M1_S12 = M1B;  M2_S12 = M2B;
-M1_S14 = M1B;  M2_S14 = M2B;
-M1_S16 = M1B;  M2_S16 = M2B;
-M1_S18 = M1B;  M2_S18 = M2B;
-M1_S20 = M1B;  M2_S20 = M2B;
+M1_S01 = M1A;  M2_S01 = M2A;  M1_S02 = M1B;  M2_S02 = M2B;
+M1_S03 = M1A;  M2_S03 = M2A;  M1_S04 = M1B;  M2_S04 = M2B;
+M1_S05 = M1A;  M2_S05 = M2A;  M1_S06 = M1B;  M2_S06 = M2B;
+M1_S07 = M1A;  M2_S07 = M2A;  M1_S08 = M1B;  M2_S08 = M2B;
+M1_S09 = M1A;  M2_S09 = M2A;  M1_S10 = M1B;  M2_S10 = M2B;
+M1_S11 = M1A;  M2_S11 = M2A;  M1_S12 = M1B;  M2_S12 = M2B;
+M1_S13 = M1A;  M2_S13 = M2A;  M1_S14 = M1B;  M2_S14 = M2B;
+M1_S15 = M1A;  M2_S15 = M2A;  M1_S16 = M1B;  M2_S16 = M2B;
+M1_S17 = M1A;  M2_S17 = M2A;  M1_S18 = M1B;  M2_S18 = M2B;
+M1_S19 = M1A;  M2_S19 = M2A;  M1_S20 = M1B;  M2_S20 = M2B;
 
 % dispersive arcs
 C1_S01 = C1A; C2_S01 = C2A; C3_S01 = C3A; C4_S01 = C4A;
-C1_S03 = C1A; C2_S03 = C2A; C3_S03 = C3A; C4_S03 = C4A;
-C1_S05 = C1A; C2_S05 = C2A; C3_S05 = C3A; C4_S05 = C4A;
-C1_S07 = C1A; C2_S07 = C2A; C3_S07 = C3A; C4_S07 = C4A;
-C1_S09 = C1A; C2_S09 = C2A; C3_S09 = C3A; C4_S09 = C4A;
-C1_S11 = C1A; C2_S11 = C2A; C3_S11 = C3A; C4_S11 = C4A;
-C1_S13 = C1A; C2_S13 = C2A_DCCT; C3_S13 = C3A; C4_S13 = C4A;
-C1_S15 = C1A; C2_S15 = C2A; C3_S15 = C3A; C4_S15 = C4A;
-C1_S17 = C1A; C2_S17 = C2A; C3_S17 = C3A; C4_S17 = C4A;
-C1_S19 = C1A; C2_S19 = C2A; C3_S19 = C3A; C4_S19 = C4A;
-
 C1_S02 = C1B; C2_S02 = C2B; C3_S02 = C3B; C4_S02 = C4B;
+C1_S03 = C1A; C2_S03 = C2A; C3_S03 = C3A; C4_S03 = C4A;
 C1_S04 = C1B; C2_S04 = C2B; C3_S04 = C3B; C4_S04 = C4B;
+C1_S05 = C1A; C2_S05 = C2A; C3_S05 = C3A; C4_S05 = C4A;
 C1_S06 = C1B; C2_S06 = C2B; C3_S06 = C3B; C4_S06 = C4B;
+C1_S07 = C1A; C2_S07 = C2A; C3_S07 = C3A; C4_S07 = C4A;
 C1_S08 = C1B; C2_S08 = C2B; C3_S08 = C3B; C4_S08 = C4B;
+C1_S09 = C1A; C2_S09 = C2A; C3_S09 = C3A; C4_S09 = C4A;
 C1_S10 = C1B; C2_S10 = C2B; C3_S10 = C3B; C4_S10 = C4B;
+C1_S11 = C1A; C2_S11 = C2A; C3_S11 = C3A; C4_S11 = C4A;
 C1_S12 = C1B; C2_S12 = C2B; C3_S12 = C3B; C4_S12 = C4B;
+C1_S13 = C1A; C2_S13 = C2A_DCCT; C3_S13 = C3A; C4_S13 = C4A;
 C1_S14 = C1B; C2_S14 = C2B_DCCT; C3_S14 = C3B; C4_S14 = C4B;
+C1_S15 = C1A; C2_S15 = C2A; C3_S15 = C3A; C4_S15 = C4A;
 C1_S16 = C1B; C2_S16 = C2B; C3_S16 = C3B; C4_S16 = C4B;
+C1_S17 = C1A; C2_S17 = C2A; C3_S17 = C3A; C4_S17 = C4A;
 C1_S18 = C1B; C2_S18 = C2B; C3_S18 = C3B; C4_S18 = C4B;
+C1_S19 = C1A; C2_S19 = C2A; C3_S19 = C3A; C4_S19 = C4A;
 C1_S20 = C1B; C2_S20 = C2B; C3_S20 = C3B; C4_S20 = C4B;
 
 %% SECTORS # 01..20
