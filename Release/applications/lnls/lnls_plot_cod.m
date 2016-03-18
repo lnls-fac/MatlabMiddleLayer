@@ -2,7 +2,7 @@ function lnls_plot_cod(default_path)
 
 
 prompt = {'Submachine (bo/si)', 'COD unit (um/mm)', 'symmetry', 'plot title', 'corrected?(y/n)'};
-defaultanswer = {'si', 'um', '20', 'v10.c01','y'};
+defaultanswer = {'si', 'um', '20', 'SI.V14.C03','y'};
 answer = inputdlg(prompt,'Select submachine and trackcpp algorithms to run',1,defaultanswer);
 if isempty(answer), return; end;
 submachine = answer{1};

@@ -124,11 +124,12 @@ L715  = drift('l715', 0.715, 'DriftPass');
 [QDB2, ~] = sirius_si_q14_segmented_model('qdb2', qdb2_strength, quad_pass_method);
 [QDB1, ~] = sirius_si_q14_segmented_model('qdb1', qdb1_strength, quad_pass_method);
 [QFA,  ~] = sirius_si_q20_segmented_model('qfa',  qfa_strength,  quad_pass_method);
+[QFB,  ~] = sirius_si_q30_segmented_model('qfb',  qfb_strength,  quad_pass_method);
 [QF1,  ~] = sirius_si_q20_segmented_model('qf1',  qf1_strength,  quad_pass_method);
 [QF2,  ~] = sirius_si_q20_segmented_model('qf2',  qf2_strength,  quad_pass_method);
 [QF3,  ~] = sirius_si_q20_segmented_model('qf3',  qf3_strength,  quad_pass_method);
 [QF4,  ~] = sirius_si_q20_segmented_model('qf4',  qf4_strength,  quad_pass_method);
-[QFB,  ~] = sirius_si_q30_segmented_model('qfb',  qfb_strength,  quad_pass_method);
+
 
 % -- sextupoles --
 SFA  = sextupole('sfa',   0.150, sfa_strength,  sext_pass_method); % CH-CV
