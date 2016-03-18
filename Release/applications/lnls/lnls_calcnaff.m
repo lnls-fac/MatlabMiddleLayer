@@ -22,7 +22,7 @@ ndata = size(X,1);
 tune = zeros(ndata,1);
 for ii = 1:ndata
     val = abs(calcnaff(X(ii,:),Xl(ii,:),1,2));
-    if val(1)<1e-4
+    if val(1)<1e-4 && numel(val)>1
         tune(ii) = val(2)/2/pi;
     else
         tune(ii) = val(1)/2/pi;

@@ -1,17 +1,23 @@
-function NEWRING = lnls_refine_lattice(RING, max_length, varargin)
-% REFINELATTICE - gera nova rede com elementos de comprimentos menores.
+function NEWRING = lnls_refine_lattice(RING, max_length, famORpass)
+% NEWRING = lnls_refine_lattice(RING, max_length, famORpass)
+% 
+% INPUTS:
+%   RING       - ring model.
+%   max_length - maximum length each element must have.
+%   famORpass  - cell array of families or passMethods to refine.
 %
-% Hist�rico:
+% Historico:
 %
-% 2010-10-27: vers�o inicial do c�digo (Ximenes R. Resende)
+% 2010-10-27: versao inicial do codigo (Ximenes R. Resende)
 
 NEWRING = struct([]);
-if nargin>2, families = varargin{1}; else families = {}; end;
+if ~exist('famORpass','var'),famORpass = {}; end;
 
 for i=1:length(RING)
     
     if    (~isfield(RING{i}, 'Length') || (RING{i}.Length <= max_length)) ... % length < max_length
-       || (~isempty(families) && ~any(strcmpi(families, RING{i}.FamName)))    % specified family?
+       || (~isempty(famORpass) && ~any(strcmpi(famORpass, RING{i}.FamName))...  % specified family?
+       && ~any(strcmpi(famORpass,RING{i}.PassMethod)))                         % specified PassMethod
         NEWRING{end+1} = RING{i};
         continue;
     end
