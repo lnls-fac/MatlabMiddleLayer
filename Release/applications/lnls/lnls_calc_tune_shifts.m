@@ -89,13 +89,14 @@ if print
     plot(1e6*amps.Jy,polyval(px.y,amps.Jy),'b',1e6*amps.Jy,polyval(py.y,amps.Jy),'r');
 end
 
-function [tunex,tuney,Jx,Jy] = get_frac_tunes(ring,Rin)
+function [tunex,tuney,Jx,Jy] = get_frac_tunes(ring,Rin,nturns)
 
 % escolha do metodo para calculo das sintonias:
 meth = 'naff';
 
 % ajuste do numero de voltas para que seja compativel com o naff
-nturns = 100;
+if ~exist('nturns','var'), nturns = 100; end
+
 nt = nextpow2(nturns);
 nturns = 2^nt + 6 - mod(2^nt,6);
 
