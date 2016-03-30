@@ -7,6 +7,7 @@ if params.plot,
     f2 =  figure('OuterPosition',[1,1,1300,480]);
     ax = axes('Parent',f,'Position',[0.05,0.1,0.9,0.85]);
     ay = axes('Parent',f2,'Position',[0.05,0.1,0.9,0.85]);
+    drawnow;
 end
 
 Jac = calc_jacobian(x0, params.calc_residue);

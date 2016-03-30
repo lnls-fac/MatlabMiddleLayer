@@ -87,7 +87,7 @@ func = param.objective_function;
 
 gen_start = 0;
 if isfield(param,'continue') && param.continue
-    a = dir('solution');
+    a = dir(folder);
     for i = 1:length(a)
         if strncmpi(a(i).name,'generation',10)
             gen_start = gen_start + 1;

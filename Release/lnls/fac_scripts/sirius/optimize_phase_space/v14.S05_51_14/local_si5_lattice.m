@@ -125,13 +125,13 @@ L715  = drift('l715', 0.715, 'DriftPass');
 
 % -- sextupoles --
 SFA  = sextupole('sfa',   0.150, sfa_strength,  sext_pass_method); % CH-CV
+SFB  = sextupole('sfb',   0.150, sfb_strength,  sext_pass_method); % CH-CV
 SFPA = sextupole('sfpa',  0.150, sfpa_strength, sext_pass_method); % CH-CV
 SFPB = sextupole('sfpb',  0.150, sfpb_strength, sext_pass_method); % CH-CV
-SFB  = sextupole('sfb',   0.150, sfb_strength,  sext_pass_method); % CH-CV
 SDA  = sextupole('sda',   0.150, sda_strength,  sext_pass_method); % QS
+SDB  = sextupole('sdb',   0.150, sdb_strength,  sext_pass_method); % QS
 SDPA = sextupole('sdpa',  0.150, sdpa_strength, sext_pass_method); % QS
 SDPB = sextupole('sdpb',  0.150, sdpb_strength, sext_pass_method); % QS
-SDB  = sextupole('sdb',   0.150, sdb_strength,  sext_pass_method); % QS
 SD1J = sextupole('sd1j',  0.150, sd1j_strength, sext_pass_method); % CH-CV
 SD1K = sextupole('sd1k',  0.150, sd1k_strength, sext_pass_method); % CH-CV
 SD1L = sextupole('sd1l',  0.150, sd1l_strength, sext_pass_method); % CH-CV
@@ -152,26 +152,6 @@ SF2J = sextupole('sf2j',  0.150, sf2j_strength, sext_pass_method); % CH
 SF2K = sextupole('sf2k',  0.150, sf2k_strength, sext_pass_method); % CH-CV
 SF2L = sextupole('sf2l',  0.150, sf2l_strength, sext_pass_method); % CH
 SF2M = sextupole('sf2m',  0.150, sf2m_strength, sext_pass_method); % CH-CV
-% SD1N = sextupole('sd1n',  0.150, sd1j_strength, sext_pass_method); % CH-CV
-% SD2N = sextupole('sd2n',  0.150, sd2j_strength, sext_pass_method); % --
-% SD3N = sextupole('sd3n',  0.150, sd3j_strength, sext_pass_method); % CV
-% SF1N = sextupole('sf1n',  0.150, sf1j_strength, sext_pass_method); % QS
-% SF2N = sextupole('sf2n',  0.150, sf2j_strength, sext_pass_method); % CH
-% SD1O = sextupole('sd1o',  0.150, sd1k_strength, sext_pass_method); % CH-CV
-% SD2O = sextupole('sd2o',  0.150, sd2k_strength, sext_pass_method); % --
-% SD3O = sextupole('sd3o',  0.150, sd3k_strength, sext_pass_method); % CV
-% SF1O = sextupole('sf1o',  0.150, sf1k_strength, sext_pass_method); % QS
-% SF2O = sextupole('sf2o',  0.150, sf2k_strength, sext_pass_method); % CH-CV
-% SD1P = sextupole('sd1p',  0.150, sd1l_strength, sext_pass_method); % CH-CV
-% SD2P = sextupole('sd2p',  0.150, sd2l_strength, sext_pass_method); % --
-% SD3P = sextupole('sd3p',  0.150, sd3l_strength, sext_pass_method); % CV
-% SF1P = sextupole('sf1p',  0.150, sf1l_strength, sext_pass_method); % QS
-% SF2P = sextupole('sf2p',  0.150, sf2l_strength, sext_pass_method); % CH
-% SD1Q = sextupole('sd1q',  0.150, sd1m_strength, sext_pass_method); % CH-CV
-% SD2Q = sextupole('sd2q',  0.150, sd2m_strength, sext_pass_method); % --
-% SD3Q = sextupole('sd3q',  0.150, sd3m_strength, sext_pass_method); % CV
-% SF1Q = sextupole('sf1q',  0.150, sf1m_strength, sext_pass_method); % QS
-% SF2Q = sextupole('sf2q',  0.150, sf2m_strength, sext_pass_method); % CH-CV
 
 
 % --- slow correctors ---
@@ -227,15 +207,6 @@ C4A      = [L216,SD2J,L170,QF2,L230,SF1J,L125,L135,QF1,L170,SD1J,L474];         
 C4B      = [L216,SD2K,L170,QF2,L230,SF1K,L125,L135,QF1,L170,SD1K,L474];                 % arc sector in between B2-B1 (low beta even-numbered straight sections)
 C4PA     = [L216,SD2L,L170,QF2,L230,SF1L,L125,L135,QF1,L170,SD1L,L474];                 % arc sector in between B2-B1 (low beta even-numbered straight sections)
 C4PB     = [L216,SD2M,L170,QF2,L230,SF1M,L125,L135,QF1,L170,SD1M,L474];                 % arc sector in between B2-B1 (low beta even-numbered straight sections)
-% C3A      = [L715,L112,QF4,L083,FC,L077,SF2N,L230,QF3,L170,SD3N,L275,L061];              % arc sector in between BC-B2 (high beta odd-numbered straight sections)
-% C3B      = [L715,L112,QF4,L083,FC,L077,SF2O,L230,QF3,L170,SD3O,L275,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
-% C3PA     = [L715,L112,QF4,L083,FC,L077,SF2P,L230,QF3,L170,SD3P,L275,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
-% C3PB     = [L715,L112,QF4,L083,FC,L077,SF2Q,L230,QF3,L170,SD3Q,L275,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
-% C4A      = [L216,SD2N,L170,QF2,L230,SF1N,L125,L135,QF1,L170,SD1N,L474];                 % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-% C4B      = [L216,SD2O,L170,QF2,L230,SF1O,L125,L135,QF1,L170,SD1O,L474];                 % arc sector in between B2-B1 (low beta even-numbered straight sections)
-% C4PA     = [L216,SD2P,L170,QF2,L230,SF1P,L125,L135,QF1,L170,SD1P,L474];                 % arc sector in between B2-B1 (low beta even-numbered straight sections)
-% C4PB     = [L216,SD2Q,L170,QF2,L230,SF1Q,L125,L135,QF1,L170,SD1Q,L474];                 % arc sector in between B2-B1 (low beta even-numbered straight sections)
-
 
 
 %% GIRDERS
