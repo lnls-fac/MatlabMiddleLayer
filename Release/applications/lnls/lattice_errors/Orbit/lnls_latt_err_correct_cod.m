@@ -101,8 +101,10 @@ for i=1:nr_machines
     polynomb_orig = getcellstruct(machine{i}, 'PolynomB', sext_idx);
     
     if orbit.simul_bpm_err
-        random_cod = getcellstruct(machine{i},'Offsets',orbit.bpm_idx);
-        random_cod = cell2mat(random_cod)';
+        if isfield(machine{i}, 'Offsets')
+            random_cod = getcellstruct(machine{i},'Offsets',orbit.bpm_idx);
+            random_cod = cell2mat(random_cod)';
+        end
     end
     if orbit.correct2bba_orbit
         T1 = getcellstruct(machine{i},'T1',ind_bba,1,1);
