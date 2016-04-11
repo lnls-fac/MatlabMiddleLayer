@@ -10,12 +10,24 @@
 % qfb_strength     =  4.097059;
 % qdb1_strength    = -2.043692;
 
-% After tune correction to compensate difference in dipole modeling:
-qfa_strength     =  3.577387;
-qda_strength     = -1.559539;
-qdb2_strength    = -3.212800;
-qfb_strength     =  4.094894;
-qdb1_strength    = -2.046566;
+% % After tune correction to compensate difference in dipole modeling:
+% qfa_strength     =  3.577387;
+% qda_strength     = -1.559539;
+% qdb2_strength    = -3.212800;
+% qfb_strength     =  4.094894;
+% qdb1_strength    = -2.046566;
+% 
+% qf1_strength     =  2.924964;
+% qf2_strength     =  4.264732;
+% qf3_strength     =  3.275260;
+% qf4_strength     =  3.928041;
+
+% 2016-02-23 - After tune correction to [48.071118271156664  13.176494180166365] after modification of B2 model
+qfa_strength     =  3.576225912494526;
+qda_strength     = -1.561769848733389;
+qdb2_strength    = -3.213617825493527;
+qfb_strength     =  4.093538898931883;
+qdb1_strength    = -2.048725525435448;
 
 qf1_strength     =  2.924964;
 qf2_strength     =  4.264732;

@@ -23,6 +23,12 @@ points3 = findcells(the_ring(super_per),'BendingAngle');
 points2 = setdiff(points2,points3);
 points = sort([points, points2]);
 
+fnames = findmemberof('sext');
+for i=1:length(fnames)
+    points4 = findcells(the_ring(super_per), 'FamName', fnames{i});
+    points = sort([points, points4]);
+end
+
 %Define sposition of the calculated points
 spos = spos(points);
 

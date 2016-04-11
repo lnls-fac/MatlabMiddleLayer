@@ -5,8 +5,8 @@ function nonlinearBSC_figure(data)
 % nesse caso, temos dois calculos:
 % o dos markers
 the_ring = data.the_ring;
-n_per = data.n_per;
-points = data.points;
+n_per    = data.n_per;
+points   = data.points;
 bsch_pos = data.bsch_pos;
 bsch_neg = data.bsch_neg;
 bscv_pos = data.bscv_pos;
@@ -48,10 +48,11 @@ plot1(:,1) = plot(axv,spos,[bscv_pos;bscv_neg]*1e3,'MarkerSize',8,...
                   'LineStyle','--','LineWidth',1);
 plot1(:,2) = plot(axv,twiss.pos,[bscvl,-bscvl]*1e3,'Color','r','LineWidth',2);
 plot1(:,3) = plot(axv,twiss.pos,[-cam_vacy,cam_vacy]*1e3,'Color','k','LineWidth',2);
-lnls_drawlattice(the_ring,n_per,0,true,1,true,axv);
+lnls_drawlattice(the_ring,n_per,0,true,1,true,axv,true);
 xlabel('Position [m]');
 xlim([spos(1), spos(end)]);
 ylim([-1, 1]*1.1*max(cam_vacy)*1e3);
+ylim([-15, 15]);
 ylabel('Vertical BSC [mm]');
 legend(plot1(1,:),'show',{'Nonlinear';'Linear';'Chamber'});
 
@@ -64,8 +65,9 @@ plot(axh,spos,[bsch_pos;bsch_neg]*1e3,'MarkerSize',8,...
                   'LineStyle','--','LineWidth',1);
 plot(axh,twiss.pos,[bschl,-bschl]*1e3,'Color','r','LineWidth',2);
 plot(axh,twiss.pos,[-cam_vacx,cam_vacx]*1e3,'Color','k','LineWidth',2);
-lnls_drawlattice(the_ring,n_per,0,true,1,true,axh);
+lnls_drawlattice(the_ring,n_per,0,true,1,true,axh,true);
 xlabel('Position [m]');
 xlim([spos(1) spos(end)]);
 ylim([-1, 1]*1.1*max(cam_vacx)*1e3);
+ylim([-15, 15]);
 ylabel('Horizontal BSC [mm]');

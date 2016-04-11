@@ -239,9 +239,11 @@ function the_ring = set_num_integ_steps(the_ring0)
 
 the_ring = the_ring0;
 
+mags = findcells(the_ring, 'PolynomB');
 bends = findcells(the_ring, 'BendingAngle');
-quads = setdiff(findcells(the_ring, 'K'), bends);
-sexts = setdiff(findcells(the_ring, 'PolynomB'), [bends quads]);
+quads = setdiff(mags,bends);
+ch = findcells(the_ring, 'FamName', 'ch');
+cv = findcells(the_ring, 'FamName', 'cv');
 kicks = findcells(the_ring, 'XGrid');
 
 dl = 0.035;
@@ -251,5 +253,6 @@ bends_nis = ceil(bends_len / dl);
 bends_nis = max([bends_nis'; 10 * ones(size(bends_nis'))]);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', bends, bends_nis);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', quads, 10);
-the_ring = setcellstruct(the_ring, 'NumIntSteps', sexts, 5);
+the_ring = setcellstruct(the_ring, 'NumIntSteps', ch, 5);
+the_ring = setcellstruct(the_ring, 'NumIntSteps', cv, 5);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);

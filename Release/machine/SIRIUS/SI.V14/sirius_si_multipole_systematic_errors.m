@@ -72,14 +72,116 @@ fam_data = sirius_si_family_data(the_ring);
 % fams       = findmemberof(model_name);
 % the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
+% ---- previous model of sextupoles ---
+
+% % SEXTUPOLES
+% % ==========
+% model_name = 'SEXT';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-02-03 Sextupolo_Anel_S_Modelo 1_-12_12mm_-500_500mm.txt'
+% monoms     =   [ 4,       6,       8,       14];
+% Bn_normal  = 1*[-6.7e-5, -1.3e-4, -2.1e-3, +1.0e-3];
+% Bn_skew    = 1*[ 0.0,     0.0,     0.0,     0.0];
+% main_monom = {2, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+% % CHS
+% % ===
+% model_name = 'ch';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CH_Modelo 1_-12_12mm_-500_500mm.txt'
+% monoms     =   [ 4,       6,       8,       14];
+% Bn_normal  = 1*[+2.8e-1, +2.8e-2, -3.9e-2, +1.1e-2];
+% Bn_skew    = 1*[ 0.0,     0.0,     0.0,     0.0];
+% main_monom = {0, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+% % CVS
+% % ===
+% model_name = 'cv';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CV_Modelo 1_-12_12mm_-500_500mm.txt'
+% monoms     =   [ 4,       6,       8,       10     ];
+% Bn_normal  = 1*[ 0.0,     0.0,     0.0,     0.0,   ];
+% Bn_skew    = 1*[ -2.6e-1, -3.0e-3, +4.5e-2, -8.3e-3];
+% main_monom = {0, 'skew'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+% % QS
+% % ==
+% model_name = 'qs';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CV_Modelo 1_-12_12mm_-500_500mm.txt'
+% monoms    = [      3,      7,      9,     13];
+% Bn_normal = [   0.00,   0.00,   0.00,   0.00];
+% Bn_skew   = [-5.5e-1, 2.3e-2, 6.5e-3, 1.8e-3];
+% main_monom = {1, 'skew'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+
+% ---- current model of sextupoles ---
+
+% % SEXTUPOLES
+% % ==========
+% model_name = 'SEXT';
+% r0         = 12/1000;
+% % systematic multipoles from '2016-01-29 Sextupolo_Anel_S_Modelo 5_-14_14mm_-500_500mm.txt'
+% monoms     =   [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+% Bn_normal  = 1*[+0.0000e+00, +0.0000e+00, +0.0000e+00, +2.1375e-04, -5.8657e-04, +0.0000e+00, -2.1622e-03, +0.0000e+00, +0.0000e+00, +0.0000e+00, +0.0000e+00];
+% Bn_skew    = 1*[-2.7682e-11, -4.2157e-07, +9.1876e-11, +2.4706e-06, -5.8532e-06, -2.3938e-10, +6.0205e-06, +2.0654e-10, -2.2377e-06, -3.1102e-11, +0.0000e+00];
+% main_monom = {2, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% 
+% % CHS
+% % ===
+% model_name = 'ch';
+% r0         = 12/1000;
+% % systematic multipoles from '2016-02-01 Sextupolo_Anel_S_CH_Modelo 5_-14_14mm_-500_500mm.txt'
+% monoms     =   [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+% Bn_normal  = 1*[-0.0000e+00, +2.7095e-03, -0.0000e+00, +2.9399e-01, +7.5225e-02, -0.0000e+00, -4.4112e-02, -0.0000e+00, -0.0000e+00, -0.0000e+00, +3.1510e-03];
+% Bn_skew    = 1*[+4.1723e-05, -1.2690e-03, -2.3411e-04, +7.4254e-03, -1.7352e-02, +1.4442e-03, +1.7496e-02, -1.7058e-03, -6.4012e-03, +5.0200e-04, -0.0000e+00];
+% main_monom = {0, 'normal'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% 
+% % CVS
+% % ===
+% model_name = 'cv';
+% r0         = 12/1000;
+% % systematic multipoles from '2016-02-01 Sextupolo_Anel_S_CV_Modelo 5_-14_14mm_-500_500mm.txt'
+% monoms     =   [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+% Bn_normal  = 1*[-0.0000e+00, +8.9809e-04, -0.0000e+00, -3.7395e-03, +1.1069e-02, -0.0000e+00, -1.1097e-02, -0.0000e+00, -0.0000e+00, -0.0000e+00, +3.3551e-03];
+% Bn_skew    = 1*[+3.8618e-05, -1.4830e-03, -2.2187e-04, -2.9344e-01, +1.2617e-02, +1.3048e-03, +3.3651e-02, -1.4938e-03, -5.7924e-04, +4.1594e-04, -0.0000e+00];
+% main_monom = {0, 'skew'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% 
+% % QS
+% % ==
+% model_name = 'qs';
+% r0         = 12/1000;
+% % systematic multipoles from '2015-02-01 Sextupolo_Anel_S_QS_Modelo 5_-14_14mm_-500_500mm.txt'
+% monoms    = [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+% Bn_normal = [-0.0000e+00, +1.9374e-03, -0.0000e+00, -1.0388e-02, +2.8264e-02, -0.0000e+00, -2.5529e-02, -0.0000e+00, -0.0000e+00, -0.0000e+00, +6.8507e-03];
+% Bn_skew   = [-0.0000e+00, -2.1055e-03, -5.7765e-01, +1.2248e-02, -2.8575e-02, +2.5363e-02, +2.8797e-02, +1.3401e-02, -1.0545e-02, -1.1152e-03, -0.0000e+00];
+% main_monom = {1, 'skew'}; 
+% fams       = findmemberof(model_name);
+% the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
+
 % SEXTUPOLES
 % ==========
 model_name = 'SEXT';
 r0         = 12/1000;
-% systematic multipoles from '2015-02-03 Sextupolo_Anel_S_Modelo 1_-12_12mm_-500_500mm.txt'
-monoms     =   [ 4,       6,       8,       14];
-Bn_normal  = 1*[-6.7e-5, -1.3e-4, -2.1e-3, +1.0e-3];
-Bn_skew    = 1*[ 0.0,     0.0,     0.0,     0.0];
+% systematic multipoles from '2016-03-15 Sextupolo_Anel_S_Modelo 6_-14_14mm_-500_500mm.txt'
+monoms     =   [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+Bn_normal  = 1*[+0.0000e+00, +0.0000e+00, +0.0000e+00, +2.9128e-04, -1.0522e-03, +0.0000e+00, -8.7110e-04, +0.0000e+00, +0.0000e+00, +0.0000e+00, +1.2180e-03];
+Bn_skew    = 1*[+4.6218e-15, +2.2945e-07, +2.3625e-17, -1.3447e-06, +3.1857e-06, -1.7834e-16, -3.2768e-06, +1.8635e-16, +1.2179e-06, -1.4269e-17, +0.0000e+00];
 main_monom = {2, 'normal'}; 
 fams       = findmemberof(model_name);
 the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
@@ -88,10 +190,10 @@ the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom
 % ===
 model_name = 'ch';
 r0         = 12/1000;
-% systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CH_Modelo 1_-12_12mm_-500_500mm.txt'
-monoms     =   [ 4,       6,       8,       14];
-Bn_normal  = 1*[+2.8e-1, +2.8e-2, -3.9e-2, +1.1e-2];
-Bn_skew    = 1*[ 0.0,     0.0,     0.0,     0.0];
+% systematic multipoles from '2016-03-15 Sextupolo_Anel_S_CH_Modelo 6_-14_14mm_-500_500mm.txt'
+monoms     =   [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+Bn_normal  = 1*[-0.0000e+00, +3.6108e-03, -0.0000e+00, +2.8318e-01, +1.0058e-01, -0.0000e+00, -6.2534e-02, -0.0000e+00, -0.0000e+00, -0.0000e+00, +6.5894e-03];
+Bn_skew    = 1*[+4.4111e-05, +1.9989e-04, -2.3554e-04, -1.1191e-03, +2.5895e-03, +1.3759e-03, -2.6608e-03, -1.5952e-03, +9.6896e-04, +4.5901e-04, -0.0000e+00];
 main_monom = {0, 'normal'}; 
 fams       = findmemberof(model_name);
 the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
@@ -100,23 +202,22 @@ the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom
 % ===
 model_name = 'cv';
 r0         = 12/1000;
-% systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CV_Modelo 1_-12_12mm_-500_500mm.txt'
-monoms     =   [ 4,       6,       8,       10     ];
-Bn_normal  = 1*[ 0.0,     0.0,     0.0,     0.0,   ];
-Bn_skew    = 1*[ -2.6e-1, -3.0e-3, +4.5e-2, -8.3e-3];
+% systematic multipoles from '2016-03-28 Sextupolo_Anel_S_CV_Modelo 6_-14_14mm_-500_500mm.txt'
+monoms     =   [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+Bn_normal  = 1*[-0.0000e+00, -2.3697e-01, -0.0000e+00, -8.1620e-03, +1.6450e-02, -0.0000e+00, -1.4619e-02, -0.0000e+00, -0.0000e+00, -0.0000e+00, +3.6937e-03]; 
+Bn_skew    = 1*[+4.9747e-05, +4.7054e-05, -2.0127e-04, -3.0284e-01, +3.5422e-02, +1.0822e-03, +1.0901e-02, -1.1595e-03, +7.6000e-03, +2.9536e-04, -0.0000e+00];
 main_monom = {0, 'skew'}; 
 fams       = findmemberof(model_name);
 the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
-
 
 % QS
 % ==
 model_name = 'qs';
 r0         = 12/1000;
-% systematic multipoles from '2015-02-27 Sextupolo_Anel_S_CV_Modelo 1_-12_12mm_-500_500mm.txt'
-monoms    = [      3,      7,      9,     13];
-Bn_normal = [   0.00,   0.00,   0.00,   0.00];
-Bn_skew   = [-5.5e-1, 2.3e-2, 6.5e-3, 1.8e-3];
+% systematic multipoles from '2016-03-17 Sextupolo_Anel_S_QS_Modelo 6_-14_14mm_-500_500mm.txt'
+monoms    = [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
+Bn_normal = [-0.0000e+00, +1.9376e-03, -0.0000e+00, -1.5111e-02, +3.8595e-02, -0.0000e+00, -3.3011e-02, -0.0000e+00, -0.0000e+00, -0.0000e+00, +8.2269e-03];
+Bn_skew   = [+0.0000e+00, +5.5917e-04, -5.7790e-01, -3.4338e-03, +8.4633e-03, +2.5945e-02, -9.1209e-03, +1.3271e-02, +3.4780e-03, -1.2490e-03, -0.0000e+00];
 main_monom = {1, 'skew'}; 
 fams       = findmemberof(model_name);
 the_ring = add_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);

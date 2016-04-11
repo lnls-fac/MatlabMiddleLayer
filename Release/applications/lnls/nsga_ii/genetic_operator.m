@@ -122,12 +122,12 @@ for i = 1 : N
             % algorithm, but I could try to test one child at a time and
             % see if it satisfy the condition of stability.
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            [a1, accept] = func(child_1, M);
+            [a1, accept] = func(child_1);
             if ~accept, continue; end
             
-            [a2, accept] = func(child_2, M);
+            [a2, accept] = func(child_2);
             if accept
-                fprintf('.');
+                fprintf('..');
                 if ~mod(i,50), fprintf('\n');end
                 child_1(:,V + 1: M + V) = a1;
                 child_2(:,V + 1: M + V) = a2;
@@ -188,7 +188,7 @@ for i = 1 : N
             % to let the random selection of the parent_3 and only modify
             % the result obtained by mutation, child_3.
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            [a, accept] = func(child_3, M);
+            [a, accept] = func(child_3);
             if accept
                 fprintf('.');
                 if ~mod(i,50), fprintf('\n');end
