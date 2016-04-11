@@ -85,13 +85,23 @@
 % sf_strength = 11.327508716063402;
 % sd_strength =  6.669827683440462;
 
-% 2015-11-05 ximenes
+% % 2015-11-05 ximenes
+% % tunes fitted to [19.20433 7.31417]
+% % chroms fitted to [0.5 0.5]
+% qf_strength = 1.661204884438163;
+% qd_strength = -0.009683797310216;
+% sf_strength = 11.327047617231438;
+% sd_strength = 6.700042815533210;
+
+
+% 2016-04-08 ximenes (overall checking of model)
 % tunes fitted to [19.20433 7.31417]
 % chroms fitted to [0.5 0.5]
-qf_strength = 1.661204884438163;
-qd_strength = -0.009683797310216;
+qf_strength = 1.661222805216001;
+qd_strength = -0.011484791886341;
 sf_strength = 11.327047617231438;
 sd_strength = 6.700042815533210;
+
 
 
 

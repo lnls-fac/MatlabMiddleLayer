@@ -16,7 +16,7 @@ global THERING
 
 energy = 0.15e9; % eV
 
-lattice_version = 'BO.V02A';
+lattice_version = 'BO.V02.01';
 for i=1:length(varargin)
 	energy = varargin{i} * 1e9;
 end
@@ -224,7 +224,7 @@ function the_ring = set_vacuum_chamber(the_ring)
 bends_vchamber =      [0.0117 0.0117 1];   % n = 100: ~rectangular
 other_vchamber =      [0.018  0.018  1];   % n = 1;   circular/eliptica
 extraction_vchamber = [0.026  0.018  1];   % n = 1;   circular/eliptica
-injection_vchamber  = [0.050  0.018  1];
+
 
 % default
 for i=1:length(the_ring)
@@ -249,17 +249,7 @@ end
 for i=b_ex(end):sept_ex(1)
     the_ring{i}.VChamber = extraction_vchamber;
 end
-
-% sector from injection point to injection kicker
-sept_in = findcells(the_ring, 'FamName', 'sept_in');
-kick_in = findcells(the_ring, 'FamName', 'kick_in');
-for i=sept_in(end):length(the_ring)
-    the_ring{i}.VChamber = injection_vchamber;
-end
-for j=1:kick_in(1)
-    the_ring{j}.VChamber = injection_vchamber;
-end
-
+    
 
 function the_ring = set_girders(the_ring)
 idx = findcells(the_ring,'FamName','bpm'); idx = idx(end);
