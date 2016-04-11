@@ -18,7 +18,16 @@ fam_data = sirius_bo_family_data(the_ring);
 % ==========
 % Already applied while building AT lattice with segmented sextupole models.
 
-
+% SEXTUPOLES
+% ==========
+% updated in 2016-04-05 from BS004, BS005 and BS006 rotating coil measurements
+% r0         = 17.5/1000;
+% monoms     = [ 0,      1,      2,      3,      4,      5,      6,      7,      8,        9,      10,     11,     12,     13,     14];
+% Bn_normal  = [-4.0e-3,+2.2e-3,+0.0e-0,+1.3e-4,-1.9e-3,+2.7e-5,-2.8e-4,+1.4e-6,-2.2e-2,+1.0e-4,+2.2e-4,+1.1e-4,+3.4e-5,-3.6e-4,-1.7e-2];
+% Bn_skew    = [-1.5e-3,-3.4e-3,-8.6e-4,-1.2e-3,+4.0e-5,-7.3e-5,-3.5e-5,+3.8e-4,-4.6e-5,-3.1e-6,-8.3e-5,-4.9e-5,-7.7e-5,+4.3e-4,-9.9e-6];
+% main_monom = {2, 'normal'}; 
+% fams       = {'sd','sf'};
+% the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % % QF QUADRUPOLES
 % % ==============

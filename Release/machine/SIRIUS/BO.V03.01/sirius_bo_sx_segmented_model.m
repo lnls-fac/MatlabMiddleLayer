@@ -47,8 +47,13 @@ b  0.05250  +0.0000000000000000e+00 +1.9010451096983513e+01 -1.6319594457349304e
 % =========================
 % data based on quadrupole prototype
 % Rescale multipolar profile according to rotating coild measurement
+% rcoil_monomials  = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+% rcoil_integrated_multipoles  = [+2.5e-05,-7.8e-04,-2.1e+01,-1.5e-01,+1.3e+02,-1.1e+02,+6.2e+04,+2.4e+04,+1.6e+10,-4.2e+09,-5.2e+11,-1.5e+13,-2.7e+14,+1.5e+17,+4.3e+20];
+% skew   = [+9.3e-06, +1.2e-03, +1.8e-02, +1.4e+00, -2.8e+00, +2.7e+02, +8.1e+03, -4.8e+06, +3.2e+07, +1.2e+08, +1.9e+11, +6.7e+12, +5.8e+14, -1.9e+17, +2.9e+17];
+
 rcoil_monomials  = [];
-rcoil_integrated_multipoles = [];
+rcoil_integrated_multipoles  = [];
+
 % ---------------------------------------------------------------
 
 
@@ -65,12 +70,13 @@ if exist('hardedge_SL','var')
     fmap_model(:,4:end) = fmap_model(:,4:end) * rescaling;
 end
 
-% rescale multipoles of the rotating coild data according to nominal strength value passed as argument
+
+% rescale multipoles of the rotating coil data according to nominal strength value passed as argument
 % ----------------------------------------------------------------------------------------------------
 if ~isempty(rcoil_monomials)
     [~,~,brho] = lnls_beta_gamma(energy/1e9);
     rcoil_normalized_integrated_multipoles = -rcoil_integrated_multipoles / brho;
-    rcoil_main_multipole_idx = find(rcoil_monomials == magnet_type, 1);
+    rcoil_main_multipole_idx = find(rcoil_monomials == magnet_type, 2);
     rescaling = hardedge_SL / rcoil_normalized_integrated_multipoles(rcoil_main_multipole_idx);
     rcoil_normalized_integrated_multipoles = rcoil_normalized_integrated_multipoles * rescaling;
 end
