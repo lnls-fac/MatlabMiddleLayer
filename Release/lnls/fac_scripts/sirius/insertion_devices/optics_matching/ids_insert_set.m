@@ -8,7 +8,8 @@ the_ring = circshift(the_ring_old,[0,-idx]);
 
 % excludes markers for the end of 2-meter IDs
 idx = [findcells(the_ring, 'FamName', 'id_enda'), ...
-       findcells(the_ring, 'FamName', 'id_endb')];
+       findcells(the_ring, 'FamName', 'id_endb'), ...
+       findcells(the_ring, 'FamName', 'id_endp')];
 the_ring(idx) = [];
 
 for i=1:length(ids)

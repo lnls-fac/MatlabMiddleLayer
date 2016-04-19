@@ -26,7 +26,15 @@ for i=1:length(id_sections)
     end
     
     % builds optionals for symmetrizations
-    if ~mod(id_sections(i),2), straight_label = 'mib'; else straight_label = 'mia';end
+    if ~mod(id_sections(i),2), 
+        straight_label = 'mib'; 
+    else
+        if mod(id_sections(i),4)==1,
+            straight_label = 'mia';
+        else
+            straight_label = 'mip';
+        end
+    end
     symm_point = findcells(the_line, 'FamName', straight_label);
     optionals = {symm_point,params.goal(1),params.goal(2),params.goal(3),...
                             params.goal(4),params.goal(5),params.goal(6)};

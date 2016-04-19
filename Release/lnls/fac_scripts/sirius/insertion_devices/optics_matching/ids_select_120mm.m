@@ -41,34 +41,34 @@ for i =1:length(ids_names)
             ids{i}.label           = 'ipe_hp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_HP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 11;
         case 'ipe_vp'
             ids{i}.label           = 'ipe_vp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_VP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 11;
         case 'ipe_cp'
             ids{i}.label           = 'ipe_cp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_CP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 11;
         case 'sabia_hp'
-            ids{i}.label           = 'sabia';
+            ids{i}.label           = 'sabia_hp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_HP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 12;
         case 'sabia_vp'
-            ids{i}.label           = 'sabia';
+            ids{i}.label           = 'sabia_vp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_VP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 12;
         case 'sabia_cp'
-            ids{i}.label           = 'sabia';
+            ids{i}.label           = 'sabia_cp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_CP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
@@ -124,19 +124,19 @@ for i =1:length(ids_names)
             ids{i}.straight_label  = 'mia';
             ids{i}.straight_number = 17;
         case 'sabia2_hp'
-            ids{i}.label           = 'sabia2';
+            ids{i}.label           = 'sabia2_hp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_HP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 18;
         case 'sabia2_vp'
-            ids{i}.label           = 'sabia2';
+            ids{i}.label           = 'sabia2_vp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80_VPt_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 18;
         case 'sabia2_cp'
-            ids{i}.label           = 'sabia2';
+            ids{i}.label           = 'sabia2_cp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_CP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mib';
@@ -151,34 +151,34 @@ for i =1:length(ids_names)
             ids{i}.label           = 'ipe3_hp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_HP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 7;
         case 'ipe3_vp'
             ids{i}.label           = 'ipe3_vp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_VP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 7;
         case 'ipe3_cp'
             ids{i}.label           = 'ipe3_cp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_CP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 7;
         case 'sabia3_hp'
-            ids{i}.label           = 'sabia3';
+            ids{i}.label           = 'sabia3_hp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_HP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mia';
             ids{i}.straight_number = 13;
         case 'sabia3_vp'
-            ids{i}.label           = 'sabia3';
+            ids{i}.label           = 'sabia3_vp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_VP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mia';
             ids{i}.straight_number = 13;
         case 'sabia3_cp'
-            ids{i}.label           = 'sabia3';
+            ids{i}.label           = 'sabia3_cp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_CP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
             ids{i}.straight_label  = 'mia';
@@ -187,37 +187,37 @@ for i =1:length(ids_names)
             ids{i}.label           = 'ipe4_hp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_HP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 15;
         case 'ipe4_vp'
             ids{i}.label           = 'ipe4_vp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_VP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 15;
         case 'ipe4_cp'
             ids{i}.label           = 'ipe4_cp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU50t/EPU50t_CP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 15;
         case 'sabia4_hp'
-            ids{i}.label           = 'sabia4';
+            ids{i}.label           = 'sabia4_hp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_HP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 19;
         case 'sabia4_vp'
-            ids{i}.label           = 'sabia4';
+            ids{i}.label           = 'sabia4_vp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_VP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 19;
         case 'sabia4_cp'
-            ids{i}.label           = 'sabia4';
+            ids{i}.label           = 'sabia4_cp';
             ids{i}.kicktable_file  = [path2kcktbls, 'EPU80t/EPU80t_CP_kicktable.txt'];
             ids{i}.nr_segs         = 20;
-            ids{i}.straight_label  = 'mia';
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 19; 
            
         otherwise
