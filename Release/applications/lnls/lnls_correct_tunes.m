@@ -9,7 +9,7 @@ function [the_ring, converged, tunesf, tunesi] = lnls_correct_tunes(the_ring, fa
 %   goal_tunes : goal tunes, including the integer;
 %   max_iter   : maximum # of trials for the correction algorithm;
 %   tolerancia : acceptable euclidian distance between tunes0 and goal_tunes
-%                 for the definition of convergence of the algoritm;
+%                 for the definition of convergence of the algorithm;
 %
 % Outputs:
 %   the_ring  : ring model with minimum distance from the desired solution
@@ -18,6 +18,13 @@ function [the_ring, converged, tunesf, tunesi] = lnls_correct_tunes(the_ring, fa
 %   tunesf     : tunes of the model the_ring0;
 %   tunesi     : initial tunes, before adjust.
 
+if ~exist('max_iter', 'var')
+    max_iter = 10;
+end
+
+if ~exist('tolerancia', 'var')
+    tolerancia = 1e-6;
+end
 
 % cria lista de indices a elementos do modelo AT
 knobs = cell(1,length(families));
