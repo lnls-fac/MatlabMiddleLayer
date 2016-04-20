@@ -1,21 +1,19 @@
-% Macthing done by Liu on MAD. There was a difference in the model
-% that caused an assymetry of the optics. Liu changed the model on MAD to
-% agree with the AT model and did the matching again, creating the S10_02
-% optics.
+% Matching done by Liu on MAD. Exact simmetry of optics in the MC markers.
+% The dynamic aperture is not very good 
 %  QUADRUPOLOS
 %  ===========
-qfa_strength  = 3.564163099141;
-qda_strength  =-1.537784298689;
-qdb2_strength =-3.204319620651;
-qfb_strength  = 4.096109116982;
-qdb1_strength =-2.057582400574;
-qdp2_strength = 0.000000000000;
-qfp_strength  = 2.305971093805;
-qdp1_strength =-1.407829594769;
-q1_strength   = 2.923551830042;
-q2_strength   = 4.265188804423;
-q3_strength   = 3.273391092836;
-q4_strength   = 3.937386169778;
+qfa_strength  = 3.615330935595;
+qda_strength  =-1.536945137228;
+qdb2_strength =-3.219266951761;
+qfb_strength  = 4.093789258132;
+qdb1_strength =-2.040885443971;
+qdp2_strength =-0.179366774673;
+qfp_strength  = 2.425486024752;
+qdp1_strength =-1.421262635498;
+q1_strength   = 2.823883739904;
+q2_strength   = 4.328376648999;
+q3_strength   = 3.289214163551;
+q4_strength   = 3.889791885421;
 
 % same sextupoles as si.v14.c03
 %  SEXTUPOLOS
