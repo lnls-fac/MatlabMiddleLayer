@@ -68,7 +68,9 @@ if isfield(config, 'fams')
             if ischar(family.labels)
                 % GIRDERS!!!
                 label = family.labels;
-                idx = fam_idx(ismember(fam_list,label));
+                ind   = ismember(fam_list,label);
+                if ~any(ind), error(['Family ',label,' not present in model.']); end
+                idx = fam_idx(ind);
                 idx   = idx(:)';
                 idx   = [idx; idx(2:end) idx(1)]';
                 for j=1:size(idx, 1)
@@ -83,19 +85,25 @@ if isfield(config, 'fams')
                         nrsgs, cutoff, rndtype);
                 end
             elseif iscell(family.labels{1})
-                indcs = [];
-                for j=1:length(family.labels{1})
-                    indcs = [indcs fam_idx(ismember(fam_list,family.labels{1}{j}))];
+                for jj=1:length(family.labels)
+                    indcs = [];
+                    for j=1:length(family.labels{jj})
+                        ind   = ismember(fam_list,family.labels{jj}{j});
+                        if ~any(ind), error(['Family ',label,' not present in model.']); end
+                        indcs = [indcs fam_idx(ind)];
+                    end
+                    nrels = 1;
+                    nrsgs = length(indcs);
+                    errors = get_fam_random_errors(errors, family, k, indcs, nrels, nrsgs, ...
+                        cutoff, rndtype);
                 end
-                nrels = 1;
-                nrsgs = length(indcs);
-                errors = get_fam_random_errors(errors, family, k, indcs, nrels, nrsgs, ...
-                    cutoff, rndtype);
             else
                 for j=1:length(family.labels)
                     label = family.labels{j};
                     nrsgs = family.nrsegs(j);
-                    indcs = fam_idx(ismember(fam_list,label));
+                    ind   = ismember(fam_list,label);
+                    if ~any(ind), error(['Family ',label,' not present in model.']); end
+                    indcs = fam_idx(ind);
                     nrels = length(indcs) / nrsgs;
                     errors = get_fam_random_errors(errors, family, k, indcs, nrels, ...
                         nrsgs, cutoff, rndtype);

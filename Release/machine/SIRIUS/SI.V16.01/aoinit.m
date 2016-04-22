@@ -10,7 +10,7 @@ if exist(Directory, 'dir')
 end
     
 % Modo default de carregamento
-OperationalMode = sirius_get_mode_number('S10'); % Default
+OperationalMode = sirius_get_mode_number('S05'); % Default
 
 sirius_init;
 setoperationalmode(OperationalMode);

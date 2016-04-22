@@ -28,7 +28,7 @@ global THERING;
 
 % --- system parameters ---
 energy = 3e9;
-mode   = 'S10';
+mode   = 'S05';
 version = '01';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
