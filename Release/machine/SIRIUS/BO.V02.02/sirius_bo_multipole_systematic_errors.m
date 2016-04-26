@@ -4,6 +4,7 @@ function the_ring = sirius_bo_multipole_systematic_errors(the_ring)
    
 fam_data = sirius_bo_family_data(the_ring);
 
+energy = unique(getcellstruct(the_ring, 'Energy', 1:length(the_ring)));
 
 % DIPOLES
 % =======
@@ -35,17 +36,28 @@ fam_data = sirius_bo_family_data(the_ring);
 r0            = 17.5/1000;
 monoms        = [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14];
 
-% avg values of multipoles for E = 3 GeV (~149A excitation current)
-Bn_normal     = [-4.0e-03,+2.2e-03,+0.0e+00,+1.3e-04,-1.9e-03,+2.7e-05,-2.8e-04,+1.3e-06,-2.2e-02,+1.0e-04,+2.2e-04,+1.1e-04,+3.4e-05,-3.6e-04,-1.7e-02];
-Bn_skew       = [-1.5e-03,-3.4e-03,-8.6e-04,-1.2e-03,+4.1e-05,-7.4e-05,-3.6e-05,+3.8e-04,-4.6e-05,-2.9e-06,-8.2e-05,-4.8e-05,-7.6e-05,+4.3e-04,-1.0e-05];
+% avg values of multipoles for E = 0.15 GeV (+6.399A excitation current)
+% ----------------------------------------------------------------------
+energy_inj    = 0.15e9; % [eV]
+%Bn_normal_inj = [-1.4e-03,+1.3e-03,+1.0e+00,+7.0e-04,+9.4e-04,-1.2e-04,-5.5e-04,-1.3e-04,-2.2e-02,-3.9e-05,-1.5e-04,-8.5e-05,-2.9e-04,-5.0e-04,-1.7e-02];
+ Bn_normal_inj = [-1.5e-03,+1.6e-03,+0.0e+00,+6.3e-04,+8.6e-04,-2.1e-04,-7.1e-04,-3.2e-04,-2.2e-02,-2.5e-04,-3.8e-04,-2.6e-04,-4.5e-04,-6.4e-04,-1.8e-02];
+%Bn_skew_inj   = [-1.1e-02,-1.6e-03,+2.8e-03,-2.3e-03,+8.8e-05,-3.4e-04,-5.4e-05,+4.7e-04,-5.0e-05,+5.9e-05,-1.0e-05,+8.0e-05,-8.8e-06,+4.3e-04,+4.8e-05];
+ Bn_skew_inj   = [-1.4e-02,-1.5e-03,+2.8e-03,-2.3e-03,+7.4e-04,-3.5e-04,-9.8e-05,+4.8e-04,-3.9e-05,+1.2e-04,+9.1e-07,+9.2e-05,+9.5e-05,+4.8e-04,+9.6e-05];
+% avg values of multipoles for E = 3 GeV (+146.835A excitation current)
+% ---------------------------------------------------------------------
+energy_eje    = 3e9; % [eV]
+%Bn_normal_eje = [-4.0e-03,+2.2e-03,+0.0e+00,+1.3e-04,-1.9e-03,+2.7e-05,-2.8e-04,+1.3e-06,-2.2e-02,+1.0e-04,+2.2e-04,+1.1e-04,+3.4e-05,-3.6e-04,-1.7e-02]; % values from outofdate script
+ Bn_normal_eje = [-4.0e-03,+2.5e-03,+0.0e+00,+1.2e-04,-1.9e-03,+3.4e-05,-3.0e-04,-3.5e-05,-2.2e-02,+9.4e-05,+2.2e-04,+1.2e-04,+4.0e-05,-3.2e-04,-1.7e-02];
+%Bn_skew_eje   = [-1.5e-03,-3.4e-03,-8.6e-04,-1.2e-03,+4.1e-05,-7.4e-05,-3.6e-05,+3.8e-04,-4.6e-05,-2.9e-06,-8.2e-05,-4.8e-05,-7.6e-05,+4.3e-04,-1.0e-05]; % values from outofdate script
+ Bn_skew_eje   = [-1.5e-03,-3.3e-03,-8.9e-04,-1.2e-03,+5.8e-05,-5.4e-05,-5.9e-05,+3.8e-04,-4.0e-05,-1.2e-06,-7.9e-05,-5.7e-05,-6.9e-05,+4.1e-04,-3.0e-05];
 
-% avg values of multipoles for E = 0.15 GeV (~6A excitation current)
-%Bn_normal     = [-1.4e-03,+1.3e-03,+1.0e+00,+7.0e-04,+9.4e-04,-1.2e-04,-5.5e-04,-1.3e-04,-2.2e-02,-3.9e-05,-1.5e-04,-8.5e-05,-2.9e-04,-5.0e-04,-1.7e-02];
-%Bn_skew       = [-1.1e-02,-1.6e-03,+2.8e-03,-2.3e-03,+8.8e-05,-3.4e-04,-5.4e-05,+4.7e-04,-5.0e-05,+5.9e-05,-1.0e-05,+8.0e-05,-8.8e-06,+4.3e-04,+4.8e-05];
+ % linear interpolation:
+Bn_normal = Bn_normal_inj + (Bn_normal_eje - Bn_normal_inj) * (energy - energy_inj)/(energy_eje - energy_inj);
+Bn_skew   = Bn_skew_inj   + (Bn_skew_eje   - Bn_skew_inj)   * (energy - energy_inj)/(energy_eje - energy_inj);
 
 main_monom = {2, 'normal'}; 
 fams       = {'sd','sf'};
-the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+the_ring   = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % % QF QUADRUPOLES
 % % ==============

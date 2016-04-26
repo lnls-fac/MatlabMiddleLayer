@@ -1,162 +1,193 @@
-function sirius_injection
+function sirius_injection()
 
 %% PARAMETERS
 
-p.bo_version = 'BO.V02';
-p.ts_version = 'TS.V01';
-p.si_version = 'SI.V12';
-p.ts_mode    = 'M1';
+p.bo_version      = 'BO.V03.02';
+p.ts_version      = 'TS.V02';
+p.si_version      = 'SI.V16.01';
+p.ts_mode         = 'M1';
 p.nr_particles    = 1000;     % nr_particles in simulation
 p.bo_coupling     = 0.10;     % booster transverse coupling (<1.0)
-p.bo_kickex_kick  = 2.516e-3; % booster extraction kick [rad]
-p.si_pmm_strength = 0.265;    % storage ring pmm strength [no unit]
+p.bo_kickex_kick  = 2.461e-3; % booster extraction kick [rad]
+p.si_pmm_strength = 0.350;    % storage ring pmm strength [no unit]
+p.nr_turns        = 50;       % number of turns
+p.plot_flag       = true;
+
+
+lnls_setpath_mml_at;
+sirius_path = fullfile(lnls_get_root_folder(), 'code', 'MatlabMiddleLayer', 'Release', 'machine', 'SIRIUS');
+close all; drawnow;
+
+% loads BO model
+addpath(fullfile(sirius_path, p.bo_version));
+p.bo = sirius_bo_lattice(3.0);
+[p.bo, ~] = setcavity('on', p.bo);
+[p.bo, ~, ~, ~, ~, ~, ~] = setradiation('on', p.bo);
+
+% loads TS model
+addpath(fullfile(sirius_path, p.ts_version));
+p.ts = sirius_ts_lattice(p.ts_mode);
+[p.ts, ~] = setcavity('on', p.ts);
+[p.ts,~,~,~,~,~,~] = setradiation('on', p.ts);
+
+% loads SI model
+addpath(fullfile(sirius_path, p.si_version));
+p.si = sirius_si_lattice();
+[p.si, ~] = setcavity('on', p.si);
+[p.si,~,~,~,~,~,~] = setradiation('on', p.si);
+    
+fprintf('\n');
+p = sirius_injection_local(p);
+    
+
+function p = sirius_injection_local(p0)
+
+
 
 %% INITIALIZATIONS
-fprintf('<initializations>\n');
 
-close all; drawnow;
-lnls_setpath_mml_at;
+p = p0;
 
 % global parameters
 sirius_path = fullfile(lnls_get_root_folder(), 'code', 'MatlabMiddleLayer', 'Release', 'machine', 'SIRIUS');
 
-fprintf('\n');
 
 %% LOADING MODELS
-fprintf('<loading models>\n');
 
-% loads BO model and shifts it so that it starts at begining of extraction kicker
-addpath(fullfile(sirius_path, p.bo_version));
-bo = sirius_bo_lattice(3.0);
-bo_kickex_idx = findcells(bo, 'FamName', 'kick_ex');
-bo = [bo(bo_kickex_idx(1):end) bo(1:bo_kickex_idx(1)-1)];
-bo_kickex_idx = findcells(bo, 'FamName', 'kick_ex');
+if ~isfield(p, 'bo') || isempty(p.bo)
+    % loads BO model
+    addpath(fullfile(sirius_path, p.bo_version));
+    p.bo = sirius_bo_lattice(3.0);
+end
+% shifts it so that it starts at begining of extraction kicker
+bo_kickex_idx = findcells(p.bo, 'FamName', 'kick_ex');
+p.bo = [p.bo(bo_kickex_idx(1):end) p.bo(1:bo_kickex_idx(1)-1)];
+bo_kickex_idx = findcells(p.bo, 'FamName', 'kick_ex');
 
-% loads TS model
-addpath(fullfile(sirius_path, p.ts_version));
-ts = sirius_ts_lattice(p.ts_mode);
-[ts, ~] = setcavity('on', ts);
-[ts,~,~,~,~,~,~] = setradiation('on', ts);
+if ~isfield(p, 'ts') || isempty(p.ts)
+    % loads TS model
+    addpath(fullfile(sirius_path, p.ts_version));
+    p.ts = sirius_ts_lattice(p.ts_mode);
+end
 
-% loads SI model and shifts it so that it starts at injection point
-addpath(fullfile(sirius_path, p.si_version));
-si = sirius_si_lattice();
-injection_point = findcells(si, 'FamName', 'eseptinf');
-si = [si(injection_point:end) si(1:injection_point-1)];
-[si, ~] = setcavity('on', si);
-[si,~,~,~,~,~,~] = setradiation('on', si);
+if ~isfield(p, 'si') || isempty(p.si)
+    % loads SI model
+    addpath(fullfile(sirius_path, p.si_version));
+    p.si = sirius_si_lattice();
+end
+% shifts it so that it starts at injection point
+injection_point = findcells(p.si, 'FamName', 'eseptinj');
+p.si = [p.si(injection_point:end) p.si(1:injection_point-1)];
 
-fprintf('\n');
 
 
 %% INITIAL BUNCH
-fprintf('<initial bunch>\n');
 
 % generates bunch at entrance of BO extraction kicker
-bo_twiss = calctwiss(bo);
-bo_eqparms = atsummary(bo);
+bo_twiss = calctwiss(p.bo);
+bo_eqparms = atsummary(p.bo);
 e0 = bo_eqparms.naturalEmittance; k = p.bo_coupling;
 emitx =  1 * e0 / (1.0 + k); emity =  k * e0 / (1.0 + k);
 bo_twiss0 = create_twiss(bo_twiss,1);
-bunch = [zeros(6,1) lnls_generate_bunch(emitx, emity, bo_eqparms.naturalEnergySpread, bo_eqparms.bunchlength, bo_twiss0, p.nr_particles-1, 30)];
-create_new_x_phase_space_plot(bunch, [], [], 'bunch at entrance of BO extraction kicker');
+cod = findorbit6(p.bo);
+bunch = lnls_generate_bunch(emitx, emity, bo_eqparms.naturalEnergySpread, bo_eqparms.bunchlength, bo_twiss0, p.nr_particles-1, 30);
+bunch = [cod, bunch + repmat(cod, 1, size(bunch,2))];
+if p.plot_flag, create_new_x_phase_space_plot(bunch, [], [], 'bunch at entrance of BO extraction kicker'); end
+fprintf('- initial beam with %i particles\n', p.nr_particles);
 
-fprintf('\n');
 
 %% EXTRACTION KICK
-fprintf('<BO extraction kick>\n');
 
 % sets extraction kicker and kicks beam
-bo = lnls_set_kickangle(bo, p.bo_kickex_kick, bo_kickex_idx, 'x');
+p.bo = lnls_set_kickangle(p.bo, p.bo_kickex_kick, bo_kickex_idx, 'x');
 
 % transport bunch from entrance of extraction kicker to entrance of extraction thin septum
-bo_septex_idx = findcells(bo, 'FamName', 'sept_ex');
-tbunch = linepass(bo, bunch, 1:bo_septex_idx(1));
+bo_septex_idx = findcells(p.bo, 'FamName', 'sept_ex');
+tbunch = linepass(p.bo, bunch, 1:bo_septex_idx(1));
+fprintf('- setting bo extraction kick to %+.3f mrad\n', p.bo_kickex_kick*1000);
 
 % plots bunch after extraction kicker
-create_new_x_phase_space_plot(tbunch(:,get_bunch(bo_kickex_idx(end)+1, p.nr_particles)), [], [], 'bunch after extraction kicker');
+if p.plot_flag, create_new_x_phase_space_plot(tbunch(:,get_bunch(bo_kickex_idx(end)+1, p.nr_particles)), [], [], 'bunch after extraction kicker'); end
 
 % calcs particle loss and plots trajectories
-fprintf('at BO thin extraction septum, '); 
-tbunch = calc_particle_loss(tbunch, bo(1:bo_septex_idx(1)), p.nr_particles, 'from BO extraction kicker to thin extraction septum');
+[tbunch, p.lost_particles1] = calc_particle_loss(tbunch, p.bo(1:bo_septex_idx(1)), p.nr_particles, 'from BO extraction kicker to extraction septum', p.plot_flag);
+fprintf('- lost particles from entrance of bo extraction kicker to entrance of bo extraction septa: %i\n', p.lost_particles1);
 
 % gets bunch at entrance of thin extraction septum
 bunch = tbunch(:,get_bunch(bo_septex_idx(1), p.nr_particles));
-create_new_x_phase_space_plot(bunch, [], [], 'bunch at entrance of thin extraction septum (BO coordinates)');
+if p.plot_flag, create_new_x_phase_space_plot(bunch, [], [], 'bunch at entrance of extraction septa (BO coordinates)'); end
 
-fprintf('\n');
 
 %% TRANSPORT ALONG TS
-fprintf('<transport along TS\n');
+
 
 % translation of bunch coordinates from BO to TS
 ts_chamber_rx_at_bo = 22e-3;  % [m]   (rx of center of TS vacuum chamber w.r.t. TS coord. system)
 ts_chamber_px_at_bo = 5.0e-3; % [rad] (px of center of TS vacuum chamber w.r.t. TS coord. system)
 ts_chamber_at_bo = [ts_chamber_rx_at_bo;ts_chamber_px_at_bo;0;0;0;0];
 bunch = bunch - repmat(ts_chamber_at_bo, 1, size(bunch,2));
-create_new_x_phase_space_plot(bunch, [], [], 'bunch at beginning of TS');
+if p.plot_flag, create_new_x_phase_space_plot(bunch, [], [], 'bunch at beginning of TS'); end
 
 % adds error in thin and thick BO extraction septa
 % (INCOMPLETE!!! right now they have ideal pulses)
 
 % transports bunch through TS
-tbunch = linepass(ts, bunch, 1:length(ts)+1);
+tbunch = linepass(p.ts, bunch, 1:length(p.ts)+1);
 
 % calcs particle loss and plots trajectories
-fprintf('at end of TS, ');
-tbunch = calc_particle_loss(tbunch, [ts ts(1)], p.nr_particles, 'bunch transported along TS');
+[tbunch, p.lost_particles2] = calc_particle_loss(tbunch, [p.ts p.ts(1)], p.nr_particles, 'bunch transported along TS', p.plot_flag);
+fprintf('- lost particles from entrance of bo extraction septa to exit of ts line: %i\n', p.lost_particles2 - p.lost_particles1);
 
 % plots bunch at end of TS
-bunch = tbunch(:,get_bunch(length(ts)+1, p.nr_particles));
-create_new_x_phase_space_plot(bunch, [], [], 'bunch at end of TS');
+bunch = tbunch(:,get_bunch(length(p.ts)+1, p.nr_particles));
+if p.plot_flag, create_new_x_phase_space_plot(bunch, [], [], 'bunch at end of TS'); end
 
-fprintf('\n');
 
 %% INJECTION IN SI
-fprintf('<injection in SI\n');
 
 % translation of bunch coordinates from TS to SI
-si_chamber_rx_at_ts =  0.0165; % [m]   (as measured at TS coordinates)
-si_chamber_px_at_ts = -2.2e-3; % [rad] (as measured at SI coordinates)
+% si_chamber_rx_at_ts =  0.0165;  % [m]   (as measured at TS coordinates)
+% si_chamber_px_at_ts = -2.2e-3;  % [rad] (as measured at SI coordinates)
+si_chamber_rx_at_ts =  0.01935; % [m]   (as measured at TS coordinates)
+si_chamber_px_at_ts = -2.84e-3; % [rad] (as measured at SI coordinates)
+
 si_chamber_at_ts = [si_chamber_rx_at_ts;si_chamber_px_at_ts;0;0;0;0];
 bunch = bunch - repmat(si_chamber_at_ts, 1, size(bunch,2));
 
 % plots bunch at SI injection point
-si_twiss = calctwiss(si);
-si_s = findspos(si,1:length(si));
-[si_xaccept,si_yaccept,~,err] = lnls_calcula_aceitancias(si, si_s, si_twiss.betax, si_twiss.betay, -1);
+si_twiss = calctwiss(p.si);
+si_s = findspos(p.si,1:length(p.si));
+[si_xaccept,si_yaccept,~,err] = lnls_calcula_aceitancias(p.si, si_s, si_twiss.betax, si_twiss.betay, -1);
 si_twiss0 = create_twiss(si_twiss, 1);
-create_new_x_phase_space_plot(bunch, si_xaccept, si_twiss0, 'bunch at injection point of SI');
+if p.plot_flag, create_new_x_phase_space_plot(bunch, si_xaccept, si_twiss0, 'bunch at injection point of SI'); end
 
 % transports bunch from injection point to PMM and plots bunch right before PMM kick
-si_pmm_idx = findcells(si, 'FamName', 'pmm');
-inj_2_pmm  = si(1:si_pmm_idx(1));
+si_pmm_idx = findcells(p.si, 'FamName', 'pmm');
+inj_2_pmm  = p.si(1:si_pmm_idx(1));
 tbunch = linepass(inj_2_pmm, bunch, 1:length(inj_2_pmm));
-fprintf('before PMM, ');
-tbunch = calc_particle_loss(tbunch, inj_2_pmm, p.nr_particles, 'from SI injection point to entrance of PMM');
+[tbunch, p.lost_particles3] = calc_particle_loss(tbunch, inj_2_pmm, p.nr_particles, 'from SI injection point to entrance of PMM', p.plot_flag);
+fprintf('- lost particles from si injection point (exit of ts line) to entrance of si pmm: %i\n', p.lost_particles3 - p.lost_particles2);
+
 bunch_pmm = tbunch(:,get_bunch(length(inj_2_pmm),p.nr_particles));
 si_twiss0 = create_twiss(si_twiss, si_pmm_idx(1));
-create_new_x_phase_space_plot(bunch_pmm, si_xaccept, si_twiss0, 'bunch right before PMM kick');
+if p.plot_flag, create_new_x_phase_space_plot(bunch_pmm, si_xaccept, si_twiss0, 'bunch right before PMM kick'); end
 
-fprintf('\n')
 
 %% PMM KICK
-fprintf('<PMM kick\n');
 
 % turns PMM kick on
-[~, ~, ~, LPolyB] = sirius_si_pmm_kick(p.si_pmm_strength);
-si = sets_pmm(si, si_pmm_idx, 1.0, LPolyB);
+[x, integ_field, kickx, LPolyB] = sirius_si_pmm_kick(p.si_pmm_strength, [2,3,4,5,6,7,8,9,10], p.plot_flag);
+p.si = sets_pmm(p.si, si_pmm_idx, 1.0, LPolyB);
+fprintf('- pmm pulsed with %.2f %% of maximum strength\n', p.si_pmm_strength * 100);
 
 % transports bunch from injection point to PMM and plots bunch right after PMM kick
-inj_2_pmm  = si(1:si_pmm_idx(end)+1);
+inj_2_pmm  = p.si(1:si_pmm_idx(end)+1);
 tbunch = linepass(inj_2_pmm, bunch, 1:length(inj_2_pmm));
-fprintf('after PMM, ');
-tbunch = calc_particle_loss(tbunch, inj_2_pmm, p.nr_particles, 'from SI injection point to end of PMM');
+fprintf('- beam center kicked with %+.3f mrad to x = %+.3f mm and xp = \n', 1000*(tbunch(2,end) - tbunch(2,1)));
+[tbunch, lost_particles] = calc_particle_loss(tbunch, inj_2_pmm, p.nr_particles, 'from SI injection point to end of PMM', p.plot_flag);
 bunch_pmm = tbunch(:,get_bunch(length(inj_2_pmm),p.nr_particles));
 si_twiss0 = create_twiss(si_twiss, si_pmm_idx(end)+1);
-create_new_x_phase_space_plot(bunch_pmm, si_xaccept, si_twiss0, 'bunch right after PMM kick');
-
-fprintf('\n');
+if p.plot_flag, create_new_x_phase_space_plot(bunch_pmm, si_xaccept, si_twiss0, 'bunch right after PMM kick'); end
 
 
 
@@ -164,29 +195,28 @@ fprintf('\n');
 fprintf('<SI first turn\n');
 
 % transports bunch one turn around SI
-tbunch = linepass(si, bunch, 1:length(si)+1);
+tbunch = linepass(p.si, bunch, 1:length(p.si)+1);
 fprintf('after 1 turn, ');
-tbunch = calc_particle_loss(tbunch, [si si(1)], p.nr_particles, '1-turn around SI');
-bunch = tbunch(:,get_bunch(length(si)+1,p.nr_particles));
-create_new_x_phase_space_plot(bunch, si_xaccept, si_twiss0, 'bunch at injection point after one turn');
+[tbunch, lost_particles] = calc_particle_loss(tbunch, [p.si p.si(1)], p.nr_particles, '1-turn around SI', p.plot_flag);
+bunch = tbunch(:,get_bunch(length(p.si)+1,p.nr_particles));
+if p.plot_flag, create_new_x_phase_space_plot(bunch, si_xaccept, si_twiss0, 'bunch at injection point after one turn'); end
 
 % turns PMM kick off
-si = sets_pmm(si, si_pmm_idx, 0.0, LPolyB);
+p.si = sets_pmm(p.si, si_pmm_idx, 0.0, LPolyB);
 
 fprintf('\n');
 
 
 %% SI MANY TURNS
-nr_turns = 50;
 fprintf('<SI many turns\n');
 
 fig = [];
-for i=1:nr_turns-1
-    tbunch = linepass(si, bunch, 1:length(si)+1);
+for i=1:p.nr_turns-1
+    tbunch = linepass(p.si, bunch, 1:length(p.si)+1);
     fprintf(['after ' int2str(i+1) ' turns, ']);
-    tbunch = calc_particle_loss(tbunch, [si si(1)], p.nr_particles, ['after ' int2str(i+1) ' turns around SI'], false);
-    bunch = tbunch(:,get_bunch(length(si)+1,p.nr_particles));
-    fig = create_new_x_phase_space_plot(bunch, si_xaccept, si_twiss0, ['bunch at injection point after ' int2str(i+1), ' turns'], fig);
+    [tbunch, lost_particles] = calc_particle_loss(tbunch, [p.si p.si(1)], p.nr_particles, ['after ' int2str(i+1) ' turns around SI'], false);
+    bunch = tbunch(:,get_bunch(length(p.si)+1,p.nr_particles));
+    if p.plot_flag, fig = create_new_x_phase_space_plot(bunch, si_xaccept, si_twiss0, ['bunch at injection point after ' int2str(i+1), ' turns'], fig); end
     drawnow;
 end
 
@@ -205,7 +235,7 @@ twiss.etaxl = twissv.etaxl(idx);
 twiss.etayl = twissv.etayl(idx);
 
 
-function tbunch = calc_particle_loss(original_tbunch, lattice, nr_particles, ptitle, plot_flag)
+function [tbunch, lost_particles] = calc_particle_loss(original_tbunch, lattice, nr_particles, ptitle, plot_flag)
 
 if ~exist('plot_flag','var')
     plot_flag = true;
@@ -227,7 +257,8 @@ ylost = (y >= yapert) | (y <= -yapert) | isnan(y);
 if plot_flag
     % plots horizontal trajectory
     xmin = min(-1000*xapert0); xmax = max(1000*xapert0);
-    figure; lnls_plot_horizontal_vchamber(lattice); hold all;
+    %figure; 
+    lnls_plot_horizontal_vchamber(lattice); hold all;
     lnls_plot_lattice(lattice, 0, max(s), xmin - 0.5*(xmax-xmin), 0.5*(xmax-xmin));
     plot(s, 1000*x');
     xlabel('s / m'); ylabel('rx / mm'); title(['Horizontal trajectories: ', ptitle]);
@@ -245,12 +276,14 @@ end
 [xr,xc] = find(xlost);
 [yr,yc] = find(ylost);
 lost_particles = unique([xr; yr]);
-fprintf('nr particles lost: %i/%i\n', length(lost_particles), nr_particles);
+%fprintf('nr particles lost: %i/%i\n', length(lost_particles), nr_particles);
 
 for i=1:length(lost_particles)
     p = lost_particles(i);
     tbunch(:,p:nr_particles:end) = NaN;
 end
+
+lost_particles = length(lost_particles);
 
 
 function si = sets_pmm(old_si, pmm_idx, strength, LPolyB)
