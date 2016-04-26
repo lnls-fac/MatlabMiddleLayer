@@ -103,7 +103,7 @@ idx = [idx; data.cv.ATIndex];
 % sf2 of every sector C3 of the arc the lattice. It means the corrector
 % alternates between all SF2's. The logic bellow uses the
 % dipoles B2 and BC_LF to determine where to put the corrector.
-indcs = sort([data.sfa2.ATIndex; data.sfba2.ATIndex; data.sfbp2.ATIndex; data.sfp2.ATIndex]);
+indcs = sort([data.sfa2.ATIndex; data.sfb2.ATIndex; data.sfp2.ATIndex]);
 dips = sort([data.b2.ATIndex(:); data.bc_lf.ATIndex(:)]);
 for i=1:length(indcs)
     el = find(dips > indcs(i),1,'first');

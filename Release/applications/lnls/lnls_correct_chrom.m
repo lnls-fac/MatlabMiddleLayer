@@ -1,30 +1,62 @@
-function ring = lnls_correct_chrom(ring, fams, chrom)
+function ring = lnls_correct_chrom(ring, fams, chrom, max_iter, tolerancia)
 
-%indS = cell();
+if ~exist('chrom', 'var')
+    chrom = [0,0];
+end
+
+if ~exist('max_iter', 'var')
+    max_iter = 10;
+end
+
+if ~exist('tolerancia', 'var')
+    tolerancia = 1e-3;
+end
+
+indS = cell(length(fams));
 dchrom = zeros(length(fams),2);
+sumDeltaS = zeros(length(fams),1);
 
 for j=1:length(fams)
     indS{j} = findcells(ring,'FamName',fams{j});
-    dchrom(j,:) = lnls_calc_dchrom(ring, indS{j});
 end
 
-% A = [eye(length(fams)),dchrom;dchrom',zeros(2)];
-% 
-% B = [zeros(length(fams),1);chrom'-lnls_calc_chrom(ring)'];
-% 
-% DeltaS = (A\B)';
+for count=1:max_iter
+    
+    for j=1:length(fams)
+        dchrom(j,:) = lnls_calc_dchrom(ring, indS{j});
+    end
+    
+    last_chrom = lnls_calc_chrom(ring);
+    
+    if(norm(chrom-last_chrom) < tolerancia)
+        break
+    end
 
-A = dchrom';
-[U,S,V] = svd(A,'econ');
+%   Using Lagrange-multipliers method. Lagrange multiplayers are given by
+%   the last two elements of DeltaS.
 
-B = (chrom'-lnls_calc_chrom(ring)');
+%     A = [eye(length(fams)),dchrom;dchrom',zeros(2)];
+%     B = [zeros(length(fams),1);chrom'-last_chrom']; % optimize partial
+%     norm
+%     %B = [-sumDeltaS;chrom'-last_chrom']; % optimize total norm
+%     DeltaS = (A\B);
+%     sumDeltaS = sumDeltaS + DeltaS(1:length(fams));
 
-DeltaS = V*inv(S)*U'*B;
+    [U,S,V] = svd(dchrom','econ');
+    B = (chrom'-last_chrom');
+    
+    DeltaS = V*(S\U')*B;
+%    DeltaS = V*inv(S)*[1,0;0,0]*U'*B
 
-for j=1:length(fams)
-    strS = getcellstruct(ring,'PolynomB',indS{j},1,3) + DeltaS(j);
-    ring = setcellstruct(ring,'PolynomB',indS{j},strS,1,3);
+    for j=1:length(fams)
+        strS = getcellstruct(ring,'PolynomB',indS{j},1,3) + DeltaS(j);
+        ring = setcellstruct(ring,'PolynomB',indS{j},strS,1,3);
+    end
 end
+
+
+
+
 
 function dchrom = lnls_calc_dchrom(ring, ind)
 

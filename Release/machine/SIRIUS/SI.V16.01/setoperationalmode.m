@@ -14,8 +14,8 @@ checkforao;
 
 % MODES
 ModeCell = { ...
-    '3 GeV - S10 (default)', ...
-    '3 GeV - S05', ...
+    '3 GeV - S05 (default)', ...
+    '3 GeV - S10', ...
     };
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -30,9 +30,9 @@ if nargin < 1
 end
 
 if (ModeNumber == 1)
-    set_operationalmode_s10;
-elseif (ModeNumber == 2)
     set_operationalmode_s05;
+elseif (ModeNumber == 2)
+    set_operationalmode_s10;
 else
     error('Operational mode unknown');
 end
