@@ -41,7 +41,8 @@ for ii=1:length(params.svs_lst)
         iS = 1./Jac.S; iS(sv+1:end) = 0;
         dx = - factor*(Jac.V * diag(iS) * Jac.U') * res;
         new_x = x + dx;
-        new_x = sign(new_x) .* min(abs(new_x),params.max_x);
+        new_x = min(new_x,params.max_x);
+        new_x = max(new_x,params.min_x);
         [new_res, new_obj] = params.calc_residue(new_x);
         if params.plot, set(pl,'YData',new_res); set(pl2,'YData',new_x); drawnow; end
         if (new_obj < obj)

@@ -3,12 +3,12 @@ function respm = calc_jacobian(x, calc_residue, print)
 if ~exist('print','var'),print = true; end;
 
 if print, fprintf('\n\nComputing Jacobian: %2d knobs to go.\n',length(x));end
-dx = 0.001;
 
 res = calc_residue(x);
 M = zeros(length(res),length(x));
 dia = eye(length(x));
 for ii = 1:length(x)
+    if x(ii) == 0, dx = 0.001; else dx = 1e-4*x(ii);end
     new_x = x + dia(:,ii)*dx/2;
     res_p = calc_residue(new_x);
     

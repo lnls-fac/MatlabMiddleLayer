@@ -76,9 +76,9 @@ m_accep_fam_name = 'calc_mom_accep';
 LKK   = drift('lkk',  1.7630, 'DriftPass');
 LPMU  = drift('lpmu', 0.3220, 'DriftPass');
 LPMD  = drift('lpmd', 0.4629, 'DriftPass');
-LIA   = drift('lia', 1.5179, 'DriftPass');
-LIB   = drift('lib', 1.0879, 'DriftPass');
-LIP   = drift('lip', 1.0879, 'DriftPass');
+LIA   = drift('lia',  1.5179, 'DriftPass');
+LIB   = drift('lib',  1.0879, 'DriftPass');
+LIP   = drift('lip',  1.0879, 'DriftPass');
 
 L035  = drift('l035', 0.035, 'DriftPass');
 L050  = drift('l050', 0.050, 'DriftPass');
@@ -134,10 +134,10 @@ L715  = drift('l715', 0.715, 'DriftPass');
 [QDP2,~] = sirius_si_q14_segmented_model('qdp2',qdp2_strength, quad_pass_method);
 [QFP, ~] = sirius_si_q30_segmented_model('qfp', qfp_strength,  quad_pass_method);
 [QDP1,~] = sirius_si_q14_segmented_model('qdp1',qdp1_strength, quad_pass_method);
-[Q1,  ~] = sirius_si_q20_segmented_model('q1',  q1_strength,  quad_pass_method);
-[Q2,  ~] = sirius_si_q20_segmented_model('q2',  q2_strength,  quad_pass_method);
-[Q3,  ~] = sirius_si_q20_segmented_model('q3',  q3_strength,  quad_pass_method);
-[Q4,  ~] = sirius_si_q20_segmented_model('q4',  q4_strength,  quad_pass_method);
+[Q1,  ~] = sirius_si_q20_segmented_model('q1',  q1_strength,   quad_pass_method);
+[Q2,  ~] = sirius_si_q20_segmented_model('q2',  q2_strength,   quad_pass_method);
+[Q3,  ~] = sirius_si_q20_segmented_model('q3',  q3_strength,   quad_pass_method);
+[Q4,  ~] = sirius_si_q20_segmented_model('q4',  q4_strength,   quad_pass_method);
 
 
 % -- sextupoles --
@@ -323,12 +323,12 @@ anel = [S01,S02,S03,S04,S05,S06,S07,S08,S09,S10,S11,S12,S13,S14,S15,S16,S17,S18,
 elist = anel;
 
 
-%% finalization 
+%% finalizations
 
 THERING = buildlat(elist);
 THERING = setcellstruct(THERING, 'Energy', 1:length(THERING), energy);
 
-% shift lattice to start at the marker 'inicio'
+% shifts lattice to start at the marker 'start'
 idx = findcells(THERING, 'FamName', 'start');
 if ~isempty(idx)
     THERING = [THERING(idx:end) THERING(1:idx-1)];

@@ -28,6 +28,7 @@ end
 
 const = lnls_constants;
 
+
 % Refine dipole elements for better calculation of radiation integrals
 max_length = 0.05;
 idx = findcells(the_ring, 'BendingAngle');
@@ -49,6 +50,11 @@ r.twiss.alpha       = cat(1,TD.alpha);
 r.twiss.ClosedOrbit = [TD.ClosedOrbit]';
 r.twiss.Dispersion  = [TD.Dispersion]';
 r.twiss.SPos        = cat(1,TD.SPos);
+
+if exist('lnls_turn_sextupoles_off','file')
+    the_ring2 = lnls_turn_sextupoles_off(the_ring);
+    [~, ~, r.natural_chromaticity] = twissring(the_ring2, 0, 1:length(the_ring)+1, 'chrom', 1e-8);
+end
 
 r.compactionFactor = mcf(the_ring);
 
@@ -186,6 +192,8 @@ if nargout == 0
     fprintf('   Momentum Compaction Factor: \t%4.5f\n', r.compactionFactor);
     fprintf('   Chromaticity H: \t\t%+4.5f\n', r.chromaticity(1));
     fprintf('                V: \t\t%+4.5f\n', r.chromaticity(2));
+    fprintf('    (natural)   H: \t\t%+4.5f\n', r.natural_chromaticity(1));
+    fprintf('                V: \t\t%+4.5f\n', r.natural_chromaticity(2));
     fprintf('   Synchrotron Integral 1: \t%4.5f [m]\n', r.integrals(1));
     fprintf('                        2: \t%4.5f [m^-1]\n', r.integrals(2));
     fprintf('                        3: \t%4.5f [m^-2]\n', r.integrals(3));
