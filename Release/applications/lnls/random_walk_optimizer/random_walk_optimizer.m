@@ -28,8 +28,10 @@ all_val(:,1) = x0;
 x = x0;
 for ii=1:params.nr_iters
     num_not_impr = num_not_impr + 1;
-    dx = (rand(length(x),1)-0.5)*error;
+    dx = (rand(length(x),1)-0.5).*error;
     new_x = x + dx;
+    new_x = min(new_x,params.max_x);
+    new_x = max(new_x,params.min_x);
     [new_res, new_obj] = params.calc_residue(new_x);
     if params.plot, set(pl,'YData',new_res); set(pl2,'YData',new_x); drawnow; end
     if (new_obj < obj)
