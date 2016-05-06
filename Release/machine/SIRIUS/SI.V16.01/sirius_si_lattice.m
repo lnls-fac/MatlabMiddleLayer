@@ -76,9 +76,9 @@ m_accep_fam_name = 'calc_mom_accep';
 LKK   = drift('lkk',  1.7630, 'DriftPass');
 LPMU  = drift('lpmu', 0.3220, 'DriftPass');
 LPMD  = drift('lpmd', 0.4629, 'DriftPass');
-LIA   = drift('lia', 1.5179, 'DriftPass');
-LIB   = drift('lib', 1.0879, 'DriftPass');
-LIP   = drift('lip', 1.0879, 'DriftPass');
+LIA   = drift('lia',  1.5179, 'DriftPass');
+LIB   = drift('lib',  1.0879, 'DriftPass');
+LIP   = drift('lip',  1.0879, 'DriftPass');
 
 L035  = drift('l035', 0.035, 'DriftPass');
 L050  = drift('l050', 0.050, 'DriftPass');
