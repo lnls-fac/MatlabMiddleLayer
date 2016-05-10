@@ -1,7 +1,7 @@
 function [POS, HBSC, VBSC] = sirius_plot_BSC(maquina,tipo,save_fig,e_spread)
 %Funcao que faz o grafico do tamanho do feixe apenas no booster e anel de
 %armazenmento.  +
-%Antes de executar esse script e necessario rodar o camando
+%Antes de executar esse script e necessario rodar o comando
 %sirius('versao') para carregar os caminhos no matlab
 %variaveis de entrada:
 %   maquina - string indicando a maquina que deseja fazer os grafico, pode
