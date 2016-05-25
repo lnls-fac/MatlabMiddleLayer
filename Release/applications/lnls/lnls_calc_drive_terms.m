@@ -1,4 +1,4 @@
-function [DT, S, Q] = lnls_calc_drive_terms(ring,twiss,n_per,Jx,Jy,delta)
+function [DT, S, Q] = lnls_calc_drive_terms(ring,twiss,n_per,Jx,Jy,delta,drts, fams)
 % [DT, S, Q] = lnls_calc_drive_terms(ring,twiss,n_per,Jx,Jy,delta)
 
 if ~exist('twiss','var'), twiss = calctwiss(ring,1:length(ring)); end
@@ -6,6 +6,9 @@ if ~exist('n_per','var'), n_per = 1; end
 if ~exist('Jx','var'), Jx = 1; end
 if ~exist('Jy','var'), Jy = 1; end
 if ~exist('delta','var'), delta = 1; end
+if ~exist('drts','var'), draw_drive = false; end
+if ~exist('fams','var'), fams = {}; end
+
 
 tunes = [twiss.mux(end), twiss.muy(end)];
 
@@ -102,6 +105,35 @@ DT.h02001 = DT.h02001 + Q.h02001.' * stren;
 DT.h00021 = DT.h00021 + Q.h00021.' * stren;
 DT.h01002 = DT.h01002 + Q.h01002.' * stren;
 
+if ~draw_drive, return; end
+
+figure; ax = axes; hold(ax,'all');
+if iscell(drts)
+    len = length(drts);
+    lsty = {'-','--',':','-.'};
+    for i=1:len
+        fact = 1;
+        drt = drts{i};
+        if any(strcmpi(drt(end),{'1','2'})), fact = 1;end
+        plot_arrow(ax,DT.(drt)*fact,[i/len,0,(len-i)/len],drt,lsty{1+mod(i-1,length(lsty))});
+    end
+    legend(ax,'show','Location','best');
+elseif ischar(drts) && ~isempty(fams)
+    Dt    = [];
+    indcs = [];
+    if isfield(S,drts), Dt = [Dt,S.(drts)];indcs = [indcs,S.indcs];end
+    if isfield(Q,drts), Dt = [Dt,Q.(drts)];indcs = [indcs,Q.indcs];end
+    
+    len = length(fams);
+    for i=1:len
+        fam  = fams{i};
+        ind  = findcells(ring,'FamName',fam);
+        ind2 = ismember(indcs,ind);
+        dr   = sum(Dt(ind2));
+        plot_arrow(ax, dr, [i/len,0,(len-i)/len], fam, '-');
+    end
+end
+
 function twis = get_twiss_at_center(twi,indcs)
 
 twis = (twi(indcs) + twi(indcs+1)) / 2;
@@ -123,3 +155,17 @@ AijklmN = 1;
 if n_per ~= 1
     AijklmN = exp(1i*(n_per-1)*n*tunes/2).*sin(n_per*n*tunes/2)/sin(n*tunes/2);
 end
+
+function plot_arrow(ax,x,c,name,lsty)
+
+phi = angle(x);
+A   = abs(x);
+
+%Define Arrow.
+x=A*[0, 1, 1-0.1, 1, 1-0.1]';
+y=A*[0, 0, 0.1, 0, -0.1]';
+%Rotate Arrow.
+x1=x*cos(phi)-y*sin(phi);
+y1=x*sin(phi)+y*cos(phi);
+%Plot Arrow.
+plot(ax,x1,y1,'Color',c,'LineWidth',2,'DisplayName',name,'LineStyle',lsty)
