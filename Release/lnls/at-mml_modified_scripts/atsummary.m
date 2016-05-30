@@ -144,38 +144,41 @@ r.the_ring = the_ring;
 % Lifetime and pressure - Afonso 2012-07-02 - Ximenes 2015-06-13
 try
     AD = getad; 
-  
-    pressure_file = fullfile(getmmlroot,'machine',AD.Machine,AD.SubMachine,AD.OpsData.PrsProfFile);
-    if(exist(pressure_file,'file'))
-        [lifetime,pressure] = lnls_calcula_tau(r,AD,-1,-1);
+    if ~isempty(AD)
+        pressure_file = fullfile(getmmlroot,'machine',AD.Machine,AD.SubMachine,AD.OpsData.PrsProfFile);
+        if(exist(pressure_file,'file'))
+            [lifetime,pressure] = lnls_calcula_tau(r,AD,-1,-1);
+        else
+            [lifetime,pressure] = lnls_calcula_tau(r,AD,AD.AveragePressure,-1);
+        end
+
+        if(isnumeric(lifetime.total))
+            r.lifetime = lifetime.total;
+        elseif(isfield(r,'lifetime'))
+            r = rmfield(r,'lifetime');
+        end
+        if(isnumeric(pressure.average))
+            r.avgpressure = pressure.average;
+        elseif(isfield(r,'pressure'))
+            r = rmfield(r,'pressure');
+        end
+        lifetime.quantum   = num2str(lifetime.quantum,'%0.2g');
+        lifetime.elastic   = num2str(lifetime.elastic,'%0.2f');
+        lifetime.inelastic = num2str(lifetime.inelastic,'%0.2f');
+        lifetime.touschek  = num2str(lifetime.touschek,'%0.2f');
+        lifetime.total     = num2str(lifetime.total,'%0.2f');
+        if(strcmp(pressure.average,'Not available'))
+            presprofileinfo = '';
+        else
+            presprofileinfo = ['(''' AD.OpsData.PrsProfFile ''')'];
+        end
+        pressure.average   = num2str(pressure.average,'%0.2e');
+        lifetime.calc = 1;
     else
-        [lifetime,pressure] = lnls_calcula_tau(r,AD,AD.AveragePressure,-1);
+        lifetime.calc = 0;
     end
-   
-    if(isnumeric(lifetime.total))
-        r.lifetime = lifetime.total;
-    elseif(isfield(r,'lifetime'))
-        r = rmfield(r,'lifetime');
-    end
-    if(isnumeric(pressure.average))
-        r.avgpressure = pressure.average;
-    elseif(isfield(r,'pressure'))
-        r = rmfield(r,'pressure');
-    end
-    lifetime.quantum   = num2str(lifetime.quantum,'%0.2g');
-    lifetime.elastic   = num2str(lifetime.elastic,'%0.2f');
-    lifetime.inelastic = num2str(lifetime.inelastic,'%0.2f');
-    lifetime.touschek  = num2str(lifetime.touschek,'%0.2f');
-    lifetime.total     = num2str(lifetime.total,'%0.2f');
-    if(strcmp(pressure.average,'Not available'))
-        presprofileinfo = '';
-    else
-        presprofileinfo = ['(''' AD.OpsData.PrsProfFile ''')'];
-    end
-    pressure.average   = num2str(pressure.average,'%0.2e');
-    lifetime.calc =1;
 catch
-    lifetime.calc= 0;
+    lifetime.calc = 0;
 end
 
 

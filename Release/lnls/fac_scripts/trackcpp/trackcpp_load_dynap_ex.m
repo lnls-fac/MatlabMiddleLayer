@@ -2,6 +2,13 @@ function [dynapt dados] = trackcpp_load_dynap_ex(pathname)
 
 nr_header_lines = 13;
 fname = fullfile(pathname, 'dynap_ex_out.txt');
+
+if ~exist(fname,'file')
+    dynapt = [];
+    dados = struct();
+    return;
+end
+
 tdata = importdata(fname, ' ', nr_header_lines); tdata = tdata.data;
 
 % Agora, eu tenho que encontrar a DA

@@ -9,7 +9,7 @@ end
 % date: 2016-04-27
 % current: 
 % length: 0.45 m
-
+% posx[mm] field[T.m]
 maxfield = [ ...
 -12.0,	-2.4041E-02;
 -11.5,	-2.9740E-02;
@@ -130,9 +130,13 @@ kickx = integ_field / brho;
 
 [coeffs, fit_kickx] = lnls_polyfit(x, kickx, fit_monomials);
 if plot_flag
-    figure; hold all; plot(1000*x, 1000*kickx); plot(1000*x,1000*fit_kickx);
-    xlabel('x / mm'); ylabel('kick / mrad');
-    title('PMM kick'); legend({'data points', 'fitted curve'});
+    figure; hold all; 
+    %plot(1000*x, 1000*kickx); 
+    plot(1000*x,1000*fit_kickx, 'Color', [0,0.6,0]);
+    xlabel('X [mm]'); ylabel('Kick @ 3 GeV [mrad]');
+    title('NLK Profile'); 
+    grid('on');
+    %legend({'data points', 'fitted curve'});
 end
 
 % LPolyB = PolynomB * L

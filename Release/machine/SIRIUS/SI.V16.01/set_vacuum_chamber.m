@@ -1,11 +1,15 @@
-function the_ring = set_vacuum_chamber(the_ring)
+function the_ring = set_vacuum_chamber(the_ring,mode)
 
+if ~exist('mode','var'), mode = 'S05'; end
 % y = +/- y_lim * (1 - (x/x_lim)^n)^(1/n);
 
 bc_vchamber    = [0.012 0.004 100]; % n = 100: ~rectangular
 other_vchamber = [0.012 0.012 2];   % n = 2;   circular/eliptica
-ivu_vchamber   = [0.012 0.00225 2];   
-ovu_vchamber   = [0.012 0.004 2];
+idb_vchamber   = [0.004 0.00225 2];   
+ida_vchamber   = [0.012 0.004 2];
+if strcmpi(mode,'S05'), idp_vchamber = idb_vchamber;
+else                    idp_vchamber = ida_vchamber;
+end
 inj_vchamber   = [0.030 0.012 2];
 
 % Set ordinary Vacuum Chamber
@@ -25,19 +29,28 @@ end
 
 % Set in-vacuum ids vacuum chamber
 idb = findcells(the_ring, 'FamName', 'id_endb');
-ivu_ini = idb(1:2:end);  ivu_end = idb(2:2:end);
-for i=1:length(ivu_ini)
-    for j=ivu_ini(i):ivu_end(i)
-     the_ring{j}.VChamber = ivu_vchamber;
+idb_ini = idb(1:2:end);  idb_end = idb(2:2:end);
+for i=1:length(idb_ini)
+    for j=idb_ini(i):idb_end(i)
+     the_ring{j}.VChamber = idb_vchamber;
     end
 end
 
 % Set other ids vacuum chamber
 ida = findcells(the_ring, 'FamName', 'id_enda');
-ovu_ini = ida(1:2:end);  ovu_end = ida(2:2:end);
-for i=1:length(ovu_ini)
-    for j=ovu_ini(i):ovu_end(i)
-     the_ring{j}.VChamber = ovu_vchamber;
+ida_ini = ida(1:2:end);  ida_end = ida(2:2:end);
+for i=1:length(ida_ini)
+    for j=ida_ini(i):ida_end(i)
+     the_ring{j}.VChamber = ida_vchamber;
+    end
+end
+
+% Set other ids vacuum chamber
+idp = findcells(the_ring, 'FamName', 'id_endp');
+idp_ini = idp(1:2:end);  idp_end = idp(2:2:end);
+for i=1:length(idp_ini)
+    for j=idp_ini(i):idp_end(i)
+     the_ring{j}.VChamber = idp_vchamber;
     end
 end
 

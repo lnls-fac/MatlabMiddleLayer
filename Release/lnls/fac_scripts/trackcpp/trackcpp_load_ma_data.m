@@ -2,6 +2,15 @@ function [spos, accep, nLost, eLost] = trackcpp_load_ma_data(pathname)
 
 fname = fullfile(pathname,'dynap_ma_out.txt');
 
+if ~exist(fname,'file')
+    spos  = [];
+    accep = [];
+    nLost = [];
+    eLost = [];
+    return;
+end
+
+
 a = importdata(fname, ' ', 13);
 
 spos  = a.data(1:2:end,5)'; 
