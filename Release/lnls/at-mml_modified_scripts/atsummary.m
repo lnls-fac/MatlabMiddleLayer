@@ -13,9 +13,9 @@ function r = atsummary(varargin)
 %  Written by Eugene Tan
 %  Revised by Laurent S. Nadolski
 %  Modified by Ximenes Resende (for more than one RF cavity)
-%  2012-06-25: mudan�a de rho^3 para abs(rho^3) em I5!
+%  2012-06-25: mudan???a de rho^3 para abs(rho^3) em I5!
 %  2012-07-04: modified by Afonso Mukai (lifetime calculations)
-%  2012-08-29: elementos dipolares refinados para calculo mais preciso das integrais de radia��o.
+%  2012-08-29: elementos dipolares refinados para calculo mais preciso das integrais de radia??????o.
 
 
 global THERING
@@ -189,17 +189,17 @@ if nargout == 0
     fprintf('   Revolution time: \t\t%4.5f [ns] (%4.5f [MHz]) \n', r.revTime*1e9,r.revFreq*1e-6);
     fprintf('   Betatron tune H: \t\t%4.5f (%4.5f [kHz])\n', r.tunes(1),abs(r.tunes(1)-round(r.tunes(1)))/r.revTime*1e-3);
     fprintf('                 V: \t\t%4.5f (%4.5f [kHz])\n', r.tunes(2),abs(r.tunes(2)-round(r.tunes(2)))/r.revTime*1e-3);
-    fprintf('   Momentum Compaction Factor: \t%4.5f\n', r.compactionFactor);
+    fprintf('   Momentum Compaction Factor: \t%4.5e\n', r.compactionFactor);
     fprintf('   Chromaticity H: \t\t%+4.5f\n', r.chromaticity(1));
     fprintf('                V: \t\t%+4.5f\n', r.chromaticity(2));
     fprintf('    (natural)   H: \t\t%+4.5f\n', r.natural_chromaticity(1));
     fprintf('                V: \t\t%+4.5f\n', r.natural_chromaticity(2));
-    fprintf('   Synchrotron Integral 1: \t%4.5f [m]\n', r.integrals(1));
-    fprintf('                        2: \t%4.5f [m^-1]\n', r.integrals(2));
-    fprintf('                        3: \t%4.5f [m^-2]\n', r.integrals(3));
-    fprintf('                        4: \t%4.5f [m^-1]\n', r.integrals(4));
-    fprintf('                        5: \t%4.5f [m^-1]\n', r.integrals(5));
-    fprintf('                        6: \t%4.5f [m^-1]\n', r.integrals(6));
+    fprintf('   Synchrotron Integral 1: \t%4.5e [m]\n', r.integrals(1));
+    fprintf('                        2: \t%4.5e [m^-1]\n', r.integrals(2));
+    fprintf('                        3: \t%4.5e [m^-2]\n', r.integrals(3));
+    fprintf('                        4: \t%4.5e [m^-1]\n', r.integrals(4));
+    fprintf('                        5: \t%4.5e [m^-1]\n', r.integrals(5));
+    fprintf('                        6: \t%4.5e [m^-1]\n', r.integrals(6));
     fprintf('   Damping Partition H: \t%4.5f\n', r.damping(1));
     fprintf('                     V: \t%4.5f\n', r.damping(2));
     fprintf('                     E: \t%4.5f\n', r.damping(3));
@@ -209,7 +209,7 @@ if nargout == 0
     fprintf('   Radiation Damping H: \t%4.5f [ms]\n', r.radiationDamping(1)*1e3);
     fprintf('                     V: \t%4.5f [ms]\n', r.radiationDamping(2)*1e3);
     fprintf('                     E: \t%4.5f [ms]\n', r.radiationDamping(3)*1e3);
-    fprintf('   Slip factor : \t%4.5f\n', r.etac);
+    fprintf('   Slip factor : \t%4.5e\n', r.etac);
     fprintf('\n');
     fprintf('   Assuming cavities Voltage: %4.5f [kV]\n', v_cav/1e3);
     fprintf('                   Frequency: %4.5f [MHz]\n', freq/1e6);
