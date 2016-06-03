@@ -12,9 +12,9 @@ p.bo_kickex_kick  = 2.461e-3; % booster extraction kick [rad]
 p.nr_turns        = 213;      % number of turns to track
 p.plot_flag       = true;
 p.print_flag      = true;
-p.si_pmm_strength = 0.727;      % storage ring pmm strength [no unit] M2
-p.si_pmm_pulse    = [1.0, 0.00, 0.00]; % temporal profile of pmm pulse
-p.si_pmm_physaccp = [0.0095, Inf];
+p.si_nlk_strength = 0.727;      % storage ring nlk strength [no unit] M2
+p.si_nlk_pulse    = [1.0, 0.00, 0.00]; % temporal profile of nlk pulse
+p.si_nlk_physaccp = [0.0095, Inf];
 p.ts_chamber_rx_at_bo =  22e-3;   % [m]   (rx of center of TS vacuum chamber w.r.t. TS coord. system)
 p.ts_chamber_px_at_bo =  5.0e-3;  % [rad] (px of center of TS vacuum chamber w.r.t. TS coord. system)
 p.si_chamber_rx_at_ts =  0.01935; % [m]   (as measured at TS coordinates)
@@ -28,9 +28,9 @@ p = generate_injection_plots(p);
 
 
 % 
-% % varies and plots injection efficiency vs si pmm strength
-% % si_pmm_strength = p.si_pmm_strength * linspace(0.8,1.2,55);
-% % p = vary_si_pmm_strength(p, si_pmm_strength);
+% % varies and plots injection efficiency vs si nlk strength
+% % si_nlk_strength = p.si_nlk_strength * linspace(0.8,1.2,55);
+% % p = vary_si_nlk_strength(p, si_nlk_strength);
 
 
 function p = generate_injection_plots(p0)
@@ -56,13 +56,13 @@ p = eject_from_booster(p);
 p = transport_along_ts(p);
 
 % injection into si
-p = inject_into_si_and_transports_to_pmm(p);
+p = inject_into_si_and_transports_to_nlk(p);
 
 p.plot_flag = true;
 p.print_flag = true;
 
-% sets pmm and kicks beam first time
-p = sets_pmm_and_kicks_beam(p);
+% sets nlk and kicks beam first time
+p = sets_nlk_and_kicks_beam(p);
 axis([-12,1,-1,4]);
 xlabel('X [mm]'); ylabel('PX [mrad]');
 
@@ -87,18 +87,18 @@ init_random_numbers();
 p = create_initial_bunch(p);
 p = eject_from_booster(p);
 p = transport_along_ts(p);
-p = inject_into_si_and_transports_to_pmm(p);
+p = inject_into_si_and_transports_to_nlk(p);
 
 si = p.si; bunch = p.bunch;
 
-nlk_strengths = (1+linspace(-0.15,0.15,51)) * p.si_pmm_strength;
+nlk_strengths = (1+linspace(-0.15,0.15,51)) * p.si_nlk_strength;
 efficiency = zeros(size(nlk_strengths));
 for i=1:length(nlk_strengths)
     fprintf('%03i/%02i: %f ', i, length(nlk_strengths), 100*nlk_strengths(i));
     p.si = si; p.bunch = bunch;
-    p.si_pmm_strength = nlk_strengths(i);
+    p.si_nlk_strength = nlk_strengths(i);
     p.print_flag = false; 
-    p.plot_flag = false; p = sets_pmm_and_kicks_beam(p); p.plot_flag = false;
+    p.plot_flag = false; p = sets_nlk_and_kicks_beam(p); p.plot_flag = false;
     p = track_many_turns_in_si(p);
     p.print_flag = false;
     efficiency(i) = 100*(p.nr_particles - p.particle_loss)/p.nr_particles;
@@ -133,9 +133,9 @@ addpath(fullfile(sirius_path, p.si_version));
 p.si = sirius_si_lattice();
 [p.si, ~] = setcavity('on', p.si);
 [p.si,~,~,~,~,~,~] = setradiation('on', p.si);
-% adds defined acceptance as VChamber at entrance of pmm
-p.si_pmm_idx = findcells(p.si, 'FamName', 'pmm');
-p.si{p.si_pmm_idx}.VChamber(1) = p.si_pmm_physaccp(1);
+% adds defined acceptance as VChamber at entrance of nlk
+p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si{p.si_nlk_idx}.VChamber(1) = p.si_nlk_physaccp(1);
 
 % shifts it so that it starts at begining of extraction kicker
 bo_kickex_idx = findcells(p.bo, 'FamName', 'kick_ex');
@@ -221,7 +221,7 @@ if p.print_flag, fprintf('- number of electrons lost from entrance of bo extsept
 p.bunch = trajectories(:,get_bunch(length(p.ts)+1, p.nr_particles));
 if p.plot_flag, create_new_x_phase_space_plot(p.bunch, [], [], 'bunch at end of TS'); end
 
-function p = inject_into_si_and_transports_to_pmm(p0)
+function p = inject_into_si_and_transports_to_nlk(p0)
 
 p = p0;
 
@@ -236,21 +236,21 @@ if p.print_flag, fprintf('- beam centroid at si injpoint (rx,px)(ry,py): (%+.3f 
 % plots bunch at SI injection point
 if p.plot_flag, create_new_x_phase_space_plot(p.bunch,[], [], 'bunch at injection point of SI'); end
 
-% transports bunch from injection point to pmm
-p.si_pmm_idx = findcells(p.si, 'FamName', 'pmm');
-inj_2_pmm  = p.si(1:p.si_pmm_idx(1));
-trajectories = linepass(inj_2_pmm, p.bunch, 1:length(inj_2_pmm));
-[trajectories, p.loss_si_nlk] = calc_particle_loss(trajectories, inj_2_pmm, p.nr_particles, 'from SI injection point to entrance of PMM', p.plot_flag);
-if p.print_flag, fprintf('- number of electrons lost from si injpoint to entrance of si pmm: %i\n', p.loss_si_nlk - p.loss_si_injpoint); end
-p.bunch = trajectories(:,get_bunch(length(inj_2_pmm),p.nr_particles)); % bunch at entrance of si pmm
-if p.print_flag, fprintf('- beam centroid at entrance of si pmm (rx,px): (%+.3f mm, %+.3f mrad)\n', 1000*p.bunch([1,2],1)); end
+% transports bunch from injection point to nlk
+p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+inj_2_nlk  = p.si(1:p.si_nlk_idx(1));
+trajectories = linepass(inj_2_nlk, p.bunch, 1:length(inj_2_nlk));
+[trajectories, p.loss_si_nlk] = calc_particle_loss(trajectories, inj_2_nlk, p.nr_particles, 'from SI injection point to entrance of nlk', p.plot_flag);
+if p.print_flag, fprintf('- number of electrons lost from si injpoint to entrance of si nlk: %i\n', p.loss_si_nlk - p.loss_si_injpoint); end
+p.bunch = trajectories(:,get_bunch(length(inj_2_nlk),p.nr_particles)); % bunch at entrance of si nlk
+if p.print_flag, fprintf('- beam centroid at entrance of si nlk (rx,px): (%+.3f mm, %+.3f mrad)\n', 1000*p.bunch([1,2],1)); end
 
-% shifts si so that it starts at pmm
-p.si = [p.si(p.si_pmm_idx:end) p.si(1:p.si_pmm_idx-1)];
-p.si_pmm_idx = findcells(p.si, 'FamName', 'pmm');
-p.si{p.si_pmm_idx}.VChamber(1) = p.si_pmm_physaccp(1);
+% shifts si so that it starts at nlk
+p.si = [p.si(p.si_nlk_idx:end) p.si(1:p.si_nlk_idx-1)];
+p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si{p.si_nlk_idx}.VChamber(1) = p.si_nlk_physaccp(1);
 
-function p = sets_pmm_and_kicks_beam(p0)
+function p = sets_nlk_and_kicks_beam(p0)
 
 p = p0;
 
@@ -259,9 +259,9 @@ if ~isfield(p,'si_stored_bunch')
     % does tracking 
     co = findorbit6(p.si); 
     si = p.si; [si,~] = setcavity('off',si); [si, ~,~,~,~,~,~] = setradiation('off',si);
-    fp = [co(1:4);0;0]+[-p.si_pmm_physaccp(1);0;0;0;0;0];
+    fp = [co(1:4);0;0]+[-p.si_nlk_physaccp(1);0;0;0;0;0];
     p.si_acceptance_nlk = ringpass(si,fp,1000);
-    %p.si_acceptance_nlk = ringpass(p.si, co+[-p.si_pmm_physaccp(1);0;0;0;0;0], 1000);
+    %p.si_acceptance_nlk = ringpass(p.si, co+[-p.si_nlk_physaccp(1);0;0;0;0;0], 1000);
     si_twiss = calctwiss(p.si); p.si_twiss_nlk = create_twiss(si_twiss, 1);
     si_eqparms = atsummary(p.si);
     e0 = si_eqparms.naturalEmittance; k = 0.01;
@@ -272,13 +272,13 @@ if ~isfield(p,'si_stored_bunch')
     %[p.si_xaccept_nlk,yaccept,~,err] = lnls_calcula_aceitancias(p.si, s, si_twiss.betax, si_twiss.betay, -1);
 end
         
-% gets pmm pulse parameters
-p.si_pmm_pulse = [p.si_pmm_pulse, zeros(1,p.nr_turns-length(p.si_pmm_pulse))];
-[x, integ_field, kickx, p.LPolyB] = sirius_si_pmm_kick(p.si_pmm_strength, [2,3,4,5,6,7,8,9,10], p.plot_flag);
+% gets nlk pulse parameters
+p.si_nlk_pulse = [p.si_nlk_pulse, zeros(1,p.nr_turns-length(p.si_nlk_pulse))];
+[x, integ_field, kickx, p.LPolyB] = sirius_si_nlk_kick(p.si_nlk_strength, [2,3,4,5,6,7,8,9,10], p.plot_flag);
 
-% sets PMM
-p.si_pmm_idx = findcells(p.si, 'FamName', 'pmm');
-p.si = sets_pmm(p.si, p.si_pmm_idx, p.si_pmm_pulse(1), p.LPolyB);
+% sets nlk
+p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si = sets_nlk(p.si, p.si_nlk_idx, p.si_nlk_pulse(1), p.LPolyB);
     
 % plots bunch at SI NLK entrance
 if p.plot_flag
@@ -291,13 +291,13 @@ if p.plot_flag
 end
 
 % kicks beam
-p.bunch = linepass(p.si(p.si_pmm_idx(1):p.si_pmm_idx(end)), p.bunch); 
+p.bunch = linepass(p.si(p.si_nlk_idx(1):p.si_nlk_idx(end)), p.bunch); 
 
 % shifts si lattice to the end of NLK
-p.si = [p.si(p.si_pmm_idx(end)+1:end) p.si(1:p.si_pmm_idx(end))];
-p.si_pmm_idx = findcells(p.si, 'FamName', 'pmm');
+p.si = [p.si(p.si_nlk_idx(end)+1:end) p.si(1:p.si_nlk_idx(end))];
+p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
 
-% plots bunch after pmm kick
+% plots bunch after nlk kick
 if p.plot_flag
     %si_twiss = calctwiss(p.si); twiss0 = create_twiss(si_twiss, 1);
     %s = findspos(p.si,1:length(p.si));
@@ -326,19 +326,19 @@ end
     
 bunch0 = p.bunch;
 % tracks turn 1
-p.si = sets_pmm(p.si, p.si_pmm_idx, p.si_pmm_pulse(2), p.LPolyB); % sets nlk to 2nd kick
+p.si = sets_nlk(p.si, p.si_nlk_idx, p.si_nlk_pulse(2), p.LPolyB); % sets nlk to 2nd kick
 trajectories = linepass(p.si, bunch0, 1:length(p.si)+1);
 [trajectories, loss_turn] = calc_particle_loss(trajectories, [p.si p.si(1)], p.nr_particles, 'first turn in SI', p.plot_flag);
 if p.print_flag, fprintf('- number of electrons lost after turn 001: %i\n', loss_turn); end
 bunch1 = trajectories(:,get_bunch(length(p.si)+1,p.nr_particles));
 % tracks turn 2
-p.si = sets_pmm(p.si, p.si_pmm_idx, p.si_pmm_pulse(3), p.LPolyB); % sets nlk to 3rd kick
+p.si = sets_nlk(p.si, p.si_nlk_idx, p.si_nlk_pulse(3), p.LPolyB); % sets nlk to 3rd kick
 trajectories = linepass(p.si, bunch1, 1:length(p.si)+1);
 [trajectories, loss_turn] = calc_particle_loss(trajectories, [p.si p.si(1)], p.nr_particles, 'second turn in SI', false);
 if p.print_flag, fprintf('- number of electrons lost after turn 002: %i\n', loss_turn); end
 bunch2 = trajectories(:,get_bunch(length(p.si)+1,p.nr_particles));
 % tracks turn 3
-p.si = sets_pmm(p.si, p.si_pmm_idx, p.si_pmm_pulse(4), p.LPolyB); % sets nlk to 4th kick
+p.si = sets_nlk(p.si, p.si_nlk_idx, p.si_nlk_pulse(4), p.LPolyB); % sets nlk to 4th kick
 trajectories = linepass(p.si, bunch2, 1:length(p.si)+1);
 [trajectories, loss_turn] = calc_particle_loss(trajectories, [p.si p.si(1)], p.nr_particles, 'third turn in SI', false);
 if p.print_flag, fprintf('- number of electrons lost after turn 003: %i\n', loss_turn); end
@@ -347,7 +347,7 @@ bunch3 = trajectories(:,get_bunch(length(p.si)+1,p.nr_particles));
 
 bunch = bunch3;
 for i=5:p.nr_turns
-    p.si = sets_pmm(p.si, p.si_pmm_idx, p.si_pmm_pulse(i), p.LPolyB); % sets nlk
+    p.si = sets_nlk(p.si, p.si_nlk_idx, p.si_nlk_pulse(i), p.LPolyB); % sets nlk
     trajectories = linepass(p.si, bunch, 1:length(p.si)+1);
     [trajectories, loss_turn] = calc_particle_loss(trajectories, [p.si p.si(1)], p.nr_particles, '', false);
     if p.print_flag, fprintf('- number of electrons lost after turn %03i: %i\n', i-1, loss_turn); end
@@ -373,20 +373,20 @@ end
 
 
 
-function p = vary_si_pmm_strength(p0, si_pmm_strength)
+function p = vary_si_nlk_strength(p0, si_nlk_strength)
 
 p = p0;
 
-efficiency = zeros(size(si_pmm_strength));
-for i=1:length(si_pmm_strength)
+efficiency = zeros(size(si_nlk_strength));
+for i=1:length(si_nlk_strength)
     close all; drawnow;
-    fprintf('%03i: pmm_strength = %.4f, ', i, si_pmm_strength(i));
-    p.si_pmm_strength = si_pmm_strength(i);
+    fprintf('%03i: nlk_strength = %.4f, ', i, si_nlk_strength(i));
+    p.si_nlk_strength = si_nlk_strength(i);
     p = sirius_injection_local(p);
     efficiency(i) = (p.nr_particles - p.lost_particles)/p.nr_particles;
     fprintf('efficienty = %7.3f %%\n', 100*efficiency(i));
 end
-figure; plot(si_pmm_strength, efficiency);
+figure; plot(si_nlk_strength, efficiency);
 
 function twiss = create_twiss(twissv, idx)
 twiss.betax = twissv.betax(idx);
@@ -449,11 +449,11 @@ end
 
 lost_particles = length(lost_particles);
 
-function si = sets_pmm(old_si, pmm_idx, strength, LPolyB)
+function si = sets_nlk(old_si, nlk_idx, strength, LPolyB)
 si = old_si;
-si_pmm_len = sum(getcellstruct(si, 'Length', pmm_idx));
-PolynomB = LPolyB/si_pmm_len;
-for i=pmm_idx
+si_nlk_len = sum(getcellstruct(si, 'Length', nlk_idx));
+PolynomB = LPolyB/si_nlk_len;
+for i=nlk_idx
     si{i}.PolynomB = strength * PolynomB;
     si{i}.PolynomA = zeros(1,length(PolynomB));
     si{i}.MaxOrder = length(PolynomB)-1;
