@@ -1,12 +1,11 @@
-function aper = check_validity_of_chaos_indicator(lattices)
+function info = check_validity_of_chaos_indicator(lattices)
 
 planes = {'x','y','ep','en'};
-aper.ind0 = zeros(length(planes),length(lattices));
-aper.ind1 = zeros(length(planes),length(lattices));
-aper.ind2 = zeros(length(planes),length(lattices));
-aper.ind3 = zeros(length(planes),length(lattices));
-aper.trc_mean = zeros(length(planes),length(lattices));
-aper.trc_std = zeros(length(planes),length(lattices));
+info = struct('aper0', {}, 'aper1', {}, 'aper2', {}, 'aper3', {}, ...
+    'trc_mean', {}, 'trc_std', {}, 'nmlam', {}, 'ratio_lam', {}, ...
+    'x_chaos', {}, 'diff_ind', {}, 'x_diff', {});
+
+flag_plot = false;
 
 for i = 1:length(lattices)
     si = lattices(i).lattice;
@@ -21,14 +20,54 @@ for i = 1:length(lattices)
     fprintf('%04d     Symmetry: %3d\n',i,lattices(i).symmetry);
     for ii=1:length(planes)
 %         aper.ind2(ii,i) = lnls_chaos_indicator2(si,planes{ii},lattices(i).symmetry,false);
-        [aper.ind0(ii,i),aper.ind1(ii,i)] = ...
-                    lnls_chaos_indicator(si,planes{ii},pos,true);
-        [aper.trc_mean(ii,i),aper.trc_std(ii,i)] = aperture_from_tracking([lattices(i).folder,'trackcpp/'],planes{ii},pos);
+        [info(ii,i).aper0,info(ii,i).aper1,info(ii,i).nmlam, ...
+            info(ii,i).ratio_lam,info(ii,i).x_chaos] = ...
+        	lnls_chaos_indicator(si,planes{ii},pos,flag_plot);
+        [info(ii,i).aper2,info(ii,i).aper3,info(ii,i).diff_ind,info(ii,i).x_diff] = ...
+        	lnls_diffusion_indicator(si,planes{ii},pos,...
+            flag_plot,calc_window(si,lattices(i).symmetry));
+        [info(ii,i).trc_mean,info(ii,i).trc_std] = ...
+            aperture_from_tracking([lattices(i).folder,'trackcpp/'],planes{ii},pos);
         fprintf('%8s : %9.4f, %9.4f, %9.4f, %9.4f --> %9.4f\n',...
-            upper(planes{ii}),aper.ind0(ii,i),aper.ind1(ii,i),aper.ind2(ii,i),aper.ind3(ii,i),aper.trc_mean(ii,i));
+            upper(planes{ii}),info(ii,i).aper0,info(ii,i).aper1,...
+            info(ii,i).aper2,info(ii,i).aper3,info(ii,i).trc_mean);
     end
 end
 fprintf('\n');
+
+function window = calc_window(ring, symmetry)
+
+pos = 0.0;
+offset = [0;0;0;0;0;0];
+n = 7;
+nturns = 2*(2^n + 6 - mod(2^n,6)) - 1;
+
+offset([2,4]) = offset([2,4]) + 1e-6;
+
+spos = findspos(ring,1:length(ring));
+[~,point] = min(abs(pos-spos));
+ring = ring([point:end,1:point-1]);
+
+Rin = offset;
+Rou = [Rin, ringpass(ring,Rin,nturns)];
+
+x0  = reshape(Rou(1,:),[],nturns+1); % +1, because of initial condition
+xl = reshape(Rou(2,:),[],nturns+1);
+y0  = reshape(Rou(3,:),[],nturns+1);
+yl = reshape(Rou(4,:),[],nturns+1);
+
+tunex = lnls_calcnaff(x0, xl);
+tuney = lnls_calcnaff(y0, yl);
+
+side = 0.5/symmetry;
+margem = 5e-3/symmetry;
+
+kx = floor(tunex/side);
+ky = floor(tuney/side);
+
+window = [-1 0 kx*side+margem; 0 -1 ky*side+margem;...
+            1 0 (kx+1)*side-margem; 0 1 (ky+1)*side-margem];
+
 
 
 function [aper,rms] = aperture_from_tracking(folder,plane,pos)

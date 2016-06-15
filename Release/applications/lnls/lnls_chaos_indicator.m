@@ -1,4 +1,4 @@
-function [aper0,aper1] = lnls_chaos_indicator(ring, plane,pos,plota, offset)
+function [aper0,aper1, nmlam, ratio_lam, x] = lnls_chaos_indicator(ring, plane,pos,plota, offset)
 
 if ~exist('pos','var'), pos = 0.0; end
 if ~exist('plota','var'), plota = false; end
@@ -10,7 +10,7 @@ if strcmpi(plane,'x')
     pos = 0.0;
     lim = 1.02;
     pl = 1;
-    i = 0; j = 0;
+%    i = 0; j = 0;
     xi =  -6e-3;
     xf = -13e-3;
     expoent = 1;
@@ -19,7 +19,7 @@ elseif strcmpi(plane,'y')
     pos = 0.0;
     lim = 1.02;
     pl = 3;
-    i = 1; j = 0;
+%    i = 1; j = 0;
     xi = 2e-3;
     xf = 3e-3;
     expoent = 1;
@@ -27,7 +27,7 @@ elseif strcmpi(plane,'y')
 elseif strcmpi(plane,'ep')
     lim = 1.02;
     pl = 5;
-    i = 0; j = 1;
+%    i = 0; j = 1;
     xi = 2e-2;
     xf = 5e-2;
     expoent = 1;
@@ -35,7 +35,7 @@ elseif strcmpi(plane,'ep')
 elseif strcmpi(plane,'en')
     lim = 1.02;
     pl = 5;
-    i = 1; j = 1;
+%    i = 1; j = 1;
     xi = -2e-2;
     xf = -5e-2;
     expoent = 1;
@@ -76,12 +76,14 @@ hfmlam   = mean(lambda1(:,1:end/2),2)';
 hfnmlam  = 4*hfmlam ./ x(1:end-1).^4 / nturns^2 ./ dx.^2;
 
 d2nmlam = diff(nmlam,2,2);
-d2hfnmlam = diff(hfnmlam,2,2);
+%d2hfnmlam = diff(hfnmlam,2,2);
 
-ind0 = find(isnan(mlam),1,'first'); if isempty(ind0), ind0 = length(x); end;
+ratio_lam = nmlam./hfnmlam;
+
+ind0 = find(isnan(mlam),1,'first'); if isempty(ind0), ind0=length(x); end;
 aper0 = x(ind0);
 
-ind1 = find(nmlam./hfnmlam > lim,1,'first');if isempty(ind1), ind1 = length(x); end;
+ind1 = find(ratio_lam > lim,1,'first');if isempty(ind1), ind1 = length(x); end;
 aper1  = x(min([ind1,ind0]));
 
 if plota
@@ -89,12 +91,19 @@ if plota
 %     plot(x(1:end-2),d1nsqrtmlam); hold all; plot(x,[on*lim;-on*lim]); ylim(3*lim*[-1,1]);
     figure('OuterPosition',[633*1,540*(1-0),633, 540]);
     plot(x(1:end-3),d2nmlam);% hold all; plot(x,[on*lim;-on*lim]); ylim(3*lim*[-1,1]);
-    figure('OuterPosition',[633*1,540*(1-1),633, 540]); plot(x(1:end-1),nmlam./hfnmlam);
+    str=sprintf('Plot of Chaos (%d turns)', nturns); title(str)
+    xlabel(plane)
+    ylabel('d2nmlam')
+    figure('OuterPosition',[633*1,540*(1-1),633, 540]); plot(x(1:end-1),ratio_lam);
+    str=sprintf('Plot of Chaos (%d turns)', nturns); title(str)
+    xlabel(plane)
+    ylabel('ratio lam')
 %     figure('OuterPosition',[633*1,540*(1-1),633, 540]);
 %     plot(x(1:end-4),d3nsqrtmlam); hold all; plot(x,[on*lim;-on*lim]/10); ylim(3*lim/10*[-1,1]);
-    
 %     figure('OuterPosition',[633*0,540*(1-1),633, 540]); plot(Rou(1,:),Rou(2,:),'.');hold all;plot(squeeze(Rou(1,1:ch,:)),squeeze(Rou(2,1:ch,:)),'.r');
 %     figure('OuterPosition',[633*1,540*(1-1),633, 540]); plot(Rou(3,:),Rou(4,:),'.');hold all;plot(squeeze(Rou(3,1:ch,:)),squeeze(Rou(4,1:ch,:)),'.r');
     drawnow;
 end
+
+x = x(1:end-1);
 
