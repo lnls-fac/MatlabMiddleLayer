@@ -32,15 +32,15 @@ b = 1; types{end+1} = struct('fam_name', fam_name, 'passmethod', passmethod);
 
 
 % ---------------------------------------------------------------
-% SX model 2015-11-09
+% SX model 2016-06-16
 % ====================
 % this model is based on results provided by James in 16/06/2016
 % based on a fitting of all the even monopoles on the field profile of 
 % latested (up to that date) fieldmap.
-fmap_monomials = [2,4,6,8,10,12,14];
+fmap_monomials = [0,2,4,6,8,10,12,14];
 fmap_model = [ ...
-%len[m]        angle[deg]             PolynomB(n=2)    PolynomB(n=4)     PolynomB(n=6)      PolynomB(n=8)    PolynomB(n=10)   PolynomB(n=12)   PolynomB(n=14)
-b  0.05250  +0.0000000000000000e+00     22.2497691     -349.7596237       9108671.095       -1.28082e+11       6.7845e+14       -2.09e+18         2.03e+21
+% type len[m]   angle[deg]  PolyB(n=0)      PolyB(n=2)      PolyB(n=4)        PolyB(n=6)         PolyB(n=8)        PolyB(n=10)       PolyB(n=12)      PolyB(n=14)  
+b,     0.05250,  +0.00000, +1.37e-06 ,     -2.12e+01 ,     +3.97e+02 ,       -9.57e+06 ,        +1.27e+11 ,       -6.59e+14 ,       +1.99e+18 ,      -1.92e+21
 ]; 
 
 % ROTATING COIL MEASUREMENT
@@ -105,8 +105,10 @@ end
 segmodel(:,3) = segmodel(:,3) * (pi/180.0);
 
 % turns deflection angle error off (convenient for having a nominal model with zero 4d closed orbit)
-sel = (monomials == 0);
-segmodel(:,sel) = 0;
+sel = find(monomials == 0);
+if any(sel)
+    segmodel(:,3+sel) = 0;
+end
 
 % builds half of the magnet model
 b = zeros(1,size(segmodel,1));
