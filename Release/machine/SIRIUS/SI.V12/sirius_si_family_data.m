@@ -1,9 +1,10 @@
 function data = sirius_si_family_data(the_ring)
 
-data.b1.nr_segs   = 2;
-data.b2.nr_segs   = 3;
-data.bc_lf.nr_segs   = 7;
-data.bc_hf.nr_segs   = 14;
+data.b1.nr_segs    = 2;
+data.b2.nr_segs    = 3;
+data.bc_lf.nr_segs = 14;
+data.bc_hf.nr_segs = 14;
+data.bc.nr_segs    = 28;
 
 data.qfa.nr_segs  = 1;
 data.qda.nr_segs  = 1;
@@ -15,10 +16,10 @@ data.qf2.nr_segs  = 1;
 data.qf3.nr_segs  = 1;
 data.qf4.nr_segs  = 1;
 
-data.sda.nr_segs = 1;
-data.sfa.nr_segs = 1;
-data.sdb.nr_segs = 1;
-data.sfb.nr_segs = 1;
+data.sda.nr_segs  = 1;
+data.sfa.nr_segs  = 1;
+data.sdb.nr_segs  = 1;
+data.sfb.nr_segs  = 1;
 data.sd1j.nr_segs = 1;
 data.sf1j.nr_segs = 1;
 data.sd2j.nr_segs = 1;
@@ -30,15 +31,15 @@ data.sd2k.nr_segs = 1;
 data.sd3k.nr_segs = 1;
 data.sf2k.nr_segs = 1;
 
-data.bpm.nr_segs = 1;
-data.rbpm.nr_segs= 1;
-data.cf.nr_segs  = 1;
-data.fch.nr_segs = 1;
-data.fcv.nr_segs = 1;
-data.qs.nr_segs  = 1;
-data.ch.nr_segs = 1;
-data.cv.nr_segs = 1;
-data.qn.nr_segs  = 1;
+data.bpm.nr_segs  = 1;
+data.rbpm.nr_segs = 1;
+data.cf.nr_segs   = 1;
+data.fch.nr_segs  = 1;
+data.fcv.nr_segs  = 1;
+data.qs.nr_segs   = 1;
+data.ch.nr_segs   = 1;
+data.cv.nr_segs   = 1;
+data.qn.nr_segs   = 1;
 
 
 fams = fields(data);
@@ -104,6 +105,10 @@ end
 idx = sort(idx);
 data.cv.ATIndex = reshape(idx,data.cv.nr_segs,[]);
 data.cv.ATIndex = data.cv.ATIndex';
+
+% bc 
+idx = [data.('bc_lf').ATIndex, data.('bc_hf').ATIndex];
+data.bc.ATIndex = sort(idx);
 
 % fch - fast horizontal correctors
 idx = [];

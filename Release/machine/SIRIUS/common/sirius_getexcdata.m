@@ -24,7 +24,7 @@ for i=1:length(CommonNames(:,1))
                     ExcData.skew{i} = true;
                 end
             else
-                data(j, :) = sscanf(line, '%f');
+                data(j, :) = sscanf(line, '%e');
                 j = j+1;
             end
         end 
@@ -42,4 +42,10 @@ for i=1:length(CommonNames(:,1))
     end
     
     
+end
+
+if isempty(ExcData)
+    fprintf('\n   WARNING: Problem with %s excitation curve.\n', CommonNames(1,:));
+end
+
 end

@@ -113,7 +113,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         k=zeros(size(Amps,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
+            k(i) = -interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
         end
         
     elseif any(strcmpi(Family, findmemberof('SEXT')))
@@ -122,7 +122,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         k=zeros(size(Amps,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
+            k(i) = -interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
         end
                
     elseif any(strcmpi(Family, findmemberof('SKEWCORR')))
@@ -131,7 +131,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         k=zeros(size(Amps,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
+            k(i) = -interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho * EffLength(i));
         end
 
     elseif any(strcmpi(Family, findmemberof('SEPTUM')))
@@ -139,7 +139,7 @@ if any(strcmpi(Field, {'Setpoint','Monitor'}))
         k=zeros(size(Amps,1),1);
         for i=1:length(ElementsIndex)
             idx = ElementsIndex(i);
-            k(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho) ;
+            k(i) = -interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i)) / (Brho) ;
         end
               
     else

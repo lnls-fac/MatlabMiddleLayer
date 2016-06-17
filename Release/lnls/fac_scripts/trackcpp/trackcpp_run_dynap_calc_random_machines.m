@@ -31,9 +31,9 @@ else
     dynap_xy_answer    = {'5000', '0', '120', '-0.012','+0.012','30','0','0.003','1'}; % to be changed
     dynap_ex_answer    = {'3500', '0.001', '40', '-0.05','+0.05','55','-0.012','0','1'}; % to be changed
     %                     turns    y0    e0      de   st_bk rescl  nit s0   sf  tr    fams
-    dynap_ma_answer    = {'2000','1e-5','0.02','5e-3','1'  ,'0.33','3','0','52','1','calc_mom_accep mia mib'};
-    dynap_pxa_answer   = {'2000','1e-5','0.00','5e-5','1'  ,'0.33','3','0','52','1','calc_mom_accep mia mib'};
-    dynap_pya_answer   = {'2000','1e-5','0.00','5e-5','1'  ,'0.33','3','0','52','1','calc_mom_accep mia mib'};
+    dynap_ma_answer    = {'2000','1e-5','0.02','5e-3','1'  ,'0.33','3','0','104','1','calc_mom_accep mia mib mip'};
+    dynap_pxa_answer   = {'2000','1e-5','0.00','5e-5','1'  ,'0.33','3','0','104','1','calc_mom_accep mia mib mip'};
+    dynap_pya_answer   = {'2000','1e-5','0.00','5e-5','1'  ,'0.33','3','0','104','1','calc_mom_accep mia mib mip'};
 end
 
 %% user defines accelerator

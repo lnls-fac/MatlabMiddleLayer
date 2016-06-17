@@ -446,32 +446,7 @@ else
         NewSP = NewSP*ones(1,Nsplit);
         NewSP = NewSP';
         NewSP = NewSP(:);
-        
-        % % 2015-09-17 Luana 
-        % % The kick is divide amoung the splits in the functions
-        % % lnls_set_kickangle and sirius_set_kickangle
-        % if strcmpi(AT.ATType, 'HCM') || strcmpi(AT.ATType, 'VCM')
-        %    % Correctors are in radians so the kick needs to be divided amoung the splits
-        %    % Note: NaN's in the ATIndex are not splits for instance [45 46; 67 NaN] means
-        %    %       the first magnet is split but the second is not.
-        %
-        %    Nsplits = ones(size(AT.ATIndex));
-        %    Nsplits(find(isnan(AT.ATIndex))) = 0;
-        %    Nsplits = sum(Nsplits')';
-        %    NewSP = NewSP ./ Nsplits;
-        %   
-        %   %for i = 1:size(NewSP,1)
-        %   %    NewSP(i,:) = NewSP(i,:) / (Nsplit - sum(isnan(AT.ATIndex(i,:))));
-        %   %end
-        %else
-        %   ATIndexList = AT.ATIndex(DeviceIndex,:)';
-        %   ATIndexList = ATIndexList(:);
-        %   
-        %   iNaN = find(isnan(ATIndexList));
-        %   ATIndexList(iNaN) = [];
-        %   NewSP(iNaN) = [];
-        %end
-        
+               
         ATIndexList = AT.ATIndex(DeviceIndex,:)';
         ATIndexList = ATIndexList(:);
         
@@ -499,46 +474,24 @@ else
     else
         if any(strcmpi(AT.ATType, {'HCM','Kicker'}))
             % HCM
-            
+            % 2015-09-18 Luana 
             if SetMultipolesErrors
                 NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);     
+                THERING = sirius_add_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);     
             end
-            
+         
             for i = 1:size(NewSP,1)
                 % Coupling: Magnet roll is part of the AT model
                 %           The gain is part of hw2physics/physics2hw
                 if isfield(THERING{ATIndexList(i)}, 'Roll')
                     Roll = THERING{ATIndexList(i)}.Roll;
                 else
-                    % Knowing the cross-plane family name can be a problem
-                    % If the VCM family has the same AT index, then use it.
-                    
-                    % % 2015-09-17 Luana 
-                    %Roll = [getroll(Family, Field, DeviceList(i,:))  0];
-                    %VCMDevList = family2dev('VCM');
-                    %iVCM = findrowindex(DeviceList(i,:), VCMDevList);
-                    %if ~isempty(iVCM)
-                    %    try
-                    %        ATIndexVCM = family2atindex('VCM', DeviceList(i,:));
-                    %        if ATIndexVCM == ATIndexList(i)
-                    %            Roll = [Roll(1) getroll('VCM', Field, DeviceList(i,:))];
-                    %        else
-                    %            Roll = [0 0];
-                    %        end
-                    %    catch
-                    %    end
-                    %    
-                    %end
-                    
-                    Roll = [0 0];
-                                       
+                    Roll = [0 0];          
                 end
                 
                 % New X-Kick, but the Y-Kick needs to be maintained (middle layer coordinates)
-                XKick = NewSP(i);
-                % 2015-09-17 Luana
-                YKick = [-sin(Roll(1)) cos(Roll(1))] * [sirius_get_kickangle(THERING, ATIndexList(i), 'x'); sirius_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
+                XKick = NewSP(i);           
+                YKick = [-sin(Roll(1)) cos(Roll(1))] * [sirius_get_kickangle(THERING,ATIndexList(i),'x'); sirius_get_kickangle(THERING,ATIndexList(i),'y')] / (cos(Roll(1)-Roll(2)));
                 
                 %YKick = [-sin(Roll(1)) cos(Roll(1))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
                 %YKick = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
@@ -548,10 +501,6 @@ else
                 % 2015-09-17 Luana
                 THERING = sirius_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
                 THERING = sirius_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y');      
-                
-                % 2015-08-24 Luana
-                %THERING = lnls_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
-                %THERING = lnls_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y');                
                 
                 %THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
                 %THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
@@ -564,60 +513,27 @@ else
                     
             
         elseif strcmpi(AT.ATType, 'VCM')
-            % VCM
-            
-            % 2015-09-18 Luana
+            % VCM            
+            % 2015-09-18 Luana     
             if SetMultipolesErrors
                 NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
+                THERING = sirius_add_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
             end
-            
+
             for i = 1:size(NewSP,1)
                 % Coupling: Magnet roll is part of the model
                 %           The gain is part of hw2physics/physics2hw
                 
-                %if isfield(THERING{ATIndexList(i)}, 'Roll')
-                %    Roll = THERING{ATIndexList(i)}.Roll;
-                %else
-                %    % Setting to zero may cause a problem.  It would be better
-                %    % to call getroll but the cross-plane family name is not known.
-                %    Roll = [0 0];
-                %end
-                
                 if isfield(THERING{ATIndexList(i)}, 'Roll')
                     Roll = THERING{ATIndexList(i)}.Roll;
                 else
-                    % Knowing the cross-plane family name can be a problem
-                    % If the VCM family has the same AT index, then use it.
-                      
-                    % % 2015-09-17 Luana
-                    %Roll = [0 getroll(Family, Field, DeviceList(i,:))];
-                    %HCMDevList = family2dev('HCM');
-                    %iHCM = findrowindex(DeviceList(i,:), HCMDevList);
-                    %if ~isempty(iHCM)
-                    %    try
-                    %        ATIndexHCM = family2atindex('HCM', DeviceList(i,:));
-                    %        if ATIndexHCM == ATIndexList(i)
-                    %            Roll = [getroll('HCM', Field, DeviceList(i,:)) Roll(2)];
-                    %        else
-                    %            Roll = [0 0];
-                    %        end
-                    %    catch
-                    %    end
-                    %end
-                    
-                    Roll = [0 0];
-                    
+                    Roll = [0 0];           
                 end
-                
                 % New Y-Kick, but the X-Kick needs to be maintained (middle layer coordinates)
                 
                 % 2015-09-17 Luana
-                XKick = [cos(Roll(2)) sin(Roll(2))] * [sirius_get_kickangle(THERING, ATIndexList(i), 'x'); sirius_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
+                XKick = [cos(Roll(2)) sin(Roll(2))] * [sirius_get_kickangle(THERING,ATIndexList(i),'x'); sirius_get_kickangle(THERING,ATIndexList(i),'y')] / (cos(Roll(1)-Roll(2)));
                 YKick = NewSP(i);
-                
-                % % 2015-08-24 Luana
-                %XKick = [cos(Roll(2)) sin(Roll(2))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
                 
                 %XKick = [cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
                 
@@ -626,11 +542,7 @@ else
                 % 2015-09-17 Luana
                 THERING = sirius_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
                 THERING = sirius_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y');
-                
-                % % 2015-08-24 Luana
-                %THERING = lnls_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
-                %THERING = lnls_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y'); 
-                
+                               
                 %THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
                 %THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
                 %fprintf('kick(%d,%d)=%g %g  AT=%g %g  Roll=%g  %g\n',DeviceList(i,:), XKick, YKick, THERING{ATIndexList(i)}.KickAngle, Roll);
@@ -649,7 +561,7 @@ else
             NewHardwareValue  = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
             
             if SetMultipolesErrors
-                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
+                THERING = sirius_add_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
             end
             
             for i = 1:size(NewSP,1)
@@ -657,7 +569,6 @@ else
                     THERING{ATIndexList(i)}.K = NewSP(i);
                 end
                 THERING{ATIndexList(i)}.PolynomB(2) = NewSP(i);
-                THERING{ATIndexList(i)}.NPB(2)      = NewSP(i);
             end
                                   
             AllDevices = family2dev(Family);
@@ -695,7 +606,7 @@ else
             NewTotalValue = PrevTotalValue - PrevFamilyValue + NewFamilyValue;
             
             if SetMultipolesErrors
-                THERING = sirius_set_multipoles_errors(THERING, AT.ATMagnet, Field,  NewTotalValue, AllDevices);
+                THERING = sirius_add_multipoles_errors(THERING, AT.ATMagnet, Field,  NewTotalValue, AllDevices);
             end
             
             NewTotalValue = hw2physics(AT.ATMagnet, Field, NewTotalValue, AllDevices); 
@@ -705,7 +616,6 @@ else
                         THERING{AllIndices(i,j)}.K = NewTotalValue(i);
                     end
                     THERING{AllIndices(i,j)}.PolynomB(2) = NewTotalValue(i);
-                    THERING{AllIndices(i,j)}.NPB(2)      = NewTotalValue(i);
                 end
             end
             
@@ -719,7 +629,7 @@ else
             NewTotalValue = PrevTotalValue - PrevShuntValue + NewShuntValue;
             
             if SetMultipolesErrors
-                THERING = sirius_set_multipoles_errors(THERING, AT.ATMagnet, Field, NewTotalValue, DeviceList);
+                THERING = sirius_add_multipoles_errors(THERING, AT.ATMagnet, Field, NewTotalValue, DeviceList);
             end
             
             NewTotalvalue = hw2physics(AT.ATMagnet, Field, NewTotalValue, DeviceList);
@@ -729,7 +639,6 @@ else
                         THERING{AT.ATIndex(i,j)}.K = NewTotalvalue(i);
                     end
                     THERING{AT.ATIndex(i,j)}.PolynomB(2) = NewTotalvalue(i); % Physics Units
-                    THERING{AT.ATIndex(i,j)}.NPB(2)      = NewTotalvalue(i); % Physics Units
                     THERING{AT.ATIndex(i,j)}.Shunt       = NewShuntValue(i); % Hardware Units
                 end                
             end  
@@ -737,13 +646,15 @@ else
         % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType,{'K2','Sext','Sextupole'}))
             % K2 - Sextupole
-            
             if SetMultipolesErrors
                 NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
-            end
+                THERING = sirius_add_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
+            end           
             
             for i = 1:size(NewSP,1)
+                if isfield(THERING{ATIndexList(i)}, 'SX')
+                    THERING{ATIndexList(i)}.SX = NewSP(i);
+                end
                 THERING{ATIndexList(i)}.PolynomB(3) = NewSP(i);
             end           
         
@@ -753,26 +664,26 @@ else
             
             if SetMultipolesErrors
                 NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
+                THERING = sirius_add_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
             end
             
             for i = 1:size(NewSP,1)
                 THERING{ATIndexList(i)}.PolynomB(4) = NewSP(i);
-                THERING{ATIndexList(i)}.NPB(4)      = NewSP(i);
             end
 
         % 2015-09-17 Luana
         elseif any(strcmpi(AT.ATType,{'KS','KS1','SkewQ','SkewQuad', 'SKEWCORR', 'SkewCorrector'}))
             % KS1 - Skew Quadrupole
-            
             if SetMultipolesErrors
                 NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
+                THERING = sirius_add_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList); 
             end
-            
+          	
             for i = 1:size(NewSP,1)
+                if isfield(THERING{ATIndexList(i)}, 'QS')
+                    THERING{ATIndexList(i)}.QS = NewSP(i);
+                end
                 THERING{ATIndexList(i)}.PolynomA(2) = NewSP(i);
-                THERING{ATIndexList(i)}.NPA(2)      = NewSP(i);
             end
                     
         % 2015-09-17 Luana
@@ -864,7 +775,7 @@ else
                     FamName = Dipoles{k};
                     fprintf('   Setting all magnets of family %s to %.4f Amperes\n', FamName, NewSP_HW);
                     if SetMultipolesErrors
-                        THERING = sirius_set_multipoles_errors(THERING, FamName, Field, NewSP_HW);
+                        THERING = sirius_add_multipoles_errors(THERING, FamName, Field, NewSP_HW);
                     end
                     THERING = sirius_modelbendset(THERING, FamName, Field, NewSP_HW);
                 end
@@ -884,47 +795,6 @@ else
                     error(sprintf('%s(%d,%d) must have a R1 & R2 field in the model to be rolled.', Family, DeviceList(i,:)));
                 end
             end
-            
-        % % 2015-09-17 Luana    
-        %elseif strcmpi(AT.ATType, 'RollX') || strcmpi(AT.ATType, 'RollY')
-        %    % Roll or Tilt
-        %   for i = 1:size(NewSP,1)
-        %       % Roll the corrector magnet
-        %       if isfield(THERING{ATIndexList(i)}, 'KickAngle')
-        %           % The .Roll field is just a middle layer way to store the roll.
-        %           % Otherwise, one can not tell the difference between x/y kicks and coupling
-        %           % Unroll it, then roll it to the new setpoint
-        %           if isfield(THERING{ATIndexList(i)}, 'Roll')
-        %               Roll = THERING{ATIndexList(i)}.Roll;
-        %           else
-        %               Roll = [0 0];
-        %           end
-        %           
-        %           % Roll it back to actual (measured) coordinates
-        %
-        %           XKick = [ cos(Roll(2)) sin(Roll(2))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
-        %           YKick = [-sin(Roll(1)) cos(Roll(1))] * [lnls_get_kickangle(THERING, ATIndexList(i), 'x'); lnls_get_kickangle(THERING, ATIndexList(i), 'y')] / (cos(Roll(1)-Roll(2)));
-        %           
-        %           %XKick = [ cos(Roll(2)) sin(Roll(2))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
-        %           %YKick = [-sin(Roll(1)) cos(Roll(1))] * THERING{ATIndexList(i)}.KickAngle(:) / (cos(Roll(1)-Roll(2)));
-        %           
-        %            % Roll it forward to the new model coordinates
-        %           if strcmpi(AT.ATType, 'RollX')
-        %               Roll(1) = NewSP(i);
-        %           else
-        %               Roll(2) = NewSP(i);
-        %           end
-        %           
-        %           % 2015-08-24 Luana           
-        %           THERING = lnls_set_kickangle(THERING, XKick * cos(Roll(1)) - YKick * sin(Roll(2)), ATIndexList(i), 'x');
-        %           THERING = lnls_set_kickangle(THERING, XKick * sin(Roll(1)) + YKick * cos(Roll(2)), ATIndexList(i), 'y');
-        %
-        %           %THERING{ATIndexList(i)}.KickAngle(1) = XKick * cos(Roll(1)) - YKick * sin(Roll(2));
-        %           %THERING{ATIndexList(i)}.KickAngle(2) = XKick * sin(Roll(1)) + YKick * cos(Roll(2));
-        %       else
-        %           error(sprintf('%s(%d,%d) must be a KickAngle field in the model to be rolled.', Family, DeviceList(i,:)));
-        %       end
-        %   end
         
         % 2015-09-17 Luana
         elseif strcmpi(AT.ATType, 'Septum')
@@ -932,7 +802,7 @@ else
             
             if SetMultipolesErrors
                 NewHardwareValue = physics2hw(Family, Field, NewPhysicsValue, DeviceList);
-                THERING = sirius_set_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
+                THERING = sirius_add_multipoles_errors(THERING, Family, Field, NewHardwareValue, DeviceList);
             end
             
             SeptumLength = zeros(size(AT.ATIndex, 1), 1);
@@ -949,7 +819,6 @@ else
             for i=1:size(DeltaPB,1)
                 for j = 1:Nsplit
                     THERING{AT.ATIndex(i,j)}.PolynomB(1) = DeltaPB(i); 
-                    THERING{AT.ATIndex(i,j)}.NPB(1)      = DeltaPB(i);
                 end
             end
             

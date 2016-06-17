@@ -89,7 +89,7 @@ Ri = Ri_next;
 itercount = 1;
 
 % 2012-10-31 Afonso: alterado 5*eps -> 100*eps
-%   Para algumas máquinas, o valor de change converge para números
+%   Para algumas mï¿½quinas, o valor de change converge para nï¿½meros
 %   ligeiramente maiores que 5*eps.
 while (change>100*eps) & (itercount < max_iterations)
     RMATi=[Ri Ri Ri Ri Ri];
@@ -97,6 +97,7 @@ while (change>100*eps) & (itercount < max_iterations)
         RMATi(k,k)=RMATi(k,k)+d;
     end
     RMATf = linepass(RING,RMATi,'reuse');
+    %RMATf = linepass(RING,RMATi);
     
     Rf = RMATf(:,5);
     
@@ -119,6 +120,7 @@ if(nargin<3) | (varargin{1}==(length(RING)+1))
 else            % 3-rd input argument - vector of reference points along the RING
                 % is supplied - return orbit            
    orb6 = linepass(RING,Ri,varargin{1},'reuse'); 
+   %orb6 = linepass(RING,Ri,varargin{1}); 
    orbit = orb6(1:4,:); 
 end
 

@@ -147,50 +147,31 @@ catch
 end
 
 try
-    % HCM
-    AO.hcm.AT.ATType = 'HCM';
+    % CH
+    AO.ch.AT.ATType = 'HCM';
     li = [];
-    if isfield(Indices, 'cm'), li = [li Indices.cm]; end;
+    if isfield(Indices, 'ch'), li = [li Indices.ch]; end;
     if isfield(Indices, 'hcm'), li = [li Indices.hcm]; end;
-    AO.hcm.AT.ATIndex = buildatindex(AO.hcm.FamilyName, sort(li));
-    AO.hcm.Position = findspos(THERING, AO.hcm.AT.ATIndex(:,1))';   
+    AO.ch.AT.ATIndex = buildatindex(AO.ch.FamilyName, sort(li));
+    AO.ch.Position = findspos(THERING, AO.ch.AT.ATIndex(:,1))';   
 catch
-    warning('HCM family not found in the model.');
+    warning('CH family not found in the model.');
 end
 
 
 try
-    % VCM
-    AO.vcm.AT.ATType = 'VCM';
+    % CV
+    AO.cv.AT.ATType = 'VCM';
     li = [];
-    if isfield(Indices, 'cm'), li = [li Indices.cm]; end;
+    if isfield(Indices, 'cv'), li = [li Indices.cv]; end;
     if isfield(Indices, 'vcm'), li = [li Indices.vcm]; end;
-    AO.vcm.AT.ATIndex = buildatindex(AO.vcm.FamilyName, sort(li));
-    AO.vcm.Position = findspos(THERING, AO.vcm.AT.ATIndex(:,1))';   
+    AO.cv.AT.ATIndex = buildatindex(AO.cv.FamilyName, sort(li));
+    AO.cv.Position = findspos(THERING, AO.cv.AT.ATIndex(:,1))';   
 catch
-    warning('VCM family not found in the model.');
+    warning('CV family not found in the model.');
 end
-
-
 
 
 
 setao(AO);
 
-
-
-% Set TwissData at the start of the storage ring
-% try
-%     % BTS twiss parameters at the input
-%     TwissData.alpha = [0 0]';
-%     TwissData.beta  = [15.6475 0.7037]';
-%     TwissData.mu    = [0 0]';
-%     TwissData.ClosedOrbit = [0 0 0 0]';
-%     TwissData.dP = 0;
-%     TwissData.dL = 0;
-%     TwissData.Dispersion  = [0 0 0 0]';
-%     
-%     setpvmodel('TwissData', '', TwissData);  % Same as, THERING{1}.TwissData = TwissData;
-% catch
-%      warning('Setting the twiss data parameters in the MML failed.');
-% end

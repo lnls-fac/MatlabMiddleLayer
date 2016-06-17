@@ -47,8 +47,9 @@ setmmldirectories(AD.Machine, AD.SubMachine, AD.ModeName, AD.OpsFileExtension);
 updateatindex;
 
 % 2015-09-18 Luana
+sirius_set_sextupole_fields;
+
 if AD.SetMultipolesErrors
-    fprintf('   Setting initial values of multipoles errors.\n');
     sirius_init_multipoles_errors;
 end
 
@@ -191,7 +192,7 @@ AD.OperationalMode     = 'V12.C01';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;
 AD.ModeName            = 'C';
-AD.ModeVersion         = '01';
+AD.ModeVersion         = '02';
 AD.OpsFileExtension    = '';
 
 sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);

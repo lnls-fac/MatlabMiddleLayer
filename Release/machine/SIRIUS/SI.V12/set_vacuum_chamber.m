@@ -2,7 +2,7 @@ function the_ring = set_vacuum_chamber(the_ring)
 
 % y = +/- y_lim * (1 - (x/x_lim)^n)^(1/n);
 
-bc_vchamber    = [0.012 0.0055 100]; % n = 100: ~rectangular
+bc_vchamber    = [0.012 0.004 100]; % n = 100: ~rectangular
 other_vchamber = [0.012 0.012 2];   % n = 2;   circular/eliptica
 ivu_vchamber   = [0.012 0.00225 2];   
 ovu_vchamber   = [0.012 0.004 2];

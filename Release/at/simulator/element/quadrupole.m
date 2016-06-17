@@ -16,7 +16,7 @@ function z=quadrupole(fname,L,K,method)
 
 ElemData.FamName = fname;  % add check for existing identical family names
 ElemData.Length = L;
-ElemData.K         = K;
+%ElemData.K         = K;
 ElemData.MaxOrder = 3;
 ElemData.NumIntSteps = 10;
 ElemData.PolynomA= [0 0 0 0];	 

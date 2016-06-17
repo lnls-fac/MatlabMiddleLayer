@@ -1,6 +1,6 @@
-function kicks = sirius_get_kickangle(ring, ind, plane)
+function Kicks = sirius_get_kickangle(Ring, ind, plane)
 
-kicks = zeros(1,size(ind,1));
+Kicks = zeros(1,size(ind,1));
 if ischar(plane) 
     if plane == 'x'
         pl = 1;
@@ -18,22 +18,30 @@ elseif isnumeric(plane)
 end
 
 for ii=1:size(ind,1)
-    if strcmp(ring{ind(ii,1)}.PassMethod, 'CorrectorPass')
-        kicks(ii) = sum(ring{ind(ii,:)}.KickAngle(pl));
-    elseif  strcmp(ring{ind(ii,1)}.PassMethod, 'ThinMPolePass')
+    if strcmp(Ring{ind(ii,1)}.PassMethod, 'CorrectorPass')
+        Kicks(ii) = sum(Ring{ind(ii,:)}.KickAngle(pl));
+    elseif  strcmp(Ring{ind(ii,1)}.PassMethod, 'ThinMPolePass')
         if pl == 1
-            kicks(ii) = -sum(getcellstruct(ring, 'NPB', ind(ii,:), 1, 1));
+            Kicks(ii) = -sum(getcellstruct(Ring, 'PolynomB', ind(ii,:), 1, 1));
         else
-            kicks(ii) = +sum(getcellstruct(ring, 'NPA', ind(ii,:), 1, 1));
+            Kicks(ii) = +sum(getcellstruct(Ring, 'PolynomA', ind(ii,:), 1, 1));
         end
-    elseif any(strcmp(ring{ind(ii,1)}.PassMethod, { ...
+    elseif any(strcmp(Ring{ind(ii,1)}.PassMethod, { ...
             'BndMPoleSymplectic4Pass', 'BndMPoleSymplectic4RadPass', ...
             'StrMPoleSymplectic4Pass', 'StrMPoleSymplectic4RadPass'}))
-        len = getcellstruct(ring, 'Length', ind(ii,:));
+        Len = getcellstruct(Ring, 'Length', ind(ii,:));
         if pl == 1
-            kicks(ii) = -sum(getcellstruct(ring, 'NPB', ind(ii,:), 1, 1) .* len);
+            if isfield(Ring{ind(ii,1)}, 'CH')
+                Kicks(ii) = -sum(getcellstruct(Ring, 'CH', ind(ii,:), 1, 1) .* Len);
+            else
+                Kicks(ii) = -sum(getcellstruct(Ring, 'PolynomB', ind(ii,:), 1, 1) .* Len);
+            end
         else
-            kicks(ii) = +sum(getcellstruct(ring, 'NPA', ind(ii,:), 1, 1) .* len);
+            if isfield(Ring{ind(ii,1)}, 'CV')
+                Kicks(ii) = +sum(getcellstruct(Ring, 'CV', ind(ii,:), 1, 1) .* Len);
+            else
+                Kicks(ii) = +sum(getcellstruct(Ring, 'PolynomA', ind(ii,:), 1, 1) .* Len);
+            end
         end
     else
         error('Element cannot be used as corrector.')
