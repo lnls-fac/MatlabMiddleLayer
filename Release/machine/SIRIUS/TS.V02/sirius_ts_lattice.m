@@ -202,7 +202,7 @@ end
 the_line = set_num_integ_steps(the_line);
 
 % Define Camara de Vacuo
-%the_line = set_vacuum_chamber(the_line);
+the_line = set_vacuum_chamber(the_line);
 
 
 % pre-carrega passmethods de forma a evitar problema com bibliotecas recem-compiladas
