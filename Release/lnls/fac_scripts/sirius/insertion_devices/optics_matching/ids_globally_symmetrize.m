@@ -10,8 +10,9 @@ knobs_idx   = find_knobs_idx(the_ring, params.knobs, params.id_sections);
 % section_markers
 mia  = findcells(the_ring, 'FamName', 'mia');
 mib  = findcells(the_ring, 'FamName', 'mib');
+mip  = findcells(the_ring, 'FamName', 'mip');
 mc  = findcells(the_ring, 'FamName', 'mc');
-optionals = {tunes_goal, mia, mib, mc};
+optionals = {tunes_goal, mia, mib, mip, mc};
 
 fprintf('\nGLOBAL SYMMETRIZATION OF OPTICS:\n');
 respm = ids_calc_response_matrix(the_ring, knobs_idx, @calc_residue_global_symm, optionals, true);
@@ -65,7 +66,8 @@ function residue = calc_residue_global_symm(the_ring, optionals)
 tunes_goal = optionals{1};
 mia        = optionals{2};
 mib        = optionals{3};
-mc         = optionals{4};
+mip        = optionals{4};
+mc         = optionals{5};
 
 % Calculate Twiss parameters:
 % twiss = calctwiss(the_ring, 'n+1');
@@ -82,12 +84,14 @@ scale_tune  = 1e5;
 scale_beta  = 1e1;
 
 residue = (tunes - tunes_goal)' * scale_tune * 80;
-residue = [residue; twiss.alphax([mia, mib, mc]) * scale_alpha];
-residue = [residue; twiss.alphay([mia, mib, mc]) * scale_alpha];
+residue = [residue; twiss.alphax([mia, mib, mip, mc]) * scale_alpha];
+residue = [residue; twiss.alphay([mia, mib, mip, mc]) * scale_alpha];
 residue = [residue; (twiss.betax(mia)-twiss.betax(circshift(mia,[0,1]))) * scale_beta];
 residue = [residue; (twiss.betax(mib)-twiss.betax(circshift(mib,[0,1]))) * scale_beta];
+residue = [residue; (twiss.betax(mip)-twiss.betax(circshift(mip,[0,1]))) * scale_beta];
 residue = [residue; (twiss.betay(mia)-twiss.betay(circshift(mia,[0,1]))) * scale_beta];
 residue = [residue; (twiss.betay(mib)-twiss.betay(circshift(mib,[0,1]))) * scale_beta];
+residue = [residue; (twiss.betay(mip)-twiss.betay(circshift(mip,[0,1]))) * scale_beta];
 
 % residue = [residue;  twiss.etaxl(etaxl_idx) / scale_alpha];
 % residue = [residue;  twiss.etax(etax_idx) / scale_eta];

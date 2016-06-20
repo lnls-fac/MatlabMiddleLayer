@@ -1,7 +1,7 @@
 function [POS, HBSC, VBSC] = sirius_plot_BSC(maquina,tipo,save_fig,e_spread)
 %Funcao que faz o grafico do tamanho do feixe apenas no booster e anel de
 %armazenmento.  +
-%Antes de executar esse script e necessario rodar o camando
+%Antes de executar esse script e necessario rodar o comando
 %sirius('versao') para carregar os caminhos no matlab
 %variaveis de entrada:
 %   maquina - string indicando a maquina que deseja fazer os grafico, pode
@@ -27,6 +27,11 @@ if ~exist('tipo', 'var'), tipo = 1; end
 if ~exist('save_fig','var'), save_fig = false; end
 
 
+if strcmp(maquina,'BO')
+    plot_bo(maquina);
+    return;
+end
+    
 %Carrega a rede e titulo da maquina desejada
 if strcmp(maquina,'si')
     [THERING titulo]=sirius_si_lattice;
@@ -44,6 +49,7 @@ if strcmp(maquina,'si')
     e_spread=param.naturalEnergySpread;
     delta = 0.06;
 elseif strcmp(maquina,'bo')
+    error('This is to be reviewed. BO has a specific way for the BSC to be calculated!');
     [THERING titulo]=sirius_bo_lattice;
     titulo=regexprep(titulo,'_','-');
     %Calcula parametros de twiss da rede
@@ -217,4 +223,6 @@ end
 POS  = twiss.pos(ini:fim);
 HBSC = HBSC(ini:fim);
 VBSC = VBSC(ini:fim);
+
+
 

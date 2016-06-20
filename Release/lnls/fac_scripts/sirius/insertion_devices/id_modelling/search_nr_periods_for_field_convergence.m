@@ -12,6 +12,7 @@ while (true)
     if (maxdiff < 1e-6) || (nr_periods >= id_def.nr_periods), break; end
     fs = new_fs;
 end
+nr_periods = nr_periods - 4; % avoids unnecessary running out of parameter
 nr_periods = min([nr_periods, id_def.nr_periods]);
 
 

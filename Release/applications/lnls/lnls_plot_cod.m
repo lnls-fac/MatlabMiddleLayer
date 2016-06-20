@@ -2,7 +2,7 @@ function lnls_plot_cod(default_path)
 
 
 prompt = {'Submachine (bo/si)', 'COD unit (um/mm)', 'symmetry', 'plot title', 'corrected?(y/n)'};
-defaultanswer = {'si', 'um', '20', 'v10.c01','y'};
+defaultanswer = {'si', 'mm', '20', 'SI.V14.C03','n'};
 answer = inputdlg(prompt,'Select submachine and trackcpp algorithms to run',1,defaultanswer);
 if isempty(answer), return; end;
 submachine = answer{1};
@@ -28,6 +28,7 @@ r = load(fname); machine = r.machine;
 s = findspos(machine{1}, 1:length(machine{1}));
 s_max = s(end)/symmetry;
 
+
 % calcs closed-orbit, store them in matriz
 if strcmpi(unit, 'um')
     factor = 1e6;
@@ -41,7 +42,11 @@ codpy = zeros(length(machine), length(machine{1}));
 
 try
     fam_data = sirius_si_family_data(machine{1});
-    ch = 'ch';cv = 'cv';
+    if isfield(fam_data, 'cvs')
+        ch = 'chs';cv = 'cvs';
+    else
+        ch = 'ch';cv = 'cv';
+    end
 catch
     fam_data = sirius_bo_family_data(machine{1});
     ch = 'ch';cv = 'cv';
@@ -59,7 +64,7 @@ for i=1:length(machine)
     if ~corrected
         machine{i} = lnls_set_kickangle(machine{i},0.0*hcms,hcms,'x');
         machine{i} = lnls_set_kickangle(machine{i},0.0*vcms,vcms,'y');
-        machine{i} = setcellstruct(machine{i},'PolynomB',sexts,0,1,3);
+        machine{i} = turn_multipoles_off(machine{i}, sexts);
     end
     orb = findorbit4(machine{i}, 0, 1:length(machine{i}));
     codrx(i,:) = factor * orb(1,:);
@@ -115,3 +120,16 @@ xlabel('s [m]', 'FontSize', size_font); ylabel(['COD [' unit ']'], 'FontSize', s
 set(gca, 'FontSize', 15);
 title(plot_title, 'FontSize', size_font);
 
+function the_ring = turn_multipoles_off(the_ring0, idx)
+
+the_ring = setcellstruct(the_ring0, 'MaxOrder', idx, 1);
+
+% the_ring = the_ring0;
+% for i=idx
+%     PolyB = getcellstruct(the_ring, 'PolynomB', i);
+%     PolyA = getcellstruct(the_ring, 'PolynomA', i);
+%     PolyB{1}(3:end) = 0; PolyA{1}(3:end) = 0;
+%     PolyB{1}(1) = 0; PolyA{1}(1) = 0;
+%     the_ring = setcellstruct(the_ring, 'PolynomB', i, PolyB);
+%     the_ring = setcellstruct(the_ring, 'PolynomA', i, PolyA);
+% end

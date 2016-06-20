@@ -3,6 +3,13 @@ function [dynapt, area, dados] = trackcpp_load_dynap_xy(pathname, var_plane)
 nr_header_lines = 13;
 fname = fullfile(pathname, 'dynap_xy_out.txt');
 
+if ~exist(fname,'file')
+    dynapt = [];
+    area = 0;
+    dados = struct();
+    return;
+end
+
 %variável para determinar o tipo de varredura no calculo da abertura;
 if ~exist('var_plane','var');
      var_plane = 'y';  % varredura em y ou varredura em x;

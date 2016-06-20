@@ -1,11 +1,12 @@
 function lnls_plot_lattice(the_ring, smin, smax, y, dy)
 
 bends = findcells(the_ring, 'BendingAngle');
-sexts = setdiff(findcells(the_ring, 'PolynomB'), bends);
-sexts = sexts(getcellstruct(the_ring, 'PolynomB', sexts, 1, 3) ~= 0);
-quads = setdiff(findcells(the_ring, 'K'), [bends, sexts]);
+multi = setdiff(findcells(the_ring, 'PolynomB'), bends);
+sexts = multi(getcellstruct(the_ring, 'PolynomB', multi, 1, 3) ~= 0);
+quads = setdiff(multi, sexts);
+
 if ~isempty(quads)
-    quads_qf = (getcellstruct(the_ring, 'K', quads) >= 0);
+    quads_qf = (getcellstruct(the_ring, 'PolynomB', quads, 1, 2) >= 0);
 else
     quads_qf = [];
 end
@@ -36,7 +37,7 @@ end
 % plots quadrupoles
 for i=1:size(quads_pos, 1)
     pos = get_pos(quads_pos(i,:), smin, smax);
-    if isempty(pos), continue; end;
+    if (isempty(pos) || diff(pos)==0), continue; end;
     if quads_qf(i)
         rectangle('Position', [pos(1),y,diff(pos),quads_height], 'FaceColor', 'b', 'EdgeColor', 'b');
     else
@@ -47,7 +48,7 @@ end
 % plots sextupoles
 for i=1:size(sexts_pos, 1)
     pos = get_pos(sexts_pos(i,:), smin, smax);
-    if isempty(pos), continue; end;
+    if (isempty(pos) || diff(pos)==0), continue; end;
     rectangle('Position', [pos(1),y-sexts_height/2,diff(pos),sexts_height], 'FaceColor', [0,0.8,0], 'EdgeColor', [0,0.8,0]);
 end
 

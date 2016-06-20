@@ -13,9 +13,9 @@ function r = atsummary(varargin)
 %  Written by Eugene Tan
 %  Revised by Laurent S. Nadolski
 %  Modified by Ximenes Resende (for more than one RF cavity)
-%  2012-06-25: mudan�a de rho^3 para abs(rho^3) em I5!
+%  2012-06-25: mudan???a de rho^3 para abs(rho^3) em I5!
 %  2012-07-04: modified by Afonso Mukai (lifetime calculations)
-%  2012-08-29: elementos dipolares refinados para calculo mais preciso das integrais de radia��o.
+%  2012-08-29: elementos dipolares refinados para calculo mais preciso das integrais de radia??????o.
 
 
 global THERING
@@ -27,6 +27,7 @@ end
 
 
 const = lnls_constants;
+
 
 % Refine dipole elements for better calculation of radiation integrals
 max_length = 0.05;
@@ -49,6 +50,11 @@ r.twiss.alpha       = cat(1,TD.alpha);
 r.twiss.ClosedOrbit = [TD.ClosedOrbit]';
 r.twiss.Dispersion  = [TD.Dispersion]';
 r.twiss.SPos        = cat(1,TD.SPos);
+
+if exist('lnls_turn_sextupoles_off','file')
+    the_ring2 = lnls_turn_sextupoles_off(the_ring);
+    [~, ~, r.natural_chromaticity] = twissring(the_ring2, 0, 1:length(the_ring)+1, 'chrom', 1e-8);
+end
 
 r.compactionFactor = mcf(the_ring);
 
@@ -138,38 +144,41 @@ r.the_ring = the_ring;
 % Lifetime and pressure - Afonso 2012-07-02 - Ximenes 2015-06-13
 try
     AD = getad; 
-  
-    pressure_file = fullfile(getmmlroot,'machine',AD.Machine,AD.SubMachine,AD.OpsData.PrsProfFile);
-    if(exist(pressure_file,'file'))
-        [lifetime,pressure] = lnls_calcula_tau(r,AD,-1,-1);
+    if ~isempty(AD)
+        pressure_file = fullfile(getmmlroot,'machine',AD.Machine,AD.SubMachine,AD.OpsData.PrsProfFile);
+        if(exist(pressure_file,'file'))
+            [lifetime,pressure] = lnls_calcula_tau(r,AD,-1,-1);
+        else
+            [lifetime,pressure] = lnls_calcula_tau(r,AD,AD.AveragePressure,-1);
+        end
+
+        if(isnumeric(lifetime.total))
+            r.lifetime = lifetime.total;
+        elseif(isfield(r,'lifetime'))
+            r = rmfield(r,'lifetime');
+        end
+        if(isnumeric(pressure.average))
+            r.avgpressure = pressure.average;
+        elseif(isfield(r,'pressure'))
+            r = rmfield(r,'pressure');
+        end
+        lifetime.quantum   = num2str(lifetime.quantum,'%0.2g');
+        lifetime.elastic   = num2str(lifetime.elastic,'%0.2f');
+        lifetime.inelastic = num2str(lifetime.inelastic,'%0.2f');
+        lifetime.touschek  = num2str(lifetime.touschek,'%0.2f');
+        lifetime.total     = num2str(lifetime.total,'%0.2f');
+        if(strcmp(pressure.average,'Not available'))
+            presprofileinfo = '';
+        else
+            presprofileinfo = ['(''' AD.OpsData.PrsProfFile ''')'];
+        end
+        pressure.average   = num2str(pressure.average,'%0.2e');
+        lifetime.calc = 1;
     else
-        [lifetime,pressure] = lnls_calcula_tau(r,AD,AD.AveragePressure,-1);
+        lifetime.calc = 0;
     end
-   
-    if(isnumeric(lifetime.total))
-        r.lifetime = lifetime.total;
-    elseif(isfield(r,'lifetime'))
-        r = rmfield(r,'lifetime');
-    end
-    if(isnumeric(pressure.average))
-        r.avgpressure = pressure.average;
-    elseif(isfield(r,'pressure'))
-        r = rmfield(r,'pressure');
-    end
-    lifetime.quantum   = num2str(lifetime.quantum,'%0.2g');
-    lifetime.elastic   = num2str(lifetime.elastic,'%0.2f');
-    lifetime.inelastic = num2str(lifetime.inelastic,'%0.2f');
-    lifetime.touschek  = num2str(lifetime.touschek,'%0.2f');
-    lifetime.total     = num2str(lifetime.total,'%0.2f');
-    if(strcmp(pressure.average,'Not available'))
-        presprofileinfo = '';
-    else
-        presprofileinfo = ['(''' AD.OpsData.PrsProfFile ''')'];
-    end
-    pressure.average   = num2str(pressure.average,'%0.2e');
-    lifetime.calc =1;
 catch
-    lifetime.calc= 0;
+    lifetime.calc = 0;
 end
 
 
@@ -183,15 +192,17 @@ if nargout == 0
     fprintf('   Revolution time: \t\t%4.5f [ns] (%4.5f [MHz]) \n', r.revTime*1e9,r.revFreq*1e-6);
     fprintf('   Betatron tune H: \t\t%4.5f (%4.5f [kHz])\n', r.tunes(1),abs(r.tunes(1)-round(r.tunes(1)))/r.revTime*1e-3);
     fprintf('                 V: \t\t%4.5f (%4.5f [kHz])\n', r.tunes(2),abs(r.tunes(2)-round(r.tunes(2)))/r.revTime*1e-3);
-    fprintf('   Momentum Compaction Factor: \t%4.5f\n', r.compactionFactor);
+    fprintf('   Momentum Compaction Factor: \t%4.5e\n', r.compactionFactor);
     fprintf('   Chromaticity H: \t\t%+4.5f\n', r.chromaticity(1));
     fprintf('                V: \t\t%+4.5f\n', r.chromaticity(2));
-    fprintf('   Synchrotron Integral 1: \t%4.5f [m]\n', r.integrals(1));
-    fprintf('                        2: \t%4.5f [m^-1]\n', r.integrals(2));
-    fprintf('                        3: \t%4.5f [m^-2]\n', r.integrals(3));
-    fprintf('                        4: \t%4.5f [m^-1]\n', r.integrals(4));
-    fprintf('                        5: \t%4.5f [m^-1]\n', r.integrals(5));
-    fprintf('                        6: \t%4.5f [m^-1]\n', r.integrals(6));
+    fprintf('    (natural)   H: \t\t%+4.5f\n', r.natural_chromaticity(1));
+    fprintf('                V: \t\t%+4.5f\n', r.natural_chromaticity(2));
+    fprintf('   Synchrotron Integral 1: \t%4.5e [m]\n', r.integrals(1));
+    fprintf('                        2: \t%4.5e [m^-1]\n', r.integrals(2));
+    fprintf('                        3: \t%4.5e [m^-2]\n', r.integrals(3));
+    fprintf('                        4: \t%4.5e [m^-1]\n', r.integrals(4));
+    fprintf('                        5: \t%4.5e [m^-1]\n', r.integrals(5));
+    fprintf('                        6: \t%4.5e [m^-1]\n', r.integrals(6));
     fprintf('   Damping Partition H: \t%4.5f\n', r.damping(1));
     fprintf('                     V: \t%4.5f\n', r.damping(2));
     fprintf('                     E: \t%4.5f\n', r.damping(3));
@@ -201,7 +212,7 @@ if nargout == 0
     fprintf('   Radiation Damping H: \t%4.5f [ms]\n', r.radiationDamping(1)*1e3);
     fprintf('                     V: \t%4.5f [ms]\n', r.radiationDamping(2)*1e3);
     fprintf('                     E: \t%4.5f [ms]\n', r.radiationDamping(3)*1e3);
-    fprintf('   Slip factor : \t%4.5f\n', r.etac);
+    fprintf('   Slip factor : \t%4.5e\n', r.etac);
     fprintf('\n');
     fprintf('   Assuming cavities Voltage: %4.5f [kV]\n', v_cav/1e3);
     fprintf('                   Frequency: %4.5f [MHz]\n', freq/1e6);

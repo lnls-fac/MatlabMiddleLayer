@@ -52,7 +52,7 @@ for i=1:(length(pos)-1)
         rectangle('Position',[s,-1*scale+offset,len,2*scale], 'FaceColor', [0 0.535 0.711], 'EdgeColor', [0 0.535 0.711],'Parent',h);
         print_name = true;
     elseif isfield(the_ring{i}, 'PolynomB')
-        if any(strcmpi(the_ring{i}.FamName,{'kick_in','pmm','cf','cv'}))
+        if any(strcmpi(the_ring{i}.FamName,{'kick_in','pmm','dipk', 'nlk','cf','cv'}))
             line([s s+len], [0+offset 0+offset], 'Color', [0 0 0],'Parent',h);
         elseif the_ring{i}.PolynomB(3) ~= 0 && the_ring{i}.PolynomB(2) == 0
             rectangle('Position',[s,-1*scale+offset,len,2*scale], 'FaceColor', [0.539 0.598 0.465], 'EdgeColor', [0.539 0.598 0.465],'Parent',h);

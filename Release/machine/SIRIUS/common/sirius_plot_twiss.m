@@ -190,7 +190,7 @@ else
     f1 = figure('Color',[1 1 1],'Position', [1 1 900 650]);
     
     %Grafico dispersao horizontal
-    axes('Units','pixels','Position',[70 365 780 245],'XTickLabel',{},'FontSize',FnSz);
+    axes('Units','pixels','Position',[70 415 780 195],'XTickLabel',{},'FontSize',FnSz);
     title(['Twiss functions - ' titulo], 'FontWeight','bold');
     hold all;
     plot(twiss.pos(ini:fim),100*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
@@ -201,13 +201,13 @@ else
     box on;
     
     %Grafico rede magnetica
-    axes('Units','pixels','Position',[70 315 780 50]);
-    lnls_drawlattice(THERING,sym,0,true,1,true,true);
+    axes('Units','pixels','Position',[70 380 780 20]);
+    lnls_drawlattice(THERING,sym,0,true,1,false,false);
     xlim(xlimit);
     axis off;
     
     %Grafico funcoes betatron
-    axes('Units','pixels','Position',[70 70 780 245],'FontSize',FnSz);
+    axes('Units','pixels','Position',[70 70 780 295],'FontSize',FnSz);
     hold all;
     xlim(xlimit);
     plot(twiss.pos(ini:fim),twiss.betax(ini:fim),'LineWidth',LnWd,'Color',BxCl);
