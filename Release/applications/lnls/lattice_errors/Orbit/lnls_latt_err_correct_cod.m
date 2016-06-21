@@ -144,8 +144,8 @@ for i=1:nr_machines
         end
         [machine{i},hkck,vkck,codx,cody,niter(j),ntimes(j)] = cod_sg(orbit, machine{i}, gcodx, gcody);
         if any(isnan([codx,cody]))
-            fprintf('Machine %03i unstable @ sextupole ramp = %5.1f %%\n',i,sextupole_ramp(j)*100);
-            machine{i} = setcellstruct(machine{i},'PolynomB',sext_idx, sext_str, 1, 3);
+            fprintf('Machine %03i unstable @ sextupole ramp = %5.1f %%\n',i,orbit.sext_ramp(j)*100);
+            machine{i} = setcellstruct(machine{i},'PolynomB',sext_idx, {polynomb_orig});
             break;
         end
     end
