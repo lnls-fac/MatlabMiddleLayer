@@ -167,7 +167,7 @@ SFP2 = sextupole('sfp2', 0.150, sfp2_strength, sext_pass_method); % CH-CV
 CV   = sextupole('cv',        0.150, 0.0, sext_pass_method); % same model as BO correctors
 
 % -- pulsed magnets --
-KICKIN = sextupole('kick_in', 0.500, 0.0, sext_pass_method); % injection kicker
+DIPK = sextupole('dipk', 0.500, 0.0, sext_pass_method); % injection kicker
 PMM    = sextupole('pmm',     0.470, 0.0, sext_pass_method); % pulsed multipole magnet
 
 % -- bpms and fast correctors --
@@ -202,7 +202,7 @@ M2A      = fliplr(M1A);                                                         
 M2B      = fliplr(M1B);                                                                              % low beta xxM2 girder
 M2P      = fliplr(M1P);                                                                               % low beta xxM2 girder
 IDA      = [L500,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];                           % high beta ID straight section
-INJ      = [L500,LIA,L419,SEPTIN,L081,L500,L500,END,START,MIA,LKK,KICKIN,LPMU,PMM,LPMD];              % high beta INJ straight section
+INJ      = [L500,LIA,L419,SEPTIN,L081,L500,L500,END,START,MIA,LKK,DIPK,LPMU,PMM,LPMD];              % high beta INJ straight section
 IDB      = [L500,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,L500];                           % low beta ID straight section
 IDP      = [L500,LIP,L500,MIDP,L500,L500,MIP,L500,L500,MIDP,L500,LIP,L500];                           % low beta ID straight section
 CAV      = [L500,LIP,L500,L500,L500,MIP,RFC,L500,L500,L500,LIP,L500];                                 % low beta RF cavity straight section 
