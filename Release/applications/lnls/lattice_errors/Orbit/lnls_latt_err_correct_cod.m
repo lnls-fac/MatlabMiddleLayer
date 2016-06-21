@@ -101,9 +101,11 @@ for i=1:nr_machines
     polynomb_orig = getcellstruct(machine{i}, 'PolynomB', sext_idx);
     
     if orbit.simul_bpm_err
-        if isfield(machine{i}, 'Offsets')
+        try
             random_cod = getcellstruct(machine{i},'Offsets',orbit.bpm_idx);
             random_cod = cell2mat(random_cod)';
+        catch
+            error('BPM offset errors are not defined.');
         end
     end
     if orbit.correct2bba_orbit
