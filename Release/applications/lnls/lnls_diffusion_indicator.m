@@ -1,4 +1,5 @@
-function [aper2,aper3,diff_ind,x] = lnls_diffusion_indicator(ring, plane, pos, plota, window, offset)
+function [aper2,aper3,diff_ind,tunes,x] = lnls_diffusion_indicator(ring,...
+    plane, pos, plota, window, offset)
 
 if ~exist('pos','var'), pos = 0.0; end
 if ~exist('plota','var'), plota = false; end
@@ -16,7 +17,7 @@ nturns = 2*(2^n + 6 - mod(2^n,6)) - 1;
 offset([2,4]) = offset([2,4]) + 1e-6; % a small delta to exclude singularity;
 if strcmpi(plane,'x')
     pos = 0.0;
-    lim = 1e-5;
+    lim = 1e-04;
     pl = 1;
     xi =  -6e-3;
     xf = -13e-3;
@@ -24,21 +25,21 @@ if strcmpi(plane,'x')
     np = 351;
 elseif strcmpi(plane,'y')
     pos = 0.0;
-    lim = 5e-5;
+    lim = 1e-04;
     pl = 3;
     xi = 2e-3;
     xf = 3e-3;
     expoent = 1;
     np = 351;
 elseif strcmpi(plane,'ep')
-    lim = 2e-5;
+    lim = 1e-04;
     pl = 5;
     xi = 2e-2;
     xf = 5e-2;
     expoent = 1;
     np = 351;
 elseif strcmpi(plane,'en')
-    lim = 2e-5;
+    lim = 1e-04;
     pl = 5;
     xi = -2e-2;
     xf = -5e-2;
@@ -66,58 +67,16 @@ y0  = reshape(Rou(3,:),[],nturns+1);
 yl = reshape(Rou(4,:),[],nturns+1);
 ind = ~isnan(x0(:,end));
 
-%-----OLD-WAY-----%
-% tunex = NaN*ones(size(Rin,2),2);
-% tuney = NaN*ones(size(Rin,2),2);
-% amplx = NaN*ones(size(Rin,2),2);
-% amply = NaN*ones(size(Rin,2),2);
-% [tunex(ind,:) amplx(ind,:)] = lnls_calcnaff(x0(ind,1:end/2), xl(ind,1:end/2),2);
-% [tuney(ind,:) amply(ind,:)] = lnls_calcnaff(y0(ind,1:end/2), yl(ind,1:end/2),2);
-% 
-% tune1 = [tunex, tuney];
-% ampl1 = [amplx, amply];
-% [~,ind1] = sort(ampl1,2,'descend');
-% for j=1:length(x0)
-%     tune1(j,:) = tune1(j,ind1(j,:));
-% end
-% 
-% tunex = NaN*ones(size(Rin,2),2);
-% tuney = NaN*ones(size(Rin,2),2);
-% amplx = NaN*ones(size(Rin,2),2);
-% amply = NaN*ones(size(Rin,2),2);
-% [tunex(ind,:) amplx(ind,:)] = lnls_calcnaff(x0(ind,end/2+1:end), xl(ind,end/2+1:end),2);
-% [tuney(ind,:) amply(ind,:)] = lnls_calcnaff(y0(ind,end/2+1:end), yl(ind,end/2+1:end),2);
-% 
-% tune2 = [tunex, tuney];
-% ampl2 = [amplx, amply];
-% [~,ind2] = sort(ampl2,2,'descend');
-% for j=1:length(x0)
-%     tune2(j,:) = tune2(j,ind2(j,:));
-% end
-% 
-% diff_ind = sqrt( (tune2(:,1)-tune1(:,1)).^2 + (tune2(:,2)-tune1(:,2)).^2 );
-% 
-% if plota
-%     figure('OuterPosition',[633*1,540*(1-0),633, 540]);
-%     plot(x,diff_ind);
-% end
-% 
-% ind0 = find(diff_ind > lim,1,'first');if isempty(ind0), ind0 = length(x); end;
-% aper2  = x(ind0);
-% 
-% aper3 = 0;
-%-----OLD-WAY-----%
-
-
-
 %--------Diffusion--------%
 
 tunex = NaN*ones(size(Rin,2),ntunes);
 tuney = NaN*ones(size(Rin,2),ntunes);
 amplx = NaN*ones(size(Rin,2),ntunes);
 amply = NaN*ones(size(Rin,2),ntunes);
-[tunex(ind,:) amplx(ind,:)] = lnls_calcnaff(x0(ind,1:end/2), xl(ind,1:end/2),ntunes);
-[tuney(ind,:) amply(ind,:)] = lnls_calcnaff(y0(ind,1:end/2), yl(ind,1:end/2),ntunes);
+[tunex(ind,:) amplx(ind,:)] = lnls_calcnaff(x0(ind,1:end/2),...
+    xl(ind,1:end/2),ntunes);
+[tuney(ind,:) amply(ind,:)] = lnls_calcnaff(y0(ind,1:end/2),...
+    yl(ind,1:end/2),ntunes);
 
 tune1 = [tunex, tuney];
 ampl1 = [amplx, amply];
@@ -130,8 +89,12 @@ tunex = NaN*ones(size(Rin,2),ntunes);
 tuney = NaN*ones(size(Rin,2),ntunes);
 amplx = NaN*ones(size(Rin,2),ntunes);
 amply = NaN*ones(size(Rin,2),ntunes);
-[tunex(ind,:) amplx(ind,:)] = lnls_calcnaff(x0(ind,end/2+1:end), xl(ind,end/2+1:end),ntunes);
-[tuney(ind,:) amply(ind,:)] = lnls_calcnaff(y0(ind,end/2+1:end), yl(ind,end/2+1:end),ntunes);
+[tunex(ind,:) amplx(ind,:)] = lnls_calcnaff(x0(ind,end/2+1:end),...
+    xl(ind,end/2+1:end),ntunes);
+[tuney(ind,:) amply(ind,:)] = lnls_calcnaff(y0(ind,end/2+1:end),...
+    yl(ind,end/2+1:end),ntunes);
+
+tunes = [tunex(:,1) tuney(:,1)];
 
 tune2 = [tunex, tuney];
 ampl2 = [amplx, amply];
@@ -159,13 +122,16 @@ aper2  = x(ind0);
 tunex = lnls_calcnaff(x0(ind,:), xl(ind,:));
 tuney = lnls_calcnaff(y0(ind,:), yl(ind,:));
 
-for j = 1:size(x0(ind,:),1)
-    if window(:,[1 2])*[tunex(j); tuney(j)] > window(:,end)
-        break;
-    end
-end
+% for j = 1:size(x0(ind,:),1)
+%     if any(window(:,[1 2])*[tunex(j); tuney(j)] > window(:,3))
+%         break;
+%     end
+% end
 
-aper3 = x(j);
+C = window(:,[1,2]) * [tunex,tuney]';
+idx = any(C > repmat(window(:,3),1,size(C,2)),1);
+w_ind = find(idx > 0,1,'first'); if isempty(w_ind), w_ind = length(x); end;
+aper3 = x(w_ind);
 
 %------------------------%
 
