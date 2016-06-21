@@ -5,22 +5,16 @@ function sirius_init
 
 % 2012-07-10 Modificado para sirius3_lattice_e025 - Afonso
 
-
 setao([]);
 setad([]);
 
 % Base on the location of this file
 [SIRIUS_ROOT, ~, ~] = fileparts(mfilename('fullpath'));
 
-AD.Directory.ExcDataDir  = '/home/fac_files/siriusdb/excitation_curves';
-
-%AD.Directory.ExcDataDir = [SIRIUS_ROOT, filesep, 'excitation_curves'];
+root_folder = lnls_get_root_folder();
+AD.Directory.ExcDataDir  = fullfile(root_folder, 'siriusdb/excitation_curves');
 AD.Directory.LatticesDef = [SIRIUS_ROOT, filesep, 'lattices_def'];
 setad(AD);
-
-% Add additional directories with SIRIUS_V03 specific stuff.
-%MMLROOT = getmmlroot('IgnoreTheAD');
-%addpath(fullfile(MMLROOT,'machine','SIRIUS_V03','StorageRing','scripts'), '-begin');
 
 
 %% dipoles
