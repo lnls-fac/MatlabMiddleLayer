@@ -59,7 +59,7 @@ the_ring = circshift(the_ring,[0,bpm(1)]);
 
 % Set injection vacuum chamber
 inj = findcells(the_ring, 'FamName', 'eseptinj');
-kickin = findcells(the_ring, 'FamName', 'kick_in');
+kickin = findcells(the_ring, 'FamName', 'dipk');
 if (inj(end) > kickin(1))
     for i=[inj(end):length(the_ring) 1:kickin(end)]
         the_ring{i}.VChamber = inj_vchamber;

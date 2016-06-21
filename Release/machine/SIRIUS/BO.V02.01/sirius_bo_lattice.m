@@ -81,7 +81,7 @@ SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
 BPM  = marker('bpm',     'IdentityPass');
 
-KIN  = quadrupole('kick_in', 0.500,     0.0,         quad_pass_method);
+KIN  = quadrupole('injk', 0.500,     0.0,         quad_pass_method);
 KEX  = quadrupole('kick_ex', 0.500,     0.0,         quad_pass_method);
 
 CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);

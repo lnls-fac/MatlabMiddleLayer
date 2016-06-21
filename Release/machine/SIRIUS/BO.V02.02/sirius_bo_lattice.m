@@ -81,8 +81,8 @@ SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
 BPM  = marker('bpm',     'IdentityPass');
 
-KIN  = quadrupole('kick_in', 0.500,     0.0,         quad_pass_method);
-KEX  = quadrupole('kick_ex', 0.500,     0.0,         quad_pass_method);
+KIN  = quadrupole('injk', 0.500,     0.0,         quad_pass_method);
+KEX  = quadrupole('ejek', 0.500,     0.0,         quad_pass_method);
 
 CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);
 CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
@@ -238,9 +238,9 @@ for i=b
 end
 
 % extraction bend
-kick_ex = findcells(the_ring, 'FamName', 'kick_ex');
+ejek = findcells(the_ring, 'FamName', 'ejek');
 sept_ex = findcells(the_ring, 'FamName', 'sept_ex');
-b_ex = b((b > kick_ex(end)) & (b < sept_ex(1)));
+b_ex = b((b > ejek(end)) & (b < sept_ex(1)));
 for i=b_ex
     the_ring{i}.VChamber = other_vchamber;
 end
