@@ -101,9 +101,11 @@ for i=1:nr_machines
     polynomb_orig = getcellstruct(machine{i}, 'PolynomB', sext_idx);
     
     if orbit.simul_bpm_err
-        if isfield(machine{i}, 'Offsets')
+        try
             random_cod = getcellstruct(machine{i},'Offsets',orbit.bpm_idx);
             random_cod = cell2mat(random_cod)';
+        catch
+            error('BPM offset errors are not defined.');
         end
     end
     if orbit.correct2bba_orbit
@@ -142,8 +144,8 @@ for i=1:nr_machines
         end
         [machine{i},hkck,vkck,codx,cody,niter(j),ntimes(j)] = cod_sg(orbit, machine{i}, gcodx, gcody);
         if any(isnan([codx,cody]))
-            fprintf('Machine %03i unstable @ sextupole ramp = %5.1f %%\n',i,sextupole_ramp(j)*100);
-            machine{i} = setcellstruct(machine{i},'PolynomB',sext_idx, sext_str, 1, 3);
+            fprintf('Machine %03i unstable @ sextupole ramp = %5.1f %%\n',i,orbit.sext_ramp(j)*100);
+            machine{i} = setcellstruct(machine{i},'PolynomB',sext_idx, {polynomb_orig});
             break;
         end
     end

@@ -73,12 +73,12 @@ D2146    = drift('d2146',  2.1460-lenDif,  'DriftPass');
 STR  = marker('start',   'IdentityPass');     % start of the model
 FIM  = marker('end',     'IdentityPass');     % end of the model
 GIR  = marker('girder',  'IdentityPass');
-KIN  = marker('kick_in', 'IdentityPass');
+KIN  = marker('injk', 'IdentityPass');
 SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
 mqf  = marker('mqf',     'IdentityPass');
 
-KEX  = quadrupole('kick_ex', 0.5, 0.0, quad_pass_method);
+KEX  = quadrupole('ejek', 0.5, 0.0, quad_pass_method);
 
 QD   = quadrupole('qd', 0.100740, qd_strength, quad_pass_method);
 QFI  = quadrupole('qf', 0.100000, qf_strength, quad_pass_method);
