@@ -14,37 +14,30 @@ ntunes = 2;
 n = 7;
 nturns = 2*(2^n + 6 - mod(2^n,6)) - 1;
 
+expoent = 1;
+np = 351;
+
 offset([2,4]) = offset([2,4]) + 1e-6; % a small delta to exclude singularity;
 if strcmpi(plane,'x')
-    pos = 0.0;
-    lim = 1e-04;
+    lim_dif = 1e-04;
     pl = 1;
     xi =  -6e-3;
     xf = -13e-3;
-    expoent = 1;
-    np = 351;
 elseif strcmpi(plane,'y')
-    pos = 0.0;
-    lim = 1e-04;
+    lim_dif = 1e-04;
     pl = 3;
     xi = 2e-3;
     xf = 3e-3;
-    expoent = 1;
-    np = 351;
 elseif strcmpi(plane,'ep')
-    lim = 1e-04;
+    lim_dif = 1e-04;
     pl = 5;
     xi = 2e-2;
     xf = 5e-2;
-    expoent = 1;
-    np = 351;
 elseif strcmpi(plane,'en')
-    lim = 1e-04;
+    lim_dif = 1e-04;
     pl = 5;
     xi = -2e-2;
     xf = -5e-2;
-    expoent = 1;
-    np = 351;
 end
     
 % Shift the ring to the point where the tracking will be done:
@@ -103,7 +96,7 @@ for j = 1:size(x0,1)
     tune2(j,:) = tune2(j,ind2(j,:));
 end
 
-diff_ind = sqrt(sum(tune2(:,1:ntunes)-tune1(:,1:ntunes),2).^2);
+diff_ind = sqrt(sum( (tune2(:,1:ntunes)-tune1(:,1:ntunes)).^2 ,2));
 
 if plota
     figure('OuterPosition',[633*1,540*(1-0),633, 540]);
@@ -114,8 +107,11 @@ if plota
     ylabel('diffusion')
 end
 
-ind0 = find(diff_ind > lim,1,'first');if isempty(ind0), ind0 = length(x); end;
-aper2  = x(ind0);
+ind0 = max(find(isnan(x0(:,end)),1,'first')-1,1); if isempty(ind0), ind0=length(x); end;
+%aper0 = x(ind0);
+
+ind2 = find(diff_ind > lim_dif,1,'first');if isempty(ind2), ind2 = length(x); end;
+aper2  = x(min([ind2,ind0]));
 
 %---------Window---------%
 
@@ -130,8 +126,8 @@ tuney = lnls_calcnaff(y0(ind,:), yl(ind,:));
 
 C = window(:,[1,2]) * [tunex,tuney]';
 idx = any(C > repmat(window(:,3),1,size(C,2)),1);
-w_ind = find(idx > 0,1,'first'); if isempty(w_ind), w_ind = length(x); end;
-aper3 = x(w_ind);
+ind3 = find(idx > 0,1,'first'); if isempty(ind3), ind3 = length(x); end;
+aper3 = x(min([ind3,ind0]));
 
 %------------------------%
 

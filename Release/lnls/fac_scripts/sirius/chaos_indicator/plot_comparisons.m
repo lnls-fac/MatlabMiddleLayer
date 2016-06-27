@@ -37,49 +37,59 @@ for i=1:length(lattices)
 end
 
 for i = 1:length(planes)
-    posx = mod(i-1,2);
-    posy = floor((i-1)/2);
+    pl = planes{i};
+    aux = [info(:).(pl)];
+%     posx = mod(i-1,2);
+%     posy = floor((i-1)/2);
+    posx = 0;
+    posy = 0;
     figure('OuterPosition',[633*posx,540*(1-posy),633, 540]);
-    errorbar([info(i,ind10).aper0],[info(i,ind10).trc_mean],[info(i,ind10).trc_std],'.b');
+    errorbar([aux(ind10).aper0],[aux(ind10).trc_mean],[aux(ind10).trc_std],'.b');
     hold all;
-    errorbar([info(i,ind05).aper0],[info(i,ind05).trc_mean],[info(i,ind05).trc_std],'.r');
-    errorbar([info(i,ind01).aper0],[info(i,ind01).trc_mean],[info(i,ind01).trc_std],'.g');
+    errorbar([aux(ind05).aper0],[aux(ind05).trc_mean],[aux(ind05).trc_std],'.r');
+    errorbar([aux(ind01).aper0],[aux(ind01).trc_mean],[aux(ind01).trc_std],'.g');
     title(upper(planes{i}));
-    mini = min([[info(i,:).aper0],[info(i,:).trc_mean]-[info(i,:).trc_std]]);
-    maxi = max([[info(i,:).aper0],[info(i,:).trc_mean]+[info(i,:).trc_std]]);
+    mini = min([[aux(:).aper0],[aux(:).trc_mean]-[aux(:).trc_std]]);
+    maxi = max([[aux(:).aper0],[aux(:).trc_mean]+[aux(:).trc_std]]);
     plot([mini,maxi],[mini,maxi],'k');
-    xlabel('aper0');
+    xlabel('stability');
     
+    posx = 0;
+    posy = 1;
     figure('OuterPosition',[633*posx,540*(1-posy),633, 540]);
-    errorbar([info(i,ind10).aper1],[info(i,ind10).trc_mean],[info(i,ind10).trc_std],'.b');
+    errorbar([aux(ind10).aper1],[aux(ind10).trc_mean],[aux(ind10).trc_std],'.b');
     hold all;
-    errorbar([info(i,ind05).aper1],[info(i,ind05).trc_mean],[info(i,ind05).trc_std],'.r');
-    errorbar([info(i,ind01).aper1],[info(i,ind01).trc_mean],[info(i,ind01).trc_std],'.g');
+    errorbar([aux(ind05).aper1],[aux(ind05).trc_mean],[aux(ind05).trc_std],'.r');
+    errorbar([aux(ind01).aper1],[aux(ind01).trc_mean],[aux(ind01).trc_std],'.g');
     title(upper(planes{i}));
-    mini = min([[info(i,:).aper1],[info(i,:).trc_mean]-[info(i,:).trc_std]]);
-    maxi = max([[info(i,:).aper1],[info(i,:).trc_mean]+[info(i,:).trc_std]]);
+    mini = min([[aux(:).aper1],[aux(:).trc_mean]-[aux(:).trc_std]]);
+    maxi = max([[aux(:).aper1],[aux(:).trc_mean]+[aux(:).trc_std]]);
     plot([mini,maxi],[mini,maxi],'k');
-    xlabel('aper1');
+    xlabel('average distance ratio');
     
+    posx = 1;
+    posy = 0;
     figure('OuterPosition',[633*posx,540*(1-posy),633, 540]);
-    errorbar([info(i,ind10).aper2],[info(i,ind10).trc_mean],[info(i,ind10).trc_std],'.b');
+    errorbar([aux(ind10).aper2],[aux(ind10).trc_mean],[aux(ind10).trc_std],'.b');
     hold all;
-    errorbar([info(i,ind05).aper2],[info(i,ind05).trc_mean],[info(i,ind05).trc_std],'.r');
-    errorbar([info(i,ind01).aper2],[info(i,ind01).trc_mean],[info(i,ind01).trc_std],'.g');
+    errorbar([aux(ind05).aper2],[aux(ind05).trc_mean],[aux(ind05).trc_std],'.r');
+    errorbar([aux(ind01).aper2],[aux(ind01).trc_mean],[aux(ind01).trc_std],'.g');
     title(upper(planes{i}));
-    mini = min([[info(i,:).aper2],[info(i,:).trc_mean]-[info(i,:).trc_std]]);
-    maxi = max([[info(i,:).aper2],[info(i,:).trc_mean]+[info(i,:).trc_std]]);
+    mini = min([[aux(:).aper2],[aux(:).trc_mean]-[aux(:).trc_std]]);
+    maxi = max([[aux(:).aper2],[aux(:).trc_mean]+[aux(:).trc_std]]);
     plot([mini,maxi],[mini,maxi],'k');
-    xlabel('aper2');
+    xlabel('diffusion');
     
+    posx = 1;
+    posy = 1;
     figure('OuterPosition',[633*posx,540*(1-posy),633, 540]);
-    errorbar([info(i,ind10).aper3],[info(i,ind10).trc_mean],[info(i,ind10).trc_std],'.b');
+    errorbar([aux(ind10).aper3],[aux(ind10).trc_mean],[aux(ind10).trc_std],'.b');
     hold all;
-    errorbar([info(i,ind05).aper3],[info(i,ind05).trc_mean],[info(i,ind05).trc_std],'.r');
-    errorbar([info(i,ind01).aper3],[info(i,ind01).trc_mean],[info(i,ind01).trc_std],'.g');
+    errorbar([aux(ind05).aper3],[aux(ind05).trc_mean],[aux(ind05).trc_std],'.r');
+    errorbar([aux(ind01).aper3],[aux(ind01).trc_mean],[aux(ind01).trc_std],'.g');
     title(upper(planes{i}));
-    mini = min([[info(i,:).aper3],[info(i,:).trc_mean]-[info(i,:).trc_std]]);
-    maxi = max([[info(i,:).aper3],[info(i,:).trc_mean]+[info(i,:).trc_std]]);
+    mini = min([[aux(:).aper3],[aux(:).trc_mean]-[aux(:).trc_std]]);
+    maxi = max([[aux(:).aper3],[aux(:).trc_mean]+[aux(:).trc_std]]);
     plot([mini,maxi],[mini,maxi],'k');
-    xlabel('aper3');
+    xlabel('tune window');
 end
