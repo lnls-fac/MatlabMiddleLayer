@@ -1,9 +1,8 @@
 function info = check_validity_of_chaos_indicator(lattices)
 
 planes = {'x','y','ep','en'};
-info = struct('aper0', {}, 'aper1', {}, 'aper2', {}, 'aper3', {}, ...
-    'trc_mean', {}, 'trc_std', {}, 'nmlam', {}, 'ratio_lam', {}, ...
-    'x_chaos', {}, 'diff_ind', {}, 'tunes', {}, 'x_diff', {});
+
+info = struct('x', {}, 'y', {}, 'ep', {}, 'en', {});
 
 flag_plot = false;
 
@@ -13,25 +12,32 @@ for i = 1:length(lattices)
         mia = findcells(si,'FamName','mia');
         si  = si(1:mia(2));
     end
-%     if mod(i,50), fprintf('.'); else fprintf('.\n'); end
+    
     spos = findspos(si,1:length(si));
     maccep = findcells(si,'FamName','calc_mom_accep');
-    pos = spos(maccep(6));
+    
     fprintf('%04d     Symmetry: %3d\n',i,lattices(i).symmetry);
-    for ii=1:length(planes)
-%         aper.ind2(ii,i) = lnls_chaos_indicator2(si,planes{ii},lattices(i).symmetry,false);
-        [info(ii,i).aper0,info(ii,i).aper1,info(ii,i).nmlam, ...
-            info(ii,i).ratio_lam,info(ii,i).x_chaos] = ...
-        	lnls_chaos_indicator(si,planes{ii},pos,flag_plot);
-        [info(ii,i).aper2,info(ii,i).aper3,info(ii,i).diff_ind,...
-            info(ii,i).tunes,info(ii,i).x_diff] = ...
-        	lnls_diffusion_indicator(si,planes{ii},pos,...
-            flag_plot,calc_window(si,lattices(i).symmetry));
-        [info(ii,i).trc_mean,info(ii,i).trc_std] = ...
-            aperture_from_tracking([lattices(i).folder,'trackcpp/'],planes{ii},pos);
+    fprintf('%8s   %9s  %9s  %9s  %9s     %9s\n',...
+            'plane', 'stabi', 'adr','dif','window', 'tracking');
+    for ii = 1:length(planes);
+        pl = planes{ii};
+        if pl == 'x'
+            pos = 0.0;
+            offset = [0;0;5e-5;0;0;0];
+        elseif pl == 'y'
+            pos = 0.0;
+            offset = [1e-4;0;0;0;0;0];
+        else
+            pos = spos(maccep(6));
+            offset = [0;0;0;0;0;0];
+        end
+        info(i).(pl) = lnls_chaos_indicator(si,pl,pos,flag_plot,...
+            calc_window(si,lattices(i).symmetry),offset);
+        [info(i).(pl).trc_mean,info(i).(pl).trc_std] = ...
+            aperture_from_tracking([lattices(i).folder,'trackcpp/'],pl,pos);
         fprintf('%8s : %9.4f, %9.4f, %9.4f, %9.4f --> %9.4f\n',...
-            upper(planes{ii}),info(ii,i).aper0,info(ii,i).aper1,...
-            info(ii,i).aper2,info(ii,i).aper3,info(ii,i).trc_mean);
+            upper(pl),info(i).(pl).aper0,info(i).(pl).aper1,...
+            info(i).(pl).aper2,info(i).(pl).aper3,info(i).(pl).trc_mean);
     end
 end
 fprintf('\n');
