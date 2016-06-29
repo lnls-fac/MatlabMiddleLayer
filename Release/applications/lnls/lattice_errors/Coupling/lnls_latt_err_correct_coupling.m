@@ -45,7 +45,16 @@ coup2 = rmfield(coup,'respm');
 save([name,'_correct_coup_input.mat'], 'coup2');
 
 %if isnumeric(coup.svs), svs = num2str(coup.svs);else svs = coup.svs;end
-fprintf('   number of svs used in correction: %i\n', coup.svs);
+if ischar(coup.svs)
+    fprintf('   number of svs used in correction: %s\n', coup.svs);
+elseif (coup.svs < 1) 
+    sel = diag(S)/max(diag(S)) >= coup.svs;
+    coup_svs = find(sel,1,'last');
+    fprintf('   number of svs used in correction: %i (threshold %f) \n', coup_svs, coup.svs);
+    coup.svs = coup_svs;
+else
+    fprintf('   number of svs used in correction: %i\n', coup.svs);
+end
 fprintf('   maximum number of correction iterations: %i\n', coup.max_nr_iter);
 fprintf('   tolerance: %8.2e\n', coup.tolerance);
 
