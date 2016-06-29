@@ -33,7 +33,7 @@ version = '01';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
 
-lattice_version = 'SI.EV18.01';
+lattice_version = 'SI.V19.01';
 % processamento de input (energia e modo de operacao)
 for i=1:length(varargin)
     if ischar(varargin{i})
