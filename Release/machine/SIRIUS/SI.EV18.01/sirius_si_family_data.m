@@ -191,6 +191,7 @@ data.qs.ATIndex = data.qs.ATIndex';
 % data.qs.ATIndex = reshape(idx,data.qs.nr_segs,[]);
 % data.qs.ATIndex = data.qs.ATIndex';
 
+
 % In this version of the lattice, there are qs correctors in the sextupoles
 % sd3 of every sector C3 of the arc in the lattice. It means the corrector
 % alternates between all SD3's. The logic bellow uses the
