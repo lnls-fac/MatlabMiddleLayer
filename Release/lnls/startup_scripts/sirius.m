@@ -23,7 +23,7 @@ for i=length(varargin):-1:1
         if any(strcmpi(varargin{i}, {'NoServer'})), NoServer = true; end;
         if any(strcmpi(varargin{i}, {'Disconnect'})), Disconnect = true; end; 
         varargin{i} = upper(varargin{i});
-        if isempty(strfind(varargin{i}, 'V'))
+        if isempty(strfind(varargin{i}, 'V')) && isempty(strfind(varargin{i}, 'E'))
             if strfind(varargin{i}, 'BO')
                 default_version = default_bo_version;
             elseif strfind(varargin{i}, 'TB')
