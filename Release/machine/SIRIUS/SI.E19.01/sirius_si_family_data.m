@@ -144,6 +144,13 @@ idx = sort(idx);
 data.fcv.ATIndex = reshape(idx,data.fcv.nr_segs,[]);
 data.fcv.ATIndex = data.fcv.ATIndex';
 
+% rbpm - bpms for FOFB
+idx = [];
+idx = [idx; data.rbpm.ATIndex];
+idx = sort(idx);
+data.rbpm.ATIndex = reshape(idx,data.rbpm.nr_segs,[]);
+data.rbpm.ATIndex = data.rbpm.ATIndex';
+
 % qs - skew quad correctors
 idx = [];
 idx = [idx; data.sfa0.ATIndex];
