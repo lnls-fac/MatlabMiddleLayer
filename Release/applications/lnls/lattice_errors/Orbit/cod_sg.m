@@ -63,7 +63,7 @@ for iter = 1:orbit.max_nr_iter
         n_times = n_times + 1; % to check how many times it passed here
     end
     % breaks the loop in case convergence is reached
-    if residue < tol
+    if ((residue < tol) || (best_fm < 1e-13))
         break;
     end
 end
