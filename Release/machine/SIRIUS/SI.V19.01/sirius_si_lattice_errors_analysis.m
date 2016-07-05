@@ -18,8 +18,14 @@ machine  = create_apply_errors(the_ring, family_data);
 %application of bpm offset errors
 machine = create_apply_bpm_errors(machine, family_data);
 
+%inserts IDs into lattice and sets its configuration
+%machine = set_ids_dipolar_errors(machine);
+
 % orbit correction is performed
 machine  = correct_orbit(machine, family_data);
+
+% fast orbit correction is performed
+%machine  = fast_correct_orbit(machine, family_data);
 
 % tune correction
 machine  = correct_tune(machine);
@@ -235,6 +241,42 @@ finalizations();
         
     end
 
+%% Fast Cod Correction
+    function machine = fast_correct_orbit(machine, family_data)
+        
+        fprintf('\n<fast closed-orbit distortions correction> [%s]\n\n', datestr(now));
+        
+        % parameters for slow correction algorithms
+        orbit.bpm_idx = sort(family_data.rbpm.ATIndex);
+        orbit.hcm_idx = sort(family_data.fch.ATIndex);
+        orbit.vcm_idx = sort(family_data.fcv.ATIndex);
+        
+        % parameters for SVD correction
+        orbit.sext_ramp         = [0 1];
+        orbit.svs               = 'all';
+        orbit.max_nr_iter       = 50;
+        orbit.tolerance         = 1e-5;
+        orbit.correct2bba_orbit = false;
+        orbit.simul_bpm_err     = false;
+        orbit.ind_bba           = get_bba_ind(the_ring, sort(family_data.qn.ATIndex(:)));
+        
+        % calcs nominal cod response matrix, if chosen
+        use_respm_from_nominal_lattice = true; 
+        if use_respm_from_nominal_lattice
+            fprintf('-  calculating orbit response matrix from nominal machine ...\n');
+            lattice_symmetry = 5;  
+            orbit.respm = calc_respm_cod(the_ring, orbit.bpm_idx, orbit.hcm_idx, orbit.vcm_idx, lattice_symmetry, true); 
+            orbit.respm = orbit.respm.respm;
+        end 
+        
+        % loops over random machine, correcting COD...
+        machine = lnls_latt_err_correct_cod(name, machine, orbit);
+        
+        % saves results to file
+        name_saved_machines = [name_saved_machines,'_machines_cod_corrected'];
+        save2file(name_saved_machines,machine);
+        
+    end
 
 %% Symmetrization of the optics
     function machine = correct_optics(machine, family_data)
@@ -397,4 +439,75 @@ finalizations();
         end
         save([name '.mat'], 'machine');
     end
+end
+
+function [machine, ids] = insert_ids(machine0)
+    
+    indices = find_indices(machine0{1});
+    
+    for j=1:length(machine0)
+        machine{j} = machine0{j};
+        idx = indices.ids(2:end); idx(2) = [];
+        indices_ids_coup = sort([idx-2, idx-1, idx+1, idx+2]);
+        nlk = [findcells(machine{j}, 'FamName', 'nlk'); findcells(machine{j}, 'FamName', 'pmm');];
+        for i=indices_ids_coup
+            len = machine{j}{i}.Length;
+            fam = machine{j}{i}.FamName;
+            machine{j}{i} = machine{j}{nlk};
+            machine{j}{i}.Length = len;
+            machine{j}{i}.FamName = fam;
+            machine{j}{i}.PolynomA = 0 * machine{j}{i}.PolynomA;
+            machine{j}{i}.PolynomB = 0 * machine{j}{i}.PolynomB;
+        end
+    end
+    ids.indices_ids_coup = reshape(indices_ids_coup,4,[])';
+    
+end
+
+function machine = set_ids_dipolar_errors(machine0)
+
+    [machine, ids] = insert_ids(machine0);
+    
+    ids.ss = {'mib','mib','mia','mib','mip','mib','mia','mib','mip','mib','mia','mib','mip','mib','mia','mib','mip','mib'};
+    ids.max_kickx = 10e-6 * ones(1,18);
+    ids.max_kicky = 10e-6 * ones(1,18);
+    
+    for j=1:length(machine)
+        kickx = 2*(rand(1,length(ids.max_kickx))-0.5) .* ids.max_kickx;
+        kicky = 2*(rand(1,length(ids.max_kicky))-0.5) .* ids.max_kicky;
+        for i=1:length(kickx)
+            machine{j} = lnls_set_kickangle(machine{j}, kickx(i), ids.indices_ids_coup(i,:), 'x');
+            machine{j} = lnls_set_kickangle(machine{j}, kicky(i), ids.indices_ids_coup(i,:), 'y');
+        end
+    end
+    
+end
+
+function indices = find_indices(the_ring)
+
+    
+    % --- builds vectors with various indices ---
+    data = sirius_si_family_data(the_ring);
+    indices.mia = findcells(the_ring, 'FamName', 'mia');
+    indices.mib = findcells(the_ring, 'FamName', 'mib');
+    indices.mip = findcells(the_ring, 'FamName', 'mip');
+    indices.mic = findcells(the_ring, 'FamName', 'mc');
+    indices.ids = sort([indices.mia, indices.mib, indices.mip]);
+    indices.all = sort([indices.ids, indices.mic]);
+    b2_seg_idx   = 8;  % corresponds to 13 mrad (correct value : ~16 mrad)
+    if exist('b2_selection','var')
+        indices.b2  = data.b2.ATIndex(b2_selection,b2_seg_idx);
+    else
+        indices.b2  = data.b2.ATIndex(:,b2_seg_idx);
+    end
+    indices.qs  = data.qs.ATIndex;
+    indices.pos = findspos(the_ring, 1:length(the_ring)+1);
+
+    famnames = unique(getcellstruct(the_ring, 'FamName', data.qs.ATIndex(:,1)));
+    indices.qs_fams = cell(1,length(famnames));
+    for i=1:length(famnames)
+        idx = findcells(the_ring, 'FamName', famnames{i});
+        indices.qs_fams{i} = reshape(intersect(idx, data.qs.ATIndex(:)), [], size(data.qs.ATIndex,2));
+    end
+
 end
