@@ -246,7 +246,7 @@ finalizations();
         
         fprintf('\n<fast closed-orbit distortions correction> [%s]\n\n', datestr(now));
         
-        % parameters for slow correction algorithms
+        % parameters for fast correction algorithms
         orbit.bpm_idx = sort(family_data.rbpm.ATIndex);
         orbit.hcm_idx = sort(family_data.fch.ATIndex);
         orbit.vcm_idx = sort(family_data.fcv.ATIndex);
@@ -321,7 +321,7 @@ finalizations();
         coup.bpm_idx = family_data.bpm.ATIndex;
         coup.hcm_idx = family_data.ch.ATIndex;
         coup.vcm_idx = family_data.cv.ATIndex;
-        coup.svs           = 'all';
+        coup.svs           = 80;
         coup.max_nr_iter   = 50;
         coup.tolerance     = 1e-5;
         coup.simul_bpm_corr_err = false;
