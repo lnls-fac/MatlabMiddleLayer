@@ -78,6 +78,7 @@ if isnumeric(orbit.svs), svs = num2str(orbit.svs);else svs = orbit.svs;end
 fprintf('   selection of singular values: %4s\n',svs);
 fprintf('   maximum number of orbit correction iterations: %i\n',orbit.max_nr_iter);
 fprintf('   tolerance: %8.2e\n', orbit.tolerance);
+if isfield(orbit,'max_kick'), fprintf('   maximum kicks for correctors : %8.2g, %8.2g urad\n',orbit.max_kick*1e6);end
 
 fprintf('\n');
 fprintf('    -----------------------------------------------------------------------------------------------  \n');

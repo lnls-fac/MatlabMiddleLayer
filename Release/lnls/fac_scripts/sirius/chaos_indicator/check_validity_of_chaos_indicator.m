@@ -18,7 +18,7 @@ for i = 1:length(lattices)
     
     fprintf('%04d     Symmetry: %3d\n',i,lattices(i).symmetry);
     fprintf('%8s   %9s  %9s  %9s  %9s     %9s\n',...
-            'plane', 'stabi', 'adr','dif','window', 'tracking');
+            'plane', 'stb', 'adr','dif','win', 'tracking');
     for ii = 1:length(planes);
         pl = planes{ii};
         if pl == 'x'
@@ -28,6 +28,7 @@ for i = 1:length(lattices)
             pos = 0.0;
             offset = [1e-4;0;0;0;0;0];
         else
+            %pos = spos(maccep([1,3,6,10,12]));
             pos = spos(maccep(6));
             offset = [0;0;0;0;0;0];
         end
@@ -36,8 +37,8 @@ for i = 1:length(lattices)
         [info(i).(pl).trc_mean,info(i).(pl).trc_std] = ...
             aperture_from_tracking([lattices(i).folder,'trackcpp/'],pl,pos);
         fprintf('%8s : %9.4f, %9.4f, %9.4f, %9.4f --> %9.4f\n',...
-            upper(pl),info(i).(pl).aper0,info(i).(pl).aper1,...
-            info(i).(pl).aper2,info(i).(pl).aper3,info(i).(pl).trc_mean);
+            upper(pl),info(i).(pl).aper_stb(1),info(i).(pl).aper_adr(1),...
+            info(i).(pl).aper_dif(1),info(i).(pl).aper_win(1),info(i).(pl).trc_mean);
     end
 end
 fprintf('\n');

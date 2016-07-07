@@ -1,8 +1,8 @@
 function indicator = lnls_chaos_indicator(ring, plane, pos, plota, window, offset)
 
-indicator = struct('aper0', [], 'aper1', [], 'aper2', [], 'aper3', [], ...
-    'nmlam', [], 'adr', [], 'x_adr', [], 'dif', [], 'tunex', [], ...
-    'tuney', [], 'x_dif', []);
+indicator = struct('aper_stb', [], 'aper_adr', [], 'aper_dif', [], ...
+    'aper_win', [], 'adr', [], 'x_adr', [], 'dif', [], ...
+    'tunex', [], 'tuney', [], 'x_dif', []);
 
 if ~exist('pos','var'), pos = 0.0; end
 if ~exist('plota','var'), plota = false; end
@@ -17,8 +17,8 @@ end
 if length(pos) > 1
     for i = 1:length(pos)
         aux = chaos_indicator(ring, plane, pos(i), plota, window, offset);
-        indicator.aper0(i) = aux.aper0; indicator.aper1(i) = aux.aper1;
-        indicator.aper2(i) = aux.aper2; indicator.aper3(i) = aux.aper3;
+        indicator.aper_stb(i) = aux.aper_stb; indicator.aper_adr(i) = aux.aper_adr;
+        indicator.aper_dif(i) = aux.aper_dif; indicator.aper_win(i) = aux.aper_win;
         indicator.nmlam(:,i) = aux.nmlam;
         indicator.adr(:,i) = aux.adr;
         indicator.dif(:,i) = aux.dif;
@@ -28,9 +28,8 @@ if length(pos) > 1
 else
     for i = 1:size(offset,2)
         aux = chaos_indicator(ring, plane, pos, plota, window, offset(:,i));
-        indicator.aper0(i) = aux.aper0; indicator.aper1(i) = aux.aper1;
-        indicator.aper2(i) = aux.aper2; indicator.aper3(i) = aux.aper3;
-        indicator.nmlam(:,i) = aux.nmlam;
+        indicator.aper_stb(i) = aux.aper_stb; indicator.aper_adr(i) = aux.aper_adr;
+        indicator.aper_dif(i) = aux.aper_dif; indicator.aper_win(i) = aux.aper_win;
         indicator.adr(:,i) = aux.adr;
         indicator.dif(:,i) = aux.dif;
         indicator.tunex(:,i) = aux.tunes(:,1);
@@ -45,8 +44,8 @@ end
 
 function indicator = chaos_indicator(ring, plane, pos, plota, window, offset)
 
-indicator = struct('aper0', 0, 'aper1', 0, 'aper2', 0, 'aper3', 0,...
-    'nmlam', [], 'adr', [], 'x_adr', [], 'dif', [], 'tunes', [], 'x_dif', []);
+indicator = struct('aper_stb', 0, 'aper_adr', 0, 'aper_dif', 0, 'aper_win', 0,...
+    'adr', [], 'x_adr', [], 'dif', [], 'tunes', [], 'x_dif', []);
 
 n_adr = 7; %power of two number of turns to find the average distance ratio;
 n_dif = 7; %power of two times two number of turns to find the diffusion;
@@ -64,25 +63,25 @@ np = 351; % number of initial conditions
 offset([2,4]) = offset([2,4]) + 1e-6; % a small delta to exclude singularity;
 
 if strcmpi(plane,'x')
-    lim_adr = 1.02;
+    lim_adr = 1.05;
     lim_dif = 1e-04;
     pl = 1;
     xi =  -6e-3;
     xf = -13e-3;
 elseif strcmpi(plane,'y')
-    lim_adr = 1.02;
+    lim_adr = 1.05;
     lim_dif = 1e-04;
     pl = 3;
     xi = 2e-3;
     xf = 3e-3;
 elseif strcmpi(plane,'ep')
-    lim_adr = 1.02;
+    lim_adr = 1.05;
     lim_dif = 1e-04;
     pl = 5;
     xi = 2e-2;
     xf = 5e-2;
 elseif strcmpi(plane,'en')
-    lim_adr = 1.02;
+    lim_adr = 1.05;
     lim_dif = 1e-04;
     pl = 5;
     xi = -2e-2;
@@ -91,7 +90,7 @@ end
 
 % create the vector of initial conditions
 x = linspace(0,1,np).^expoent;
-x = xi + (xf-xi)*x; dx = diff(x);
+x = xi + (xf-xi)*x;
 Rin = repmat(offset(:),1,length(x));
 Rin(pl,:) = x;
 
@@ -107,30 +106,30 @@ Rou = reshape(Rou,6,length(x),[]);
 %-----------------Stability-----------------%
 
 ind0 = find(isnan(Rou(1,:,end)),1,'first'); if isempty(ind0), ind0=length(x); end;
-indicator.aper0 = x(ind0);
+indicator.aper_stb = x(ind0);
 
 %----------Average-Distance-Ratio-----------%
 
 Rou_adr = Rou(:,:,1:n_adr+1);
 
-lambda  = diff(Rou_adr,1,2);
-lambda1  = squeeze(sum(lambda.*lambda,1));
+x_dP = [0; 0; 0; 0];
+for j=1:size(Rou_adr,2)
+    x_dP = findorbit4(ring, Rou_adr(5,j,1),1,[x_dP; 0; 0]);
+    Rou_adr(1:4,j,:) = Rou_adr(1:4,j,:) - repmat(x_dP, [1,1,size(Rou_adr,3)]);
+end
 
-mlam    = mean(lambda1,2)';
-nmlam   = mlam ./ x(1:end-1).^4 / nturns^2 ./ dx.^2;
-hfmlam   = mean(lambda1(:,1:end/2),2)';
-hfnmlam  = 4*hfmlam ./ x(1:end-1).^4 / nturns^2 ./ dx.^2;
+delta_x = diff(Rou_adr,1,2);
+exp2 = mean(delta_x.*delta_x,3);
 
-d2nmlam = diff(nmlam,2,2);
+delta_x = delta_x(:,:,1:end/2);
+exp1 = mean(delta_x.*delta_x,3);
 
-ratio_lam = nmlam./hfnmlam;
+adr = sqrt(mean((exp2(1:4,:)./exp1(1:4,:)/4)));
 
-ind1 = find(ratio_lam > lim_adr,1,'first'); if isempty(ind1), ind1 = length(x); end;
-indicator.aper1  = x(min([ind1,ind0]));
+ind1 = find(adr > lim_adr,1,'first'); if isempty(ind1), ind1 = length(x); end;
+indicator.aper_adr  = x(min([ind1,ind0]));
 
-indicator.nmlam = nmlam;
-indicator.adr = ratio_lam;
-
+indicator.adr = adr;
 indicator.x_adr = x(1:end-1);
 
 %----------------Diffusion------------------%
@@ -180,7 +179,7 @@ end
 dif_ind = sqrt(sum( (tune2(:,1:ntunes)-tune1(:,1:ntunes)).^2 ,2));
 
 ind2 = find(dif_ind > lim_dif,1,'first'); if isempty(ind2), ind2 = length(x); end;
-indicator.aper2  = x(min([ind2,ind0]));
+indicator.aper_dif  = x(min([ind2,ind0]));
 
 indicator.dif = dif_ind;
 indicator.x_dif = x;
@@ -194,21 +193,15 @@ C = window(:,[1,2]) * [tunex,tuney]';
 idx = any(C > repmat(window(:,3),1,size(C,2)),1);
 ind3 = find(idx > 0,1,'first'); if isempty(ind3), ind3 = length(x); end;
 
-indicator.aper3 = x(min([ind3,ind0]));
+indicator.aper_win = x(min([ind3,ind0]));
 
 %-------------------------------------------%
 
 if plota
-    figure('OuterPosition',[633*1,540*(1-0),633, 540]);
-    plot(x(1:end-3),d2nmlam);
-    str=sprintf('Plot of d2nmlam (%d turns)', nturns); title(str)
-    xlabel(plane)
-    ylabel('d2nmlam')
-    
-    figure('OuterPosition',[633*1,540*(1-1),633, 540]); plot(x(1:end-1),ratio_lam);
+    figure('OuterPosition',[633*1,540*(1-1),633, 540]); plot(x(1:end-1),adr);
     str=sprintf('Plot of ADR (%d turns)', nturns); title(str)
     xlabel(plane)
-    ylabel('ratio lam')
+    ylabel('adr')
     
     figure('OuterPosition',[633*1,540*(1-0),633, 540]);
     plot(x,dif_ind);
