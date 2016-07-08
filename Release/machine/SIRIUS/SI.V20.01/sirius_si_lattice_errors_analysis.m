@@ -258,7 +258,7 @@ finalizations();
         orbit.tolerance         = 1e-5;
         orbit.correct2bba_orbit = false;
         orbit.simul_bpm_err     = false;
-        orbit.ind_bba           = get_bba_ind(the_ring, sort([family_data.qn.ATIndex(:);family_data.qs.ATIndex(:)]));
+        orbit.ind_bba           = get_bba_ind(the_ring, orbit.bpm_idx, sort([family_data.qn.ATIndex(:);family_data.qs.ATIndex(:)]));
         
         % calcs nominal cod response matrix, if chosen
         use_respm_from_nominal_lattice = true; 
