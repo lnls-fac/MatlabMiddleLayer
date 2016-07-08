@@ -1,9 +1,21 @@
-function coupling_feedback
+function sirius_coupling_feedback
 
+temp20_onecoup();
+temp10_onecoup();
+temp05_onecoup();
+temp01_onecoup();
+% 
+temp20_halfcoup();
+temp10_halfcoup();
+temp05_halfcoup();
+temp01_halfcoup();
+
+
+function temp20_onecoup
 
 % --- initialization ---
 close all; drawnow;
-version = 'SI.E19.01';
+version = 'SI.V20.01';
 run_initializations(version);
 
 % --- loads/creates nominal machine ---
@@ -12,10 +24,10 @@ sim_anneal.nr_iterations = 10000;
 sim_anneal.scale_tilt = 0.5 * (pi / 180); 
 sim_anneal.scale_sigmay = 0.5 * 1e-6;
 target_coupling = 0.03;
-save_fname = 'e19-01_3.0coup.mat';
+save_fname = 'v20-01_3.0coup.mat';
 
-%b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
-b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+%b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
 %b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
 %b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
 %[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
@@ -23,9 +35,7 @@ b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
 
 
 % --- loads random machines --- 
-fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.e19.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
-%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v18.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
-%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
 
@@ -46,6 +56,342 @@ for i=1:length(r.machines.machine)
     [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
 end
 save(strrep(save_fname, 'coup', 'coup_1.0coup-ids_20b2_results'));
+
+function temp10_onecoup
+
+% --- initialization ---
+close all; drawnow;
+version = 'SI.V20.01';
+run_initializations(version);
+
+% --- loads/creates nominal machine ---
+sim_anneal.qs_delta = 0.001;
+sim_anneal.nr_iterations = 10000;
+sim_anneal.scale_tilt = 0.5 * (pi / 180); 
+sim_anneal.scale_sigmay = 0.5 * 1e-6;
+target_coupling = 0.03;
+save_fname = 'v20-01_3.0coup.mat';
+
+%b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+%b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
+%b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
+%[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
+[r.nominal, r.indices] = loads_nominal_machine(save_fname,b2_selection);
+
+
+% --- loads random machines --- 
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.v20.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+r.machines = load_random_machines(fname, r.indices);
+
+
+% --- adds qs from nominal machine to random machines ---
+r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
+show_summary_machines(r.machines, r.nominal, r.indices);
+
+r.machines = calc_respm_machines(r.machines, r.indices);
+
+for i=1:length(r.machines.machine)
+    fprintf('machine #%02i\n', i);
+    goal_tilt = r.machines.coupling{i}.tilt;
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
+    r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
+    r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
+    r.machines.feedback{i}.svd_nr_iterations = 50;
+    [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
+end
+save(strrep(save_fname, 'coup', 'coup_1.0coup-ids_10b2_results'));
+
+function temp05_onecoup
+
+% --- initialization ---
+close all; drawnow;
+version = 'SI.V20.01';
+run_initializations(version);
+
+% --- loads/creates nominal machine ---
+sim_anneal.qs_delta = 0.001;
+sim_anneal.nr_iterations = 10000;
+sim_anneal.scale_tilt = 0.5 * (pi / 180); 
+sim_anneal.scale_sigmay = 0.5 * 1e-6;
+target_coupling = 0.03;
+save_fname = 'v20-01_3.0coup.mat';
+
+%b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+%b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
+%b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
+%[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
+[r.nominal, r.indices] = loads_nominal_machine(save_fname,b2_selection);
+
+
+% --- loads random machines --- 
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.v20.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+r.machines = load_random_machines(fname, r.indices);
+
+
+% --- adds qs from nominal machine to random machines ---
+r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
+show_summary_machines(r.machines, r.nominal, r.indices);
+
+r.machines = calc_respm_machines(r.machines, r.indices);
+
+for i=1:length(r.machines.machine)
+    fprintf('machine #%02i\n', i);
+    goal_tilt = r.machines.coupling{i}.tilt;
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
+    r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
+    r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
+    r.machines.feedback{i}.svd_nr_iterations = 50;
+    [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
+end
+save(strrep(save_fname, 'coup', 'coup_1.0coup-ids_5b2_results'));
+
+function temp01_onecoup
+
+% --- initialization ---
+close all; drawnow;
+version = 'SI.V20.01';
+run_initializations(version);
+
+% --- loads/creates nominal machine ---
+sim_anneal.qs_delta = 0.001;
+sim_anneal.nr_iterations = 10000;
+sim_anneal.scale_tilt = 0.5 * (pi / 180); 
+sim_anneal.scale_sigmay = 0.5 * 1e-6;
+target_coupling = 0.03;
+save_fname = 'v20-01_3.0coup.mat';
+
+%b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+%b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+%b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
+b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
+%[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
+[r.nominal, r.indices] = loads_nominal_machine(save_fname,b2_selection);
+
+
+% --- loads random machines --- 
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.v20.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+r.machines = load_random_machines(fname, r.indices);
+
+
+% --- adds qs from nominal machine to random machines ---
+r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
+show_summary_machines(r.machines, r.nominal, r.indices);
+
+r.machines = calc_respm_machines(r.machines, r.indices);
+
+for i=1:length(r.machines.machine)
+    fprintf('machine #%02i\n', i);
+    goal_tilt = r.machines.coupling{i}.tilt;
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
+    r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
+    r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
+    r.machines.feedback{i}.svd_nr_iterations = 50;
+    [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
+end
+save(strrep(save_fname, 'coup', 'coup_1.0coup-ids_1b2_results'));
+
+function temp20_halfcoup
+
+% --- initialization ---
+close all; drawnow;
+version = 'SI.V20.01';
+run_initializations(version);
+
+% --- loads/creates nominal machine ---
+sim_anneal.qs_delta = 0.001;
+sim_anneal.nr_iterations = 10000;
+sim_anneal.scale_tilt = 0.5 * (pi / 180); 
+sim_anneal.scale_sigmay = 0.5 * 1e-6;
+target_coupling = 0.03;
+save_fname = 'v20-01_3.0coup.mat';
+
+b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+%b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+%b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
+%b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
+%[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
+[r.nominal, r.indices] = loads_nominal_machine(save_fname,b2_selection);
+
+
+% --- loads random machines --- 
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.v20.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+r.machines = load_random_machines(fname, r.indices);
+
+
+% --- adds qs from nominal machine to random machines ---
+r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
+show_summary_machines(r.machines, r.nominal, r.indices);
+
+r.machines = calc_respm_machines(r.machines, r.indices);
+
+for i=1:length(r.machines.machine)
+    fprintf('machine #%02i\n', i);
+    goal_tilt = r.machines.coupling{i}.tilt;
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
+    r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
+    r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
+    r.machines.feedback{i}.svd_nr_iterations = 50;
+    [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
+end
+save(strrep(save_fname, 'coup', 'coup_0.5coup-ids_20b2_results'));
+
+function temp10_halfcoup
+
+% --- initialization ---
+close all; drawnow;
+version = 'SI.V20.01';
+run_initializations(version);
+
+% --- loads/creates nominal machine ---
+sim_anneal.qs_delta = 0.001;
+sim_anneal.nr_iterations = 10000;
+sim_anneal.scale_tilt = 0.5 * (pi / 180); 
+sim_anneal.scale_sigmay = 0.5 * 1e-6;
+target_coupling = 0.03;
+save_fname = 'v20-01_3.0coup.mat';
+
+%b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+%b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
+%b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
+%[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
+[r.nominal, r.indices] = loads_nominal_machine(save_fname,b2_selection);
+
+
+% --- loads random machines --- 
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.v20.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+r.machines = load_random_machines(fname, r.indices);
+
+
+% --- adds qs from nominal machine to random machines ---
+r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
+show_summary_machines(r.machines, r.nominal, r.indices);
+
+r.machines = calc_respm_machines(r.machines, r.indices);
+
+for i=1:length(r.machines.machine)
+    fprintf('machine #%02i\n', i);
+    goal_tilt = r.machines.coupling{i}.tilt;
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
+    r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
+    r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
+    r.machines.feedback{i}.svd_nr_iterations = 50;
+    [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
+end
+save(strrep(save_fname, 'coup', 'coup_0.5coup-ids_10b2_results'));
+
+function temp05_halfcoup
+
+% --- initialization ---
+close all; drawnow;
+version = 'SI.V20.01';
+run_initializations(version);
+
+% --- loads/creates nominal machine ---
+sim_anneal.qs_delta = 0.001;
+sim_anneal.nr_iterations = 10000;
+sim_anneal.scale_tilt = 0.5 * (pi / 180); 
+sim_anneal.scale_sigmay = 0.5 * 1e-6;
+target_coupling = 0.03;
+save_fname = 'v20-01_3.0coup.mat';
+
+%b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+%b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
+%b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
+%[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
+[r.nominal, r.indices] = loads_nominal_machine(save_fname,b2_selection);
+
+
+% --- loads random machines --- 
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.v20.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+r.machines = load_random_machines(fname, r.indices);
+
+
+% --- adds qs from nominal machine to random machines ---
+r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
+show_summary_machines(r.machines, r.nominal, r.indices);
+
+r.machines = calc_respm_machines(r.machines, r.indices);
+
+for i=1:length(r.machines.machine)
+    fprintf('machine #%02i\n', i);
+    goal_tilt = r.machines.coupling{i}.tilt;
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
+    r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
+    r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
+    r.machines.feedback{i}.svd_nr_iterations = 50;
+    [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
+end
+save(strrep(save_fname, 'coup', 'coup_0.5coup-ids_5b2_results'));
+
+function temp01_halfcoup
+
+% --- initialization ---
+close all; drawnow;
+version = 'SI.V20.01';
+run_initializations(version);
+
+% --- loads/creates nominal machine ---
+sim_anneal.qs_delta = 0.001;
+sim_anneal.nr_iterations = 10000;
+sim_anneal.scale_tilt = 0.5 * (pi / 180); 
+sim_anneal.scale_sigmay = 0.5 * 1e-6;
+target_coupling = 0.03;
+save_fname = 'v20-01_3.0coup.mat';
+
+%b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
+%b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
+%b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
+b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
+%[r.nominal, r.indices] = create_nominal_machine(version, target_coupling, save_fname, sim_anneal, b2_selection);
+[r.nominal, r.indices] = loads_nominal_machine(save_fname,b2_selection);
+
+
+% --- loads random machines --- 
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/calcs/s05.01/study.less_qs_configs/si.v20.01/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+%fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+r.machines = load_random_machines(fname, r.indices);
+
+
+% --- adds qs from nominal machine to random machines ---
+r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
+show_summary_machines(r.machines, r.nominal, r.indices);
+
+r.machines = calc_respm_machines(r.machines, r.indices);
+
+for i=1:length(r.machines.machine)
+    fprintf('machine #%02i\n', i);
+    goal_tilt = r.machines.coupling{i}.tilt;
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
+    r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
+    r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
+    r.machines.feedback{i}.svd_nr_iterations = 50;
+    [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
+end
+save(strrep(save_fname, 'coup', 'coup_0.5coup-ids_1b2_results'));
 
 
 function [the_ring, ids] = insert_ids(the_ring0, indices)
@@ -94,7 +440,7 @@ target = goal_tilt(indices.b2)';
 actual = coupling.tilt(indices.b2)';
 residue = actual - target;
     
-fprintf('%02i: %f ', 0, (180/pi)*std(residue));
+fprintf('%f\n ', 0, (180/pi)*std(residue));
 for j=1:feedback.svd_nr_iterations
     qs      = -0.5 * (feedback.V*iS*feedback.U') * residue;
     for i=1:size(feedback.matrix,2)
@@ -104,7 +450,7 @@ for j=1:feedback.svd_nr_iterations
     coupling = calc_coupling(the_ring, indices);
     actual = coupling.tilt(indices.b2)';
     residue = actual - target;
-    fprintf('%f ', j, (180/pi)*std(residue));
+    fprintf('%f ', (180/pi)*std(residue));
     if (mod(j,5)==0) 
         fprintf('\n');
     end
@@ -277,9 +623,10 @@ drawnow;
 
 function coupling = calc_coupling(the_ring, indices)
 
-[ENV, ~, ~] = ohmienvelope(the_ring, indices.rad', 1:length(the_ring)+1);
+[ENV, ~, ~] = my_ohmienvelope(the_ring, indices.rad', 1:length(the_ring)+1);
 coupling.sigmas = cat(2, ENV.Sigma);
 coupling.tilt = cat(2, ENV.Tilt);
+coupling.tiltl = cat(2, ENV.TiltL);
 
 
 function [residue, coupling] = calc_residue(the_ring, indices, sim_anneal, nominal)
@@ -391,5 +738,129 @@ end
 
 [feedback.U, feedback.S, feedback.V] = svd(feedback.matrix, 'econ');
 feedback.S = diag(feedback.S);
+
+
+function [ENVELOPE, RMSDP, RMSBL] = my_ohmienvelope(RING,RADELEMINDEX,varargin)
+%OHMIENVELOPE calculates equilibrium beam envelope in a 
+% circular accelerator using Ohmi's beam envelope formalism [1]
+% [1] K.Ohmi et al. Phys.Rev.E. Vol.49. (1994)
+% 
+% [ENVELOPE, RMSDP, RMSBL] = OHMIENVELOPE(RING,RADELEMINDEX,REFPTS)
+% 
+% ENVELOPE is a structure with fields
+% Sigma   - [SIGMA(1); SIGMA(2)] - RMS size [m] along 
+%           the principal axis of a tilted ellips 
+%           Assuming normal distribution exp(-(Z^2)/(2*SIGMA))
+% Tilt    - Tilt angle of the XY ellips [rad]
+%           Positive Tilt corresponds to Corkscrew (right) 
+%           rotatiom of XY plane around s-axis
+% R       - 6-by-6 equilibrium envelope matrix R
+%
+% RMSDP   - RMS momentum spread 
+% RMSBL   - RMS bunch length[m]
+% modified by Fernando (2015-01-29) for improvement in speed.
+
+NumElements = length(RING);
+ 
+[MRING, MS, orbit] = findm66(RING,1:NumElements+1);
+
+B = cell(1,NumElements); % B{i} is the diffusion matrix of the i-th element
+BATEXIT = B;             % BATEXIT{i} is the cumulative diffusion matrix from 
+                         % element 0 to the end of the i-th element
+
+% calculate Radiation-Diffusion matrix B for elements with radiation
+for i = RADELEMINDEX
+   B{i} = findmpoleraddiffmatrix(RING{i},orbit(:,i));
+end
+
+% Calculate cumulative Radiation-Diffusion matrix for the ring
+BCUM = zeros(6,6); % Cumulative diffusion matrix of the entire ring
+
+% Calculate 6-by-6 linear transfer matrix in each element
+% near the equilibrium orbit 
+for i = 1:NumElements
+   % Fernando: I changed the direct calculation of the element Matrix by
+   % the manipulation of the result obtained in MS, to speed up the
+   % process:
+%    ELEM = RING{i};
+%    M = findelemm66(ELEM,ELEM.PassMethod,orbit(:,i));
+   M =  MS(:,:,i+1)/MS(:,:,i);
+   % Set Radiation-Diffusion matrix B to 0 in elements without radiation
+   if ~isempty(B{i})
+       BCUM = M*BCUM*M' + B{i};
+   else
+       BCUM = M*BCUM*M';
+   end
+   BATEXIT{i} = BCUM;
+end
+
+% ------------------------------------------------------------------------
+% Equation for the moment matrix R is
+%         R = MRING*R*MRING' + BCUM;
+% We rewrite it in the form of Lyapunov equation to use MATLAB's LYAP function
+%            AA*R + R*BB = -CC  
+% where 
+%				AA =  inv(MRING)
+%				BB = -MRING'
+%				CC = -inv(MRING)*BCUM
+% -----------------------------------------------------------------------
+AA =  inv(MRING);
+BB = -MRING';
+CC = -inv(MRING)*BCUM;
+ 
+R = lyap(AA,BB,CC);     % Envelope matrix at the rinng entrance
+
+RMSDP = sqrt(R(5,5));   % R.M.S. energy spread
+RMSBL = sqrt(R(6,6));   % R.M.S. bunch lenght
+
+if nargin == 2 % no REFPTS
+    ENVELOPE.R = R;
+elseif nargin == 3
+    REFPTS = varargin{1};
+    
+    REFPTSX = REFPTS;
+    % complete REFPTS with 1 and NumElements+1 if necessary
+    if REFPTS(1)~=1
+        REFPTSX = [1 REFPTS];
+    end
+    if REFPTS(end)~= NumElements+1
+        REFPTSX = [REFPTSX NumElements+1];
+    end
+    % Now REFPTS has at least 2 ponts and the first one is the ring entrance
+    
+    NRX = length(REFPTSX);
+    ENVELOPE = struct('Sigma',num2cell(zeros(2,NRX),1),...
+        'Tilt',0,'R',zeros(6)); 
+    
+    ENVELOPE(1).R = R;
+
+    for i=2:NRX
+        ELEM = REFPTSX(i);
+        ENVELOPE(i).R = MS(:,:,ELEM)*R*MS(:,:,ELEM)'+BATEXIT{ELEM-1};
+    end
+    
+   
+    if REFPTS(1)~=1
+        ENVELOPE = ENVELOPE(2:end);
+    end
+    if REFPTS(end)~= NumElements+1
+        ENVELOPE = ENVELOPE(1:end-1);
+    end
+
+else
+    error('Too many input arguments');
+end
+
+for i=1:length(ENVELOPE)
+    [U,DR] = eig(ENVELOPE(i).R([1 3],[1 3]));
+    ENVELOPE(i).Tilt = asin((U(2,1)-U(1,2))/2);
+    ENVELOPE(i).Sigma(1) = sqrt(DR(1,1));
+    ENVELOPE(i).Sigma(2) = sqrt(DR(2,2));
+    
+    [U,DR] = eig(ENVELOPE(i).R([2 4],[2 4]));
+    ENVELOPE(i).TiltL = asin((U(2,1)-U(1,2))/2);
+    ENVELOPE(i).SigmaL(1) = sqrt(DR(1,1));
+    ENVELOPE(i).SigmaL(2) = sqrt(DR(2,2));
+end
 
 
