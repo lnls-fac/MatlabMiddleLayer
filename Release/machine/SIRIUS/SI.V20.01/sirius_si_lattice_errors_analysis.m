@@ -108,7 +108,7 @@ finalizations();
         config.fams.quads.labels     = {'qfa','qda',...
                                         'qdb2','qfb','qdb1',...
                                         'qdp2','qfp','qdp1',...
-                                        'q1','q2','q3','q4',...
+                                        'q1','q2','q3','q4','fcq',...
                                         };
         config.fams.quads.sigma_x    = 40 * um * 1;
         config.fams.quads.sigma_y    = 40 * um * 1;
@@ -221,7 +221,7 @@ finalizations();
         orbit.tolerance         = 1e-5;
         orbit.correct2bba_orbit = true;
         orbit.simul_bpm_err     = true;
-        orbit.ind_bba           = get_bba_ind(the_ring, sort(family_data.qn.ATIndex(:)));
+        orbit.ind_bba           = get_bba_ind(the_ring, orbit.bpm_idx, sort([family_data.qn.ATIndex(:);family_data.qs.ATIndex(:)]));
         
         % calcs nominal cod response matrix, if chosen
         use_respm_from_nominal_lattice = true; 
@@ -258,7 +258,7 @@ finalizations();
         orbit.tolerance         = 1e-5;
         orbit.correct2bba_orbit = false;
         orbit.simul_bpm_err     = false;
-        orbit.ind_bba           = get_bba_ind(the_ring, sort(family_data.qn.ATIndex(:)));
+        orbit.ind_bba           = get_bba_ind(the_ring, sort([family_data.qn.ATIndex(:);family_data.qs.ATIndex(:)]));
         
         % calcs nominal cod response matrix, if chosen
         use_respm_from_nominal_lattice = true; 

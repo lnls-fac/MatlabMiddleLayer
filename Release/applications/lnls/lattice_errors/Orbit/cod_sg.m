@@ -3,8 +3,8 @@ function [the_ring, hkicks, vkicks, codx, cody, iter, n_times] = cod_sg(orbit, t
 if ~exist('goal_codx','var'), goal_codx = zeros(1,size(orbit.bpm_idx,1)); end
 if ~exist('goal_cody','var'), goal_cody = zeros(1,size(orbit.bpm_idx,1)); end
 if ~isfield(orbit,'tolerance'), orbit.tolerance = 1e-5; end
-if ~isfield(orbit,'max_kick'), max_kick = [0,0];else max_kick = orbit.max_kick; end
-if length(max_kick) ~= 2, error('Field max_kick must have length == 2');end
+if ~isfield(orbit,'max_kick'), orbit.max_kick = [0,0]; end
+if length(orbit.max_kick) ~= 2, error('Field max_kick must have length == 2');end
 tol = abs(orbit.tolerance);
 
 scale_x = 200e-6;
