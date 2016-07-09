@@ -38,6 +38,10 @@ b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
 fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
+
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -48,7 +52,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -86,6 +90,10 @@ fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/mult
 %fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
+
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -96,7 +104,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -134,6 +142,9 @@ fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/mult
 %fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -144,7 +155,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -182,6 +193,9 @@ fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/mult
 %fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -192,7 +206,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -230,6 +244,9 @@ fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/mult
 %fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -240,7 +257,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -278,6 +295,9 @@ fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/mult
 %fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -288,7 +308,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -326,6 +346,9 @@ fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/mult
 %fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -336,7 +359,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -374,6 +397,9 @@ fname = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/mult
 %fname = '/home/fac_files/data/sirius/beam_dynamics/si.v19.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
 r.machines = load_random_machines(fname, r.indices);
 
+% --- IDS errors ---
+%coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+coupling_polynom_a_scale = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]/1000/2;
 
 % --- adds qs from nominal machine to random machines ---
 r.machines = enhance_lifetime(r.machines, r.nominal, r.indices);
@@ -384,7 +410,7 @@ r.machines = calc_respm_machines(r.machines, r.indices);
 for i=1:length(r.machines.machine)
     fprintf('machine #%02i\n', i);
     goal_tilt = r.machines.coupling{i}.tilt;
-    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices);
+    [r.machines.machine{i}, ids] = insert_ids(r.machines.machine{i}, r.indices, coupling_polynom_a_scale);
     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
@@ -394,7 +420,8 @@ end
 save(strrep(save_fname, 'coup', 'coup_0.5coup-ids_1b2_results'));
 
 
-function [the_ring, ids] = insert_ids(the_ring0, indices)
+
+function [the_ring, ids] = insert_ids(the_ring0, indices, coupling_polynom_a_scale)
 
 
 the_ring = the_ring0;
@@ -411,8 +438,8 @@ for i=indices_ids_coup
     the_ring{i}.PolynomB = 0 * the_ring{i}.PolynomB;
 end
 ids.indices_ids_coup = reshape(indices_ids_coup,2,[])';
-ids.coupling_ss = ['mib','mib','mia','mib','mip','mib','mia','mib','mip','mib','mia','mib','mip','mib','mia','mib','mip','mib'];
-ids.coupling_polynom_a_scale = [24,24,4,22,24,24,4,24,24,24,4,22,24,24,4,22,22,24]/1000;
+ids.coupling_ss = {'mib','mib','mia','mib','mip','mib','mia','mib','mip','mib','mia','mib','mip','mib','mia','mib','mip','mib'};
+ids.coupling_polynom_a_scale = coupling_polynom_a_scale;
 
 
 function the_ring = set_ids_configs(the_ring0, ids)

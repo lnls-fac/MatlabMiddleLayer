@@ -2,29 +2,33 @@ function sirius_coupling_feedback_plot_results
 
 close all; drawnow;
 
-% fname = 'v18-01_3.0coup_1.0coup-ids_1b2_results.mat';  data1 = load_data(fname);
-% fname = 'v18-01_3.0coup_1.0coup-ids_5b2_results.mat';  data2 = load_data(fname);
-% fname = 'v18-01_3.0coup_1.0coup-ids_10b2_results.mat'; data3 = load_data(fname);
-% fname = 'v18-01_3.0coup_1.0coup-ids_20b2_results.mat'; data4 = load_data(fname);
-% fprintf('mia: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mia); fprintf('\n');
-% fprintf('mib: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mib); fprintf('\n');
-% fprintf('mip: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mip); fprintf('\n');
-% fprintf('mc : '); plot_at_indices({data1,data2,data3,data4},data1.indices.mic); fprintf('\n');
-
-% fname = 'v18-01_3.0coup_0.5coup-ids_1b2_results.mat';  data1 = load_data(fname);
-% fname = 'v18-01_3.0coup_0.5coup-ids_5b2_results.mat';  data2 = load_data(fname);
-% fname = 'v18-01_3.0coup_0.5coup-ids_10b2_results.mat'; data3 = load_data(fname);
-% fname = 'v18-01_3.0coup_0.5coup-ids_20b2_results.mat'; data4 = load_data(fname);
-% fprintf('mia: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mia); fprintf('\n');
-% fprintf('mib: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mib); fprintf('\n');
-% fprintf('mip: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mip); fprintf('\n');
-% fprintf('mc : '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mic); fprintf('\n');
-
 prefix = 'v20-01_3.0coup_1.0coup-ids_';
 fname = [prefix, '1b2_results.mat'];  data1 = load_data(fname);
 fname = [prefix, '5b2_results.mat'];  data2 = load_data(fname);
 fname = [prefix, '10b2_results.mat']; data3 = load_data(fname);
 fname = [prefix, '20b2_results.mat']; data4 = load_data(fname);
+fprintf('\n');
+fprintf('mia: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mia,[prefix, 'xy_tilt_mia']); fprintf('\n');
+fprintf('mib: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mib,[prefix, 'xy_tilt_mib']); fprintf('\n');
+fprintf('mip: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mip,[prefix, 'xy_tilt_mip']); fprintf('\n');
+fprintf('mc : '); plot_at_indices({data1,data2,data3,data4},data1.indices.mic,[prefix, 'xy_tilt_mic']); fprintf('\n');
+fprintf('\n');
+fprintf('mia: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mia,[prefix, 'xlyl_tilt_mia']); fprintf('\n');
+fprintf('mib: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mib,[prefix, 'xlyl_tilt_mib']); fprintf('\n');
+fprintf('mip: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mip,[prefix, 'xlyl_tilt_mip']); fprintf('\n');
+fprintf('mc : '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mic,[prefix, 'xlyl_tilt_mic']); fprintf('\n');
+
+prefix = 'v20-01_3.0coup_0.5coup-ids_';
+fname = [prefix, '1b2_results.mat'];  data1 = load_data(fname);
+fname = [prefix, '5b2_results.mat'];  data2 = load_data(fname);
+fname = [prefix, '10b2_results.mat']; data3 = load_data(fname);
+fname = [prefix, '20b2_results.mat']; data4 = load_data(fname);
+fprintf('\n');
+fprintf('mia: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mia,[prefix, 'xy_tilt_mia']); fprintf('\n');
+fprintf('mib: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mib,[prefix, 'xy_tilt_mib']); fprintf('\n');
+fprintf('mip: '); plot_at_indices({data1,data2,data3,data4},data1.indices.mip,[prefix, 'xy_tilt_mip']); fprintf('\n');
+fprintf('mc : '); plot_at_indices({data1,data2,data3,data4},data1.indices.mic,[prefix, 'xy_tilt_mic']); fprintf('\n');
+fprintf('\n');
 fprintf('mia: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mia,[prefix, 'xlyl_tilt_mia']); fprintf('\n');
 fprintf('mib: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mib,[prefix, 'xlyl_tilt_mib']); fprintf('\n');
 fprintf('mip: '); plot_at_indices_divergence({data1,data2,data3,data4},data1.indices.mip,[prefix, 'xlyl_tilt_mip']); fprintf('\n');

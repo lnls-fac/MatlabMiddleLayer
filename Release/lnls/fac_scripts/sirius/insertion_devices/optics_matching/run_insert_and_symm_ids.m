@@ -14,7 +14,7 @@ ids_names{end+1} = 'manaca';    % SS-14 PHASE1
 ids_phase1 = ids_select_80mm(ids_names);
 
 % Create nominal model
-sirius('SI.V14B');
+sirius('SI.V20.01');
 the_ring0 = sirius_si_lattice();
 save('the_ring0.mat', 'the_ring0');
 
