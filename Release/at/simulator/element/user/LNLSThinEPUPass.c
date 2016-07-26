@@ -97,8 +97,8 @@ void LNLSThinEPUPass(double *r, double E, int nx, int ny, double *XEPU, double *
      mexCallMATLAB(num_out, output_array, num_in, input_array, "interp2");
      ykick = mxGetScalar(output_array[0]);
 
-     r6[1] += xkick / (brho * brho);
-     r6[3] += ykick / (brho * brho);
+     r6[1] += xkick / (brho * brho) / (1+r6[4]); /* as in tracysoleil */
+     r6[3] += ykick / (brho * brho) / (1+r6[4]); /* as in tracysoleil */
            
      /* linearized misalignment transformation at the exit */
      ATmultmv(r6,R2);

@@ -114,8 +114,10 @@ void LNLSThickEPUPass1(double *r, double E, double le, int nr_steps, int nx, int
          mxSetN(input_array[2], nx) ;
          mexCallMATLAB(num_out, output_array, num_in, input_array, "interp2");
          ykick = mxGetScalar(output_array[0]);
-         r6[1] += xkick / (brho * brho);
-         r6[3] += ykick / (brho * brho);
+         /* r6[1] += xkick / (brho * brho);
+            r6[3] += ykick / (brho * brho); */
+         r6[1] += xkick / (brho * brho) / (1+r6[4]); /* as with tracysoleil */
+         r6[3] += ykick / (brho * brho) / (1+r6[4]); /* as with tracysoleil */                                              
          
          fastdrift(r6, NormL1);
          
