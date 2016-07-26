@@ -39,107 +39,6 @@ void fastdrift(double* r, double NormL)
 }
 
 
-void LNLSThickEPUPass1(double *r, double E, double le, int nr_steps, int nx, int ny, double *XEPU, double *YEPU, double *PXEPU, double *PYEPU,
-                 double *R1, double *R2, double *T1, double *T2, int num_particles)
-
-{ 
-
-  const double constc = 299792458;
-  const double E0     = 0.51099892811;
-
-  int c, i;
-  double *r6, *xi, *yi;   
-  char *method;
-  int buflen;
-  double xkick, ykick, gam, beta, brho, L1, norm, NormL1;
-  int num_in, num_out;
-  mxArray *input_array[6], *output_array[1];
-
-  gam = (E/1e9) / (E0/1000);
-  beta  = sqrt(1 - 1/(gam*gam));
-  brho = beta * E / constc;
-  
-  num_in = 6;
-  num_out = 1;
-  input_array[0] = mxCreateDoubleMatrix(ny,nx,mxREAL);
-  input_array[1] = mxCreateDoubleMatrix(ny,nx,mxREAL);
-  input_array[2] = mxCreateDoubleMatrix(ny,nx,mxREAL);
-  input_array[3] = mxCreateDoubleMatrix(1,1,mxREAL);
-  input_array[4] = mxCreateDoubleMatrix(1,1,mxREAL);
-  xi = (double*)mxCalloc(1,sizeof(double));
-  yi = (double*)mxCalloc(1,sizeof(double));
-  fill(mxGetPr(input_array[0]), XEPU, ny, nx, 1);
-  fill(mxGetPr(input_array[1]), YEPU, ny, nx, 1);
-  mxSetM(input_array[0], ny);
-  mxSetN(input_array[0], nx);
-  mxSetM(input_array[1], ny);
-  mxSetN(input_array[1], nx);
-  buflen = 7;
-  method = mxCalloc(buflen,sizeof(char));
-  strncpy(method,"*linear",buflen);
-  
-  L1 = le / (2.0 * nr_steps);
-  
-  input_array[5] = mxCreateString(method);
-  for (c = 0;c<num_particles;c++){/* Loop over particles */
-     
-      r6 = r+c*6;
-     
-     /* linearized misalignment transformation at the entrance */
-     ATaddvv(r6,T1);
-     ATmultmv(r6,R1);
-     
-     norm = 1/(1+r6[4]);
-     NormL1 = L1*norm;
-    
-     for(i = 0; i<nr_steps; ++i) { /* loog over integration step */
-         
-		 fastdrift(r6, NormL1);
-         
-         xi[0] = r6[0]; 
-         yi[0] = r6[2]; 
-         fill(mxGetPr(input_array[3]), xi, 1, 1, 1);
-         fill(mxGetPr(input_array[4]), yi, 1, 1, 1);
-         mxSetM(input_array[3], 1) ;
-         mxSetN(input_array[3], 1) ;
-         mxSetM(input_array[4], 1) ;
-         mxSetN(input_array[4], 1) ;
-         fill(mxGetPr(input_array[2]), PXEPU, ny, nx, nr_steps);
-         mxSetM(input_array[2], ny) ;
-         mxSetN(input_array[2], nx) ;
-         mexCallMATLAB(num_out, output_array, num_in, input_array, "interp2");
-         xkick = mxGetScalar(output_array[0]);
-         fill(mxGetPr(input_array[2]), PYEPU, ny, nx, nr_steps);
-         mxSetM(input_array[2], ny) ;
-         mxSetN(input_array[2], nx) ;
-         mexCallMATLAB(num_out, output_array, num_in, input_array, "interp2");
-         ykick = mxGetScalar(output_array[0]);
-         /* r6[1] += xkick / (brho * brho);
-            r6[3] += ykick / (brho * brho); */
-         r6[1] += xkick / (brho * brho) / (1+r6[4]); /* as with tracysoleil */
-         r6[3] += ykick / (brho * brho) / (1+r6[4]); /* as with tracysoleil */                                              
-         
-         fastdrift(r6, NormL1);
-         
-     }
-           
-     /* linearized misalignment transformation at the exit */
-     ATmultmv(r6,R2);
-     ATaddvv(r6,T2);
-     
-  }
-  
-  mxDestroyArray(input_array[5]);
-  mxFree(method);
-  mxFree(yi);
-  mxFree(xi);
-  mxDestroyArray(input_array[4]);
-  mxDestroyArray(input_array[3]);
-  mxDestroyArray(input_array[2]);
-  mxDestroyArray(input_array[1]);
-  mxDestroyArray(input_array[0]);
-}
-
         
 void interpolate_kickmap(int nx, int ny, double *XEPU, double *YEPU, double *PXEPU, double *PYEPU, double x, double y, double *xkick, double *ykick) {
     int    ix, iy;
@@ -241,8 +140,10 @@ void LNLSThickEPUPass(double *r, double E, double le, int nr_steps, int nx, int 
      for(i = 0; i<nr_steps; ++i) { /* loog over integration step */
 		 fastdrift(r6, NormL1);
          interpolate_kickmap(nx, ny, XEPU, YEPU, PXEPU, PYEPU, r6[0], r6[2], &xkick, &ykick);    
-         r6[1] += (xkick/nr_steps) / (brho * brho);
-         r6[3] += (ykick/nr_steps) / (brho * brho);
+         /* r6[1] += (xkick/nr_steps) / (brho * brho);
+         r6[3] += (ykick/nr_steps) / (brho * brho); */
+         r6[1] += (xkick/nr_steps) / (brho * brho) / (1+r6[4]); /* as with tracysoleil */
+         r6[3] += (ykick/nr_steps) / (brho * brho) / (1+r6[4]); /* as with tracysoleil */                                              
          fastdrift(r6, NormL1);
      }
            
