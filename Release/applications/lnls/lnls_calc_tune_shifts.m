@@ -4,11 +4,12 @@ function [tunex,tuney,px,py,amps] = lnls_calc_tune_shifts(ring,print,amps, npols
 % Plota os espacos de fase horizontal e vertical e monta o diagrama de
 % tuneshifts com as amplitudes horizontal e vertical:
 % 
-% ring   = modelo do anel para o qual os calculos serao feitos;
-% x_amps = vetor com as amplitudes horizontais para as quais o calculo sera
-%          realizado [m];
-% y_amps = vetor com as amplitudes verticais para as quais o calculo sera
-%          realizado [m];
+% ring = modelo do anel para o qual os calculos serao feitos;
+% amps = struct with horizontal amplitudes
+%   x = vetor com as amplitudes horizontais para as quais o calculo sera
+%       realizado [m];
+%   y = vetor com as amplitudes verticais para as quais o calculo sera
+%       realizado [m];
 %
 % Como padrao, a funcao usa o algoritmo NAFF para os calculos de sintonia.
 % Por isso, o numero real de voltas usado sera tal que satisfaca a seguinte

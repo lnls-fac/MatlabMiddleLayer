@@ -5,6 +5,8 @@ if ~exist('n','var'), n = 6; end;
 if ~exist('print','var'), print  = false; end;
 if ~exist('sdepend','var'), sdepend = false; end
 
+par.energy = energy;
+
 if ~sdepend
     lene = length(energy);
     par.betax = zeros(1,lene);
