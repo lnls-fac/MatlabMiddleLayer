@@ -23,16 +23,17 @@ double pi = M_PI;
 /* Input Arguments */
 #define	Y_IN    prhs[0]
 #define	YP_IN   prhs[1]
-#define	WIN_IN  prhs[2]
-#define	NFREQ_IN  prhs[3]
-#define	DEBUG_IN  prhs[4]
+#define	IS_REAL prhs[2]
+#define	WIN_IN  prhs[3]
+#define	NFREQ_IN  prhs[4]
+#define	DEBUG_IN  prhs[5]
 
 /* Output Arguments */
 #define	NU_OUT plhs[0]
 #define	AMPLITUDE_OUT plhs[1]
 #define	PHASE_OUT plhs[2]
 
-unsigned int call_naff(double *ydata, double *ypdata, int n_interval, double  *nu_out,
+unsigned int call_naff(double *ydata, double *ypdata, bool is_real, int n_interval, double  *nu_out,
 double *amplitude_out, double *phase_out, int win, int nfreq, int debug)
 {
     int i, iCpt;
@@ -41,37 +42,42 @@ double *amplitude_out, double *phase_out, int win, int nfreq, int debug)
     /* n_interval is truncated to be a multiple of 6 if is not yet) */
     n_interval = 6*(int )(n_interval/6.0);
 
-    g_NAFVariable.DTOUR=2*pi;   /* size of a "cadran" */
-    g_NAFVariable.XH=1;         /* step */
-    g_NAFVariable.T0=0;         /* time t0 */
-    g_NAFVariable.NTERM=nfreq;     /* max term to find */
-    g_NAFVariable.KTABS=n_interval;  /* number of intervals between data (equal ndata-1): must be a multiple of 6. */
-    g_NAFVariable.m_pListFen=NULL; /*no window*/
-    g_NAFVariable.TFS=NULL;    /* will contain frequency */
-    g_NAFVariable.ZAMP=NULL;   /* will contain amplitude */
-    g_NAFVariable.ZTABS=NULL;  /* will contain data to analyze */
-
- /*internal use in naf */
-    g_NAFVariable.NERROR=0;
-    g_NAFVariable.ICPLX=1;
-    g_NAFVariable.IPRT=-1; /*0*/
-    g_NAFVariable.NFPRT=stdout; /*NULL;*/
-    g_NAFVariable.NFS=0;
-    g_NAFVariable.IW=win;
-    g_NAFVariable.ISEC=1;
-    g_NAFVariable.EPSM=2.2204e-16;
-    g_NAFVariable.UNIANG=0;
-    g_NAFVariable.FREFON=0;
-    g_NAFVariable.ZALP=NULL;
-    g_NAFVariable.m_iNbLineToIgnore=1; /*unused*/
-    g_NAFVariable.m_dneps=1.E100;
-    g_NAFVariable.m_bFSTAB=FALSE; /*unused*/
- /*end of internal use in naf */
+    /*Created before naf_initnaf*/
+    g_NAFVariable.DTOUR      = 2*pi;       /* size of one "cadran" */
+    g_NAFVariable.KTABS      = n_interval; /* number of intervals between data (equal ndata-1): must be a multiple of 6. */
+    g_NAFVariable.XH         = 1;          /* time interval between data. if 1, frequencies go from -pi to pi, if 2pi frequencies go from -0.5 to 0.5 */
+    g_NAFVariable.NTERM      = nfreq;      /* max term to find */
+    g_NAFVariable.IW         = win;        /* type of window to use. 0 means no window , 1 means hanning*/
+    g_NAFVariable.T0         = 0.0;        /* initial time t0. Necessary to get the phase correctly*/
+    g_NAFVariable.ICPLX      = !is_real;   /* 0 if the function is real, 1 if not*/
+    g_NAFVariable.ISEC       = 1;          /* Flag defining use of secant method: 0 don't use, 1 use*/
+    g_NAFVariable.NFPRT      = stdout;     /* Where to print the results : stdout or NULL   */
+    g_NAFVariable.IPRT       = -1;         /* type of Printing: -1 nothing, O Error Messages, 1  Results, 2 (DEBUG) */
+    /* Calculated by naf_initnaf*/
+    g_NAFVariable.UNIANG     = 0;
+    g_NAFVariable.FREFON     = 0;
+    g_NAFVariable.EPSM       = 2.2204e-16;
+    /*Filled after naf_initnaf*/
+    g_NAFVariable.ZTABS      = NULL;     /* will contain data to analyze */
+    /*Returned by NAFF*/
+    g_NAFVariable.TFS        = NULL;     /* will contain frequency */
+    g_NAFVariable.ZAMP       = NULL;     /* will contain amplitude and phase*/
+    g_NAFVariable.NFS        = 0;        /* Number of frequencies found by NAFF */
+    /****************************************************/
+    /*               internal use in naf                */
+    g_NAFVariable.NERROR            = 0;
+    g_NAFVariable.ZALP              = NULL;   /* will contain transformation matrix to the orthgonal basis */
+    g_NAFVariable.m_pListFen        = NULL;   /* no window */
+    g_NAFVariable.m_iNbLineToIgnore = 1;      /* unused */
+    g_NAFVariable.m_dneps           = 1.E100;
+    g_NAFVariable.m_bFSTAB          = FALSE;  /* unused */
+    /*             end of internal use in naf             */
+    /****************************************************/
 
     naf_initnaf();
 
  /*Transform initial data to complex data since algorithm is optimized for cx data*/
-    for(i=0;i<n_interval;i++)
+    for(i=0;i<=n_interval;i++)
     {
         g_NAFVariable.ZTABS[i].reel = ydata[i];
         g_NAFVariable.ZTABS[i].imag = ypdata[i];
@@ -112,7 +118,7 @@ double *amplitude_out, double *phase_out, int win, int nfreq, int debug)
     /*free memory*/
     naf_cleannaf();
 
-    /* return number of fundaental frequencies */
+    /* return number of fundamental frequencies */
     return(numfreq);
 }
 
@@ -126,22 +132,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double   *nu, *amplitude, *phase;
     unsigned int  i, m, n, m2, n2, numfreq;
     int win, debug, nfreq;
+    bool is_real = false;
 
     /* lock mex-file for avoiding unloading with clear all */
-    mexLock();
+    /*mexLock();*/
 
     debug = 0; /* 1 means debugging information */
     nfreq = 10;/* maximum number of frequencies to look for */
 
-    if ((nrhs < 2) || (nrhs >5)) {
-        mexErrMsgTxt("Requires 2 to 5 input arguments");
+    if ((nrhs < 2) || (nrhs >6)) {
+        mexErrMsgTxt("Requires 2 to 6 input arguments");
     }
 
     if (nrhs <2) { /* no windows */
         win = 0;
     }
 
-    if (nrhs >= 3){ /* windowing */
+    if (nrhs >= 3){ /* check if user wants it to be treated as real */
+        m = mxGetM(IS_REAL);
+        n = mxGetN(IS_REAL);
+
+        if (!mxIsLogical(IS_REAL) || mxIsSparse(IS_REAL)  ||  (max(m,n) != 1) || (min(m,n) != 1))
+        {
+            mexErrMsgTxt("CALCNAFF requires that is_real be a scalar.");
+        }
+        is_real = mxIsLogicalScalarTrue(IS_REAL);
+    }
+
+    if (nrhs >= 4){ /* windowing */
         m = mxGetM(WIN_IN);
         n = mxGetN(WIN_IN);
 
@@ -156,7 +174,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         win = (int )*scalar_in;
     }
 
-    if (nrhs >= 4){ /* user fequency number */
+    if (nrhs >= 5){ /* user fequency number */
         m = mxGetM(NFREQ_IN);
         n = mxGetN(NFREQ_IN);
 
@@ -170,7 +188,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         nfreq = (int )*scalar_in;
     }
 
-    if (nrhs >= 5){ /* debugging flag */
+    if (nrhs >= 6){ /* debugging flag */
         m = mxGetM(DEBUG_IN);
         n = mxGetN(DEBUG_IN);
 
@@ -194,7 +212,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (!mxIsNumeric(Y_IN) || mxIsComplex(Y_IN) ||
     mxIsSparse(Y_IN)  || !mxIsDouble(Y_IN) ||
     (max(m,n) < 67) || (min(m,n) != 1)) { /*Fernando Henrique de Sá - changed from 66 to 67*/
-        mexErrMsgTxt("CALCNAFF requires that Y be a >= 66 x 1 vector.");
+        mexErrMsgTxt("CALCNAFF requires that Y be a >= 67 x 1 vector.");
     }
 
     /* assign pointer */
@@ -219,7 +237,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     SYSCHECKMALLOCSIZE(phase, double, nfreq);
 
     /* call subroutine that calls routine for all NAFF computation */
-    numfreq = call_naff(y_in,yp_in,(int )(max(m,n)-0), nu, amplitude, phase,  win, nfreq, debug);
+    numfreq = call_naff(y_in, yp_in, is_real, (int )(max(m,n)-1), nu, amplitude, phase, win, nfreq, debug);
     /*In above, (int )max(m,n) was changed to (int )(max(m,n)-1) due to misintepretation of input*//* Fernando*/
 
     /* Create Output Vector */
