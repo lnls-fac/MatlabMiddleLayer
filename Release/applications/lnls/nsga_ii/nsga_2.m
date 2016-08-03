@@ -103,7 +103,7 @@ if gen_start == 0
     % the value of the objective functions, rank and crowding distance
     % information is also added to the chromosome vector but only the elements
     % of the vector which has the decision variables are operated upon to
-    % perform the genetic operations like corssover and mutation.
+    % perform the genetic operations like crossover and mutation.
     if ~isfield(param,'initialPop');
         chromosome = initialize_variables(pop, M, V, min_range, max_range, func);%, param.initialPoints);
     else

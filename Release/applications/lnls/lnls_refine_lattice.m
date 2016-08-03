@@ -29,8 +29,8 @@ for i=1:length(RING)
     
     % for ID Kicktables
     if isfield(RING{i}, 'PxGrid')
-        elem.PxGrid = elem.PxGrid / ntsplits;
-        elem.PyGrid = elem.PyGrid / ntsplits;
+        elem.PxGrid = elem.PxGrid / nrsplits;
+        elem.PyGrid = elem.PyGrid / nrsplits;
     end
         
     if isfield(RING{i}, 'BendingAngle')

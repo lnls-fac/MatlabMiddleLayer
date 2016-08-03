@@ -73,8 +73,11 @@ margem = 5e-3/symmetry;
 kx = floor(tunex/side);
 ky = floor(tuney/side);
 
-window = [-1 0 kx*side+margem; 0 -1 ky*side+margem;...
-            1 0 (kx+1)*side-margem; 0 1 (ky+1)*side-margem];
+window = [-1  0 -kx*side-margem;...
+           0 -1 -ky*side-margem;...
+           1  0 (kx+1)*side-margem;...
+           0  1 (ky+1)*side-margem];
+
 
 
 

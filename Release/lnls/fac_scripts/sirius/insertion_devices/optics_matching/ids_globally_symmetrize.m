@@ -79,9 +79,9 @@ alpha = cat(1, TD.alpha);
 twiss.alphax = alpha(:,1);
 twiss.alphay = alpha(:,2);
 
-scale_alpha = 1e5;
-scale_tune  = 1e5;
-scale_beta  = 1e1;
+scale_alpha = 1e3;
+scale_tune  = 1e3;
+scale_beta  = 1e3;
 
 residue = (tunes - tunes_goal)' * scale_tune * 80;
 residue = [residue; twiss.alphax([mia, mib, mip, mc]) * scale_alpha];

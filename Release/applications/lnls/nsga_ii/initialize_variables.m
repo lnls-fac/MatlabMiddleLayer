@@ -56,7 +56,7 @@ for i = 1 : N
     % Initialize the decision variables based on the minimum and maximum
     % possible values. V is the number of decision variable. A random
     % number is picked between the minimum and maximum possible values for
-    % the each decision variable.
+    % each decision variable.
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,10 +72,8 @@ for i = 1 : N
     end
     while true
         f(i,1:V) = (min + (max-min).*rand(1,V))';
-        %         f(i,1:3) = [qf_ini qd_ini qfc_ini].*rand(1,V);
-        %         f(i,1:V) = initial(randi([1,size(initial,1)],1),:).*(1 + 0.2*(rand(1,V)-0.5));
         % For ease of computation and handling data the chromosome also has the
-        % vlaue of the objective function concatenated at the end. The elements
+        % value of the objective function concatenated at the end. The elements
         % V + 1 to K has the objective function valued.
         % The function evaluate_objective takes one chromosome at a time,
         % infact only the decision variables are passed to the function along

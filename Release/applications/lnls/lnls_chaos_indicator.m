@@ -1,4 +1,4 @@
-function indicator = lnls_chaos_indicator(ring, plane, pos, plota, window, offset)
+function indicator = lnls_chaos_indicator(ring, plane, pos, plota, window, n_adr, n_dif, offset)
 
 indicator = struct('aper_stb', [], 'aper_adr', [], 'aper_dif', [], ...
     'aper_win', [], 'adr', [], 'x_adr', [], 'dif', [], ...
@@ -16,10 +16,9 @@ end
 
 if length(pos) > 1
     for i = 1:length(pos)
-        aux = chaos_indicator(ring, plane, pos(i), plota, window, offset);
+        aux = chaos_indicator(ring, plane, pos(i), plota, window, n_adr, n_dif, offset);
         indicator.aper_stb(i) = aux.aper_stb; indicator.aper_adr(i) = aux.aper_adr;
         indicator.aper_dif(i) = aux.aper_dif; indicator.aper_win(i) = aux.aper_win;
-        indicator.nmlam(:,i) = aux.nmlam;
         indicator.adr(:,i) = aux.adr;
         indicator.dif(:,i) = aux.dif;
         indicator.tunex(:,i) = aux.tunes(:,1);
@@ -27,7 +26,7 @@ if length(pos) > 1
     end
 else
     for i = 1:size(offset,2)
-        aux = chaos_indicator(ring, plane, pos, plota, window, offset(:,i));
+        aux = chaos_indicator(ring, plane, pos, plota, window, n_adr, n_dif, offset(:,i));
         indicator.aper_stb(i) = aux.aper_stb; indicator.aper_adr(i) = aux.aper_adr;
         indicator.aper_dif(i) = aux.aper_dif; indicator.aper_win(i) = aux.aper_win;
         indicator.adr(:,i) = aux.adr;
@@ -37,18 +36,18 @@ else
     end
 end
 
-indicator.x_adr = aux.x_adr;
-indicator.x_dif = aux.x_dif;
+indicator.x_adr = aux.x_adr';
+indicator.x_dif = aux.x_dif';
 
 end
 
-function indicator = chaos_indicator(ring, plane, pos, plota, window, offset)
+function indicator = chaos_indicator(ring, plane, pos, plota, window, n_adr, n_dif, offset)
 
 indicator = struct('aper_stb', 0, 'aper_adr', 0, 'aper_dif', 0, 'aper_win', 0,...
     'adr', [], 'x_adr', [], 'dif', [], 'tunes', [], 'x_dif', []);
 
-n_adr = 7; %power of two number of turns to find the average distance ratio;
-n_dif = 7; %power of two times two number of turns to find the diffusion;
+if ~exist('n_adr','var'), n_adr = 7; end
+if ~exist('n_dif','var'), n_dif = 7; end
 
 n_adr = (2^n_adr + 6 - mod(2^n_adr,6)) - 1; %to satisfy naff conditions
 n_dif = 2*(2^n_dif + 6 - mod(2^n_dif,6)) - 1; %to satisfy naff conditions
@@ -103,6 +102,13 @@ ring = ring([point:end,1:point-1]);
 Rou = [Rin, ringpass(ring,Rin,nturns)];
 Rou = reshape(Rou,6,length(x),[]);
 
+% subtract closed orbit
+x_dP = [0; 0; 0; 0];
+for j=1:size(Rou,2)
+    x_dP = findorbit4(ring, Rou(5,j,1),1,[x_dP; 0; 0]);
+    Rou(1:4,j,:) = Rou(1:4,j,:) - repmat(x_dP, [1,1,size(Rou,3)]);
+end
+
 %-----------------Stability-----------------%
 
 ind0 = find(isnan(Rou(1,:,end)),1,'first'); if isempty(ind0), ind0=length(x); end;
@@ -111,12 +117,6 @@ indicator.aper_stb = x(ind0);
 %----------Average-Distance-Ratio-----------%
 
 Rou_adr = Rou(:,:,1:n_adr+1);
-
-x_dP = [0; 0; 0; 0];
-for j=1:size(Rou_adr,2)
-    x_dP = findorbit4(ring, Rou_adr(5,j,1),1,[x_dP; 0; 0]);
-    Rou_adr(1:4,j,:) = Rou_adr(1:4,j,:) - repmat(x_dP, [1,1,size(Rou_adr,3)]);
-end
 
 delta_x = diff(Rou_adr,1,2);
 exp2 = mean(delta_x.*delta_x,3);

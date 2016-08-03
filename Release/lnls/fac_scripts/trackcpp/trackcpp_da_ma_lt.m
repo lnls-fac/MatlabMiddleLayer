@@ -31,7 +31,7 @@ if strcmpi(answer{1}, 'bo')
         params.sigS  = 11.2e-3; % linac
         accepRF      = 0.033;
         params.K     = 0.0002;
-        params.I     = 0.6;
+        params.I     = 0.6/1000;
         params.nrBun = 1;
     else
         params.E     = energy * 1e9;
@@ -39,7 +39,7 @@ if strcmpi(answer{1}, 'bo')
         params.sigE  = ats.naturalEnergySpread;
         params.sigS  = ats.bunchlength;
         params.K     = 0.0002;
-        params.I     = 0.6;
+        params.I     = 0.6/1000;
         params.nrBun = 1;
         accepRF      = ats.energyacceptance;
     end
@@ -60,7 +60,7 @@ else
     params.sigE  = 9.4e-4;   %ats.naturalEnergySpread;
     params.sigS  = 3.0e-3;   %3.5e-3; % takes IBS into account
     params.K     = 0.01;
-    params.I     = 100;
+    params.I     = 100/1000;
     params.nrBun = 864;
     accepRF      = ats.energyacceptance;
 end
@@ -71,7 +71,7 @@ prompt = {'Emitance[nm.rad]', 'Energy spread', 'Bunch length (with IBS) [mm]',..
     'Coupling [%]', 'Current [mA]', 'Nr bunches', 'RF Energy Acceptance [%]'};
 defaultanswer = {num2str(params.emit0/1e-9), num2str(params.sigE), ...
     num2str(params.sigS*1000), num2str(100*params.K), ...
-    num2str(params.I), num2str(params.nrBun), num2str(accepRF*100)};
+    num2str(params.I*1000), num2str(params.nrBun), num2str(accepRF*100)};
 answer = inputdlg(prompt,'Parameters for beam lifetime calculation', 1, defaultanswer);
 if isempty(answer), return; end;
 params.emit0 = str2double(answer{1})*1e-9;

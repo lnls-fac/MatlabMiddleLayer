@@ -57,6 +57,7 @@ else
     y_tabela = dinttable.y_tabela;
 end
 
+% To Do: use function unique to avoid repeated Accep.s
 
 % calcular o tempo de vida a cada 10 cm do anel:
 npoints = ceil((Accep.s(end) - Accep.s(1))/0.1);

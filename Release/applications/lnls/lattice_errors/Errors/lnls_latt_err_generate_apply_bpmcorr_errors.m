@@ -43,7 +43,11 @@ if ~exist('rndtype','var'), rndtype = 'gaussian'; end;
 
 save([name,'_bpmcorr_errors_input.mat'],'control','cutoff','rndtype');
 
-if ~iscell(the_ring{1}), the_ring = {the_ring};end
+is_ring=false;
+if ~iscell(the_ring{1}) 
+    the_ring = {the_ring};
+    is_ring=true;
+end
 
 if isfield(control,'bpm')
     bpm = control.bpm;
@@ -92,7 +96,7 @@ if isfield(control,'vcm') && isfield(control.vcm,'sigma_gain') && any(control.vc
     end
 end
 
-if length(the_ring) == 1, the_ring = the_ring{1}; end
+if is_ring, the_ring = the_ring{1}; end
 
 
 function rndnr = get_random_numbers(sigma, nrels, cutoff, type)
