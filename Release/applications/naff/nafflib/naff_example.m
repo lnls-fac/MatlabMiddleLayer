@@ -1,13 +1,13 @@
 function naff_example
 % Example to test naff within matlab
 
-NT = 9996; % divided by 6
+NT = 9997; % NT-1 is divisible by 6
 
-% simple quasiperiodic (even period) motion 
+% simple quasiperiodic (even period) motion
 y =2+0.1*cos(pi*(0:NT-1))+0.00125*cos(pi/3*(0:NT-1));
 yp=2+0.1*sin(pi*(0:NT-1))+0.00125*sin(pi/3*(0:NT-1));
 
-[nu ampl phase] = calcnaff(y,yp,1,'Debug'); % with windowing
+[nu ampl phase] = calcnaff(y+1i*yp,false,1,'Debug'); % with windowing
 
 str = [
 'NFS = 3\n' ...

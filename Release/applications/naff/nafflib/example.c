@@ -15,7 +15,7 @@ int main(void)
 {
     int i, iCpt;
     const int ndata=9996; /* multiple of 6 */
-    
+
  g_NAFVariable.DTOUR=2*pi;   /* size of a "cadran" */
  g_NAFVariable.XH=1;         /* step */
  g_NAFVariable.T0=0;         /* time t0 */
@@ -34,18 +34,18 @@ int main(void)
  g_NAFVariable.NFS=0;
  g_NAFVariable.IW=1;
  g_NAFVariable.ISEC=1;
- g_NAFVariable.EPSM=0; 
+ g_NAFVariable.EPSM=0;
  g_NAFVariable.UNIANG=0;
  g_NAFVariable.FREFON=0;
- g_NAFVariable.ZALP=NULL; 
+ g_NAFVariable.ZALP=NULL;
  g_NAFVariable.m_iNbLineToIgnore=1; /*unused*/
  g_NAFVariable.m_dneps=1.E100;
  g_NAFVariable.m_bFSTAB=FALSE; /*unused*/
  /*end of interl use in naf */
- 
- 
+
+
     naf_initnaf();
-    
+
     /*remplit les donnees initiales*/
     for(i=0;i<ndata;i++)
     {
@@ -54,7 +54,7 @@ int main(void)
      fprintf(stdout,"%2d = % .15f % .15f\n",i,g_NAFVariable.ZTABS[i].reel
      ,g_NAFVariable.ZTABS[i].imag);
     }
-    
+
     /*analyse en frequence*/
     /* recherche de 5 termes */
     printf("cte=%g\n",fabs(g_NAFVariable.FREFON)/g_NAFVariable.m_dneps);
@@ -66,8 +66,8 @@ int main(void)
    for(iCpt=1;iCpt<=g_NAFVariable.NFS; iCpt++)
    {
     printf("AMPL=% .15E+i*% .15E abs(AMPL)=% .15E arg(AMPL)=% .15E FREQ=% .15E\n",
-           g_NAFVariable.ZAMP[iCpt].reel,g_NAFVariable.ZAMP[iCpt].imag, 
-           i_compl_module(g_NAFVariable.ZAMP[iCpt]), 
+           g_NAFVariable.ZAMP[iCpt].reel,g_NAFVariable.ZAMP[iCpt].imag,
+           i_compl_module(g_NAFVariable.ZAMP[iCpt]),
            i_compl_angle(g_NAFVariable.ZAMP[iCpt]),
            g_NAFVariable.TFS[iCpt]);
    }
@@ -75,4 +75,3 @@ int main(void)
 	naf_cleannaf();
 	return 0;
 }
-
