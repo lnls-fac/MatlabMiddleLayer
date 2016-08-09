@@ -324,7 +324,7 @@ box on;
 %Plot lattice
 %subplot(5,1,3);
 subplot('position',[0.1 0.47 0.85 0.05]);
-lnls_drawlattice(ltba, 1, 0, 1, 1, 1);
+lnls_drawlattice(ltba, 1, 0, 1, 1, 1, 1);
 xlim(xlimit);
 axis off;
 

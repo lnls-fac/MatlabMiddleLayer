@@ -10,7 +10,7 @@ d2r = pi/180;
 energy = 3e9;
 lattice_version = 'TS.V03.01';
 mode = 'M';
-version = '1';
+version = '2';
 mode_version = [mode version];
 
 % processamento de input (energia e modo de operacao)
@@ -45,11 +45,11 @@ l10      = drift('l10',  0.10, 'DriftPass');
 l15      = drift('l15',  0.15, 'DriftPass');
 l20      = drift('l20',  0.20, 'DriftPass');
 l25      = drift('l25',  0.25, 'DriftPass');
-la2p     = drift('la2p', 0.08341, 'DriftPass');
+la2p     = drift('la2p', 0.08323, 'DriftPass');
 la3p     = drift('la3p', 0.232-ldif, 'DriftPass');
 lb1p     = drift('lb1p', 0.220-ldif, 'DriftPass');
 lb2p     = drift('lb2p', 0.133, 'DriftPass');
-lb3p     = drift('lb3p', 0.19842-ldif, 'DriftPass');
+lb3p     = drift('lb3p', 0.19897-ldif, 'DriftPass');
 lc1p     = drift('lc1p', 0.18704-ldif, 'DriftPass');
 lc2p     = drift('lc2p', 0.226-ldif, 'DriftPass');
 ld1p     = drift('ld1p', 0.21409-ldif, 'DriftPass');
