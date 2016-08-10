@@ -80,9 +80,8 @@ LIA   = drift('lia',  1.5179, 'DriftPass');
 LIB   = drift('lib',  1.0879, 'DriftPass');
 LIP   = drift('lip',  1.0879, 'DriftPass');
 
-L035  = drift('l035', 0.035, 'DriftPass');
-L050  = drift('l050', 0.050, 'DriftPass');
-L055  = drift('l055', 0.055, 'DriftPass');
+L041  = drift('l041', 0.041, 'DriftPass');
+L044  = drift('l044', 0.044, 'DriftPass');
 L061  = drift('l061', 0.061, 'DriftPass');
 L066  = drift('l066', 0.066, 'DriftPass');
 L074  = drift('l074', 0.074, 'DriftPass');
@@ -200,8 +199,8 @@ DCCT2  = marker('dcct2',    'IdentityPass'); % dcct2 to measure beam current
 
 %% transport lines
 M1A      = [GIR,L134,GIR,QDA,L150,SDA0,L066,FC,L074,QFA,L150,SFA0,L135,BPM,RBPM,GIR];                 % high beta xxM1 girder (with fasc corrector)
-M1B      = [GIR,L134,GIR,QDB1,L150,SDB0,L240,QFB,L150,SFB0,L050,FC,L035,QDB2,L140,BPM,RBPM,GIR];      % low beta xxM1 girder
-M1P      = [GIR,L134,GIR,QDP1,L150,SDP0,L240,QFP,L150,SFP0,L050,FC,L035,QDP2,L140,BPM,RBPM,GIR];      % low beta xxM1 girder
+M1B      = [GIR,L134,GIR,QDB1,L150,SDB0,L240,QFB,L150,SFB0,L041,FC,L044,QDB2,L140,BPM,RBPM,GIR];      % low beta xxM1 girder
+M1P      = [GIR,L134,GIR,QDP1,L150,SDP0,L240,QFP,L150,SFP0,L041,FC,L044,QDP2,L140,BPM,RBPM,GIR];      % low beta xxM1 girder
 M2A      = fliplr(M1A);                                                                               % high beta xxM2 girder (with fast correctors)
 M2B      = fliplr(M1B);                                                                               % low beta xxM2 girder
 M2P      = fliplr(M1P);                                                                               % low beta xxM2 girder
