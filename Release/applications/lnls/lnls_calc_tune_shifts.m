@@ -96,12 +96,9 @@ function [tunex,tuney,Jx,Jy] = get_frac_tunes(ring,Rin,nturns)
 meth = 'naff';
 
 % ajuste do numero de voltas para que seja compativel com o naff
-if ~exist('nturns','var'), nturns = 100; end
+if ~exist('nturns','var'), nturns = 22*6-1; end
 
-nt = nextpow2(nturns);
-nturns = 2^nt + 6 - mod(2^nt,6);
-
-Rout = ringpass(ring,Rin,nturns);
+Rout = [Rin,ringpass(ring,Rin,nturns)];
 x  = reshape(Rout(1,:),[],nturns);
 xl = reshape(Rout(2,:),[],nturns);
 y  = reshape(Rout(3,:),[],nturns);
