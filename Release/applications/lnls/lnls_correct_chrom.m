@@ -1,7 +1,15 @@
-function ring = lnls_correct_chrom(ring, fams, chrom, max_iter, tolerancia)
+function ring = lnls_correct_chrom(ring, chrom, fams, max_iter, tolerancia)
+
 
 if ~exist('chrom', 'var')
     chrom = [0,0];
+end
+
+if ~exist('fams', 'var')
+    fams = {'sda1', 'sda2', 'sda3', 'sfa1', 'sfa2', ...
+        'sdb1', 'sdb2', 'sdb3', 'sfb1', 'sfb2', ...
+        'sdp1', 'sdp2', 'sdp3', 'sfp1', 'sfp2', ...
+        };
 end
 
 if ~exist('max_iter', 'var')

@@ -37,7 +37,7 @@ save('the_ring_nosym.mat', 'the_ring1');
 % figure; hold all; plot(r0.pos, r0.betay); plot(r1.pos, r1.betay); 
 
 % Local symmetrization of each ID
-symm_loc.knobs       = {'qfa','qda','qfb','qdb1'};
+symm_loc.knobs       = {'qfa','qda','qfb','qdb1', 'qfp', 'qdp1'};
 symm_loc.nr_iters    = 20;
 symm_loc.tol         = 1e-6;
 symm_loc.goal        = [twiss0.betax(mc(1)),twiss0.alphax(mc(1)),...
@@ -52,12 +52,15 @@ the_ring2 = ids_locally_symmetrize(the_ring1, symm_loc);
 save('the_ring_locsym.mat', 'the_ring2');
 
 % Global symmetrization with tune fitting
-symm_glob.knobs      = {'qfa','qda','qfb','qdb1'};
+symm_glob.knobs      = {'qfa','qda','qfb','qdb1', 'qfp', 'qdp1'};
 symm_glob.id_sections = symm_loc.id_sections;
 symm_glob.nr_iters = 80;
 symm_glob.tol      = 1e-2;
 symm_glob.svs_lst  = [3,5,10,18];
 the_ring2          = ids_globally_symmetrize(the_ring2, tunes0, symm_glob);
+
+% Chromaticity correction
+the_ring2 = lnls_correct_chrom(the_ring2, [2.5,2.5]);
 
 % saves lattice model with ids
 save('the_ring_withids.mat', 'the_ring2');
@@ -102,6 +105,9 @@ symm_glob.nr_iters = 30;
 symm_glob.tol      = 1e-2;
 symm_glob.svs_lst  = [1,3,5,10,20,30,38];
 the_ring2           = ids_globally_symmetrize(the_ring2, tunes0, symm_glob);
+
+% Chromaticity correction
+the_ring2 = lnls_correct_chrom(the_ring2, [2.5,2.5]);
 
 % Checks effect of IDs on optics
 r0 = calctwiss(the_ring0);

@@ -22,8 +22,7 @@ function lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons)
 meth = 'naff';
 
 % ajuste do numero de voltas para que seja compativel com o naff
-nt = nextpow2(nturns);
-nturns = 2^nt + 6 - mod(2^nt,6);
+nturns = nturns +1 - mod(nturns,6);
 
 
 
