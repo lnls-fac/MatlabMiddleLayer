@@ -22,8 +22,7 @@ function lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons)
 meth = 'naff';
 
 % ajuste do numero de voltas para que seja compativel com o naff
-nturns = nturns + 6 - mod(nturns,6) + 1;
-
+nturns = nturns + 6 - mod(nturns,6);
 
 orb = findorbit6(the_ring);
 if any(isnan(orb))
@@ -36,13 +35,15 @@ end
 % faz o tracking nas amplitudes horizontais especificadas no input, setando
 % a posicao vertical inicial para 1e-5 para evitar singularidades do mapa
 % de transferencia e tornar possivel a obtencao da sintonia vertical
-x_amps = x_amps(:);
-Rinx  = [x_amps'+orb(1); zeros(1,length(x_amps))+orb(2); 1e-5*ones(1,length(x_amps))+orb(3); zeros(3,length(x_amps))+repmat(orb(4:6),1,length(x_amps))];
-Routx = ringpass(the_ring,Rinx,nturns);
-coordx_x  = reshape(Routx(1,:),length(x_amps),nturns);
-coordxl_x = reshape(Routx(2,:),length(x_amps),nturns);
-coordy_x  = reshape(Routx(3,:),length(x_amps),nturns);
-coordyl_x = reshape(Routx(4,:),length(x_amps),nturns);
+Rinx      = repmat(orb,1,length(x_amps));
+Rinx(1,:) = Rinx(1,:) + x_amps(:).';
+Rinx(3,:) = Rinx(3,:) + 1e-5;
+
+Routx = [Rinx,ringpass(the_ring,Rinx,nturns)];
+coordx_x  = reshape(Routx(1,:),length(x_amps),nturns+1);
+coordxl_x = reshape(Routx(2,:),length(x_amps),nturns+1);
+coordy_x  = reshape(Routx(3,:),length(x_amps),nturns+1);
+coordyl_x = reshape(Routx(4,:),length(x_amps),nturns+1);
 
 % exclui as particulas perdidas e calcula a sintonia
 ind = ~isnan(coordx_x(:,end));
@@ -61,13 +62,15 @@ fprintf(' [mm] nao sobreviveram\n');
 
 %%
 % a mesma coisa que foi feita para a horizontal eh repetida para vertical
-y_amps = y_amps(:);
-Riny  = [1e-5*ones(1,length(y_amps))+orb(1); zeros(1,length(y_amps))+orb(2); y_amps'+orb(3); zeros(3,length(y_amps))+repmat(orb(4:6),1,length(y_amps))];
-Routy = ringpass(the_ring,Riny,nturns);
-coordx_y  = reshape(Routy(1,:),length(y_amps),nturns);
-coordxl_y = reshape(Routy(2,:),length(y_amps),nturns);
-coordy_y  = reshape(Routy(3,:),length(y_amps),nturns);
-coordyl_y = reshape(Routy(4,:),length(y_amps),nturns);
+Riny      = repmat(orb,1,length(y_amps));
+Riny(3,:) = Riny(3,:) + y_amps(:).';
+Riny(1,:) = Riny(1,:) + 1e-5;
+
+Routy = [Riny,ringpass(the_ring,Riny,nturns)];
+coordx_y  = reshape(Routy(1,:),length(y_amps),nturns+1);
+coordxl_y = reshape(Routy(2,:),length(y_amps),nturns+1);
+coordy_y  = reshape(Routy(3,:),length(y_amps),nturns+1);
+coordyl_y = reshape(Routy(4,:),length(y_amps),nturns+1);
 
 ind = ~isnan(coordx_y(:,end));
 tunex_y = NaN*ind; tuney_y = NaN*ind;
@@ -85,15 +88,16 @@ fprintf(' [mm] nao sobreviveram\n');
 
 %%
 % e agora para as amplitudes de energia
-en_amps = en_amps(:);
-Rinen  = [1e-4*ones(1,length(en_amps))+orb(1); zeros(1,length(en_amps))+orb(2); ...
-          1e-4*ones(1,length(en_amps))+orb(3); zeros(1,length(en_amps))+orb(4); ...
-          en_amps'+orb(5); zeros(1,length(en_amps))+orb(6)];
-Routen = ringpass(the_ring,Rinen,nturns);
-coordx_en  = reshape(Routen(1,:),length(en_amps),nturns);
-coordxl_en = reshape(Routen(2,:),length(en_amps),nturns);
-coordy_en  = reshape(Routen(3,:),length(en_amps),nturns);
-coordyl_en = reshape(Routen(4,:),length(en_amps),nturns);
+Rinen      = repmat(orb,1,length(en_amps));
+Rinen(5,:) = Riny(5,:) + en_amps(:).';
+Rinen(1,:) = Riny(1,:) + 1e-5;
+Rinen(3,:) = Riny(3,:) + 1e-5;
+
+Routen = [Rinen,ringpass(the_ring,Rinen,nturns)];
+coordx_en  = reshape(Routen(1,:),length(en_amps),nturns+1);
+coordxl_en = reshape(Routen(2,:),length(en_amps),nturns+1);
+coordy_en  = reshape(Routen(3,:),length(en_amps),nturns+1);
+coordyl_en = reshape(Routen(4,:),length(en_amps),nturns+1);
 
 ind = ~isnan(coordx_en(:,end));
 tunex_en = NaN*ind; tuney_en = NaN*ind;
