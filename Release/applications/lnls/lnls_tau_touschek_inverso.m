@@ -45,6 +45,11 @@ r0 = Qe^2/(4*pi*ep0*me*c^2);
 gamma = params.E/510.998928e3;
 N     = params.N;
 
+% Exclui dados da mesma posição do anel
+[Accep.s, perm] = unique(Accep.s,'first');
+Accep.pos = Accep.pos(perm);
+Accep.neg = Accep.neg(perm);
+
 % Tabela para interpolar d_touschek
 dinttable = getappdata(0, 'TouschekDIntegralTable');
 if isempty(dinttable)
@@ -56,8 +61,6 @@ else
     x_tabela = dinttable.x_tabela;
     y_tabela = dinttable.y_tabela;
 end
-
-% To Do: use function unique to avoid repeated Accep.s
 
 % calcular o tempo de vida a cada 10 cm do anel:
 npoints = ceil((Accep.s(end) - Accep.s(1))/0.1);

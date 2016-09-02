@@ -1,6 +1,6 @@
 function [par, fit] = lnls_calc_energy_dependent_optics(ring,energy,n, print, sdepend)
 
-if ~exist('energy','var'), energy = (-5:1:5)*1e-2; end;
+if ~exist('energy','var'), energy = (-5:0.2:5)*1e-2; end;
 if ~exist('n','var'), n = 6; end;
 if ~exist('print','var'), print  = false; end;
 if ~exist('sdepend','var'), sdepend = false; end

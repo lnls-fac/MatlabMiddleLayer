@@ -32,8 +32,15 @@ for i = 1:length(lattices)
             pos = spos(maccep(6));
             offset = [0;0;0;0;0;0];
         end
-        info(i).(pl) = lnls_chaos_indicator(si,pl,pos,flag_plot,...
-            calc_window(si,lattices(i).symmetry),offset);
+        
+        param.plane  = pl;
+        param.pos    = pos;
+        param.window = calc_window(si,lattices(i).symmetry);
+        param.offset = offset;
+        param.n_adr  = 130;
+        param.n_dif  = 260;
+        
+        info(i).(pl) = lnls_chaos_indicator(si,param,flag_plot);
         [info(i).(pl).trc_mean,info(i).(pl).trc_std] = ...
             aperture_from_tracking([lattices(i).folder,'trackcpp/'],pl,pos);
         fprintf('%8s : %9.4f, %9.4f, %9.4f, %9.4f --> %9.4f\n',...

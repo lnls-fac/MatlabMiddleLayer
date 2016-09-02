@@ -75,6 +75,12 @@ gen = round(param.gen);
 % range for the variables in the decision variable space. User has to
 % define the objective functions using the decision variables. Make sure to
 % edit the function 'evaluate_objective' to suit your needs.
+if ~isfield(param,'minInitValueDeciVar')
+    param.minInitValueDeciVar = param.minValueDeciVar;
+end
+if ~isfield(param,'maxInitValueDeciVar')
+    param.maxInitValueDeciVar = param.maxValueDeciVar;
+end
 M = param.nObjectives;
 V = param.nDeciVar;
 if param.nObjectives <= 1
@@ -82,6 +88,8 @@ if param.nObjectives <= 1
 end
 min_range = param.minValueDeciVar;
 max_range = param.maxValueDeciVar;
+min_init  = param.minInitValueDeciVar;
+max_init  = param.maxInitValueDeciVar;
 folder = param.folder;
 func = param.objective_function;
 
@@ -105,14 +113,14 @@ if gen_start == 0
     % of the vector which has the decision variables are operated upon to
     % perform the genetic operations like crossover and mutation.
     if ~isfield(param,'initialPop');
-        chromosome = initialize_variables(pop, M, V, min_range, max_range, func);%, param.initialPoints);
+        chromosome = initialize_variables(pop, M, V, min_init, max_init, func);%, param.initialPoints);
     else
         if V == size(param.initialPop,2)
-            chromosome = initialize_variables(pop, M, V, min_range, max_range, func, param.initialPop);
+            chromosome = initialize_variables(pop, M, V, min_init, max_init, func, param.initialPop);
         elseif V+M == size(param.initialPop,2)
             if pop > size(param.initialPop,1)
                 chromosome = initialize_variables(pop-size(param.initialPop,1),...
-                    M, V, min_range, max_range, func, param.initialPop);
+                    M, V, min_init, max_init, func, param.initialPop);
                 chromosome = [param.initialPop; chromosome];
             elseif pop <= size(param.initialPop,1)
                 chromosome = param.initialPop(1:pop,:);

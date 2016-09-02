@@ -101,11 +101,11 @@ if ~exist('nturns','var'), nturns = 100; end
 nt = nextpow2(nturns);
 nturns = 2^nt + 6 - mod(2^nt,6);
 
-Rout = ringpass(ring,Rin,nturns);
-x  = reshape(Rout(1,:),[],nturns);
-xl = reshape(Rout(2,:),[],nturns);
-y  = reshape(Rout(3,:),[],nturns);
-yl = reshape(Rout(4,:),[],nturns);
+Rout = [Rin,ringpass(ring,Rin,nturns)];
+x  = reshape(Rout(1,:),[],nturns+1);
+xl = reshape(Rout(2,:),[],nturns+1);
+y  = reshape(Rout(3,:),[],nturns+1);
+yl = reshape(Rout(4,:),[],nturns+1);
 
 ind = ~isnan(x(:,end));
 tunex = NaN*ind;

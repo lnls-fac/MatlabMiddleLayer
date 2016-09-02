@@ -47,6 +47,8 @@ end
 A = window(:,[1,2]);
 B = window(:,3);
 
+tune(isnan(tune)) = 0;
+
 ind = any(A*tune' > repmat(B,1,size(tune,1)),1);
 
 end
