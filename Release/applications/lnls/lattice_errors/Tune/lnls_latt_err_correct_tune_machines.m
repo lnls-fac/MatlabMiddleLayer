@@ -26,7 +26,7 @@ fprintf('    ------------------------------------------------------- \n');
 fprintf('   |    initial tunes    | converged |     final tunes     |\n');
 fprintf('---|-------------------------------------------------------|\n');
 for i=1:length(machine)
-    [machine{i}, converged, tunesf, tunesi] = lnls_correct_tunes(machine{i}, tune.families, tune.goal, tune.max_iter, tune.tolerance);
+    [machine{i}, converged, tunesf, tunesi] = lnls_correct_tunes(machine{i}, tune.goal, tune.families,tunes.method, tune.max_iter, tune.tolerance);
     if (converged), cstr = 'yes'; else cstr = 'no'; end;
     fprintf('%03i| %9.6f %9.6f |    %3s    | %9.6f %9.6f |\n',i,tunesi,cstr,tunesf);
 end

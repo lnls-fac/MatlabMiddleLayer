@@ -352,6 +352,7 @@ finalizations();
         tune.correction_flag = false;
         tune.families        = {'qfa','qda','qdb2','qfb','qdb1','qdp2','qfp','qdp1'};
         [~, tune.goal]       = twissring(the_ring,0,1:length(the_ring)+1);
+        tune.method          = 'svd';
         tune.max_iter        = 10;
         tune.tolerance       = 1e-6;
      
