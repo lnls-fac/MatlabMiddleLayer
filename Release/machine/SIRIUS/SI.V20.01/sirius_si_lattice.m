@@ -377,6 +377,7 @@ kicks = findcells(the_ring, 'XGrid');
 % value determined by a convergence study and relaxed by running time:
 len_b  = 5e-2;
 len_qs = 1.5e-2;
+len_id = 0.2;
 
 bends_len = getcellstruct(the_ring, 'Length', bends);
 bends_nis = ceil(bends_len / len_b);
@@ -386,5 +387,9 @@ quad_sext_len = getcellstruct(the_ring, 'Length', quad_sext);
 quad_sext_nis = ceil(quad_sext_len / len_qs);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', quad_sext, quad_sext_nis);
 
-the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);
+if ~isempty(kicks)
+    id_total_len = getcellstruct(the_ring, 'Length', kicks);
+    id_nis = ceil(id_total_len / len_id);
+    the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, id_nis);
+end
 
