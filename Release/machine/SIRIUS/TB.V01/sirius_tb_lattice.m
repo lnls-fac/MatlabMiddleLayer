@@ -83,19 +83,19 @@ lcv  = corrector('cv',  0, [0 0], 'CorrectorPass');
 
 
 % --- quadrupoles ---
-q1a   = quadrupole('q1a',  0.05, q1a_strength,  quad_pass_method);   %
-q1b   = quadrupole('q1b',  0.10, q1b_strength,  quad_pass_method);   % LINAC TRIPLET
-q1c   = quadrupole('q1c',  0.05, q1c_strength,  quad_pass_method);   %
-qd2   = quadrupole('qd2',  0.10, qd2_strength,  quad_pass_method); 
-qf2   = quadrupole('qf2',  0.10, qf2_strength,  quad_pass_method); 
-qd3a  = quadrupole('qd3a', 0.10, qd3a_strength, quad_pass_method); 
-qf3a  = quadrupole('qf3a', 0.10, qf3a_strength, quad_pass_method); 
-qf3b  = quadrupole('qf3b', 0.10, qf3b_strength, quad_pass_method); 
-qd3b  = quadrupole('qd3b', 0.10, qd3b_strength, quad_pass_method); 
-qf4   = quadrupole('qf4',  0.10, qf4_strength,  quad_pass_method); 
-qd4   = quadrupole('qd4',  0.10, qd4_strength,  quad_pass_method); 
-qf5   = quadrupole('qf5',  0.10, qf5_strength,  quad_pass_method);
-qd5   = quadrupole('qd5',  0.10, qd5_strength,  quad_pass_method);
+q1a   = quadrupole('q1al',  0.05, q1al_strength,  quad_pass_method);   %
+q1b   = quadrupole('q1bl',  0.10, q1bl_strength,  quad_pass_method);   % LINAC TRIPLET
+q1c   = quadrupole('q1cl',  0.05, q1cl_strength,  quad_pass_method);   %
+qd2   = quadrupole('qd2l',  0.10, qd2l_strength,  quad_pass_method); 
+qf2   = quadrupole('qf2l',  0.10, qf2l_strength,  quad_pass_method); 
+qd3a  = quadrupole('qd3al', 0.10, qd3al_strength, quad_pass_method); 
+qf3a  = quadrupole('qf3al', 0.10, qf3al_strength, quad_pass_method); 
+qf3b  = quadrupole('qf3bl', 0.10, qf3bl_strength, quad_pass_method); 
+qd3b  = quadrupole('qd3bl', 0.10, qd3bl_strength, quad_pass_method); 
+qf4   = quadrupole('qf4l',  0.10, qf4l_strength,  quad_pass_method); 
+qd4   = quadrupole('qd4l',  0.10, qd4l_strength,  quad_pass_method); 
+qf5   = quadrupole('qf5l',  0.10, qf5l_strength,  quad_pass_method);
+qd5   = quadrupole('qd5l',  0.10, qd5l_strength,  quad_pass_method);
 
 % --- bending magnets --- 
 deg_2_rad = (pi/180);

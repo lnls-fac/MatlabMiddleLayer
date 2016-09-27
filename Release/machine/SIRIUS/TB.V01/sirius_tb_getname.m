@@ -51,43 +51,43 @@ switch lower(Family)
     case 'septin'
         ChannelName = 'TBPU-SEPIN-05';
         
-    case 'q1a'
+    case 'q1al'
         ChannelName = ['TBPS-Q1A-01-A'; 'TBPS-Q1A-01-B'];
         
-    case 'q1b'
+    case 'q1bl'
         ChannelName = 'TBPS-Q1B-01';
         
-    case 'q1c'
+    case 'q1cl'
         ChannelName = 'TBPS-Q1C-01';    
     
-    case 'qd2'
+    case 'qd2l'
         ChannelName = 'TBPS-QD-02';
     
-    case 'qf2'
+    case 'qf2l'
         ChannelName = 'TBPS-QF-02';
         
-    case 'qd3a'
+    case 'qd3al'
         ChannelName = 'TBPS-QD-03-A';
         
-    case 'qf3a'
+    case 'qf3al'
         ChannelName = 'TBPS-QF-03-A';
         
-    case 'qf3b'
+    case 'qf3bl'
         ChannelName = 'TBPS-QF-03-B';
         
-    case 'qd3b'
+    case 'qd3bl'
         ChannelName = 'TBPS-QD-03-B';
         
-    case 'qf4'
+    case 'qf4l'
         ChannelName = 'TBPS-QF-04';
         
-    case 'qd4'
+    case 'qd4l'
         ChannelName = 'TBPS-QD-04';  
         
-    case 'qf5'
+    case 'qf5l'
         ChannelName = 'TBPS-QF-05';   
         
-    case 'qd5'
+    case 'qd5l'
         ChannelName = 'TBPS-QD-05';  
         
     case {'hcm', 'ch'}
