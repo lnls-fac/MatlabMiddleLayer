@@ -40,7 +40,7 @@ switch lower(Family)
             error('Don''t know how to make the channel name for family %s', Family);
         end
           
-    case 'bend'
+    case 'diph'
         ChannelName = ['TSPS-BEND-01'; 'TSPS-BEND-02'; 'TSPS-BEND-03'];
 
     case 'septex'

@@ -23,36 +23,34 @@ setad(AD);
 
 % BENDS
 
-AO.bend.FamilyName  = 'bend';
-AO.bend.MemberOf    = {'PlotFamily'; 'bend'; 'BEND'; 'Magnet';};
-AO.bend.DeviceList  = getDeviceList(1,3);
-AO.bend.ElementList = (1:size(AO.bend.DeviceList,1))';
-AO.bend.Status      = ones(size(AO.bend.DeviceList,1),1);
-AO.bend.Position    = [];
-AO.bend.ExcitationCurves = sirius_getexcdata(repmat('tsma-bend', size(AO.bend.DeviceList,1), 1)); 
-
-AO.bend.Monitor.MemberOf = {};
-AO.bend.Monitor.Mode = 'Simulator';
-AO.bend.Monitor.DataType = 'Scalar';
-AO.bend.Monitor.ChannelNames = sirius_ts_getname(AO.bend.FamilyName, 'Monitor', AO.bend.DeviceList);
-AO.bend.Monitor.HW2PhysicsFcn = @bend2gev;
-AO.bend.Monitor.Physics2HWFcn = @gev2bend;
-AO.bend.Monitor.Units        = 'Hardware';
-AO.bend.Monitor.HWUnits      = 'Ampere';
-AO.bend.Monitor.PhysicsUnits = 'GeV';
-
-AO.bend.Setpoint.MemberOf = {'MachineConfig';};
-AO.bend.Setpoint.Mode = 'Simulator';
-AO.bend.Setpoint.DataType = 'Scalar';
-AO.bend.Setpoint.ChannelNames = sirius_ts_getname(AO.bend.FamilyName, 'Setpoint', AO.bend.DeviceList);
-AO.bend.Setpoint.HW2PhysicsFcn = @bend2gev;
-AO.bend.Setpoint.Physics2HWFcn = @gev2bend;
-AO.bend.Setpoint.Units        = 'Hardware';
-AO.bend.Setpoint.HWUnits      = 'Ampere';
-AO.bend.Setpoint.PhysicsUnits = 'GeV';
-AO.bend.Setpoint.Range        = [0 300];
-AO.bend.Setpoint.Tolerance    = .1;
-AO.bend.Setpoint.DeltaRespMat = .01;
+AO.diph.FamilyName  = 'diph';
+AO.diph.MemberOf    = {'PlotFamily'; 'diph'; 'BEND'; 'Magnet';};
+AO.diph.DeviceList  = getDeviceList(1,3);
+AO.diph.ElementList = (1:size(AO.diph.DeviceList,1))';
+AO.diph.Status      = ones(size(AO.diph.DeviceList,1),1);
+AO.diph.Position    = [];
+AO.diph.ExcitationCurves = sirius_getexcdata(repmat('tsma-diph', size(AO.diph.DeviceList,1), 1)); 
+AO.diph.Monitor.MemberOf = {};
+AO.diph.Monitor.Mode = 'Simulator';
+AO.diph.Monitor.DataType = 'Scalar';
+AO.diph.Monitor.ChannelNames = sirius_ts_getname(AO.diph.FamilyName, 'Monitor', AO.diph.DeviceList);
+AO.diph.Monitor.HW2PhysicsFcn = @diph2gev;
+AO.diph.Monitor.Physics2HWFcn = @gev2diph;
+AO.diph.Monitor.Units        = 'Hardware';
+AO.diph.Monitor.HWUnits      = 'Ampere';
+AO.diph.Monitor.PhysicsUnits = 'GeV';
+AO.diph.Setpoint.MemberOf = {'MachineConfig';};
+AO.diph.Setpoint.Mode = 'Simulator';
+AO.diph.Setpoint.DataType = 'Scalar';
+AO.diph.Setpoint.ChannelNames = sirius_ts_getname(AO.diph.FamilyName, 'Setpoint', AO.diph.DeviceList);
+AO.diph.Setpoint.HW2PhysicsFcn = @diph2gev;
+AO.diph.Setpoint.Physics2HWFcn = @gev2diph;
+AO.diph.Setpoint.Units        = 'Hardware';
+AO.diph.Setpoint.HWUnits      = 'Ampere';
+AO.diph.Setpoint.PhysicsUnits = 'GeV';
+AO.diph.Setpoint.Range        = [0 300];
+AO.diph.Setpoint.Tolerance    = .1;
+AO.diph.Setpoint.DeltaRespMat = .01;
 
 % Septa
 

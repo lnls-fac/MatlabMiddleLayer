@@ -1,5 +1,6 @@
 function [r, lattice_title, IniCond] = sirius_ts_lattice(varargin)
 % 2013-11-26 created Ximenes (from V100)
+% 2016-09-28 V01.02 - new version (Ximenes) - see 'VERSIONS.txt' in Release/machine/SIRIUS
 
 %% global parameters 
 %  =================
@@ -58,7 +59,7 @@ ld3p     = drift('ld3p', 0.143, 'DriftPass');
 
 % --- markers ---
 
-mbend    = marker('mbend',  'IdentityPass');
+mbend    = marker('mdiph',  'IdentityPass');
 start    = marker('start',  'IdentityPass');
 fim      = marker('end',    'IdentityPass');
 
@@ -84,7 +85,7 @@ cv     = corrector('cv',  0, [0 0], 'CorrectorPass');
 
       
 % -- bend --
-%dip_nam =  'bend';
+%dip_nam =  'diph';
 %dip_len =  1.151658;
 %dip_ang =  5.333333 * deg_2_rad;
 %dip_K   =  -0.1526;
@@ -95,16 +96,16 @@ cv     = corrector('cv',  0, [0 0], 'CorrectorPass');
 %           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
 %bend      = [h1 mbend h2];      
 f = 5.011542/5.333333;
-h1  = rbend_sirius('bend', 0.196, d2r * 0.8597 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.163 -1.443 0] * f, bend_pass_method);
-h2  = rbend_sirius('bend', 0.192, d2r * 0.8467 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.154 -1.418 0] * f, bend_pass_method);
-h3  = rbend_sirius('bend', 0.182, d2r * 0.8099 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.14 -1.403 0] * f, bend_pass_method);
-h4  = rbend_sirius('bend', 0.010, d2r * 0.0379 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.175 -1.245 0] * f, bend_pass_method);
-h5  = rbend_sirius('bend', 0.010, d2r * 0.0274 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.115 -0.902 0] * f, bend_pass_method);
-h6  = rbend_sirius('bend', 0.013, d2r * 0.0244 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.042 -1.194 0] * f, bend_pass_method);
-h7  = rbend_sirius('bend', 0.017, d2r * 0.0216 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.008 -1.408 0] * f, bend_pass_method);
-h8  = rbend_sirius('bend', 0.020, d2r * 0.0166 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0] * f, bend_pass_method);
-h9  = rbend_sirius('bend', 0.030, d2r * 0.0136 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0] * f, bend_pass_method);
-h10 = rbend_sirius('bend', 0.05,  d2r * 0.0089 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0] * f, bend_pass_method);
+h1  = rbend_sirius('diph', 0.196, d2r * 0.8597 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.163 -1.443 0] * f, bend_pass_method);
+h2  = rbend_sirius('diph', 0.192, d2r * 0.8467 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.154 -1.418 0] * f, bend_pass_method);
+h3  = rbend_sirius('diph', 0.182, d2r * 0.8099 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.14 -1.403 0] * f, bend_pass_method);
+h4  = rbend_sirius('diph', 0.010, d2r * 0.0379 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.175 -1.245 0] * f, bend_pass_method);
+h5  = rbend_sirius('diph', 0.010, d2r * 0.0274 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.115 -0.902 0] * f, bend_pass_method);
+h6  = rbend_sirius('diph', 0.013, d2r * 0.0244 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.042 -1.194 0] * f, bend_pass_method);
+h7  = rbend_sirius('diph', 0.017, d2r * 0.0216 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.008 -1.408 0] * f, bend_pass_method);
+h8  = rbend_sirius('diph', 0.020, d2r * 0.0166 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0] * f, bend_pass_method);
+h9  = rbend_sirius('diph', 0.030, d2r * 0.0136 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0] * f, bend_pass_method);
+h10 = rbend_sirius('diph', 0.05,  d2r * 0.0089 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0] * f, bend_pass_method);
 
 bend = [h10 h9 h8 h7 h6 h5 h4 h3 h2 h1 mbend h1 h2 h3 h4 h5 h6 h7 h8 h9 h10];
 
