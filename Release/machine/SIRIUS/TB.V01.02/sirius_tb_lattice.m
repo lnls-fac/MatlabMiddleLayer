@@ -3,13 +3,14 @@ function [r, lattice_title, IniCond] = sirius_tb_lattice(varargin)
 % 2013-12-02 V200 - from OPA (Ximenes)
 % 2014-10-20 V300 - new version (Liu)
 % 2015-08-26 V01 - new version (Liu)
+% 2016-09-28 V01.02 - new version (Ximenes) - see 'VERSIONS.txt' in Release/machine/SIRIUS
 
 %% global parameters 
 %  =================
 
 % --- system parameters ---
 energy = 0.15e9;
-lattice_version = 'TB.V01';
+lattice_version = 'TB.V01.02';
 mode = 'M';
 version = '1';
 mode_version = [mode version];
@@ -83,19 +84,19 @@ lcv  = corrector('cv',  0, [0 0], 'CorrectorPass');
 
 
 % --- quadrupoles ---
-q1a   = quadrupole('q1a',  0.05, q1a_strength,  quad_pass_method);   %
-q1b   = quadrupole('q1b',  0.10, q1b_strength,  quad_pass_method);   % LINAC TRIPLET
-q1c   = quadrupole('q1c',  0.05, q1c_strength,  quad_pass_method);   %
-qd2   = quadrupole('qd2',  0.10, qd2_strength,  quad_pass_method); 
-qf2   = quadrupole('qf2',  0.10, qf2_strength,  quad_pass_method); 
-qd3a  = quadrupole('qd3a', 0.10, qd3a_strength, quad_pass_method); 
-qf3a  = quadrupole('qf3a', 0.10, qf3a_strength, quad_pass_method); 
-qf3b  = quadrupole('qf3b', 0.10, qf3b_strength, quad_pass_method); 
-qd3b  = quadrupole('qd3b', 0.10, qd3b_strength, quad_pass_method); 
-qf4   = quadrupole('qf4',  0.10, qf4_strength,  quad_pass_method); 
-qd4   = quadrupole('qd4',  0.10, qd4_strength,  quad_pass_method); 
-qf5   = quadrupole('qf5',  0.10, qf5_strength,  quad_pass_method);
-qd5   = quadrupole('qd5',  0.10, qd5_strength,  quad_pass_method);
+q1a   = quadrupole('q1al',  0.05, q1al_strength,  quad_pass_method);   %
+q1b   = quadrupole('q1bl',  0.10, q1bl_strength,  quad_pass_method);   % LINAC TRIPLET
+q1c   = quadrupole('q1cl',  0.05, q1cl_strength,  quad_pass_method);   %
+qd2   = quadrupole('qd2l',  0.10, qd2l_strength,  quad_pass_method); 
+qf2   = quadrupole('qf2l',  0.10, qf2l_strength,  quad_pass_method); 
+qd3a  = quadrupole('qd3al', 0.10, qd3al_strength, quad_pass_method); 
+qf3a  = quadrupole('qf3al', 0.10, qf3al_strength, quad_pass_method); 
+qf3b  = quadrupole('qf3bl', 0.10, qf3bl_strength, quad_pass_method); 
+qd3b  = quadrupole('qd3bl', 0.10, qd3bl_strength, quad_pass_method); 
+qf4   = quadrupole('qf4l',  0.10, qf4l_strength,  quad_pass_method); 
+qd4   = quadrupole('qd4l',  0.10, qd4l_strength,  quad_pass_method); 
+qf5   = quadrupole('qf5l',  0.10, qf5l_strength,  quad_pass_method);
+qd5   = quadrupole('qd5l',  0.10, qd5l_strength,  quad_pass_method);
 
 % --- bending magnets --- 
 deg_2_rad = (pi/180);
@@ -110,7 +111,7 @@ spech      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0, 0, 0,0,0, [0,0,0], [
 spec   = [spech, spech];
 
 % -- bn --
-dip_nam =  'bn';
+dip_nam =  'dipl';
 dip_len =  0.300858;
 dip_ang =  -15 * deg_2_rad;
 dip_K   =  0.0;
@@ -120,7 +121,7 @@ bns     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 
 bn      = [bne, bns];
       
 % -- bp --
-dip_nam =  'bp';
+dip_nam =  'dipl';
 dip_len =  0.300858;
 dip_ang =  15 * deg_2_rad;
 dip_K   =  0.0;
@@ -130,15 +131,15 @@ bps     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 
 bp      = [bpe, bps];      
 
 % -- bo injection septum --
-dip_nam =  'septin';
+dip_nam =  'injsept';
 dip_len =  0.50;
 dip_ang =  21.75 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
 septine = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
 septins = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-bseptin = marker('bseptin','IdentityPass');
-eseptin = marker('eseptin','IdentityPass');
+bseptin = marker('binjsept','IdentityPass');
+eseptin = marker('einjsept','IdentityPass');
 septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
 
@@ -208,8 +209,8 @@ for i=[bn, bp]
 end
 
 % -- bo injection septum --
-mbeg = findcells(the_ring, 'FamName', 'bseptin');
-mend = findcells(the_ring, 'FamName', 'eseptin');
+mbeg = findcells(the_ring, 'FamName', 'binjsept');
+mend = findcells(the_ring, 'FamName', 'einjsept');
 for i=mbeg:mend
     the_ring{i}.VChamber = [0.0075, 0.008, 2];
 end
