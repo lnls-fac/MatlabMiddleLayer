@@ -7,7 +7,7 @@ function [the_ring, lattice_title] = sirius_bo_lattice(varargin)
 % 2015-09-03 novo modelo QD: Leff = 100.74 mm - Ximenes.
 % 2015-09-08 novo modelo QF: Leff = 227.46 mm - Ximenes.
 % 2015-09-14 novos modelos de corretoras com Leff = 150.18 mm - Ximenes.
-% 2015-11-04 modelos com comprimentos multiplos de milímetros - Ximenes.
+% 2015-11-04 modelos com comprimentos multiplos de mil??metros - Ximenes.
 % 2015-11-04 segmented model of B corrected (last element had 5 mm, instead of 50 mm)
 
 %%% HEADER SECTION %%%
@@ -16,7 +16,7 @@ global THERING
 
 energy = 0.15e9; % eV
 
-lattice_version = 'BO.V03.01';
+lattice_version = 'BO.V02.04';
 for i=1:length(varargin)
 	energy = varargin{i} * 1e9;
 end
@@ -43,23 +43,23 @@ set_magnets_strength_booster;
 
 % loads dipole segmented model:
 b_len_hdedge   = 1.152; % [m]
-[B, b_len_seg] = sirius_bo_b_segmented_model('b', bend_pass_method);
+[B, b_len_seg] = sirius_bo_b_segmented_model('dipb', bend_pass_method);
 lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 
+L00880  = drift('l00880', 0.0880, 'DriftPass');
 L01340  = drift('l01340', 0.1340, 'DriftPass');
 L01615  = drift('l01615', 0.1615, 'DriftPass');
 L01725  = drift('l01725', 0.1725, 'DriftPass');
 L02410  = drift('l02410', 0.2410, 'DriftPass');
 L03365  = drift('l03365', 0.3365, 'DriftPass');
-L03600  = drift('l03600', 0.3600, 'DriftPass');
 L05550  = drift('l05550', 0.5550, 'DriftPass');
 L07250  = drift('l07250', 0.7250, 'DriftPass');
 L10000  = drift('l10000', 1.0000, 'DriftPass');
 L10960  = drift('l10960', 1.0960, 'DriftPass');
 L11325  = drift('l11325', 1.1325, 'DriftPass');
 L12960  = drift('l12960', 1.2960, 'DriftPass');
-L14110  = drift('l14110', 1.4110, 'DriftPass');
 L14710  = drift('l14710', 1.4710, 'DriftPass');
+L16830  = drift('l16830', 1.6830, 'DriftPass');
 L17710  = drift('l17710', 1.7710, 'DriftPass');
 L17935  = drift('l17935', 1.7935, 'DriftPass');
 L17955  = drift('l17955', 1.7955, 'DriftPass');
@@ -100,7 +100,7 @@ US_SS = [D02475, SD, GIR, L17935, BPM, L18935, GIR, SF, L01340];
 US_SI = [D02250, CV, GIR, L17710, BPM, L10960, SIN, L07250, GIR, CH, L01615];
 US_CS = [D02475, SD, L01725, CV, GIR, L14710, BPM, L18210, GIR, CH, L01615];
 US_CC = [D02250, CV, GIR, L17710, BPM, L18210, GIR, CH, L01615];
-US_SE = [D02250, CV, GIR, L14110, SEX, L03600, L10000, BPM, L11325, GIR];
+US_SE = [D02250, CV, GIR, L16830, SEX, L00880, L10000, BPM, L11325, GIR];
 
 DS    = [GIR, L21325, D21460, GIR];
 DS_QD = [GIR, L21325, L17955, GIR, QD, D02495];
@@ -224,7 +224,7 @@ function the_ring = set_vacuum_chamber(the_ring)
 bends_vchamber =      [0.0117 0.0117 1];   % n = 100: ~rectangular
 other_vchamber =      [0.018  0.018  1];   % n = 1;   circular/eliptica
 extraction_vchamber = [0.026  0.018  1];   % n = 1;   circular/eliptica
-injection_vchamber  = [0.050  0.018  1];
+
 
 % default
 for i=1:length(the_ring)
@@ -232,12 +232,12 @@ for i=1:length(the_ring)
 end
 
 % bends
-b = [findcells(the_ring, 'FamName', 'b') findcells(the_ring, 'FamName', 'mb')];
+b = [findcells(the_ring, 'FamName', 'dipb') findcells(the_ring, 'FamName', 'mdipb')];
 for i=b
     the_ring{i}.VChamber = bends_vchamber;
 end
 
-% extraction bend
+% ejection bend
 ejek = findcells(the_ring, 'FamName', 'ejek');
 sept_ex = findcells(the_ring, 'FamName', 'sept_ex');
 b_ex = b((b > ejek(end)) & (b < sept_ex(1)));
@@ -249,17 +249,7 @@ end
 for i=b_ex(end):sept_ex(1)
     the_ring{i}.VChamber = extraction_vchamber;
 end
-
-% sector from injection point to injection kicker
-sept_in = findcells(the_ring, 'FamName', 'sept_in');
-injk = findcells(the_ring, 'FamName', 'injk');
-for i=sept_in(end):length(the_ring)
-    the_ring{i}.VChamber = injection_vchamber;
-end
-for j=1:injk(1)
-    the_ring{j}.VChamber = injection_vchamber;
-end
-
+    
 
 function the_ring = set_girders(the_ring)
 idx = findcells(the_ring,'FamName','bpm'); idx = idx(end);
