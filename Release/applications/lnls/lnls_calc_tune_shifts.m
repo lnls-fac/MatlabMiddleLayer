@@ -17,8 +17,8 @@ function [tunex,tuney,px,py,amps] = lnls_calc_tune_shifts(ring,print,amps, npols
 
 if ~exist('print','var'), print = false; end
 if ~exist('amps','var'), amps = struct(); end
-if ~isfield(amps,'x'), amps.x = -(1:2:80)*1e-4; end
-if ~isfield(amps,'y'), amps.y = (1:25)*1e-4; end
+if ~isfield(amps,'x'), amps.x = -(1:2:100)*1e-4; end
+if ~isfield(amps,'y'), amps.y = (1:30)*1e-4; end
 if ~exist('npols','var'), npols = struct(); end
 if ~isfield(npols,'x'), npols.x = 3; end
 if ~isfield(npols,'y'), npols.y = 3; end

@@ -52,7 +52,7 @@ p = 1;
 % Flags used to set if crossover and mutation were actually performed.
 was_crossover = 0;
 was_mutation = 0;
-max_tent = 30;
+max_tent = 50;
 
 for i = 1 : N
     % With 60 % probability perform crossover
@@ -196,21 +196,25 @@ while true
             delta(j) = 1 - (2*(1 - r(j)))^(1/(mum+1));
         end
         % Generate the corresponding child element.
-        child_3(j) = child_3(j) + scale*(u_limit(j)-l_limit(j))*delta(j);
+        % child_3(j) = child_3(j) + scale*(u_limit(j)-l_limit(j))*delta(j);
+        % child_3(j) = child_3(j)*(1 + scale*delta(j));
         % Make sure that the generated element is within the decision
         % space.
-        if child_3(j) > u_limit(j)
-            child_3(j) = u_limit(j);
-        elseif child_3(j) < l_limit(j)
-            child_3(j) = l_limit(j);
-        end
+        % if child_3(j) > u_limit(j)
+        %     child_3(j) = u_limit(j);
+        % elseif child_3(j) < l_limit(j)
+        %     child_3(j) = l_limit(j);
+        % end
     end
+    child_3(1:V) = child_3(1:V).*(1 + scale.*delta);
+    child_3(1:V) = min(child_3(1:V), u_limit);
+    child_3(1:V) = max(child_3(1:V), l_limit);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Again, I decided not to change the algorithm, but I could try
     % to let the random selection of the parent_3 and only modify
     % the result obtained by mutation, child_3.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    [a, accept] = func(child_3);
+    [a, accept] = func(child_3(1:V));
     if accept
         fprintf('.');
         if ~mod(i,50), fprintf('\n');end
@@ -219,7 +223,7 @@ while true
     end
     %condicao para nao cair em loop infinito
     if (maxi >= max_tent)
-        fprintf('%03d: Child = parent\n',i);
+        fprintf('o');
         child_3=parent_chromosome(parent_3,1:(M+V));
         break;
     end

@@ -89,9 +89,9 @@ fprintf(' [mm] nao sobreviveram\n');
 %%
 % e agora para as amplitudes de energia
 Rinen      = repmat(orb,1,length(en_amps));
-Rinen(5,:) = Riny(5,:) + en_amps(:).';
-Rinen(1,:) = Riny(1,:) + 1e-5;
-Rinen(3,:) = Riny(3,:) + 1e-5;
+Rinen(5,:) = Rinen(5,:) + en_amps(:).';
+Rinen(1,:) = Rinen(1,:) + 1e-5;
+Rinen(3,:) = Rinen(3,:) + 1e-5;
 
 Routen = [Rinen,ringpass(the_ring,Rinen,nturns)];
 coordx_en  = reshape(Routen(1,:),length(en_amps),nturns+1);

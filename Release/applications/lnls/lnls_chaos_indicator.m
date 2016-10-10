@@ -43,10 +43,10 @@ indicator = struct('aper_stb', [], 'aper_adr', [], 'aper_dif', [], ...
     'tunex', [], 'tuney', [], 'x_dif', []);
 
 if isstruct(param)
-    if ~isfield(param,'plane'), error('Define Plane'); end
-    if ~isfield(param,'pos'), param.pos       = 0.0; end
-    if ~isfield(param,'n_adr'), param.n_adr   = 130; end
-    if ~isfield(param,'n_dif'), param.n_dif   = 121; end
+    if ~isfield(param,'plane'),  error('Define Plane'); end
+    if ~isfield(param,'pos'),    param.pos    = 0.0; end
+    if ~isfield(param,'n_adr'),  param.n_adr  = 130; end
+    if ~isfield(param,'n_dif'),  param.n_dif  = 121; end
     if ~isfield(param,'window'), param.window = [-1 0 0; 0 -1 0; 1 0 0.5; 0 1 0.5]; end
     if ~isfield(param,'offset'), param.offset = [0;0;0;0;0;0]; end
     

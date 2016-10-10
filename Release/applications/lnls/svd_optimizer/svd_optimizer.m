@@ -3,8 +3,8 @@ function [x,all_val] = svd_optimizer(x0, params)
 if exist('stop','file'), delete 'stop'; end
 
 if params.plot, 
-    f =  figure('OuterPosition',[1,480,1920,600]);
-    f2 =  figure('OuterPosition',[1,1,1300,480]);
+    f  = figure('OuterPosition',[1,480,1920,600]);
+    f2 = figure('OuterPosition',[1,1,1300,480]);
     ax = axes('Parent',f,'Position',[0.05,0.1,0.9,0.85]);
     ay = axes('Parent',f2,'Position',[0.05,0.1,0.9,0.85]);
     drawnow;

@@ -1,4 +1,4 @@
-function the_ring = ids_symmetrize(the_ring, params)
+function [the_ring, quad_strength] = ids_symmetrize(the_ring, params)
 
 % Start at the last mc marker to preserve sections numbers
 idx = findcells(the_ring, 'FamName', 'mc');  idx = idx(end)-1;
@@ -16,6 +16,8 @@ optionals.twiss0 = calctwiss(the_ring0,'n+1');
 
 id_sections = params.id_sections;
 fprintf('\nSYMMETRIZATION OF OPTICS:\n');
+
+quad_strength = struct();
 for i=1:length(id_sections)
     fprintf('\nsection: %02d --> ', id_sections(i));
     
@@ -45,7 +47,9 @@ for i=1:length(id_sections)
     optionals.look_tune  = params.look_tune;
     
     % symmetrize one ID
-    the_line = symmetrize_id_straight_sector(the_line, optionals, knobs_idx, knobs_fams, params);
+    [the_line, dK] = symmetrize_id_straight_sector(the_line, optionals, knobs_idx, knobs_fams, params);
+    quad_strength(i).fams = knobs_fams;
+    quad_strength(i).dK = dK; 
     the_ring(line) = the_line;
 end
 the_ring = circshift(the_ring,[0,idx]);
@@ -53,7 +57,7 @@ fprintf('\n');
 end
 
 
-function the_line = symmetrize_id_straight_sector(the_line, optionals, knobs_idx, knobs_fams, params)
+function [the_line, accum_dK] = symmetrize_id_straight_sector(the_line, optionals, knobs_idx, knobs_fams, params)
 
 factor = 1;
 residue_vec = calc_residue_local_symm(the_line, optionals);
