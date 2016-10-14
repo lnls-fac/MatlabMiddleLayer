@@ -11,6 +11,7 @@ data.sf.nr_segs  = 1;
 data.bpm.nr_segs = 1;
 data.ch.nr_segs  = 1;
 data.cv.nr_segs  = 1;
+data.qsb.nr_segs = 1;
 
 fams = fields(data);
 for i=1:length(fams)

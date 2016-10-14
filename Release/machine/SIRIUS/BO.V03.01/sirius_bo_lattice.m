@@ -9,6 +9,7 @@ function [the_ring, lattice_title] = sirius_bo_lattice(varargin)
 % 2015-09-14 novos modelos de corretoras com Leff = 150.18 mm - Ximenes.
 % 2015-11-04 modelos com comprimentos multiplos de mil??metros - Ximenes.
 % 2015-11-04 segmented model of B corrected (last element had 5 mm, instead of 50 mm)
+% 2016-10-14 skew quadrupole QSB added at sector 02U to introduce coupling up to 5%
 
 %%% HEADER SECTION %%%
 
@@ -16,7 +17,7 @@ global THERING
 
 energy = 0.15e9; % eV
 
-lattice_version = 'BO.E02.04';
+lattice_version = 'BO.V03.01';
 for i=1:length(varargin)
 	energy = varargin{i} * 1e9;
 end
@@ -75,12 +76,13 @@ D02475 = drift('d02475',  0.2475-lenDif, 'DriftPass');
 D02495 = drift('d02495',  0.2495-lenDif, 'DriftPass');
 D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 
-STR  = marker('start',   'IdentityPass');     % start of the model
-FIM  = marker('end',     'IdentityPass');     % end of the model
+STR  = marker('start',   'IdentityPass');    % start of the model
+FIM  = marker('end',     'IdentityPass');    % end of the model
 GIR  = marker('girder',  'IdentityPass');
-SIN  = marker('sept_in', 'IdentityPass');
-SEX  = marker('sept_ex', 'IdentityPass');
+SIN  = marker('injsl',   'IdentityPass');    % end of BO injection septum at TB transport line
+SEX  = marker('ejesfh',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
 BPM  = marker('bpm',     'IdentityPass');
+
 
 KIN  = quadrupole('injk', 0.500,     0.0,         quad_pass_method);
 KEX  = quadrupole('ejek', 0.500,     0.0,         quad_pass_method);
@@ -92,7 +94,7 @@ SD  = sirius_bo_sx_segmented_model(energy, 'sd', sext_pass_method, sd_strength *
 QD  = sirius_bo_qd_segmented_model(energy, 'qd', quad_pass_method, qd_strength * 0.101);
 QF  = sirius_bo_qf_segmented_model(energy, 'qf', quad_pass_method, qf_strength * 0.227);
 
-QS  = quadrupole('qs',  0.10, 0.0,  quad_pass_method);
+QS  = quadrupole('qsb',  0.10, 0.0,  quad_pass_method);
 
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
 
@@ -243,11 +245,12 @@ end
 
 % ejection bend
 ejek = findcells(the_ring, 'FamName', 'ejek');
-sept_ex = findcells(the_ring, 'FamName', 'sept_ex');
+sept_ex = findcells(the_ring, 'FamName', 'ejesfh');
 b_ex = b((b > ejek(end)) & (b < sept_ex(1)));
 for i=b_ex
     the_ring{i}.VChamber = other_vchamber;
 end
+
 
 % sector from extraction bend to extraction septum
 for i=b_ex(end):sept_ex(1)

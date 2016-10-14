@@ -88,6 +88,12 @@ switch lower(Family)
 			'BOPS-QF-45'; 'BOPS-QF-46'; 'BOPS-QF-47'; 'BOPS-QF-48' ;...
 			'BOPS-QF-49'; 'BOPS-QF-50'; ];
 
+    case 'qsb_fam'
+		ChannelName = 'BOPS-QSB-FAM';
+
+	case 'qsb'
+		ChannelName = 'BOPS-QSB-02';
+        
 	case 'sf_fam'
 		ChannelName = 'BOPS-SF-FAM';
 

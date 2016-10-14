@@ -68,6 +68,15 @@ catch
 end
 
 try
+    % QSB
+    AO.qsb.AT.ATType = 'QUAD';
+    AO.qsb.AT.ATIndex = buildatindex(AO.qsb.FamilyName, Indices.qsb);
+    AO.qsb.Position = findspos(THERING, AO.qsb.AT.ATIndex(:,1));
+catch
+    warning('QSB family not found in the model.');
+end
+
+try
     % SD
     AO.sd.AT.ATType = 'SEXT';
     AO.sd.AT.ATIndex = buildatindex(AO.sd.FamilyName, Indices.sd);

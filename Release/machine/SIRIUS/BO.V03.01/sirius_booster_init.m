@@ -160,6 +160,35 @@ AO.qf.Setpoint.Range         = [-5 5];
 AO.qf.Setpoint.Tolerance     = 0.002;
 AO.qf.Setpoint.DeltaRespMat  = 0.05; 
 
+AO.qsb.FamilyName = 'qsb';
+AO.qsb.MemberOf    = {'PlotFamily'; 'qsb'; 'SkewQUAD'; 'Magnet'; 'Coupling Corrector'};
+AO.qsb.DeviceList  = getDeviceList(2,1);
+AO.qsb.ElementList = (1:size(AO.qsb.DeviceList,1))';
+AO.qsb.Status      = ones(size(AO.qsb.DeviceList,1),1);
+AO.qsb.Position    = [];
+AO.qsb.ExcitationCurves = sirius_getexcdata(repmat('boma-qsb', size(AO.qsb.DeviceList,1), 1)); 
+AO.qsb.Monitor.MemberOf = {};
+AO.qsb.Monitor.Mode = 'Simulator';
+AO.qsb.Monitor.DataType = 'Scalar';
+AO.qsb.Monitor.Units        = 'Hardware';
+AO.qsb.Monitor.HWUnits      = 'Ampere';
+AO.qsb.Monitor.PhysicsUnits = 'meter^-2';
+AO.qsb.Monitor.ChannelNames = repmat(sirius_booster_getname('qsb_fam', 'Monitor'), size(AO.qsb.DeviceList,1), 1);
+AO.qsb.Monitor.HW2PhysicsFcn  = @sirius_hw2ph;
+AO.qsb.Monitor.Physics2HWFcn  = @sirius_ph2hw;
+AO.qsb.Setpoint.MemberOf      = {'MachineConfig'};
+AO.qsb.Setpoint.Mode          = 'Simulator';
+AO.qsb.Setpoint.DataType      = 'Scalar';
+AO.qsb.Setpoint.Units         = 'Hardware';
+AO.qsb.Setpoint.HWUnits       = 'Ampere';
+AO.qsb.Setpoint.PhysicsUnits  = 'meter^-2';
+AO.qsb.Setpoint.ChannelNames = repmat(sirius_booster_getname('qsb_fam', 'Setpoint'), size(AO.qsb.DeviceList,1), 1);
+AO.qsb.Setpoint.HW2PhysicsFcn = @sirius_hw2ph;
+AO.qsb.Setpoint.Physics2HWFcn = @sirius_ph2hw;
+AO.qsb.Setpoint.Range         = [-5 5];
+AO.qsb.Setpoint.Tolerance     = 0.002;
+AO.qsb.Setpoint.DeltaRespMat  = 0.05; 
+
 %SEXT
 AO.sd.FamilyName = 'sd';
 AO.sd.MemberOf    = {'PlotFamily'; 'sd'; 'SEXT'; 'Magnet'; 'Chromaticity Corrector'};
