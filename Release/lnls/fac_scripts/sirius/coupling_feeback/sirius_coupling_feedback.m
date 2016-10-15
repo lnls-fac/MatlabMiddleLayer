@@ -82,6 +82,7 @@ if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'
 end
    
 % --- run coupling feedback on random machines ---
+% !!! response matrix of nominal machine is being used for all random machines !!!
 if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'), 'run_feedback')
     load('results.mat'); if ~exist('feedback','var'), feedback = random_machines_opt_ids_fb.feedback; end
     random_machines_opt_ids_fb = apply_feedback_machine(feedback, 200);
