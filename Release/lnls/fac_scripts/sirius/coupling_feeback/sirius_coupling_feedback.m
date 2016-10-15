@@ -5,16 +5,17 @@ setappdata(0,'sirius_cfb_run_all', false);
 
 
 setappdata(0,'sirius_cfb_run_at', '');
-% setappdata(0,'sirius_cfb_run_at', 'the_ring_coup');
-% setappdata(0,'sirius_cfb_run_at', 'random_machines');
-% setappdata(0,'sirius_cfb_run_at', 'random_machines_opt');
+%setappdata(0,'sirius_cfb_run_at', 'the_ring_coup');
+%setappdata(0,'sirius_cfb_run_at', 'random_machines');
+%setappdata(0,'sirius_cfb_run_at', 'random_machines_opt');
 %setappdata(0,'sirius_cfb_run_at', 'random_machines_opt_ids');
-setappdata(0,'sirius_cfb_run_at', 'calc_respm');
+%setappdata(0,'sirius_cfb_run_at', 'calc_respm');
+%setappdata(0,'sirius_cfb_run_at', 'run_feedback');
 
 
 % --- load nominal machine ---
 if strcmp(getappdata(0,'sirius_cfb_run_at'), '')
-    the_ring.lattice_version = 'SI.V18.01';
+    the_ring.lattice_version = 'SI.V20.01';
     save('results.mat'); setappdata(0,'sirius_cfb_run_all',true);
     clear('the_ring');
 end
@@ -27,7 +28,7 @@ if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'
     coup.sim_anneal.nr_iterations = 0*10000;
     coup.sim_anneal.scale_tilt = 0.5 * (pi / 180); 
     coup.sim_anneal.scale_sigmay = 0.5 * 1e-6;
-    coup.fname_the_ring_coup = [the_ring.lattice_version, '-ring_coup3p0-5.1016.mat'];
+    coup.fname_the_ring_coup = [the_ring.lattice_version, '-ring_coup3p0.mat'];
     the_ring_coup = generate_the_ring_with_controlled_coupling(the_ring, coup); clear('coup'); clear('the_ring');
     save('results.mat'); setappdata(0,'sirius_cfb_run_all',true);
     clear('the_ring_coup');
@@ -36,7 +37,8 @@ end
 % --- load random machines ---
 if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'), 'random_machines')
     load('results.mat');
-    fname_random_machines = '/home/fac_files/data/sirius/beam_dynamics/si.v18.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+    %fname_random_machines = '/home/fac_files/data/sirius/beam_dynamics/si.v18.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
+    fname_random_machines = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
     random_machines = load_random_machines(fname_random_machines); clear('fname_random_machines');
     save('results.mat'); setappdata(0,'sirius_cfb_run_all',true);
     clear('random_machines'); clear('the_ring_coup');
@@ -53,8 +55,9 @@ end
 
 % --- insert IDs into random lattices
 if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'), 'random_machines_opt_ids')
-    id_coupling_label = 'SI.V18.01, 1% coupling IDs';
     load('results.mat'); if ~exist('random_machines_opt','var'), random_machines_opt = random_machines_opt_ids.random_machines_opt; end
+    %id_coupling_label = 'SI.V18.01, 1% coupling IDs';
+    id_coupling_label = 'SI.V20.01, 1% coupling IDs';
     show_summary_machines(random_machines_opt, 'random machines with controlled coupling');
     ids_config = get_coupling_polynom_a_scale(id_coupling_label);
     random_machines_opt_ids = insert_ids(random_machines_opt, ids_config);
@@ -63,98 +66,30 @@ if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'
     clear('random_machines_opt_ids');
 end
 
-% --- run coupling feedback on random machines ---
+
+% --- calculate feedback responses
 if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'), 'calc_respm')
     load('results.mat'); if ~exist('random_machines_opt_ids','var'), random_machines_opt_ids = feedback.random_machines_opt_ids; end
-    %show_summary_machines(random_machines_opt_ids, 'random machines with IDs on');
+    show_summary_machines(random_machines_opt_ids, 'random machines with IDs on');
     %b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % for 20 B2 beamlines
     b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % for 10 B2 beamlines
     %b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % for 05 B2 beamlines
     %b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % for 01 B2 beamlines
-    feedback.respm = calc_feedback_respm(random_machines_opt_ids, b2_selection);
-    clear('b2_selection'); clear('random_machines_opt_ids'); clear
+    feedback.random_machines_opt_ids = random_machines_opt_ids;
+    feedback.responses = calc_feedback_respm(random_machines_opt_ids, b2_selection);
+    clear('b2_selection'); clear('random_machines_opt_ids');
     save('results.mat'); setappdata(0,'sirius_cfb_run_all',true);
 end
-    
+   
+% --- run coupling feedback on random machines ---
+if getappdata(0,'sirius_cfb_run_all') || strcmp(getappdata(0,'sirius_cfb_run_at'), 'run_feedback')
+    load('results.mat'); if ~exist('feedback','var'), feedback = random_machines_opt_ids_fb.feedback; end
+    random_machines_opt_ids_fb = apply_feedback_machine(feedback, 200);
+    clear('feedback');
+    save('results.mat');
+end
 
 
-
-
-% 
-% 
-% 
-% % --- calc IDs polynom_a scale ---
-% id_coup_strength = 1.0/100;
-% ids = get_coupling_polynom_a_scale(id_coup_strength, the_ring);
-% 
-% 
-% config.target_coupling = 0.03;
-% config.fname_nominal_machine = 'nominal_SI.V18.01_coup3p0.mat';
-% 
-% config.id_coupling = 0.01;
-% config.feedback.nr_b2 = 10;
-% 
-% % --- select number of b2 in feedback ---
-% config.b2_selection = get_b2_selection(config);
-% 
-% %config.fname_random_machines = '/home/fac_files/data/sirius/beam_dynamics/si.v20.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
-% config.fname_random_machines = '/home/fac_files/data/sirius/beam_dynamics/si.v18.01/oficial/s05.01/multi.cod.tune.coup/cod_matlab/CONFIG_machines_cod_corrected_tune_coup_multi.mat';
-% 
-% 
-% % --- generate nominal machine with controled coupling
-% [r.nominal, r.indices] = create_nominal_machine(r, config);
-% close all; now;
-% 
-% [the_ring0, ids] = insert_ids(r.the_ring0, r.indices);
-% % % --- shows coupling for IDs polynom_a scales ---
-% % ids.coupling_polynom_a_scale = coupling_polynom_a_scale;
-% % for i=1:size(ids.indices_ids_coup,1) 
-% %     the_ring = setcellstruct(the_ring0, 'PolynomA', ids.indices_ids_coup(i,:), ids.coupling_polynom_a_scale(i), 1, 2);
-% %     [Tilt, Eta, EpsX, EpsY, Ratio, ENV, DP, DL, sigmas] = calccoupling(the_ring);
-% %     fprintf('ID %03i: coupling %f %%\n', i, 100*Ratio);
-% % end
-%     
-%     
-% % --- load random machines ---
-% r.machines = load_random_machines(config.fname_random_machines, r.indices);
-%     
-% % --- add qs from nominal machine to random machines ---
-% r.machines = add_dqs_to_random_machines(r.machines, r.nominal, r.indices);
-% show_summary_machines(r.machines, r.nominal, r.indices);
-% 
-% % --- add ids to machines ---
-% ids.coupling_polynom_a_scale = coupling_polynom_a_scale;
-% for i=1:length(r.machines.machine)
-%     [r.machines.machine{i}, ~] = insert_ids(r.machines.machine{i}, r.indices);
-%     r.machines.machine_ids{i} = set_ids_configs(r.machines.machine{i}, ids);
-%     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine_ids{i}, r.indices);
-% end
-% 
-% save(fname,'r');
-% close all; drawnow;
-% 
-% % --- calc feedback matrix ---
-% if exist('feedback.mat','file')
-%     data = load('feedback.mat'); r.machines.feedback = data.feedback;
-% else
-%     r.machines = calc_respm_machines(r.machines, r.indices);
-%     feedback = r.machines.feedback; save('feedback.mat', 'feedback');
-% end
-%     
-% % --- apply feedback ---
-% for i=1:length(r.machines.machine)
-%     fprintf('machine #%02i\n', i);
-%     goal_tilt = r.machines.coupling{i}.tilt;
-%     [r.machines.machine{i}, ~] = insert_ids(r.machines.machine{i}, r.indices);
-%     r.machines.machine{i} = set_ids_configs(r.machines.machine{i}, ids);
-%     r.machines.coupling_ids{i} = calc_coupling(r.machines.machine{i}, r.indices);
-%     r.machines.feedback{i}.svd_nr_svs = length(r.machines.feedback{i}.S);
-%     r.machines.feedback{i}.svd_nr_iterations = 100;
-%     [r.machines.machine{i}, r.machines.coupling_ids_feedback{i}] = correct_coupling_tilt(r.machines.machine{i}, goal_tilt, r.machines.coupling_ids{i}, r.machines.feedback{i}, r.indices);
-% end
-% 
-% % --- save results ---
-% save('results.mat');
 
 
 function the_ring_coup = generate_the_ring_with_controlled_coupling(the_ring, coup)
@@ -405,20 +340,22 @@ if ~exist('f1o','var')
     f1 = figure; hold all;
     p1{1} = plot(indices.pos, 1e6*coupling.sigmas(2,:), 'Color', [0.8, 0.8, 1]);
     p1{2} = scatter(indices.pos(indices.b2), 1e6*nominal_sigmas(2,indices.b2), 52, [0,0,1], 'filled');
-    p1{3} = scatter(indices.pos(indices.b2), 1e6*nominal_sigmas(2,indices.b2), 50, [0.5,0.5,1], 'filled');
+    p1{3} = scatter(indices.pos(indices.b2), 1e6*coupling.sigmas(2,indices.b2), 50, [0.5,0.5,1], 'filled');
     figure(f1); ylim([0,1e6*1.2*maxsigmay]); ylabel('sigmay [um]'); 
     f2 = figure; hold all;
     p2{1} = plot(indices.pos, (180/pi)*coupling.tilt, 'Color', [1, 0.8, 0.8]);
-    p2{2} = scatter(indices.pos(indices.all), (180/pi)*coupling.tilt(indices.all), 50, [1,0.5,0.5], 'filled');
+    p2{2} = scatter(indices.pos(indices.mic), (180/pi)*coupling.tilt(indices.mic), 50, [1,0.5,0.5], 'filled');
+    p2{3} = scatter(indices.pos(indices.ids), (180/pi)*coupling.tilt(indices.ids), 50, [1,0,0], 'filled');
     figure(f2); ylim([-45,45]); ylabel('tilt angle [degree]'); 
 else
     f1 = f1o; p1 = p1o; f2 = f2o; p2 = p2o;
     set(p1{1}, 'YData', 1e6*coupling.sigmas(2,:)); 
     set(p1{2}, 'YData', 1e6*nominal_sigmas(2,indices.b2)); 
-    set(p1{3}, 'YData', 1e6*nominal_sigmas(2,indices.b2));
+    set(p1{3}, 'YData', 1e6*coupling.sigmas(2,indices.b2));
     figure(f1); ylim([0,1e6*1.2*maxsigmay]);
     set(p2{1}, 'YData', (180/pi)*coupling.tilt); 
-    set(p2{2}, 'YData', (180/pi)*coupling.tilt(indices.all)); 
+    set(p2{2}, 'YData', (180/pi)*coupling.tilt(indices.mic)); 
+    set(p2{3}, 'YData', (180/pi)*coupling.tilt(indices.ids)); 
     figure(f2); ylim([-45,45]);
 end
 drawnow;
@@ -468,7 +405,7 @@ function show_summary_machines(random_machines, plot_label)
 % tilt angle
 fprintf(['-- plotting coupling info of optimizing random machines [', datestr(now), ']\n']);
 f1 = figure; hold all;
-if isfield('random_machines','the_ring_coup')
+if isfield(random_machines,'the_ring_coup')
     indices = random_machines.the_ring_coup.the_ring.indices;
     ref_coupling = random_machines.the_ring_coup.coupling;
 else
@@ -562,6 +499,14 @@ if strcmp(config_label, 'SI.V18.01, 1% coupling IDs')
         0.0021689575, 0.0021694000, 0.0021694000, 0.0021694000, ...
         0.0021689575, 0.0021694000, 0.0021694000, 0.0021694000, ...
         ];
+elseif strcmp(config_label, 'SI.V20.01, 1% coupling IDs')
+    ids_config.polynom_a_scale = [...
+        0.0021694000, 0.0021694000, ...
+        0.0021689575, 0.0021694000, 0.0021694000, 0.0021694000, ...
+        0.0021689575, 0.0021694000, 0.0021694000, 0.0021694000, ...
+        0.0021689575, 0.0021694000, 0.0021694000, 0.0021694000, ...
+        0.0021689575, 0.0021694000, 0.0021694000, 0.0021694000, ...
+        ];
 else
     error('undefined ID coupling strength or lattice_version');
 end
@@ -621,33 +566,25 @@ for i=1:length(idx)
     the_ring{i}.PolynomA(2) = polynom_a_str;
 end
 
+function responses = calc_feedback_respm(random_machines_opt_ids, b2_selection)
 
-function respm = calc_feedback_respm(random_machines_opt_ids, b2_selection)
-
-fprintf(['-- running couling feedback [', datestr(now), ']\n']);
-respm.b2_selection = b2_selection;
-respm.random_machines_opt_ids = random_machines_opt_ids;
+fprintf(['-- running coupling feedback [', datestr(now), ']\n']);
+%respm.random_machines_opt_ids = random_machines_opt_ids;
 lat0 = random_machines_opt_ids.random_machines_opt.the_ring_coup.lattice_coup;
 indices = random_machines_opt_ids.random_machines_opt.the_ring_coup.the_ring.indices;
 %feedback.responses = calc_feedback_responses(random_machines_opt_ids.lattices, indices, b2_selection);
-response = calc_respm_tilt(lat0, indices, b2_selection, true);
+nominal_response = calc_respm_tilt(lat0, indices, b2_selection, true);
 for i=1:length(random_machines_opt_ids.lattices)
-    respm.response{i} = response;
+    responses{i} = nominal_response;
 end
 
 for i=1:length(random_machines_opt_ids.lattices)
     
 end
 
-function response = calc_feedback_responses(lattices, indices, b2_selection)
-
-for i=1:length(machines.machine)
-    fprintf('   . feedback matrix for machine #%02i\n', i);
-    response{i} = calc_respm_tilt(lattices{i}, indices, true);
-end
-
 function response = calc_respm_tilt(the_ring, indices, b2_selection, print_results)
 
+response.b2_selection = b2_selection;
 response.delta_qs = 0.001;
 b2_idx = indices.b2(b2_selection);
 response.matrix = zeros(size(b2_idx,1), size(indices.qs,1));
@@ -658,13 +595,13 @@ if ~exist('print_results','var')
 end
 
 if print_results
-    fprintf('angle monitors at: ');
+    fprintf('   angle monitors at: ');
     names = unique(getcellstruct(the_ring, 'FamName', b2_idx));
     for i=1:length(names)
         fprintf('%s ', names{i});
     end; fprintf(' (%03i)\n', size(b2_idx,1));
 
-    fprintf('skew correctors at: ');
+    fprintf('   skew correctors at: ');
     names = unique(getcellstruct(the_ring, 'FamName', indices.qs));
     for i=1:length(names)
         fprintf('%s ', names{i});
@@ -692,163 +629,50 @@ fprintf('\n');
 [response.U, response.S, response.V] = svd(response.matrix, 'econ');
 response.S = diag(response.S);
 
+function random_machines_opt_ids_fb = apply_feedback_machine(feedback, svd_nr_iterations)
 
-
-
-
-
-
-
-
-
-
-
-
-function b2_selection = get_b2_selection(config)
-
-if (config.feedback.nr_b2 == 20)
-    config.b2_selection = logical(repmat([1,0,1,0, 1,0,1,0],1,5)); % 20 B2
-elseif (config.feedback.nr_b2 == 10)
-    b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % 10 B2
-elseif (config.feedback.nr_b2 == 5)
-    b2_selection = logical(repmat([1,0,0,0, 0,0,0,0],1,5)); % 05 B2
-elseif (config.feedback.nr_b2 == 1)    
-    b2_selection = logical([[1,0,0,0, 0,0,0,0], repmat([0,0,0,0, 0,0,0,0],1,4)]); % 01 B2
-else
-    error('invalid number of b2 in feedbac system');
+indices = feedback.random_machines_opt_ids.random_machines_opt.the_ring_coup.the_ring.indices;
+for i=1:length(feedback.random_machines_opt_ids.lattices)
+    fprintf('   . correcting machine %02i...\n', i);
+    coupling = feedback.random_machines_opt_ids.coupling{i};
+    goal_tilt = feedback.random_machines_opt_ids.random_machines_opt.coupling{i}.tilt;
+    feedback.responses{i}.svd_nr_iterations = svd_nr_iterations;
+    [random_machines_opt_ids_fb.lattices{i}, random_machines_opt_ids_fb.coupling{i}] = correct_coupling_tilt(feedback.random_machines_opt_ids.lattices{i}, goal_tilt, coupling, feedback.responses{i}, indices, feedback.responses{i}.b2_selection);
 end
+random_machines_opt_ids_fb.feedback = feedback;
 
-function ids = find_coupling_polynom_a_strength(r, target_id_coupling)
-
-[the_ring0, ids] = insert_ids(r.the_ring0, r.indices);
-
-ids.coupling_polynom_a_scale = zeros(1,size(ids.indices_ids_coup,1));
-
-for i=1:size(ids.indices_ids_coup,1) 
-    
-    % initial points
-    x = [0, 0.03236,  0.005629, linspace(0.06/9,0.06,9)]; 
-    y = [0];
-    for j=2:length(x)
-        the_ring = setcellstruct(the_ring0, 'PolynomA', ids.indices_ids_coup(i,:), x(j), 1, 2);
-        [Tilt, Eta, EpsX, EpsY, Ratio, ENV, DP, DL, sigmas] = calccoupling(the_ring); y(j) = Ratio;
-        if any(abs(y - target_id_coupling)/abs(target_id_coupling) < 0.01) 
-            break;
-        end
-    end
-       
-    while all(abs(y - target_id_coupling)/abs(target_id_coupling) > 0.01)
-        %figure; scatter(x,y);
-        nx = interp1(y, x, target_id_coupling, 'linear','extrap');
-        the_ring = setcellstruct(the_ring0, 'PolynomA', ids.indices_ids_coup(i,:), nx, 1, 2);
-        [Tilt, Eta, EpsX, EpsY, Ratio, ENV, DP, DL, sigmas] = calccoupling(the_ring);
-        if (Ratio > 0) && (Ratio < 1)
-            x(end+1) = nx;
-            y(end+1) = Ratio;
-        end
-    end
-    
-    ids.coupling_polynom_a_scale(i) = interp1(y, x(1:length(y)), target_id_coupling, 'spline','extrap');
-    fprintf('id %02i : strength %f 1/m^2\n', i, ids.coupling_polynom_a_scale(i));
-    
-end
-    
-function the_ring = vary_qs_in_families(the_ring0, indices, sim_anneal)
-
-sel_fam_idx = randi(length(indices.qs_fams),1,1);
-delta_q = 2*(rand()-0.5)*sim_anneal.qs_delta;
-q0 = getcellstruct(the_ring0, 'PolynomA', indices.qs_fams{sel_fam_idx}, 1, 2);
-q1 = q0 + delta_q;
-the_ring = setcellstruct(the_ring0, 'PolynomA', indices.qs_fams{sel_fam_idx}, q1, 1, 2);
-
-function machines = calc_respm_machines(machines0, indices)
-
-machines = machines0;
-for i=1:length(machines.machine)
-    fprintf('response matrix for machine #%02i\n', i);
-    machines.feedback{i} = calc_respm_tilt(machines.machine{i}, indices, true);
-end
-
-function feedback = calc_respm_tilt(the_ring, indices, b2_selection, print_results)
-
-feedback.delta_qs = 0.001;
-feedback.matrix = zeros(size(indices.b2,1), size(indices.qs,1));
-b2_idx = indices.b2(b2_selection);
-
-if ~exist('print_results','var')
-    print_results = false;
-end
-
-if print_results
-    fprintf('angle monitors at: ');
-    names = unique(getcellstruct(the_ring, 'FamName', b2_idx));
-    for i=1:length(names)
-        fprintf('%s ', names{i});
-    end; fprintf(' (%03i)\n', size(b2_idx,1));
-
-    fprintf('skew correctors at: ');
-    names = unique(getcellstruct(the_ring, 'FamName', indices.qs));
-    for i=1:length(names)
-        fprintf('%s ', names{i});
-    end; fprintf(' (%03i)\n', size(indices.qs,1));
-end
-
-for i=1:size(feedback.matrix,2)
-    if print_results
-        fprintf('%03i ',i);
-        if (rem(i,10) == 0)
-            fprintf('\n');
-        end
-    end
-    qs0 = getcellstruct(the_ring, 'PolynomA', indices.qs(i,:), 1, 2);
-    the_ring = setcellstruct(the_ring, 'PolynomA', indices.qs(i,:), qs0 + feedback.delta_qs/2, 1, 2);
-    coupling_p = calc_coupling(the_ring, indices);
-    the_ring = setcellstruct(the_ring, 'PolynomA', indices.qs(i,:), qs0 - feedback.delta_qs/2, 1, 2);
-    coupling_n = calc_coupling(the_ring, indices);
-    the_ring = setcellstruct(the_ring, 'PolynomA', indices.qs(i,:), qs0, 1, 2);
-    tilt = coupling_p.tilt(b2_idx) - coupling_n.tilt(b2_idx);
-    feedback.matrix(:,i) = tilt / feedback.delta_qs;
-end
-
-[feedback.U, feedback.S, feedback.V] = svd(feedback.matrix, 'econ');
-feedback.S = diag(feedback.S);
-
-function [the_ring, coupling] = correct_coupling_tilt(the_ring0, goal_tilt, coupling, feedback, indices)
+function [the_ring, coupling] = correct_coupling_tilt(the_ring0, goal_tilt, coupling0, response, indices, b2_selection)
 
 the_ring = the_ring0;
+coupling = coupling0;
 
-if ~isfield(feedback, 'svd_nr_svs')
-    feedback.svd_nr_svs = length(feedback.S);
+if ~isfield(response, 'svd_nr_svs')
+    response.svd_nr_svs = length(response.S);
 end
 
-iS = pinv(feedback.S);
-iS(feedback.svd_nr_svs+1:end) = 0;
+iS = pinv(response.S);
+iS(response.svd_nr_svs+1:end) = 0;
 iS = diag(iS);
     
-target = goal_tilt(indices.b2)';
-actual = coupling.tilt(indices.b2)';
+target = goal_tilt(indices.b2(b2_selection))';
+actual = coupling.tilt(indices.b2(b2_selection))';
 residue = actual - target;
     
-fprintf('%f\n ', 0, (180/pi)*std(residue));
-for j=1:feedback.svd_nr_iterations
-    qs      = -0.5 * (feedback.V*iS*feedback.U') * residue;
-    for i=1:size(feedback.matrix,2)
+fprintf('   %f ', (180/pi)*std(residue));
+for j=1:response.svd_nr_iterations
+    qs      = -1.0 * (response.V*iS*response.U') * residue;
+    for i=1:size(response.matrix,2)
         qs0 = getcellstruct(the_ring, 'PolynomA', indices.qs(i,:), 1, 2);
         the_ring = setcellstruct(the_ring, 'PolynomA', indices.qs(i,:), qs0 + qs(i), 1, 2);
     end
     coupling = calc_coupling(the_ring, indices);
-    actual = coupling.tilt(indices.b2)';
+    actual = coupling.tilt(indices.b2(b2_selection))';
     residue = actual - target;
     fprintf('%f ', (180/pi)*std(residue));
-    if (mod(j,5)==0) 
-        fprintf('\n');
+    if (mod(j-1,5)==0) 
+        fprintf('\n   ');
     end
 end
+fprintf('\n');
 
-function the_ring = set_ids_configs(the_ring0, ids)
 
-the_ring = the_ring0;
-polya = 2*(rand(1,length(ids.coupling_polynom_a_scale))-0.5) .* ids.coupling_polynom_a_scale;
-for i=1:size(ids.indices_ids_coup,1)
-    the_ring = setcellstruct(the_ring, 'PolynomA', ids.indices_ids_coup(i,:), polya(i), 1, 2);
-end
