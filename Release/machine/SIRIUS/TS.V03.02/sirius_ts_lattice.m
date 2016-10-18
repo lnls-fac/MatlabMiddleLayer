@@ -54,7 +54,7 @@ lb3p     = drift('lb3p', 0.19897-ldif, 'DriftPass');
 lc1p     = drift('lc1p', 0.18704-ldif, 'DriftPass');
 lc2p     = drift('lc2p', 0.226-ldif, 'DriftPass');
 ld1p     = drift('ld1p', 0.21409-ldif, 'DriftPass');
-ld2p     = drift('ld2p', 0.242, 'DriftPass');
+ld2p     = drift('ld2p', 0.192, 'DriftPass');
 ld3p     = drift('ld3p', 0.143, 'DriftPass');
 
 % --- markers ---
@@ -178,7 +178,7 @@ lb3   = [l20, ch, l25, cv, l15, lb3p];
 lc1   = [lc1p, repmat(l20,1,21)];
 lc2   = [l25, bpm, l20, ch, l25, cv, lc2p];
 ld1   = [ld1p, repmat(l20,1,6), l10];
-ld2   = [ld2p, repmat(l20,1,6)];
+ld2   = [ld2p, l20, l20, l20, bpm, l20, cv, l25, ch, l20];
 ld3   = [ld3p, l20];
 ld4   = [repmat(l20,1,6), bpm, l20, cv, l20];
 %lnlk  = [repmat(l25,1,14), l20, l20];
