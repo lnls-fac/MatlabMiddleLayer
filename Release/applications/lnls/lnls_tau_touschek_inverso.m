@@ -74,12 +74,14 @@ d_accn(~d_accn) = 1e-4;
 
 [~, ind, ~] = unique(optics.pos);
 
-betax  = interp1(optics.pos(ind), optics.betax(ind), s_calc);
-alphax = interp1(optics.pos(ind), optics.alphax(ind), s_calc);
-etax   = interp1(optics.pos(ind), optics.etax(ind), s_calc);     
-etaxl  = interp1(optics.pos(ind), optics.etaxl(ind), s_calc);
-betay  = interp1(optics.pos(ind), optics.betay(ind), s_calc);
-etay   = interp1(optics.pos(ind), optics.etay(ind), s_calc); 
+% I added extrapolation, since sometimes s_calc was 1e-14 greater than pos,
+% leading to NaN - Plinio
+betax  = interp1(optics.pos(ind), optics.betax(ind), s_calc, 'linear', 'extrap');
+alphax = interp1(optics.pos(ind), optics.alphax(ind), s_calc, 'linear', 'extrap');
+etax   = interp1(optics.pos(ind), optics.etax(ind), s_calc, 'linear', 'extrap');     
+etaxl  = interp1(optics.pos(ind), optics.etaxl(ind), s_calc, 'linear', 'extrap');
+betay  = interp1(optics.pos(ind), optics.betay(ind), s_calc, 'linear', 'extrap');
+etay   = interp1(optics.pos(ind), optics.etay(ind), s_calc, 'linear', 'extrap'); 
 
 K    = params.K;        emit0 = params.emit0; 
 sigS = params.sigS;     sigE  = params.sigE;
