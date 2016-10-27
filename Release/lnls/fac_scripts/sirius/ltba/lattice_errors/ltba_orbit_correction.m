@@ -19,7 +19,7 @@ rms_xp0  = 0.1 * mrad;
 rms_y0   = 0.2 * mm;
 rms_yp0  = 0.1 * mrad;
 rms_dp0  = 0.2 * pc;
-rms_bpm  = 0.2 * mm;
+rms_bpm  = 0* 0.2 * mm;  %sem erro de alinhamento de BPM
 n_maquinas = 100;
 
 t=twissline(ltba,0.0,Twiss0,1:length(ltba)+1,'chrom');
@@ -30,8 +30,8 @@ disp=[t.Dispersion];
 d=disp(1,:)';
 
 ind_bpm = findcells(ltba, 'FamName', 'bpm');
-ind_ch = findcells(ltba, 'FamName', 'hcm');
-ind_cv = findcells(ltba, 'FamName', 'vcm');
+ind_ch = findcells(ltba, 'FamName', 'ch');
+ind_cv = findcells(ltba, 'FamName', 'cv');
 
 sBPM = s(ind_bpm);
 
@@ -88,7 +88,7 @@ MCH = -VH*diag(1./diag(SH))*UH';
 MCV = -VV*diag(1./diag(SV))*UV';
 
 % Erros de alinhamento e excitacao em dipolos e quadrupolos
-idx = findcells(ltba,'K');
+idx = findcells(ltba,'PolynomB');
 ltba_Ori = ltba;
 
 % Loop nas maquinas aleatorias
@@ -126,12 +126,12 @@ for nmaq=1:n_maquinas
     %Twiss0.ClosedOrbit=[ex0; exp0; ey0; eyp0];
     %dp0 = (-1+2*rand(1)) * rms_dp0;
 
-    ex0 = trandn(1,1) * rms_x0;
-    exp0 = trandn(1,1) * rms_xp0;
-    ey0 = trandn(1,1) * rms_y0;
-    eyp0 = trandn(1,1) * rms_yp0;
+    ex0 = lnls_trandn(1,1) * rms_x0;
+    exp0 = lnls_trandn(1,1) * rms_xp0;
+    ey0 = lnls_trandn(1,1) * rms_y0;
+    eyp0 = lnls_trandn(1,1) * rms_yp0;
     Twiss0.ClosedOrbit=[ex0; exp0; ey0; eyp0];
-    dp0 = trandn(1,1) * rms_dp0;
+    dp0 = lnls_trandn(1,1) * rms_dp0;
 
     t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
     for i=1:length(t)
@@ -322,7 +322,7 @@ box on;
 %Plot lattice
 %subplot(5,1,3);
 subplot('position',[0.1 0.47 0.85 0.05]);
-lnls_drawlattice(ltba, 1, 0, 1, 1, 1);
+lnls_drawlattice(ltba, 1, 0, 1, 1, 1, 1);
 xlim(xlimit);
 axis off;
 

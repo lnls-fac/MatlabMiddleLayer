@@ -6,12 +6,11 @@ function [Accep, info] = lnls_calc_touschek_accep(ring,delta,plota,flag_dyn,info
 %
 %  INPUTS:
 %   ring        = model of the ring;
-%	delta (opt) = set with different energy deviation values to search,
+%	delta (opt) = set with positive energy deviation values to search,
 %                 default is linspace(1e-6,0.065,60).
 %                 If delta is singleton, then it uses the expansion
 %                 around delta (do not calculate tune).
 %   plota (opt) = boolean to decide if plot acceptance. Default is false.
-%   pos (opt)   = positions for which we want pol (see OUTPUTS: pol).
 %
 %  OUTPUTS:
 %	Accep.ind  = indices of the ring where the vacuum chamber is defined and

@@ -11,7 +11,7 @@ d2r = pi/180;
 energy = 3e9;
 lattice_version = 'TS.V03.02';
 mode = 'M';
-version = '2';
+version = '1';
 mode_version = [mode version];
 
 % processamento de input (energia e modo de operacao)
@@ -179,16 +179,18 @@ lc1   = [lc1p, repmat(l20,1,21)];
 lc2   = [l25, bpm, l20, ch, l25, cv, lc2p];
 ld1   = [ld1p, repmat(l20,1,6), l10];
 ld2   = [ld2p, l20, l20, l20, bpm, l20, cv, l25, ch, l20];
+%ld2   = [ld2p, l20, l20, l20, l20, l25, l20];
 ld3   = [ld3p, l20];
-ld4   = [repmat(l20,1,6), bpm, l20, cv, l20];
-%lnlk  = [repmat(l25,1,14), l20, l20];
+%ld4   = [repmat(l20,1,6), bpm, l20, cv, l20];
+ld4   = [repmat(l20,1,6), l20, cv, l20];
+lnlk  = [repmat(l25,1,14), l20, l20];
 
-line1 = [thinejesept, l25, thickejesept, la1, qf1a, la2, qf1b, la3];
+line1 = [thinejesept, l25, ch, thickejesept, la1, qf1a, la2, qf1b, la3];
 line2 = [bend, lb1, qd2, lb2, qf2, lb3];
 line3 = [bend, lc1, qf3, lc2];
 line4 = [bend, ld1, qd4a, ld2, qf4, ld3, qd4b, ld4];
-line5 = [thickinjsept, l25, thickinjsept, l25, thininjsept, bpm];
-ltba  = [start, line1, line2, line3, line4, line5, fim];
+line5 = [thickinjsept, l25, thickinjsept, l25, ch, thininjsept, bpm];
+ltba  = [start, line1, line2, line3, line4, line5, lnlk, bpm, fim];
 
 %% line extension to PMM
 
