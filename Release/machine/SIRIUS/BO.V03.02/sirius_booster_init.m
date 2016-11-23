@@ -162,7 +162,7 @@ AO.qf.Setpoint.DeltaRespMat  = 0.05;
 
 AO.qsb.FamilyName = 'qsb';
 AO.qsb.MemberOf    = {'PlotFamily'; 'qsb'; 'SkewQUAD'; 'Magnet'; 'Coupling Corrector'};
-AO.qsb.DeviceList  = getDeviceList(2,1);
+AO.qsb.DeviceList  = getDeviceList(1,1);
 AO.qsb.ElementList = (1:size(AO.qsb.DeviceList,1))';
 AO.qsb.Status      = ones(size(AO.qsb.DeviceList,1),1);
 AO.qsb.Position    = [];

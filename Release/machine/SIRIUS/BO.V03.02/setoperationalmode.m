@@ -121,7 +121,7 @@ global THERING;
 
 AD = getad;
 AD.Machine             = 'SIRIUS';     % Will already be defined if setpathmml was used
-AD.SubMachine          = 'BO.V03.01';  % Will already be defined if setpathmml was used
+AD.SubMachine          = 'BO.V03.02';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'Booster';    % Will already be defined if setpathmml was used
 AD.OperationalMode     = '3 GeV';
 AD.Energy              = 3.0;
@@ -163,7 +163,7 @@ global THERING;
 
 AD = getad;
 AD.Machine             = 'SIRIUS';     % Will already be defined if setpathmml was used
-AD.SubMachine          = 'BO.V03.01';  % Will already be defined if setpathmml was used
+AD.SubMachine          = 'BO.V03.02';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'Booster';    % Will already be defined if setpathmml was used
 AD.OperationalMode     = '150 MeV';
 AD.Energy              = 0.150;
