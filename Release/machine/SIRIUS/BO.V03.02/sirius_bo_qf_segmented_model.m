@@ -41,7 +41,7 @@ b = 1; types{end+1} = struct('fam_name', fam_name, 'passmethod', passmethod);
 fmap_monomials = [1,5,9,13];
 fmap_model = [ ...
  %type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
-b,     0.1135 ,  +0.00000 ,  +2.07e+00 ,  -2.27e+04 ,  +2.77e+11 ,  +6.96e+16 ;
+b,     0.114  ,  +0.00000 ,  +1.87e+00 ,  -2.01e+04 ,  +2.49e+11 ,  +5.16e+16 ;
 ];
 
 % ROTATING COIL MEASUREMENT

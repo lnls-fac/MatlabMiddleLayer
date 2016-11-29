@@ -10,6 +10,8 @@ function [the_ring, lattice_title] = sirius_bo_lattice(varargin)
 % 2015-11-04 modelos com comprimentos multiplos de mil??metros - Ximenes.
 % 2015-11-04 segmented model of B corrected (last element had 5 mm, instead of 50 mm)
 % 2016-10-14 skew quadrupole QSB added at sector 02U to introduce coupling up to 5%
+% 2016-11-23 dipole magnet model updated (model09)
+% 2016-11-29 quadrupole QF model updated (model06)
 
 %%% HEADER SECTION %%%
 
@@ -92,7 +94,7 @@ CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
 SF  = sirius_bo_sx_segmented_model(energy, 'sf', sext_pass_method, sf_strength * 0.105);
 SD  = sirius_bo_sx_segmented_model(energy, 'sd', sext_pass_method, sd_strength * 0.105);
 QD  = sirius_bo_qd_segmented_model(energy, 'qd', quad_pass_method, qd_strength * 0.101);
-QF  = sirius_bo_qf_segmented_model(energy, 'qf', quad_pass_method, qf_strength * 0.227);
+QF  = sirius_bo_qf_segmented_model(energy, 'qf', quad_pass_method, qf_strength * 0.228);
 
 QS  = quadrupole('qsb',  0.10, 0.0,  quad_pass_method);
 
