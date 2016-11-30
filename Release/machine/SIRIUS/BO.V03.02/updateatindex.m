@@ -22,18 +22,18 @@ AO = getao;
 
 try
     % BEND
-    AO.dipb.AT.ATType = 'BEND';
-    AO.dipb.AT.ATIndex = buildatindex(AO.dipb.FamilyName, Indices.dipb);
-    AO.dipb.Position = findspos(THERING, AO.dipb.AT.ATIndex(:,1));
+    AO.b.AT.ATType = 'BEND';
+    AO.b.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
+    AO.b.Position = findspos(THERING, AO.b.AT.ATIndex(:,1));
 catch
-    warning('dipb family not found in the model.');
+    warning('b family not found in the model.');
 end
 
 try
     % bend_a
     AO.bend_a.AT.ATType = 'BendPS';
-    AO.bend_a.AT.ATMagnet = 'dipb';
-    AO.bend_a.AT.ATIndex = buildatindex(AO.dipb.FamilyName, Indices.dipb);
+    AO.bend_a.AT.ATMagnet = 'b';
+    AO.bend_a.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
     AO.bend_a.Position = findspos(THERING, AO.bend_a.AT.ATIndex(:,1));
 catch
     warning('bend_a family not found in the model.');
@@ -42,8 +42,8 @@ end
 try
     % bend_b
     AO.bend_b.AT.ATType = 'BendPS';
-    AO.bend_b.AT.ATMagnet = 'dipb';
-    AO.bend_b.AT.ATIndex = buildatindex(AO.dipb.FamilyName, Indices.dipb);
+    AO.bend_b.AT.ATMagnet = 'b';
+    AO.bend_b.AT.ATIndex = buildatindex(AO.b.FamilyName, Indices.b);
     AO.bend_b.Position = findspos(THERING, AO.bend_b.AT.ATIndex(:,1));
 catch
     warning('bend_b family not found in the model.');
@@ -68,12 +68,12 @@ catch
 end
 
 try
-    % QSB
-    AO.qsb.AT.ATType = 'QUAD';
-    AO.qsb.AT.ATIndex = buildatindex(AO.qsb.FamilyName, Indices.qsb);
-    AO.qsb.Position = findspos(THERING, AO.qsb.AT.ATIndex(:,1));
+    % QS
+    AO.qs.AT.ATType = 'QUAD';
+    AO.qs.AT.ATIndex = buildatindex(AO.qs.FamilyName, Indices.qs);
+    AO.qs.Position = findspos(THERING, AO.qs.AT.ATIndex(:,1));
 catch
-    warning('QSB family not found in the model.');
+    warning('QS family not found in the model.');
 end
 
 try
@@ -98,7 +98,7 @@ try
     % BPMx
     AO.bpmx.AT.ATType = 'X';
     AO.bpmx.AT.ATIndex = buildatindex(AO.bpmx.FamilyName, Indices.bpm);
-    AO.bpmx.Position = findspos(THERING, AO.bpmx.AT.ATIndex(:,1))';   
+    AO.bpmx.Position = findspos(THERING, AO.bpmx.AT.ATIndex(:,1))';
 catch
     warning('BPMx family not found in the model.');
 end
@@ -107,7 +107,7 @@ try
     % BPMy
     AO.bpmy.AT.ATType = 'Y';
     AO.bpmy.AT.ATIndex = buildatindex(AO.bpmy.FamilyName, Indices.bpm);
-    AO.bpmy.Position = findspos(THERING, AO.bpmy.AT.ATIndex(:,1))';   
+    AO.bpmy.Position = findspos(THERING, AO.bpmy.AT.ATIndex(:,1))';
 catch
     warning('BPMy family not found in the model.');
 end
@@ -116,7 +116,7 @@ try
     % HCM
     AO.ch.AT.ATType = 'HCM';
     AO.ch.AT.ATIndex = buildatindex(AO.ch.FamilyName, Indices.ch);
-    AO.ch.Position = findspos(THERING, AO.ch.AT.ATIndex(:,1))';   
+    AO.ch.Position = findspos(THERING, AO.ch.AT.ATIndex(:,1))';
 catch
     warning('HCM family not found in the model.');
 end
@@ -125,7 +125,7 @@ try
     % VCM
     AO.cv.AT.ATType = 'VCM';
     AO.cv.AT.ATIndex = buildatindex(AO.cv.FamilyName, Indices.cv);
-    AO.cv.Position = findspos(THERING, AO.cv.AT.ATIndex(:,1))';   
+    AO.cv.Position = findspos(THERING, AO.cv.AT.ATIndex(:,1))';
 catch
     warning('VCM family not found in the model.');
 end

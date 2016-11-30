@@ -22,9 +22,9 @@ if strcmpi(gen_answer{1}, 'bo')
     dynap_xy_answer    = {'5000','0',     '100', '-0.018','+0.018','30','0','0.006','1'};
     dynap_ex_answer    = {'5000','0.001', '80', '-0.03','+0.03','50','-0.018','0','1'};
     %                     turns    y0    e0      de   st_bk rescl  nit s0   sf  tr    fams
-    dynap_ma_answer    = {'5000','1e-5','0.01','5e-3','1'  ,'0.33','3','0','49.681','1','pdipb mdipb'};
-    dynap_pxa_answer   = {'5000','1e-5','0.00','1e-4','1'  ,'0.25','3','0','49.681','1','pdipb mdipb'};
-    dynap_pya_answer   = {'5000','1e-5','0.00','1e-4','1'  ,'0.25','3','0','49.681','1','pdipb mdipb'};
+    dynap_ma_answer    = {'5000','1e-5','0.01','5e-3','1'  ,'0.33','3','0','49.681','1','pb mb'};
+    dynap_pxa_answer   = {'5000','1e-5','0.00','1e-4','1'  ,'0.25','3','0','49.681','1','pb mb'};
+    dynap_pya_answer   = {'5000','1e-5','0.00','1e-4','1'  ,'0.25','3','0','49.681','1','pb mb'};
 else
     % storage ring default parm values
     acc_answer = {'3.00', '864', 'on', 'on', 'on'};

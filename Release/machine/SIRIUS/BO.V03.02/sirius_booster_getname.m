@@ -30,7 +30,7 @@ end
 ChannelName = [];
 
 switch lower(Family)
-    
+
     case {'bpmx', 'bpmy'}
         if (strcmpi(Field, 'Monitor') || strcmpi(Field, 'CommonNames'))
             ChannelName = [
@@ -50,12 +50,12 @@ switch lower(Family)
             if strcmpi(Family, 'bpmx')
                 ChannelName = strcat(ChannelName, '-X');
             else
-                ChannelName = strcat(ChannelName, '-Y');                
+                ChannelName = strcat(ChannelName, '-Y');
             end
         else
             error('Don''t know how to make the channel name for family %s', Family);
         end
-        
+
 	case 'qd_fam'
 		ChannelName = 'BOPS-QD-FAM';
 
@@ -88,12 +88,12 @@ switch lower(Family)
 			'BOPS-QF-45'; 'BOPS-QF-46'; 'BOPS-QF-47'; 'BOPS-QF-48' ;...
 			'BOPS-QF-49'; 'BOPS-QF-50'; ];
 
-    case 'qsb_fam'
-		ChannelName = 'BOPS-QSB-FAM';
+    case 'qs_fam'
+		ChannelName = 'BOPS-QS-FAM';
 
-	case 'qsb'
-		ChannelName = 'BOPS-QSB-02';
-        
+	case 'qs'
+		ChannelName = 'BOPS-QS-02';
+
 	case 'sf_fam'
 		ChannelName = 'BOPS-SF-FAM';
 
@@ -135,29 +135,29 @@ switch lower(Family)
 			'BOPS-CH-33-U'; 'BOPS-CH-35-U'; 'BOPS-CH-37-U'; 'BOPS-CH-39-U' ;...
 			'BOPS-CH-41-U'; 'BOPS-CH-43-U'; 'BOPS-CH-45-U'; 'BOPS-CH-47-U' ;...
 			'BOPS-CH-49-D'; ];
-        
+
     case 'rf'
         ChannelName = 'BORF-FREQUENCY';
-    
+
     case 'bend_a'
 		ChannelName = 'BOPS-BEND-FAM-A';
- 
+
     case 'bend_b'
 		ChannelName ='BOPS-BEND-FAM-B';
-        
+
     case 'dcct'
         ChannelName = 'BODI-CURRENT';
-            
+
     case 'tune'
         ChannelName = ['BODI-TUNEH'; 'BODI-TUNEV'; 'BODI-TUNES'];
-        
+
     otherwise
         error('Don''t know how to make the channel name for family %s', Family);
-        
+
 end
 
 if any(strcmpi(Family, {'bpmx', 'bpmy', 'DCCT', 'tune'}))
-    
+
 else
     if strcmpi(Field, 'Monitor')
         ChannelName = strcat(ChannelName, '-RB');
@@ -167,5 +167,3 @@ else
 end
 
 end
-
-
