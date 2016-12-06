@@ -101,22 +101,35 @@
 % sf_strength = 11.327047617231438;
 % sd_strength = 6.700042815533210;
 
-% 2016-11-23 ximenes (overall checking of model - dipole model09)
-% tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'qf','qd'},'svd','add',10,1e-9)"
-% chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'sd', 'sf')"
-qf_strength = 1.661214083215930;
-qd_strength = -0.005159016503686;
-sf_strength = 11.327040434943536;
-sd_strength = 6.278086202577062;
+% % 2016-11-23 ximenes (overall checking of model - dipole model09)
+% % tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'qf','qd'},'svd','add',10,1e-9)"
+% % chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'sd', 'sf')"
+% qf_strength = 1.661214083215930;
+% qd_strength = -0.005159016503686;
+% sf_strength = 11.327040434943536;
+% sd_strength = 6.278086202577062;
+
 
 % 2016-11-29 ximenes (overall checking of model - quadrupole qf model 06)
 % tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'qf','qd'},'svd','add',10,1e-9)"
 % chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'sd', 'sf')"
 % effective length changed from 227 mm to 228 mm.
-qf_strength = 1.653861341941806;
-qd_strength = -0.004822541503476;
-sf_strength = 11.327309449559875;
-sd_strength = 6.281530681569274;
+% added model data for injection energy (2016-12-06 - ximenes)
+
+qf_strength_3gev = 1.653861341941806;
+qd_strength_3gev = -0.004822541503476;
+sf_strength_3gev = 11.327309449559875;
+sd_strength_3gev = 6.281530681569274;
+
+qf_strength_150mev = 1.653771340966689;
+qd_strength_150mev = 0.011692191830813;  % this is correct! the sign has changed!
+sf_strength_150mev = 11.332998999039631;
+sd_strength_150mev = 5.006605035910315;
+
+qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
+qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
+sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
+sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
 
 
 

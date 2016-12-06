@@ -46,7 +46,7 @@ set_magnets_strength_booster;
 
 % loads dipole segmented model:
 b_len_hdedge   = 1.152; % [m]
-[B, b_len_seg] = sirius_bo_b_segmented_model('b', bend_pass_method);
+[B, b_len_seg] = sirius_bo_b_segmented_model(energy, 'b', bend_pass_method);
 lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 
 L00880  = drift('l00880', 0.0880, 'DriftPass');
