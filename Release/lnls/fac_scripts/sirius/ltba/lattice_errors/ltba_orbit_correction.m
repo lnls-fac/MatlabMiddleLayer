@@ -23,13 +23,13 @@ rms_bpm  = 0* 0.2 * mm;  %sem erro de alinhamento de BPM
 n_maquinas = 100;
 
 t=twissline(ltba,0.0,Twiss0,1:length(ltba)+1,'chrom');
- 
+
 s=cat(1,t.SPos);
 beta=cat(1,t.beta);
 disp=[t.Dispersion];
 d=disp(1,:)';
 
-ind_bpm = findcells(ltba, 'FamName', 'bpm');
+ind_bpm = sort([findcells(ltba, 'FamName', 'bpm'), findcells(ltba, 'FamName', 'BPM')]);
 ind_ch = findcells(ltba, 'FamName', 'ch');
 ind_cv = findcells(ltba, 'FamName', 'cv');
 
@@ -116,7 +116,7 @@ for nmaq=1:n_maquinas
     ltba = lnls_add_misalignmentY(erroy, idx, ltba);
     ltba = lnls_add_rotation_ROLL(erroroll, idx, ltba);
     ltba = lnls_add_excitation(erroex, idx, ltba);
-    
+
 % Orbit without correction
     % Error in lauching conditions
     %ex0 = (-1+2*rand(1)) * rms_x0;
@@ -138,16 +138,16 @@ for nmaq=1:n_maquinas
         orbx(i,nmaq)=t(i).ClosedOrbit(1);
         orby(i,nmaq)=t(i).ClosedOrbit(3);
     end
-    orb_semcorr_fim(:,nmaq)=t(end).ClosedOrbit;    
-    
-    
+    orb_semcorr_fim(:,nmaq)=t(end).ClosedOrbit;
+
+
 % Orbita nos BPMs
     x_BPM(:,nmaq) = orbx(ind_bpm,nmaq);
     y_BPM(:,nmaq) = orby(ind_bpm,nmaq);
-    
+
     xc_BPM(:,nmaq) = x_BPM(:,nmaq);
     yc_BPM(:,nmaq) = y_BPM(:,nmaq);
-    
+
 % Correcao
     dteta_ch(:,nmaq) = MCH * (xc_BPM(:,nmaq) + ebpmx');
     dteta_cv(:,nmaq) = MCV * (yc_BPM(:,nmaq) + ebpmy');
@@ -173,12 +173,12 @@ for nmaq=1:n_maquinas
 % Orbita corrigida nos BPMs
     xc_BPM(:,nmaq) = orbcx(ind_bpm,nmaq);
     yc_BPM(:,nmaq) = orbcy(ind_bpm,nmaq);
-     
+
 %    erroex = (-1+2*rand(1,length(idx))) * 1/1000;
 %    ltba = lnls_add_excitation(erroex, idx, ltba);
 %    t=twissline(ltba,dp0,Twiss0,1:length(ltba)+1);
 %    orb_ripple_fim(:,nmaq)=t(end).ClosedOrbit - orb_corr_fim(:,nmaq);
-        
+
 end
 
 for i=1:n_maquinas
@@ -275,7 +275,7 @@ end
 for i=1:ncv
     fmt = 'CV%i  %5.3f   %5.3f  \n'; fprintf(fout,fmt,i,tetai_cv_rms(i)/mrad,tetai_cv_max(i)/mrad);
 end
-    
+
 %fmt = '\n Vibration study - rms position at line end without correction\n'; fprintf(fout,fmt);
 %fmt = 'rms_x : %5.3f mm\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(1)/mm);
 %fmt = 'rms_xp: %5.3f mrad\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(2)/mrad);
@@ -298,7 +298,7 @@ annotation('textbox', [0.2,0.88,0.1,0.1],...
            'FontWeight','bold',...
            'LineStyle','none',...
            'String', ['BTS Tansfer Line Orbit Correction - ' tit]);
-       
+
 %Plot before correction
 %subplot(5,1,[1,2],'FontSize',14);
 xlimit=[0 s(end)];
@@ -347,6 +347,3 @@ grid on;
 box on;
 
 plot2svg([tit '_Orbit.svg'],figure1);
-
-
-

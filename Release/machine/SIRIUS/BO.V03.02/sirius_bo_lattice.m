@@ -46,7 +46,7 @@ set_magnets_strength_booster;
 
 % loads dipole segmented model:
 b_len_hdedge   = 1.152; % [m]
-[B, b_len_seg] = sirius_bo_b_segmented_model(energy, 'b', bend_pass_method);
+[B, b_len_seg] = sirius_bo_b_segmented_model(energy, 'B', bend_pass_method);
 lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 
 L00880  = drift('l00880', 0.0880, 'DriftPass');
@@ -81,26 +81,26 @@ D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 STR  = marker('start',   'IdentityPass');    % start of the model
 FIM  = marker('end',     'IdentityPass');    % end of the model
 GIR  = marker('girder',  'IdentityPass');
-SIN  = marker('injsl',   'IdentityPass');    % end of BO injection septum at TB transport line
-SEX  = marker('ejesfh',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
-BPM  = marker('bpm',     'IdentityPass');
+SIN  = marker('InjS',    'IdentityPass');    % end of BO injection septum at TB transport line
+SEX  = marker('EjeSF',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
+BPM  = marker('BPM',     'IdentityPass');
 
 
-KIN  = quadrupole('injk', 0.500,     0.0,         quad_pass_method);
-KEX  = quadrupole('ejek', 0.500,     0.0,         quad_pass_method);
+KIN  = quadrupole('InjK', 0.500,     0.0,         quad_pass_method);
+KEX  = quadrupole('EjeK', 0.500,     0.0,         quad_pass_method);
 
-CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);
-CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
-SF  = sirius_bo_sx_segmented_model(energy, 'sf', sext_pass_method, sf_strength * 0.105);
-SD  = sirius_bo_sx_segmented_model(energy, 'sd', sext_pass_method, sd_strength * 0.105);
-QD  = sirius_bo_qd_segmented_model(energy, 'qd', quad_pass_method, qd_strength * 0.101);
-QF  = sirius_bo_qf_segmented_model(energy, 'qf', quad_pass_method, qf_strength * 0.228);
+CH   = sextupole ('CH',      0.150,     0.0,         sext_pass_method);
+CV   = sextupole ('CV',      0.150,     0.0,         sext_pass_method);
+SF  = sirius_bo_sx_segmented_model(energy, 'SF', sext_pass_method, sf_strength * 0.105);
+SD  = sirius_bo_sx_segmented_model(energy, 'SD', sext_pass_method, sd_strength * 0.105);
+QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength * 0.101);
+QF  = sirius_bo_qf_segmented_model(energy, 'QF', quad_pass_method, qf_strength * 0.228);
 
-QS  = quadrupole('qs',  0.10, 0.0,  quad_pass_method);
+QS  = quadrupole('QS',  0.10, 0.0,  quad_pass_method);
 
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
 
-RFC = rfcavity('cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
+RFC = rfcavity('Cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
 
 US_SF = [GIR, D21460, BPM, L18935, GIR, SF, L01340];
 US_SS = [D02475, SD, GIR, L17935, BPM, L18935, GIR, SF, L01340];
@@ -201,7 +201,7 @@ fprintf('   Circumference: %.5f m\n', L0_tot);
 
 %rev_freq     = beta * const.c / L0_tot;
 rev_freq     = const.c / L0_tot;
-rf_idx       = findcells(THERING, 'FamName', 'cav');
+rf_idx       = sort([findcells(THERING, 'FamName', 'cav'), findcells(THERING, 'FamName', 'Cav')]);
 rf_frequency = rev_freq * harmonic_number;
 THERING{rf_idx}.Frequency = rf_frequency;
 fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);
@@ -246,8 +246,8 @@ for i=b
 end
 
 % ejection bend
-ejek = findcells(the_ring, 'FamName', 'ejek');
-sept_ex = findcells(the_ring, 'FamName', 'ejesfh');
+ejek = findcells(the_ring, 'FamName', 'EjeK');
+sept_ex = findcells(the_ring, 'FamName', 'EjeSF');
 b_ex = b((b > ejek(end)) & (b < sept_ex(1)));
 for i=b_ex
     the_ring{i}.VChamber = other_vchamber;
@@ -261,7 +261,7 @@ end
 
 
 function the_ring = set_girders(the_ring)
-idx = findcells(the_ring,'FamName','bpm'); idx = idx(end);
+idx = sort([findcells(the_ring,'FamName','bpm'), findcells(the_ring,'FamName','BPM')]); idx = idx(end);
 the_ring = circshift(the_ring,[0,-idx]);
 
 gir = findcells(the_ring,'FamName','girder');

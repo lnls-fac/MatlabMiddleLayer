@@ -64,7 +64,7 @@ for i=1:(length(pos)-1)
     else
         line([s s+len], [0+offset 0+offset], 'Color', [0 0 0],'Parent',h);
     end
-    
+
     if ~unset_names && print_name
         text(s+len/2, -1.9, the_ring{i}.FamName, 'HorizontalAlignment', 'center', 'FontWeight', 'bold','Parent',h);
     end
@@ -73,7 +73,7 @@ for i=1:(length(pos)-1)
 end
 xlim(h,[0,max_pos]);
 
-    
+
 function draw_girders(the_ring, nper, offset, scale, h)
 
 if ~exist('h','var')
@@ -106,7 +106,7 @@ for i=1:length(gir_names)
     'FaceColor',Colors{mod(j-1,length(Colors))+1},...
     'Curvature',[0.5 0.5]);
     j = j + 1;
-end    
+end
 
 
 function draw_cms(the_ring, nper, offset, scale, h)
@@ -131,7 +131,7 @@ function draw_bpms(the_ring, nper, offset, scale, h)
 
 pos = findspos(the_ring, 1:(length(the_ring)+1));
 max_pos = pos(end) / (nper - 0.001);
-bpms = findcells(the_ring, 'FamName', 'bpm');
+bpms = sort([findcells(the_ring, 'FamName', 'bpm'), findcells(the_ring, 'FamName', 'BPM')]);
 for i=1:length(bpms)
     s = pos(bpms(i));
     if (s > max_pos), break; end;

@@ -7,7 +7,8 @@ AD = getad;
 
 for i=1:length(CommonNames(:,1))  
     
-    file = fopen([AD.Directory.ExcDataDir, filesep, deblank(CommonNames(i,:)), '.txt']);
+    CName = lower(CommonNames(i,:));
+    file = fopen([AD.Directory.ExcDataDir, filesep, deblank(CName), '.txt']);
     j = 1;
     ExcData.skew{i} = false;
     try

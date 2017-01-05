@@ -127,7 +127,7 @@ finalizations();
         fprintf('-  generating errors ...\n');
         % I have to do this for the booster, because the lattice begins at
         % the middle of the quadrupole:
-        idx = findcells(the_ring,'FamName','bpm'); idx = idx(end)-1;
+        idx = sort([findcells(the_ring,'FamName','bpm'), findcells(the_ring,'FamName','BPM')]); idx = idx(end)-1;
         the_ring = circshift(the_ring,[0,-idx]);
 
         errors        = lnls_latt_err_generate_errors(name, the_ring, config, nr_machines, cutoff_errors, rndtype);
@@ -255,7 +255,7 @@ finalizations();
 
         % I have to do this for the booster, because the lattice begins at
         % the middle of the quadrupole:
-        idx = findcells(the_ring,'FamName','bpm'); idx = idx(end)-1;
+        idx = sort([findcells(the_ring,'FamName','bpm'), findcells(the_ring,'FamName','BPM')]); idx = idx(end)-1;
         the_ring = circshift(the_ring,[0,-idx]);
         for i=1:length(machine)
             machine{i} = circshift(machine{i},[0,-idx]);

@@ -29,7 +29,7 @@ beta=cat(1,t.beta);
 disp=[t.Dispersion];
 d=disp(1,:)';
 
-ind_bpm = findcells(ltlb, 'FamName', 'bpm');
+ind_bpm = sort([findcells(ltlb, 'FamName', 'bpm'), findcells(ltlb, 'FamName', 'bpm')]);
 ind_ch = findcells(ltlb, 'FamName', 'hcm');
 ind_cv = findcells(ltlb, 'FamName', 'vcm');
 
@@ -107,7 +107,7 @@ for nmaq=1:n_maquinas
     ltlb = lnls_add_misalignmentY(erroy, idx, ltlb);
     ltlb = lnls_add_rotation_ROLL(erroroll, idx, ltlb);
     ltlb = lnls_add_excitation(erroex, idx, ltlb);
-    
+
 % Orbit without correction
     % Error in lauching conditions
     ex0 = (-1+2*rand(1)) * rms_x0;
@@ -116,24 +116,24 @@ for nmaq=1:n_maquinas
     eyp0 = (-1+2*rand(1)) * rms_yp0;
     Twiss0.ClosedOrbit=[ex0; exp0; ey0; eyp0];
     dp0 = (-1+2*rand(1)) * rms_dp0;
-    
+
     t=twissline(ltlb,dp0,Twiss0,1:length(ltlb)+1);
     for i=1:length(t)
         orbx(i,nmaq)=t(i).ClosedOrbit(1);
         orby(i,nmaq)=t(i).ClosedOrbit(3);
     end
-    orb_semcorr_fim(:,nmaq)=t(end).ClosedOrbit;    
-    
-    
+    orb_semcorr_fim(:,nmaq)=t(end).ClosedOrbit;
+
+
 % Orbita nos BPMs
     x_BPM(:,nmaq) = orbx(ind_bpm,nmaq);
     y_BPM(:,nmaq) = orby(ind_bpm,nmaq);
-    
+
     xc_BPM(:,nmaq) = x_BPM(:,nmaq);
     yc_BPM(:,nmaq) = y_BPM(:,nmaq);
-    
+
     %Itera
-    
+
     dteta_ch(:,nmaq) = MCH * (xc_BPM(:,nmaq) + ebpmx');
     dteta_cv(:,nmaq) = MCV * (yc_BPM(:,nmaq) + ebpmy');
 
@@ -163,7 +163,7 @@ for nmaq=1:n_maquinas
 %    ltlb = lnls_add_excitation(erroex, idx, ltlb);
 %    t=twissline(ltlb,dp0,Twiss0,1:length(ltlb)+1);
 %    orb_ripple_fim(:,nmaq)=t(end).ClosedOrbit - orb_corr_fim(:,nmaq);
-        
+
 end
 
 for i=1:n_maquinas
@@ -260,7 +260,7 @@ end
 for i=1:ncv
     fmt = 'CV%i  %5.3f   %5.3f  \n'; fprintf(fout,fmt,i,tetai_cv_rms(i)/mrad,tetai_cv_max(i)/mrad);
 end
-    
+
 %fmt = '\n Vibration study - rms position at line end without correction\n'; fprintf(fout,fmt);
 %fmt = 'rms_x : %5.3f mm\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(1)/mm);
 %fmt = 'rms_xp: %5.3f mrad\n'; fprintf(fout,fmt,orb_semcorr_fim_rms(2)/mrad);
@@ -283,7 +283,7 @@ annotation('textbox', [0.3,0.88,0.1,0.1],...
            'FontWeight','bold',...
            'LineStyle','none',...
            'String', ['LTB Transfer Line - ' tit]);
-       
+
 %Plot before correction
 %subplot(5,1,[1,2],'FontSize',14);
 xlimit=[0 s(end)];
@@ -330,8 +330,3 @@ grid on;
 box on;
 
 plot2svg([tit '_Orbit.svg'],figure1);
-
-
-
-
-
