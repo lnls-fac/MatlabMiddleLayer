@@ -201,7 +201,7 @@ fprintf('   Circumference: %.5f m\n', L0_tot);
 
 %rev_freq     = beta * const.c / L0_tot;
 rev_freq     = const.c / L0_tot;
-rf_idx       = sort([findcells(THERING, 'FamName', 'cav'), findcells(THERING, 'FamName', 'Cav')]);
+rf_idx       = findcells(THERING, 'FamName', 'Cav');
 rf_frequency = rev_freq * harmonic_number;
 THERING{rf_idx}.Frequency = rf_frequency;
 fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);
@@ -240,7 +240,7 @@ for i=1:length(the_ring)
 end
 
 % bends
-b = [findcells(the_ring, 'FamName', 'b') findcells(the_ring, 'FamName', 'mb')];
+b = [findcells(the_ring, 'FamName', 'B') findcells(the_ring, 'FamName', 'mB')];
 for i=b
     the_ring{i}.VChamber = bends_vchamber;
 end
@@ -261,7 +261,7 @@ end
 
 
 function the_ring = set_girders(the_ring)
-idx = sort([findcells(the_ring,'FamName','bpm'), findcells(the_ring,'FamName','BPM')]); idx = idx(end);
+idx = findcells(the_ring,'FamName','BPM'); idx = idx(end);
 the_ring = circshift(the_ring,[0,-idx]);
 
 gir = findcells(the_ring,'FamName','girder');

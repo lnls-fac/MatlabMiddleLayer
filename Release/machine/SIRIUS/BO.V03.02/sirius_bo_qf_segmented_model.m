@@ -120,7 +120,7 @@ for i=1:size(segmodel,1)
 end
 
 model_length = 2*sum(segmodel(:,2));
-mqf  = marker('mqf',     'IdentityPass');
+mqf  = marker('mQF',     'IdentityPass');
 model = [b mqf b];
 
 
