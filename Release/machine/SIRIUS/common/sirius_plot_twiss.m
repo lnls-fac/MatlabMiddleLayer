@@ -91,11 +91,11 @@ if junto
     f1=figure('Color',[1 1 1],'Position', [1 1 1000 500]);
     ax1 = axes('FontSize',FnSz);
     xlabel({'s [m]'},'FontSize',FnSz);
-    ylabel({'\beta [m], \eta_x [cm]'},'FontSize',FnSz);
+    ylabel({'\beta [m], 10\eta_x [m]'},'FontSize',FnSz);
     hold all;
     plot(twiss.pos(ini:fim),twiss.betax(ini:fim),'LineWidth',LnWd,'Color',BxCl);
     plot(twiss.pos(ini:fim),twiss.betay(ini:fim),'LineWidth',LnWd,'Color',ByCl);
-    plot(twiss.pos(ini:fim),100*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
+    plot(twiss.pos(ini:fim),10*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
 
     legend({'\beta_x','\beta_y', '\eta_x'},'Location','northwest','Box','off',...
            'Color','none','XColor','w','YColor','w');
@@ -116,7 +116,7 @@ if junto
     
     %Faz grafico da rede
     Delta=(top+offset)*0.1/3;
-    offset=-offset-2*Delta;
+    offset=-offset-5*Delta;
     xlimit=[0 twiss.pos(fim)];
     switch lower(maquina)
         case 'si'

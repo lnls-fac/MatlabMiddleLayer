@@ -51,8 +51,13 @@ catch
     fam_data = sirius_bo_family_data(machine{1});
     ch = 'ch';cv = 'cv';
 end
+
 hcms = fam_data.(ch).ATIndex;
 vcms = fam_data.(cv).ATIndex;
+
+%hcms = fam_data.fch.ATIndex;
+%vcms = fam_data.fcv.ATIndex;
+
 bpms = fam_data.bpm.ATIndex;
 kickx = zeros(length(machine), length(hcms));
 kicky = zeros(length(machine), length(vcms));
