@@ -46,7 +46,7 @@ switch lower(maquina)
         %Calcula parametros de twiss da rede
         twiss = calctwiss(THERING);
         %Define inicio e fim para o grafico (5 periodos)
-        mqf = findcells(THERING,'FamName','qf');
+        mqf = sort([findcells(THERING,'FamName','qf'), findcells(THERING,'FamName','QF')]);
         ini=1;
         fim=mqf(40);
         sym = 5;

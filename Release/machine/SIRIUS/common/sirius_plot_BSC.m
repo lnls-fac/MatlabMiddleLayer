@@ -55,7 +55,7 @@ elseif strcmp(maquina,'bo')
     %Calcula parametros de twiss da rede
     twiss = calctwiss(THERING);
     %Define inicio e fim para o grafico (5 periodos)
-    mqf = findcells(THERING,'FamName','qf');
+    mqf = sort([findcells(THERING,'FamName','QF'), findcells(THERING,'FamName','qf')]);
     ini=1;
     fim=mqf(6);
     %Calcula dispersao de energia
