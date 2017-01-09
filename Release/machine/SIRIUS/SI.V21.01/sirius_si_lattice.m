@@ -73,9 +73,9 @@ m_accep_fam_name = 'calc_mom_accep';
 
 % -- drifts --
 
-LKK   = drift('lkk',  1.9900, 'DriftPass');
-LPMU  = drift('lpmu', 0.1050, 'DriftPass');
-LPMD  = drift('lpmd', 0.4729, 'DriftPass');
+LKK   = drift('lkk',  2.0050, 'DriftPass');
+LPMU  = drift('lpmu', 0.1700, 'DriftPass');
+LPMD  = drift('lpmd', 0.4929, 'DriftPass');
 LIA   = drift('lia',  1.5179, 'DriftPass');
 LIB   = drift('lib',  1.0879, 'DriftPass');
 LIP   = drift('lip',  1.0879, 'DriftPass');
@@ -114,9 +114,10 @@ L474  = drift('l474', 0.474, 'DriftPass');
 L500  = drift('l500', 0.500, 'DriftPass');
 L715  = drift('l715', 0.715, 'DriftPass');
 
-L354  = drift('l354', 0.354, 'DriftPass');
 L146  = drift('l146', 0.146, 'DriftPass');
-
+L354  = drift('l354', 0.354, 'DriftPass');
+L009  = drift('l009', 0.009, 'DriftPass');
+L465  = drift('l465', 0.465, 'DriftPass');
 
 % -- dipoles -- 
 
@@ -174,7 +175,7 @@ SFP2 = sextupole('sfp2', 0.150, sfp2_strength, sext_pass_method); %
 CV   = sextupole('cv', 0.150, 0.0, sext_pass_method); % same model as BO correctors
 
 % -- pulsed magnets --
-DIPK = sextupole('dipk', 0.500, 0.0, sext_pass_method); % injection kicker
+DIPK = sextupole('dipk', 0.400, 0.0, sext_pass_method); % injection kicker
 NLK  = sextupole('nlk',  0.450, 0.0, sext_pass_method); % pulsed multipole magnet
 
 % -- bpms and fast correctors --
@@ -196,11 +197,13 @@ GIR    = marker('girder',   'IdentityPass'); % marker used to delimitate girders
 MIDA   = marker('id_enda',  'IdentityPass'); % marker for the extremities of IDs in long straight sections
 MIDB   = marker('id_endb',  'IdentityPass'); % marker for the extremities of IDs in short straight sections
 MIDP   = marker('id_endp',  'IdentityPass'); % marker for the extremities of IDs in short straight sections
-SEPTIN = marker('eseptinj', 'IdentityPass'); % end of thin injection septum
+InjSF  = marker('InjSF',    'IdentityPass'); % end of thin injection septum
 
 % -- diagnostics markers --
 DCCT   = marker('dcct',     'IdentityPass'); % dcct to measure beam current
 HScrap = marker('HScrap',   'IdentityPass'); % horizontal scraper
+VScrap = marker('VScrap',   'IdentityPass'); % vertical scraper
+
 
 %% transport lines
 M1A      = [GIR,L134,GIR,QDA,L150,SDA0,L066,FC,L074,QFA,L150,SFA0,L135,BPM,RBPM,GIR];                 % high beta xxM1 girder (with fasc corrector)
@@ -211,7 +214,7 @@ M2B      = fliplr(M1B);                                                         
 M2P      = fliplr(M1P);                                                                               % low beta xxM2 girder
 
 IDA      = [L500,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];                           % high beta ID straight section
-IDA_INJ  = [L500,LIA,L419,SEPTIN,L081,L500,L500,END,START,MIA,LKK,DIPK,LPMU,NLK,LPMD];                % high beta INJ straight section
+IDA_INJ  = [L500,LIA,L419,InjSF,L081,L500,L500,END,START,MIA,LKK,DIPK,LPMU,NLK,LPMD];                % high beta INJ straight section
 IDA_09   = [L354,HScrap,L146,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];               % high beta ID straight section
 
 IDB      = [L500,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,L500];                           % low beta ID straight section
@@ -232,6 +235,7 @@ C3B      = [GIR,L715,GIR,L112,Q4,L133,BPM,RBPM,L127,SFB2,L048,FC,L082,Q3,L170,SD
 C3P      = [GIR,L715,GIR,L112,Q4,L133,BPM,RBPM,L127,SFP2,L048,FC,L082,Q3,L170,SDP3,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
 
 C4A      = [GIR,L216,GIR,SDA2,L170,Q2,L230,SFA1,L125,BPM,L135,Q1,L170,SDA1,GIR,L474,GIR];                          % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C4A_20   = [GIR,L216,GIR,SDA2,L170,Q2,L230,SFA1,L125,BPM,L135,Q1,L170,SDA1,GIR,L465,VScrap,L009,GIR];               % arc sector in between B2-B1 (high beta odd-numbered straight sections)
 
 C4B      = [GIR,L216,GIR,SDB2,L170,Q2,L230,SFB1,L125,BPM,L135,Q1,L170,SDB1,GIR,L474,GIR];                          % arc sector in between B2-B1 (low beta even-numbered straight sections)
 C4B_DCCT = [GIR,L216,GIR,SDB2,L170,Q2,L230,SFB1,L125,BPM,L135,Q1,L170,SDB1,L237,DCCT,GIR,L237,GIR];                % arc sector in between B2-B1 (low beta even-numbered straight sections)
@@ -285,7 +289,7 @@ C1_S16 = C1B; C2_S16 = C2B;    C3_S16 = C3A; C4_S16 = C4A;
 C1_S17 = C1A; C2_S17 = C2A;    C3_S17 = C3B; C4_S17 = C4B;
 C1_S18 = C1B; C2_S18 = C2B;    C3_S18 = C3P; C4_S18 = C4P;
 C1_S19 = C1P; C2_S19 = C2P;    C3_S19 = C3B; C4_S19 = C4B;
-C1_S20 = C1B; C2_S20 = C2B;    C3_S20 = C3A; C4_S20 = C4A;
+C1_S20 = C1B; C2_S20 = C2B;    C3_S20 = C3A; C4_S20 = C4A_20;
 
 
 %% SECTORS # 01..20
