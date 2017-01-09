@@ -48,7 +48,9 @@ l100     = drift('l100', 0.10,   'DriftPass');
 l150     = drift('l150', 0.15,   'DriftPass');
 l200     = drift('l200', 0.20,   'DriftPass');
 la1      = drift('la1',  0.115,  'DriftPass');
-la2p     = drift('la2p', 0.1588, 'DriftPass');
+la2p     = drift('la2p', 0.2100, 'DriftPass');
+la3p     = drift('la3p', 0.1488, 'DriftPass');
+la4p     = drift('la4p', 0.0512, 'DriftPass');
 lb1p     = drift('lb1p', 0.125,  'DriftPass');
 lb2p     = drift('lb2p', 0.275,  'DriftPass');
 lb3p     = drift('lb3p', 0.2765, 'DriftPass');
@@ -169,7 +171,7 @@ septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consiste
 
 %% % --- lines ---
 
-lin_1 = [la2p, l200, bpm, ict, l200, l200];
+lin_1 = [la2p, bpm, la3p, ict, la4p, l200];
 s01_1 = [lb1p, l200, l200, scrn, bpm, l150c, ch, l100cc, cv, l150c];
 s01_2 = [lb2p, l200];
 s01_3 = [l200, l200, l200, l200, l200, l200, hslit, scrn, bpm, l150c, cv, l100cc, ch, l200c, vslit, l200, lb3p];
@@ -181,14 +183,17 @@ s03_1 = [ld3p, scrn, bpm, l150c, ch, l200c];
 s04_1 = [l200c, cv, l200c, l200, l200, l200, l200, l200, ict, le1p];
 s04_2   = [l150, scrn, bpm, l150c, cv, l100c];
 
-linac    = [chl, cvl, la1, qf2l, l100, qd2l, l100, qf2l, l100, qf3l, lin_1, spec];
 sector01 = [s01_1, qd1, s01_2, qf1, s01_3, bn];
 sector02 = [s02_1, qd2a, lc2, qf2a, s02_2, qf2b, lc4, qd2b, s02_3, bp];
 sector03 = [ld1, qf3, ld2, qd3, s03_1, bp];
 sector04 = [cv, s04_1, qf4, le2, qd4, scrn, cv, s04_2, septin];
 
-%ltlb  = [inicio, line1, spec, arc1, bn, line2, bp, arc2, bp, line3, septin, bpm, fim];
+%% TB beamline beginning with end of linac
+linac    = [chl, cvl, la1, qf2l, l100, qd2l, l100, qf2l, l100, qf3l, lin_1, spec];
 ltlb  = [inicio, linac, sector01, sector02, sector03, sector04, fim];
+
+%ltlb  = [inicio, sector01, sector02, sector03, sector04, fim];
+
 elist = ltlb;
 
 
