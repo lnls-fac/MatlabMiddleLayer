@@ -1,4 +1,4 @@
-function lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons)
+function lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons, sym)
 % lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons)
 %
 % Plota os espacos de fase horizontal e vertical e monta o diagrama de
@@ -17,6 +17,8 @@ function lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons)
 % Como padrao, a funcao usa o algoritmo NAFF para os calculos de sintonia.
 % Por isso, o numero real de voltas usado sera tal que satisfaca a seguinte
 % formula nt = mod(2^nextpow2(nturns),6)==0
+
+if ~exist('sym','var'), sym = 1; end
 
 % escolha do metodo para calculo das sintonias:
 meth = 'naff';
@@ -159,12 +161,12 @@ ax_e = axes('Parent',f1,'Units','pixels','Position',[924,60,350,350],...
             'FontSize',16,'xGrid','on','yGrid','on');
 ylabel(ax_e,'\nu_y'); xlabel(ax_e,'\nu_x');
 hold(ax_e,'all');  box(ax_e,'on');
-lim_x = floor(tunes(1)*2)/2 + [-0.05,0.55];
-lim_y = floor(tunes(2)*2)/2 + [-0.05,0.55];
+lim_x = floor(sym*tunes(1)*2)/2 + [-0.05,0.55];
+lim_y = floor(sym*tunes(2)*2)/2 + [-0.05,0.55];
 for i=rot90(resons,2)
     reson(i,1,[lim_x,lim_y],ax_e);
 end
-plot(tunex_y,tuney_y,'r.','Parent',ax_e);
-plot(tunex_x,tuney_x,'b.','Parent',ax_e);
-plot(tunex_en,tuney_en,'m.','Parent',ax_e);
+plot(sym*tunex_y,sym*tuney_y,'r.','Parent',ax_e);
+plot(sym*tunex_x,sym*tuney_x,'b.','Parent',ax_e);
+plot(sym*tunex_en,sym*tuney_en,'m.','Parent',ax_e);
 
