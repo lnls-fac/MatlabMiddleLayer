@@ -27,7 +27,6 @@ if ischar(GeV)
     end
 end
 
-
 % GLOBVAL will be obsolete soon
 if ~isempty(whos('global','GLOBVAL'))
     global GLOBVAL
@@ -35,6 +34,10 @@ if ~isempty(whos('global','GLOBVAL'))
 end
 
 global THERING;
+if THERING{1}.Energy ~= GeV*1e9
+    ad=getad();
+    eval(['THERING = ', ad.ATModel, '(GeV);']); 
+end
 
 % Newer AT versions require 'Energy' to be an AT field
 THERING = setcellstruct(THERING, 'Energy', 1:length(THERING), 1e+009 * GeV(end));
