@@ -34,7 +34,7 @@ machine  = correct_tune(machine);
 machine  = correct_coupling(machine, family_data);
 
 % lattice symmetrization
-%machine = correct_optics(machine, family_data);
+machine = correct_optics(machine, family_data);
 
 % at last, multipole errors are applied
 machine  = create_apply_multipoles(machine, family_data);
@@ -52,11 +52,6 @@ finalizations();
         seed = 131071;
         fprintf('-  initializing random number generator with seed = %i ...\n', seed);
         RandStream.setGlobalStream(RandStream('mt19937ar','seed', seed));
-        
-        % saves this file to working directory so that what has been done
-        % is registered
-        p = mfilename('fullpath');
-        copyfile([p '.m'], 'lattice_errors_analysis.m');
         
         % sends copy of all output to a diary in a file
         fprintf('-  creating diary file ...\n');
@@ -288,25 +283,14 @@ finalizations();
         optics.vcm_idx = sort(family_data.cv.ATIndex);
         optics.kbs_idx = sort(family_data.qn.ATIndex);
         
+        optics.symmetry           = 5;
         optics.svs                = 156;
         optics.max_nr_iter        = 50;
         optics.tolerance          = 1e-5;
-        [~, optics.tune_goal]     = twissring(the_ring,0,1:length(the_ring)+1);
         optics.simul_bpm_corr_err = false;
         
         % calcs optics symmetrization matrix
-        fname = [name '_info_optics.mat'];
-        lattice_symmetry = 5;
-        if ~exist(fname, 'file')
-            [respm, info] = calc_respm_optics(the_ring, optics, lattice_symmetry);
-            optics.respm = respm;
-            save(fname, 'info');
-        else
-            data = load(fname);
-            [respm, ~] = calc_respm_optics(the_ring, optics, lattice_symmetry, data.info);
-            optics.respm = respm;
-        end
-        machine = lnls_latt_err_correct_optics(name, machine, optics, the_ring);
+        machine = lnls_latt_err_correct_optics_loco(name, machine, optics, the_ring);
         
         name_saved_machines = [name_saved_machines '_symm'];
         save2file(name_saved_machines,machine);
@@ -349,7 +333,6 @@ finalizations();
         
         fprintf('\n<tune correction> [%s]\n\n', datestr(now));
         
-        tune.correction_flag = false;
         tune.families        = {'qfa','qda','qdb2','qfb','qdb1','qdp2','qfp','qdp1'};
         [~, tune.goal]       = twissring(the_ring,0,1:length(the_ring)+1);
         tune.method          = 'svd';

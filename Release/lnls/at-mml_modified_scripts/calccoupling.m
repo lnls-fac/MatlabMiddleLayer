@@ -12,7 +12,7 @@ function [Tilt, Eta, EpsX, EpsY, Ratio, ENV, DP, DL, sigmas] = calccoupling(the_
 %  2. Eta - Dispersion
 %  3. EpsX - Horzontal emittance
 %  4. EpsY - Vertical  emittance
-%  5. EmittanceRatio - median(EpsX) / median(EpsX)
+%  5. EmittanceRatio - median(EpsY) / median(EpsX)
 %  6-8. ENV, DP, DL - Output of ohmienvelope
 %
 %  NOTES

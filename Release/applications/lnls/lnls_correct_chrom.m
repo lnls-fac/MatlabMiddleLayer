@@ -1,10 +1,8 @@
 function ring = lnls_correct_chrom(ring, chrom, fams, max_iter, tolerancia)
 
-
-if ~exist('chrom', 'var')
-    chrom = [0,0];
-end
-
+if ~exist('chrom', 'var'), chrom = [0,0]; end
+if ~exist('max_iter', 'var'), max_iter = 10; end
+if ~exist('tolerancia', 'var'), tolerancia = 1e-3; end
 if ~exist('fams', 'var')
     fams = {'sda1', 'sda2', 'sda3', 'sfa1', 'sfa2', ...
         'sdb1', 'sdb2', 'sdb3', 'sfb1', 'sfb2', ...
@@ -12,17 +10,9 @@ if ~exist('fams', 'var')
         };
 end
 
-if ~exist('max_iter', 'var')
-    max_iter = 10;
-end
-
-if ~exist('tolerancia', 'var')
-    tolerancia = 1e-3;
-end
-
 indS = cell(length(fams));
 dchrom = zeros(length(fams),2);
-sumDeltaS = zeros(length(fams),1);
+% sumDeltaS = zeros(length(fams),1);
 
 for j=1:length(fams)
     indS{j} = findcells(ring,'FamName',fams{j});
@@ -54,16 +44,12 @@ for count=1:max_iter
     B = (chrom'-last_chrom');
     
     DeltaS = V*(S\U')*B;
-%    DeltaS = V*inv(S)*[1,0;0,0]*U'*B
 
     for j=1:length(fams)
         strS = getcellstruct(ring,'PolynomB',indS{j},1,3) + DeltaS(j);
         ring = setcellstruct(ring,'PolynomB',indS{j},strS,1,3);
     end
 end
-
-
-
 
 
 function dchrom = lnls_calc_dchrom(ring, ind)

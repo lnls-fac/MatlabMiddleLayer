@@ -16,7 +16,7 @@ function machine = lnls_latt_err_apply_errors(name, machine, errors, increment)
 %
 %  modified 2015/03/05 by Fernando.
 %
-% SEE ALSO: lnls_latt_err_apply_errors, lnls_latt_err_correct_cod, 
+% SEE ALSO: lnls_latt_err_apply_errors, lnls_latt_err_correct_cod,
 % lnls_latt_err_correct_coupling, lnls_latt_err_correct_optics,
 % lnls_latt_err_correct_tune_machines
 
@@ -35,7 +35,7 @@ if length(machine) ~= nr_machines
 end
 
 dim = get_dim(machine{1});
-bpm = findcells(machine{1},'FamName','bpm');
+bpm = sort([findcells(machine{1},'FamName','bpm'), findcells(machine{1},'FamName','BPM')]);
 
 ids_idx  = findcells(machine{1}, 'PassMethod', 'LNLSThickEPUPass');
 sext_idx = findcells(machine{1}, 'PolynomB');

@@ -1,7 +1,7 @@
 function [r, lattice_title, IniCond] = sirius_ts_lattice(varargin)
 % 2013-11-26 created Ximenes (from V100)
 
-%% global parameters 
+%% global parameters
 %  =================
 
 
@@ -62,7 +62,7 @@ start    = marker('start',  'IdentityPass');
 fim      = marker('end',    'IdentityPass');
 
 % --- quadrupoles ---
-  
+
 qf1a    = quadrupole('qf1a', 0.14, qf1a_strength, quad_pass_method); % qf
 qf1b    = quadrupole('qf1b', 0.14, qf1b_strength, quad_pass_method); % qf
 qd2     = quadrupole('qd2',  0.14, qd2_strength,  quad_pass_method); % qd
@@ -79,10 +79,10 @@ bpm  = marker('bpm', 'IdentityPass');
 ch   = sextupole ('ch', 0.1, 0.0, sext_pass_method);
 cv   = sextupole ('cv', 0.1, 0.0, sext_pass_method);
 
-% --- bending magnets --- 
+% --- bending magnets ---
 
 deg_2_rad = (pi/180);
-      
+
 % -- bend --
 dip_nam =  'bend';
 dip_len =  1.151658;
@@ -90,10 +90,10 @@ dip_ang =  5.333333 * deg_2_rad;
 dip_K   =  -0.1526;
 dip_S   =  0.00;
 h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2,...
-           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
+           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
 h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2,...
            0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-bend      = [h1 mbend h2];      
+bend      = [h1 mbend h2];
 
 
 % -- bo extraction septum --
@@ -102,7 +102,7 @@ dip_len =  0.85;
 dip_ang =  -3.6 * deg_2_rad;
 dip_K   =  0.0;
 dip_S   =  0.00;
-h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,   0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,   0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
 h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
 bseptex = marker('bseptex', 'IdentityPass'); % marker at the beginning of extraction septum
 mseptex = marker('mseptex', 'IdentityPass'); % marker at the center of extraction septum
@@ -116,7 +116,7 @@ dip_len  =  1.10;
 dip_ang  =  6.2 * deg_2_rad;
 dip_K    =  0.0;
 dip_S    =  0.00;
-h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
 h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
 bsepting = marker('bsepting', 'IdentityPass'); % marker at the beginning of thick septum
 msepting = marker('msepting', 'IdentityPass'); % marker at the center of thick septum
@@ -129,14 +129,14 @@ dip_len  =  0.925;
 dip_ang  =  3.13 * deg_2_rad;
 dip_K    =  0.00;
 dip_S    =  0.00;
-h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
+h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
 h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
 bseptinf = marker('bseptinf', 'IdentityPass');   % marker at the beginning of thin septum
 mseptinf = marker('mseptinf', 'IdentityPass');   % marker at the center of thin septum
 eseptinf = marker('eseptinf', 'IdentityPass');   % marker at the end of thin septum
 septfi   = [bseptinf, h1, mseptinf, h2, eseptinf];   % we excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
-           
+
 % --- lines ---
 la1   = [l20, l13, cv, l15, repmat(l20,1,4), l24];
 la2   = [la2p, repmat(l20,1,11), bpm, l15, ch, l15, cv, l15];
@@ -163,12 +163,12 @@ ltba  = [start, line1, line2, line3, line4, line5, fim];
 % lkipmm   = drift('lkipmm', 0.807, 'DriftPass');
 % MIA      = marker('MIA', 'IdentityPass');
 % sept_in  = marker('sept_in', 'IdentityPass');
-% injk  = marker('injk', 'IdentityPass');
+% injk  = marker('InjK', 'IdentityPass');
 % PMM      = marker('PMM', 'IdentityPass');
 % AN_kipmm = [sept_in, l10, MIA, lki, lkipmm, PMM];
 % ltba_estendido  = [inicio, linea, lineb, linec, lined, linee, AN_kipmm, fim];
 
-%% finalization 
+%% finalization
 
 %elist = ltba;
 elist = ltba;

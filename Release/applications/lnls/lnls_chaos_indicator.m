@@ -1,7 +1,7 @@
 function indicator = lnls_chaos_indicator(ring, param, plota)
 % indicator = lnls_chaos_indicator(ring, param, plota)
-%   Calculate ADR (see Plinio's internship report) and diffusion for a
-%   model of ring.
+%   Calculate ASDR (see Plinio's internship report for details) and 
+%   diffusion for a model of ring.
 %
 %   INPUT
 %       ring    = accelerator model.
