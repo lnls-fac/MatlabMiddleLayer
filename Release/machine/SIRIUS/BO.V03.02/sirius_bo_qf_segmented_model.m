@@ -32,17 +32,36 @@ types = {};
 b = 1; types{end+1} = struct('fam_name', fam_name, 'passmethod', passmethod);
 
 
-% ---------------------------------------------------------------
-% QF model 2016-01-25
-% ====================
-% this (half) model is based on fieldmap
-% /home/fac_files/data/sirius/bo/magnet_modelling/qf/fieldmaps/
-% '2014-11-04 Quadrupolo_Booster_QF_Modelo 4_-32_32mm_-450_450mm.txt'
+% FIELDMAP
+% trajectory centered in good-field region. init_rx is set to 0.0 mm
+% *** interpolation of fields is now cubic ***
+% *** more refined segmented model.
+% *** dipole angle is now in units of degrees
+%--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m],[T] for polynom_b ---
 fmap_monomials = [1,5,9,13];
-fmap_model = [ ...
- %type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
-b,     0.114  ,  +0.00000 ,  +1.87e+00 ,  -2.01e+04 ,  +2.49e+11 ,  +5.16e+16 ;
+
+% QF model 2017-01-09 (3GeV)
+% ===========================
+% dipole model06
+% filename: 2016-11-23_BQF_Model06_Sim_X=-20_20mm_Z=-450_450mm_I=110.8A.txt
+segmodel_3GeV = [ ...
+%type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
+b,     0.114  ,  +0.00000 ,  +1.78e+00 ,  -1.91e+04 ,  +2.37e+11 ,  +4.91e+16 ;
 ];
+
+% QF model 2017-01-09 (150MeV)
+% ============================
+% dipole model06
+% filename: 2016-12-06_BQF_Model06_Sim_X=-20_20mm_Z=-450_450mm_I=5.28A.txt
+segmodel_150MeV = [ ...
+%type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
+b,     0.114  ,  +0.00000 ,  +1.78e+00 ,  -1.91e+04 ,  +2.38e+11 ,  +4.91e+16 ;
+];
+
+% interpolates multipoles linearly in energy
+segmodelo = segmodel_3GeV;
+segmodelo(:,4:end) = segmodel_150MeV(:,4:end) + (energy - 150e6)/(3e9-150e6) * (segmodel_3GeV(:,4:end) - segmodel_150MeV(:,4:end));
+
 
 % ROTATING COIL MEASUREMENT
 % =========================
@@ -54,15 +73,15 @@ rcoil_integrated_multipoles = [1,-1.066222407330279e+04,1.250513244082492e+11,9.
 
 
 
-fmap_lens = fmap_model(:,2);
+fmap_lens = segmodelo(:,2);
 
 % rescale multipoles of the model according to nominal strength value passed as argument
 % --------------------------------------------------------------------------------------
 if exist('hardedge_KL','var')
     idx = find(fmap_monomials == magnet_type); 
-    model_KL = 2*sum(fmap_model(:,3+idx) .* fmap_lens); 
+    model_KL = 2*sum(segmodelo(:,3+idx) .* fmap_lens); 
     rescaling = hardedge_KL / model_KL;
-    fmap_model(:,4:end) = fmap_model(:,4:end) * rescaling;
+    segmodelo(:,4:end) = segmodelo(:,4:end) * rescaling;
 end
 
 % rescale multipoles of the rotating coild data according to nominal strength value passed as argument
@@ -78,23 +97,23 @@ end
 % builds final model with fieldmap and rotating coild measurements
 % ----------------------------------------------------------------
 monomials = unique([fmap_monomials rcoil_monomials]);
-segmodel = zeros(size(fmap_model,1),length(monomials));
-segmodel(:,1:3) = fmap_model(:,1:3);
+segmodel = zeros(size(segmodelo,1),length(monomials));
+segmodel(:,1:3) = segmodelo(:,1:3);
 for i=1:length(monomials)
     rcoil_idx = find(rcoil_monomials == monomials(i), 1);
     fmap_idx  = find(fmap_monomials == monomials(i), 1);
     if isempty(rcoil_idx)
         % this multipole is not in rotating coil data: does nothing then.
-        segmodel(:,i+3) = fmap_model(:,fmap_idx+3);
+        segmodel(:,i+3) = segmodelo(:,fmap_idx+3);
     else
         if isempty(fmap_idx)
             % if this multipole is not in fmap model then uses main multipole to build a multipolar profile
-            fmap_integrated_multipole = 2*sum(fmap_model(:,magnet_type+3) .* fmap_lens);
+            fmap_integrated_multipole = 2*sum(segmodelo(:,magnet_type+3) .* fmap_lens);
         else
-            fmap_integrated_multipole = 2*sum(fmap_model(:,fmap_idx+3) .* fmap_lens);
+            fmap_integrated_multipole = 2*sum(segmodelo(:,fmap_idx+3) .* fmap_lens);
         end    
         rescaling = rcoil_normalized_integrated_multipoles(rcoil_idx) / fmap_integrated_multipole;
-        segmodel(:,i+3) = fmap_model(:,fmap_idx+3) * rescaling;
+        segmodel(:,i+3) = segmodelo(:,fmap_idx+3) * rescaling;
     end
 end
 

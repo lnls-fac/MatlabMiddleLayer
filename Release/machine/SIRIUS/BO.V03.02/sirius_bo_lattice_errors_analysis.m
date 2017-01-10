@@ -88,21 +88,21 @@ finalizations();
         um = 1e-6; mrad = 0.001; percent = 0.01;
 
         % <quadrupoles> alignment, rotation and excitation errors
-        config.fams.quads.labels     = {'qf','qd','qs'};
+        config.fams.quads.labels     = {'QF','QD','QS'};
         config.fams.quads.sigma_x    = 160 * um * 1;
         config.fams.quads.sigma_y    = 160 * um * 1;
         config.fams.quads.sigma_roll = 0.800 * mrad * 1;
         config.fams.quads.sigma_e    = 0.3 * percent * 1;
 
         % <sextupoles> alignment, rotation and excitation errors
-        config.fams.sexts.labels     = {'sd','sf'};
+        config.fams.sexts.labels     = {'SD','SF'};
         config.fams.sexts.sigma_x    = 160 * um * 1;
         config.fams.sexts.sigma_y    = 160 * um * 1;
         config.fams.sexts.sigma_roll = 0.800 * mrad * 1;
         config.fams.sexts.sigma_e    = 0.3 * percent * 1;
 
         % <dipoles with more than one piece> alignment, rotation and excitation errors
-        config.fams.b.labels       = {'b'};
+        config.fams.b.labels       = {'B'};
         config.fams.b.sigma_x      = 160 * um * 1;
         config.fams.b.sigma_y      = 160 * um * 1;
         config.fams.b.sigma_roll   = 0.800 * mrad * 1;
@@ -127,7 +127,7 @@ finalizations();
         fprintf('-  generating errors ...\n');
         % I have to do this for the booster, because the lattice begins at
         % the middle of the quadrupole:
-        idx = sort([findcells(the_ring,'FamName','bpm'), findcells(the_ring,'FamName','BPM')]); idx = idx(end)-1;
+        idx = findcells(the_ring,'FamName','BPM'); idx = idx(end)-1;
         the_ring = circshift(the_ring,[0,-idx]);
 
         errors        = lnls_latt_err_generate_errors(name, the_ring, config, nr_machines, cutoff_errors, rndtype);
@@ -199,7 +199,7 @@ finalizations();
         fprintf('\n<tune correction> [%s]\n\n', datestr(now));
 
         tune.correction_flag = false;
-        tune.families        = {'qf','qd'};
+        tune.families        = {'QF','QD'};
         [~, tune.goal]       = twissring(the_ring,0,1:length(the_ring)+1);
         tune.max_iter        = 10;
         tune.tolerance       = 1e-6;
@@ -219,7 +219,7 @@ finalizations();
         fprintf('\n<application of multipole errors> [%s]\n\n', datestr(now));
 
         % QUADRUPOLES
-        multi.quads.labels = {'qd','qf','qs'};
+        multi.quads.labels = {'QD','QF','QS'};
         multi.quads.main_multipole = 2;% positive for normal negative for skew
         multi.quads.r0 = 17.5e-3;
         multi.quads.order     = [3, 4, 5, 6, 7, 8, 9]; % 1 for dipole
@@ -227,7 +227,7 @@ finalizations();
         multi.quads.skew_vals = [10, 5, ones(1,5)]*1e-4;
 
         % SEXTUPOLES
-        multi.sexts.labels = {'sd','sf'};
+        multi.sexts.labels = {'SD','SF'};
         multi.sexts.main_multipole = 3;% positive for normal negative for skew
         multi.sexts.r0 = 17.5e-3;
         multi.sexts.order     = [4, 5, 6, 7, 8, 9, 10]; % 1 for dipole
@@ -235,7 +235,7 @@ finalizations();
         multi.sexts.skew_vals = ones(1,7)*1e-4;
 
         % DIPOLES
-        multi.bends.labels = {'b'};
+        multi.bends.labels = {'B'};
         multi.bends.main_multipole = 1;% positive for normal negative for skew
         multi.bends.r0 = 17.5e-3;
         multi.bends.order = [3, 4, 5, 6, 7]; % 1 for dipole
@@ -255,7 +255,7 @@ finalizations();
 
         % I have to do this for the booster, because the lattice begins at
         % the middle of the quadrupole:
-        idx = sort([findcells(the_ring,'FamName','bpm'), findcells(the_ring,'FamName','BPM')]); idx = idx(end)-1;
+        idx = findcells(the_ring,'FamName','BPM'); idx = idx(end)-1;
         the_ring = circshift(the_ring,[0,-idx]);
         for i=1:length(machine)
             machine{i} = circshift(machine{i},[0,-idx]);

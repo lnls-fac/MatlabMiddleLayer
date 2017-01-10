@@ -44,10 +44,14 @@ set_magnets_strength_booster;
 % approved fieldmap. The segmented model has a longer length
 % and the difference has to be accomodated.
 
-% loads dipole segmented model:
+% --- segmented dipole model ---
+
 b_len_hdedge   = 1.152; % [m]
 [B, b_len_seg] = sirius_bo_b_segmented_model(energy, 'B', bend_pass_method);
 lenDif         = (b_len_seg - b_len_hdedge)/2.0;
+
+
+% --- drifts ---
 
 L00880  = drift('l00880', 0.0880, 'DriftPass');
 L01340  = drift('l01340', 0.1340, 'DriftPass');
@@ -70,37 +74,39 @@ L18210  = drift('l18210', 1.8210, 'DriftPass');
 L18935  = drift('l18935', 1.8935, 'DriftPass');
 L21325  = drift('l21325', 2.1325, 'DriftPass');
 L36940  = drift('l36940', 3.6940, 'DriftPass');
-
 % drifts affected by the dipole modelling:
-
 D02250 = drift('d02250',  0.2250-lenDif, 'DriftPass');
 D02475 = drift('d02475',  0.2475-lenDif, 'DriftPass');
 D02495 = drift('d02495',  0.2495-lenDif, 'DriftPass');
 D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 
-STR  = marker('start',   'IdentityPass');    % start of the model
-FIM  = marker('end',     'IdentityPass');    % end of the model
+
+% --- markers ---
+
+STR  = marker('start',   'IdentityPass');   % start of the model
+FIM  = marker('end',     'IdentityPass');   % end of the model
 GIR  = marker('girder',  'IdentityPass');
-SIN  = marker('InjS',    'IdentityPass');    % end of BO injection septum at TB transport line
-SEX  = marker('EjeSF',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
+SIN  = marker('InjS',    'IdentityPass');   % end of BO injection septum at TB transport line
+SEX  = marker('EjeSF',   'IdentityPass');   % start of BO ejection thin septum at TS transport line
 BPM  = marker('BPM',     'IdentityPass');
 
 
-KIN  = quadrupole('InjK', 0.500,     0.0,         quad_pass_method);
-KEX  = quadrupole('EjeK', 0.500,     0.0,         quad_pass_method);
+% --- lattice elements ---
 
-CH   = sextupole ('CH',      0.150,     0.0,         sext_pass_method);
-CV   = sextupole ('CV',      0.150,     0.0,         sext_pass_method);
+KIN  = quadrupole('InjK', 0.500, 0.0, quad_pass_method);
+KEX  = quadrupole('EjeK', 0.500, 0.0, quad_pass_method);
+CH   = sextupole ('CH',   0.150, 0.0, sext_pass_method);
+CV   = sextupole ('CV',   0.150, 0.0, sext_pass_method);
 SF  = sirius_bo_sx_segmented_model(energy, 'SF', sext_pass_method, sf_strength * 0.105);
 SD  = sirius_bo_sx_segmented_model(energy, 'SD', sext_pass_method, sd_strength * 0.105);
 QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength * 0.101);
 QF  = sirius_bo_qf_segmented_model(energy, 'QF', quad_pass_method, qf_strength * 0.228);
-
 QS  = quadrupole('QS',  0.10, 0.0,  quad_pass_method);
-
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
-
 RFC = rfcavity('Cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
+
+
+% --- lines ---
 
 US_SF = [GIR, D21460, BPM, L18935, GIR, SF, L01340];
 US_SS = [D02475, SD, GIR, L17935, BPM, L18935, GIR, SF, L01340];
