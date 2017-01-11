@@ -54,30 +54,31 @@ lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 % --- drifts ---
 
 L00880  = drift('l00880', 0.0880, 'DriftPass');
-L01340  = drift('l01340', 0.1340, 'DriftPass');
-L01615  = drift('l01615', 0.1615, 'DriftPass');
+L01610  = drift('l01610', 0.1610, 'DriftPass');
+L01335  = drift('l01335', 0.1335, 'DriftPass');
 L01725  = drift('l01725', 0.1725, 'DriftPass');
 L02410  = drift('l02410', 0.2410, 'DriftPass');
-L03365  = drift('l03365', 0.3365, 'DriftPass');
+L03360  = drift('l03360', 0.3360, 'DriftPass');
 L05550  = drift('l05550', 0.5550, 'DriftPass');
 L07250  = drift('l07250', 0.7250, 'DriftPass');
 L10000  = drift('l10000', 1.0000, 'DriftPass');
 L10960  = drift('l10960', 1.0960, 'DriftPass');
-L11325  = drift('l11325', 1.1325, 'DriftPass');
+L11320  = drift('l11320', 1.1320, 'DriftPass');
 L12960  = drift('l12960', 1.2960, 'DriftPass');
 L14710  = drift('l14710', 1.4710, 'DriftPass');
 L16830  = drift('l16830', 1.6830, 'DriftPass');
 L17710  = drift('l17710', 1.7710, 'DriftPass');
 L17935  = drift('l17935', 1.7935, 'DriftPass');
-L17955  = drift('l17955', 1.7955, 'DriftPass');
+L17960  = drift('l17960', 1.7960, 'DriftPass');
 L18210  = drift('l18210', 1.8210, 'DriftPass');
 L18935  = drift('l18935', 1.8935, 'DriftPass');
-L21325  = drift('l21325', 2.1325, 'DriftPass');
-L36940  = drift('l36940', 3.6940, 'DriftPass');
+L21320  = drift('l21320', 2.1320, 'DriftPass');
+L36945  = drift('l36945', 3.6945, 'DriftPass');
+
 % drifts affected by the dipole modelling:
 D02250 = drift('d02250',  0.2250-lenDif, 'DriftPass');
 D02475 = drift('d02475',  0.2475-lenDif, 'DriftPass');
-D02495 = drift('d02495',  0.2495-lenDif, 'DriftPass');
+D02500  = drift('d02500', 0.2500-lenDif, 'DriftPass');
 D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 
 
@@ -99,7 +100,7 @@ CH   = sextupole ('CH',   0.150, 0.0, sext_pass_method);
 CV   = sextupole ('CV',   0.150, 0.0, sext_pass_method);
 SF  = sirius_bo_sx_segmented_model(energy, 'SF', sext_pass_method, sf_strength * 0.105);
 SD  = sirius_bo_sx_segmented_model(energy, 'SD', sext_pass_method, sd_strength * 0.105);
-QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength * 0.101);
+QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength * 0.100);
 QF  = sirius_bo_qf_segmented_model(energy, 'QF', quad_pass_method, qf_strength * 0.228);
 QS  = quadrupole('QS',  0.10, 0.0,  quad_pass_method);
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
@@ -108,20 +109,21 @@ RFC = rfcavity('Cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF fre
 
 % --- lines ---
 
-US_SF = [GIR, D21460, BPM, L18935, GIR, SF, L01340];
-US_SS = [D02475, SD, GIR, L17935, BPM, L18935, GIR, SF, L01340];
-US_SI = [D02250, CV, GIR, L17710, BPM, L10960, SIN, L07250, GIR, CH, L01615];
-US_CS = [D02475, SD, L01725, CV, GIR, L14710, BPM, L18210, GIR, CH, L01615];
-US_CC = [D02250, CV, GIR, L17710, BPM, L18210, GIR, CH, L01615];
-US_SE = [D02250, CV, GIR, L16830, SEX, L00880, L10000, BPM, L11325, GIR];
+US_SF = [GIR, D21460, BPM, L18935, GIR, SF, L01335];
+US_CS = [D02475, SD, L01725, CV, GIR, L14710, BPM, L18210, GIR, CH, L01610];
+US_CC = [D02250, CV, GIR, L17710, BPM, L18210, GIR, CH, L01610];
+US_SS = [D02475, SD, GIR, L17935, BPM, L18935, GIR, SF, L01335];
+US_SE = [D02250, CV, GIR, L16830, SEX, L00880, L10000, BPM, L11320, GIR];
+US_SI = [D02250, CV, GIR, L17710, BPM, L10960, SIN, L07250, GIR, CH, L01610];
 
-DS    = [GIR, L21325, D21460, GIR];
-DS_QD = [GIR, L21325, L17955, GIR, QD, D02495];
-DS_KE = [GIR, L03365, KEX, L02410, KEX, L05550, L17955, GIR, QD, D02495];
-DS_RF = [GIR, L21325, RFC, D21460, GIR];
-DS_KI = [GIR, L03365, KIN, L12960, D21460, GIR];
-DS_CH = [L01615, CH, GIR, L18210, D21460, GIR];
-DS_QS = [L01340, QS, GIR, L36940, GIR, QD, D02495];
+DS    = [GIR, L21320, D21460, GIR];
+DS_QD = [GIR, L21320, L17960, GIR, QD, D02500];
+DS_RF = [GIR, L21320, RFC, D21460, GIR];
+DS_KE = [GIR, L03360, KEX, L02410, KEX, L05550, L17960, GIR, QD, D02500];
+DS_CH = [L01610, CH, GIR, L18210, D21460, GIR];
+DS_KI = [GIR, L03360, KIN, L12960, D21460, GIR];
+DS_QS = [L01335, QS, GIR, L36945, GIR, QD, D02500];
+
 
 %US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QFI, FIM, STR, mqf, QFI, DS_01, B];
 US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QF0,DS_01, B];

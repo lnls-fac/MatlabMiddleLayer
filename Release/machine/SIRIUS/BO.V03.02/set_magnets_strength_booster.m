@@ -110,28 +110,47 @@
 % sd_strength = 6.278086202577062;
 
 
-% 2016-11-29 ximenes (overall checking of model - quadrupole qf model 06)
-% tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'qf','qd'},'svd','add',10,1e-9)"
-% chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'sd', 'sf')"
+% % 2016-11-29 ximenes (overall checking of model - quadrupole qf model 06)
+% % tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9)"
+% % chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF')"
+% % effective length changed from 227 mm to 228 mm.
+% % added model data for injection energy (2016-12-06 - ximenes)
+% 
+% qf_strength_3gev = 1.654036901202666;
+% qd_strength_3gev = -0.005420679200790;
+% sf_strength_3gev = 11.326236886929777;
+% sd_strength_3gev = 6.282585994172798;
+% 
+% qf_strength_150mev = 1.653947030508554;
+% qd_strength_150mev = 0.011087086666236;  % this is correct! the sign has changed!
+% sf_strength_150mev = 11.331918086866839;
+% sd_strength_150mev = 5.007982664695219;
+% 
+% qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
+% qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
+% sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
+% sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
+
+
+% 2017-01-11 ximenes (overall checking of model - quadrupole qd model 02)
+% tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9)"
+% chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF')"
 % effective length changed from 227 mm to 228 mm.
 % added model data for injection energy (2016-12-06 - ximenes)
 
-qf_strength_3gev = 1.653861341941806;
-qd_strength_3gev = -0.004822541503476;
-sf_strength_3gev = 11.327309449559875;
-sd_strength_3gev = 6.281530681569274;
+qf_strength_3gev = 1.654036900448982;
+qd_strength_3gev = -0.005474886350700;
+sf_strength_3gev = 11.326236792215228;
+sd_strength_3gev = 6.282586036135388;
 
-qf_strength_150mev = 1.653771340966689;
-qd_strength_150mev = 0.011692191830813;  % this is correct! the sign has changed!
-sf_strength_150mev = 11.332998999039631;
-sd_strength_150mev = 5.006605035910315;
+qf_strength_150mev = 1.653947031926041;
+qd_strength_150mev = 0.011197961538728;  % this is correct! the sign has changed!
+sf_strength_150mev = 11.331918124055948;
+sd_strength_150mev = 5.007982970980575;
 
 qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
 qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
 sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
 sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
-
-
-
 
 
