@@ -60,6 +60,9 @@ for i=1:length(lattice)
     if isfield(lattice{i}, 'Frequency')
         fprintf(fp, CLFMT, 'frequency'); fprintf(fp, [DBLFMT, EOL], lattice{i}.Frequency);
     end
+    if isfield(lattice{i}, 'PhaseLag')
+        fprintf(fp, CLFMT, 'phase_lag'); fprintf(fp, [DBLFMT, EOL], lattice{i}.PhaseLag);
+    end
     if isfield(lattice{i}, 'BendingAngle')
         fprintf(fp, CLFMT, 'angle'); fprintf(fp, [DBLFMT, EOL], lattice{i}.BendingAngle);
         fprintf(fp, CLFMT, 'angle_in'); fprintf(fp, [DBLFMT, EOL], lattice{i}.EntranceAngle);
