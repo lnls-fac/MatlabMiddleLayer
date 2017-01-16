@@ -41,7 +41,7 @@ fmap_monomials = [1,5,9,13];
 
 % QD model 2017-01-11 (3GeV)
 % ===========================
-% dipole model-02
+% quadrupole model-02
 % filename: 2017-01-10_BO_QD_Model02_Sim_X=-20_20mm_Z=-300_300mm_Imc=113.7A.txt
 segmodel_3GeV = [ ...
 %type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
@@ -60,19 +60,6 @@ b,     0.050  ,  +0.00000 ,  -5.01e-01 ,  +2.49e+04 ,  -6.89e+10 ,  -3.25e+14 ;
 % interpolates multipoles linearly in energy
 segmodelo = segmodel_3GeV;
 segmodelo(:,4:end) = segmodel_150MeV(:,4:end) + (energy - 150e6)/(3e9-150e6) * (segmodel_3GeV(:,4:end) - segmodel_150MeV(:,4:end));
-
-
-% % ---------------------------------------------------------------
-% % QD model 2016-01-26
-% % ====================
-% % this (half) model is based on fieldmap
-% % /home/fac_files/data/sirius/bo/magnet_modelling/qd/fieldmaps/
-% % '2015-08-24 Quadrupolo_Booster_QD_Modelo 1_-20_20mm_-300_300mm_115A_extracao.txt'
-% fmap_monomials = [1,5,9,13];
-% segmodelo = [ ...
-% %type len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
-% b      0.0505, +0.00000 ,  -5.00e-01 ,  +2.49e+04 ,  -6.87e+10 ,  -7.53e+14 ;
-% ]; 
 
 
 % ROTATING COIL MEASUREMENT

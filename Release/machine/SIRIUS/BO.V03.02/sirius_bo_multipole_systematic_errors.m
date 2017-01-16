@@ -62,12 +62,34 @@ fam_data = sirius_bo_family_data(the_ring);
 % fams       = {'sd','sf'};
 % the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
+% % CORRECTOR CH
+% % ============
+% % updated in 2015-09-14 for model1 with 112-mm physical length (XRR)
+% r0         = 17.5/1000;
+% monoms     = [      1,       2,       3,       4        5,       6];
+% Bn_normal  = [-3.0e-4, +3.0e-3, +1.3e-4, -3.3e-3, +6.2e-4, -3.2e-3];
+% Bn_skew    = [    0.0,     0.0,     0.0,     0.0,     0.0,     0.0];
+% main_monom = {0, 'normal'}; 
+% fams       = {'ch'};
+% the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+% 
+% % CORRECTOR CV
+% % ============
+% % updated in 2015-09-14 for model1 with 112-mm physical length (XRR)
+% r0         = 17.5/1000;
+% monoms     = [      1,       2,       3,       4        5,       6];
+% Bn_normal  = [-3.1e-4,     0.0, +3.7e-4,     0.0, +4.6e-4,     0.0];
+% Bn_skew    = [    0.0, -3.1e-3,     0.0, -1.1e-3,     0.0, +2.8e-3];
+% main_monom = {0, 'skew'}; 
+% fams       = {'cv'};
+% the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
+
 % CORRECTOR CH
 % ============
-% updated in 2015-09-14 for model1 with 112-mm physical length (XRR)
+% updated in 2017-01-16 for model2 of fmap 2016-11-28_Corrector_Model02_Sim_X=-20_20mm_Z=-300_300mm_CH_I=9A.txt
 r0         = 17.5/1000;
 monoms     = [      1,       2,       3,       4        5,       6];
-Bn_normal  = [-3.0e-4, +3.0e-3, +1.3e-4, -3.3e-3, +6.2e-4, -3.2e-3];
+Bn_normal  = [+2.8e-5, +2.8e-3, -1.6e-4, -3.1e-3, -6.0e-4, -3.2e-3];
 Bn_skew    = [    0.0,     0.0,     0.0,     0.0,     0.0,     0.0];
 main_monom = {0, 'normal'}; 
 fams       = {'ch'};
@@ -75,15 +97,15 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 
 % CORRECTOR CV
 % ============
-% updated in 2015-09-14 for model1 with 112-mm physical length (XRR)
+% updated in 2017-01-16 for model2 of fmap 2016-11-28_Corrector_Model02_Sim_X=-20_20mm_Z=-300_300mm_CH_I=9A.txt
+% used An <-> Bn rules (see wiki)
 r0         = 17.5/1000;
 monoms     = [      1,       2,       3,       4        5,       6];
-Bn_normal  = [-3.1e-4,     0.0, +3.7e-4,     0.0, +4.6e-4,     0.0];
-Bn_skew    = [    0.0, -3.1e-3,     0.0, -1.1e-3,     0.0, +2.8e-3];
+Bn_normal  = [+2.8e-5,     0.0, -1.6e-4,     0.0, -6.0e-4,     0.0];
+Bn_skew    = [    0.0, -2.8e-3,     0.0, -3.1e-3,     0.0, +3.2e-3];
 main_monom = {0, 'skew'}; 
 fams       = {'cv'};
 the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
-
 
 
 function the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0,fam_data)

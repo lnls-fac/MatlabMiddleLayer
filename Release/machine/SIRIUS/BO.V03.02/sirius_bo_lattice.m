@@ -78,7 +78,7 @@ L36945  = drift('l36945', 3.6945, 'DriftPass');
 % drifts affected by the dipole modelling:
 D02250 = drift('d02250',  0.2250-lenDif, 'DriftPass');
 D02475 = drift('d02475',  0.2475-lenDif, 'DriftPass');
-D02500  = drift('d02500', 0.2500-lenDif, 'DriftPass');
+D02500 = drift('d02500',  0.2500-lenDif, 'DriftPass');
 D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 
 
@@ -98,6 +98,7 @@ KIN  = quadrupole('InjK', 0.500, 0.0, quad_pass_method);
 KEX  = quadrupole('EjeK', 0.500, 0.0, quad_pass_method);
 CH   = sextupole ('CH',   0.150, 0.0, sext_pass_method);
 CV   = sextupole ('CV',   0.150, 0.0, sext_pass_method);
+
 SF  = sirius_bo_sx_segmented_model(energy, 'SF', sext_pass_method, sf_strength * 0.105);
 SD  = sirius_bo_sx_segmented_model(energy, 'SD', sext_pass_method, sd_strength * 0.105);
 QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength * 0.100);

@@ -42,7 +42,7 @@ fmap_monomials = [1,5,9,13];
 
 % QF model 2017-01-09 (3GeV)
 % ===========================
-% dipole model06
+% quadrupole model06
 % filename: 2016-11-23_BQF_Model06_Sim_X=-20_20mm_Z=-450_450mm_I=110.8A.txt
 segmodel_3GeV = [ ...
 %type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
