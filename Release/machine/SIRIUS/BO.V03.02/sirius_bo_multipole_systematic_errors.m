@@ -97,12 +97,15 @@ the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_mo
 
 % CORRECTOR CV
 % ============
-% updated in 2017-01-16 for model2 of fmap 2016-11-28_Corrector_Model02_Sim_X=-20_20mm_Z=-300_300mm_CH_I=9A.txt
+% updated in 2017-01-16 for model2 of fmap 2017-01-16_Corrector_Model02_Sim_CV_X=-20_20mm_Z=-300_300mm_Imc=9A.txt
 % used An <-> Bn rules (see wiki)
 r0         = 17.5/1000;
 monoms     = [      1,       2,       3,       4        5,       6];
-Bn_normal  = [+2.8e-5,     0.0, -1.6e-4,     0.0, -6.0e-4,     0.0];
-Bn_skew    = [    0.0, -2.8e-3,     0.0, -3.1e-3,     0.0, +3.2e-3];
+Bn_normal  = [-3.8e-5,     0.0, +3.2e-4,     0.0, +4.4e-4,     0.0];
+Bn_skew    = [    0.0, -3.0e-3,     0.0, -9.6e-4,     0.0, +2.7e-3];
+% % using An <-> Bn rules (see wiki)
+% Bn_normal  = [+2.8e-5,     0.0, -1.6e-4,     0.0, -6.0e-4,     0.0];
+% Bn_skew    = [    0.0, -2.8e-3,     0.0, -3.1e-3,     0.0, +3.2e-3];
 main_monom = {0, 'skew'}; 
 fams       = {'cv'};
 the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
