@@ -57,14 +57,14 @@ else
     r = (a:h:b)';
     
     % Interpola
-    Bx = interp1(r0,Bx,r,'cubic');
-    By = interp1(r0,By,r,'cubic');
-    alphax = interp1(r0,alphax,r,'cubic');
-    alphay = interp1(r0,alphay,r,'cubic');
-    etax = interp1(r0,etax,r,'cubic');
-    etaxl = interp1(r0,etaxl,r,'cubic');
-    etay = interp1(r0,etay,r,'cubic');
-    etayl = interp1(r0,etayl,r,'cubic');
+    Bx = interp1(r0,Bx,r,'PCHIP');
+    By = interp1(r0,By,r,'PCHIP');
+    alphax = interp1(r0,alphax,r,'PCHIP');
+    alphay = interp1(r0,alphay,r,'PCHIP');
+    etax = interp1(r0,etax,r,'PCHIP');
+    etaxl = interp1(r0,etaxl,r,'PCHIP');
+    etay = interp1(r0,etay,r,'PCHIP');
+    etayl = interp1(r0,etayl,r,'PCHIP');
 end
 
 idx_fim = length(r);
