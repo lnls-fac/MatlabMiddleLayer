@@ -35,7 +35,7 @@ if ~exist('variation','var')||isempty(variation), variation = 'prop'; end
 if ~exist('max_iter', 'var')||isempty(max_iter),  max_iter = 10; end
 if ~exist('tolerance','var')||isempty(tolerance), tolerance = 1e-6; end
 if ~exist('families', 'var')||isempty(families)
-    families = {'qda','qfa','qdb1','qdb2','qfb','qdp1','qdp2','qfp'};
+    families = {'QDA','QFA','QDB1','QDB2','QFB','QDP1','QDP2','QFP'};
 end
 
 
