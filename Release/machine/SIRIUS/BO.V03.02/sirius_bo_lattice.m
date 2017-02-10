@@ -87,6 +87,7 @@ D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 STR  = marker('start',   'IdentityPass');   % start of the model
 FIM  = marker('end',     'IdentityPass');   % end of the model
 GIR  = marker('girder',  'IdentityPass');
+DCCT = marker('DCCT',    'IdentityPass');
 SIN  = marker('InjS',    'IdentityPass');   % end of BO injection septum at TB transport line
 SEX  = marker('EjeSF',   'IdentityPass');   % start of BO ejection thin septum at TS transport line
 BPM  = marker('BPM',     'IdentityPass');
@@ -124,7 +125,7 @@ DS_KE = [GIR, L03360, KEX, L02410, KEX, L05550, L17960, GIR, QD, D02500];
 DS_CH = [L01610, CH, GIR, L18210, D21460, GIR];
 DS_KI = [GIR, L03360, KIN, L12960, D21460, GIR];
 DS_QS = [L01335, QS, GIR, L36945, GIR, QD, D02500];
-
+DS    = [GIR, L21320,DCCT, D21460, GIR];
 
 %US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QFI, FIM, STR, mqf, QFI, DS_01, B];
 US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QF0,DS_01, B];
