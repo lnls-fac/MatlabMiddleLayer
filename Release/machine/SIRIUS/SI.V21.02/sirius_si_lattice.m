@@ -97,6 +97,7 @@ L082  = drift('l082', 0.082, 'DriftPass');
 L100  = drift('l100', 0.100, 'DriftPass');
 L110  = drift('l110', 0.110, 'DriftPass');
 L112  = drift('l112', 0.112, 'DriftPass');
+L120  = drift('l120', 0.120, 'DriftPass');
 L125  = drift('l125', 0.125, 'DriftPass');
 L127  = drift('l127', 0.127, 'DriftPass');
 L133  = drift('l133', 0.133, 'DriftPass');
@@ -181,8 +182,9 @@ SFP2 = sextupole('SFP2', 0.150, SFP2_strength, sext_pass_method); %
 CV   = sextupole('CV', 0.150, 0.0, sext_pass_method);   % same model as BO correctors
 
 % -- pulsed magnets --
-DIPK = sextupole('InjDpK', 0.400, 0.0, sext_pass_method); % injection kicker
-NLK  = sextupole('InjNLK',  0.450, 0.0, sext_pass_method); % pulsed multipole magnet
+InjDpK = sextupole('InjDpK', 0.400, 0.0, sext_pass_method); % injection kicker
+InjNLK = sextupole('InjNLK',  0.450, 0.0, sext_pass_method); % pulsed multipole magnet
+VPing  = marker('VPing', 'IdentityPass');                    % Vertical Pinger
 
 % -- BPMs and fast correctors --
 FC     = sextupole('FC', 0.100, 0.0, sext_pass_method);
@@ -368,7 +370,7 @@ L0_tot = findspos(THERING, length(THERING)+1);
 rev_freq    = const.c / L0_tot;
 fprintf('   Circumference: %.5f m\n', L0_tot);
 
-rf_idx      = findcells(THERING, 'FamName', 'Cav');
+rf_idx      = findcells(THERING, 'FamName', 'SRFCav');
 rf_frequency = rev_freq * harmonic_number;
 THERING{rf_idx}.Frequency = rf_frequency;
 fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);

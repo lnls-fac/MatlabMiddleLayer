@@ -5,8 +5,8 @@ if ~exist('m_accep_fam_name','var'), m_accep_fam_name = 'calc_mom_accep'; end
 
 types = {};
 bc   = 1; types{end+1} = struct('fam_name', 'BC', 'passmethod', passmethod);
-bc_edge = 3; types{end+1} = struct('fam_name', 'BC_EDGE', 'passmethod', 'IdentityPass');
-m_accep = 4; types{end+1} = struct('fam_name', m_accep_fam_name, 'passmethod', 'IdentityPass');
+bc_edge = 2; types{end+1} = struct('fam_name', 'BC_EDGE', 'passmethod', 'IdentityPass');
+m_accep = 3; types{end+1} = struct('fam_name', m_accep_fam_name, 'passmethod', 'IdentityPass');
 
 
 % dipole model 2016-01-13

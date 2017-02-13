@@ -24,8 +24,8 @@ the_ring = circshift(the_ring,[0,-BPM(1)]);
 % Set bc vacuum chamber
 bcs = findcells(the_ring, 'FamName','mc');
 for i=1:length(bcs)
-    for j=(i-8):(i+8)
-        the_ring{bcs(j)}.VChamber = bc_vchamber;
+    for j=(bcs(i)-8):(bcs(i)+8)
+        the_ring{j}.VChamber = bc_vchamber;
     end
 end
 
