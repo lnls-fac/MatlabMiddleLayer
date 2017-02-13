@@ -128,7 +128,7 @@ finalizations();
         %MAGNET BLOCKS
         
         % <dipoles with only one piece> alignment, rotation and excitation errors
-        config.fams.bc.labels     = {'bc_hf','bc_lf'};
+        config.fams.bc.labels     = {'bc'};
         config.fams.bc.sigma_y    = 40 * um * 1;
         config.fams.bc.sigma_x    = 40 * um * 1;
         config.fams.bc.sigma_roll = 0.30 * mrad * 1;
@@ -380,7 +380,7 @@ finalizations();
         multi.sexts.skew_vals = ones(1,4)*0.5e-4;
         
         % DIPOLES
-        multi.bends.labels = {'B1','B2','BC_HF', 'BC_LF'};
+        multi.bends.labels = {'B1','B2','BC'};
         multi.bends.main_multipole = 1;% positive for normal negative for skew
         multi.bends.r0 = 12e-3;
         multi.bends.order = [ 3   4   5   6]; % 1 for dipole

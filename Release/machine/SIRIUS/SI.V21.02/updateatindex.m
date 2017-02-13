@@ -44,7 +44,7 @@ end
 try
     % BC
     AO.bc.AT.ATType = 'BEND';
-    AO.bc.AT.ATIndex = buildatindex(AO.bc.FamilyName, sort([Indices.bc_lf, Indices.bc_hf]));
+    AO.bc.AT.ATIndex = buildatindex(AO.bc.FamilyName, Indices.bc);
     AO.bc.Position = findspos(THERING, AO.bc.AT.ATIndex(:,1+floor(size(AO.bc.AT.ATIndex,2)/2)))';
       
 catch

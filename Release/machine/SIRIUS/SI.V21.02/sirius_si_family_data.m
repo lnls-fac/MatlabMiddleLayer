@@ -2,8 +2,6 @@ function data = sirius_si_family_data(the_ring)
 
 data.B1.nr_segs    = 30;
 data.B2.nr_segs    = 36;
-data.BC_HF.nr_segs = 16;
-data.BC_LF.nr_segs = 14;
 data.BC.nr_segs    = 30;
 
 data.QFA.nr_segs  = 1;
@@ -68,10 +66,6 @@ for i=1:length(the_ring)
         data.(Fam).ATIndex = [data.(Fam).ATIndex; i];
     end
 end
-data.BC.ATIndex = sort([data.BC_LF.ATIndex; data.BC_HF.ATIndex]);
-for i=1:length(fams)
-    data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
-end
 
 
 % chs - slow horizontal correctors
@@ -108,21 +102,21 @@ idx = [idx; data.CV.ATIndex];
 % In this version of the lattice, there is a CV corrector in the sextupoles
 % sf2 of every sector C3 of the arc in the lattice. It means the corrector
 % alternates between all SF2's. The logic bellow uses the
-% dipoles B2 and BC_LF to determine where to put the corrector.
+% dipoles B2 and BC to determine where to put the corrector.
 indcs = sort([data.SFA2.ATIndex; data.SFB2.ATIndex; data.SFP2.ATIndex]);
-dips = sort([data.B2.ATIndex(:); data.BC_LF.ATIndex(:)]);
+dips = sort([data.B2.ATIndex(:); data.BC.ATIndex(:)]);
 for i=1:length(indcs)
     el = find(dips > indcs(i),1,'first');
     if ~isempty(el)
         if strcmpi(the_ring{dips(el)}.FamName,'B2'), idx = [idx; indcs(i)];          
-        elseif strcmpi(the_ring{dips(el)}.FamName,'BC_LF')
+        elseif strcmpi(the_ring{dips(el)}.FamName,'BC')
         else error('Problem with vertical corrector index definition.')
         end
         continue
     end
     el = find(dips < indcs(i),1,'last');
     if ~isempty(el)
-        if strcmpi(the_ring{dips(el)}.FamName,'BC_LF'), idx = [idx; indcs(i)];          
+        if strcmpi(the_ring{dips(el)}.FamName,'BC'), idx = [idx; indcs(i)];          
         elseif strcmpi(the_ring{dips(el)}.FamName,'B2')
         else error('Problem with vertical corrector index definition.')
         end
@@ -148,21 +142,21 @@ idx = [idx; data.SDP3.ATIndex];
 % In this version of the lattice, there is a CV corrector in the sextupoles
 % sf2 of every sector C3 of the arc in the lattice. It means the corrector
 % alternates between all SF2's. The logic bellow uses the
-% dipoles B2 and BC_LF to determine where to put the corrector.
+% dipoles B2 and BC to determine where to put the corrector.
 indcs = sort([data.SFA2.ATIndex; data.SFB2.ATIndex; data.SFP2.ATIndex]);
-dips = sort([data.B2.ATIndex(:); data.BC_LF.ATIndex(:)]);
+dips = sort([data.B2.ATIndex(:); data.BC.ATIndex(:)]);
 for i=1:length(indcs)
     el = find(dips > indcs(i),1,'first');
     if ~isempty(el)
         if strcmpi(the_ring{dips(el)}.FamName,'B2'), idx = [idx; indcs(i)];          
-        elseif strcmpi(the_ring{dips(el)}.FamName,'BC_LF')
+        elseif strcmpi(the_ring{dips(el)}.FamName,'BC')
         else error('Problem with vertical corrector index definition.')
         end
         continue
     end
     el = find(dips < indcs(i),1,'last');
     if ~isempty(el)
-        if strcmpi(the_ring{dips(el)}.FamName,'BC_LF'), idx = [idx; indcs(i)];          
+        if strcmpi(the_ring{dips(el)}.FamName,'BC'), idx = [idx; indcs(i)];          
         elseif strcmpi(the_ring{dips(el)}.FamName,'B2')
         else error('Problem with vertical corrector index definition.')
         end
@@ -172,10 +166,6 @@ idx = sort(idx);
 data.CVS.ATIndex = reshape(idx,data.CVS.nr_segs,[]);
 data.CVS.ATIndex = data.CVS.ATIndex';
 
-
-% BC 
-idx = [data.BC_LF.ATIndex, data.BC_HF.ATIndex];
-data.BC.ATIndex = sort(idx);
 
 % FCH - fast horizontal correctors
 idx = [];
@@ -251,21 +241,21 @@ data.QS.ATIndex = data.QS.ATIndex';
 % In this version of the lattice, there are QS correctors in the sextupoles
 % sd3 of every sector C3 of the arc in the lattice. It means the corrector
 % alternates between all SD3's. The logic bellow uses the
-% dipoles B2 and BC_LF to determine where to put the corrector.
+% dipoles B2 and BC to determine where to put the corrector.
 indqs = sort([data.SDA3.ATIndex; data.SDB3.ATIndex; data.SDP3.ATIndex]);
-dips = sort([data.B2.ATIndex(:); data.BC_LF.ATIndex(:)]);
+dips = sort([data.B2.ATIndex(:); data.BC.ATIndex(:)]);
 for i=1:length(indqs)
     el = find(dips > indqs(i),1,'first');
     if ~isempty(el)
         if strcmpi(the_ring{dips(el)}.FamName,'B2'), idx = [idx; indqs(i)];          
-        elseif strcmpi(the_ring{dips(el)}.FamName,'BC_LF')
+        elseif strcmpi(the_ring{dips(el)}.FamName,'BC')
         else error('Problem with vertical corrector index definition.')
         end
         continue
     end
     el = find(dips < indqs(i),1,'last');
     if ~isempty(el)
-        if strcmpi(the_ring{dips(el)}.FamName,'BC_LF'), idx = [idx; indqs(i)];          
+        if strcmpi(the_ring{dips(el)}.FamName,'BC'), idx = [idx; indqs(i)];          
         elseif strcmpi(the_ring{dips(el)}.FamName,'B2')
         else error('Problem with vertical corrector index definition.')
         end

@@ -22,9 +22,11 @@ BPM = findcells(the_ring,'FamName','BPM');
 the_ring = circshift(the_ring,[0,-BPM(1)]);
 
 % Set bc vacuum chamber
-bcs = findcells(the_ring, 'FamName','bc_hf');
+bcs = findcells(the_ring, 'FamName','mc');
 for i=1:length(bcs)
-    the_ring{bcs(i)}.VChamber = bc_vchamber;
+    for j=(i-8):(i+8)
+        the_ring{bcs(j)}.VChamber = bc_vchamber;
+    end
 end
 
 % Set in-vacuum ids vacuum chamber
