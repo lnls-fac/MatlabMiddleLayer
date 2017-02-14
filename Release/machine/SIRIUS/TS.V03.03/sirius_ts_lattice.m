@@ -64,10 +64,22 @@ ld2p     = drift('ld2p', 0.192, 'DriftPass');
 ld3p     = drift('ld3p', 0.143, 'DriftPass');
 
 % --- markers ---
-
-mbend    = marker('mB',  'IdentityPass');
 start    = marker('start',  'IdentityPass');
 fim      = marker('end',    'IdentityPass');
+
+% --- beam screen monitors
+scrn   = marker('Scrn', 'IdentityPass');
+
+% --- beam current monitors ---
+ict    = marker('ICT', 'IdentityPass');
+fct    = marker('FCT', 'IdentityPass');
+
+% --- beam position monitors ---
+bpm    = marker('BPM', 'IdentityPass');
+
+% --- correctors ---
+ch     = corrector('CH',  0, [0 0], 'CorrectorPass');
+cv     = corrector('CV',  0, [0 0], 'CorrectorPass');
 
 % --- quadrupoles ---
   
@@ -80,15 +92,6 @@ qd4a    = quadrupole('QD4A', 0.14, qd4ah_strength, quad_pass_method); % qd
 qf4     = quadrupole('QF4',  0.20, qf4h_strength,  quad_pass_method); % qf
 qd4b    = quadrupole('QD4B', 0.14, qd4bh_strength, quad_pass_method); % qd
 
-% --- beam position monitors ---
-bpm    = marker('BPM', 'IdentityPass');
-
-% --- beam screen monitors
-scrn   = marker('Scrn', 'IdentityPass');
-
-% --- correctors ---
-ch     = corrector('CH',  0, [0 0], 'CorrectorPass');
-cv     = corrector('CV',  0, [0 0], 'CorrectorPass');
 
 % --- bending magnets --- 
 
@@ -115,6 +118,7 @@ h7  = rbend_sirius('B', 0.017, d2r * 0.0216 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.0
 h8  = rbend_sirius('B', 0.020, d2r * 0.0166 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0] * f, bend_pass_method);
 h9  = rbend_sirius('B', 0.030, d2r * 0.0136 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0] * f, bend_pass_method);
 h10 = rbend_sirius('B', 0.05,  d2r * 0.0089 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0] * f, bend_pass_method);
+mbend = marker('mB',  'IdentityPass');
 
 bend = [h10 h9 h8 h7 h6 h5 h4 h3 h2 h1 mbend h1 h2 h3 h4 h5 h6 h7 h8 h9 h10];
 
@@ -174,18 +178,17 @@ binjsf = marker('bInjSF', 'IdentityPass'); % marker at the beginning of thin sep
 minjsf = marker('mInjSF', 'IdentityPass'); % marker at the center of thin septum
 einjsf = marker('eInjSF', 'IdentityPass'); % marker at the end of thin septum
 injsf = [binjsf, h1, minjsf, h2, einjsf];
-   
-% --- sectors ---
 
-sector01 = [ejesf,l025,ejesg,l060,cv,l090,qf1a,la2p,l280,scrn,bpm,l020,ch,l020,qf1b,l020,cv,l020,la3p,bend];
-sector02 = [l080,lb1p,qd2,lb2p,l080,scrn,bpm,l020,qf2,l020,ch,l025,cv,l015,lb3p,bend];
-sector03 = [lc1p,l220,qf3,l025,scrn,bpm,l020,ch,l025,cv,lc2p,bend];
-sector04 = [ld1p,l130,qd4a,ld2p,l060,scrn,bpm,l020,cv,l025,ch,l020,qf4,ld3p,l020,qd4b,l140,bpm,cv,l020,injsg,l025,injsg,l025,ch,injsf];
 
-%nlk_line = [repmat(l025,1,14),l020,l020];
-%ltba  = [start,sector01,sector02,sector03,sector04,nlk_line,fim]; % line extension to NLK
+% --- lines ---
+sec01 = [ejesf,l025,ejesg,l060,cv,l090,qf1a,la2p,ict,l280,scrn,bpm,...
+         l020,ch,l020,qf1b,l020,cv,l020,la3p,bend];
+sec02 = [l080,lb1p,qd2,lb2p,l080,scrn,bpm,l020,qf2,l020,ch,l025,cv,l015,lb3p,bend];
+sec03 = [lc1p,l220,qf3,l025,scrn,bpm,l020,ch,l025,cv,lc2p,bend];
+sec04 = [ld1p,l130,qd4a,ld2p,l060,scrn,bpm,l020,cv,l025,ch,l020,qf4,ld3p,...
+         l020,qd4b,l060,fct,l040,ict,l040,scrn,bpm,cv,l020,injsg,l025,injsg,l025,ch,injsf];
 
-ltba  = [start,sector01,sector02,sector03,sector04,fim];
+ltba  = [start,sec01,sec02,sec03,sec04,fim];
 
 
 %% finalization 

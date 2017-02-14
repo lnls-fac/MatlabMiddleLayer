@@ -43,12 +43,12 @@ end
 
 try
     % BC
-    AO.bc.AT.ATType = 'BEND';
-    AO.bc.AT.ATIndex = buildatindex(AO.bc.FamilyName, Indices.bc);
-    AO.bc.Position = findspos(THERING, AO.bc.AT.ATIndex(:,1+floor(size(AO.bc.AT.ATIndex,2)/2)))';
+    AO.BC.AT.ATType = 'BEND';
+    AO.BC.AT.ATIndex = buildatindex(AO.BC.FamilyName, Indices.BC);
+    AO.BC.Position = findspos(THERING, AO.BC.AT.ATIndex(:,1+floor(size(AO.BC.AT.ATIndex,2)/2)))';
       
 catch
-    warning('bc family not found in the model.');
+    warning('BC family not found in the model.');
 end
 
 try

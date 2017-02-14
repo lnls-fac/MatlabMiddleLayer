@@ -1,14 +1,11 @@
 if strcmp(mode_version,'M1')
     
     %%% Initial Conditions
-    IniCond.Dispersion = [0,0,0,0]';
-    IniCond.beta = [7, 7];
-    IniCond.alpha= [0,0];
+    IniCond.Dispersion = [-0.0586, -0.2588,  0.0000,  0.0000]';
+    IniCond.beta = [ 3.1667, 13.3117]';
+    IniCond.alpha = [ 1.5073, -2.9245]';
     
     %%% Quadrupoles
-    qf2l_strength      =  3.197471856142;
-    qd2l_strength      =  -1.57498322484;
-    qf3l_strength      =  2.16753642533;
     qd1_strength      =  -8.420879613851;
     qf1_strength      =  13.146671512202;
     qd2a_strength      =  -5.003211465479;
@@ -24,14 +21,11 @@ if strcmp(mode_version,'M1')
 elseif strcmp(mode_version,'M2')
     
     %%% Initial Conditions
-    IniCond.Dispersion = [0,0,0,0]';
-    IniCond.beta = [10, 10];
-    IniCond.alpha= [0,0];
+    IniCond.Dispersion = [-0.0586, -0.2588,  0.0000,  0.0000]';
+    IniCond.beta = [ 3.6036, 16.6264]';
+    IniCond.alpha = [ 1.5671, -1.3144]';
     
     %%% Quadrupoles
-    qf2l_strength      =  9.831704524983;
-    qd2l_strength      =  -4.217071772967;
-    qf3l_strength      =  -8.283779571728;
     qd1_strength      =  -8.420884154134;
     qf1_strength      =  13.146672851601;
     qd2a_strength      =  -5.786996070251;
@@ -46,14 +40,11 @@ elseif strcmp(mode_version,'M2')
 elseif strcmp(mode_version,'M3')
     
     %%% Initial Conditions
-    IniCond.Dispersion = [0,0,0,0]';
-    IniCond.beta = [7, 7];
-    IniCond.alpha= [-1.0,-1.0];
+    IniCond.Dispersion = [-0.0586, -0.2588,  0.0000,  0.0000]';
+    IniCond.beta = [ 3.2556, 19.6968]';
+    IniCond.alpha = [ 1.0134, -3.6354]';
     
     %%% Quadrupoles
-    qf2l_strength      =  11.497289971737;
-    qd2l_strength      =  -4.009053542903;
-    qf3l_strength      =  -10.05208966219;
     qd1_strength      =  -8.4202421458;
     qf1_strength      =  13.146512110234;
     qd2a_strength      =  -4.742318522445;
@@ -68,14 +59,11 @@ elseif strcmp(mode_version,'M3')
 elseif strcmp(mode_version,'M4')
     
     %%% Initial Conditions
-    IniCond.Dispersion = [0,0,0,0]';
-    IniCond.beta = [7, 7];
-    IniCond.alpha= [1.0,1.0];
+    IniCond.Dispersion = [-0.0586, -0.2588,  0.0000,  0.0000]';
+    IniCond.beta = [ 3.2421,  3.8668]';
+    IniCond.alpha = [ 1.7275,  0.2114]';
     
     %%% Quadrupoles
-    qf2l_strength      =  3.534340054347;
-    qd2l_strength      =  -6.58275439308;
-    qf3l_strength      =  8.590198057857;
     qd1_strength      =  -8.420952075727;
     qf1_strength      =  13.146690356394;
     qd2a_strength      =  -6.698085523725;
@@ -90,14 +78,11 @@ elseif strcmp(mode_version,'M4')
 elseif strcmp(mode_version,'M5')
     
     %%% Initial Conditions
-    IniCond.Dispersion = [0,0,0,0]';
-    IniCond.beta = [7, 7];
-    IniCond.alpha= [1.0,-1.0];
+    IniCond.Dispersion = [-0.0586, -0.2588,  0.0000,  0.0000]';
+    IniCond.beta = [ 0.4918, 21.7039]';
+    IniCond.alpha = [-0.6437, -3.4604]';
     
     %%% Quadrupoles
-    qf2l_strength      =  14.330293389213;
-    qd2l_strength      =  -3.670822362331;
-    qf3l_strength      =  -14.999984099609;
     qd1_strength      =  -8.420850561756;
     qf1_strength      =  13.146666514846;
     qd2a_strength      =  -5.621149037043;
@@ -112,14 +97,11 @@ elseif strcmp(mode_version,'M5')
 elseif strcmp(mode_version,'M6')
     
     %%% Initial Conditions
-    IniCond.Dispersion = [0,0,0,0]';
-    IniCond.beta = [7, 7];
-    IniCond.alpha= [-1.0,1.0];
+    IniCond.Dispersion = [-0.0586, -0.2588,  0.0000,  0.0000]';
+    IniCond.beta = [ 2.9771, 11.0431]';
+    IniCond.alpha = [ 1.0378, -0.8005]';
     
     %%% Quadrupoles
-    qf2l_strength      =  10.334311920772;
-    qd2l_strength      =  -2.542582493248;
-    qf3l_strength      =  -10.124615533866;
     qd1_strength      =  -8.420886991042;
     qf1_strength      =  13.146673683891;
     qd2a_strength      =  -5.452694879372;

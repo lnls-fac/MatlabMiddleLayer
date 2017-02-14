@@ -82,12 +82,13 @@ AO.B2.Setpoint.Range        = [0 300];
 AO.B2.Setpoint.Tolerance    = .1;
 AO.B2.Setpoint.DeltaRespMat = .01;
 
-AO.bc.FamilyName  = 'bc';
-AO.bc.MemberOf    = {'si-bc'; }; 
-AO.bc.DeviceList  = getDeviceList(10,2);
-AO.bc.ElementList = (1:size(AO.bc.DeviceList,1))';
-AO.bc.Status      = ones(size(AO.bc.DeviceList,1),1);
-AO.bc.Position    = [];
+AO.BC.FamilyName  = 'BC';
+AO.BC.MemberOf    = {'SI-BC'; 'BC';};
+AO.BC.DeviceList  = getDeviceList(10,2);
+AO.BC.ElementList = (1:size(AO.BC.DeviceList,1))';
+AO.BC.Status      = ones(size(AO.BC.DeviceList,1),1);
+AO.BC.Position    = [];
+
 
 %% quadrupoles 
 AO = get_AO_quads(AO,'QFA', 'Q20',2);

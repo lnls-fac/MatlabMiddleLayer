@@ -47,10 +47,6 @@ corr_length = 0.07;
 l100     = drift('l100', 0.10,   'DriftPass');
 l150     = drift('l150', 0.15,   'DriftPass');
 l200     = drift('l200', 0.20,   'DriftPass');
-la1      = drift('la1',  0.115,  'DriftPass');
-la2p     = drift('la2p', 0.2100, 'DriftPass');
-la3p     = drift('la3p', 0.1488, 'DriftPass');
-la4p     = drift('la4p', 0.0512, 'DriftPass');
 lb1p     = drift('lb1p', 0.125,  'DriftPass');
 lb2p     = drift('lb2p', 0.275,  'DriftPass');
 lb3p     = drift('lb3p', 0.2765, 'DriftPass');
@@ -89,29 +85,6 @@ bpm      = marker('BPM', 'IdentityPass');
 ch   = sextupole ('CH', corr_length, 0.0, sext_pass_method);
 cv   = sextupole ('CV', corr_length, 0.0, sext_pass_method);
 
-% --- linac correctors ---
-chl  = corrector('CH',  0, [0 0], 'CorrectorPass');
-cvl  = corrector('CV',  0, [0 0], 'CorrectorPass');
-
-
-% --- quadrupoles ---
-% qf2l  = quadrupole('q1al',  0.05, lqf2_strength, quad_pass_method);   %
-% qd2l  = quadrupole('q1bl',  0.10, lqd2_strength, quad_pass_method);   % LINAC TRIPLET
-% qf3l  = quadrupole('q1cl',  0.05, lqf3_strength, quad_pass_method);   %
-% qd1   = quadrupole('qd2l',  0.10, qd1_strength,  quad_pass_method);
-% qf1   = quadrupole('qf2l',  0.10, qf1_strength,  quad_pass_method);
-% qd2a  = quadrupole('qd3al', 0.10, qd2a_strength, quad_pass_method);
-% qf2a  = quadrupole('qf3al', 0.10, qf2a_strength, quad_pass_method);
-% qf2b  = quadrupole('qf3bl', 0.10, qf2b_strength, quad_pass_method);
-% qd2b  = quadrupole('qd3bl', 0.10, qd2b_strength, quad_pass_method);
-% qf3   = quadrupole('qf4l',  0.10, qf3_strength,  quad_pass_method);
-% qd3   = quadrupole('qd4l',  0.10, qd3_strength,  quad_pass_method);
-% qf4   = quadrupole('qf5l',  0.10, qf4_strength,  quad_pass_method);
-% qd4   = quadrupole('qd5l',  0.10, qd4_strength,  quad_pass_method);
-
-qf2l  = quadrupole('QF2L',  0.05, qf2l_strength, quad_pass_method);   %
-qd2l  = quadrupole('QD2L',  0.10, qd2l_strength, quad_pass_method);   % LINAC TRIPLET
-qf3l  = quadrupole('QF3L',  0.05, qf3l_strength, quad_pass_method);   %
 qd1   = quadrupole('QD1',   0.10, qd1_strength,  quad_pass_method);
 qf1   = quadrupole('QF1',   0.10, qf1_strength,  quad_pass_method);
 qd2a  = quadrupole('QD2A',  0.10, qd2a_strength, quad_pass_method);
@@ -126,15 +99,6 @@ qd4   = quadrupole('QD4',   0.10, qd4_strength,  quad_pass_method);
 
 % --- bending magnets ---
 deg_2_rad = (pi/180);
-
-% -- spec --
-dip_nam =  'Spect';
-dip_len =  0.45003;
-dip_ang =  -15 * deg_2_rad;
-dip_K   =  0.0;
-dip_S   =  0.00;
-spech      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0, 0, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-spec   = [spech, spech];
 
 % -- bn --
 dip_nam =  'B';
@@ -171,7 +135,6 @@ septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consiste
 
 %% % --- lines ---
 
-lin_1 = [la2p, bpm, la3p, ict, la4p, l200];
 s01_1 = [lb1p, l200, l200, scrn, bpm, l150c, ch, l100cc, cv, l150c];
 s01_2 = [lb2p, l200];
 s01_3 = [l200, l200, l200, l200, l200, l200, hslit, scrn, bpm, l150c, cv, l100cc, ch, l200c, vslit, l200, lb3p];
@@ -188,9 +151,8 @@ sector02 = [s02_1, qd2a, lc2, qf2a, s02_2, qf2b, lc4, qd2b, s02_3, bp];
 sector03 = [ld1, qf3, ld2, qd3, s03_1, bp];
 sector04 = [cv, s04_1, qf4, le2, qd4, scrn, cv, s04_2, septin];
 
-%% TB beamline beginning with end of linac
-linac    = [chl, cvl, la1, qf2l, l100, qd2l, l100, qf2l, l100, qf3l, lin_1, spec];
-ltlb  = [inicio, linac, sector01, sector02, sector03, sector04, fim];
+%% TB beamline 
+ltlb  = [inicio, sector01, sector02, sector03, sector04, fim];
 
 %ltlb  = [inicio, sector01, sector02, sector03, sector04, fim];
 

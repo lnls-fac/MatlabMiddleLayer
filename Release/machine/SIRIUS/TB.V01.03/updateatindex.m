@@ -19,15 +19,6 @@ Indices = atindex(THERING);
 AO = getao;
 
 try
-    % Spect
-    AO.Spect.AT.ATType = 'BEND';
-    AO.Spect.AT.ATIndex = buildatindex(AO.Spect.FamilyName, Indices.Spect);
-    AO.Spect.Position = findspos(THERING, AO.Spect.AT.ATIndex(:,1+floor(size(AO.Spect.AT.ATIndex,2)/2)))';
-      
-catch
-    warning('Spect family not found in the model.');
-end
-try
     % B
     AO.B.AT.ATType = 'BEND';
     AO.B.AT.ATIndex = buildatindex(AO.B.FamilyName, Indices.B);
@@ -46,33 +37,6 @@ catch
     warning('InjS family not found in the model.');
 end
 
-
-try
-    % QF2L
-    AO.QF2L.AT.ATType = 'Quad';
-    AO.QF2L.AT.ATIndex = buildatindex(AO.QF2L.FamilyName, Indices.QF2L);
-    AO.QF2L.Position = findspos(THERING, AO.QF2L.AT.ATIndex(:,1))';
-catch
-    warning('QF2L family not found in the model.');
-end
-
-try
-    % QD2L
-    AO.QD2L.AT.ATType = 'Quad';
-    AO.QD2L.AT.ATIndex = buildatindex(AO.QD2L.FamilyName, Indices.QD2L);
-    AO.QD2L.Position = findspos(THERING, AO.QD2L.AT.ATIndex(:,1))';
-catch
-    warning('QD2L family not found in the model.');
-end
-
-try
-    % QF3L
-    AO.QF3L.AT.ATType = 'Quad';
-    AO.QF3L.AT.ATIndex = buildatindex(AO.QF3L.FamilyName, Indices.QF3L);
-    AO.QF3L.Position = findspos(THERING, AO.QF3L.AT.ATIndex(:,1))';
-catch
-    warning('QF3L family not found in the model.');
-end
 
 try
     % QD1
