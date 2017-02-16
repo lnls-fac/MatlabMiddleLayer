@@ -186,7 +186,7 @@ sec01 = [ejesf,l025,ejesg,l060,cv,l090,qf1a,la2p,ict,l280,scrn,bpm,...
 sec02 = [l080,lb1p,qd2,lb2p,l080,scrn,bpm,l020,qf2,l020,ch,l025,cv,l015,lb3p,bend];
 sec03 = [lc1p,l220,qf3,l025,scrn,bpm,l020,ch,l025,cv,lc2p,bend];
 sec04 = [ld1p,l130,qd4a,ld2p,l060,scrn,bpm,l020,cv,l025,ch,l020,qf4,ld3p,...
-         l020,qd4b,l060,fct,l040,ict,l040,scrn,bpm,cv,l020,injsg,l025,injsg,l025,ch,injsf];
+         l020,qd4b,l060,fct,l040,ict,l040,scrn,bpm,cv,l020,injsg,l025,injsg,l025,ch,injsf,scrn];
 
 ltba  = [start,sec01,sec02,sec03,sec04,fim];
 
