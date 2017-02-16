@@ -2,7 +2,7 @@ function lnls1_fittune(tunes, nrpts, perc)
 %LNLS1_FITTUNE - ajusta sintonia, inclusive cruzando inteiros.
 %
 % Exemplo:
-%   lnls1_fittune([5.27 2.17], 30, 0.2);
+%   lnls1_fittune([5.27 4.17], 30, 0.2);
 
 global THERING;
 

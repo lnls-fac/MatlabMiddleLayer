@@ -28,6 +28,8 @@ elseif ~isempty(strfind(SubMachine, 'TB.'))
     MachineType = 'TransportLine';
 elseif ~isempty(strfind(SubMachine, 'TS.'))
     MachineType = 'TransportLine';
+elseif ~isempty(strfind(SubMachine, 'LI.'))
+    MachineType = 'TransportLine';
 end
 
 [MachineName, SubMachineName, LinkFlag, MMLROOT] = setpathmml(Machine, SubMachine, MachineType, LinkFlag);
