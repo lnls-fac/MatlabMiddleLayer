@@ -74,7 +74,7 @@ axis(a);
 hold off;
 
 
-legend('{\it\beta_x}', '{\it\beta_y }', 0);
+legend('{\it\beta_x}', '{\it\beta_y }', '{\it\eta_x}');
 
 ax(end+1) = gca;
 linkaxes(ax, 'x');
