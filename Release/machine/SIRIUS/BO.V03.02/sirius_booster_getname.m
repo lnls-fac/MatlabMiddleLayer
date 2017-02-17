@@ -136,7 +136,7 @@ switch lower(Family)
 			'BOPS-CH-41-U'; 'BOPS-CH-43-U'; 'BOPS-CH-45-U'; 'BOPS-CH-47-U' ;...
 			'BOPS-CH-49-D'; ];
 
-    case 'rf'
+    case 'p5cav'
         ChannelName = 'BORF-FREQUENCY';
 
     case 'bend_a'

@@ -30,7 +30,7 @@ AO.B.ElementList = (1:size(AO.B.DeviceList,1))';
 AO.B.Status      = ones(size(AO.B.DeviceList,1),1);
 AO.B.Position    = [];
 AO.B.PowerSupplies = ['bend_a'; 'bend_b'];
-AO.B.ExcitationCurves            = sirius_getexcdata(repmat('boma-bend', size(AO.B.DeviceList,1), 1));
+AO.B.ExcitationCurves            = sirius_getexcdata(repmat('boma-b', size(AO.B.DeviceList,1), 1));
 AO.B.Monitor.MemberOf            = {};
 AO.B.Monitor.Mode                = 'Simulator';
 AO.B.Monitor.DataType            = 'Scalar';
@@ -370,8 +370,8 @@ AO.TUNE.Monitor.PhysicsUnits = 'Tune';
 %%%%%%%%%%
 %   RF   %
 %%%%%%%%%%
-AO.RF.FamilyName                = 'RF';
-AO.RF.MemberOf                  = {'RF'; 'RFSystem'};
+AO.RF.FamilyName                = 'P5Cav';
+AO.RF.MemberOf                  = {'P5Cav';'RF'; 'RFSystem'};
 AO.RF.DeviceList                = [ 1 1 ];
 AO.RF.ElementList               = 1;
 AO.RF.Status                    = 1;
@@ -431,7 +431,7 @@ AO.RF.Power.PhysicsUnits      = 'MWatts';
 AO.RF.Power.Range             = [-inf inf];  % ???
 AO.RF.Power.Tolerance         = inf;  % ???
 
-AO.RF.Phase.MemberOf          = {'RF'; 'Phase'};
+AO.RF.Phase.MemberOf          = {'P5Cav'; 'RF'; 'Phase'};
 AO.RF.Phase.Mode              = 'Simulator';
 AO.RF.Phase.DataType          = 'Scalar';
 AO.RF.Phase.ChannelNames      = 'SRF1:STN:PHASE:CALC';    % ???
@@ -441,7 +441,7 @@ AO.RF.Phase.Physics2HWParams  = 1;
 AO.RF.Phase.HWUnits           = 'Degrees';
 AO.RF.Phase.PhysicsUnits      = 'Degrees';
 
-AO.RF.PhaseCtrl.MemberOf          = {'RF; Phase'; 'Control'};  % 'MachineConfig';
+AO.RF.PhaseCtrl.MemberOf          = {'P5Cav'; 'RF; Phase'; 'Control'};  % 'MachineConfig';
 AO.RF.PhaseCtrl.Mode              = 'Simulator';
 AO.RF.PhaseCtrl.DataType          = 'Scalar';
 AO.RF.PhaseCtrl.ChannelNames      = 'SRF1:STN:PHASE';    % ???
