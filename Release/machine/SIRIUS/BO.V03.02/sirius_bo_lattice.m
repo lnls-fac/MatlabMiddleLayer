@@ -122,7 +122,7 @@ QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength *
 QF  = sirius_bo_qf_segmented_model(energy, 'QF', quad_pass_method, qf_strength * 0.228);
 QS  = quadrupole('QS',  0.10, 0.0,  quad_pass_method);
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
-RFC = rfcavity('RFCav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
+RFC = rfcavity('P5Cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
 
 
 % --- lines ---
@@ -229,7 +229,7 @@ fprintf('   Circumference: %.5f m\n', L0_tot);
 
 %rev_freq     = beta * const.c / L0_tot;
 rev_freq     = const.c / L0_tot;
-rf_idx       = findcells(THERING, 'FamName', 'RFCav');
+rf_idx       = findcells(THERING, 'FamName', 'P5Cav');
 rf_frequency = rev_freq * harmonic_number;
 THERING{rf_idx}.Frequency = rf_frequency;
 fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);
