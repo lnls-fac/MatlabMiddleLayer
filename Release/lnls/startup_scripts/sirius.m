@@ -54,7 +54,11 @@ end
 % inicializa estruturas do MML
 cdir = pwd;
 root_folder = lnls_get_root_folder();
-cd(fullfile(root_folder, 'lnls-fac', 'MatlabMiddleLayer','Release','mml'))
+folder = fullfile(root_folder, 'MatlabMiddleLayer','Release','mml');
+if ~exist(folder, 'dir')
+    folder = fullfile(root_folder, 'code', 'MatlabMiddleLayer','Release','mml');
+end
+cd(folder)
 
 % remove toolbox/finance/finsupport/ do path para previnir conflito com
 % funcao drift da Financial Toolbox (se pasta est?? no caminho, para evitar warningMessage)
@@ -81,5 +85,9 @@ end
 cd(cdir);
 clear cdir;
 
-addpath(genpath(fullfile(root_folder, 'lnls-fac', 'MatlabMiddleLayer','Release','applications','lnls','lattice_errors')),'-begin');
-addpath(fullfile(root_folder, 'lnls-fac', 'MatlabMiddleLayer','Release','lnls','fac_scripts','trackcpp'), '-begin');
+folder = fullfile(root_folder, 'MatlabMiddleLayer','Release');
+if ~exist(folder,'dir')
+    folder = fullfile(root_folder, 'code', 'MatlabMiddleLayer','Release');
+end
+addpath(genpath(fullfile(folder,'applications','lnls','lattice_errors')),'-begin');
+addpath(fullfile(folder,'lnls','fac_scripts','trackcpp'), '-begin');

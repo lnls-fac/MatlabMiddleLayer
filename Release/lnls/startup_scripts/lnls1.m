@@ -1,10 +1,10 @@
 function lnls1(varargin)
 % Inicializa as estruturas do MML-LNLS e conecta com servidor LNLS1LinkS
 %
-% Hist�rico
+% Historia
 %
-% 2011-04-28: nova versao. script transformado em fun��o.
-% 2010-09-16: coment�rios iniciais no c�digo
+% 2011-04-28: nova versao. script transformado em funcaoo.
+% 2010-09-16: comenterios iniciais no codigo
 
 default_SERVER_TYPE = '';
 default_IP_ADDRESS  = '';
@@ -35,7 +35,7 @@ end
 % inicializa estruturas do MML
 cdir = pwd;
 root_folder = lnls_get_root_folder();
-cd(fullfile(root_folder, 'code', 'MatlabMiddleLayer','Release','mml'))
+cd(fullfile(root_folder, 'MatlabMiddleLayer','Release','mml'))
 
 % remove toolbox/finance/finsupport/ do path para previnir conflito com
 % funcao drift da Financial Toolbox
