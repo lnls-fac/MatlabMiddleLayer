@@ -1,7 +1,7 @@
 function lnls1_simulation_mode_user_1p37GeV
 
-lnls1_set_id_field('AWG01', 2.0);
-lnls1_set_id_field('AWG09', 4.0);
+lnls1_set_id_field('AWG01', 2.00);
+lnls1_set_id_field('AWG09', 4.00);
 lnls1_set_id_field('AON11', 0.56);
 setpv('QF',     'Physics',  2.769898074970893);
 setpv('A2QF09', 'Physics',  2.769920040998070);
