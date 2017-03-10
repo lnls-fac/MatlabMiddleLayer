@@ -170,16 +170,20 @@ AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
 AD.BeamCurrent         = 0.25; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.0035;
-AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+
 
 AD.TuneDelay           = 3.0;  
 AD.ATModel             = 'lnls1_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
 
+AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
+
 setad(AD);
 switch2sim;
 switch2hw; 
+
 
 function set_operationalmode_noIDs
 
@@ -208,12 +212,14 @@ AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
 AD.BeamCurrent         = 0.25; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.0035;
-AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
 
 AD.TuneDelay           = 3.0;  
 AD.ATModel             = 'lnls1_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
+
+AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;
@@ -245,12 +251,15 @@ AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
 AD.BeamCurrent         = 0.25; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.0035;
-AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+
 
 AD.TuneDelay           = 3.0;  
 AD.ATModel             = 'lnls1_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
+
+AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;
@@ -280,12 +289,14 @@ AD.DeltaRFChro         = [-2000 -1000 0 1000 2000] * 1e-6;
 AD.BeamCurrent         = 0.25; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.0035;
-AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
 
 AD.TuneDelay           = 3.0;  
 AD.ATModel             = 'lnls1_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
+
+AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;
@@ -318,12 +329,14 @@ AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
 AD.BeamCurrent         = 0.25; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.0035;
-AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
 
 AD.TuneDelay           = 3.0;  
 AD.ATModel             = 'lnls1_lattice_BEDI';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
+
+AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;
@@ -356,12 +369,14 @@ AD.DeltaRFChro         = 1e-6 * linspace(-3000,3000,11);
 AD.BeamCurrent         = 0.25; % [A]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.0035;
-AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
 
 AD.TuneDelay           = 3.0;  
 AD.ATModel             = 'lnls1_lattice_low_alpha';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
+
+AD.OpsData.PrsProfFile = 'lnls1_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
 
 setad(AD);
 switch2sim;

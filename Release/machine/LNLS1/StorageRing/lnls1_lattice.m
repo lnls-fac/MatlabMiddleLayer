@@ -1119,11 +1119,19 @@ mbegin = findcells(THERING, 'FamName', 'BEGIN');
 if ~isempty(mbegin), THERING = circshift(THERING, [0 -(mbegin(1)-1)]); end
 THERING{end+1} = struct('FamName','END','Length',0,'PassMethod','IdentityPass');
 THERING = setcellstruct(THERING, 'Energy', 1:length(THERING), 1e9*energy);
-r = THERING;
 
 % Compute total length and RF frequency
 L0_tot = findspos(THERING, length(THERING)+1);
 fprintf('   Length: %.6f m   (design length 93.1999 m)\n', L0_tot);
+
+% insert Vacuum chamber
+for i=1:length(THERING)
+    THERING{i}.VChamber = [0.03025, 0.03025, 2];
+end
+bend = findcells(THERING, 'FamName', 'BEND');
+for i=1:length(bend)
+    THERING{bend(i)}.VChamber = [0.03025, 0.02050, 100];
+end
 
 % Just in case...
 num_iter_max = 10;
@@ -1136,4 +1144,6 @@ for i=1:num_iter_max
        %end
     end
 end
+
+r = THERING;
 

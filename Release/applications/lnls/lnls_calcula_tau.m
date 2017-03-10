@@ -177,10 +177,10 @@ if(flag_touschek)
     params.sigE = sigma_E;
     params.sigS = sigma_s;
     params.K = K;
-    Accep = zeros(3,length(s_B));
-    Accep(1,:) = s_B;
-    Accep(2,:) = +d_acc;
-    Accep(3,:) = -d_acc;
+    %Accep = zeros(3,length(s_B));
+    Accep.s = s_B; %Accep(1,:) = s_B;
+    Accep.pos = +d_acc; %Accep(2,:) = +d_acc;
+    Accep.neg = -d_acc; %Accep(3,:) = -d_acc;
     optics.pos = s_B;
     optics.betax = Bx;
     optics.betay = By;
@@ -215,7 +215,7 @@ end
 
 % Press�o
 if(flag_pressure)
-    pressure.average = trapz(r,P) / (r(length(r) - r(1)));
+    pressure.average = trapz(s_B,P) / (s_B(length(s_B) - s_B(1)));
     pressure.min     = min(P);
     pressure.max     = max(P);
 else

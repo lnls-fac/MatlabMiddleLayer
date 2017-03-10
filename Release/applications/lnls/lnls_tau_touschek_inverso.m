@@ -45,6 +45,11 @@ r0 = Qe^2/(4*pi*ep0*me*c^2);
 gamma = params.E/510.998928e3;
 N     = params.N;
 
+if length(Accep.pos) == 1
+    Accep.pos = Accep.pos(1) * ones(size(Accep.s));
+    Accep.neg = Accep.neg(1) * ones(size(Accep.s));
+end
+
 % Exclui dados da mesma posição do anel
 [Accep.s, perm] = unique(Accep.s,'first');
 Accep.pos = Accep.pos(perm);
