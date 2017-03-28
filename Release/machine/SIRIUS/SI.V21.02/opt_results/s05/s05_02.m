@@ -1,13 +1,18 @@
+%% Version SI.V21-S05.02 
+%  =====================
+%% 2017-03-28 - Liu
+% Optics assymetries introduced by new B1 and B2 models in previous version (SI.V21-S05.01) were corrected using MAD. In addition, 
+% the dispersion function has been corrected to zero at ID straights and first order optics in sectors B and P are now identical.
+ 
+
+%% Version SI.V21-S05.01 
+%  =====================
 % same optics as optimization run2_000491.m of tux49.tuy14.sext14.defConf
-
-
 %% 2017-02-02 New B1 and B2 models - Ximenes
-%  =========================================
-% 
 % B1 model-08: fieldmap '2017-02-01_B1_Model08_Sim_X=-32_32mm_Z=-1000_1000mm_Imc=451.8A.txt', init_rx is set to  4.860 mm at s=0   
 % B2 model-07: fieldmap '2017-02-01_B2_Model07_Sim_X=-63_27mm_Z=-1000_1000mm_Imc=451.8A.txt', init_rx is set to  5.444 mm at s=0
-%
 % local script 'sirius_si_correct_tune_chrom' used.
+
 
 % QUADRUPOLES
 % ===========

@@ -145,11 +145,11 @@ AD = getad;
 AD.Machine             = 'SIRIUS_V21.02';   % Will already be defined if setpathmml was used
 AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
-AD.OperationalMode     = 'V21.02_S05.01';
+AD.OperationalMode     = 'V21.02_S05.02';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;
 AD.ModeName            = 'S05';
-AD.ModeVersion         = '01';
+AD.ModeVersion         = '02';
 AD.OpsFileExtension    = '';
 
 sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
@@ -163,7 +163,7 @@ AD.ATModel             = 'sirius_si_lattice';
 AD.Chromaticity.Golden = [1; 1];
 AD.MCF                 = getmcf('Model');
 
-AD.BeamCurrent         = 0.500; % [A]
+AD.BeamCurrent         = 0.500; % [sA]
 AD.NrBunches           = AD.HarmonicNumber;
 AD.Coupling            = 0.010;
 AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
