@@ -168,8 +168,8 @@ line1 = [septex, ch, l25, septex, la1, qf1a, la2, qf1b, la3];
 line2 = [bend, lb1, qd2, lb2, qf2, lb3];
 line3 = [bend, lc1, qf3, lc2];
 line4 = [bend, ld1, qd4a, ld2, qf4, ld3, qd4b, ld4];
-line5 = [sept_thick, ch, l25, sept_thick, l25, septin, bpm];
-ltba  = [start, line1, line2, line3, line4, line5, fim];
+line5 = [sept_thick, ch, l25, sept_thick, l25, septin];
+ltba  = [start, line1, line2, line3, line4, line5, lnlk, bpm, fim];
 
 %% line extension to PMM
 
