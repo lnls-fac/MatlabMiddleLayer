@@ -6,7 +6,7 @@ function the_ring = sirius_si_multipole_systematic_errors(the_ring,fam_data)
 
 % SEXTUPOLES COILS
 % ================
-fams = {'sn'};
+fams = {'SN'};
 r0         = 12/1000;
 % systematic multipoles from '2016-01-29 Sextupolo_Anel_S_Modelo 5_-14_14mm_-500_500mm.txt'
 monoms     =   [ 1,           2,           3,           4,           6,           7,           8,           9,           10,          13,          14];
