@@ -16,7 +16,7 @@ family_data = sirius_si_family_data(the_ring);
 machine  = create_apply_errors(the_ring, family_data);
 
 %application of BPM offset errors
-machine = create_apply_BPM_errors(machine, family_data);
+machine = create_apply_bpm_errors(machine, family_data);
 
 %inserts IDs into lattice and sets its configuration
 %machine = set_ids_dipolar_errors(machine);
@@ -128,7 +128,7 @@ finalizations();
         %MAGNET BLOCKS
         
         % <dipoles with only one piece> alignment, rotation and excitation errors
-        config.fams.bc.labels     = {'bc'};
+        config.fams.bc.labels     = {'BC'};
         config.fams.bc.sigma_y    = 40 * um * 1;
         config.fams.bc.sigma_x    = 40 * um * 1;
         config.fams.bc.sigma_roll = 0.30 * mrad * 1;
@@ -155,13 +155,13 @@ finalizations();
         
         % <dipole pieces> alignment, rotation and excitation
         % errors for each 
-        config.fams.bendblocks.labels       = {'b1','B2'};
-        b1_nrsegs = family_data.b1.nr_segs;
+        config.fams.bendblocks.labels       = {'B1','B2'};
+        B1_nrsegs = family_data.B1.nr_segs;
         B2_nrsegs = family_data.B2.nr_segs;
-        if mod(b1_nrsegs,2) || mod(B2_nrsegs,3)
-            error('nrsegs of b1/B2 must be a multiple of 2/3.');
+        if mod(B1_nrsegs,2) || mod(B2_nrsegs,3)
+            error('nrsegs of B1/B2 must be a multiple of 2/3.');
         end
-        config.fams.bendblocks.nrsegs       = [b1_nrsegs/2,B2_nrsegs/3];
+        config.fams.bendblocks.nrsegs       = [B1_nrsegs/2,B2_nrsegs/3];
         config.fams.bendblocks.sigma_x      = 40 * um * 1;
         config.fams.bendblocks.sigma_y      = 40 * um * 1;
         config.fams.bendblocks.sigma_roll   = 0.30 * mrad * 1;
@@ -185,17 +185,17 @@ finalizations();
     end
 
 %% BPM and Correctors Errors
-    function machine = create_apply_BPM_errors(machine, family_data)
+    function machine = create_apply_bpm_errors(machine, family_data)
         % BPM  anc Corr errors are treated differently from magnet errors:
         % constants
         um = 1e-6;
         
-        control.BPM.idx = family_data.BPM.ATIndex;
-        control.BPM.sigma_offsetx   = 20 * um * 1; % BBA precision
-        control.BPM.sigma_offsety   = 20 * um * 1;
+        control.bpm.idx = family_data.BPM.ATIndex;
+        control.bpm.sigma_offsetx   = 20 * um * 1; % BBA precision
+        control.bpm.sigma_offsety   = 20 * um * 1;
         
         cutoff_errors = 1;
-        machine = lnls_latt_err_generate_apply_BPMcorr_errors(name, machine, control, cutoff_errors);
+        machine = lnls_latt_err_generate_apply_bpmcorr_errors(name, machine, control, cutoff_errors);
     end
 
 
@@ -205,7 +205,7 @@ finalizations();
         fprintf('\n<closed-orbit distortions correction> [%s]\n\n', datestr(now));
         
         % parameters for slow correction algorithms
-        orbit.BPM_idx = sort(family_data.BPM.ATIndex);
+        orbit.bpm_idx = sort(family_data.BPM.ATIndex);
         orbit.hcm_idx = sort(family_data.CH.ATIndex);
         orbit.vcm_idx = sort(family_data.CV.ATIndex);
         
@@ -215,15 +215,15 @@ finalizations();
         orbit.max_nr_iter       = 50;
         orbit.tolerance         = 1e-5;
         orbit.correct2bba_orbit = true;
-        orbit.simul_BPM_err     = true;
-        orbit.ind_bba           = get_bba_ind(the_ring, orbit.BPM_idx, sort([family_data.QN.ATIndex(:);family_data.QS.ATIndex(:)]));
+        orbit.simul_bpm_err     = true;
+        orbit.ind_bba           = get_bba_ind(the_ring, orbit.bpm_idx, sort([family_data.QN.ATIndex(:);family_data.QS.ATIndex(:)]));
         
         % calcs nominal cod response matrix, if chosen
         use_respm_from_nominal_lattice = true; 
         if use_respm_from_nominal_lattice
             fprintf('-  calculating orbit response matrix from nominal machine ...\n');
             lattice_symmetry = 5;  
-            orbit.respm = calc_respm_cod(the_ring, orbit.BPM_idx, orbit.hcm_idx, orbit.vcm_idx, lattice_symmetry, true); 
+            orbit.respm = calc_respm_cod(the_ring, orbit.bpm_idx, orbit.hcm_idx, orbit.vcm_idx, lattice_symmetry, true); 
             orbit.respm = orbit.respm.respm;
         end 
         
