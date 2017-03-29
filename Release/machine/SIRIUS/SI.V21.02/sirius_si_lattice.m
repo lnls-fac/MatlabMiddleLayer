@@ -30,7 +30,7 @@ global THERING;
 % --- system parameters ---
 energy = 3e9;
 mode   = 'S05';
-version = '02';
+version = '03';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
 
@@ -52,10 +52,6 @@ for i=1:length(varargin)
         energy = varargin{i} * 1e9;
     end;
 end
-
-fprintf('\n');
-fprintf(['   !!! symmetrization after new dipole models is missing !!! \n']);
-fprintf('\n');
 
 lattice_title = [lattice_version, '_', mode, '.', version];
 fprintf(['   Loading lattice ' lattice_title ' - ' num2str(energy/1e9) ' GeV' '\n']);
