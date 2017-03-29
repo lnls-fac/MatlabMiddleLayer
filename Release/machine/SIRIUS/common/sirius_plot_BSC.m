@@ -41,9 +41,9 @@ if strcmp(maquina,'si')
     %Calcula parametros de twiss da rede
     twiss = calctwiss(THERING);
     %Define inicio e fim para o grafico (1 periodo)
-    mib = findcells(THERING,'FamName','mib');
+    mip = findcells(THERING,'FamName','mip');
     ini=1;
-    fim=mib(1);
+    fim=mip(1);
     %Calcula dispersao de energia
     param=atsummary;
     e_spread=param.naturalEnergySpread;
