@@ -24,20 +24,6 @@ if(~exist('delta','var') || isempty(delta)), delta = linspace(1e-6,0.065,60); en
 if(~exist('plota','var')), plota = false; end
 if(~exist('flag_dyn','var')), flag_dyn = true; end
 
-% if(exist('pos','var')),
-%     flag_pol = true;
-%     betax_pos  = zeros(length(pos),length(delta));
-%     betax_neg  = zeros(length(pos),length(delta));
-%     alphax_pos = zeros(length(pos),length(delta));
-%     alphax_neg = zeros(length(pos),length(delta));
-%     cox_pos    = zeros(length(pos),length(delta));
-%     cox_neg    = zeros(length(pos),length(delta));
-%     coxp_pos   = zeros(length(pos),length(delta));
-%     coxp_neg   = zeros(length(pos),length(delta));
-% else
-%     flag_pol = false;
-% end
-
 const = lnls_constants;
 
 Accep.ind = findcells(ring,'VChamber');
@@ -86,17 +72,6 @@ else
             if( any(imag(tune_p(j,:))) || any(imag(tune_n(j,:))))
                 tune_p(j,:) = [NaN NaN];
                 tune_n(j,:) = [NaN NaN];
-%                 if(flag_pol)
-%                     ind_pos = dsearchn(Accep.s',pos');
-%                     betax_pos(:,j)  = twi_pos.betax(ind_pos);
-%                     betax_neg(:,j)  = twi_neg.betax(ind_pos);
-%                     alphax_pos(:,j) = twi_pos.alphax(ind_pos);
-%                     alphax_neg(:,j) = twi_neg.alphax(ind_pos);
-%                     cox_pos(:,j)    = twi_pos.cox(ind_pos);
-%                     cox_neg(:,j)    = twi_neg.cox(ind_pos);
-%                     coxp_pos(:,j)   = twi_pos.coxp(ind_pos);
-%                     coxp_neg(:,j)   = twi_neg.coxp(ind_pos);
-%                 end
             else
                 % positive energies
                 dcox = twi_p(j).cox - twi0.cox;
@@ -129,14 +104,10 @@ else
     %% Calculate Dynamic Aperture
     if isstruct(flag_dyn) || flag_dyn
         
-        if isfield(flag_dyn, 'n_turns'), n_turns = flag_dyn.n_turns;
-        else n_turns = 131; end
-        if isfield(flag_dyn, 'H'), H = flag_dyn.H;
-        else H = linspace(0, 4e-6, 30); end
-        if isfield(flag_dyn, 'ep'), ep = flag_dyn.ep;
-        else ep = linspace(0.02, 0.06, 20); end
-        if isfield(flag_dyn, 'en'), en = flag_dyn.en;
-        else en = -ep; end
+        if isfield(flag_dyn, 'n_turns'), n_turns = flag_dyn.n_turns; else n_turns = 131; end
+        if isfield(flag_dyn, 'H'),       H = flag_dyn.H;             else H = linspace(0, 4e-6, 30); end
+        if isfield(flag_dyn, 'ep'),      ep = flag_dyn.ep;           else ep = linspace(0.02, 0.06, 20); end
+        if isfield(flag_dyn, 'en'),      en = flag_dyn.en;           else en = -ep; end
         
         ring_6d = setcavity('on',ring);
         ring_6d = setradiation('on',ring_6d);
@@ -223,7 +194,7 @@ else
         Adyn_p = interp1(ep,Adyn_p,delta)';
     else
         if ~( exist('info_in', 'var') && isstruct(info_in) && ...
-                isfield(info_in,'Adyn_p_p') && isfield(info_in,'Adyn_p_n') )
+                isfield(info_in,'Adyn_p') && isfield(info_in,'Adyn_n') )
             Adyn_p = Inf*ones(length(delta),1);
             Adyn_n = Inf*ones(length(delta),1);
         else
@@ -251,20 +222,6 @@ else
     c_n = c_n + (~sel)*(length(delta)-1);
     Accep.neg = -delta(c_n);
     
-    %     if(flag_pol)
-    %         n_deg = 6;
-    %         for k = 1:length(pos);
-    %             pol.betax(k,:) = fit_pol([-fliplr(delta(1:c_n)) delta(1:c_p)],...
-    %                 [fliplr(betax_neg(k,1:c_n)) betax_pos(k,1:c_p)], n_deg);
-    %             pol.alphax(k,:) = fit_pol([-fliplr(delta(1:c_n)) delta(1:c_p)],...
-    %                 [fliplr(alphax_neg(k,1:c_n)) alphax_pos(k,1:c_p)], n_deg);
-    %             pol.cox(k,:) = fit_pol([-fliplr(delta(1:c_n)) delta(1:c_p)],...
-    %                 [fliplr(cox_neg(k,1:c_n)) cox_pos(k,1:c_p)], n_deg);
-    %             pol.coxp(k,:) = fit_pol([-fliplr(delta(1:c_n)) delta(1:c_p)],...
-    %                 [fliplr(coxp_neg(k,1:c_n)) coxp_pos(k,1:c_p)], n_deg);
-    %         end
-    %     end
-    
     info.delta = delta;
     info.twi_p = twi_p;
     info.twi_n = twi_n;
@@ -276,7 +233,6 @@ else
     info.Adyn_n = Adyn_n;
     info.H_p = H_p;
     info.H_n = H_n;
-    % info.pol = pol;
     info.tune_n = tune_n - floor(tune_n);
     info.tune_p = tune_p - floor(tune_p);
 end
@@ -355,25 +311,3 @@ twi.cox  = co(1:4:end);
 twi.coxp = co(2:4:end);
 twi.coy  = co(3:4:end);
 twi.coyp = co(4:4:end);
-
-
-% function py = fit_pol(x,y,n)
-% 
-% % Exclude unstable points:
-% ind = ~isnan(y(:));
-% 
-% % Use only the first contiguous points for fitting:
-% idx = find(diff(ind)==-1);
-% if numel(idx), ii = idx(1); else ii = length(ind); end
-% ind = ind(1:ii);
-% 
-% x  = x(ind); y = y(ind);
-% x  = x(:); y = y(:);
-% 
-% if n <=9,ord = sprintf('poly%1d',n); else ord = 'poly9'; end
-% 
-% try
-%     py = coeffvalues(fit(x,y,ord,'Robust','on'));
-% catch
-%     py = 1e15*ones(1,n+1);
-% end
