@@ -63,7 +63,7 @@ finalizations();
     function finalizations()
         
         % closes diary and all open plots
-        diary 'off'; FClose('all');
+        diary 'off'; fclose('all');
         
     end
 
