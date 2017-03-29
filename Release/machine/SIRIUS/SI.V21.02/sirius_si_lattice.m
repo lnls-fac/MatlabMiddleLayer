@@ -38,7 +38,7 @@ lattice_version = 'SI.V21.02';
 % processamento de input (energia e modo de operacao)
 for i=1:length(varargin)
     if ischar(varargin{i})
-        if any(strcmpi(varargin{i},{'01'}))
+        if any(strcmpi(varargin{i},{'01','02','03'}))
             version = varargin{i};
         elseif any(strcmpi(varargin{i},{'S05','S10'}))
             mode = varargin{i};

@@ -149,7 +149,7 @@ AD.OperationalMode     = 'V21.02_S05.02';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;
 AD.ModeName            = 'S05';
-AD.ModeVersion         = '02';
+AD.ModeVersion         = '03';
 AD.OpsFileExtension    = '';
 
 sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
