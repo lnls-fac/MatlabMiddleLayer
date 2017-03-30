@@ -14,7 +14,9 @@ checkforao;
 
 % MODES
 ModeCell = { ...
-    '3 GeV - S05 (default)', ...
+    '3 GeV - S05.03 (default)', ...
+    '3 GeV - S05.02', ...
+    '3 GeV - S05.01', ...
     '3 GeV - S10', ...
     };
 
@@ -30,8 +32,12 @@ if nargin < 1
 end
 
 if (ModeNumber == 1)
-    set_operationalmode_s05;
+    set_operationalmode_s05_03;
 elseif (ModeNumber == 2)
+    set_operationalmode_s05_02;
+elseif (ModeNumber == 3)
+    set_operationalmode_s05_01;
+elseif (ModeNumber == 4)
     set_operationalmode_s10;
 else
     error('Operational mode unknown');
@@ -137,7 +143,46 @@ switch2sim;
 switch2hw;
 
 
-function set_operationalmode_s05
+function set_operationalmode_s05_03
+
+global THERING;
+
+AD = getad;
+AD.Machine             = 'SIRIUS_V21.02';   % Will already be defined if setpathmml was used
+AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
+AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
+AD.OperationalMode     = 'V21.02_S05.03';
+AD.Energy              = 3.0;
+AD.InjectionEnergy     = 3.0;
+AD.ModeName            = 'S05';
+AD.ModeVersion         = '03';
+AD.OpsFileExtension    = '';
+
+sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
+
+AD.Circumference       = findspos(THERING,length(THERING)+1);
+AD.HarmonicNumber      = 864;
+AD.DeltaRFDisp         = 1000;
+AD.DeltaRFChro         = linspace(-500,500,11);
+
+AD.ATModel             = 'sirius_si_lattice';
+AD.Chromaticity.Golden = [1; 1];
+AD.MCF                 = getmcf('Model');
+
+AD.BeamCurrent         = 0.500; % [sA]
+AD.NrBunches           = AD.HarmonicNumber;
+AD.Coupling            = 0.010;
+AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
+
+% 2015-09-18 Luana
+AD.SetMultipolesErrors = false;
+
+setad(AD);
+switch2sim;
+switch2hw;
+
+function set_operationalmode_s05_02
 
 global THERING;
 
@@ -149,7 +194,46 @@ AD.OperationalMode     = 'V21.02_S05.02';
 AD.Energy              = 3.0;
 AD.InjectionEnergy     = 3.0;
 AD.ModeName            = 'S05';
-AD.ModeVersion         = '03';
+AD.ModeVersion         = '02';
+AD.OpsFileExtension    = '';
+
+sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
+
+AD.Circumference       = findspos(THERING,length(THERING)+1);
+AD.HarmonicNumber      = 864;
+AD.DeltaRFDisp         = 1000;
+AD.DeltaRFChro         = linspace(-500,500,11);
+
+AD.ATModel             = 'sirius_si_lattice';
+AD.Chromaticity.Golden = [1; 1];
+AD.MCF                 = getmcf('Model');
+
+AD.BeamCurrent         = 0.500; % [sA]
+AD.NrBunches           = AD.HarmonicNumber;
+AD.Coupling            = 0.010;
+AD.OpsData.PrsProfFile = 'sirius_si_pressure_profile.txt';
+AD.AveragePressure     = 1.333e-9; % [mbar]
+
+% 2015-09-18 Luana
+AD.SetMultipolesErrors = false;
+
+setad(AD);
+switch2sim;
+switch2hw;
+
+function set_operationalmode_s05_01
+
+global THERING;
+
+AD = getad;
+AD.Machine             = 'SIRIUS_V21.02';   % Will already be defined if setpathmml was used
+AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
+AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
+AD.OperationalMode     = 'V21.02_S05.01';
+AD.Energy              = 3.0;
+AD.InjectionEnergy     = 3.0;
+AD.ModeName            = 'S05';
+AD.ModeVersion         = '01';
 AD.OpsFileExtension    = '';
 
 sirius_si_lattice(AD.Energy, AD.ModeName, AD.ModeVersion);
