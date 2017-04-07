@@ -92,7 +92,7 @@ monoms     = [      1,       2,       3,       4        5,       6];
 Bn_normal  = [+2.8e-5, +2.8e-3, -1.6e-4, -3.1e-3, -6.0e-4, -3.2e-3];
 Bn_skew    = [    0.0,     0.0,     0.0,     0.0,     0.0,     0.0];
 main_monom = {0, 'normal'}; 
-fams       = {'ch'};
+fams       = {'CH'};
 the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 % CORRECTOR CV
@@ -107,7 +107,7 @@ Bn_skew    = [    0.0, -3.0e-3,     0.0, -9.6e-4,     0.0, +2.7e-3];
 % Bn_normal  = [+2.8e-5,     0.0, -1.6e-4,     0.0, -6.0e-4,     0.0];
 % Bn_skew    = [    0.0, -2.8e-3,     0.0, -3.1e-3,     0.0, +3.2e-3];
 main_monom = {0, 'skew'}; 
-fams       = {'cv'};
+fams       = {'CV'};
 the_ring = insert_multipoles(the_ring, fams, monoms, Bn_normal, Bn_skew, main_monom, r0, fam_data);
 
 

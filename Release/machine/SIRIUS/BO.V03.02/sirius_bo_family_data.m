@@ -1,17 +1,17 @@
 function data = sirius_bo_family_data(the_ring)
 
-data.b.nr_segs   = 20;
+data.B.nr_segs   = 20;
 
-data.qf.nr_segs  = 2;
-data.qd.nr_segs  = 1;
+data.QF.nr_segs  = 2;
+data.QD.nr_segs  = 1;
 
-data.sd.nr_segs  = 1;
-data.sf.nr_segs  = 1;
+data.SD.nr_segs  = 1;
+data.SF.nr_segs  = 1;
 
-data.bpm.nr_segs = 1;
-data.ch.nr_segs  = 1;
-data.cv.nr_segs  = 1;
-data.qs.nr_segs  = 1;
+data.BPM.nr_segs = 1;
+data.CH.nr_segs  = 1;
+data.CV.nr_segs  = 1;
+data.QS.nr_segs  = 1;
 
 fams = fields(data);
 for i=1:length(fams)

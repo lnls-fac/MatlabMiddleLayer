@@ -50,7 +50,7 @@ b,     0.050  ,  +0.00000 ,  -5.00e-01 ,  +2.48e+04 ,  -6.87e+10 ,  -3.30e+14 ;
 
 % QF model 2017-01-11 (150MeV)
 % ============================
-% dipole model-02
+% quadrupole model-02
 % filename: 2017-01-10_BO_QD_Model02_Sim_X=-20_20mm_Z=-300_300mm_Imc=5.7A.txt
 segmodel_150MeV = [ ...
 %type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  

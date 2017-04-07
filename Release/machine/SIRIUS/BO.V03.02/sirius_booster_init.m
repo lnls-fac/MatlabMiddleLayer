@@ -12,7 +12,7 @@ setad([]);
 % Base on the location of this file
 [SIRIUS_ROOT, ~, ~] = fileparts(mfilename('fullpath'));
 
-AD.Directory.ExcDataDir  = '/home/fac_files/siriusdb/excitation_curves';
+AD.Directory.ExcDataDir  = '/home/fac_files/lnls-fac/siriusdb/excitation_curves';
 
 %AD.Directory.ExcDataDir = [SIRIUS_ROOT, filesep, 'excitation_curves'];
 AD.Directory.LatticesDef = [SIRIUS_ROOT, filesep, 'lattices_def'];

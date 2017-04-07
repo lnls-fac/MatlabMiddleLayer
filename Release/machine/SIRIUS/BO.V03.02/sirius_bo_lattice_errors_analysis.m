@@ -1,4 +1,4 @@
-function machine = local_lattice_errors_analysis()
+function machine = sirius_bo_lattice_errors_analysis()
 
 fprintf('\n')
 fprintf('Lattice Errors Run\n');
@@ -9,7 +9,7 @@ name = 'CONFIG'; name_saved_machines = name;
 initializations();
 
 % next a nominal model is chosen for the study
-energy = 0.15;  % [GeV]
+energy = 3.0;  % [GeV]
 the_ring = create_nominal_model(energy);
 family_data = sirius_bo_family_data(the_ring);
 
@@ -148,7 +148,7 @@ finalizations();
         % constants
         um = 1e-6; mrad = 0.001; percent = 0.01;
 
-        control.bpm.idx = family_data.bpm.ATIndex;
+        control.bpm.idx = family_data.BPM.ATIndex;
         control.bpm.sigma_offsetx   = 300 * um * 1;
         control.bpm.sigma_offsety   = 300 * um * 1;
 
@@ -163,9 +163,9 @@ finalizations();
         fprintf('\n<closed-orbit distortions correction> [%s]\n\n', datestr(now));
 
         % parameters for slow correction algorithms
-        orbit.bpm_idx = family_data.bpm.ATIndex;
-        orbit.hcm_idx = family_data.ch.ATIndex;
-        orbit.vcm_idx = family_data.cv.ATIndex;
+        orbit.bpm_idx = family_data.BPM.ATIndex;
+        orbit.hcm_idx = family_data.CH.ATIndex;
+        orbit.vcm_idx = family_data.CV.ATIndex;
 
         % parameters for SVD correction
         orbit.sext_ramp         = [0 1];

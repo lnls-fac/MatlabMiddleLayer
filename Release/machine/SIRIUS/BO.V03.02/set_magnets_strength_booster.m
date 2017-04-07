@@ -140,16 +140,19 @@
 
 qf_strength_3gev = 1.654036900448982;
 qd_strength_3gev = -0.005474886350700;
+qs_strength_3gev = 0.0;
 sf_strength_3gev = 11.326236792215228;
 sd_strength_3gev = 6.282586036135388;
 
 qf_strength_150mev = 1.653947031926041;
 qd_strength_150mev = 0.011197961538728;  % this is correct! the sign has changed!
+qs_strength_150mev = 0.0;
 sf_strength_150mev = 11.331918124055948;
 sd_strength_150mev = 5.007982970980575;
 
 qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
 qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
+qs_strength = qs_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qs_strength_3gev - qs_strength_150mev);
 sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
 sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
 

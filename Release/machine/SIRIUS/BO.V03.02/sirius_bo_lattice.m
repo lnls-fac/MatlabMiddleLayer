@@ -120,7 +120,9 @@ SF  = sirius_bo_sx_segmented_model(energy, 'SF', sext_pass_method, sf_strength *
 SD  = sirius_bo_sx_segmented_model(energy, 'SD', sext_pass_method, sd_strength * 0.105);
 QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength * 0.100);
 QF  = sirius_bo_qf_segmented_model(energy, 'QF', quad_pass_method, qf_strength * 0.228);
-QS  = quadrupole('QS',  0.10, 0.0,  quad_pass_method);
+QS  = sirius_bo_qs_segmented_model(energy, 'QS', quad_pass_method, qs_strength * 0.100);
+%QS  = quadrupole('QS',  0.10, 0.0,  quad_pass_method);
+
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
 RFC = rfcavity('P5Cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
 

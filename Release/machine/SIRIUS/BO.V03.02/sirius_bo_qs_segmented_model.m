@@ -1,4 +1,4 @@
-function [model, model_length] = sirius_bo_qf_segmented_model(energy, fam_name, passmethod, hardedge_KL)
+function [model, model_length] = sirius_bo_qs_segmented_model(energy, fam_name, passmethod, hardedge_KL)
 
 % This script build an AT quadrupole model based on analysis of a fieldmap generated for a 3D magnetic model
 % of the magnet and based on rotating coil measurement data for the constructed magnet.
@@ -25,7 +25,6 @@ function [model, model_length] = sirius_bo_qf_segmented_model(energy, fam_name, 
 %    matches the rotating coil integrated multipole. It keeps the
 %    longitudinal multipole profile of the segmented model.
 
-
 magnet_type = 1;  % 0:dipole, 1:quadrupole, 2:sextupole
 
 types = {};
@@ -38,25 +37,25 @@ b = 1; types{end+1} = struct('fam_name', fam_name, 'passmethod', passmethod);
 % *** more refined segmented model.
 % *** dipole angle is now in units of degrees
 %--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m],[T] for polynom_b ---
-fmap_monomials = [1,5,9,13];
+fmap_monomials = [1,3,5,7,9];
 
-% QF model 2017-01-09 (3GeV)
-% ===========================
-% quadrupole model06
-% filename: 2016-11-23_BQF_Model06_Sim_X=-20_20mm_Z=-450_450mm_I=110.8A.txt
+% QS model
+% ========
+% quadrupole qs model01
+% filename: 2017-04-05_BQS_Model01_Sim_X=-20_20mm_Z=-300_300mm_Imc=9.64A.txt
 segmodel_3GeV = [ ...
-%type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
-b,     0.114  ,  +0.00000 ,  +1.78e+00 ,  -1.91e+04 ,  +2.37e+11 ,  +4.91e+16 ;
+%type  len[m]    angle[deg]  PolyA(n=1)   PolyA(n=3)   PolyA(n=5)   PolyA(n=7)   PolyA(n=9)   
+b,     0.0500 ,  +0.00000 ,  -1.68e-01 ,  +5.83e-01 ,  -1.77e+04 ,  +5.04e+07 ,  -1.21e+11 , 
 ];
 
-% QF model 2017-01-09 (150MeV)
-% ============================
-% quadrupole model06
-% filename: 2016-12-06_BQF_Model06_Sim_X=-20_20mm_Z=-450_450mm_I=5.28A.txt
+% QS model
+% ========
+% quadrupole qs model01 (copy of 3 GeV)
 segmodel_150MeV = [ ...
-%type  len[m]   angle[deg]  PolyB(n=1)   PolyB(n=5)   PolyB(n=9)   PolyB(n=13)  
-b,     0.114  ,  +0.00000 ,  +1.78e+00 ,  -1.91e+04 ,  +2.38e+11 ,  +4.91e+16 ;
+%type  len[m]    angle[deg]  PolyA(n=1)   PolyA(n=3)   PolyA(n=5)   PolyA(n=7)   PolyA(n=9)   
+b,     0.0500 ,  +0.00000 ,  -1.68e-01 ,  +5.83e-01 ,  -1.77e+04 ,  +5.04e+07 ,  -1.21e+11 , 
 ];
+
 
 % interpolates multipoles linearly in energy
 segmodelo = segmodel_3GeV;
@@ -66,14 +65,14 @@ segmodelo(:,4:end) = segmodel_150MeV(:,4:end) + (energy - 150e6)/(3e9-150e6) * (
 % ROTATING COIL MEASUREMENT
 % =========================
 % data based on quadrupole prototype
-% Rescale multipolar profile according to rotating coil measurement
-rcoil_monomials  = [1,5,9,13];
-rcoil_integrated_multipoles = [1,-1.066222407330279e+04,1.250513244082492e+11,9.696910847302045e+16]; % based on relative [1.0, -1.0e-3, 1.1e-3, 0.08e-3];
+% Rescale multipolar profile according to rotating coild measurement
+rcoil_monomials  = [];
+rcoil_integrated_multipoles = [];
 % ---------------------------------------------------------------
 
 
-
 fmap_lens = segmodelo(:,2);
+
 
 % rescale multipoles of the model according to nominal strength value passed as argument
 % --------------------------------------------------------------------------------------
@@ -92,10 +91,12 @@ if ~isempty(rcoil_monomials)
     rcoil_main_multipole_idx = find(rcoil_monomials == magnet_type, 1);
     rescaling = hardedge_KL / rcoil_normalized_integrated_multipoles(rcoil_main_multipole_idx);
     rcoil_normalized_integrated_multipoles = rcoil_normalized_integrated_multipoles * rescaling;
-end        
+end
+        
 
 % builds final model with fieldmap and rotating coild measurements
 % ----------------------------------------------------------------
+
 monomials = unique([fmap_monomials rcoil_monomials]);
 segmodel = zeros(size(segmodelo,1),length(monomials));
 segmodel(:,1:3) = segmodelo(:,1:3);
@@ -107,13 +108,14 @@ for i=1:length(monomials)
         segmodel(:,i+3) = segmodelo(:,fmap_idx+3);
     else
         if isempty(fmap_idx)
-            % if this multipole is not in fmap model then uses main multipole to build a multipolar profile
+            % if this multipole is not in fmap model then uses main
+            % multipole to build a multipolar profile
             fmap_integrated_multipole = 2*sum(segmodelo(:,magnet_type+3) .* fmap_lens);
         else
             fmap_integrated_multipole = 2*sum(segmodelo(:,fmap_idx+3) .* fmap_lens);
         end    
         rescaling = rcoil_normalized_integrated_multipoles(rcoil_idx) / fmap_integrated_multipole;
-        segmodel(:,i+3) = segmodelo(:,fmap_idx+3) * rescaling;
+        segmodel(:,i+3) = segmodel(:,fmap_idx+3) * rescaling;
     end
 end
 
@@ -133,13 +135,14 @@ for i=1:size(segmodel,1)
         b(i) = marker(type.fam_name, 'IdentityPass');
     else
         PolyB = zeros(1,maxorder); PolyA = zeros(1,maxorder);
-        PolyB(monomials+1) = segmodel(i,4:end); 
-        b(i) = quadrupole_sirius(type.fam_name, segmodel(i,2), PolyA, PolyB, passmethod); 
+        PolyA(monomials+1) = segmodel(i,4:end); 
+        b(i) = quadrupole_sirius(type.fam_name, 2*segmodel(i,2), PolyA, PolyB, passmethod); % factor 2 in length for one-segment model
     end
 end
 
 model_length = 2*sum(segmodel(:,2));
-mqf  = marker('mQF',     'IdentityPass');
-model = [b mqf b];
+model = b;
+
+
 
 
