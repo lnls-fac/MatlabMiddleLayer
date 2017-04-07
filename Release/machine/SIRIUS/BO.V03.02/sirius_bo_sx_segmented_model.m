@@ -49,10 +49,10 @@ b,      0.0525 ,  +0.00000 ,  -2.38e-06 ,  +1.90e+01 ,  -1.79e+10 ,  -3.25e+20 ;
 % Sextupole model 2017-01-05 (150Mev)
 % ===================================
 % sextupole model-03
-% filename: 2017-01-05_BO_Sextupole_Model03_Sim_X=-20_20mm_Z=-300_300mm_Imc=135A.txt
+% filename: 2017-01-05_BO_Sextupole_Model03_Sim_X=-20_20mm_Z=-300_300mm_Imc=6.75A.txt
 segmodel_150MeV = [ ...  
 % type  len[m]    angle[deg]  PolyB(n=0)   PolyB(n=2)   PolyB(n=8)   PolyB(n=14)  
-b,      0.0525 ,  +0.00000 ,  -2.38e-06 ,  +1.90e+01 ,  -1.79e+10 ,  -3.25e+20 ;
+b,      0.0525 ,  +0.00000 ,  -2.38e-06 ,  +1.90e+01 ,  -1.79e+10 ,  -3.25e+20 ; % within precision, same as for 3GeV, not a bug!
 ]; 
 
 % interpolates multipoles linearly in energy
