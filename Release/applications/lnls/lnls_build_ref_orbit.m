@@ -1,4 +1,4 @@
-function [pos vel] = lnls_build_ref_orbit(the_ring, FamName)
+function [post, velt] = lnls_build_ref_orbit(the_ring, FamName, machine)
 %
 % build reference trajectory from model's benging angles
 %
@@ -25,6 +25,10 @@ function [pos vel] = lnls_build_ref_orbit(the_ring, FamName)
 %
 %   r   = rc + R(ang) * rho * n
 %   t   = R(ang) * t
+
+if ~exist('machine','var')
+    machine = 'sirius';
+end
 
 local_pos = [0; 0]; local_vel = [0; 1];
 pos = zeros(2,length(the_ring)); vel = zeros(2,length(the_ring));
@@ -55,4 +59,17 @@ if exist('FamName', 'var')
     idx = findcells(the_ring, 'FamName', FamName);
     r_center = mean(pos(:,idx),2);
     pos = pos - repmat(r_center, 1, size(pos,2));
+end
+
+if strcmpi(machine, 'sirius')
+    ang = -(180-1*23)*(pi/180.0);
+    m = [cos(ang) sin(ang); -sin(ang), cos(ang)];
+    post = pos; velt = vel;
+    for i=1:length(the_ring)
+        post(:,i) = m * pos(:,i);
+        velt(:,i) = m * vel(:,i);
+    end
+else
+    post = pos;
+    velt = vel
 end
