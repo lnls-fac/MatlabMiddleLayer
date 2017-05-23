@@ -71,5 +71,5 @@ if strcmpi(machine, 'sirius')
     end
 else
     post = pos;
-    velt = vel
+    velt = vel;
 end

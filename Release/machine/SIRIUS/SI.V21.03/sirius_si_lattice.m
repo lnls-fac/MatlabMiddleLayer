@@ -124,12 +124,6 @@ L465  = drift('l465', 0.465, 'DriftPass');
 
 % -- dipoles --
 
-%deg2rad = pi/180.0;
-% B2E = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 1.4143*deg2rad/2, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
-% B2M = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 0,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
-% B2S = rbend_sirius('b2', 1.231/3, 4.0964*deg2rad/3, 0, 1.4143*deg2rad/2,   0, 0, 0, [0 0 0], [0 -0.78 0], bend_pass_method);
-% B2  = [MOMACCEP,B2E,MOMACCEP,B2M,MOMACCEP,B2S,MOMACCEP];
-
 [BC, ~] = sirius_si_bc_segmented_model(bend_pass_method, m_accep_fam_name);
 [B1, ~] = sirius_si_b1_segmented_model(bend_pass_method, m_accep_fam_name);
 [B2, ~] = sirius_si_b2_segmented_model(bend_pass_method, m_accep_fam_name);
@@ -404,6 +398,6 @@ for ii=1:length(gir_ini)
     name_girder = sprintf('%03d',ii);
     the_ring = setcellstruct(the_ring,'Girder',idx,name_girder);
 end
-the_ring(gir) = [];
+%the_ring(gir) = [];
 
 
