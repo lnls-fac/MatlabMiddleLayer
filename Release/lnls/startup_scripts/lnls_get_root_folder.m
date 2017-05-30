@@ -12,6 +12,6 @@ else
     elseif exist('/home/fac_files/code','dir')
         root_folder = '/home/fac_files/code';
     else
-        root_folder = '/Users/fac_files/code';
+        root_folder = '/Users/fac_files/lnls-fac';
     end
 end
