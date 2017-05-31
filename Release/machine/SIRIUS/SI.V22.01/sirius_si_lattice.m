@@ -30,11 +30,11 @@ global THERING;
 % --- system parameters ---
 energy = 3e9;
 mode   = 'S05';
-version = '01’;
+version = '01';
 strengths = @set_magnet_strengths;
 harmonic_number = 864;
 
-lattice_version = 'SI.V22.01’;
+lattice_version = 'SI.V22.01';
 % processamento de input (energia e modo de operacao)
 for i=1:length(varargin)
     if ischar(varargin{i})
@@ -104,13 +104,13 @@ L150  = drift('l150', 0.150, 'DriftPass');
 L170  = drift('l170', 0.170, 'DriftPass');
 L192  = drift('l192', 0.192, 'DriftPass');
 L200  = drift('l200', 0.200, 'DriftPass');
-L205  = drift('l205’, 0.205, 'DriftPass');
+L205  = drift('l205', 0.205, 'DriftPass');
 L216  = drift('l216', 0.216, 'DriftPass');
 L230  = drift('l230', 0.230, 'DriftPass');
 L237  = drift('l237', 0.237, 'DriftPass');
 L240  = drift('l240', 0.240, 'DriftPass');
 L260  = drift('l260', 0.260, 'DriftPass');
-L325  = drift('l325’, 0.325, 'DriftPass');
+L325  = drift('l325', 0.325, 'DriftPass');
 L336  = drift('l336', 0.336, 'DriftPass');
 L419  = drift('l419', 0.419, 'DriftPass');
 L474  = drift('l474', 0.474, 'DriftPass');
