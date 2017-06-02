@@ -69,6 +69,14 @@ if strcmpi(machine, 'sirius')
         post(:,i) = m * pos(:,i);
         velt(:,i) = m * vel(:,i);
     end
+elseif strcmpi(machine, 'booster')
+    ang = -(180-1*26.6)*(pi/180.0);
+    m = [cos(ang) sin(ang); -sin(ang), cos(ang)];
+    post = pos; velt = vel;
+    for i=1:length(the_ring)
+        post(:,i) = m * pos(:,i);
+        velt(:,i) = m * vel(:,i);
+    end
 else
     post = pos;
     velt = vel;
