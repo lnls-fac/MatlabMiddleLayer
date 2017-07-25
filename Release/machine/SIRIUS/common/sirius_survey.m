@@ -29,11 +29,16 @@ if ~exist('type','var')
     end
 end
 
-%% 
+type = 'bo_ssectors_refp_dipoles';
+
+
+%% take surkey
 if strcmpi(type, 'si_ssectors_centerof_dipoles')
     si_survey_ssectors_centerof_dipoles(p)
 elseif strcmpi(type, 'si_ssectors_refp_dipoles')
     si_survey_ssectors_refp_dipoles(p)
+elseif strcmpi(type, 'si_radiation_points')
+    si_survey_radiation_points
 elseif strcmpi(type, 'si_quadrupoles_sextupoles')
     si_survey_quadrupoles_sextupoles
 elseif strcmpi(type, 'bo_ssectors_refp_dipoles')
@@ -156,11 +161,14 @@ the_ring = setcellstruct(the_ring, 'FamName', mB1, 'B1');
 the_ring = setcellstruct(the_ring, 'FamName', mB2, 'B2');
 the_ring = setcellstruct(the_ring, 'FamName', mBC, 'BC');
 
+
+% moves from center of dipolos to the reference points (intersection of
+% straight lines)
+pos = move_from_traj_to_refp(pos, vel, mB1, p.si_b1_rx_refp-p.si_b1_rx_traj);
+pos = move_from_traj_to_refp(pos, vel, mB2, p.si_b2_rx_refp-p.si_b2_rx_traj);
+pos = move_from_traj_to_refp(pos, vel, mBC, p.si_bc_rx_refp-p.si_bc_rx_traj);
+
 idx = sort([mia,mib,mip,mB1,mB2,mBC,lB1,lB2,lBC]);
-dr = zeros(1,length(the_ring));
-dr(mB1) = -(p.si_b1_rx_refp-p.si_b1_rx_traj); % rx position of the reference point (intesection point of asymptote lines) as measured from the RK orbit
-dr(mB2) = -(p.si_b2_rx_refp-p.si_b2_rx_traj); % this displacement from the RK trajectory at s=0 for the B2 dipole to the origin of the coordinate system of the magnet.
-dr(mBC) = -(p.si_bc_rx_refp-p.si_bc_rx_traj); % this displacement from the RK trajectory at s=0 for the BC dipole to the origin of the coordinate system of the magnet.
 
 fprintf('%5s: point(X,Y) is the center of SA straight sectors [mm]\n', the_ring{mia(1)}.FamName);
 fprintf('%5s: point(X,Y) is the center of SB straight sectors [mm]\n', the_ring{mib(1)}.FamName);
@@ -175,9 +183,7 @@ fprintf('\n')
 for i=1:length(idx)
     ind = idx(i);
     famname = the_ring{ind}.FamName;
-    p0 = pos(:,ind);
-    v = dr(ind) * [0, 1; -1, 0] * vel(:,ind);
-    p = p0 + v;
+    p = pos(:,ind);
     fprintf('%5s: point(X,Y)= %+12.4f %+12.4f    versor(X,Y)= %+.6e %+.6e\n', famname, 1000*p(2), 1000*p(1), vel(2,ind), vel(1,ind));
 end
 
@@ -194,10 +200,11 @@ tmp = getfamilydata('B','AT','ATIndex'); lB = sort(reshape([tmp(:,1), tmp(:,end)
 the_ring = setcellstruct(the_ring, 'FamName', lB, 'line');
 the_ring = setcellstruct(the_ring, 'FamName', mB, 'B');
 
-idx = sort([mS,mB,lB]);
-dr = zeros(1,length(the_ring));
-dr(mB) = -(p.bo_b_rx_refp-p.bo_b_rx_traj); % this displacement from the RK trajectory at s=0 for the B1 dipole to the origin of the coordinate system of the magnet.
+% moves from center of dipolos to the reference points (intersection of
+% straight lines)
+pos = move_from_traj_to_refp(pos, vel, mB, p.bo_b_rx_refp-p.bo_b_rx_traj);
 
+idx = sort([mS,mB,lB]);
 
 fprintf('%5s: point(X,Y) is the center of straight sectors [mm]\n', the_ring{mS(1)}.FamName);
 fprintf('%5s: point(X,Y) is the position of the B dipole reference point [mm]\n', the_ring{mB(1)}.FamName);
@@ -208,9 +215,7 @@ fprintf('\n')
 for i=1:length(idx)
     ind = idx(i);
     famname = the_ring{ind}.FamName;
-    p0 = pos(:,ind);
-    v = dr(ind) * [0, 1; -1, 0] * vel(:,ind);
-    p = p0 + v;
+    p = pos(:,ind);
     fprintf('%5s: point(X,Y)= %+12.4f %+12.4f    versor(X,Y)= %+.6e %+.6e\n', famname, 1000*p(2), 1000*p(1), vel(2,ind), vel(1,ind));
 end
 
@@ -231,6 +236,7 @@ end
 for i=1:length(sext_famnames)
     idx = [idx findcells(the_ring, 'FamName', sext_famnames{i})];
 end
+
 idx = sort(idx);
 
 for i=1:length(idx)
@@ -242,5 +248,46 @@ for i=1:length(idx)
     fprintf('%5s: point(X,Y)= %+12.4f %+12.4f    versor(X,Y)= %+.6e %+.6e\n', famname, 1000*p_center(2), 1000*p_center(1), vel(2,ind), vel(1,ind));
 end
 
+function si_survey_radiation_points()
+
+global THERING
+the_ring = THERING;
+
+[pos, vel] = lnls_build_ref_orbit(the_ring, 'B2', 'sirius');
+
+mia = findcells(the_ring, 'FamName', 'mia');
+mib = findcells(the_ring, 'FamName', 'mib');
+mip = findcells(the_ring, 'FamName', 'mip');
+mBC = findcells(the_ring, 'FamName', 'mc');
+%tmp = getfamilydata('BC','AT','ATIndex'); lBC = sort(reshape([tmp(:,1), tmp(:,end)+1],1,[]));
+%the_ring = setcellstruct(the_ring, 'FamName', lBC, 'line');
+the_ring = setcellstruct(the_ring, 'FamName', mBC, 'BC');
+
+idx = sort([mia,mib,mip,mBC]);
+
+fprintf('%5s: point(X,Y) is the center of SA straight sectors [mm]\n', the_ring{mia(1)}.FamName);
+fprintf('%5s: point(X,Y) is the center of SB straight sectors [mm]\n', the_ring{mib(1)}.FamName);
+fprintf('%5s: point(X,Y) is the center of SP straight sectors [mm]\n', the_ring{mip(1)}.FamName);
+fprintf('%5s: point(X,Y) is the position of the BC dipole reference point [mm]\n', the_ring{mBC(1)}.FamName);
+fprintf('\n')
+fprintf('versor(X,Y) is a versor pointing to the tangent direction of the element\n');
+fprintf('\n')
+
+for i=1:length(idx)
+    ind = idx(i);
+    famname = the_ring{ind}.FamName;
+    p = pos(:,ind);
+    fprintf('%5s: point(X,Y)= %+12.4f %+12.4f    versor(X,Y)= %+.6e %+.6e\n', famname, 1000*p(2), 1000*p(1), vel(2,ind), vel(1,ind));
+end
+
+
+function posf = move_from_traj_to_refp(pos, vel, idx, dx)
+
+posf = pos;
+for ind=idx
+    p0 = posf(:,ind);
+    v = dx * [0, 1; -1, 0] * vel(:,ind);
+    posf(:,ind) = p0 + v;
+end
 
 
