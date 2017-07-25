@@ -36,8 +36,13 @@ case 'SOL64'
 case 'GLNX86'
     PLATFORMOPTION = [PLATFORMOPTION,'LDFLAGS=''-pthread -shared -m32 -Wl,--version-script,',atroot,'/simulator/element/mexFunctionGLNX86.map''',' '];   
 case 'GLNXA64'
-    PLATFORMOPTION = [PLATFORMOPTION,'LDFLAGS=''-pthread -shared -m64 -Wl,--version-script,',atroot,'/simulator/element/user/mexFunctionGLNXA64.map''',' '];   
-    %PLATFORMOPTION = [PLATFORMOPTION,'LDFLAGS=''-pthread -shared -m64 -Wl,--version-script,',atroot,'/simulator/element/mexFunctionGLNXA64.map''',' '];   
+    ver = version;
+    if str2double(ver(1)) <= 8
+        LD = ['LDFLAGS=''-pthread -shared -m64 -Wl,--version-script,',atroot,'/simulator/element/mexFunctionGLNXA64.map'''];
+    else
+        LD = ['LDFLAGS=''-pthread -shared -m64'' LINKEXPORTVER=''-Wl,--version-script,',atroot,'/simulator/element/user/mexFunctionGLNXA64v9.map'''];
+    end
+    PLATFORMOPTION = [PLATFORMOPTION, LD,' '];   
 end
 
 
