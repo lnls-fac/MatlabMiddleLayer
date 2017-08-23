@@ -1,4 +1,3 @@
-
 function aoinit(SubMachineName)
 %AOINIT - Initialization function for the Matlab Middle Layer (MML)
 
@@ -11,9 +10,9 @@ if exist(Directory, 'dir')
 end
     
 % Modo default de carregamento
-OperationalMode = 1;
+OperationalMode = sirius_get_mode_number('S05'); % Default
 
-sirius_ts_init;
+sirius_init;
 setoperationalmode(OperationalMode);
 
 
