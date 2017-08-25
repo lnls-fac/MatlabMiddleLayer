@@ -19,7 +19,7 @@ global THERING
 
 energy = 0.15e9; % eV
 
-lattice_version = 'BO.V04.01’;
+lattice_version = 'BO.V04.01';
 for i=1:length(varargin)
 	energy = varargin{i} * 1e9;
 end
@@ -54,12 +54,10 @@ lenDif         = (b_len_seg - b_len_hdedge)/2.0;
 % --- drifts ---
 
 L00880  = drift('l00880', 0.0880, 'DriftPass');
-L00880  = drift('l00880', 0.0880, 'DriftPass');
 L01335  = drift('l01335', 0.1335, 'DriftPass');
 L01360  = drift('l01360', 0.1360, 'DriftPass');
 L01610  = drift('l01610', 0.1610, 'DriftPass');
 L01675  = drift('l01675', 0.1675, 'DriftPass');
-L01725  = drift('l01725', 0.1725, 'DriftPass');
 L02500  = drift('l02500', 0.2500, 'DriftPass');
 L02725  = drift('l02725', 0.2725, 'DriftPass');
 L03500  = drift('l03500', 0.3500, 'DriftPass');
@@ -67,14 +65,12 @@ L03860  = drift('l03860', 0.3860, 'DriftPass');
 L04500  = drift('l04500', 0.4500, 'DriftPass');
 L06200  = drift('l06200', 0.6200, 'DriftPass');
 L07250  = drift('l07250', 0.7250, 'DriftPass');
-L10960  = drift('l10960', 1.0960, 'DriftPass');
 L10000  = drift('l10000', 1.0000, 'DriftPass');
 L10960  = drift('l10960', 1.0960, 'DriftPass');
 L11320  = drift('l11320', 1.1320, 'DriftPass');
 L13460  = drift('l13460', 1.3460, 'DriftPass');
 L13710  = drift('l13710', 1.3710, 'DriftPass');
 L14460  = drift('l14460', 1.4460, 'DriftPass');
-L14710  = drift('l14710', 1.4710, 'DriftPass');
 L15120  = drift('l15120', 1.5120, 'DriftPass');
 L16830  = drift('l16830', 1.6830, 'DriftPass');
 L17260  = drift('l17260', 1.7260, 'DriftPass');
