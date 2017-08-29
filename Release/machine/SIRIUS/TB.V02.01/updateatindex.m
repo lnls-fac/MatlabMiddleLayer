@@ -150,12 +150,7 @@ end
 try
     % CH
     AO.CH.AT.ATType = 'HCM';
-    li = [];
-    if isfield(Indices, 'CH'), li = [li Indices.CH]; end;
-    if isfield(Indices, 'hcm'), li = [li Indices.hcm]; end;
-    % Remove linac corrector
-    li = sort(li);
-    li = li(2:end);
+    li = Indices.CH;
     AO.CH.AT.ATIndex = buildatindex(AO.CH.FamilyName, li);
     AO.CH.Position = findspos(THERING, AO.CH.AT.ATIndex(:,1))';   
 catch
@@ -166,12 +161,7 @@ end
 try
     % CV
     AO.CV.AT.ATType = 'VCM';
-    li = [];
-    if isfield(Indices, 'CV'), li = [li Indices.CV]; end;
-    if isfield(Indices, 'vcm'), li = [li Indices.vcm]; end;
-    % Remove linac corrector
-    li = sort(li);
-    li = li(2:end);
+    li = Indices.CV;
     AO.CV.AT.ATIndex = buildatindex(AO.CV.FamilyName, li);
     AO.CV.Position = findspos(THERING, AO.CV.AT.ATIndex(:,1))';   
 catch
