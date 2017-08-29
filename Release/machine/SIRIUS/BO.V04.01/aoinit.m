@@ -12,7 +12,7 @@ end
 % set operational mode to low energy by default.
 OperationalMode = 2;
 
-sirius_booster_init;
+sirius_bo_init;
 setoperationalmode(OperationalMode);
 
 

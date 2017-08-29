@@ -24,7 +24,7 @@ for i=1:length(CommonNames(:,1))
                 elseif ~isempty(regexpi(line, 'skew', 'match')) || ~isempty(regexpi(line, 'vertical', 'match'))
                     ExcData.skew{i} = true;
                 end
-            else
+            elseif ~isempty(line)
                 data(j, :) = sscanf(line, '%e');
                 j = j+1;
             end
