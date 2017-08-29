@@ -12,7 +12,7 @@ end
 % Modo default de carregamento
 OperationalMode = sirius_get_mode_number('S05'); % Default
 
-sirius_init;
+sirius_si_init;
 setoperationalmode(OperationalMode);
 
 

@@ -8,11 +8,8 @@ function sirius_init
 setao([]);
 setad([]);
 
-% Base on the location of this file
 [SIRIUS_ROOT, ~, ~] = fileparts(mfilename('fullpath'));
-
-root_folder = lnls_get_root_folder();
-AD.Directory.ExcDataDir  = fullfile(root_folder, 'siriusdb/excitation_curves');
+AD.Directory.ExcDataDir  = '/home/fac_files/lnls-sirius/control-system-constants/magnet/excitation-data';
 AD.Directory.LatticesDef = [SIRIUS_ROOT, filesep, 'lattices_def'];
 setad(AD);
 
@@ -25,7 +22,7 @@ AO.B1.DeviceList  = getDeviceList(10,4);
 AO.B1.ElementList = (1:size(AO.B1.DeviceList,1))';
 AO.B1.Status      = ones(size(AO.B1.DeviceList,1),1);
 AO.B1.Position    = [];
-AO.B1.ExcitationCurves = sirius_getexcdata(repmat('sima-b1',size(AO.B1.DeviceList,1),1)); 
+AO.B1.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B1.DeviceList,1),1)); 
 
 AO.B1.Monitor.MemberOf = {};
 AO.B1.Monitor.Mode = 'Simulator';
@@ -57,7 +54,7 @@ AO.B2.DeviceList  = getDeviceList(10,4);
 AO.B2.ElementList = (1:size(AO.B2.DeviceList,1))';
 AO.B2.Status      = ones(size(AO.B2.DeviceList,1),1);
 AO.B2.Position    = [];
-AO.B2.ExcitationCurves = sirius_getexcdata(repmat('sima-B2',size(AO.B2.DeviceList,1),1)); 
+AO.B2.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B2.DeviceList,1),1)); 
 
 AO.B2.Monitor.MemberOf = {};
 AO.B2.Monitor.Mode = 'Simulator';
@@ -91,18 +88,18 @@ AO.BC.Position    = [];
 
 
 %% quadrupoles 
-AO = get_AO_quads(AO,'QFA', 'Q20',2);
-AO = get_AO_quads(AO,'QDA', 'Q14',2);
-AO = get_AO_quads(AO,'QFB', 'Q30',4);
-AO = get_AO_quads(AO,'QDB2','Q14',4);
-AO = get_AO_quads(AO,'QDB1','Q14',4);
-AO = get_AO_quads(AO,'QFP', 'Q30',2);
-AO = get_AO_quads(AO,'QDP2','Q14',2);
-AO = get_AO_quads(AO,'QDP1','Q14',2);
-AO = get_AO_quads(AO,'Q1',  'Q20',8);
-AO = get_AO_quads(AO,'Q2',  'Q20',8);
-AO = get_AO_quads(AO,'Q3',  'Q20',8);
-AO = get_AO_quads(AO,'Q4',  'Q20',8);
+AO = get_AO_quads(AO,'QFA', 'q20-fam', 2);
+AO = get_AO_quads(AO,'QDA', 'q14-fam', 2);
+AO = get_AO_quads(AO,'QFB', 'q30-fam', 4);
+AO = get_AO_quads(AO,'QDB2','q14-fam', 4);
+AO = get_AO_quads(AO,'QDB1','q14-fam', 4);
+AO = get_AO_quads(AO,'QFP', 'q30-fam', 2);
+AO = get_AO_quads(AO,'QDP2','q14-fam', 2);
+AO = get_AO_quads(AO,'QDP1','q14-fam', 2);
+AO = get_AO_quads(AO,'Q1',  'q20-fam', 8);
+AO = get_AO_quads(AO,'Q2',  'q20-fam', 8);
+AO = get_AO_quads(AO,'Q3',  'q20-fam', 8);
+AO = get_AO_quads(AO,'Q4',  'q20-fam', 8);
 
 
 %% sextupoles
@@ -139,7 +136,7 @@ AO.CH.DeviceList  = getDeviceList(10, 12);
 AO.CH.ElementList = (1:size(AO.CH.DeviceList,1))';
 AO.CH.Status      = ones(size(AO.CH.DeviceList,1),1);
 AO.CH.Position    = [];
-AO.CH.ExcitationCurves = sirius_getexcdata(repmat('sima-ch',size(AO.CH.DeviceList,1),1));
+AO.CH.ExcitationCurves = sirius_getexcdata(repmat('si-sextupole-s15-ch',size(AO.CH.DeviceList,1),1));
 AO.CH.Monitor.MemberOf = {'Horizontal'; 'COR'; 'CH'; 'Magnet';};
 AO.CH.Monitor.Mode     = 'Simulator';
 AO.CH.Monitor.DataType = 'Scalar';
@@ -169,7 +166,7 @@ AO.CV.DeviceList  = getDeviceList(10, 16);
 AO.CV.ElementList = (1:size(AO.CV.DeviceList,1))';
 AO.CV.Status      = ones(size(AO.CV.DeviceList,1),1);
 AO.CV.Position    = [];
-AO.CV.ExcitationCurves = sirius_getexcdata(repmat('sima-CV',size(AO.CV.DeviceList,1),1));
+AO.CV.ExcitationCurves = sirius_getexcdata(repmat('si-sextupole-s15-cv',size(AO.CV.DeviceList,1),1));
 AO.CV.Monitor.MemberOf = {'Horizontal'; 'COR'; 'CV'; 'Magnet';};
 AO.CV.Monitor.Mode     = 'Simulator';
 AO.CV.Monitor.DataType = 'Scalar';
@@ -200,7 +197,7 @@ AO.FCH.DeviceList([8,15,16,80],:) = []; % subtracts fast correctors from injecti
 AO.FCH.ElementList = (1:size(AO.FCH.DeviceList,1))';
 AO.FCH.Status      = ones(size(AO.FCH.DeviceList,1),1);
 AO.FCH.Position    = [];
-AO.FCH.ExcitationCurves = sirius_getexcdata(repmat('sima-ch',size(AO.FCH.DeviceList,1),1));
+AO.FCH.ExcitationCurves = sirius_getexcdata(repmat('si-corrector-fch',size(AO.FCH.DeviceList,1),1));
 AO.FCH.Monitor.MemberOf = {'Horizontal'; 'COR'; 'FCH'; 'Magnet';};
 AO.FCH.Monitor.Mode     = 'Simulator';
 AO.FCH.Monitor.DataType = 'Scalar';
@@ -231,7 +228,7 @@ AO.FCV.DeviceList([8,15,16,80],:) = []; % subtracts fast correctors from injecti
 AO.FCV.ElementList = (1:size(AO.FCV.DeviceList,1))';
 AO.FCV.Status      = ones(size(AO.FCV.DeviceList,1),1);
 AO.FCV.Position    = [];
-AO.FCV.ExcitationCurves = sirius_getexcdata(repmat('sima-CV',size(AO.FCV.DeviceList,1),1));
+AO.FCV.ExcitationCurves = sirius_getexcdata(repmat('si-corrector-fcv',size(AO.FCV.DeviceList,1),1));
 AO.FCV.Monitor.MemberOf = {'Horizontal'; 'COR'; 'FCV'; 'Magnet';};
 AO.FCV.Monitor.Mode     = 'Simulator';
 AO.FCV.Monitor.DataType = 'Scalar';
@@ -261,7 +258,7 @@ AO.QS.DeviceList  = getDeviceList(10, 8);
 AO.QS.ElementList = (1:size(AO.QS.DeviceList,1))';
 AO.QS.Status      = ones(size(AO.QS.DeviceList,1),1);
 AO.QS.Position    = [];
-AO.QS.ExcitationCurves = sirius_getexcdata(repmat('sima-QS',size(AO.QS.DeviceList,1),1));
+AO.QS.ExcitationCurves = sirius_getexcdata(repmat('si-quadrupole-qs',size(AO.QS.DeviceList,1),1));
 AO.QS.Monitor.MemberOf = {'Horizontal'; 'COR'; 'QS'; 'Magnet';};
 AO.QS.Monitor.ChannelNames = sirius_si_getname(AO.QS.FamilyName, 'Monitor', AO.QS.DeviceList);
 AO.QS.Monitor.Mode     = 'Simulator';
@@ -478,7 +475,7 @@ A.(fam).Status      = ones(size(A.(fam).DeviceList,1),1);
 A.(fam).Position    = [];
 A.(fam).FamilyPS    = fam_fam;
 A.(fam).ShuntPS     = fam_shunt;
-A.(fam).ExcitationCurves = sirius_getexcdata(repmat(['sima-',type],size(A.(fam).DeviceList,1),1)); 
+A.(fam).ExcitationCurves = sirius_getexcdata(repmat(['si-quadrupole-',type],size(A.(fam).DeviceList,1),1)); 
 A.(fam).Monitor.MemberOf      = {};
 A.(fam).Monitor.Mode          = 'Simulator';
 A.(fam).Monitor.DataType      = 'Scalar';
@@ -549,14 +546,13 @@ A.(fam_fam).Setpoint.DeltaRespMat = 0.5;
 
 function A = get_AO_sexts(A,fam,num_el_arc)
 
-type = fam(1:2);
 A.(fam).FamilyName = fam;
 A.(fam).MemberOf    = {'PlotFamily'; fam; 'SEXT'; 'Magnet'; 'Chromaticity Corrector'};
 A.(fam).DeviceList  = getDeviceList(5, num_el_arc);
 A.(fam).ElementList = (1:size(A.(fam).DeviceList,1))';
 A.(fam).Status      = ones(size(A.(fam).DeviceList,1),1);
 A.(fam).Position    = [];
-A.(fam).ExcitationCurves = sirius_getexcdata(repmat(['sima-',type],size(A.(fam).DeviceList,1),1));
+A.(fam).ExcitationCurves = sirius_getexcdata(repmat('si-sextupole-s15-fam',size(A.(fam).DeviceList,1),1));
 A.(fam).Monitor.MemberOf = {};
 A.(fam).Monitor.Mode = 'Simulator';
 A.(fam).Monitor.DataType = 'Scalar';
