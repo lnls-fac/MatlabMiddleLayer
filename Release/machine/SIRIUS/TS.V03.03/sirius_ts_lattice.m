@@ -121,6 +121,8 @@ h10 = rbend_sirius('B', 0.05,  d2r * 0.0089 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0
 mbend = marker('mB',  'IdentityPass');
 
 bend = [h10 h9 h8 h7 h6 h5 h4 h3 h2 h1 mbend h1 h2 h3 h4 h5 h6 h7 h8 h9 h10];
+%[bend, ~] = sirius_ts_b_segmented_model(energy, famname, passmethod);
+
 
 % -- pulsed magnets --
 
