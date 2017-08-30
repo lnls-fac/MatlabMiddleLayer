@@ -1,4 +1,4 @@
-function sirius_init
+function sirius_si_init
 %SIRIUSINIT - MML initialization file for the VUV ring at sirius3
 % 
 %  See also setoperationalmode
