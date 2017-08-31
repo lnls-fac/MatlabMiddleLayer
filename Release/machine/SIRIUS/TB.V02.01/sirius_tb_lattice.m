@@ -49,9 +49,9 @@ l100 = drift('l100', 0.100,    'DriftPass');
 l150 = drift('l150', 0.150,    'DriftPass');
 l200 = drift('l200', 0.200,    'DriftPass');
 l165 = drift('l165', 0.165000, 'DriftPass');
-l075 = drift('l165', 0.075429, 'DriftPass');
+l075 = drift('l075', 0.075429, 'DriftPass');
 l110 = drift('l110', 0.110429, 'DriftPass');
-l199 = drift('ld1p', 0.199629, 'DriftPass');
+l199 = drift('l199', 0.199629, 'DriftPass');
 l187 = drift('l187', 0.186929, 'DriftPass');
 
 lb1p     = drift('lb1p', 0.125,  'DriftPass');
