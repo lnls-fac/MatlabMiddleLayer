@@ -28,7 +28,7 @@ end
 the_ring = the_ring0;
 q = q1_idx;
 for i=1:length(q)
-    K = getcellstruct(the_ring, 'K', q{i});
+    K = getcellstruct(the_ring, 'PolynomB', q{i}, 1, 2);
     newK = K + step_K/2;
     the_ring = setcellstruct(the_ring, 'K', q{i}, newK);
     the_ring = setcellstruct(the_ring, 'PolynomB', q{i}, newK, 1, 2);
@@ -36,7 +36,7 @@ end
 [~, tunes_p]  = twissring(the_ring,0,1:length(the_ring)+1);
 the_ring = the_ring0;
 for i=1:length(q)
-    K = getcellstruct(the_ring, 'K', q{i});
+    K = getcellstruct(the_ring, 'PolynomB', q{i}, 1, 2);
     newK = K - step_K/2;
     the_ring = setcellstruct(the_ring, 'K', q{i}, newK);
     the_ring = setcellstruct(the_ring, 'PolynomB', q{i}, newK, 1, 2);
@@ -48,7 +48,7 @@ M(:,1) = (tunes_p - tunes_n)/step_K;
 the_ring = the_ring0;
 q = q2_idx;
 for i=1:length(q)
-    K = getcellstruct(the_ring, 'K', q{i});
+    K = getcellstruct(the_ring, 'PolynomB', q{i}, 1, 2);
     newK = K + step_K/2;
     the_ring = setcellstruct(the_ring, 'K', q{i}, newK);
     the_ring = setcellstruct(the_ring, 'PolynomB', q{i}, newK, 1, 2);
@@ -56,7 +56,7 @@ end
 [~, tunes_p]  = twissring(the_ring,0,1:length(the_ring)+1);
 the_ring = the_ring0;
 for i=1:length(q)
-    K = getcellstruct(the_ring, 'K', q{i});
+    K = getcellstruct(the_ring, 'PolynomB', q{i}, 1, 2);
     newK = K - step_K/2;
     the_ring = setcellstruct(the_ring, 'K', q{i}, newK);
     the_ring = setcellstruct(the_ring, 'PolynomB', q{i}, newK, 1, 2);
@@ -71,13 +71,13 @@ dK = (M \ v);
 % applies factor
 the_ring = the_ring0;
 for i=1:length(q1_idx)
-    K = getcellstruct(the_ring, 'K', q1_idx{i});
+    K = getcellstruct(the_ring, 'PolynomB', q1_idx{i}, 1, 2);
     newK = K + dK(1);
     the_ring = setcellstruct(the_ring, 'K', q1_idx{i}, newK);
     the_ring = setcellstruct(the_ring, 'PolynomB', q1_idx{i}, newK, 1, 2);
 end
 for i=1:length(q2_idx)
-    K = getcellstruct(the_ring, 'K', q2_idx{i});
+    K = getcellstruct(the_ring, 'PolynomB', q2_idx{i}, 1, 2);
     newK = K + dK(2);
     the_ring = setcellstruct(the_ring, 'K', q2_idx{i}, newK);
     the_ring = setcellstruct(the_ring, 'PolynomB', q2_idx{i}, newK, 1, 2);
