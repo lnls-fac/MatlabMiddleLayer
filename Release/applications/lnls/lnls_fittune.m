@@ -1,4 +1,4 @@
-function [the_ring tunes1 dK] = lnls_fittune(the_ring0, goal_tunes, q1, q2, step_K)
+function [the_ring, tunes1, dK] = lnls_fittune(the_ring0, goal_tunes, q1, q2, step_K)
 
 if ~exist('step_K','var'), step_K=0.001; end;
 
