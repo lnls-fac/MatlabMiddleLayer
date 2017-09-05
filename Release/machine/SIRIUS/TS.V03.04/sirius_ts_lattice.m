@@ -9,7 +9,7 @@ d2r = pi/180;
 
 % --- system parameters ---
 energy = 3e9;
-lattice_version = 'TS.V03.03';
+lattice_version = 'TS.V03.04';
 mode = 'M';
 version = '1';
 mode_version = [mode version];
@@ -108,20 +108,21 @@ qd4b    = quadrupole('QD4B', 0.14, qd4bh_strength, quad_pass_method); % qd
 %           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
 %bend      = [h1 mbend h2];      
 
-f = 5.011542/5.333333;
-h1  = rbend_sirius('B', 0.196, d2r * 0.8597 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.163 -1.443 0] * f, bend_pass_method);
-h2  = rbend_sirius('B', 0.192, d2r * 0.8467 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.154 -1.418 0] * f, bend_pass_method);
-h3  = rbend_sirius('B', 0.182, d2r * 0.8099 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.14 -1.403 0] * f, bend_pass_method);
-h4  = rbend_sirius('B', 0.010, d2r * 0.0379 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.175 -1.245 0] * f, bend_pass_method);
-h5  = rbend_sirius('B', 0.010, d2r * 0.0274 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.115 -0.902 0] * f, bend_pass_method);
-h6  = rbend_sirius('B', 0.013, d2r * 0.0244 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.042 -1.194 0] * f, bend_pass_method);
-h7  = rbend_sirius('B', 0.017, d2r * 0.0216 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.008 -1.408 0] * f, bend_pass_method);
-h8  = rbend_sirius('B', 0.020, d2r * 0.0166 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0] * f, bend_pass_method);
-h9  = rbend_sirius('B', 0.030, d2r * 0.0136 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0] * f, bend_pass_method);
-h10 = rbend_sirius('B', 0.05,  d2r * 0.0089 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0] * f, bend_pass_method);
-mbend = marker('mB',  'IdentityPass');
-bend = [h10 h9 h8 h7 h6 h5 h4 h3 h2 h1 mbend h1 h2 h3 h4 h5 h6 h7 h8 h9 h10];
+% f = 5.011542/5.333333;
+% h1  = rbend_sirius('B', 0.196, d2r * 0.8597 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.163 -1.443 0] * f, bend_pass_method);
+% h2  = rbend_sirius('B', 0.192, d2r * 0.8467 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.154 -1.418 0] * f, bend_pass_method);
+% h3  = rbend_sirius('B', 0.182, d2r * 0.8099 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.14 -1.403 0] * f, bend_pass_method);
+% h4  = rbend_sirius('B', 0.010, d2r * 0.0379 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.175 -1.245 0] * f, bend_pass_method);
+% h5  = rbend_sirius('B', 0.010, d2r * 0.0274 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.115 -0.902 0] * f, bend_pass_method);
+% h6  = rbend_sirius('B', 0.013, d2r * 0.0244 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.042 -1.194 0] * f, bend_pass_method);
+% h7  = rbend_sirius('B', 0.017, d2r * 0.0216 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.008 -1.408 0] * f, bend_pass_method);
+% h8  = rbend_sirius('B', 0.020, d2r * 0.0166 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0] * f, bend_pass_method);
+% h9  = rbend_sirius('B', 0.030, d2r * 0.0136 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0] * f, bend_pass_method);
+% h10 = rbend_sirius('B', 0.05,  d2r * 0.0089 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0] * f, bend_pass_method);
+% mbend = marker('mB',  'IdentityPass');
+% bend = [h10 h9 h8 h7 h6 h5 h4 h3 h2 h1 mbend h1 h2 h3 h4 h5 h6 h7 h8 h9 h10];
 
+[bend, ~] = sirius_ts_b_segmented_model(energy, 'B', bend_pass_method);
 
 
 % -- pulsed magnets --
