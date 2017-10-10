@@ -61,7 +61,9 @@ end
 try
     % QF
     AO.QF.AT.ATType = 'QUAD';
-    AO.QF.AT.ATIndex = buildatindex(AO.QF.FamilyName, Indices.QF);
+    tmp = buildatindex(AO.QF.FamilyName, Indices.QF)';
+    tmp = circshift(tmp(:),1);
+    AO.QF.AT.ATIndex = reshape(tmp, 2, [])';
     AO.QF.Position = findspos(THERING, AO.QF.AT.ATIndex(:,1));
 catch
     warning('QF family not found in the model.');

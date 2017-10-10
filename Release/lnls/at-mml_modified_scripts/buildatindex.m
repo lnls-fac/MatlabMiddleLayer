@@ -30,6 +30,10 @@ function ATIndexDev = buildatindex(Family, FamName)
 %  Modified by Laurent S. Nadolski
 %  add FamName per default
 
+% Ximenes 2017-10-10:
+%
+% This algorithm does not work for cases where THERING starts in the
+% middle of magnet, as for QF in Sirius booster, for example!
 
 global THERING
 

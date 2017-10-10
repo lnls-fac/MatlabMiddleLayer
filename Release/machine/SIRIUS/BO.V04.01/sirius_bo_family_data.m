@@ -26,3 +26,8 @@ end
 for i=1:length(fams)
     data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
 end
+
+% fix correct ATIndex for QF (because THERING starts in its middle)
+tmp = data.QF.ATIndex';
+tmp = circshift(tmp(:),1);
+data.QF.ATIndex = reshape(tmp, 2, [])';
