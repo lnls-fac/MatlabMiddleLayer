@@ -546,13 +546,19 @@ A.(fam_fam).Setpoint.DeltaRespMat = 0.5;
 
 function A = get_AO_sexts(A,fam,num_el_arc)
 
+if strfind(fam, 'SD')
+    fname = 'si-sextupole-s15-sd-fam';
+else
+    fname = 'si-sextupole-s15-sf-fam';
+end
+
 A.(fam).FamilyName = fam;
 A.(fam).MemberOf    = {'PlotFamily'; fam; 'SEXT'; 'Magnet'; 'Chromaticity Corrector'};
 A.(fam).DeviceList  = getDeviceList(5, num_el_arc);
 A.(fam).ElementList = (1:size(A.(fam).DeviceList,1))';
 A.(fam).Status      = ones(size(A.(fam).DeviceList,1),1);
 A.(fam).Position    = [];
-A.(fam).ExcitationCurves = sirius_getexcdata(repmat('si-sextupole-s15-fam',size(A.(fam).DeviceList,1),1));
+A.(fam).ExcitationCurves = sirius_getexcdata(repmat(fname,size(A.(fam).DeviceList,1),1));
 A.(fam).Monitor.MemberOf = {};
 A.(fam).Monitor.Mode = 'Simulator';
 A.(fam).Monitor.DataType = 'Scalar';
