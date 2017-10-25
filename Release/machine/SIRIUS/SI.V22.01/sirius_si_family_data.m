@@ -2,7 +2,7 @@ function data = sirius_si_family_data(the_ring)
 
 data.B1.nr_segs    = 30;
 data.B2.nr_segs    = 36;
-data.BC.nr_segs    = 30;
+data.BC.nr_segs    = 34;
 
 data.QFA.nr_segs  = 1;
 data.QDA.nr_segs  = 1;
@@ -190,16 +190,6 @@ idx = sort(idx);
 data.rBPM.ATIndex = reshape(idx,data.rBPM.nr_segs,[]);
 data.rBPM.ATIndex = data.rBPM.ATIndex';
 
-% QS - skew quad correctors (All)
-idx = [];
-idx = [idx; data.SFA0.ATIndex];
-idx = [idx; data.SDB0.ATIndex];
-idx = [idx; data.SDP0.ATIndex];
-idx = [idx; data.FCQ.ATIndex];
-idx = sort(idx);
-data.QS.ATIndex = reshape(idx,data.QS.nr_segs,[]);
-data.QS.ATIndex = data.QS.ATIndex';
-
 % QSS - skew quad correctors (in sextupoles)
 idx = [];
 idx = [idx; data.SFA0.ATIndex];
@@ -234,8 +224,8 @@ for i=1:length(indqs)
     end
 end
 idx = sort(idx);
-data.QS.ATIndex = reshape(idx,data.QS.nr_segs,[]);
-data.QS.ATIndex = data.QS.ATIndex';
+data.QSS.ATIndex = reshape(idx,data.QSS.nr_segs,[]);
+data.QSS.ATIndex = data.QSS.ATIndex';
 
 
 % In this version of the lattice, there are QS correctors in the sextupoles
@@ -261,6 +251,13 @@ for i=1:length(indqs)
         end
     end
 end
+idx = sort(idx);
+data.QSS.ATIndex = reshape(idx,data.QSS.nr_segs,[]);
+data.QSS.ATIndex = data.QSS.ATIndex';
+
+
+% QS - skew quad correctors (All)
+idx = [data.QSS.ATIndex; data.FCQ.ATIndex];
 idx = sort(idx);
 data.QS.ATIndex = reshape(idx,data.QS.nr_segs,[]);
 data.QS.ATIndex = data.QS.ATIndex';
