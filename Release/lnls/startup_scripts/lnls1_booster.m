@@ -2,7 +2,7 @@
 
 dr = pwd;
 
-mml_root = fullfile(lnls_get_root_folder(), 'code', 'MatlabMiddleLayer', 'Release');
+mml_root = fullfile(lnls_get_root_folder(), 'MatlabMiddleLayer', 'Release');
 
 % desconecta com servidor se conexao existir
 addpath(fullfile(mml_root, 'mml'));
