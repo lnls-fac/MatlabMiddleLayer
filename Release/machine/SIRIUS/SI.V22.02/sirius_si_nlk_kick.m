@@ -129,7 +129,7 @@ maxfield = [ ...
 
 if  ~exist('fit_monomials','var')
     %fit_monomials = [2,3,4,5,6,7,8,9,10];
-    fit_monomials = [3,5,7,9,11];
+    fit_monomials = [0,1,2,3,4,5,6,7,8,9,10,11];
 end
 
 
