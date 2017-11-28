@@ -1,8 +1,18 @@
-function [x, integ_field, kickx, LPolyB] = sirius_si_InjNLK_kick(strength, fit_monomials, plot_flag)
+function [x, integ_field, kickx, LPolyB] = sirius_si_nlk_kick(strength, fit_monomials, plot_flag, r0)
 
 if ~exist('plot_flag','var')
     plot_flag = false;
 end
+
+if ~exist('r0','var')
+    r0 = 0.0;
+end
+
+if ~exist('strength','var')
+    strength = 0.565976805957669;
+    % -2.5 mrad @ -8 mm (nominal kick)
+end
+
 
 % NLK model without iron
 % ======================
@@ -118,9 +128,9 @@ maxfield = [ ...
 % ];
 
 if  ~exist('fit_monomials','var')
-    fit_monomials = [2,3,4,5,6,7,8,9,10];
+    %fit_monomials = [2,3,4,5,6,7,8,9,10];
+    fit_monomials = [3,5,7,9,11];
 end
-
 
 
 x = maxfield(:,1)*0.001;
@@ -128,17 +138,30 @@ x = maxfield(:,1)*0.001;
 integ_field = strength * maxfield(:,2);
 kickx = integ_field / brho;
 
-[coeffs, fit_kickx] = lnls_polyfit(x, kickx, fit_monomials);
+[coeffs, fit_kickx] = lnls_polyfit(x - r0, kickx, fit_monomials);
 if plot_flag
     figure; hold all; 
-    %plot(1000*x, 1000*kickx); 
-    plot(1000*x,1000*fit_kickx, 'Color', [0,0.6,0]);
+    plot(1000*(x-r0), 1000*kickx); 
+    plot(1000*(x-r0),1000*fit_kickx, 'Color', [0,0.6,0]);
     xlabel('X [mm]'); ylabel('Kick @ 3 GeV [mrad]');
     title('NLK Profile'); 
     grid('on');
-    %legend({'data points', 'fitted curve'});
+    legend({'data points', 'fitted curve'});
 end
+
 
 % LPolyB = PolynomB * L
 LPolyB = zeros(1,1+max(fit_monomials));
 LPolyB(1+fit_monomials) = -coeffs;
+
+
+fprintf('Integrated multipoles [T.m] (@ r0 == %f mm:\n', 1000*r0);
+fprintf('harmonics: ');
+for i=1:length(fit_monomials)
+    fprintf('%i ', fit_monomials(i));
+end; fprintf('\n');
+for i=1:length(fit_monomials)
+    fprintf('%+.4e %+.4e  ', LPolyB(i) * brho, 0);
+end
+fprintf('\n')
+
