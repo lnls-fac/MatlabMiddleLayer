@@ -10,10 +10,10 @@ function sirius(varargin)
 
 Disconnect = false;
 
-default_tb_version = 'TB.V02.01' ;
+default_tb_version = 'TB.V02.01';
 default_bo_version = 'BO.V04.01';
-default_ts_version = 'TS.V03.04' ;
-default_si_version = 'SI.V22.02' ;
+default_ts_version = 'TS.V03.04';
+default_si_version = 'SI.V22.02';
 default_link       = 'NONE';
 
 default_version = default_si_version;
@@ -34,6 +34,8 @@ for i=length(varargin):-1:1
                 default_version = default_si_version;
             elseif strcmpi(varargin{i}, 'LABCA')
                 default_link = 'LABCA';
+            elseif strcmpi(varargin{i}, 'CA_MATLAB')
+                default_link = 'CA_MATLAB';
             end
         else
             default_version = varargin{i};
@@ -78,6 +80,14 @@ if strcmpi(default_link, 'LABCA')
     % Luana 2015-08-25
     setpathsirius('SIRIUS', default_version, 'LABCA');
     lcaSetTimeout(.01);
+elseif strcmpi(default_link, 'CA_MATLAB')
+    setpathsirius('SIRIUS', default_version, 'CA_MATLAB');
+    ca_matlab_lib = fullfile(root_folder, 'MatlabMiddleLayer','Release','links','ca_matlab','ca_matlab-1.0.0.jar');
+    javaaddpath(ca_matlab_lib);
+    import ch.psi.jcae.*;
+    ca_properties = java.util.Properties();
+%     ca_context = Context(ca_properties);
+%     setappdata(0, 'ca_context', ca_context);
 else
     setpathsirius('SIRIUS', default_version, 'NONE');
 end

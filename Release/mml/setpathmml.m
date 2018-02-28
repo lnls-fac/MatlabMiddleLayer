@@ -45,8 +45,8 @@ for i = length(varargin):-1:1
     elseif strcmpi(varargin{i},'lnls1_link')
         LinkFlag = 'lnls1_link';
         varargin(i) = [];
-    elseif strcmpi(varargin{i},'sirius_link')
-        LinkFlag = 'sirius_link';
+    elseif strcmpi(varargin{i},'CA_MATLAB')
+        LinkFlag = 'CA_MATLAB';
         varargin(i) = [];
     elseif strcmpi(varargin{i},'UCODE')
         LinkFlag = 'UCODE';
@@ -172,7 +172,7 @@ if isempty(LinkFlag)
         case 'LNLS1'
             LinkFlag = 'lnls1_link';
         case 'SIRIUS'
-            LinkFlag = 'sirius_link';
+            LinkFlag = 'CA_MATLAB';
         case {'NSRC','SPS'}
             LinkFlag = 'OPC';
         case {'VUV','XRAY'}
@@ -336,10 +336,10 @@ if ~isdeployed_local
             addpath(fullfile(MMLROOT,'links','lnls_link','lnls1_link'), '-begin');
             addpath(fullfile(MMLROOT,'mml', 'links', 'lnls_link','lnls1_link'), '-begin');
             
-         case 'SIRIUS_LINK'
-            fprintf('   Appending MATLAB path for sirius_link control \n');
-            addpath(fullfile(MMLROOT,'links','lnls_link','sirius_link'), '-begin');
-            addpath(fullfile(MMLROOT,'mml', 'links', 'lnls_link','sirius_link'), '-begin');
+         case 'CA_MATLAB'
+            fprintf('   Appending MATLAB path for CA_MATLAB control \n');
+            addpath(fullfile(MMLROOT,'links','ca_matlab'), '-begin');
+            addpath(fullfile(MMLROOT,'mml', 'links', 'lnls_link','ca_matlab'), '-begin');
 
         case 'OPC'
             fprintf('   Appending MATLAB path for OPC control \n');
