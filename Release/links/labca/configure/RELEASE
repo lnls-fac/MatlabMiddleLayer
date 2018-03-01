@@ -12,12 +12,15 @@
 # If you don't want to install into $(TOP) then
 # define INSTALL_LOCATION_APP here
 
-#INSTALL_LOCATION_APP=<fullpathname>
+INSTALL_LOCATION_APP=/home/fac_files/lnls-fac/MatlabMiddleLayer/Release/links/labca/
 
 ##########################################
 ## Tell us where EPICS base is installed
-#EPICS_BASE=/home/als1/acct/alsbase/epics_release/R3.14.9/base
-EPICS_BASE=/usr/local/epics/R3.14/base
+-include $(TOP)/RELEASE_SITE
+-include $(TOP)/configure/RELEASE.local
+#EPICS_BASE=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
+#EPICS_BASE=/home/till/epics/base/base-3-14-12
+EPICS_BASE=/opt/epics/base
 
 ##########################################
 # For the following definitions
@@ -48,7 +51,13 @@ EPICS_BASE=/usr/local/epics/R3.14/base
 # Tell us where SCILAB is installed (only
 # needed if MAKEFOR != MATLAB [in CONFIG])
 
-#SCILABDIR=/usr/lib/scilab-4.1
+ifndef SCILABDIR
+ifneq '$(wildcard /usr/bin/scilab)' ''
+SCILABDIR=/usr
+else
+SCILABDIR=/afs/slac/g/lcls/package/scilab/scilab-6.0.0
+endif
+endif
 
 #you can also use EPICS_HOST_ARCH - specific
 #paths -- see above
@@ -57,8 +66,7 @@ EPICS_BASE=/usr/local/epics/R3.14/base
 # Tell us where MATLAB is installed (only
 # needed if MAKEFOR=MATLAB [in CONFIG])
 
-MATLABDIR=/usr/local/MATLAB/R2011b
-#MATLABDIR=/home/als/alsbase/matlab_2007a
+MATLABDIR=/usr/local/MATLAB/R2016b
 
 #you can also use EPICS_HOST_ARCH - specific
 #paths -- see above
@@ -72,27 +80,15 @@ MATLABDIR=/usr/local/MATLAB/R2011b
 # other platforms) where the 'libmex.lib' and
 # 'libmx.lib' are found.
 
-#MATLIB_SUBDIR=win32/microsoft/msvc70
-
-######### NOTHING USER-CONFIGURABLE BELOW HERE
+# older matlab needed 'msvcXY' subdir
 #
-#         SLAC specific paths are optionally 
-#         included from RELEASE-SLAC; the file
-#         (not included in the distribution) is used
-#         by me (TS) for development + testing)
-#         I use this setup so that I can leave
-#         this RELEASE template alone...
-#########
-
-# convertRelease.pl is too stupid to recognize '-include'
-# so we use this ugly trick:
-#ifndef EPICS_BASE
-# if we have no definition of EPICS_BASE; hence
-# there must be RELEASE-SLAC file
-#include $(TOP)/configure/RELEASE-SLAC
-#else
-# otherwise it's optional but convertRelease.pl will
-# find the 'include' line above and use it to
-# generate CONFIG_APP_INCLUDE
-#-include $(TOP)/configure/RELEASE-SLAC
-#endif
+#MATLIB_SUBDIR=win32/microsoft/msvc70
+#
+# more recent matlab just uses win32/microsoft
+#
+#MATLIB_SUBDIR=win32/microsoft
+#
+# or win64/microsoft
+#
+#MATLIB_SUBDIR=win64/microsoft
+#

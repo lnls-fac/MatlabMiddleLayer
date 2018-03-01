@@ -1,6 +1,6 @@
 function sirius_si_init
 %SIRIUSINIT - MML initialization file for the VUV ring at sirius3
-% 
+%
 %  See also setoperationalmode
 
 % 2012-07-10 Modificado para sirius3_lattice_e025 - Afonso
@@ -22,7 +22,7 @@ AO.B1.DeviceList  = getDeviceList(10,4);
 AO.B1.ElementList = (1:size(AO.B1.DeviceList,1))';
 AO.B1.Status      = ones(size(AO.B1.DeviceList,1),1);
 AO.B1.Position    = [];
-AO.B1.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B1.DeviceList,1),1)); 
+AO.B1.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B1.DeviceList,1),1));
 
 AO.B1.Monitor.MemberOf = {};
 AO.B1.Monitor.Mode = 'Simulator';
@@ -54,7 +54,7 @@ AO.B2.DeviceList  = getDeviceList(10,4);
 AO.B2.ElementList = (1:size(AO.B2.DeviceList,1))';
 AO.B2.Status      = ones(size(AO.B2.DeviceList,1),1);
 AO.B2.Position    = [];
-AO.B2.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B2.DeviceList,1),1)); 
+AO.B2.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B2.DeviceList,1),1));
 
 AO.B2.Monitor.MemberOf = {};
 AO.B2.Monitor.Mode = 'Simulator';
@@ -87,7 +87,7 @@ AO.BC.Status      = ones(size(AO.BC.DeviceList,1),1);
 AO.BC.Position    = [];
 
 
-%% quadrupoles 
+%% quadrupoles
 AO = get_AO_quads(AO,'QFA', 'q20-fam', 2);
 AO = get_AO_quads(AO,'QDA', 'q14-fam', 2);
 AO = get_AO_quads(AO,'QFB', 'q30-fam', 4);
@@ -157,7 +157,7 @@ AO.CH.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.CH.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.CH.Setpoint.Range        = [-10 10];
 AO.CH.Setpoint.Tolerance    = 0.00001;
-AO.CH.Setpoint.DeltaRespMat =  5e-4; 
+AO.CH.Setpoint.DeltaRespMat =  5e-4;
 
 % CV
 AO.CV.FamilyName  = 'CV';
@@ -187,7 +187,7 @@ AO.CV.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.CV.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.CV.Setpoint.Range        = [-10 10];
 AO.CV.Setpoint.Tolerance    = 0.00001;
-AO.CV.Setpoint.DeltaRespMat =  5e-4; 
+AO.CV.Setpoint.DeltaRespMat =  5e-4;
 
 % FCH
 AO.FCH.FamilyName  = 'FCH';
@@ -218,7 +218,7 @@ AO.FCH.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.FCH.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.FCH.Setpoint.Range        = [-10 10];
 AO.FCH.Setpoint.Tolerance    = 0.00001;
-AO.FCH.Setpoint.DeltaRespMat =  5e-4; 
+AO.FCH.Setpoint.DeltaRespMat =  5e-4;
 
 % FCV
 AO.FCV.FamilyName  = 'FCV';
@@ -249,7 +249,7 @@ AO.FCV.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.FCV.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.FCV.Setpoint.Range        = [-10 10];
 AO.FCV.Setpoint.Tolerance    = 0.00001;
-AO.FCV.Setpoint.DeltaRespMat =  5e-4; 
+AO.FCV.Setpoint.DeltaRespMat =  5e-4;
 
 % QS
 AO.QS.FamilyName  = 'QS';
@@ -279,7 +279,7 @@ AO.QS.Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 AO.QS.Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 AO.QS.Setpoint.Range        = [-10 10];
 AO.QS.Setpoint.Tolerance    = 0.00001;
-AO.QS.Setpoint.DeltaRespMat = 5e-4; 
+AO.QS.Setpoint.DeltaRespMat = 5e-4;
 
 % BPMx
 AO.BPMx.FamilyName  = 'BPMx';
@@ -334,7 +334,7 @@ AO.Tune.CommonNames = ['TuneX'; 'TuneY'; 'TuneS'];
 
 AO.Tune.Monitor.MemberOf   = {'Tune'};
 AO.Tune.Monitor.ChannelNames = sirius_si_getname(AO.Tune.FamilyName, 'Monitor');
-AO.Tune.Monitor.Mode = 'Simulator'; 
+AO.Tune.Monitor.Mode = 'Simulator';
 AO.Tune.Monitor.DataType = 'Scalar';
 AO.Tune.Monitor.HW2PhysicsParams = 1;
 AO.Tune.Monitor.Physics2HWParams = 1;
@@ -399,35 +399,35 @@ AO.RF.Power.MemberOf          = {};
 AO.RF.Power.Mode              = 'Simulator';
 AO.RF.Power.DataType          = 'Scalar';
 AO.RF.Power.ChannelNames      = '';          % ???
-AO.RF.Power.HW2PhysicsParams  = 1;         
+AO.RF.Power.HW2PhysicsParams  = 1;
 AO.RF.Power.Physics2HWParams  = 1;
 AO.RF.Power.Units             = 'Hardware';
-AO.RF.Power.HWUnits           = 'MWatts';           
+AO.RF.Power.HWUnits           = 'MWatts';
 AO.RF.Power.PhysicsUnits      = 'MWatts';
-AO.RF.Power.Range             = [-inf inf];  % ???  
-AO.RF.Power.Tolerance         = inf;  % ???  
+AO.RF.Power.Range             = [-inf inf];  % ???
+AO.RF.Power.Tolerance         = inf;  % ???
 
 AO.RF.Phase.MemberOf          = {'RF'; 'Phase'};
 AO.RF.Phase.Mode              = 'Simulator';
 AO.RF.Phase.DataType          = 'Scalar';
-AO.RF.Phase.ChannelNames      = 'SRF1:STN:PHASE:CALC';    % ???  
+AO.RF.Phase.ChannelNames      = 'SRF1:STN:PHASE:CALC';    % ???
 AO.RF.Phase.Units             = 'Hardware';
-AO.RF.Phase.HW2PhysicsParams  = 1; 
+AO.RF.Phase.HW2PhysicsParams  = 1;
 AO.RF.Phase.Physics2HWParams  = 1;
-AO.RF.Phase.HWUnits           = 'Degrees';  
+AO.RF.Phase.HWUnits           = 'Degrees';
 AO.RF.Phase.PhysicsUnits      = 'Degrees';
 
 AO.RF.PhaseCtrl.MemberOf      = {'RF; Phase'; 'Control'};  % 'MachineConfig';
 AO.RF.PhaseCtrl.Mode              = 'Simulator';
 AO.RF.PhaseCtrl.DataType          = 'Scalar';
-AO.RF.PhaseCtrl.ChannelNames      = 'SRF1:STN:PHASE';    % ???     
+AO.RF.PhaseCtrl.ChannelNames      = 'SRF1:STN:PHASE';    % ???
 AO.RF.PhaseCtrl.Units             = 'Hardware';
-AO.RF.PhaseCtrl.HW2PhysicsParams  = 1;         
+AO.RF.PhaseCtrl.HW2PhysicsParams  = 1;
 AO.RF.PhaseCtrl.Physics2HWParams  = 1;
-AO.RF.PhaseCtrl.HWUnits           = 'Degrees';  
-AO.RF.PhaseCtrl.PhysicsUnits      = 'Degrees'; 
-AO.RF.PhaseCtrl.Range             = [-200 200];    % ??? 
-AO.RF.PhaseCtrl.Tolerance         = 10;    % ??? 
+AO.RF.PhaseCtrl.HWUnits           = 'Degrees';
+AO.RF.PhaseCtrl.PhysicsUnits      = 'Degrees';
+AO.RF.PhaseCtrl.Range             = [-200 200];    % ???
+AO.RF.PhaseCtrl.Tolerance         = 10;    % ???
 
 
 
@@ -444,13 +444,13 @@ AO.DCCT.Position                 = [];
 AO.DCCT.Monitor.MemberOf         = {};
 AO.DCCT.Monitor.Mode             = 'Simulator';
 AO.DCCT.Monitor.DataType         = 'Scalar';
-AO.DCCT.Monitor.ChannelNames     = [];    
-AO.DCCT.Monitor.HW2PhysicsParams = 1;    
+AO.DCCT.Monitor.ChannelNames     = [];
+AO.DCCT.Monitor.HW2PhysicsParams = 1;
 AO.DCCT.Monitor.Physics2HWParams = 1;
 AO.DCCT.Monitor.Units            = 'Hardware';
-AO.DCCT.Monitor.HWUnits          = 'Ampere';     
+AO.DCCT.Monitor.HWUnits          = 'Ampere';
 AO.DCCT.Monitor.PhysicsUnits     = 'Ampere';
-AO.DCCT.Monitor.ChannelNames     = repmat(sirius_si_getname(AO.DCCT.FamilyName, 'Monitor'), size(AO.DCCT.DeviceList,1), 1); 
+AO.DCCT.Monitor.ChannelNames     = repmat(sirius_si_getname(AO.DCCT.FamilyName, 'Monitor'), size(AO.DCCT.DeviceList,1), 1);
 
 % The operational mode sets the path, filenames, and other important parameters
 % Run setoperationalmode after most of the AO is built so that the Units and Mode fields
@@ -462,87 +462,87 @@ setao(AO);
 
 
 
-function A = get_AO_quads(A,fam,type,num_el_arc)
+function AO = get_AO_quads(AO,fam,type,num_el_arc)
 
-fam_shunt = [fam,'_shunt'];
-fam_fam = [fam,'_fam'];
+famTrim = [fam,'Trim'];
+famFam = [fam,'Fam'];
 
-A.(fam).FamilyName = fam;
-A.(fam).MemberOf    = {'PlotFamily'; fam; 'QUAD'; 'Magnet';type;'Tune Corrector'};
-A.(fam).DeviceList  = getDeviceList(5, num_el_arc);
-A.(fam).ElementList = (1:size(A.(fam).DeviceList,1))';
-A.(fam).Status      = ones(size(A.(fam).DeviceList,1),1);
-A.(fam).Position    = [];
-A.(fam).FamilyPS    = fam_fam;
-A.(fam).ShuntPS     = fam_shunt;
-A.(fam).ExcitationCurves = sirius_getexcdata(repmat(['si-quadrupole-',type],size(A.(fam).DeviceList,1),1)); 
-A.(fam).Monitor.MemberOf      = {};
-A.(fam).Monitor.Mode          = 'Simulator';
-A.(fam).Monitor.DataType      = 'Scalar';
-A.(fam).Monitor.Units         = 'Hardware';
-A.(fam).Monitor.HWUnits       = 'Ampere';
-A.(fam).Monitor.PhysicsUnits  = 'meter^-2';
-A.(fam).Monitor.SpecialFunctionGet = @sirius_si_quadget;
-A.(fam).Monitor.SpecialFunctionSet = @sirius_si_quadset;
-A.(fam).Monitor.HW2PhysicsFcn  = @sirius_hw2ph;
-A.(fam).Monitor.Physics2HWFcn  = @sirius_ph2hw;
-A.(fam).Setpoint.MemberOf     = {'MachineConfig'};
-A.(fam).Setpoint.Mode         = 'Simulator';
-A.(fam).Setpoint.DataType     = 'Scalar';
-A.(fam).Setpoint.Units        = 'Hardware';
-A.(fam).Setpoint.HWUnits      = 'Ampere';
-A.(fam).Setpoint.PhysicsUnits = 'meter^-2';
-A.(fam).Setpoint.SpecialFunctionGet = @sirius_si_quadget;
-A.(fam).Setpoint.SpecialFunctionSet = @sirius_si_quadset;
-A.(fam).Setpoint.HW2PhysicsFcn = @sirius_hw2ph;
-A.(fam).Setpoint.Physics2HWFcn = @sirius_ph2hw;
-A.(fam).Setpoint.Range        = [0 225];
-A.(fam).Setpoint.Tolerance    = 0.2;
-A.(fam).Setpoint.DeltaRespMat = 0.5; 
+AO.(fam).FamilyName = fam;
+AO.(fam).MemberOf    = {'PlotFamily'; fam; 'QUAD'; 'Magnet';type;'Tune Corrector'};
+AO.(fam).DeviceList  = getDeviceList(5, num_el_arc);
+AO.(fam).ElementList = (1:size(AO.(fam).DeviceList,1))';
+AO.(fam).Status      = ones(size(AO.(fam).DeviceList,1),1);
+AO.(fam).Position    = [];
+AO.(fam).FamilyPS    = famFam;
+AO.(fam).ShuntPS     = famTrim;
+AO.(fam).ExcitationCurves = sirius_getexcdata(repmat(['si-quadrupole-',type],size(AO.(fam).DeviceList,1),1));
+AO.(fam).Monitor.MemberOf      = {};
+AO.(fam).Monitor.Mode          = 'Simulator';
+AO.(fam).Monitor.DataType      = 'Scalar';
+AO.(fam).Monitor.Units         = 'Hardware';
+AO.(fam).Monitor.HWUnits       = 'Ampere';
+AO.(fam).Monitor.PhysicsUnits  = 'meter^-2';
+AO.(fam).Monitor.SpecialFunctionGet = @sirius_si_quadget;
+AO.(fam).Monitor.SpecialFunctionSet = @sirius_si_quadset;
+AO.(fam).Monitor.HW2PhysicsFcn  = @sirius_hw2ph;
+AO.(fam).Monitor.Physics2HWFcn  = @sirius_ph2hw;
+AO.(fam).Setpoint.MemberOf     = {'MachineConfig'};
+AO.(fam).Setpoint.Mode         = 'Simulator';
+AO.(fam).Setpoint.DataType     = 'Scalar';
+AO.(fam).Setpoint.Units        = 'Hardware';
+AO.(fam).Setpoint.HWUnits      = 'Ampere';
+AO.(fam).Setpoint.PhysicsUnits = 'meter^-2';
+AO.(fam).Setpoint.SpecialFunctionGet = @sirius_si_quadget;
+AO.(fam).Setpoint.SpecialFunctionSet = @sirius_si_quadset;
+AO.(fam).Setpoint.HW2PhysicsFcn = @sirius_hw2ph;
+AO.(fam).Setpoint.Physics2HWFcn = @sirius_ph2hw;
+AO.(fam).Setpoint.Range        = [0 225];
+AO.(fam).Setpoint.Tolerance    = 0.2;
+AO.(fam).Setpoint.DeltaRespMat = 0.5;
 
-A.(fam_shunt).FamilyName = fam_shunt;
-A.(fam_shunt).MemberOf    = {'PlotFamily'; fam_shunt;'PowerSupply'};
-A.(fam_shunt).DeviceList  = getDeviceList(5, num_el_arc);
-A.(fam_shunt).ElementList = (1:size(A.(fam_shunt).DeviceList,1))';
-A.(fam_shunt).Status      = ones(size(A.(fam_shunt).DeviceList,1),1);
-A.(fam_shunt).Position    = [];
-A.(fam_shunt).Monitor.MemberOf      = {};
-A.(fam_shunt).Monitor.Mode          = 'Simulator';
-A.(fam_shunt).Monitor.DataType      = 'Scalar';
-A.(fam_shunt).Monitor.ChannelNames  = sirius_si_getname(A.(fam).FamilyName, 'Monitor', A.(fam).DeviceList);
-A.(fam_shunt).Monitor.Units         = 'Hardware';
-A.(fam_shunt).Monitor.HWUnits       = 'Ampere';
-A.(fam_shunt).Setpoint.MemberOf     = {'MachineConfig'};
-A.(fam_shunt).Setpoint.Mode         = 'Simulator';
-A.(fam_shunt).Setpoint.DataType     = 'Scalar';
-A.(fam_shunt).Setpoint.ChannelNames = sirius_si_getname(A.(fam).FamilyName, 'Setpoint', A.(fam).DeviceList);
-A.(fam_shunt).Setpoint.Units        = 'Hardware';
-A.(fam_shunt).Setpoint.HWUnits      = 'Ampere';
-A.(fam_shunt).Setpoint.Range        = [0 225];
-A.(fam_shunt).Setpoint.Tolerance    = 0.2;
-A.(fam_shunt).Setpoint.DeltaRespMat = 0.5; 
+AO.(famTrim).FamilyName = famTrim;
+AO.(famTrim).MemberOf    = {'PlotFamily'; famTrim;'PowerSupply'};
+AO.(famTrim).DeviceList  = getDeviceList(5, num_el_arc);
+AO.(famTrim).ElementList = (1:size(AO.(famTrim).DeviceList,1))';
+AO.(famTrim).Status      = ones(size(AO.(famTrim).DeviceList,1),1);
+AO.(famTrim).Position    = [];
+AO.(famTrim).Monitor.MemberOf      = {};
+AO.(famTrim).Monitor.Mode          = 'Simulator';
+AO.(famTrim).Monitor.DataType      = 'Scalar';
+AO.(famTrim).Monitor.ChannelNames  = sirius_si_getname(AO.(fam).FamilyName, 'Monitor', AO.(fam).DeviceList);
+AO.(famTrim).Monitor.Units         = 'Hardware';
+AO.(famTrim).Monitor.HWUnits       = 'Ampere';
+AO.(famTrim).Setpoint.MemberOf     = {'MachineConfig'};
+AO.(famTrim).Setpoint.Mode         = 'Simulator';
+AO.(famTrim).Setpoint.DataType     = 'Scalar';
+AO.(famTrim).Setpoint.ChannelNames = sirius_si_getname(AO.(fam).FamilyName, 'Setpoint', AO.(fam).DeviceList);
+AO.(famTrim).Setpoint.Units        = 'Hardware';
+AO.(famTrim).Setpoint.HWUnits      = 'Ampere';
+AO.(famTrim).Setpoint.Range        = [0 225];
+AO.(famTrim).Setpoint.Tolerance    = 0.2;
+AO.(famTrim).Setpoint.DeltaRespMat = 0.5;
 
-A.(fam_fam).FamilyName = fam_fam;
-A.(fam_fam).MemberOf    = {'PlotFamily'; fam_fam; 'PowerSupply'};
-A.(fam_fam).DeviceList  = getDeviceList(5, num_el_arc);
-A.(fam_fam).ElementList = (1:size(A.(fam_fam).DeviceList,1))';
-A.(fam_fam).Status      = ones(size(A.(fam_fam).DeviceList,1),1);
-A.(fam_fam).Position    = [];
-A.(fam_fam).Monitor.MemberOf      = {};
-A.(fam_fam).Monitor.Mode          = 'Simulator';
-A.(fam_fam).Monitor.DataType      = 'Scalar';
-A.(fam_fam).Monitor.ChannelNames  = repmat(sirius_si_getname(A.(fam_fam).FamilyName, 'Monitor'), size(A.(fam_fam).DeviceList,1),1);
-A.(fam_fam).Monitor.Units         = 'Hardware';
-A.(fam_fam).Monitor.HWUnits       = 'Ampere';
-A.(fam_fam).Setpoint.MemberOf     = {'MachineConfig'};
-A.(fam_fam).Setpoint.Mode         = 'Simulator';
-A.(fam_fam).Setpoint.DataType     = 'Scalar';
-A.(fam_fam).Setpoint.ChannelNames = repmat(sirius_si_getname(A.(fam_fam).FamilyName, 'Setpoint'), size(A.(fam_fam).DeviceList,1),1);
-A.(fam_fam).Setpoint.Units        = 'Hardware';
-A.(fam_fam).Setpoint.HWUnits      = 'Ampere';
-A.(fam_fam).Setpoint.Range        = [0 225];
-A.(fam_fam).Setpoint.Tolerance    = 0.2;
-A.(fam_fam).Setpoint.DeltaRespMat = 0.5;
+AO.(famFam).FamilyName = famFam;
+AO.(famFam).MemberOf    = {'PlotFamily'; famFam; 'PowerSupply'};
+AO.(famFam).DeviceList  = getDeviceList(5, num_el_arc);
+AO.(famFam).ElementList = (1:size(AO.(famFam).DeviceList,1))';
+AO.(famFam).Status      = ones(size(AO.(famFam).DeviceList,1),1);
+AO.(famFam).Position    = [];
+AO.(famFam).Monitor.MemberOf      = {};
+AO.(famFam).Monitor.Mode          = 'Simulator';
+AO.(famFam).Monitor.DataType      = 'Scalar';
+AO.(famFam).Monitor.ChannelNames  = repmat(sirius_si_getname(AO.(famFam).FamilyName, 'Monitor'), size(AO.(famFam).DeviceList,1),1);
+AO.(famFam).Monitor.Units         = 'Hardware';
+AO.(famFam).Monitor.HWUnits       = 'Ampere';
+AO.(famFam).Setpoint.MemberOf     = {'MachineConfig'};
+AO.(famFam).Setpoint.Mode         = 'Simulator';
+AO.(famFam).Setpoint.DataType     = 'Scalar';
+AO.(famFam).Setpoint.ChannelNames = repmat(sirius_si_getname(AO.(famFam).FamilyName, 'Setpoint'), size(AO.(famFam).DeviceList,1),1);
+AO.(famFam).Setpoint.Units        = 'Hardware';
+AO.(famFam).Setpoint.HWUnits      = 'Ampere';
+AO.(famFam).Setpoint.Range        = [0 225];
+AO.(famFam).Setpoint.Tolerance    = 0.2;
+AO.(famFam).Setpoint.DeltaRespMat = 0.5;
 
 function A = get_AO_sexts(A,fam,num_el_arc)
 
@@ -579,7 +579,7 @@ A.(fam).Setpoint.HW2PhysicsFcn  = @sirius_hw2ph;
 A.(fam).Setpoint.Physics2HWFcn  = @sirius_ph2hw;
 A.(fam).Setpoint.Range         = [0 225];
 A.(fam).Setpoint.Tolerance     = 0.2;
-A.(fam).Setpoint.DeltaRespMat  = 0.5; 
+A.(fam).Setpoint.DeltaRespMat  = 0.5;
 
 
 function DList = getDeviceList(NSector, NDevices, varargin)
@@ -591,7 +591,7 @@ else
     InitialSector = varargin{1};
     InitialDevice = varargin{2};
 end
-    
+
 DList = [];
 DL = ones(NDevices,2);
 DL(:,2) = (1:NDevices)';
@@ -609,5 +609,3 @@ for i=1:size(DList,1)
 end
 
 DList = [DList(idx:size(DList,1), :) ; DList(1:idx-1, :)];
-
-
