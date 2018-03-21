@@ -114,8 +114,8 @@ if size(Amps,1) == 1 && size(DeviceList,1) > 1
     Amps = ones(size(DeviceList,1),1) * Amps;
 end
 
-if isfamily('bc')  
-    BCIndex = family2atindex('bc');
+if isfamily('BC')  
+    BCIndex = family2atindex('BC');
     BCAngle = 0;
     for i=1:size(BCIndex,1)
         for j=1:size(BCIndex,2)
