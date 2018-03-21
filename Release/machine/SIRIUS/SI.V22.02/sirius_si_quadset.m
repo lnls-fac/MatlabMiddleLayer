@@ -11,7 +11,7 @@ if size(AM,1) ~= size(DeviceList,1)
     elseif size(AM,1) == 1 && size(AM,2) == size(DeviceList,1)
         AM = AM.';
     else
-        error('Setpoint size must equal the device list size or be a scalar.');
+        error('Setpoint size must be equal the device list size or be a scalar.');
     end
 end
 

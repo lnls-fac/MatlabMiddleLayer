@@ -1,4 +1,4 @@
-function [AM, tout, DataTime, ErrorFlag] = sirius_si_quadget(Family, Field, DeviceList, t)
+function [AM, tout, DataTime, ErrorFlag] = sirius_si_quadget(Family, Field, DeviceList)
 %SIRIUS_QUADGET - Combine reading of quadrupole shunts and families power supplies to return values for individual quadrupoles.
 
 % Starting time
