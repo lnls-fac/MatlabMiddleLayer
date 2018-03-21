@@ -61,23 +61,23 @@ catch
 end
 
 try
-    % QFA_fam
-    AO.QFA_fam.AT.ATType   = 'FamilyPS';
-    AO.QFA_fam.AT.ATMagnet = 'QFA';
-    AO.QFA_fam.AT.ATIndex  = buildatindex(AO.QFA.FamilyName, Indices.QFA);
-    AO.QFA_fam.Position    = findspos(THERING, AO.QFA_fam.AT.ATIndex(:,1))';
+    % QFAFam
+    AO.QFAFam.AT.ATType   = 'FamilyPS';
+    AO.QFAFam.AT.ATMagnet = 'QFA';
+    AO.QFAFam.AT.ATIndex  = buildatindex(AO.QFA.FamilyName, Indices.QFA);
+    AO.QFAFam.Position    = findspos(THERING, AO.QFAFam.AT.ATIndex(:,1))';
 catch
-    warning('QFA_fam family not found in the model.');
+    warning('QFAFam family not found in the model.');
 end
 
 try
-    % QFA_shunt
-    AO.QFA_shunt.AT.ATType   = 'ShuntPS';
-    AO.QFA_shunt.AT.ATMagnet = 'QFA';
-    AO.QFA_shunt.AT.ATIndex  = buildatindex(AO.QFA.FamilyName, Indices.QFA);
-    AO.QFA_shunt.Position    = findspos(THERING, AO.QFA_shunt.AT.ATIndex(:,1))';
+    % QFATrim
+    AO.QFATrim.AT.ATType   = 'ShuntPS';
+    AO.QFATrim.AT.ATMagnet = 'QFA';
+    AO.QFATrim.AT.ATIndex  = buildatindex(AO.QFA.FamilyName, Indices.QFA);
+    AO.QFATrim.Position    = findspos(THERING, AO.QFATrim.AT.ATIndex(:,1))';
 catch
-    warning('QFA_shunt family not found in the model.');
+    warning('QFATrim family not found in the model.');
 end
 
 try
@@ -86,27 +86,27 @@ try
     AO.QDA.AT.ATIndex = buildatindex(AO.QDA.FamilyName, Indices.QDA);
     AO.QDA.Position = findspos(THERING, AO.QDA.AT.ATIndex(:,1))';
 catch
-    warning('QDA1 family not found in the model.');
+    warning('QDA family not found in the model.');
 end
 
 try
-	% QDA_fam
-	AO.QDA_fam.AT.ATType = 'FamilyPS';
-    AO.QDA_fam.AT.ATMagnet = 'QDA';
-	AO.QDA_fam.AT.ATIndex = buildatindex(AO.QDA.FamilyName, Indices.QDA);
-	AO.QDA_fam.Position = findspos(THERING, AO.QDA_fam.AT.ATIndex(:,1));
+	% QDAFam
+	AO.QDAFam.AT.ATType = 'FamilyPS';
+    AO.QDAFam.AT.ATMagnet = 'QDA';
+	AO.QDAFam.AT.ATIndex = buildatindex(AO.QDA.FamilyName, Indices.QDA);
+	AO.QDAFam.Position = findspos(THERING, AO.QDAFam.AT.ATIndex(:,1));
 catch
-	warning('QDA_fam family not found in the model.');
+	warning('QDAFam family not found in the model.');
 end
 
 try
-	% QDA_shunt
-	AO.QDA_shunt.AT.ATType = 'ShuntPS';
-    AO.QDA_shunt.AT.ATMagnet = 'QDA';
-	AO.QDA_shunt.AT.ATIndex = buildatindex(AO.QDA.FamilyName, Indices.QDA);
-	AO.QDA_shunt.Position = findspos(THERING, AO.QDA_shunt.AT.ATIndex(:,1));
+	% QDATrim
+	AO.QDATrim.AT.ATType = 'ShuntPS';
+    AO.QDATrim.AT.ATMagnet = 'QDA';
+	AO.QDATrim.AT.ATIndex = buildatindex(AO.QDA.FamilyName, Indices.QDA);
+	AO.QDATrim.Position = findspos(THERING, AO.QDATrim.AT.ATIndex(:,1));
 catch
-	warning('QDA_shunt family not found in the model.');
+	warning('QDATrim family not found in the model.');
 end
 
 try
@@ -119,23 +119,23 @@ catch
 end
 
 try
-	% QFB_fam
-	AO.QFB_fam.AT.ATType = 'FamilyPS';
-    AO.QFB_fam.AT.ATMagnet = 'QFB';
-	AO.QFB_fam.AT.ATIndex = buildatindex(AO.QFB.FamilyName, Indices.QFB);
-	AO.QFB_fam.Position = findspos(THERING, AO.QFB_fam.AT.ATIndex(:,1));
+	% QFBFam
+	AO.QFBFam.AT.ATType = 'FamilyPS';
+    AO.QFBFam.AT.ATMagnet = 'QFB';
+	AO.QFBFam.AT.ATIndex = buildatindex(AO.QFB.FamilyName, Indices.QFB);
+	AO.QFBFam.Position = findspos(THERING, AO.QFBFam.AT.ATIndex(:,1));
 catch
-	warning('QFB_fam family not found in the model.');
+	warning('QFBFam family not found in the model.');
 end
 
 try
-	% QFB_shunt
-	AO.QFB_shunt.AT.ATType = 'ShuntPS';
-    AO.QFB_shunt.AT.ATMagnet = 'QFB';
-	AO.QFB_shunt.AT.ATIndex = buildatindex(AO.QFB.FamilyName, Indices.QFB);
-	AO.QFB_shunt.Position = findspos(THERING, AO.QFB_shunt.AT.ATIndex(:,1));
+	% QFBTrim
+	AO.QFBTrim.AT.ATType = 'ShuntPS';
+    AO.QFBTrim.AT.ATMagnet = 'QFB';
+	AO.QFBTrim.AT.ATIndex = buildatindex(AO.QFB.FamilyName, Indices.QFB);
+	AO.QFBTrim.Position = findspos(THERING, AO.QFBTrim.AT.ATIndex(:,1));
 catch
-	warning('QFB_shunt family not found in the model.');
+	warning('QFBTrim family not found in the model.');
 end
 
 try
@@ -148,23 +148,23 @@ catch
 end
 
 try
-	% QDB2_fam
-	AO.QDB2_fam.AT.ATType = 'FamilyPS';
-    AO.QDB2_fam.AT.ATMagnet = 'QDB2';
-	AO.QDB2_fam.AT.ATIndex = buildatindex(AO.QDB2.FamilyName, Indices.QDB2);
-	AO.QDB2_fam.Position = findspos(THERING, AO.QDB2_fam.AT.ATIndex(:,1));
+	% QDB2Fam
+	AO.QDB2Fam.AT.ATType = 'FamilyPS';
+    AO.QDB2Fam.AT.ATMagnet = 'QDB2';
+	AO.QDB2Fam.AT.ATIndex = buildatindex(AO.QDB2.FamilyName, Indices.QDB2);
+	AO.QDB2Fam.Position = findspos(THERING, AO.QDB2Fam.AT.ATIndex(:,1));
 catch
-	warning('QDB2_fam family not found in the model.');
+	warning('QDB2Fam family not found in the model.');
 end
 
 try
-	% QDB2_shunt
-	AO.QDB2_shunt.AT.ATType = 'ShuntPS';
-    AO.QDB2_shunt.AT.ATMagnet = 'QDB2';
-	AO.QDB2_shunt.AT.ATIndex = buildatindex(AO.QDB2.FamilyName, Indices.QDB2);
-	AO.QDB2_shunt.Position = findspos(THERING, AO.QDB2_shunt.AT.ATIndex(:,1));
+	% QDB2Trim
+	AO.QDB2Trim.AT.ATType = 'ShuntPS';
+    AO.QDB2Trim.AT.ATMagnet = 'QDB2';
+	AO.QDB2Trim.AT.ATIndex = buildatindex(AO.QDB2.FamilyName, Indices.QDB2);
+	AO.QDB2Trim.Position = findspos(THERING, AO.QDB2Trim.AT.ATIndex(:,1));
 catch
-	warning('QDB2_shunt family not found in the model.');
+	warning('QDB2Trim family not found in the model.');
 end
 
 try
@@ -177,23 +177,23 @@ catch
 end
 
 try
-	% QDB1_fam
-	AO.QDB1_fam.AT.ATType = 'FamilyPS';
-    AO.QDB1_fam.AT.ATMagnet = 'QDB1';
-	AO.QDB1_fam.AT.ATIndex = buildatindex(AO.QDB1.FamilyName, Indices.QDB1);
-	AO.QDB1_fam.Position = findspos(THERING, AO.QDB1_fam.AT.ATIndex(:,1));
+	% QDB1Fam
+	AO.QDB1Fam.AT.ATType = 'FamilyPS';
+    AO.QDB1Fam.AT.ATMagnet = 'QDB1';
+	AO.QDB1Fam.AT.ATIndex = buildatindex(AO.QDB1.FamilyName, Indices.QDB1);
+	AO.QDB1Fam.Position = findspos(THERING, AO.QDB1Fam.AT.ATIndex(:,1));
 catch
-	warning('QDB1_fam family not found in the model.');
+	warning('QDB1Fam family not found in the model.');
 end
 
 try
-	% QDB1_shunt
-	AO.QDB1_shunt.AT.ATType = 'ShuntPS';
-    AO.QDB1_shunt.AT.ATMagnet = 'QDB1';
-	AO.QDB1_shunt.AT.ATIndex = buildatindex(AO.QDB1.FamilyName, Indices.QDB1);
-	AO.QDB1_shunt.Position = findspos(THERING, AO.QDB1_shunt.AT.ATIndex(:,1));
+	% QDB1Trim
+	AO.QDB1Trim.AT.ATType = 'ShuntPS';
+    AO.QDB1Trim.AT.ATMagnet = 'QDB1';
+	AO.QDB1Trim.AT.ATIndex = buildatindex(AO.QDB1.FamilyName, Indices.QDB1);
+	AO.QDB1Trim.Position = findspos(THERING, AO.QDB1Trim.AT.ATIndex(:,1));
 catch
-	warning('QDB1_shunt family not found in the model.');
+	warning('QDB1Trim family not found in the model.');
 end
 
 try
@@ -206,23 +206,23 @@ catch
 end
 
 try
-	% QFP_fam
-	AO.QFP_fam.AT.ATType = 'FamilyPS';
-    AO.QFP_fam.AT.ATMagnet = 'QFP';
-	AO.QFP_fam.AT.ATIndex = buildatindex(AO.QFP.FamilyName, Indices.QFP);
-	AO.QFP_fam.Position = findspos(THERING, AO.QFP_fam.AT.ATIndex(:,1));
+	% QFPFam
+	AO.QFPFam.AT.ATType = 'FamilyPS';
+    AO.QFPFam.AT.ATMagnet = 'QFP';
+	AO.QFPFam.AT.ATIndex = buildatindex(AO.QFP.FamilyName, Indices.QFP);
+	AO.QFPFam.Position = findspos(THERING, AO.QFPFam.AT.ATIndex(:,1));
 catch
-	warning('QFP_fam family not found in the model.');
+	warning('QFPFam family not found in the model.');
 end
 
 try
-	% QFP_shunt
-	AO.QFP_shunt.AT.ATType = 'ShuntPS';
-    AO.QFP_shunt.AT.ATMagnet = 'QFP';
-	AO.QFP_shunt.AT.ATIndex = buildatindex(AO.QFP.FamilyName, Indices.QFP);
-	AO.QFP_shunt.Position = findspos(THERING, AO.QFP_shunt.AT.ATIndex(:,1));
+	% QFPTrim
+	AO.QFPTrim.AT.ATType = 'ShuntPS';
+    AO.QFPTrim.AT.ATMagnet = 'QFP';
+	AO.QFPTrim.AT.ATIndex = buildatindex(AO.QFP.FamilyName, Indices.QFP);
+	AO.QFPTrim.Position = findspos(THERING, AO.QFPTrim.AT.ATIndex(:,1));
 catch
-	warning('QFP_shunt family not found in the model.');
+	warning('QFPTrim family not found in the model.');
 end
 
 try
@@ -235,23 +235,23 @@ catch
 end
 
 try
-	% QDP2_fam
-	AO.QDP2_fam.AT.ATType = 'FamilyPS';
-    AO.QDP2_fam.AT.ATMagnet = 'QDP2';
-	AO.QDP2_fam.AT.ATIndex = buildatindex(AO.QDP2.FamilyName, Indices.QDP2);
-	AO.QDP2_fam.Position = findspos(THERING, AO.QDP2_fam.AT.ATIndex(:,1));
+	% QDP2Fam
+	AO.QDP2Fam.AT.ATType = 'FamilyPS';
+    AO.QDP2Fam.AT.ATMagnet = 'QDP2';
+	AO.QDP2Fam.AT.ATIndex = buildatindex(AO.QDP2.FamilyName, Indices.QDP2);
+	AO.QDP2Fam.Position = findspos(THERING, AO.QDP2Fam.AT.ATIndex(:,1));
 catch
-	warning('QDP2_fam family not found in the model.');
+	warning('QDP2Fam family not found in the model.');
 end
 
 try
-	% QDP2_shunt
-	AO.QDP2_shunt.AT.ATType = 'ShuntPS';
-    AO.QDP2_shunt.AT.ATMagnet = 'QDP2';
-	AO.QDP2_shunt.AT.ATIndex = buildatindex(AO.QDP2.FamilyName, Indices.QDP2);
-	AO.QDP2_shunt.Position = findspos(THERING, AO.QDP2_shunt.AT.ATIndex(:,1));
+	% QDP2Trim
+	AO.QDP2Trim.AT.ATType = 'ShuntPS';
+    AO.QDP2Trim.AT.ATMagnet = 'QDP2';
+	AO.QDP2Trim.AT.ATIndex = buildatindex(AO.QDP2.FamilyName, Indices.QDP2);
+	AO.QDP2Trim.Position = findspos(THERING, AO.QDP2Trim.AT.ATIndex(:,1));
 catch
-	warning('QDP2_shunt family not found in the model.');
+	warning('QDP2Trim family not found in the model.');
 end
 
 try
@@ -264,23 +264,23 @@ catch
 end
 
 try
-	% QDP1_fam
-	AO.QDP1_fam.AT.ATType = 'FamilyPS';
-    AO.QDP1_fam.AT.ATMagnet = 'QDP1';
-	AO.QDP1_fam.AT.ATIndex = buildatindex(AO.QDP1.FamilyName, Indices.QDP1);
-	AO.QDP1_fam.Position = findspos(THERING, AO.QDP1_fam.AT.ATIndex(:,1));
+	% QDP1Fam
+	AO.QDP1Fam.AT.ATType = 'FamilyPS';
+    AO.QDP1Fam.AT.ATMagnet = 'QDP1';
+	AO.QDP1Fam.AT.ATIndex = buildatindex(AO.QDP1.FamilyName, Indices.QDP1);
+	AO.QDP1Fam.Position = findspos(THERING, AO.QDP1Fam.AT.ATIndex(:,1));
 catch
-	warning('QDP1_fam family not found in the model.');
+	warning('QDP1Fam family not found in the model.');
 end
 
 try
-	% QDP1_shunt
-	AO.QDP1_shunt.AT.ATType = 'ShuntPS';
-    AO.QDP1_shunt.AT.ATMagnet = 'QDP1';
-	AO.QDP1_shunt.AT.ATIndex = buildatindex(AO.QDP1.FamilyName, Indices.QDP1);
-	AO.QDP1_shunt.Position = findspos(THERING, AO.QDP1_shunt.AT.ATIndex(:,1));
+	% QDP1Trim
+	AO.QDP1Trim.AT.ATType = 'ShuntPS';
+    AO.QDP1Trim.AT.ATMagnet = 'QDP1';
+	AO.QDP1Trim.AT.ATIndex = buildatindex(AO.QDP1.FamilyName, Indices.QDP1);
+	AO.QDP1Trim.Position = findspos(THERING, AO.QDP1Trim.AT.ATIndex(:,1));
 catch
-	warning('QDP1_shunt family not found in the model.');
+	warning('QDP1Trim family not found in the model.');
 end
 
 try
@@ -305,53 +305,53 @@ catch
 end
 
 try
-	% Q1_fam
-	AO.Q1_fam.AT.ATType = 'FamilyPS';
-    AO.Q1_fam.AT.ATMagnet = 'Q1';
-	AO.Q1_fam.AT.ATIndex = buildatindex(AO.Q1.FamilyName, Indices.Q1);
-	AO.Q1_fam.Position = findspos(THERING, AO.Q1_fam.AT.ATIndex(:,1));
-	% Q2_fam
-	AO.Q2_fam.AT.ATType = 'FamilyPS';
-    AO.Q2_fam.AT.ATMagnet = 'Q2';
-	AO.Q2_fam.AT.ATIndex = buildatindex(AO.Q2.FamilyName, Indices.Q2);
-	AO.Q2_fam.Position = findspos(THERING, AO.Q2_fam.AT.ATIndex(:,1));
-	% Q3_fam
-	AO.Q3_fam.AT.ATType = 'FamilyPS';
-    AO.Q3_fam.AT.ATMagnet = 'Q3';
-	AO.Q3_fam.AT.ATIndex = buildatindex(AO.Q3.FamilyName, Indices.Q3);
-	AO.Q3_fam.Position = findspos(THERING, AO.Q3_fam.AT.ATIndex(:,1));
-	% Q4_fam
-	AO.Q4_fam.AT.ATType = 'FamilyPS';
-    AO.Q4_fam.AT.ATMagnet = 'Q4';
-	AO.Q4_fam.AT.ATIndex = buildatindex(AO.Q4.FamilyName, Indices.Q4);
-	AO.Q4_fam.Position = findspos(THERING, AO.Q4_fam.AT.ATIndex(:,1));
+	% Q1Fam
+	AO.Q1Fam.AT.ATType = 'FamilyPS';
+    AO.Q1Fam.AT.ATMagnet = 'Q1';
+	AO.Q1Fam.AT.ATIndex = buildatindex(AO.Q1.FamilyName, Indices.Q1);
+	AO.Q1Fam.Position = findspos(THERING, AO.Q1Fam.AT.ATIndex(:,1));
+	% Q2Fam
+	AO.Q2Fam.AT.ATType = 'FamilyPS';
+    AO.Q2Fam.AT.ATMagnet = 'Q2';
+	AO.Q2Fam.AT.ATIndex = buildatindex(AO.Q2.FamilyName, Indices.Q2);
+	AO.Q2Fam.Position = findspos(THERING, AO.Q2Fam.AT.ATIndex(:,1));
+	% Q3Fam
+	AO.Q3Fam.AT.ATType = 'FamilyPS';
+    AO.Q3Fam.AT.ATMagnet = 'Q3';
+	AO.Q3Fam.AT.ATIndex = buildatindex(AO.Q3.FamilyName, Indices.Q3);
+	AO.Q3Fam.Position = findspos(THERING, AO.Q3Fam.AT.ATIndex(:,1));
+	% Q4Fam
+	AO.Q4Fam.AT.ATType = 'FamilyPS';
+    AO.Q4Fam.AT.ATMagnet = 'Q4';
+	AO.Q4Fam.AT.ATIndex = buildatindex(AO.Q4.FamilyName, Indices.Q4);
+	AO.Q4Fam.Position = findspos(THERING, AO.Q4Fam.AT.ATIndex(:,1));
 catch
-	warning('Q1_fam Q2_fam Q3_fam Q4_fam families not found in the model.');
+	warning('Q1Fam Q2Fam Q3Fam Q4Fam families not found in the model.');
 end
 
 try
-	% Q1_shunt
-	AO.Q1_shunt.AT.ATType = 'ShuntPS';
-    AO.Q1_shunt.AT.ATMagnet = 'Q1';
-	AO.Q1_shunt.AT.ATIndex = buildatindex(AO.Q1.FamilyName, Indices.Q1);
-	AO.Q1_shunt.Position = findspos(THERING, AO.Q1_shunt.AT.ATIndex(:,1));
-	% Q2_shunt
-	AO.Q2_shunt.AT.ATType = 'ShuntPS';
-    AO.Q2_shunt.AT.ATMagnet = 'Q2';
-	AO.Q2_shunt.AT.ATIndex = buildatindex(AO.Q2.FamilyName, Indices.Q2);
-	AO.Q2_shunt.Position = findspos(THERING, AO.Q2_shunt.AT.ATIndex(:,1));
-	% Q3_shunt
-	AO.Q3_shunt.AT.ATType = 'ShuntPS';
-    AO.Q3_shunt.AT.ATMagnet = 'Q3';
-	AO.Q3_shunt.AT.ATIndex = buildatindex(AO.Q3.FamilyName, Indices.Q3);
-	AO.Q3_shunt.Position = findspos(THERING, AO.Q3_shunt.AT.ATIndex(:,1));
-	% Q4_shunt
-	AO.Q4_shunt.AT.ATType = 'ShuntPS';
-    AO.Q4_shunt.AT.ATMagnet = 'Q4';
-	AO.Q4_shunt.AT.ATIndex = buildatindex(AO.Q4.FamilyName, Indices.Q4);
-	AO.Q4_shunt.Position = findspos(THERING, AO.Q4_shunt.AT.ATIndex(:,1));
+	% Q1Trim
+	AO.Q1Trim.AT.ATType = 'ShuntPS';
+    AO.Q1Trim.AT.ATMagnet = 'Q1';
+	AO.Q1Trim.AT.ATIndex = buildatindex(AO.Q1.FamilyName, Indices.Q1);
+	AO.Q1Trim.Position = findspos(THERING, AO.Q1Trim.AT.ATIndex(:,1));
+	% Q2Trim
+	AO.Q2Trim.AT.ATType = 'ShuntPS';
+    AO.Q2Trim.AT.ATMagnet = 'Q2';
+	AO.Q2Trim.AT.ATIndex = buildatindex(AO.Q2.FamilyName, Indices.Q2);
+	AO.Q2Trim.Position = findspos(THERING, AO.Q2Trim.AT.ATIndex(:,1));
+	% Q3Trim
+	AO.Q3Trim.AT.ATType = 'ShuntPS';
+    AO.Q3Trim.AT.ATMagnet = 'Q3';
+	AO.Q3Trim.AT.ATIndex = buildatindex(AO.Q3.FamilyName, Indices.Q3);
+	AO.Q3Trim.Position = findspos(THERING, AO.Q3Trim.AT.ATIndex(:,1));
+	% Q4Trim
+	AO.Q4Trim.AT.ATType = 'ShuntPS';
+    AO.Q4Trim.AT.ATMagnet = 'Q4';
+	AO.Q4Trim.AT.ATIndex = buildatindex(AO.Q4.FamilyName, Indices.Q4);
+	AO.Q4Trim.Position = findspos(THERING, AO.Q4Trim.AT.ATIndex(:,1));
 catch
-	warning('Q1_shunt Q2_shunt Q3_shunt Q4_shunt families not found in the model.');
+	warning('Q1Trim Q2Trim Q3Trim Q4Trim families not found in the model.');
 end
 
 try
@@ -562,12 +562,12 @@ catch
 end
 
 try
-    % ch
+    % CH
     AO.CH.AT.ATType = 'HCM';
     AO.CH.AT.ATIndex = family_data.CH.ATIndex;
     AO.CH.Position   = findspos(THERING, AO.CH.AT.ATIndex(:,1))';   
 catch
-    warning('ch family not found in the model.');
+    warning('CH family not found in the model.');
 end
 
 try
@@ -618,7 +618,7 @@ end
 % DCCT
 try
     AO.DCCT.AT.ATType = 'DCCT';
-    AO.DCCT.AT.ATIndex = findcells(THERING, 'FamName', 'DCCT');
+    AO.DCCT.AT.ATIndex = findcells(THERING, 'FamName', 'DCCT')';
     AO.DCCT.Position = findspos(THERING, AO.DCCT.AT.ATIndex(:,1))';
 catch
     warning('DCCT not found in the model.');
