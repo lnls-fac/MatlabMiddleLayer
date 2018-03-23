@@ -164,7 +164,7 @@ for i=1:size(BendFamilies,1)
     
     for j=1:length(AllIndex)
         idx = AllIndex(i);
-        IntegField = IntegField + interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Current(j));
+        IntegField = IntegField + interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Current(j), 'linear', 'extrap');
     end
 
 end

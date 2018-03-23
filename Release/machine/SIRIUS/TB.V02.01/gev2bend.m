@@ -167,7 +167,7 @@ Amps = zeros(size(ElementsIndex,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
     IntegratedField = -GeV * (DeflectionAngle(i) / (const.c/1e9));
-    Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), IntegratedField);
+    Amps(i) = interp1(ExcData.data{idx}(:,2), ExcData.data{idx}(:,1), IntegratedField, 'linear', 'extrap');
 end
 
 

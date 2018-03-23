@@ -57,7 +57,7 @@ ElemIndex       = dev2elem(Family, DeviceList);
 IntegratedField = zeros(size(ElemIndex,1),1);
 for i=1:size(ElemIndex)
     idx = ElemIndex(i);
-    IntegratedField(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), NewSP_HW(i));
+    IntegratedField(i) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), NewSP_HW(i), 'linear', 'extrap');
 end
 
 for i = 1:size(ATIndex, 1)

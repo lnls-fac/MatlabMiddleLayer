@@ -136,7 +136,7 @@ for i=1:size(BendFamilies,1)
         IntegratedField = zeros(size(ElemIndex, 1),1);
         for j=1:length(ElemIndex)
             idx = ElemIndex(i);
-            IntegratedField(j) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Current(j));
+            IntegratedField(j) = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Current(j), 'linear', 'extrap');
         end
     end
     
@@ -154,7 +154,7 @@ IntegratedField = alpha.*FamilyIntegratedField;
 Amps = zeros(size(ElementsIndex,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
-    Amps(i) = interp1(FamilyExcData.data{idx}(:,2), FamilyExcData.data{idx}(:,1), IntegratedField(idx));
+    Amps(i) = interp1(FamilyExcData.data{idx}(:,2), FamilyExcData.data{idx}(:,1), IntegratedField(idx), 'linear', 'extrap');
 end
 
 end
