@@ -39,7 +39,7 @@ end
 
 % Set the AD directory path
 AD = getad;
-setmmldirectories(AD.Machine, AD.SubMachine, AD.ModeName, AD.OpsFileExtension);
+setmmldirectories(fullfile('SIRIUS',AD.Machine), AD.SubMachine, AD.ModeName, AD.OpsFileExtension);
 % Updates the AT indices in the MiddleLayer with the present AT lattice
 updateatindex;
 
@@ -102,7 +102,7 @@ function set_operationalmode_s10
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS_V22.02';   % Will already be defined if setpathmml was used
+AD.Machine             = 'SI.V22.02';   % Will already be defined if setpathmml was used
 AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'V22.02_S10.01';
@@ -142,7 +142,7 @@ function set_operationalmode_s05_01
 global THERING;
 
 AD = getad;
-AD.Machine             = 'SIRIUS_V22.02';   % Will already be defined if setpathmml was used
+AD.Machine             = 'SI.V22.02';   % Will already be defined if setpathmml was used
 AD.SubMachine          = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.MachineType         = 'StorageRing';  % Will already be defined if setpathmml was used
 AD.OperationalMode     = 'V22.02_S05.01';
