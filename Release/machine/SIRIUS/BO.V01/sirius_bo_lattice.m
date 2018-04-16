@@ -32,7 +32,7 @@ sext_pass_method = 'StrMPoleSymplectic4Pass';
 set_magnets_strength_booster;
 
 % a segmented model for the dipole has been created from the
-% approved fieldmap. The segmented model has a longer length 
+% approved fieldmap. The segmented model has a longer length
 % and the difference has to be accomodated.
 % loads dipole segmented model:
 [B, b_len_seg] = dipole_segmented_model(bend_pass_method);
@@ -73,7 +73,7 @@ D2146    = drift('d2146',  2.1460-lenDif,  'DriftPass');
 STR  = marker('start',   'IdentityPass');     % start of the model
 FIM  = marker('end',     'IdentityPass');     % end of the model
 GIR  = marker('girder',  'IdentityPass');
-KIN  = marker('injk', 'IdentityPass');
+KIN  = marker('injkckr', 'IdentityPass');
 SIN  = marker('sept_in', 'IdentityPass');
 SEX  = marker('sept_ex', 'IdentityPass');
 mqf  = marker('mqf',     'IdentityPass');
@@ -83,7 +83,7 @@ KEX  = quadrupole('ejek', 0.5, 0.0, quad_pass_method);
 QD   = quadrupole('qd', 0.100740, qd_strength, quad_pass_method);
 QFI  = quadrupole('qf', 0.100000, qf_strength, quad_pass_method);
 QF   = [QFI,mqf,QFI];
-SF   = sextupole ('sf', 0.105000, sf_strength, sext_pass_method);   
+SF   = sextupole ('sf', 0.105000, sf_strength, sext_pass_method);
 SD   = sextupole ('sd', 0.105000, sd_strength, sext_pass_method);
 
 BPM  = marker('bpm', 'IdentityPass');
@@ -106,55 +106,55 @@ UP_SE = [D0300, CV, GIR, L1486, SEX, L0360,     L1000, BPM, L1146, GIR];
 UP_SI = [D0300, CV, GIR, L1846, BPM,            L1096, SIN, L0800, GIR, CH, L0250];
 
 
-UP_01 = UP_SI;        DW_01 = DW_KI;        S01 = [UP_01, QFI, FIM, STR, mqf, QFI, DW_01, B];      
+UP_01 = UP_SI;        DW_01 = DW_KI;        S01 = [UP_01, QFI, FIM, STR, mqf, QFI, DW_01, B];
 UP_02 = UP_SF;        DW_02 = DW_QD;        S02 = [UP_02, QF, DW_02, B];
-UP_03 = UP_CS;        DW_03 = DW;           S03 = [UP_03, QF, DW_03, B];   
+UP_03 = UP_CS;        DW_03 = DW;           S03 = [UP_03, QF, DW_03, B];
 UP_04 = UP_SF;        DW_04 = DW_QD;        S04 = [UP_04, QF, DW_04, B];
-UP_05 = UP_CC;        DW_05 = DW_RF;        S05 = [UP_05, QF, DW_05, B];      
+UP_05 = UP_CC;        DW_05 = DW_RF;        S05 = [UP_05, QF, DW_05, B];
 UP_06 = UP_SF;        DW_06 = DW_QD;        S06 = [UP_06, QF, DW_06, B];
-UP_07 = UP_CC;        DW_07 = DW;           S07 = [UP_07, QF, DW_07, B];   
+UP_07 = UP_CC;        DW_07 = DW;           S07 = [UP_07, QF, DW_07, B];
 UP_08 = UP_SS;        DW_08 = DW_QD;        S08 = [UP_08, QF, DW_08, B];
-UP_09 = UP_CC;        DW_09 = DW;           S09 = [UP_09, QF, DW_09, B];   
+UP_09 = UP_CC;        DW_09 = DW;           S09 = [UP_09, QF, DW_09, B];
 UP_10 = UP_SF;        DW_10 = DW_QD;        S10 = [UP_10, QF, DW_10, B];
-UP_11 = UP_CC;        DW_11 = DW;           S11 = [UP_11, QF, DW_11, B];   
+UP_11 = UP_CC;        DW_11 = DW;           S11 = [UP_11, QF, DW_11, B];
 UP_12 = UP_SF;        DW_12 = DW_QD;        S12 = [UP_12, QF, DW_12, B];
-UP_13 = UP_CS;        DW_13 = DW;           S13 = [UP_13, QF, DW_13, B];   
+UP_13 = UP_CS;        DW_13 = DW;           S13 = [UP_13, QF, DW_13, B];
 UP_14 = UP_SF;        DW_14 = DW_QD;        S14 = [UP_14, QF, DW_14, B];
-UP_15 = UP_CC;        DW_15 = DW;           S15 = [UP_15, QF, DW_15, B];   
+UP_15 = UP_CC;        DW_15 = DW;           S15 = [UP_15, QF, DW_15, B];
 UP_16 = UP_SF;        DW_16 = DW_QD;        S16 = [UP_16, QF, DW_16, B];
-UP_17 = UP_CC;        DW_17 = DW;           S17 = [UP_17, QF, DW_17, B];   
+UP_17 = UP_CC;        DW_17 = DW;           S17 = [UP_17, QF, DW_17, B];
 UP_18 = UP_SS;        DW_18 = DW_QD;        S18 = [UP_18, QF, DW_18, B];
-UP_19 = UP_CC;        DW_19 = DW;           S19 = [UP_19, QF, DW_19, B];   
+UP_19 = UP_CC;        DW_19 = DW;           S19 = [UP_19, QF, DW_19, B];
 UP_20 = UP_SF;        DW_20 = DW_QD;        S20 = [UP_20, QF, DW_20, B];
-UP_21 = UP_CC;        DW_21 = DW;           S21 = [UP_21, QF, DW_21, B];   
+UP_21 = UP_CC;        DW_21 = DW;           S21 = [UP_21, QF, DW_21, B];
 UP_22 = UP_SF;        DW_22 = DW_QD;        S22 = [UP_22, QF, DW_22, B];
-UP_23 = UP_CS;        DW_23 = DW;           S23 = [UP_23, QF, DW_23, B];   
+UP_23 = UP_CS;        DW_23 = DW;           S23 = [UP_23, QF, DW_23, B];
 UP_24 = UP_SF;        DW_24 = DW_QD;        S24 = [UP_24, QF, DW_24, B];
-UP_25 = UP_CC;        DW_25 = DW;           S25 = [UP_25, QF, DW_25, B];   
+UP_25 = UP_CC;        DW_25 = DW;           S25 = [UP_25, QF, DW_25, B];
 UP_26 = UP_SF;        DW_26 = DW_QD;        S26 = [UP_26, QF, DW_26, B];
-UP_27 = UP_CC;        DW_27 = DW;           S27 = [UP_27, QF, DW_27, B];   
+UP_27 = UP_CC;        DW_27 = DW;           S27 = [UP_27, QF, DW_27, B];
 UP_28 = UP_SS;        DW_28 = DW_QD;        S28 = [UP_28, QF, DW_28, B];
-UP_29 = UP_CC;        DW_29 = DW;           S29 = [UP_29, QF, DW_29, B];   
+UP_29 = UP_CC;        DW_29 = DW;           S29 = [UP_29, QF, DW_29, B];
 UP_30 = UP_SF;        DW_30 = DW_QD;        S30 = [UP_30, QF, DW_30, B];
-UP_31 = UP_CC;        DW_31 = DW;           S31 = [UP_31, QF, DW_31, B];   
+UP_31 = UP_CC;        DW_31 = DW;           S31 = [UP_31, QF, DW_31, B];
 UP_32 = UP_SF;        DW_32 = DW_QD;        S32 = [UP_32, QF, DW_32, B];
-UP_33 = UP_CS;        DW_33 = DW;           S33 = [UP_33, QF, DW_33, B];   
+UP_33 = UP_CS;        DW_33 = DW;           S33 = [UP_33, QF, DW_33, B];
 UP_34 = UP_SF;        DW_34 = DW_QD;        S34 = [UP_34, QF, DW_34, B];
-UP_35 = UP_CC;        DW_35 = DW;           S35 = [UP_35, QF, DW_35, B];   
+UP_35 = UP_CC;        DW_35 = DW;           S35 = [UP_35, QF, DW_35, B];
 UP_36 = UP_SF;        DW_36 = DW_QD;        S36 = [UP_36, QF, DW_36, B];
-UP_37 = UP_CC;        DW_37 = DW;           S37 = [UP_37, QF, DW_37, B];   
+UP_37 = UP_CC;        DW_37 = DW;           S37 = [UP_37, QF, DW_37, B];
 UP_38 = UP_SS;        DW_38 = DW_QD;        S38 = [UP_38, QF, DW_38, B];
-UP_39 = UP_CC;        DW_39 = DW;           S39 = [UP_39, QF, DW_39, B];   
+UP_39 = UP_CC;        DW_39 = DW;           S39 = [UP_39, QF, DW_39, B];
 UP_40 = UP_SF;        DW_40 = DW_QD;        S40 = [UP_40, QF, DW_40, B];
-UP_41 = UP_CC;        DW_41 = DW;           S41 = [UP_41, QF, DW_41, B];   
+UP_41 = UP_CC;        DW_41 = DW;           S41 = [UP_41, QF, DW_41, B];
 UP_42 = UP_SF;        DW_42 = DW_QD;        S42 = [UP_42, QF, DW_42, B];
-UP_43 = UP_CS;        DW_43 = DW;           S43 = [UP_43, QF, DW_43, B];   
+UP_43 = UP_CS;        DW_43 = DW;           S43 = [UP_43, QF, DW_43, B];
 UP_44 = UP_SF;        DW_44 = DW_QD;        S44 = [UP_44, QF, DW_44, B];
-UP_45 = UP_CC;        DW_45 = DW;           S45 = [UP_45, QF, DW_45, B];   
+UP_45 = UP_CC;        DW_45 = DW;           S45 = [UP_45, QF, DW_45, B];
 UP_46 = UP_SF;        DW_46 = DW_QD;        S46 = [UP_46, QF, DW_46, B];
-UP_47 = UP_CC;        DW_47 = DW;           S47 = [UP_47, QF, DW_47, B];   
+UP_47 = UP_CC;        DW_47 = DW;           S47 = [UP_47, QF, DW_47, B];
 UP_48 = UP_SS;        DW_48 = DW_KE;        S48 = [UP_48, QF, DW_48, B];
-UP_49 = UP_SE;        DW_49 = DW_CH;        S49 = [UP_49, QF, DW_49, B];      
+UP_49 = UP_SE;        DW_49 = DW_CH;        S49 = [UP_49, QF, DW_49, B];
 UP_50 = UP_SF;        DW_50 = DW_QD;        S50 = [UP_50, QF, DW_50, B];
 
 
@@ -164,7 +164,7 @@ elist = [S01,S02,S03,S04,S05,S06,S07,S08,S09,S10,...
          S31,S32,S33,S34,S35,S36,S37,S38,S39,S40,...
          S41,S42,S43,S44,S45,S46,S47,S48,S49,S50];
 
-%% finalization 
+%% finalization
 
 THERING = buildlat(elist);
 THERING = setcellstruct(THERING, 'Energy', 1:length(THERING), energy);
@@ -192,8 +192,8 @@ rf_frequency = rev_freq * harmonic_number;
 THERING{rf_idx}.Frequency = rf_frequency;
 fprintf(['   RF frequency set to ' num2str(rf_frequency/1e6) ' MHz.\n']);
 
-% by default cavities and radiation is set to off 
-setcavity('off'); 
+% by default cavities and radiation is set to off
+setcavity('off');
 setradiation('off');
 
 % sets default NumIntSteps values for elements
@@ -264,4 +264,3 @@ quad_sext_nis = ceil(quad_sext_len / len_qs);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', quad_sext, quad_sext_nis);
 
 the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);
-
