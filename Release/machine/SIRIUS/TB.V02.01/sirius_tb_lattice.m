@@ -73,8 +73,8 @@ inicio   = marker('start',  'IdentityPass');
 fim      = marker('end',    'IdentityPass');
 
 % --- slits ---
-hslit    = marker('HSlit',  'IdentityPass');
-vslit    = marker('VSlit',  'IdentityPass');
+slith    = marker('SlitH',  'IdentityPass');
+slitv    = marker('SlitV',  'IdentityPass');
 
 % --- beam screens ---
 scrn     = marker('Scrn',  'IdentityPass');
@@ -130,7 +130,7 @@ deg_2_rad = (pi/180);
 
 
 % -- bo injection septum --
-dip_nam =  'InjS';
+dip_nam =  'InjSept';
 dip_len =  0.50;
 dip_ang =  21.75 * deg_2_rad;
 dip_K   =  0.0;
@@ -148,7 +148,7 @@ ld1    = [l199, repmat(l200,1,10)];
 
 s01_1  = [lb1p, l200, l200, scrn, bpm, l150c, ch, l100cc, cv, l150c];
 s01_2  = [lb2p, l200];
-s01_3  = [l200, l200, l200, l200, l200, l200, hslit, scrn, bpm, l150c, cv, l100cc, ch, l165, vslit, l200, l187];
+s01_3  = [l200, l200, l200, l200, l200, l200, slith, scrn, bpm, l150c, cv, l100cc, ch, l165, slitv, l200, l187];
 s02_1  = [l110, l200, ict, l200, l200, l100];
 s02_2  = [l200, scrn, bpm, l150c, ch, l100cc, cv, l165, repmat(l200,1,25), lc3p];
 s02_3  = [l150, l150, l150, scrn, bpm, l150c, ch, l100cc, cv, l075];

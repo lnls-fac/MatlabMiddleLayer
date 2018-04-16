@@ -79,13 +79,13 @@ D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
 STR  = marker('start',   'IdentityPass');    % start of the model
 FIM  = marker('end',     'IdentityPass');    % end of the model
 GIR  = marker('girder',  'IdentityPass');
-SIN  = marker('injsl',   'IdentityPass');    % end of BO injection septum at TB transport line
-SEX  = marker('EjeSF',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
+SIN  = marker('InjSeptL',   'IdentityPass');    % end of BO injection septum at TB transport line
+SEX  = marker('EjeSeptF',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
 BPM  = marker('bpm',     'IdentityPass');
 
 
-KIN  = quadrupole('injk', 0.500,     0.0,         quad_pass_method);
-KEX  = quadrupole('ejek', 0.500,     0.0,         quad_pass_method);
+KIN  = quadrupole('InjKckr', 0.500,     0.0,         quad_pass_method);
+KEX  = quadrupole('EjeKckr', 0.500,     0.0,         quad_pass_method);
 
 CH   = sextupole ('ch',      0.150,     0.0,         sext_pass_method);
 CV   = sextupole ('cv',      0.150,     0.0,         sext_pass_method);
@@ -244,9 +244,9 @@ for i=b
 end
 
 % ejection bend
-ejek = findcells(the_ring, 'FamName', 'ejek');
-sept_ex = findcells(the_ring, 'FamName', 'EjeSF');
-b_ex = b((b > ejek(end)) & (b < sept_ex(1)));
+EjeKckr = findcells(the_ring, 'FamName', 'EjeKckr');
+sept_ex = findcells(the_ring, 'FamName', 'EjeSeptF');
+b_ex = b((b > EjeKckr(end)) & (b < sept_ex(1)));
 for i=b_ex
     the_ring{i}.VChamber = other_vchamber;
 end

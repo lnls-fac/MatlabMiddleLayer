@@ -45,7 +45,7 @@ switch lower(Family)
     case 'b'
         ChannelName = ['TBPS-BEND-02'; 'TBPS-BEND-03'; 'TBPS-BEND-04'];
 
-    case 'injs'
+    case 'injsept'
         ChannelName = 'TBPU-SEPIN-05';
 
     case 'qf2l'

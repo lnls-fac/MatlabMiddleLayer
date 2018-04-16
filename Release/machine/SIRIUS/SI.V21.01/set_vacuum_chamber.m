@@ -58,7 +58,7 @@ end
 the_ring = circshift(the_ring,[0,bpm(1)]);
 
 % Set injection vacuum chamber
-inj = findcells(the_ring, 'FamName', 'InjSF');
+inj = findcells(the_ring, 'FamName', 'InjSeptF');
 kickin = findcells(the_ring, 'FamName', 'dipk');
 if (inj(end) > kickin(1))
     for i=[inj(end):length(the_ring) 1:kickin(end)]
