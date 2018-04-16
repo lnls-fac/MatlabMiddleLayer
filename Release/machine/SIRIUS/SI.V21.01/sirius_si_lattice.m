@@ -197,12 +197,12 @@ GIR    = marker('girder',   'IdentityPass'); % marker used to delimitate girders
 MIDA   = marker('id_enda',  'IdentityPass'); % marker for the extremities of IDs in long straight sections
 MIDB   = marker('id_endb',  'IdentityPass'); % marker for the extremities of IDs in short straight sections
 MIDP   = marker('id_endp',  'IdentityPass'); % marker for the extremities of IDs in short straight sections
-InjSF  = marker('InjSF',    'IdentityPass'); % end of thin injection septum
+InjSeptF  = marker('InjSeptF',    'IdentityPass'); % end of thin injection septum
 
 % -- diagnostics markers --
 DCCT   = marker('dcct',     'IdentityPass'); % dcct to measure beam current
-HScrap = marker('HScrap',   'IdentityPass'); % horizontal scraper
-VScrap = marker('VScrap',   'IdentityPass'); % vertical scraper
+ScrapH = marker('ScrapH',   'IdentityPass'); % horizontal scraper
+ScrapV = marker('ScrapV',   'IdentityPass'); % vertical scraper
 
 
 %% transport lines
@@ -214,8 +214,8 @@ M2B      = fliplr(M1B);                                                         
 M2P      = fliplr(M1P);                                                                               % low beta xxM2 girder
 
 IDA      = [L500,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];                           % high beta ID straight section
-IDA_INJ  = [L500,LIA,L419,InjSF,L081,L500,L500,END,START,MIA,LKK,DIPK,LPMU,NLK,LPMD];                % high beta INJ straight section
-IDA_09   = [L354,HScrap,L146,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];               % high beta ID straight section
+IDA_INJ  = [L500,LIA,L419,InjSeptF,L081,L500,L500,END,START,MIA,LKK,DIPK,LPMU,NLK,LPMD];                % high beta INJ straight section
+IDA_09   = [L354,ScrapH,L146,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];               % high beta ID straight section
 
 IDB      = [L500,LIB,L500,MIDB,L500,L500,MIB,L500,L500,MIDB,L500,LIB,L500];                           % low beta ID straight section
 
@@ -235,7 +235,7 @@ C3B      = [GIR,L715,GIR,L112,Q4,L133,BPM,RBPM,L127,SFB2,L048,FC,L082,Q3,L170,SD
 C3P      = [GIR,L715,GIR,L112,Q4,L133,BPM,RBPM,L127,SFP2,L048,FC,L082,Q3,L170,SDP3,GIR,L275,GIR,BPM,L061];              % arc sector in between BC-B2 (low beta even-numbered straight sections)
 
 C4A      = [GIR,L216,GIR,SDA2,L170,Q2,L230,SFA1,L125,BPM,L135,Q1,L170,SDA1,GIR,L474,GIR];                          % arc sector in between B2-B1 (high beta odd-numbered straight sections)
-C4A_20   = [GIR,L216,GIR,SDA2,L170,Q2,L230,SFA1,L125,BPM,L135,Q1,L170,SDA1,GIR,L465,VScrap,L009,GIR];               % arc sector in between B2-B1 (high beta odd-numbered straight sections)
+C4A_20   = [GIR,L216,GIR,SDA2,L170,Q2,L230,SFA1,L125,BPM,L135,Q1,L170,SDA1,GIR,L465,ScrapV,L009,GIR];               % arc sector in between B2-B1 (high beta odd-numbered straight sections)
 
 C4B      = [GIR,L216,GIR,SDB2,L170,Q2,L230,SFB1,L125,BPM,L135,Q1,L170,SDB1,GIR,L474,GIR];                          % arc sector in between B2-B1 (low beta even-numbered straight sections)
 C4B_DCCT = [GIR,L216,GIR,SDB2,L170,Q2,L230,SFB1,L125,BPM,L135,Q1,L170,SDB1,L237,DCCT,GIR,L237,GIR];                % arc sector in between B2-B1 (low beta even-numbered straight sections)

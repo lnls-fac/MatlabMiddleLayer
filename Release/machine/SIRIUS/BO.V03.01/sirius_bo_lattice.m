@@ -80,7 +80,7 @@ STR  = marker('start',   'IdentityPass');    % start of the model
 FIM  = marker('end',     'IdentityPass');    % end of the model
 GIR  = marker('girder',  'IdentityPass');
 SIN  = marker('injsl',   'IdentityPass');    % end of BO injection septum at TB transport line
-SEX  = marker('EjeSF',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
+SEX  = marker('EjeSeptF',  'IdentityPass');    % start of BO ejection thin septum at TS transport line
 BPM  = marker('bpm',     'IdentityPass');
 
 
@@ -245,7 +245,7 @@ end
 
 % ejection bend
 ejek = findcells(the_ring, 'FamName', 'ejek');
-sept_ex = findcells(the_ring, 'FamName', 'EjeSF');
+sept_ex = findcells(the_ring, 'FamName', 'EjeSeptF');
 b_ex = b((b > ejek(end)) & (b < sept_ex(1)));
 for i=b_ex
     the_ring{i}.VChamber = other_vchamber;

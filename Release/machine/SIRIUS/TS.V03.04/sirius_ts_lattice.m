@@ -131,55 +131,55 @@ qd4b    = quadrupole('QD4B', 0.14, qd4bh_strength, quad_pass_method); % qd
 % dynamics
 
 % -- bo thin ejection septum --
-dip_nam =  'EjeSF';
+dip_nam =  'EjeSeptF';
 dip_len =  0.5773;
 dip_ang =  -3.6 * d2r;
 dip_K   =  0.0;
 dip_S   =  0.00;
 h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,   0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
 h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-bejesf = marker('bEjeSF', 'IdentityPass'); % marker at the beginning of thin septum
-mejesf = marker('mEjeSF', 'IdentityPass'); % marker at the center of thin septum
-eejesf = marker('eEjeSF', 'IdentityPass'); % marker at the end of thin septum
+bejesf = marker('bEjeSeptF', 'IdentityPass'); % marker at the beginning of thin septum
+mejesf = marker('mEjeSeptF', 'IdentityPass'); % marker at the center of thin septum
+eejesf = marker('eEjeSeptF', 'IdentityPass'); % marker at the end of thin septum
 ejesf = [bejesf, h1, mejesf, h2, eejesf];
 
 % -- bo thick ejection septum --
-dip_nam  =  'EjeSG';
+dip_nam  =  'EjeSeptG';
 dip_len  =  0.5773;
 dip_ang  =  -3.6 * d2r;
 dip_K    =  0.0;
 dip_S    =  0.00;
 h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
 h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-bejesg = marker('bEjeSG', 'IdentityPass'); % marker at the beginning of thick septum
-mejesg = marker('mEjeSG', 'IdentityPass'); % marker at the center of thick septum
-eejesg = marker('eEjeSG', 'IdentityPass'); % marker at the end of thick septum
+bejesg = marker('bEjeSeptG', 'IdentityPass'); % marker at the beginning of thick septum
+mejesg = marker('mEjeSeptG', 'IdentityPass'); % marker at the center of thick septum
+eejesg = marker('eEjeSeptG', 'IdentityPass'); % marker at the end of thick septum
 ejesg = [bejesg, h1, mejesg, h2, eejesg];
 
 % -- si thick injection septum (2 of these are used) --
-dip_nam  =  'InjSG';
+dip_nam  =  'InjSeptG';
 dip_len  =  0.5773;
 dip_ang  =  +3.6 * d2r;
 dip_K    =  0.0;
 dip_S    =  0.00;
 h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
 h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-binjsg = marker('bInjSG', 'IdentityPass'); % marker at the beginning of thick septum
-minjsg = marker('mInjSG', 'IdentityPass'); % marker at the center of thick septum
-einjsg = marker('eInjSG', 'IdentityPass'); % marker at the end of thick septum
+binjsg = marker('bInjSeptG', 'IdentityPass'); % marker at the beginning of thick septum
+minjsg = marker('mInjSeptG', 'IdentityPass'); % marker at the center of thick septum
+einjsg = marker('eInjSeptG', 'IdentityPass'); % marker at the end of thick septum
 injsg = [binjsg, h1, minjsg, h2, einjsg];
 
 % -- si thin injection septum --
-dip_nam  =  'InjSF';
+dip_nam  =  'InjSeptF';
 dip_len  =  0.5773;
 dip_ang  =  +3.118 * d2r;
 dip_K    =  0.0;
 dip_S    =  0.00;
 h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
 h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-binjsf = marker('bInjSF', 'IdentityPass'); % marker at the beginning of thin septum
-minjsf = marker('mInjSF', 'IdentityPass'); % marker at the center of thin septum
-einjsf = marker('eInjSF', 'IdentityPass'); % marker at the end of thin septum
+binjsf = marker('bInjSeptF', 'IdentityPass'); % marker at the beginning of thin septum
+minjsf = marker('mInjSeptF', 'IdentityPass'); % marker at the center of thin septum
+einjsf = marker('eInjSeptF', 'IdentityPass'); % marker at the end of thin septum
 injsf = [binjsf, h1, minjsf, h2, einjsf];
 
 
@@ -244,22 +244,22 @@ for i=1:length(the_ring)
 end
 
 % -- bo ejection septa --
-mbeg = findcells(the_ring, 'FamName', 'bEjeSG');
-mend = findcells(the_ring, 'FamName', 'eEjeSF');
+mbeg = findcells(the_ring, 'FamName', 'bEjeSeptG');
+mend = findcells(the_ring, 'FamName', 'eEjeSeptF');
 for i=mbeg:mend
     the_ring{i}.VChamber = [0.0015, 0.004, 2];
 end
 
 % -- si thick injection septum --
-mbeg = findcells(the_ring, 'FamName', 'bInjSG');
-mend = findcells(the_ring, 'FamName', 'eInjSG');
+mbeg = findcells(the_ring, 'FamName', 'bInjSeptG');
+mend = findcells(the_ring, 'FamName', 'eInjSeptG');
 for i=mbeg:mend
     the_ring{i}.VChamber = [0.0045, 0.0035, 2];
 end
 
 % -- si thin injection septum --
-mbeg = findcells(the_ring, 'FamName', 'bInjSF');
-mend = findcells(the_ring, 'FamName', 'eInjSF');
+mbeg = findcells(the_ring, 'FamName', 'bInjSeptF');
+mend = findcells(the_ring, 'FamName', 'eInjSeptF');
 for i=mbeg:mend
     the_ring{i}.VChamber = [0.0015, 0.0035, 2];
 end
