@@ -4,17 +4,14 @@
 % emittances are calculated by the temporal evolution over a time which is
 % a multiple of damping time, based on equations described in KIM - A Code 
 % for Calculating the Time Evolution of Beam Parameters in High Intensity
-% Circular Accelerators - PAC 97. The bunch lenght was calculated by the
+% Circular Accelerators - PAC 97. The bunch length was calculated by the
 % expression given in SANDS - The Physics of Electron Storage Rings, an
 % Introduction.
 % This function was based very much on lnls_calcula_ibs developed by Afonso H. C. Mukai 
 % which calculates the effect of IBS with CIMP model only.
-%   [finalEmitBANE,relEmitBANE,finalemitCIMP,relEmitCIMP] = lnls_calc_ibs_bane_cimp(data1,data2)
-%   [finalEmitBANE,relEmitBANE,finalemitCIMP,relEmitCIMP] = lnls_calc_ibs_bane_cimp(data1,data2,R)
-%   [finalEmitBANE,relEmitBANE,finalemitCIMP,relEmitCIMP] = lnls_calc_ibs_bane_cimp(data1,data2,R,'plot')
-%
-%   ENTRADA
-%       data1       struct with ring parameters (atsummary):
+%   
+%   INPUT
+%       data_atsum      struct with ring parameters (atsummary):
 %                       revTime              revolution time [s]
 %                       gamma
 %                       twiss
@@ -24,23 +21,19 @@
 %                       naturalEmittance     zero current emittance [m rad]
 %                       radiationDamping     damping times [s]
 %                       synctune
-%       data2       struct with ring parameters (getad):
-%                       Coupling             coupling coefficient
-%                       BeamCurrent          current [A]
-%                       NrBunches            number of bunches
-%       R(=1)       growth bunch lenght factor (optional)
+%       I           Beam Current [mA]
+%       K           Coupling 
+%       R(=1)       growth bunch length factor (optional)
 %       'plot'      plot graphics of time evolution (optional)
-%   SA�DA
+%   OUTPUT
 %       finalEmit   equilibrium values for Bane and CIMP models[Ex Ey sigmaE sigmaz]
 %                   [m rad] [m rad] [] [m]
 %       relEmit     variation of initial and final values (in %)
 %
-% April, 2018 - Murilo Barbosa Alves
-% -------------------------------------------------------------------------
-%
-%
+% April, 2018 
+% =====================================================================================
 
-function [finalEmitBANE,relEmitBANE,finalEmitCIMP,relEmitCIMP] = lnls_calc_ibs_bane_cimp(data1,data2,R,p)
+function [finalEmitBANE,relEmitBANE,finalEmitCIMP,relEmitCIMP] = lnls_calc_ibs_bane_cimp(data_atsum,I,K,R,p)
 
 % If there is no argument, set R=1
 if(~exist('R','var'))
@@ -88,38 +81,42 @@ else
 end
 
 % Take parameters of database
-T_rev     = data1.revTime;
-gamma     = data1.gamma;
-alpha     = data1.compactionFactor;
-Je        = data1.damping(3);
-Se        = data1.naturalEnergySpread;
-En        = data1.naturalEmittance;
-tau_x     = data1.radiationDamping(1);
-tau_y     = data1.radiationDamping(2);
-tau_e     = data1.radiationDamping(3);
-synctune  = data1.synctune;
-K         = data2.Coupling;
-I         = data2.BeamCurrent;
-Nb        = data2.NrBunches;
+T_rev     = data_atsum.revTime;
+gamma     = data_atsum.gamma;
+alpha     = data_atsum.compactionFactor;
+Je        = data_atsum.damping(3);
+Se        = data_atsum.naturalEnergySpread;
+Sb        = data_atsum.bunchlength;
+En        = data_atsum.naturalEmittance;
+tau_x     = data_atsum.radiationDamping(1);
+tau_y     = data_atsum.radiationDamping(2);
+tau_e     = data_atsum.radiationDamping(3);
+%synctune  = data1.synctune;
+%K         = data2.Coupling;  %If the function mode which calls getad as data2 is used
+%I         = data_get.BeamCurrent; %If the function mode which calls getad as data2 is used
+%Nb        = data_get.NrBunches; %If the function mode which calls getad as data2 is used
+Nb        = 1; %It is useful to calculate the IBS effect with current per bunch
+
 % Copy values making them unique
-[s,idx]   = unique(data1.twiss.SPos(2:end));
+[s,idx]   = unique(data_atsum.twiss.SPos(2:end));
 idx       = idx + 1;
-betax     = data1.twiss.beta(idx,1);
-betay     = data1.twiss.beta(idx,2);
-alphax    = data1.twiss.alpha(idx,1);
-alphay    = data1.twiss.alpha(idx,2);
-etax      = data1.twiss.Dispersion(idx,1);
-etax_diff = data1.twiss.Dispersion(idx,2);
-etay      = data1.twiss.Dispersion(idx,3);
-etay_diff = data1.twiss.Dispersion(idx,4);
+betax     = data_atsum.twiss.beta(idx,1);
+betay     = data_atsum.twiss.beta(idx,2);
+alphax    = data_atsum.twiss.alpha(idx,1);
+alphay    = data_atsum.twiss.alpha(idx,2);
+etax      = data_atsum.twiss.Dispersion(idx,1);
+etax_diff = data_atsum.twiss.Dispersion(idx,2);
+etay      = data_atsum.twiss.Dispersion(idx,3);
+etay_diff = data_atsum.twiss.Dispersion(idx,4);
 
 delta_s = s(end) - s(1);
-omega = 2 * pi * synctune / T_rev; % angular synchrotron frequency
-%betav = sqrt(1-(1/gamma^2)); 
+synctune = R*c*T_rev *alpha*Se/Sb/2/pi; %Synchrtron tune adjusted to match bunch length
+omega = 2 * pi * synctune / T_rev; % angular synchrotron frequency [1/s]
+
 [~,Hym] = calc_H(betay,alphay,etay,etay_diff,s);
 Ex  = En/(1 + K);
-Ey  = K*En/(1 + K) + Je*Hym*Se^2;
-Sb  = R * c * alpha / omega * Se; % bunch lengh
+Ey  = K*Ex + Je*Hym*Se^2;
+%Sb  = R * c * alpha / omega * Se; % bunch length if it was not taken as an input
 Eln = Se * Sb; % zero current longitudinal emittance
 EBANEl = Eln;
 ECIMPl = Eln;
@@ -132,11 +129,12 @@ SeCIMP = Se;
 initialEmit = [Ex Ey Se Sb];
 
 N = I* T_rev / qe / Nb; % number of electrons per bunch
-CBANE = r0^2 * c * N / 16 / gamma^3;
+CBANE = r0^2 * c * N / 16 / gamma^3; 
 CCIMP = r0^2 * c * N / 64 / pi^2 /  gamma^4;
+f = 10; %ratio of IBS times over damping times
 
-tf = 10 * max([tau_x tau_y tau_e]);
-delta_t = min([tau_x tau_y tau_e]) / 10;
+tf = f * max([tau_x tau_y tau_e]);
+delta_t = min([tau_x tau_y tau_e]) /f;
 niter = ceil(tf / delta_t);
 t = linspace(0,tf,niter);
 
@@ -147,7 +145,7 @@ ECIMP(1,:) = [Ex Ey Se];
 
 % Calculates IBS effect 
 % Total time and time step are set based on assumptions that IBS tipical 
-%times are greater than damping times
+%times are greater (about 10 times) than damping times
 
 for i=1:niter
     Hx = calc_H(betax,alphax,etax,etax_diff);
@@ -155,15 +153,7 @@ for i=1:niter
 
     sigma_H2BANE = 1 ./ ( Hx./EBANEx + Hy./EBANEy + 1/SeBANE^2 );
     sigma_HBANE  = sqrt(sigma_H2BANE);
-    
-    %sigma_h2= 1./(1/SeBANE0^2 + (etax.^2./betax./EBANEx0) + (etay.^2./betay./EBANEy0));
-    %sigma_h = sqrt(sigma_h2);
-    
-    %Values of a,b,q of Piwinski model
-    %at = sigma_h .* sqrt(betax./EBANEx0) / gamma;
-    %bt = sigma_h .* sqrt(betay./EBANEy0) / gamma;
-    %qt = sigma_h.*betav.*sqrt(2.*sqrt(betay.*EBANEy0)./r0);
-         
+               
     %Argument of g(\alpha) functions (for Bane and CIMP)
     aBANE = sigma_HBANE .* sqrt(betax./EBANEx) / gamma;
     bBANE = sigma_HBANE .* sqrt(betay./EBANEy) / gamma;
@@ -198,7 +188,6 @@ for i=1:niter
     EBANEy = EBANEy + delta_EBANEy;
 
     SeBANE  = sqrt(omega * EBANEl / c / alpha / R);
-    
     EBANE(i,1) = EBANEx;
     EBANE(i,2) = EBANEy;
     EBANE(i,3) = SeBANE;
@@ -242,7 +231,6 @@ for i=1:niter
     ECIMPy = ECIMPy + delta_ECIMPy;
     
     SeCIMP  = sqrt(omega * ECIMPl / c / alpha / R);
-   
     ECIMP(i,1) = ECIMPx;
     ECIMP(i,2) = ECIMPy;
     ECIMP(i,3) = SeCIMP;
@@ -252,15 +240,6 @@ end
 SBANEb  = R * c * alpha / omega * SeBANE;
 SCIMPb  = R * c * alpha / omega * SeCIMP;
 
-%Average values of factors (a,b,q) which satisfies (small,small,large)
-%atm = trapz(s,at)/delta_s;
-%btm = trapz(s,bt)/delta_s;
-%qtm = trapz(s,qt)/delta_s;
-
-%Par = [atm btm qtm];
-
-%tIBSCIMP = [TeCIMP TxCIMP TyCIMP];
-%tIBSBANE = [TeBANE TxBANE TyBANE];
 
 finalEmitBANE = [EBANEx EBANEy SeBANE SBANEb]; %final values
 finalEmitCIMP = [ECIMPx ECIMPy SeCIMP SCIMPb];
