@@ -98,20 +98,20 @@ STR  = marker('start',   'IdentityPass');   % start of the model
 FIM  = marker('end',     'IdentityPass');   % end of the model
 GIR  = marker('girder',  'IdentityPass');
 
-SIN  = marker('InjS',    'IdentityPass');   % end of BO injection septum at TB transport line
-SEX  = marker('EjeSF',   'IdentityPass');   % start of BO ejection thin septum at TS transport line
+SIN  = marker('InjSept',    'IdentityPass');   % end of BO injection septum at TB transport line
+SEX  = marker('EjeSeptF',   'IdentityPass');   % start of BO ejection thin septum at TS transport line
 
 DCCT = marker('DCCT',    'IdentityPass');
 BPM  = marker('BPM',     'IdentityPass');
 Scrn = marker('Scrn',    'IdentityPass');
-TuneP= marker('TuneP',   'IdentityPass');
-TuneS= marker('TuneS',   'IdentityPass');
+TunePkup= marker('TunePkup',   'IdentityPass');
+TuneShkr= marker('TuneShkr',   'IdentityPass');
 GSL  = marker('GSL',     'IdentityPass');
 
 
 % --- lattice elements ---
 
-KIN  = quadrupole('InjK', 0.400, 0.0, quad_pass_method);
+KIN  = quadrupole('InjKckr', 0.400, 0.0, quad_pass_method);
 KEX  = quadrupole('EjeK', 0.400, 0.0, quad_pass_method);
 CH   = sextupole ('CH',   0.150, 0.0, sext_pass_method);
 CV   = sextupole ('CV',   0.150, 0.0, sext_pass_method);
@@ -143,9 +143,9 @@ DS_RF      = [GIR, L21320, RFC,                            D21460, GIR];
 DS_KE      = [GIR, L03860, KEX, L13460,                    L17960, GIR, QD, D02500];
 DS_CH      = [L01610, CH, GIR, L18210,                     D21460, GIR];
 DS_KI      = [GIR, L03860, KIN, L02500, Scrn, L10960,      L18960, Scrn, D02500, GIR];
-DS_QS_TuS  = [L01360, QS, GIR, L14460, TuneS, L04500,      L17960, GIR, QD, D02500];
+DS_QS_TuS  = [L01360, QS, GIR, L14460, TuneShkr, L04500,      L17960, GIR, QD, D02500];
 DS_DCCT    = [GIR, L21320,  DCCT,                          D21460, GIR];
-DS_QD_TuP  = [GIR, L15120, TuneP, L06200,                  L17960, GIR, QD, D02500];
+DS_QD_TuP  = [GIR, L15120, TunePkup, L06200,                  L17960, GIR, QD, D02500];
 
 
 US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QF0,DS_01, B];
@@ -277,7 +277,7 @@ end
 
 % ejection bend
 ejek = findcells(the_ring, 'FamName', 'EjeK');
-sept_ex = findcells(the_ring, 'FamName', 'EjeSF');
+sept_ex = findcells(the_ring, 'FamName', 'EjeSeptF');
 b_ex = b((b > ejek(end)) & (b < sept_ex(1)));
 for i=b_ex
     the_ring{i}.VChamber = other_vchamber;

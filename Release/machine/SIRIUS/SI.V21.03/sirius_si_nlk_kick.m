@@ -1,4 +1,4 @@
-function [x, integ_field, kickx, LPolyB] = sirius_si_InjNLK_kick(strength, fit_monomials, plot_flag)
+function [x, integ_field, kickx, LPolyB] = sirius_si_InjNLKckr_kick(strength, fit_monomials, plot_flag)
 
 if ~exist('plot_flag','var')
     plot_flag = false;

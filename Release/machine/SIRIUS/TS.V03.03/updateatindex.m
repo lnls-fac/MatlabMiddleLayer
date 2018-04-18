@@ -30,43 +30,43 @@ catch
 end
 
 try
-    % EjeSF
-    AO.EjeSF.AT.ATType = 'Septum';
-    AO.EjeSF.AT.ATIndex = buildatindex(AO.EjeSF.FamilyName, Indices.EjeSF);
-    AO.EjeSF.Position = findspos(THERING, AO.EjeSF.AT.ATIndex(:,1+floor(size(AO.EjeSF.AT.ATIndex,2)/2)))';
+    % EjeSeptF
+    AO.EjeSeptF.AT.ATType = 'Septum';
+    AO.EjeSeptF.AT.ATIndex = buildatindex(AO.EjeSeptF.FamilyName, Indices.EjeSeptF);
+    AO.EjeSeptF.Position = findspos(THERING, AO.EjeSeptF.AT.ATIndex(:,1+floor(size(AO.EjeSeptF.AT.ATIndex,2)/2)))';
       
 catch
-    warning('EjeSF family not found in the model.');
+    warning('EjeSeptF family not found in the model.');
 end
 
 try
-    % EjeSG
-    AO.EjeSG.AT.ATType = 'Septum';
-    AO.EjeSG.AT.ATIndex = buildatindex(AO.EjeSG.FamilyName, Indices.EjeSG);
-    AO.EjeSG.Position = findspos(THERING, AO.EjeSG.AT.ATIndex(:,1+floor(size(AO.EjeSG.AT.ATIndex,2)/2)))';
+    % EjeSeptG
+    AO.EjeSeptG.AT.ATType = 'Septum';
+    AO.EjeSeptG.AT.ATIndex = buildatindex(AO.EjeSeptG.FamilyName, Indices.EjeSeptG);
+    AO.EjeSeptG.Position = findspos(THERING, AO.EjeSeptG.AT.ATIndex(:,1+floor(size(AO.EjeSeptG.AT.ATIndex,2)/2)))';
       
 catch
-    warning('EjeSG family not found in the model.');
+    warning('EjeSeptG family not found in the model.');
 end
 
 try
-    % InjSF
-    AO.InjSF.AT.ATType = 'Septum';
-    AO.InjSF.AT.ATIndex = buildatindex(AO.InjSF.FamilyName, Indices.InjSF);
-    AO.InjSF.Position = findspos(THERING, AO.InjSF.AT.ATIndex(:,1+floor(size(AO.InjSF.AT.ATIndex,2)/2)))';
+    % InjSeptF
+    AO.InjSeptF.AT.ATType = 'Septum';
+    AO.InjSeptF.AT.ATIndex = buildatindex(AO.InjSeptF.FamilyName, Indices.InjSeptF);
+    AO.InjSeptF.Position = findspos(THERING, AO.InjSeptF.AT.ATIndex(:,1+floor(size(AO.InjSeptF.AT.ATIndex,2)/2)))';
       
 catch
-    warning('InjSF family not found in the model.');
+    warning('InjSeptF family not found in the model.');
 end
 
 try
-    % InjSG
-    AO.InjSG.AT.ATType = 'Septum';
-    AO.InjSG.AT.ATIndex = buildatindex(AO.InjSG.FamilyName, Indices.InjSG);
-    AO.InjSG.Position = findspos(THERING, AO.InjSG.AT.ATIndex(:,1+floor(size(AO.InjSG.AT.ATIndex,2)/2)))';
+    % InjSeptG
+    AO.InjSeptG.AT.ATType = 'Septum';
+    AO.InjSeptG.AT.ATIndex = buildatindex(AO.InjSeptG.FamilyName, Indices.InjSeptG);
+    AO.InjSeptG.Position = findspos(THERING, AO.InjSeptG.AT.ATIndex(:,1+floor(size(AO.InjSeptG.AT.ATIndex,2)/2)))';
       
 catch
-    warning('InjSG family not found in the model.');
+    warning('InjSeptG family not found in the model.');
 end
 
 
@@ -162,8 +162,8 @@ try
     AO.CH.AT.ATType = 'HCM';
     li = [];
     if isfield(Indices, 'CH'), li = [li Indices.CH]; end;
-    if isfield(Indices, 'EjeSF'), li = [li Indices.EjeSF]; end;
-    if isfield(Indices, 'InjSG'), li = [li Indices.InjSG]; end;
+    if isfield(Indices, 'EjeSeptF'), li = [li Indices.EjeSeptF]; end;
+    if isfield(Indices, 'InjSeptG'), li = [li Indices.InjSeptG]; end;
     AO.CH.AT.ATIndex = buildatindex(AO.CH.FamilyName, sort(li));
     AO.CH.Position = findspos(THERING, AO.CH.AT.ATIndex(:,1))';   
 catch
