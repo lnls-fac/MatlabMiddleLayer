@@ -69,8 +69,8 @@ inicio   = marker('start',  'IdentityPass');
 fim      = marker('end',    'IdentityPass');
 
 % --- slits ---
-hslit    = marker('HSlit',  'IdentityPass');
-vslit    = marker('VSlit',  'IdentityPass');
+slith    = marker('SlitH',  'IdentityPass');
+slitv    = marker('SlitV',  'IdentityPass');
 
 % --- beam screens ---
 scrn     = marker('Scrn',  'IdentityPass');
@@ -121,7 +121,7 @@ bps     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 
 bp      = [bpe, bps];
 
 % -- bo injection septum --
-dip_nam =  'InjS';
+dip_nam =  'InjSept';
 dip_len =  0.50;
 dip_ang =  21.75 * deg_2_rad;
 dip_K   =  0.0;
@@ -137,7 +137,7 @@ septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consiste
 
 s01_1 = [lb1p, l200, l200, scrn, bpm, l150c, ch, l100cc, cv, l150c];
 s01_2 = [lb2p, l200];
-s01_3 = [l200, l200, l200, l200, l200, l200, hslit, scrn, bpm, l150c, cv, l100cc, ch, l200c, vslit, l200, lb3p];
+s01_3 = [l200, l200, l200, l200, l200, l200, slith, scrn, bpm, l150c, cv, l100cc, ch, l200c, slitv, l200, lb3p];
 s02_1 = [l200, l200, ict, l200, l200, l100];
 s02_2 = [l200, scrn, bpm, l150c, ch, l100cc, cv, l200c, repmat(l200,1,25), lc3p];
 s02_3 = [l150, l150, l150, scrn, bpm, l150c, ch, l100cc, cv, l200c];

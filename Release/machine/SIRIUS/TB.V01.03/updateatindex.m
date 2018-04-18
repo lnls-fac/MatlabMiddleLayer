@@ -28,13 +28,13 @@ catch
     warning('B family not found in the model.');
 end
 try
-    % InjS
-    AO.InjS.AT.ATType = 'Septum';
-    AO.InjS.AT.ATIndex = buildatindex(AO.InjS.FamilyName, Indices.InjS);
-    AO.InjS.Position = findspos(THERING, AO.InjS.AT.ATIndex(:,1+floor(size(AO.InjS.AT.ATIndex,2)/2)))';
+    % InjSept
+    AO.InjSept.AT.ATType = 'Septum';
+    AO.InjSept.AT.ATIndex = buildatindex(AO.InjSept.FamilyName, Indices.InjSept);
+    AO.InjSept.Position = findspos(THERING, AO.InjSept.AT.ATIndex(:,1+floor(size(AO.InjSept.AT.ATIndex,2)/2)))';
       
 catch
-    warning('InjS family not found in the model.');
+    warning('InjSept family not found in the model.');
 end
 
 

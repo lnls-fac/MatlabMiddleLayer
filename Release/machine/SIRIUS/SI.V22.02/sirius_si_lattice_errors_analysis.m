@@ -434,11 +434,11 @@ function [machine, ids] = insert_ids(machine0)
         machine{j} = machine0{j};
         idx = indices.ids(2:end); idx(2) = [];
         indices_ids_coup = sort([idx-2, idx-1, idx+1, idx+2]);
-        InjNLK = [findcells(machine{j}, 'FamName', 'InjNLK'); findcells(machine{j}, 'FamName', 'pmm');];
+        InjNLKckr = [findcells(machine{j}, 'FamName', 'InjNLKckr'); findcells(machine{j}, 'FamName', 'pmm');];
         for i=indices_ids_coup
             len = machine{j}{i}.Length;
             fam = machine{j}{i}.FamName;
-            machine{j}{i} = machine{j}{InjNLK};
+            machine{j}{i} = machine{j}{InjNLKckr};
             machine{j}{i}.Length = len;
             machine{j}{i}.FamName = fam;
             machine{j}{i}.PolynomA = 0 * machine{j}{i}.PolynomA;
