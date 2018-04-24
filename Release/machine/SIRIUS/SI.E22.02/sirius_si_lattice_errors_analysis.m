@@ -375,7 +375,7 @@ finalizations();
                               };
         multi.sexts.main_multipole = 3;% positive for normal negative for skew
         multi.sexts.r0 = 12e-3;
-        % random errors based on batch mesurements (see Luana's and James' emails of 2018-04-23 for ximenes)
+        % random errors based on batch measurements (see Luana's and James' emails of 2018-04-23 for ximenes)
         multi.sexts.order     = [ 3     4     5     6 ]; % 1 for dipole
         multi.sexts.main_vals = [ 7e-4, 5e-4, 4e-4, 2e-4];
         multi.sexts.skew_vals = [ 5e-4, 5e-4, 5e-5, 9e-5];
