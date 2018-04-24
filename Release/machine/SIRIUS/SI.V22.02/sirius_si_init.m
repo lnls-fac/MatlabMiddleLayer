@@ -6,7 +6,7 @@ function sirius_si_init
 %  PS: All the Fields 'Position' are built in the 'updateatindex.m' script.
 
 % 2012-07-10 Modificado para sirius3_lattice_e025 - Afonso
-%
+
 setao([]);
 setad([]);
 
@@ -16,7 +16,7 @@ AD.Directory.LatticesDef = [SIRIUS_ROOT, filesep, 'lattices_def'];
 setad(AD);
 
 
-%% dipoles
+%% DIPOLES
 
 AO.B1.FamilyName  = 'B1';
 AO.B1.MemberOf    = {'PlotFamily'; 'B1'; 'BEND'; 'Magnet';};
@@ -24,7 +24,7 @@ AO.B1.DeviceList  = getDeviceList(20,2);
 AO.B1.ElementList = (1:size(AO.B1.DeviceList,1))';
 AO.B1.Status      = ones(size(AO.B1.DeviceList,1),1);
 AO.B1.Position    = [];
-AO.B1.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B1.DeviceList,1),1));
+AO.B1.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1',size(AO.B1.DeviceList,1),1));
 
 AO.B1.Monitor.MemberOf = {};
 AO.B1.Monitor.Mode = 'Simulator';
@@ -76,7 +76,7 @@ AO.B2.DeviceList  = getDeviceList(20,2);
 AO.B2.ElementList = (1:size(AO.B2.DeviceList,1))';
 AO.B2.Status      = ones(size(AO.B2.DeviceList,1),1);
 AO.B2.Position    = [];
-AO.B2.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b1b2-fam',size(AO.B2.DeviceList,1),1));
+AO.B2.ExcitationCurves = sirius_getexcdata(repmat('si-dipole-b2',size(AO.B2.DeviceList,1),1));
 
 AO.B2.Monitor.MemberOf = {};
 AO.B2.Monitor.Mode = 'Simulator';
@@ -121,6 +121,7 @@ AO.B2.Setpoint.Range        = [0 300];
 AO.B2.Setpoint.Tolerance    = .1;
 AO.B2.Setpoint.DeltaRespMat = .01;
 
+
 AO.BC.FamilyName  = 'BC';
 AO.BC.MemberOf    = {'SI-BC'; 'BC';};
 AO.BC.DeviceList  = getDeviceList(20,1);
@@ -129,7 +130,8 @@ AO.BC.Status      = ones(size(AO.BC.DeviceList,1),1);
 AO.BC.Position    = [];
 
 
-%% quadrupoles
+%% QUADRUPOLES
+
 AO = get_AO_quads(AO,'QFA', 'q20-fam', 2, 1, 4);
 AO = get_AO_quads(AO,'QDA', 'q14-fam', 2, 1, 4);
 AO = get_AO_quads(AO,'QDB1','q14-fam', 2, 2, 2);
@@ -144,7 +146,7 @@ AO = get_AO_quads(AO,'Q3',  'q20-fam', 2, 1, 1);
 AO = get_AO_quads(AO,'Q4',  'q20-fam', 2, 1, 1);
 
 
-%% sextupoles
+%% SEXTUPOLES
 
 AO = get_AO_sexts(AO,'SDA0',2,1,4);
 AO = get_AO_sexts(AO,'SDB0',2,2,2);
@@ -169,7 +171,7 @@ AO = get_AO_sexts(AO,'SFB2',1,1,1);
 AO = get_AO_sexts(AO,'SFP2',1,[2,3],4);
 
 
-%% correctors
+%% CORRECTORS
 
 % CH
 AO.CH.FamilyName  = 'CH';
@@ -437,7 +439,7 @@ AO.QS.Setpoint.Range         = [-10 10];
 AO.QS.Setpoint.Tolerance     = 0.00001;
 AO.QS.Setpoint.DeltaRespMat  = 5e-4;
 
-%% monitors
+%% MONITORS
 
 % BPMx
 AO.BPMx.FamilyName  = 'BPMx';
@@ -479,6 +481,7 @@ AO.BPMy.Monitor.Physics2HWParams = 1e9;
 AO.BPMy.Monitor.Units        = 'Hardware';
 AO.BPMy.Monitor.HWUnits      = 'nm';
 AO.BPMy.Monitor.PhysicsUnits = 'meter';
+
 
 %%%%%%%%
 % Tune %
@@ -589,7 +592,6 @@ AO.RF.VoltageSetpoint.PhysicsUnits     = 'Volts';
 % AO.RF.PhaseCtrl.Tolerance         = 10;    % ???
 
 
-
 %%%%%%%%%%%%%%
 %    DCCT    %
 %%%%%%%%%%%%%%
@@ -597,7 +599,7 @@ AO.DCCT.FamilyName               = 'DCCT';
 AO.DCCT.MemberOf                 = {'Diagnostics'; 'DCCT'};
 AO.DCCT.DeviceList               = [13, 1; 14, 1];
 AO.DCCT.ElementList              = [1; 2];
-AO.DCCT.Status                   = 1;
+AO.DCCT.Status                   = [1; 1];
 AO.DCCT.Position                 = [];
 
 AO.DCCT.Monitor.MemberOf         = {};

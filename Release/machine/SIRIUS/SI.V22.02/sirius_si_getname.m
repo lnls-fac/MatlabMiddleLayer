@@ -447,13 +447,10 @@ switch Family
             ];
 
     case 'RF'
-        % if operating with Superconductor cavity
-        % ChannelName = 'SI-03SP:RF-SRFCav:Frequency';
-        % if operating with PETRA-7 cavity
-        ChannelName = 'SI-02SB:RF-P7Cav';
+        ChannelName = 'AS-Glob:RF-Gen';
 
     case {'B1', 'B2'}
-        ChannelName = 'SI-Fam:MA-B1B2';
+        ChannelName = repmat('SI-Fam:MA-B1B2', size(DeviceList,1), 1);
 
     case 'DCCT'
         ChannelName = ['SI-13C4:DI-DCCT:Current-Mon';
@@ -469,18 +466,17 @@ switch Family
 end
 
 if any(strcmpi(Family, {'BPMx', 'BPMy', 'DCCT', 'TUNE'}))
-
+    %ChannelName are already complete
 elseif strcmpi(Family, 'RF')
     if strcmpi(Field, 'Monitor')
-        ChannelName = strcat(prefix, ChannelName, ':Frequency-Mon');
+        ChannelName = strcat(prefix, ChannelName, ':Freq-Mon');
     elseif strcmpi(Field, 'Setpoint')
-        ChannelName = strcat(prefix, ChannelName, ':Frequency-SP');
+        ChannelName = strcat(prefix, ChannelName, ':Freq-SP');
     elseif strcmpi(Field, 'VoltageMonitor')
         ChannelName = strcat(prefix, ChannelName, ':Voltage-Mon');
     elseif strcmpi(Field, 'VoltageSetpoint')
         ChannelName = strcat(prefix, ChannelName, ':Voltage-SP');
     end
-
 else %Bends, Quads, Sexts and Correctors
     if strcmpi(Field, 'Monitor')
         ChannelName = strcat(prefix, ChannelName, ':Current-Mon');
