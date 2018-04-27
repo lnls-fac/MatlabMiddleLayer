@@ -1,48 +1,48 @@
-% LNLS_CALCULA_TAU_IBS calcula as contribuições para o tempo de vida e o
-% tempo de vida total, considerando o aumento das emitâncias devido a
-% Intrabeam Scattering,  conforme calculado pela função lnls_calcula_ibs, a
-% partir de uma  modificação da função lnls_calcula_tau.
+% LNLS_CALCULA_TAU_IBS calcula as contribuiï¿½ï¿½es para o tempo de vida e o
+% tempo de vida total, considerando o aumento das emitï¿½ncias devido a
+% Intrabeam Scattering,  conforme calculado pela funï¿½ï¿½o lnls_calcula_ibs, a
+% partir de uma  modificaï¿½ï¿½o da funï¿½ï¿½o lnls_calcula_tau.
 %
 %   [lifetime,pressure,relEmit] = LNLS_CALCULA_TAU_IBS(data1,data2,r,pres,
-%   vacc) com pres=-1 usa o arquivo de perfil de pressão especificado em
-%   AD; com vacc=-1, usa o perfil de câmara de vácuo no modelo.
+%   vacc) com pres=-1 usa o arquivo de perfil de pressï¿½o especificado em
+%   AD; com vacc=-1, usa o perfil de cï¿½mara de vï¿½cuo no modelo.
 %
 %   ENTRADA
-%       data1       struct com os parâmetros do anel (atsummary):
+%       data1       struct com os parï¿½metros do anel (atsummary):
 %                       e0                   energia [GeV]
-%                       revTime              período de revolução [s]
+%                       revTime              perï¿½odo de revoluï¿½ï¿½o [s]
 %                       gamma
 %                       twiss
 %                       compactionFactor
 %                       damping
 %                       naturalEnergySpread
-%                       naturalEmittance     emitância natural [m rad]
+%                       naturalEmittance     emitï¿½ncia natural [m rad]
 %                       radiationDamping     tempos de amortecimento [s]
 %                       harmon
 %                       overvoltage
 %                       energyacceptance
 %                       bunchlength          comprimento do pacote [m]
-%       data2       struct com os parâmetros do anel (getad):
+%       data2       struct com os parï¿½metros do anel (getad):
 %                       Machine
 %                       Submachine
 %                       Coupling             coeficiente de acoplamento
 %                       BeamCurrent          corrente [A]
-%                       NrBunches            número de pacotes
-%                      (OpsData.PrsProfFile) arquivo do perfil de pressão
-%                      (OpsData.VccProfFile) arquivo da câmara de vácuo
+%                       NrBunches            nï¿½mero de pacotes
+%                      (OpsData.PrsProfFile) arquivo do perfil de pressï¿½o
+%                      (OpsData.VccProfFile) arquivo da cï¿½mara de vï¿½cuo
 %       r           fator multiplicativo para o comprimento do pacote
-%       pres        nome do arquivo do perfil de pressão ou valor médio de
-%                   pressão [mbar]
-%       vacc        nome do arquivo do perfil de câmara de vácuo ou valores
+%       pres        nome do arquivo do perfil de pressï¿½o ou valor mï¿½dio de
+%                   pressï¿½o [mbar]
+%       vacc        nome do arquivo do perfil de cï¿½mara de vï¿½cuo ou valores
 %                   de meia abertura horizontal e vertical [Vx Vy] [m]
-%	SAÍDA
+%	SAï¿½DA
 %       lifetime    struct com os valores de tempo de vida [h]
-%       pressure    struct com os valores de pressão [mbar]
-%       relEmit     aumento da emitância fornecido por lnls_calcula_ibs
+%       pressure    struct com os valores de pressï¿½o [mbar]
+%       relEmit     aumento da emitï¿½ncia fornecido por lnls_calcula_ibs
 %
 % NOTAS -------------------------------------------------------------------
-%   1. O aumento da emitância natural é calculado usando o aumento relativo
-%      da emitância horizontal fornecido por lnls_calcula_ibs
+%   1. O aumento da emitï¿½ncia natural ï¿½ calculado usando o aumento relativo
+%      da emitï¿½ncia horizontal fornecido por lnls_calcula_ibs
 % -------------------------------------------------------------------------
 %
 % 2012-09-28 Afonso Haruo Carnielli Mukai
@@ -50,23 +50,26 @@
 
 function [lifetime,pressure,relEmit] = lnls_calcula_tau_ibs(data1,data2,r,pres,vacc)
 
-% Parâmetros fixos
-Z = 7;   % Número atômico do átomo do gás residual diatômico equivalente
+% Parï¿½metros fixos
+Z = 7;   % Nï¿½mero atï¿½mico do ï¿½tomo do gï¿½s residual diatï¿½mico equivalente
 T = 300; % Temperatura [K]
 
-% Carga do elétron [C]
+% Carga do elï¿½tron [C]
 qe = 1.60217653e-19;
 
 [~,relEmit] = lnls_calcula_ibs(data1,data2,r);
 
 if(pres == -1)
-    pres_temp = fullfile(getmmlroot,'machine',data2.Machine,data2.SubMachine,data2.OpsData.PrsProfFile);
-    if(exist(pres_temp,'file'))
-        pres = pres_temp;
-    end
+    %pres_temp = fullfile(getmmlroot,'machine',data2.Machine,data2.SubMachine,data2.OpsData.PrsProfFile);
+    
+    pres = 'sirius_si_pressure_profile.txt';
+    pres = pres_temp;
+    %if(exist(pres_temp,'file'))
+       % pres = pres_temp;
+    %end
 end
 
-% Copia parâmetros
+% Copia parï¿½metros
 cp       = data1.e0;
 T_rev    = data1.revTime;
 gamma    = data1.gamma;
@@ -80,8 +83,12 @@ q        = data1.overvoltage;
 d_acc    = data1.energyacceptance;
 sigma_s  = data1.bunchlength * r * relEmit(4);
 if(isfield(data2,'Coupling') && isfield(data2,'BeamCurrent'))
-    K             = data2.Coupling;
-    I             = data2.BeamCurrent;
+    %K             = data2.Coupling;
+    %I             = data2.BeamCurrent;
+    I = 0.1; %pode mudar valores de coupling e corrente
+    K = 0.03;
+    data2.Couping = K;
+    data2.BeamCurrent = I;
     flag_quantum  = true;
     flag_touschek = true;
 elseif(isfield(data2,'Coupling'))
@@ -108,8 +115,10 @@ if(exist('refine','var'))
         Bx          = twiss.betax;
         By          = twiss.betay;
         alpha       = twiss.alphax;
-        eta         = twiss.etax;
-        eta_diff    = twiss.etaxl;
+        etax        = twiss.etax;
+        etaxl       = twiss.etaxl;
+        etay        = twiss.etay;
+        etayl       = twiss.etayl;
         flag_refine = true;
     else
         error('refine must be a number.');
@@ -119,13 +128,16 @@ else
     s_B      = data1.twiss.SPos(1:n-1);
     Bx       = data1.twiss.beta(1:n-1,1);
     By       = data1.twiss.beta(1:n-1,2);
-    alpha    = data1.twiss.alpha(1:n-1,1);
-    eta      = data1.twiss.Dispersion(1:n-1,1);
-    eta_diff = data1.twiss.Dispersion(1:n-1,2);
+    alphax   = data1.twiss.alpha(1:n-1,1);
+    alphay   = data1.twiss.alpha(1:n-1,2);
+    etax     = data1.twiss.Dispersion(1:n-1,1);
+    etaxl    = data1.twiss.Dispersion(1:n-1,2);
+    etay     = data1.twiss.Dispersion(1:n-1,3);
+    etayl    = data1.twiss.Dispersion(1:n-1,4);
     flag_refine = false;
 end
 
-% Calcula aceitâncias
+% Calcula aceitï¿½ncias
 [EA_x,EA_y,R,err] = lnls_calcula_aceitancias(data1.the_ring,s_B,Bx,By,vacc);
 if(err)
     flag_elastic = false;
@@ -133,16 +145,28 @@ else
     flag_elastic = true;
 end
 
-% Carrega funções
-[r,P,Bx,By,alpha,eta,eta_diff,err] = lnls_carrega_funcoes(s_B,Bx,By,alpha,eta,eta_diff,pres,flag_refine);
+load('accep.mat');
+
+% Carrega funï¿½ï¿½es
+[r,P,Bx,By,alphax,alphay,etax,etaxl,etay,etayl,err] = lnls_carrega_funcoes(s_B,Bx,By,alphax,alphay,etax,etay,etaxl,etayl,pres,flag_refine);
 if(err)
     flag_pressure = false;
 else
     flag_pressure = true;
 end
+ n        = length(r);
+data1.twiss.SPos(1:n)           = r;
+data1.twiss.beta(1:n,1)         = Bx;
+data1.twiss.beta(1:n,2)         = By;
+data1.twiss.alpha(1:n,1)        = alphax;
+data1.twiss.alpha(1:n,2)        = alphay;
+data1.twiss.Dispersion(1:n,1)   = etax;
+data1.twiss.Dispersion(1:n,2)   = etaxl;
+data1.twiss.Dispersion(1:n,3)   = etay;
+data1.twiss.Dispersion(1:n,4)   = etayl;
 
-% Calcula as contribuições para o tempo de vida
-% Tempo de vida quântico
+% Calcula as contribuiï¿½ï¿½es para o tempo de vida
+% Tempo de vida quï¿½ntico
 if(flag_quantum)
     W_q = lnls_tau_quantico_inverso(tau_am,K,EA_x,EA_y,E_n,cp,mcf,k,q,J_E);
     lifetime.quantum   = (1/W_q) / 3600;
@@ -150,7 +174,7 @@ else
     W_q = 0;
     lifetime.quantum = 'Not available';
 end
-% Tempo de vida elástico e inelástico
+% Tempo de vida elï¿½stico e inelï¿½stico
 if(flag_pressure)
     if(flag_elastic)
         [~,W_e] = lnls_tau_elastico_inverso(Z,T,cp,R,EA_x,EA_y,r,P,Bx,By);
@@ -170,7 +194,9 @@ end
 % Tempo de vida Touschek
 if(flag_touschek)
     N = I * T_rev / (qe * Nb);
-    [~,W_t,~] = lnls_tau_touschek_inverso(E_n,gamma,N,sigma_E,sigma_s,d_acc,r,Bx,By,alpha,eta,eta_diff,K);
+    %[~,W_t,~] = lnls_tau_touschek_inverso(E_n,gamma,N,sigma_E,sigma_s,d_acc,r,Bx,By,alpha,eta,eta_diff,K);
+    Resp = touschek_lifetime(data1,data2,Accep);
+    W_t = Resp.AveRate;
     lifetime.touschek = (1/W_t) / 3600;
 else
     W_t = 0;
@@ -185,7 +211,7 @@ else
     lifetime.total = 'Not available';
 end
 
-% Pressão
+% Pressï¿½o
 if(flag_pressure)
     pressure.average = trapz(r,P) / (r(length(r) - r(1)));
     pressure.min     = min(P);

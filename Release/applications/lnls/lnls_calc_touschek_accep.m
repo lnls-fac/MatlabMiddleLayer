@@ -1,4 +1,4 @@
-function [Accep, info] = lnls_calc_touschek_accep(ring,delta,plota,flag_dyn,info_in)
+function [Accep, info, ring] = lnls_calc_touschek_accep(ring,delta,plota,flag_dyn,info_in)
 % [Accp, tune_pos, tune_neg] = lnls_calc_touschek_accep(ring,delta)
 %  Function lnls_calc_touschek_accep calculates the transverve linear energy
 %  acceptance of the_ring, considering its twiss functions and vacuum
@@ -114,7 +114,7 @@ else
         
         circumference = findspos(ring, length(ring)+1);
         revFreq = const.c / circumference;
-        ind_cav = findcells(ring,'FamName', 'cav');
+        ind_cav = findcells(ring,'FamName', 'SRFCav');
         ring_6d{ind_cav}.Frequency = ring_6d{ind_cav}.HarmNumber*revFreq;
         
         beta_p = zeros(1, length(delta)); beta_n = beta_p;
