@@ -108,7 +108,7 @@ etax_diff = data1.twiss.Dispersion(idx,2);
 etay      = data1.twiss.Dispersion(idx,3);
 etay_diff = data1.twiss.Dispersion(idx,4);
 
-N = I * T_rev / qe / Nb % n�mero de el�trons por bunch
+N = I * T_rev / qe / Nb; % n�mero de el�trons por bunch
 C = r0^2 * c * N / 64 / pi^2 /  gamma^4;
 delta_s = s(end) - s(1);
 

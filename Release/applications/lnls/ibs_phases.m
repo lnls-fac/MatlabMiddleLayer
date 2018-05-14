@@ -10,8 +10,12 @@
 % give as input a current per bunch vector generated with logspace function
 % for better quality graphics.
 %       K         : Coupling between vertical and horizontal emittances [%]
-%       p         : 'plot' makes graphics of quantities versus current beam
+%       p         : 'plot' plots graphics of quantities versus current beam
 %       per bunch at different phases
+%       p         : 'save' saves four .txt files related to the operational
+%       phases 1 and 2 for two models CIMP and Bane. These files contains
+%       the current per bunch vector, vertical and horizontal emittances,
+%       energy spread and bunch length.
 %
 %
 % April, 2018 
@@ -24,10 +28,12 @@ if(~exist('K','var'))
     K = 3; 
 end
 
-K = K/100; %Coupling inputs are [%]
+K = K/100; %Coupling inputs are in [%]
 
 nint = length(I);
 
+
+%Save .txt files
 if(exist('s','var'))
     if(strcmp(s,'save'))
         flag_save = true;
@@ -37,6 +43,8 @@ if(exist('s','var'))
 else
     flag_save = false;
 end
+
+%Plot graphics with Matlab
 
 if(exist('p','var'))
     if(strcmp(p,'plot'))
@@ -48,12 +56,17 @@ else
     flag_plot = false;
 end
 
+%Phase 0
 %emitCIMP_ph0 = zeros(nint,4);
 %emitBANE_ph0 = zeros(nint,4);
 %[emitCIMP_ph0,emitBANE_ph0,~] = ibs_id(data_atsum,I,K,0);
+
+%Phase 1
 emitCIMP_ph1 = zeros(nint,4);
 emitBANE_ph1 = zeros(nint,4);
 [emitCIMP_ph1,emitBANE_ph1] = ibs_id(data_atsum,I,K,1);
+
+%Phase 2
 emitCIMP_ph2 = zeros(nint,4);
 emitBANE_ph2 = zeros(nint,4);
 [emitCIMP_ph2,emitBANE_ph2] = ibs_id(data_atsum,I,K,2);
@@ -61,7 +74,6 @@ emitBANE_ph2 = zeros(nint,4);
 if(flag_save)
 %Writes on files .dat, Current [mA], Horizonal Emittance [nm.rad], Vertical
 %Emittance [pm.rad], Energy Spread [%]
-
 
 fileCIMP1 = fopen('ibs_phase1_CIMP_plot.txt','w');
 fprintf(fileCIMP1,'%6s \t\t %6s \t %6s \t %6s \t %6s \r\n','I [mA]','Ex [nm.rad]', 'Ey [pm.rad]', 'Energy Spread [%]','Bunch Length [mm]');

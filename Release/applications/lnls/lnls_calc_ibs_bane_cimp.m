@@ -22,7 +22,7 @@
 %                       radiationDamping     damping times [s]
 %                       synctune
 %       I           Beam Current [mA]
-%       K           Coupling 
+%       K           Coupling      [%]
 %       R(=1)       growth bunch length factor (optional)
 %       'plot'      plot graphics of time evolution (optional)
 %   OUTPUT
@@ -34,6 +34,10 @@
 % =====================================================================================
 
 function [finalEmitBANE,relEmitBANE,finalEmitCIMP,relEmitCIMP] = lnls_calc_ibs_bane_cimp(data_atsum,I,K,R,p)
+
+
+%Convert Coupling from % to decimal
+%K = K/100;
 
 % If there is no argument, set R=1
 if(~exist('R','var'))
@@ -52,8 +56,8 @@ else
 end
 
 % Constants
-qe = 1.6021773e-19; % electron charge [C]
-r0 = 2.8179409e-15; % classic electron radius [m]
+qe = 1.60217662e-19; % electron charge [C]
+r0 = 2.8179403227e-15; % classic electron radius [m]
 c  = 2.99792458e8;  % speed of light [m/s]
 
 % Load interpolation tables
@@ -243,8 +247,8 @@ SCIMPb  = R * c * alpha / omega * SeCIMP;
 
 finalEmitBANE = [EBANEx EBANEy SeBANE SBANEb]; %final values
 finalEmitCIMP = [ECIMPx ECIMPy SeCIMP SCIMPb];
-relEmitBANE   = abs(1-finalEmitBANE ./ initialEmit).*100; %parameters variation in %
-relEmitCIMP   = abs(1-finalEmitCIMP ./ initialEmit).*100;
+relEmitBANE   = finalEmitBANE ./ initialEmit; %relative variation
+relEmitCIMP   = finalEmitCIMP ./ initialEmit;
 
 
 %Setting plots
