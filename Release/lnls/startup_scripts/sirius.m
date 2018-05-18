@@ -13,7 +13,7 @@ Disconnect = false;
 default_tb_version = 'TB.V02.01';
 default_bo_version = 'BO.V04.01';
 default_ts_version = 'TS.V03.04';
-default_si_version = 'SI.V22.02';
+default_si_version = 'SI.V22.03';
 default_link       = 'NONE';
 
 default_version = default_si_version;
