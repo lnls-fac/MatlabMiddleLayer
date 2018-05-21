@@ -18,8 +18,6 @@ Indices = atindex(THERING);
 AO = getao;
 
 
-
-
 try
     % BEND
     AO.B.AT.ATType = 'BEND';
@@ -27,26 +25,6 @@ try
     AO.B.Position = findspos(THERING, AO.B.AT.ATIndex(:,1));
 catch
     warning('B family not found in the model.');
-end
-
-try
-    % bend_a
-    AO.bend_a.AT.ATType = 'BendPS';
-    AO.bend_a.AT.ATMagnet = 'B';
-    AO.bend_a.AT.ATIndex = buildatindex(AO.B.FamilyName, Indices.B);
-    AO.bend_a.Position = findspos(THERING, AO.bend_a.AT.ATIndex(:,1));
-catch
-    warning('bend_a family not found in the model.');
-end
-
-try
-    % bend_b
-    AO.bend_b.AT.ATType = 'BendPS';
-    AO.bend_b.AT.ATMagnet = 'B';
-    AO.bend_b.AT.ATIndex = buildatindex(AO.B.FamilyName, Indices.B);
-    AO.bend_b.Position = findspos(THERING, AO.bend_b.AT.ATIndex(:,1));
-catch
-    warning('bend_b family not found in the model.');
 end
 
 try
@@ -98,18 +76,18 @@ end
 
 try
     % BPMx
-    AO.bpmx.AT.ATType = 'X';
-    AO.bpmx.AT.ATIndex = buildatindex(AO.bpmx.FamilyName, Indices.BPM);
-    AO.bpmx.Position = findspos(THERING, AO.bpmx.AT.ATIndex(:,1))';
+    AO.BPMx.AT.ATType = 'X';
+    AO.BPMx.AT.ATIndex = buildatindex(AO.BPMx.FamilyName, Indices.BPM);
+    AO.BPMx.Position = findspos(THERING, AO.BPMx.AT.ATIndex(:,1))';
 catch
     warning('BPMx family not found in the model.');
 end
 
 try
     % BPMy
-    AO.bpmy.AT.ATType = 'Y';
-    AO.bpmy.AT.ATIndex = buildatindex(AO.bpmy.FamilyName, Indices.BPM);
-    AO.bpmy.Position = findspos(THERING, AO.bpmy.AT.ATIndex(:,1))';
+    AO.BPMy.AT.ATType = 'Y';
+    AO.BPMy.AT.ATIndex = buildatindex(AO.BPMy.FamilyName, Indices.BPM);
+    AO.BPMy.Position = findspos(THERING, AO.BPMy.AT.ATIndex(:,1))';
 catch
     warning('BPMy family not found in the model.');
 end
@@ -132,15 +110,22 @@ catch
     warning('VCM family not found in the model.');
 end
 
-
-
-% RF Cavity
 try
-    AO.rf.AT.ATType = 'RF Cavity';
-    AO.rf.AT.ATIndex = findcells(THERING,'Frequency')';
-    AO.rf.Position = findspos(THERING, AO.rf.AT.ATIndex(:,1))';
+    % RF Cavity
+    AO.RF.AT.ATType = 'RF Cavity';
+    AO.RF.AT.ATIndex = findcells(THERING,'Frequency')';
+    AO.RF.Position = findspos(THERING, AO.RF.AT.ATIndex(:,1))';
 catch
     warning('RF cavity not found in the model.');
+end
+
+% DCCT
+try
+    AO.DCCT.AT.ATType = 'DCCT';
+    AO.DCCT.AT.ATIndex = findcells(THERING, 'FamName', 'DCCT')';
+    AO.DCCT.Position = findspos(THERING, AO.DCCT.AT.ATIndex(:,1))';
+catch
+    warning('DCCT not found in the model.');
 end
 
 
