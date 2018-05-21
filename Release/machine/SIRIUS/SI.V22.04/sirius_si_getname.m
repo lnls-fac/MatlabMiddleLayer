@@ -457,8 +457,10 @@ switch Family
                        'SI-14C4:DI-DCCT:Current-Mon' ];
 
     case 'TUNE'
-        ChannelName = ['SI-17C4:DI-VTuneP:TuneY-Mon';
-                       'SI-18SB:DI-HTuneP:TuneX-Mon' ];
+        ChannelName = ['SI-17C4:DI-TunePkup:TuneX-Mon';
+                       'SI-17C4:DI-TunePkup:TuneY-Mon';
+                       'SI-18SB:DI-TunePkup:TuneX-Mon';
+                       'SI-18SB:DI-TunePkup:TuneY-Mon' ];
 
     otherwise
         error('Don''t know how to make the channel name for family %s', Family);
@@ -466,12 +468,12 @@ switch Family
 end
 
 if any(strcmpi(Family, {'BPMx', 'BPMy', 'DCCT', 'TUNE'}))
-    %ChannelName are already complete
+    ChannelName = strcat(prefix, ChannelName);
 elseif strcmpi(Family, 'RF')
     if strcmpi(Field, 'Monitor')
-        ChannelName = strcat(prefix, ChannelName, ':Freq-Mon');
+        ChannelName = strcat(prefix, ChannelName, ':Frequency-Mon');
     elseif strcmpi(Field, 'Setpoint')
-        ChannelName = strcat(prefix, ChannelName, ':Freq-SP');
+        ChannelName = strcat(prefix, ChannelName, ':Frequency-SP');
     elseif strcmpi(Field, 'VoltageMonitor')
         ChannelName = strcat(prefix, ChannelName, ':Voltage-Mon');
     elseif strcmpi(Field, 'VoltageSetpoint')

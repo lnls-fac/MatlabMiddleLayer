@@ -488,9 +488,9 @@ AO.BPMy.Monitor.PhysicsUnits = 'meter';
 %%%%%%%%
 AO.TUNE.FamilyName = 'TUNE';
 AO.TUNE.MemberOf = {'TUNE'};
-AO.TUNE.DeviceList = [17 1;18 1];
-AO.TUNE.ElementList = [1;2];
-AO.TUNE.Status = [1; 1];
+AO.TUNE.DeviceList = [17 1; 17 2; 18 1; 18 2];
+AO.TUNE.ElementList = [1; 2; 3; 4];
+AO.TUNE.Status = [1; 1; 1; 1];
 AO.TUNE.CommonNames = ['TuneX'; 'TuneY'];
 
 AO.TUNE.Monitor.MemberOf   = {'TUNE'};
