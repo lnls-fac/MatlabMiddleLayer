@@ -370,7 +370,7 @@ else
         
     % Check DeltaRF for resonable values
     DeltaRFphysics = hw2physics('RF', 'Setpoint', DeltaRF, []);
-    if DeltaRFphysics > 15000;  % Hz
+    if DeltaRFphysics > 15000  % Hz
         tmp = questdlg(sprintf('%f Hz is a large RF change.  Do you want to continue?', DeltaRFphysics),'Dispersion Measurement','YES','NO','YES');
         if strcmp(tmp,'NO')
             Dx=[];  Dy=[];

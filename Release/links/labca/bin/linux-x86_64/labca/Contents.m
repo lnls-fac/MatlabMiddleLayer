@@ -11,6 +11,7 @@
 %   lcaGetGraphicLimits      - read graphic limits of EPICS PVs
 %   lcaGetPrecision          - read the display precision associated with EPICS PVs
 %   lcaGetUnits              - read the engineering units string associated with EPICS PVs
+%   lcaGetEnumStrings         - read the ENUM strings defined for a PV
 %   lcaGetRetryCount         - read/set the EZCA library retry count parameter
 %   lcaGetTimeout            - read/set the EZCA library timeout parameter
 %   lcaDebugOn               - NOT IMPLEMENTED YET (toggle EZCA library debugging messages on/off)

@@ -15,14 +15,14 @@ function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)
 %  [AM, tout, DataTime] = getpv(Family, Field, CommonName, t, FreshDataFlag, TimeOutPeriod)
 %
 %  INPUTS
-%  1. Family - Family Name 
+%  1. Family - Family Name
 %              Data Structure
 %              Channel Name or matrix of Channel Names
 %              Accelerator Object (only the family name is used)
 %              For CommonNames, Family=[] searches all families
 %              (or Cell Array of inputs)
 %
-%  2. Field - Subfield name of an accelerator family ('Monitor', 'Setpoint', etc)  
+%  2. Field - Subfield name of an accelerator family ('Monitor', 'Setpoint', etc)
 %             {Default: 'Monitor' or '' or ChannelName method}
 %             (For non-Family subfields, Field is added as .Field, see Note #8 below for more information.)
 %
@@ -37,7 +37,7 @@ function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)
 %                     Ie, getpv('BPMx',[1 1],0,2) measures the orbit then continues to read the orbit
 %                         until 2 new orbits have been measured and returns the last measurement.
 %                     Note: 1. t can only be a scalar when using the FreshDataFlag.
-%                           2. FreshDataFlag cannot be used with 'Matrix' data types. 
+%                           2. FreshDataFlag cannot be used with 'Matrix' data types.
 %
 %  6. TimeOutPeriod - Time-out period when waiting for fresh data {Default: 10 seconds}
 %
@@ -50,7 +50,7 @@ function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)
 %     'Hardware' - Use hardware units
 %
 %  9. Mode flag overrides
-%     'Online' - Get data online 
+%     'Online' - Get data online
 %     'Model'  - get data on the model
 %     'Manual' - Get data manually
 %
@@ -62,19 +62,19 @@ function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)
 %  1. AM   - Monitor values (Column vector or matrix where each column is a data point in time)
 %
 %  2. tout - Time when measurement was completed according to the computer time (Matlab time) (row vector)
-%            tout-t is the time it took to make the measurement.  diff(t) can be arbitarily small, but tout will 
-%            report the actual completion time.  
+%            tout-t is the time it took to make the measurement.  diff(t) can be arbitarily small, but tout will
+%            report the actual completion time.
 %
 %  3. DataTime - Time when the data was measured (as report by the hardware)
 %                Time since 00:00:00, Jan 1, 1970 in days (in the present time zone)
-%                Units are in Matlab "serial day number" format (days) to be compatible with 
-%                timing functions like datevec, datenum, datetick, etc.  
+%                Units are in Matlab "serial day number" format (days) to be compatible with
+%                timing functions like datevec, datenum, datetick, etc.
 %                For exmple, [d, tout, datatime] = getpv('BPMx', 'Monitor', [], 0:.5:10);
 %                            plot(datatime, d); datetick x
 %                When using the model, the datatime is the same a the computer time (Matlab time).
 %
 %  NOTES
-%  1. The output will be a data structure if the word 'struct' appears somewhere on the input line 
+%  1. The output will be a data structure if the word 'struct' appears somewhere on the input line
 %     or if the input is a data structure and 'numeric' is not on the input line.
 %
 %  2. For data structure inputs:
@@ -88,10 +88,10 @@ function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)
 %     TimeStamp  - Time (Matlab clock) at the start of the function
 %     tout       - Delta time vector at the end of each measurement (relative to TimeStamp)
 %
-%  4. diff(t) should not be too small.  If the desired time to collect the data is too 
-%     short then the data collecting will not be able to keep up.  Always check tout. 
-%     (t - tout) is the time it took to collect the data on each iteration.   
-% 
+%  4. diff(t) should not be too small.  If the desired time to collect the data is too
+%     short then the data collecting will not be able to keep up.  Always check tout.
+%     (t - tout) is the time it took to collect the data on each iteration.
+%
 %  5. An easy way to averaged 10 monitors is:
 %     PVmean = mean(getpv(Family,DeviceList,0:.5:4.5)')';   % .5 second between measurements
 %
@@ -103,7 +103,7 @@ function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)
 %                 plot(tout(1:end-1), 1./diff(tout),'.-'); % Point-wise data rate
 %                 If the update rate of the hardware is slower then the control system, then
 %                 hardware data rate can be visually inspected by plotting,
-%                 plot(tout, d,'.-'); 
+%                 plot(tout, d,'.-');
 %
 %  8. For cell array inputs:
 %     a. Input 1 defines the size of all cells
@@ -119,7 +119,7 @@ function [AM, tout, DataTime, ErrorFlag] = getpv(varargin)
 %  10. Error flaga are not used at the moment since all errors cause a Matlab error.
 %      Use try;catch statements to catch errors.
 %
-%  12. If say Golden is a software field in the MML structure in the BPMx family, then 
+%  12. If say Golden is a software field in the MML structure in the BPMx family, then
 %      getpv('BPMx','Golden', DeviceList) will return the data in that field.
 %
 %  See also getam, getsp, setpv, steppv
@@ -247,7 +247,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if iscell(varargin{1})
     %if strcmpi(ModeFlag, 'Online') | (isempty(ModeFlag) & strcmpi(getmode(varargin{1}{1}), 'Online'))
-    %     % Unfortunately the following code using channelnames is not much of a speed improvement over 
+    %     % Unfortunately the following code using channelnames is not much of a speed improvement over
     %     % interating over cell arrays (which is needed for simulator mode)
     %
     %     % Online cell arrays
@@ -449,7 +449,7 @@ if iscell(varargin{1})
         end
     end
 
-    
+
     % Count the number of inputs which are cells (Family or DeviceList) or strings (possibly Field)
     NCellOrString = 1;
     for i = 2:length(varargin)
@@ -708,7 +708,7 @@ if isstruct(varargin{1})
     else
         error('Input #1 of unknown type');
     end
-    
+
 else
 
     % Family, ChannelName, or Common name are still left
@@ -742,16 +742,16 @@ else
         if length(varargin) >= 5
             TimeOutPeriod = varargin{5};
         end
-        
+
     else
-        
+
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % CHANNEL NAME OR COMMON NAME INPUT %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         % Just do input parsing here
         Family = varargin{1};
-        
+
         % Default field is '' for channel names or it would be added as ChannelName.Field
         % But for common names it needs to be 'Monitor'
         Field = '';
@@ -769,7 +769,7 @@ else
         end
         if length(varargin) >= 4
             TimeOutPeriod = varargin{4};
-        end 
+        end
     end
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -784,8 +784,8 @@ end
 if isempty(t)
     t = 0;
 end
-if FamilyIndex 
-    %%%%%%%%%%%%%%%%% 
+if FamilyIndex
+    %%%%%%%%%%%%%%%%%
     % FAMILY INPUTS %
     %%%%%%%%%%%%%%%%%
 
@@ -803,7 +803,7 @@ if FamilyIndex
         % Convert common name to a DeviceList
         DeviceList = common2dev(DeviceList, AO);
     end
-    if (size(DeviceList,2) == 1) 
+    if (size(DeviceList,2) == 1)
         DeviceList = elem2dev(Family, DeviceList);
     end
 
@@ -823,7 +823,7 @@ if FamilyIndex
         end
     end
 
-    
+
     % Get data
     ExtraTimeDelay = etime(clock, t0);
     if StructOutputFlag || nargout >= 3
@@ -833,7 +833,7 @@ if FamilyIndex
     end
     tout = tout + ExtraTimeDelay;
 
-    
+
     if StructOutputFlag
         % Structure output
         AM = struct('Data', AM);
@@ -855,7 +855,7 @@ if FamilyIndex
             else
                 AM.UnitsString = AO.(Field).PhysicsUnits;
             end
-            AM.DataDescriptor = 'Get by FamilyName'; 
+            AM.DataDescriptor = 'Get by FamilyName';
         else
             AM.Mode = 'Online';
             AM.Units = '';
@@ -875,7 +875,7 @@ else
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Family input is a common name list %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         % Field default will come from getbycommonname via another getpv call
         % The DeviceList should not exist (and should not be used)
 
@@ -911,7 +911,7 @@ else
         if ~(isempty(ModeFlag) || strcmpi(ModeFlag, 'Online'))
             error('Channel names only have an ''Online'' Mode.')
         end
-        
+
         % There can be multiple channel names due to "ganged" power supplies or redundent user input
         [Family, i, j] = unique(Family, 'rows');
 
@@ -946,8 +946,8 @@ else
             end
         end
         tout = tout + ExtraTimeDelay;
-        
-        
+
+
         % Expand the blank channel names
         if ~isempty(iblank)
             AM = [NaN*ones(1,size(AM,2)); AM(iblank:end,:)];
@@ -955,8 +955,8 @@ else
                 DataTime = [(NaN+NaN*sqrt(-1))*ones(1,size(DataTime,2)); DataTime(iblank:end,:)];
             end
         end
-        
-        
+
+
         % Expand multiple channelnames back to multiple devices
         if ~isempty(AM)
             AM = AM(j,:);
@@ -1150,11 +1150,11 @@ if ~isfield(AO, Field);
         ExtraTimeDelay = etime(clock, t0);
         [AM, tout, DataTime, ErrorFlag] = getpvmodel(AO.FamilyName, Field, DeviceList, t-ExtraTimeDelay, 'Physics', 'Numeric');
         tout = tout + ExtraTimeDelay;
-        
+
         % Since physics2hw conversions are not known for fields that are not families, just return
         return
     end
-    
+
     % Try changing the suffix of the Monitor or Setpoint field
     if isfield(AO, 'Setpoint')
         Channel = family2channel(AO, 'Setpoint', DeviceList);
@@ -1165,7 +1165,7 @@ if ~isfield(AO, Field);
     end
     if any(strcmpi(getfamilydata('Machine'),{'spear3','spear'}))
         % Spear likes to change the channel name after the ':'
-        
+
         %i = findstr(Channel(1,:),':');
         %if ~isempty(i)
         %    Channel(:,i:end) = [];
@@ -1186,7 +1186,7 @@ if ~isfield(AO, Field);
         Channel = ChannelMat;
 
     else
-        % Add a .Field (EPICS) 
+        % Add a .Field (EPICS)
         Channel = strcat(Channel, ['.',Field]);
     end
 
@@ -1223,14 +1223,14 @@ if ~isstruct(AO.(Field))
     % Hardward and physics get ignored
     t1 = clock;
     [AM, ErrorFlag] = getfamilydata(AO.FamilyName, Field, DeviceList);
-    
+
     tout = etime(t1, t0);
     if nargout >= 3
         days = datenum(t1(1:3)) - 719529;  %datenum('1-Jan-1970');
         tt = 24*60*60*days + 60*60*t1(4) + 60*t1(5) + t1(6);
         DataTime(1:size(AM,1),1:length(t)) = fix(tt) + rem(tt,1)*1e9*sqrt(-1);
     end
-    
+
 elseif strcmpi(Mode,'online')
     % Online
     if strcmpi(AOField.DataType,'Scalar')
@@ -1238,9 +1238,9 @@ elseif strcmpi(Mode,'online')
 
         ExtraTimeDelay = etime(clock, t0);
         if nargout < 3
-            [AM, tout] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N, t-ExtraTimeDelay);
+            [AM, tout] = getpvonline(AOField.ChannelNames(DeviceIndex,:), N, t-ExtraTimeDelay);
         else
-            [AM, tout, DataTime, ErrorFlag] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N, t-ExtraTimeDelay);
+            [AM, tout, DataTime, ErrorFlag] = getpvonline(AOField.ChannelNames(DeviceIndex,:), N, t-ExtraTimeDelay);
         end
         tout = tout + ExtraTimeDelay;
 
@@ -1251,9 +1251,9 @@ elseif strcmpi(Mode,'online')
             AM0 = AM;
             while FreshDataCounter
                 if nargout < 3
-                    [AM, tout] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N);
+                    [AM, tout] = getpvonline(AOField.ChannelNames(DeviceIndex,:), N);
                 else
-                    [AM, tout, DataTime, ErrorFlag] = getpvonline(AOField.ChannelNames(DeviceIndex,:), OutputDataType, N);
+                    [AM, tout, DataTime, ErrorFlag] = getpvonline(AOField.ChannelNames(DeviceIndex,:), N);
                 end
 
                 if ~any((AM-AM0)==0)
@@ -1271,11 +1271,15 @@ elseif strcmpi(Mode,'online')
             end
             tout = etime(clock, t0);
         end
-        
+
+        if strcmpi(OutputDataType, 'String')
+            AM = num2str(AM);
+        end
+
     elseif strcmpi(AOField.DataType, 'Vector')
 
         % Output(DataTypeIndex) must be equal to the number of elements in the family
-        
+
         % There can only be one channel name for DataType='Vector'
         ChannelNames = deblank(AOField.ChannelNames(1,:));
 
@@ -1337,7 +1341,7 @@ elseif strcmpi(Mode,'online')
         end
 
     elseif any(strcmpi(AOField.DataType, {'Matrix','Waveform'}))
-        
+
         for iDev = 1:length(DeviceIndex)
             %AM(iDev,:) = rand(1,10); DataTime(iDev,:) = now; ErrorFlag(iDev,:)=0;
             [AM(iDev,:), tout, DataTime(iDev,:), ErrorFlag(iDev,1)] = getpvonline(AOField.ChannelNames(DeviceIndex(iDev),:), 'Matrix', N);
@@ -1347,7 +1351,7 @@ elseif strcmpi(Mode,'online')
 
     else
         %error(sprintf('Unknown DataType for family %s.', AO.FamilyName));
-        
+
         % Unknown DataType but just pass it on like a scalar (needed for machines like TLS)
         N = 1;  % Output size
 
@@ -1426,7 +1430,7 @@ elseif strcmpi(Mode,'Special')
 
             % Get data
             [Tmp, toutTmp, DataTimeTmp, ErrorFlag] = feval(SpecialFunction, AO.FamilyName, Field, DeviceList, t);
-            
+
             AM = [AM Tmp];
             DataTime = [DataTime DataTimeTmp];
 
@@ -1543,7 +1547,7 @@ elseif strcmpi(Mode,'manual')
             end
         end
     end
-    
+
     t1 = clock;
     tout = etime(t1, t0);
     days = datenum(t1(1:3)) - 719529;  %datenum('1-Jan-1970');
@@ -1568,7 +1572,7 @@ elseif strcmpi(Mode,'Simulator') || strcmpi(Mode,'Model')
     if strcmpi(OutputDataType, 'String')
         AM = num2str(AM);
     end
-        
+
     % Change to physics units if Units = 'physics'
     %if strcmpi(AO.(Field).Units,'Hardware')
     %    % Change to physics units
@@ -1578,6 +1582,3 @@ elseif strcmpi(Mode,'Simulator') || strcmpi(Mode,'Model')
 else
     error(sprintf('Unknown mode for family %s.', AO.FamilyName));
 end
-
-
-

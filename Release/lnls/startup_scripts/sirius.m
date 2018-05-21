@@ -84,10 +84,12 @@ elseif strcmpi(default_link, 'CA_MATLAB')
     setpathsirius('SIRIUS', default_version, 'CA_MATLAB');
     ca_matlab_lib = fullfile(root_folder, 'MatlabMiddleLayer','Release','links','ca_matlab','ca_matlab-1.0.0.jar');
     javaaddpath(ca_matlab_lib);
+    ca_matlab_config = fullfile(root_folder, 'MatlabMiddleLayer','Release','links','ca_matlab');
+    javaaddpath(ca_matlab_config);
     import ch.psi.jcae.*;
     ca_properties = java.util.Properties();
-%     ca_context = Context(ca_properties);
-%     setappdata(0, 'ca_context', ca_context);
+    ca_context = Context(ca_properties);
+    setappdata(0, 'ca_context', ca_context);
 else
     setpathsirius('SIRIUS', default_version, 'NONE');
 end

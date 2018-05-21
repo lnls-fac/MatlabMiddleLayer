@@ -173,6 +173,6 @@ ExcData = getfamilydata(Family, 'ExcitationCurves');
 GeV = zeros(size(Amps,1),1);
 for i=1:length(ElementsIndex)
     idx = ElementsIndex(i);
-    IntegratedField = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i));
+    IntegratedField = interp1(ExcData.data{idx}(:,1), ExcData.data{idx}(:,2), Amps(i), 'linear', 'extrap');
     GeV(i) = ((const.c/1e9) / DeflectionAngle(i)) * (-IntegratedField);
 end
