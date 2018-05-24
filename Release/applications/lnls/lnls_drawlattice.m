@@ -113,13 +113,13 @@ function draw_cms(the_ring, nper, offset, scale, h)
 
 pos = findspos(the_ring, 1:(length(the_ring)+1));
 max_pos = pos(end) / (nper - 0.001);
-hcms = findcells(the_ring, 'FamName', 'ch');
+hcms = sort([findcells(the_ring, 'FamName', 'CH'), findcells(the_ring, 'FamName', 'ch')]);
 for i=1:length(hcms)
     s = pos(hcms(i));
     if (s > max_pos), break; end;
     line([s s], [0+offset -1.5*scale+offset], 'Color', [0 0 1],'Parent',h)
 end
-vcms = findcells(the_ring, 'FamName', 'cv');
+vcms = sort([findcells(the_ring, 'FamName', 'CV'), findcells(the_ring, 'FamName', 'cv')]);
 for i=1:length(vcms)
     s = pos(vcms(i));
     if (s > max_pos), break; end;
