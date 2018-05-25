@@ -10,11 +10,10 @@
 %depending on the phase chosen a different bunch length and maximum total
 %current are set
 %
-%April, 2018 
-%
+%April, 2018 - Murilo Barbosa Alves
 %===============================================================================================
 
-function [data_at_new] = lnls_effect_emittance(data_at,phase)
+function data_at_new = lnls_effect_emittance(data_at,phase)
 
 %Definition of beam lines parameters
 
@@ -55,7 +54,7 @@ elseif phase == 2
     It_max = 350; 
     %data1.naturalEmittance = 0.15e-9;
     %data1.naturalEnergySpread = 8.3e-4;
-    data_at.bunchlength = 11.6e-3;
+    data_at.bunchlength = 11.6e-3;    
 else
     error('Invalid phase number');
 end

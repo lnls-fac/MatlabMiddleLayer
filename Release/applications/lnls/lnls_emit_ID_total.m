@@ -24,36 +24,36 @@
 %
 %==========================================================================
 
-function [Emit,EnSp,Jx,Jy,Je,tx,ty,te] = lnls_emit_ID_total(data1,bl,I)
+function [Emit,EnSp,Jx,Jy,Je,tx,ty,te] = lnls_emit_ID_total(data_at,bl,I)
 
 nbeam = size(bl); 
 nbeam = nbeam(1,1); %total number of IDs
 
-EmitNat = data1.naturalEmittance; %Natural emittance in m.rad
-EnSpNat = data1.naturalEnergySpread;
-E0 = data1.e0; %Nominal energy in GeV
-T_rev = data1.revTime;
-I20 = data1.integrals(1,2);
-I30 = data1.integrals(1,3);
-I40 = data1.integrals(1,4);
-I50 = data1.integrals(1,5);
+EmitNat = data_at.naturalEmittance; %Natural emittance in m.rad
+EnSpNat = data_at.naturalEnergySpread;
+E0 = data_at.e0; %Nominal energy in GeV
+T_rev = data_at.revTime;
+I20 = data_at.integrals(1,2);
+I30 = data_at.integrals(1,3);
+I40 = data_at.integrals(1,4);
+I50 = data_at.integrals(1,5);
 Jx0 = 1 - I40/I20;
 Je0 = 2 + I40/I20;
 
 CrEmit0 = I50/(I20*Jx0); %zero current emittance criteria
 CrEnSp0 = I30/(I20*Je0); %zero current energy spread criteria
 
-mia = findcells(data1.the_ring,'FamName','mia');
-mib = findcells(data1.the_ring,'FamName','mib');
-mip = findcells(data1.the_ring,'FamName','mip');
+mia = findcells(data_at.the_ring,'FamName','mia');
+mib = findcells(data_at.the_ring,'FamName','mib');
+mip = findcells(data_at.the_ring,'FamName','mip');
 
 %Takes from atsummary the values of twiss parameters on the given marker 
-etaxA = data1.twiss.Dispersion(mia(1),1);
-etaxB = data1.twiss.Dispersion(mib(1),1);
-etaxP = data1.twiss.Dispersion(mip(1),1);
-betaxA = data1.twiss.beta(mia(1),1);
-betaxB = data1.twiss.beta(mib(1),1);
-betaxP = data1.twiss.beta(mip(1),1);
+etaxA = data_at.twiss.Dispersion(mia(1),1);
+etaxB = data_at.twiss.Dispersion(mib(1),1);
+etaxP = data_at.twiss.Dispersion(mip(1),1);
+betaxA = data_at.twiss.beta(mia(1),1);
+betaxB = data_at.twiss.beta(mib(1),1);
+betaxP = data_at.twiss.beta(mip(1),1);
 
 I2w = zeros(nbeam,1);
 I3w = zeros(nbeam,1);
@@ -124,7 +124,7 @@ end
 I4 = I40 + sum(I4w);
 I2 = I20 + sum(I2w);
 
-U0t = data1.radiation + sum(U0); %Total energy bending + wigglers [GeV]
+U0t = data_at.radiation + sum(U0); %Total energy bending + wigglers [GeV]
 
 %New damping partition numbers
 Jx = 1 - I4/I2;

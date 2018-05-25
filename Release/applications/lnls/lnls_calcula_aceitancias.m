@@ -23,7 +23,7 @@
 %               horizontal
 %       err     verdadeiro se ocorreu erro
 
-function [EA_x,EA_y,R,err] = lnls_calcula_aceitancias(the_ring,r,Bx,By,vacc)
+function [EA_x,EA_y,theta_x,theta_y,err] = lnls_calcula_aceitancias(the_ring,r,Bx,By,vacc)
 
 err = false;
 
@@ -95,9 +95,13 @@ EA_y2 = 1e6*Vy.^2 ./ By2;
 EA_y  = min([EA_y1;EA_y2]);
 
 % Calcula R
-d = r(idx_fim) - r(1);
-Bx_media = trapz(r,Bx) / d;
-By_media = trapz(r,By) / d;
-theta_x = sqrt(EA_x / Bx_media);
-theta_y = sqrt(EA_y / By_media);
-R = theta_y / theta_x;
+%d = r(idx_fim) - r(1);
+%Bx_media = trapz(r,Bx) / d;
+%By_media = trapz(r,By) / d;
+%theta_x = sqrt(EA_x / Bx_media);
+%theta_y = sqrt(EA_y / By_media);
+theta_x = sqrt(EA_x ./Bx);
+theta_y = sqrt(EA_y ./By);
+%theta_x = trapz(r,theta_x)/d;
+%theta_y = trapz(r,theta_y)/d;
+%R = theta_y / theta_x;

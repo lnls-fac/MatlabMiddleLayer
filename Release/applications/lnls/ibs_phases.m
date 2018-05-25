@@ -12,7 +12,7 @@
 %       K         : Coupling between vertical and horizontal emittances [%]
 %       p         : 'plot' plots graphics of quantities versus current beam
 %       per bunch at different phases
-%       p         : 'save' saves four .txt files related to the operational
+%       s         : 'save' saves four .txt files related to the operational
 %       phases 1 and 2 for two models CIMP and Bane. These files contains
 %       the current per bunch vector, vertical and horizontal emittances,
 %       energy spread and bunch length.

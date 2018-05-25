@@ -238,7 +238,11 @@ for i=1:niter
     ECIMP(i,1) = ECIMPx;
     ECIMP(i,2) = ECIMPy;
     ECIMP(i,3) = SeCIMP;
-
+    if ~mod(i, 50)
+        fprintf('.\n');
+    else
+        fprintf('.');
+    end
 end
 
 SBANEb  = R * c * alpha / omega * SeBANE;
