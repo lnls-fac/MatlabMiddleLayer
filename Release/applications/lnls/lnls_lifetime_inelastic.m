@@ -21,8 +21,8 @@ function [W,Wm] = lnls_lifetime_inelastic(Z,T,P,r,Accep)
 Accep.pos = Accep.pos(perm);
 Accep.neg = Accep.neg(perm);
 r = unique(r);
-d_accp  = interp1(Accep.s, Accep.pos, r,'linear','extrap');
-d_accn  = interp1(Accep.s,-Accep.neg, r,'linear','extrap');
+d_accp  = interp1(Accep.s, Accep.pos, r,'linear');
+d_accn  = interp1(Accep.s,-Accep.neg, r,'linear');
 
 %Constants
 %r0 = 2.8179403227e-15; % classic electron radius [m]

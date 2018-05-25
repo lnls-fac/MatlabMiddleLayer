@@ -90,12 +90,6 @@ n        = length(data_at.twiss.SPos);
 s_B      = data_at.twiss.SPos(1:n-1);
 Bx       = data_at.twiss.beta(1:n-1,1);
 By       = data_at.twiss.beta(1:n-1,2);
-alphax   = data_at.twiss.alpha(1:n-1,1);
-alphay   = data_at.twiss.alpha(1:n-1,2);
-etax     = data_at.twiss.Dispersion(1:n-1,1);
-etaxl    = data_at.twiss.Dispersion(1:n-1,2);
-etay     = data_at.twiss.Dispersion(1:n-1,3);
-etayl    = data_at.twiss.Dispersion(1:n-1,4);
 
 vacc = -1; %Takes the vacuum chamber profile from atsummary
     
@@ -107,8 +101,10 @@ vacc = -1; %Takes the vacuum chamber profile from atsummary
 %generates a .mat file.
 %Qacc = 10000; %Accumulated charge: 10000 - Seeks stationary values
 %[s_P,P] = lnls_import_pressure_profile(data_at,'sirius_pressure_profile_2018.txt',Qacc);
+
 load('sirius_pressure_profile_2018.mat');
 s_B = unique(s_B);
+
 %Interpolation on the positions where twiss functions were calculated with
 %refine lattice (more accurate)
 P = interp1(s,P,s_B,'linear');

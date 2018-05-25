@@ -47,7 +47,6 @@ gamma = data_at.gamma;
 T_rev = data_at.revTime;
 N = I * T_rev / qe / Nb;
 Ib = I/Nb;
-optics = data_at.twiss;
 
 %Takes into account the ID's
 data_at_ids = lnls_effect_emittance(data_at,phase);
@@ -65,28 +64,25 @@ if length(Accep.pos) == 1
     Accep.neg = Accep.neg(1) * ones(size(Accep.s));
 end
 
+s        = data_at.twiss.SPos;
+betax    = data_at.twiss.beta(:,1);
+betay    = data_at.twiss.beta(:,2);
+alphax   = data_at.twiss.alpha(:,1);
+alphay   = data_at.twiss.alpha(:,2);
+etax     = data_at.twiss.Dispersion(:,1);
+etaxl    = data_at.twiss.Dispersion(:,2);
 
-%Delete repeated indexes to interpolation 
-[Accep.s, perm] = unique(Accep.s,'first');
-Accep.pos = Accep.pos(perm);
-Accep.neg = Accep.neg(perm);
-[~, ind, ~] = unique(optics.SPos);
+[s,r]    = unique(s);
+betax    = betax(r);
+betay    = betay(r);
+alphax   = alphax(r);
+alphay   = alphay(r);
+etax     = etax(r);
+etaxl    = etaxl(r);
 
-%Calculates the Touschek lifetime to each 10 cm of ring:
-npoints = ceil((Accep.s(end) - Accep.s(1))/0.1);
-s_calc = linspace(Accep.s(1), Accep.s(end), npoints);
-
-d_accp  = interp1(Accep.s, Accep.pos, s_calc);
-d_accn  = interp1(Accep.s,-Accep.neg, s_calc);
-
-% I added extrapolation, since sometimes s_calc was 1e-14 greater than pos,
-% leading to NaN - Plinio
-betax  = interp1(optics.SPos(ind), optics.beta(ind,1), s_calc, 'linear', 'extrap');
-alphax = interp1(optics.SPos(ind), optics.alpha(ind,1), s_calc, 'linear', 'extrap');
-etax   = interp1(optics.SPos(ind), optics.Dispersion(ind,1), s_calc, 'linear', 'extrap');
-etaxl  = interp1(optics.SPos(ind), optics.Dispersion(ind,2), s_calc, 'linear', 'extrap');
-betay  = interp1(optics.SPos(ind), optics.beta(ind,2), s_calc, 'linear', 'extrap');
-etay   = interp1(optics.SPos(ind), optics.Dispersion(ind,3), s_calc, 'linear', 'extrap');
+%Guarantees that acceptance and twiss are calculate at same positions
+d_accp   = interp1(Accep.s, Accep.pos, s);
+d_accn   = interp1(Accep.s,-Accep.neg, s);
 
 %Bunch Volume
 Sigxbeta2 = betax.*emit_x;
@@ -97,13 +93,13 @@ Hx = betax.*etaxl + alphax.*etax;
 A1 = 1/(4*sig_E^2) + (etax.^2 + Hx.^2)./(4*Sigxbeta2);
 B1 = betax.*Hx./(2*Sigxbeta2);
 C1 = betax.^2./(4*Sigxbeta2) - B1.^2./(4*A1);
-ksip = (2*sqrt(C1)/gamma .* d_accp).^2;
-ksin = (2*sqrt(C1)/gamma .* d_accn).^2;
+ksip = (2.*sqrt(C1)./gamma .* d_accp).^2;
+ksin = (2.*sqrt(C1)./gamma .* d_accn).^2;
 
 %Interpolation of function D
-load('lnls_tabela_d_touschek.mat');
-Dp = interp1(x_tabela(:),y_tabela(:),ksip,'linear',0.0);
-Dn = interp1(x_tabela(:),y_tabela(:),ksin,'linear',0.0);
+load('func_d_touschek.mat');
+Dp = interp1(range(1,:),dtouschek(1,:),ksip,'linear','extrap');
+Dn = interp1(range(1,:),dtouschek(1,:),ksin,'linear','extrap');
 
 %Inverse of Touschek Lifetime
 Ratep = (r0^2*c/8/pi)*N/gamma^2 ./ d_accp.^3 .* Dp ./ V;
@@ -111,7 +107,7 @@ Raten = (r0^2*c/8/pi)*N/gamma^2 ./ d_accn.^3 .* Dn ./ V;
 Result.Rate = (Ratep + Raten) / 2;
 
 %Average over the ring
-Result.AveRate = trapz(s_calc, Result.Rate) / ( s_calc(end) - s_calc(1) );
+Result.AveRate = trapz(s, Result.Rate) / ( s(end) - s(1) );
 Result.Lifetime = 1/Result.AveRate/3600; %Lifetime in hours
 Result.Volume = V;
-Result.Pos = s_calc;
+Result.Pos = s;
