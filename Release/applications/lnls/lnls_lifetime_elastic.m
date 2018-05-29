@@ -32,9 +32,35 @@ Kb = 1.3806505e-23; %Boltzmann Constant [J/K]
 Const = c*qe^4/(4*pi^2*epsilon0^2*Kb); % [m, K, J, m*rad, Pa]
 Const = Const*1e8/(qe*1e9)^2; % [m, K, GeV, mm*mrad, mbar];
 
-Fx = zeros(length(s_B),1);
-Fy = zeros(length(s_B),1);
+%Fx = zeros(length(s_B),1);
+%Fy = zeros(length(s_B),1);
 
+n = 1000;
+x = linspace(0, 1, n);
+X = bsxfun(@times, atan(R), x);
+th = repmat(theta_x, 1, n);
+fx = cot(th./2./cos(X)).^2;
+Fx = trapz(fx, 2) .* atan(R) / n;
+
+Y = bsxfun(@times, (pi/2 - atan(R)), x);
+Y = Y + repmat(atan(R), 1, n);
+th = repmat(theta_y, 1, n);
+fy = cot(th./2./sin(Y)).^2;
+Fy = trapz(fy, 2) .* (pi/2 - atan(R)) / n;
+
+W = Const*Z^2/(T*E0^2).*(Fx + Fy).*P;
+Wm = trapz(s_B,W) / ( s_B(length(s_B)) - s_B(1) );
+
+% funx  = @(theta,r) quad(@(x) cot(theta./2./cos(x)).^2,0,atan(r));
+% funy  = @(theta,r) quad(@(x) cot(theta./2./sin(x)).^2,atan(r),pi/2);
+% 
+% respx = arrayfun(funx,theta_x,R);
+% respy = arrayfun(funy,theta_y,R);
+% 
+% W = Const*Z^2/(T*E0^2).*(respx + respy).*P;
+
+%{
+tic
 for j=1:length(s_B);
   fx{j} = @(x) cot(theta_x(j)./2./cos(x)).^2;
   fy{j} = @(x) cot(theta_y(j)./2./sin(x)).^2;
@@ -42,13 +68,15 @@ for j=1:length(s_B);
   Fy(j) = quad(fy{j},atan(R(j)),pi/2);
   W(j) = Const*Z^2/(T*E0^2)*(Fx(j) + Fy(j))*P(j);
 end
-
 Wm = trapz(s_B,W) / ( s_B(length(s_B)) - s_B(1) );
+toc
+%}  
 
+%{  
 %Approximated model (Wiedemann)
-%{
+
 F = pi + (R.^2+1).*sin(2.*atan(R)) + 2.*(R.^2-1).*atan(R);
-WW = Const*Z^2/(cp^2)/T./theta_y.^2.*F.*P;
+W = Const*Z^2/(E0^2)/T./theta_y.^2.*F.*P;
 
 %W = Const*Z^2/(cp^2)/T*(By./EA_y)*F.*P;
 Wm = trapz(s_B,W) / ( s_B(length(s_B)) - s_B(1) );

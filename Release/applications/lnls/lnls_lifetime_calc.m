@@ -6,6 +6,7 @@
 % undulator radiation. Data file is "Pressure_Profile.txt".
 %
 % Input - data_at: struct with ring parameters (atsummary)
+%         Note: requires lattice refined with maximum length of 5cm
 %         ph: set the operational phase (0, 1 or 2)
 %         I: Beam Current [mA] (Default: current per bunch, Nb = 1, but  
 %    if Nb is different from 1, input must be total beam current and uniform 
@@ -22,11 +23,12 @@
 % lattice were made with atsummary
 % - sirius_pressure_profile_2018: check if the pressure profile is the
 % newest one
+% - Pressure and Acceptance were calculated with lattice model SI.V22.04
 % ========================================================================
 % 2012-09-28 Afonso Haruo Carnielli Mukai - Version 1
 % 2018-05-25 Murilo Barbosa Alves - Version 2
 %=========================================================================
-function [lifetime,total] = lnls_lifetime_calc(data_at,ph,I,Nb,K)
+function [lifetime,total] = lnls_lifetime_calc(ring,ph,I,Nb,K)
 
 %Default Coupling = 3%;
 if(~exist('K','var'))
@@ -47,34 +49,30 @@ T = 300; % Temperature [K]
 %so using these values of pressure is not appropriate to phase 0 calculations,
 %but there was no pressure profile without IDs effects.
 
-if ph==0
-lx = getcellstruct(data_at.the_ring,'VChamber',1:length(data_at.the_ring),1,1);
-ly = getcellstruct(data_at.the_ring,'VChamber',1:length(data_at.the_ring),1,2);
+ring = lnls_refine_lattice(ring, 0.05);
 
-for j=1:length(lx)
-    if lx(j) == 0.004 
-      lx(j) = 0.012;
-    end
-    if ly(j) ~=0.012
-    ly(j) = 0.012;
-    end
-    data_at.the_ring{1,j}.VChamber(1,1) = lx(j);
-    data_at.the_ring{1,j}.VChamber(1,2) = ly(j);
- end
-    load('accep_refined_phase0.mat');
-    ring_input = data_at.the_ring;
-    ring_model_accep = ring_model;
-if isequal(ring_input,ring_model_accep) == 0;
-  error('Input ring model differs from the ring model used to calculate acceptance \n%s','Calculate the acceptances to this input ring model with the function lnls_calc_touschek_accep');
-end
+if ph==0
+    lx = getcellstruct(ring,'VChamber',1:length(ring),1,1);
+    ly = getcellstruct(ring,'VChamber',1:length(ring),1,2); 
+    lx(lx < 0.012) = 0.012;
+    ly(ly < 0.012) = 0.012;
+    ring = setcellstruct(ring,'VChamber',1:length(ring), lx, 1,1);
+    ring = setcellstruct(ring,'VChamber',1:length(ring), ly, 1,2);
+   
+    A = load('accep_refined_phase0_SI-V22-04.mat');
 else
-load('accep_refined.mat');
-ring_input = data_at.the_ring;
-ring_model_accep = ring_model;
-if isequal(ring_input,ring_model_accep) == 0;
-  error('Input ring model differs from the ring model used to calculate acceptance \n%s','Calculate the acceptances to this input ring model with the function lnls_calc_touschek_accep');
+    A = load('accep_refined_SI-V22-04.mat');
 end
+
+ring_model = A.ring_model;
+Accep = A.Accep;
+
+if ~isequal(ring,ring_model);
+        warning('Input ring model differs from the ring model used to calculate acceptance');
+        warning('It is recommended to calculate the acceptances to this input ring model with the function lnls_calc_touschek_accep');
 end
+
+data_at  = atsummary(ring);
 
 %Parameters
 E0       = data_at.e0;
@@ -94,19 +92,17 @@ By       = data_at.twiss.beta(1:n-1,2);
 vacc = -1; %Takes the vacuum chamber profile from atsummary
     
 % Calcula aceit�ncias
-[EA_x,EA_y,theta_x,theta_y,~] = lnls_calcula_aceitancias(data_at.the_ring,s_B,Bx,By,vacc);
+[EA_x,EA_y,theta_x,theta_y,~] = lnls_calcula_aceitancias(ring,s_B,Bx,By,vacc);
 
 %Pressure Profile
-%Once lnls_import_pressure_profile calculates the pressure profile, it
-%generates a .mat file.
-%Qacc = 10000; %Accumulated charge: 10000 - Seeks stationary values
-%[s_P,P] = lnls_import_pressure_profile(data_at,'sirius_pressure_profile_2018.txt',Qacc);
+Qacc = 10000; %Accumulated charge: 10000 - Seeks stationary values
+%load('sirius_pressure_profile_2018.mat');
 
-load('sirius_pressure_profile_2018.mat');
+[s,P] = lnls_import_pressure_profile(ring,'sirius_pressure_profile_2018.txt',Qacc);
 s_B = unique(s_B);
 
 %Interpolation on the positions where twiss functions were calculated with
-%refine lattice (more accurate)
+%refine lattice
 P = interp1(s,P,s_B,'linear');
 
 % Quantum Lifetime
@@ -120,7 +116,7 @@ lifetime.elastic   = (1/W_e) / 3600;
 % Inelastic Lifetime    
 [~,W_i] = lnls_lifetime_inelastic(Z,T,P,s_B,Accep);
 lifetime.inelastic = (1/W_i)/3600;
-
+    
 % Touschek Lifetime
 rate = lnls_lifetime_touschek(data_at,ph,I,Nb,K,Accep);
 W_t = rate.AveRate;
@@ -131,4 +127,3 @@ W = W_q + W_e + W_i + W_t;
 lifetime.total = (1/W) / 3600;
 
 total = lifetime.total;
-
