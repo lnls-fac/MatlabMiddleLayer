@@ -5,8 +5,7 @@
 % accumulated charge of 10000Ah and considering the effect of delta
 % undulator radiation. Data file is "Pressure_Profile.txt".
 %
-% Input - data_at: struct with ring parameters (atsummary)
-%         Note: requires lattice refined with maximum length of 5cm
+% Input - ring: ring model
 %         ph: set the operational phase (0, 1 or 2)
 %         I: Beam Current [mA] (Default: current per bunch, Nb = 1, but  
 %    if Nb is different from 1, input must be total beam current and uniform 
