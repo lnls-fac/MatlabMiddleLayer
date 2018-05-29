@@ -3,63 +3,65 @@
 %accumulated charges and over 1/20 of the ring. This function uses the
 %periodicity of pressure to extend the pressure profile over the whole
 %ring. Adjustments to match the coordinate system from Vacuum Group with
-%Accelerator Physics Group were made. 
+%Accelerator Physics Group were made.
 %
-%Input - data_at : struct with ring parameters (atsummary)
-%        file    : file name .txt which contains the pressure profile 
-%        Last version - 'sirius_pressure_profile_2018.txt'
+%Input - the_ring : ring model from atsummary
+%        Last model used: SI.V22.04
+%        file    : file name .txt which contains the pressure profile
+%        Last version used - 'sirius_pressure_profile_2018.txt'
 %        q_acc   : accumulated charge to choose the simulated pressure
-%        values (10000 Ah is recommended because it reachs stationary condition)
-%
-%Output - s      : longitudinal position [m]
+%(10000 Ah or more is recommended because it tends to the stationary condition)
+%        
+%Output - s_P    : longitudinal position [m]
 %         P      : pressure [mbar]
 %==========================================================================
-%25 May, 2018 - Murilo Barbosa Alves
+%29 May, 2018 - Murilo Barbosa Alves
 %==========================================================================
-function [s,P] = lnls_import_pressure_profile(data_at,file,q_acc)
-
+function [s_P, P] = lnls_import_pressure_profile(the_ring, file, q_acc)
 P_file = importdata(file);
 P_data = P_file.data;
 
-if q_acc == 10;
-  press = P_data(:,2);
-  elseif q_acc==100;
-    press = P_data(:,3);
-  elseif q_acc==1000;
-    press = P_data(:,4);
-  elseif q_acc==10000;
-    press = P_data(:,5);
-  else
-    error('Invalid accumulated charge value, available values are 10, 100, 1000 and 10000');
+if q_acc <= 10;
+    P = P_data(:,2);
+elseif q_acc > 10 && q_acc < 10000;
+   q = [10, 100, 1000, 10000];
+   P = interp1(q,P_data(:,2:5)',q_acc)';   
+elseif q_acc >= 10000;
+    P = P_data(:,5);
 end
 
-L_part   = data_at.circumference/20;
-s_p = [L_part/100:L_part/100:L_part];
-s_p = s_p';
+sym = 20; %The section corresponds to 1/20 of the ring
 
-%The position where the B1 dipole begins
-b_init = findcells(data_at.the_ring,'FamName','calc_mom_accep');
-b_init = b_init(1,1);
-s_0 = findspos(data_at.the_ring,b_init);
+%The pressure values begins at the end of dipole B1
+b_init = findcells(the_ring,'FamName','B1_edge');
+the_ring = circshift(the_ring, [0, -b_init(end)+1]);
+
+%Beginning of at model to match origin of reference frames (center of
+%straight section)
+mk_strt = findcells(the_ring, 'FamName', 'start');
+s = findspos(the_ring, [mk_strt, length(the_ring)+1]);
+s_0 = s(1);
+
+%Make the position vector
+L = s(2);
+Sz = length(P);
+L_part = L/sym;
+s_P = linspace(L_part/Sz, L_part, Sz)';
+
 %Interpolation of pressure to obtain the value at the origin
-p0 = interp1(s_p,press,s_0);
-%Extends the position and the pressure taken from the pressure profile file over the whole ring
-add = [s_p(end,1)-s_0+L_part/100:L_part/100:L_part]';
-P0 = [p0;press(20:end,1);press(1:19,1)];
-P=P0;
-s0 = [0;s_p(20:end,1)-s_0;add];
-s = s0;
+p0 = interp1(s_P, P, s_0);
 
-for j=1:19;
-    s = [s;s0+j*L_part];
-end
+%Adjust origin and extends the pressure over the ring
+%Shows explicity that the last value is equal to the first value of
+%pressure
+idx = s_P > s_0;
+strt = find(idx,1);
+%strt = strt(1);
+P = [p0; P(idx, 1); P(~idx, 1)];
+P = repmat(P, sym, 1);
+P = [P; p0];
 
-while length(P)<1920
-    P = [P;P0];
-end
-
-%Just setting the last values equal to the initial values
-s = [s;s(end)+s(102)-s(101)];
-P = [P;p0];
-
-save 'sirius_pressure_profile_2018.mat' s P
+aux_vec = linspace(0,sym-1,sym)*L_part;
+s_P = [0; s_P - s_P(1) + s_P(strt) - s_0];
+s_P = reshape(bsxfun(@plus,s_P, aux_vec),[],1);
+s_P = [s_P; L];
