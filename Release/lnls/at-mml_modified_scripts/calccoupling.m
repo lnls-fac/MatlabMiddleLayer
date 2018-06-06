@@ -22,6 +22,7 @@ function [Tilt, Eta, EpsX, EpsY, Ratio, ENV, DP, DL, sigmas] = calccoupling(the_
 %     is in the MML.  Whenever changing THERING use updateatindex to sync the MML.
 
 %  Written by James Safranek
+%  2018/06/06 - change emittance estimator to median. (Fernando de Sá)
 global THERING
 if ~exist('the_ring','var')
     the_ring = THERING;
@@ -61,10 +62,10 @@ if nargout ==0 || complete
     EpsX = (sigmas(1,:).^2-Eta(1,:).^2*DP^2)./Beta(:,1)';
     EpsY = (sigmas(2,:).^2-Eta(3,:).^2*DP^2)./Beta(:,2)';
     
-    EpsX0 = mean(EpsX);
-    EpsY0 = mean(EpsY);
-    %EpsX0 = median(EpsX);
-    %EpsY0 = median(EpsY);
+%     EpsX0 = mean(EpsX);
+%     EpsY0 = mean(EpsY);
+    EpsX0 = median(EpsX);  % changed here (Fernando).
+    EpsY0 = median(EpsY);
     Ratio = EpsY0 / EpsX0;
 end
 
