@@ -8,7 +8,7 @@ close all;
 fname = 'SI.V18.01-nominal3p0-ids0p08.mat';
 %fname = 'SI.V18.01-nominal3p0-ids0p01.mat';
 
-data =load(fname); r = data.r;
+data =load(['study/',fname]); r = data.r;
 
 
 tilt0 = [];
