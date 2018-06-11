@@ -66,6 +66,9 @@ for i=1:length(the_ring)
         data.(Fam).ATIndex = [data.(Fam).ATIndex; i];
     end
 end
+for i=1:length(fams)
+    data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
+end
 
 
 % chs - slow horizontal correctors
