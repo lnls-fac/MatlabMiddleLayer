@@ -27,6 +27,7 @@ function r = sirius_coupling_feedback(lattice_version, run_nominal, run_response
         nominal_data = data.nominal_data;
         ring0 = data.ring0;
         indices = data.indices;
+        sim_anneal = data.sim_anneal;
     else
         ring0 = load_model(lattice_version);
         fprintf('   . finding lattice indices\n');
@@ -41,6 +42,7 @@ function r = sirius_coupling_feedback(lattice_version, run_nominal, run_response
         nominal_data = controlled_coupling(ring0, sim_anneal, indices);
         save(fname, 'nominal_data', 'sim_anneal', 'ring0', 'indices', 'lattice_version');
     end
+    ring = add_qs_in_families(ring0, nominal_data.qs_fams, nominal_data.skew_stren);
 
     fname = [lattice_version, '_fb_response.mat'];
     if exist(fname, 'file') && ~run_response
@@ -48,7 +50,6 @@ function r = sirius_coupling_feedback(lattice_version, run_nominal, run_response
         response = response.response;
     else
         b2_selection = logical(repmat([1,0,0,0, 1,0,0,0],1,5)); % for 10 B2 beamlines
-        ring = add_qs_in_families(ring0, nominal_data.qs_fams, nominal_data.skew_stren);
         response = calc_feedback_respm(ring, indices, b2_selection);
         save(fname, 'response', 'b2_selection');
     end
@@ -66,17 +67,14 @@ function r = sirius_coupling_feedback(lattice_version, run_nominal, run_response
             '/official/s05.01/multi.cod.tune.coup/cod_matlab/',...
             'CONFIG_machines_cod_corrected_tune_coup_multi.mat'];
         rand_mach = load_random_machines(fname_rand_mach);
-        pol_scale = [29,29,5,29,29,29,5,29,29,29,5,29,29,29,5,29,29,29]/1000;
-        ids_data = get_ids_data(ring0, indices, 0.01, length(rand_mach), pol_scale);
-%         ids_data = get_ids_data(ring0, indices, 0.01, length(rand_mach));
+%         pol_scale = [29,29,5,29,29,29,5,29,29,29,5,29,29,29,5,29,29,29]/1000;
+%         ids_data = get_ids_data(ring0, indices, 0.01, length(rand_mach), pol_scale);
+        goal_emit_ratio = 0.01;
+        ids_data = get_ids_data(ring0, indices, goal_emit_ratio, length(rand_mach));
     end
     
-%     show_summary_machines(rand_mach, indices, 'raw random machines');
     rand_mach_coup = apply_nominal_skew_to_random_machines(rand_mach, nominal_data);
-    titulo = 'random machines with controlled coupling';
-%     show_summary_machines(rand_mach_coup, indices, titulo);
     rand_mach_coup_ids = insert_ids(rand_mach_coup, ids_data);
-%     show_summary_machines(rand_mach_coup_ids, indices, 'random machines with IDs on');
     
     if ~exist('fb_data', 'var')
         corr_params.max_nr_iter = 200;
@@ -87,11 +85,12 @@ function r = sirius_coupling_feedback(lattice_version, run_nominal, run_response
     end
     rand_mach_coup_ids_fb = add_qs_to_random_machines(...
                     rand_mach_coup_ids, fb_data.idx, fb_data.quad_strens);
-%     show_summary_machines(rand_mach_coup_ids_fb, indices, 'random machines after FB');
-    r.nominal_data = nominal_data;
+
+	r.nominal_data = nominal_data;
     r.indices = indices;
     r.ring0 = ring0;
-    r.ring = add_qs_in_families(ring0, nominal_data.qs_fams, nominal_data.skew_stren);
+    r.ring = ring;
+    r.sim_anneal = sim_anneal;
     r.ids_data = ids_data;
     r.fb_data = fb_data;
     r.response = response;
@@ -129,68 +128,7 @@ function indices = find_indices(ring, data)
     b2_seg_idx = 8;  % corresponds to 13 mrad (correct value : ~16 mrad)
     indices.b2 = data.b2.ATIndex(:, b2_seg_idx);
     indices.qs = data.qs.ATIndex;
-
-
-function rand_mach = load_random_machines(fname_random_machines)
-    fprintf(['-- loading random machines [', datestr(now), ']\n']);
-    % loads random machines
-    data = load(fname_random_machines);
-    rand_mach = data.machine;
-    % calcs coupling parameters
-    for i=1:length(rand_mach)
-        [rand_mach{i}, ~, ~, ~, ~, ~, ~] = setradiation('On', rand_mach{i});
-        rand_mach{i} = setcavity('On', rand_mach{i});
-    end
-
     
-function data = get_ids_data(ring, indices, emit_ratio, n_rand_mach, pol_scale)
-
-    fprintf(['-- Find Strength of IDs [', datestr(now), ']\n']);
-
     idx = indices.bl_ids;
     idx([1 3]) = []; % section 01A and 03P have no IDs
-    idx = reshape(sort([idx-1, idx+1]), 2, [])';
-       
-    if ~exist('pol_scale', 'var')
-        pol_scale = 3e-3*ones(1, size(idx, 1));
-
-        fprintf('   . desired coupling (ey/ex): ');
-        fprintf('%f \n', emit_ratio);
-        fprintf('   . listing id configurations\n');
-        fprintf('   %2s @ %5s | ', 'id', 'mkr');
-        fprintf('%6s | ', 'family');
-        fprintf('%10s | ', 'Length [m]');
-        fprintf('%10s | ', 'Pass Meth.');
-        fprintf('%9s | ', 'QS [1/km]');
-        fprintf('%12s |', 'ex [pm.rad]');
-        fprintf('%12s |', 'ey [pm.rad]');
-        fprintf('%12s |', 'e0 [pm.rad]');
-        fprintf('%6s\n', 'ey/ex');
-        last = 0;
-        for i=1:size(idx, 1)
-            fam = unique(getcellstruct(ring, 'FamName', idx(i,:)));
-            len = getcellstruct(ring, 'Length', idx(i,:));
-            pas = unique(getcellstruct(ring, 'PassMethod', idx(i,:)));
-            while pol_scale(i) ~= last
-                la1 = insert_one_id(ring, idx(i,:), pol_scale(i));
-                coup = calc_coupling(la1);
-                rat = emit_ratio / coup.emit_ratio;
-                last = pol_scale(i);
-                pol_scale(i) = round(sqrt(rat) * pol_scale(i), 3);
-            end
-            fprintf('   %02i @ %5s | ', i, ring{idx(i,1)+1}.FamName);
-            fprintf('%6s | ', fam{1});
-            fprintf('%10.3f | ', sum(len));
-            fprintf('%10s | ', pas{1});
-            fprintf('%9.2f | ', pol_scale(i)*1000);
-            fprintf('%12.3f |', 1e12*coup.emit_x);
-            fprintf('%12.3f |', 1e12*coup.emit_y);
-            fprintf('%12.3f |', 1e12*(coup.emit_x + coup.emit_y));
-            fprintf('%6.3f\n', 100*coup.emit_ratio);
-        end
-    end
-    data.idx = idx;
-    data.pol_scale = pol_scale;
-    pol_scale = repmat(pol_scale, n_rand_mach, 1);
-    data.polynom_a = 2*(rand(size(pol_scale)) - 0.5) .* pol_scale;
- 
+    indices.ids = reshape(sort([idx-1, idx+1]), 2, [])';
