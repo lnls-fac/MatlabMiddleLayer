@@ -17,7 +17,7 @@ monomials = [0,1,2,3,4,5,6];
 
 % dipole model (150MeV)
 % =====================
-% filename: 2018-08-02_TB_Dipole_Model03_Sim_X=-85_85mm_Z=-500_500mm_Imc=250A.txt
+% filename: 2018-08-04_TB_Dipole_Model03_Sim_X=-85_85mm_Z=-500_500mm_Imc=249.1A.txt
 segmodel = [ ...
  %--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m^(n-1)] for polynom_b ---
  %type   len[m]    angle[deg]  PolyB(n=0)   PolyB(n=1)   PolyB(n=2)   PolyB(n=3)   PolyB(n=4)   PolyB(n=5)   PolyB(n=6) 
