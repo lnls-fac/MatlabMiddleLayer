@@ -10,12 +10,13 @@ function rndnr = lnls_generate_random_numbers(stdvalue, nrvalues, type, cutoff, 
 %            distributions;
 %rndnr     = vector of 1xnrvalues with random real numbers.
 
-
+if ~exist('type', 'var'), type = 'normal'; end;
 if ~exist('cutoff', 'var'), cutoff = Inf; end;
+if ~exist('avgvalue', 'var'), avgvalue = 0; end;
 
-if strcmpi(type, 'uniform')
+if strncmpi(type, 'uniform', 3)
     rndnr = avgvalue + stdvalue * (rand(1, nrvalues) - 0.5);    
-elseif strcmpi(type, 'exponential')
+elseif strncmpi(type, 'exponential', 3)
     rndnr = zeros(1,nrvalues);
     sel = 1:nrvalues;
     while ~isempty(sel)
