@@ -10,10 +10,11 @@ function sirius(varargin)
 
 Disconnect = false;
 
-default_tb_version = 'TB.V02.01';
+default_tb_version = 'TB.V02.02';
 default_bo_version = 'BO.V04.01';
 default_ts_version = 'TS.V03.04';
-default_si_version = 'SI.V22.04';
+% default_si_version = 'SI.V22.04';
+default_si_version = 'SI.V23.01';
 default_link       = 'NONE';
 
 default_version = default_si_version;
