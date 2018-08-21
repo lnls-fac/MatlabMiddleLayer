@@ -132,69 +132,26 @@
 % sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
 
 
-% % 2017-01-11 ximenes (overall checking of model - quadrupole qd model 02)
-% % tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9)"
-% % chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF')"
-% % effective length changed from 227 mm to 228 mm.
-% % added model data for injection energy (2016-12-06 - ximenes)
-% 
-% qf_strength_3gev = 1.654036900448982;
-% qd_strength_3gev = -0.005474886350700;
-% qs_strength_3gev = 0.0;
-% sf_strength_3gev = 11.326236792215228;
-% sd_strength_3gev = 6.282586036135388;
-% 
-% qf_strength_150mev = 1.653947031926041;
-% qd_strength_150mev = 0.011197961538728;  % this is correct! the sign has changed!
-% qs_strength_150mev = 0.0;
-% sf_strength_150mev = 11.331918124055948;
-% sd_strength_150mev = 5.007982970980575;
-% 
-% qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
-% qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
-% qs_strength = qs_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qs_strength_3gev - qs_strength_150mev);
-% sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
-% sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
+% 2017-01-11 ximenes (overall checking of model - quadrupole qd model 02)
+% tunes fitted to [19.20433 7.31417] with "[THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9)"
+% chroms fitted to [0.5 0.5] with "THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF')"
+% effective length changed from 227 mm to 228 mm.
+% added model data for injection energy (2016-12-06 - ximenes)
 
-
-% 2018-08-16 ximenes 
-% updated dipolo model-09 with fmap analysis x0 = 9.1013 mm (x-ref = 28.255 mm)
-%
-% Tune and Chrom fitting:
-%
-% global THERING
-% THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF');
-% THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF');
-% THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF');
-% THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF');
-% THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF');
-% THERING = fitchrom2(THERING, [0.5, 0.5], 'SD', 'SF');
-% [THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9);
-% [THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9);
-% [THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9);
-% [THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9);
-% [THERING, conv, t2, t1] = lnls_correct_tunes(THERING,[19.20433 7.31417],{'QF','QD'},'svd','add',10,1e-9);
-% idx = findcells(THERING, 'FamName', 'QF'); disp(THERING{idx(1)}.PolynomB(2));
-% idx = findcells(THERING, 'FamName', 'QD'); disp(THERING{idx(1)}.PolynomB(2));
-% idx = findcells(THERING, 'FamName', 'SF'); disp(THERING{idx(1)}.PolynomB(3));
-% idx = findcells(THERING, 'FamName', 'SD'); disp(THERING{idx(1)}.PolynomB(3));
-
-qf_strength_3gev = 1.653948476924229;
-qd_strength_3gev = 0.004348693222430; % this is correct! the sign has changed!
+qf_strength_3gev = 1.654036900448982;
+qd_strength_3gev = -0.005474886350700;
 qs_strength_3gev = 0.0;
-sf_strength_3gev = 11.331409123896279;
-sd_strength_3gev = 6.254896348595790;
+sf_strength_3gev = 11.326236792215228;
+sd_strength_3gev = 6.282586036135388;
 
-qf_strength_150mev = 1.653944034925625;
-qd_strength_150mev = 0.011836698177126; % this is correct! the sign has changed!
+qf_strength_150mev = 1.653947031926041;
+qd_strength_150mev = 0.011197961538728;  % this is correct! the sign has changed!
 qs_strength_150mev = 0.0;
-sf_strength_150mev = 11.332065904774284;
-sd_strength_150mev = 4.973798424490276;
+sf_strength_150mev = 11.331918124055948;
+sd_strength_150mev = 5.007982970980575;
 
 qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
 qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
 qs_strength = qs_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qs_strength_3gev - qs_strength_150mev);
 sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
 sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
-
-
