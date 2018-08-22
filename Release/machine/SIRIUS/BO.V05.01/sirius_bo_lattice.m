@@ -62,14 +62,15 @@ L02725  = drift('l02725',  0.27250, 'DriftPass');
 L03500  = drift('l03500',  0.35000, 'DriftPass');
 L03860  = drift('l03860',  0.38600, 'DriftPass');
 L04500  = drift('l04500',  0.45000, 'DriftPass');
+L053572 = drift('l053572', 0.53572, 'DriftPass');
 L06200  = drift('l06200',  0.62000, 'DriftPass');
 L07250  = drift('l07250',  0.72500, 'DriftPass');
-L10000  = drift('l10000',  1.00000, 'DriftPass');
 L10960  = drift('l10960',  1.09600, 'DriftPass');
 L13460  = drift('l13460',  1.34600, 'DriftPass');
 L13710  = drift('l13710',  1.37100, 'DriftPass');
 L14460  = drift('l14460',  1.44600, 'DriftPass');
 L15120  = drift('l15120',  1.51200, 'DriftPass');
+L159628 = drift('l159628', 1.59628, 'DriftPass');
 L16830  = drift('l16830',  1.68300, 'DriftPass');
 L17260  = drift('l17260',  1.72600, 'DriftPass');
 L17710  = drift('l17710',  1.77100, 'DriftPass');
@@ -79,8 +80,7 @@ L18210  = drift('l18210',  1.82100, 'DriftPass');
 L18935  = drift('l18935',  1.89350, 'DriftPass');
 L18960  = drift('l18960',  1.89600, 'DriftPass');
 L21320  = drift('l21320',  2.13200, 'DriftPass');
-L053572 = drift('l053572', 0.53572, 'DriftPass');
-L059628 = drift('l059628', 0.59628, 'DriftPass');
+
 
 
 % drifts affected by the dipole modelling:
@@ -133,7 +133,7 @@ US_CS      = [D02475, SD, L02725, CV, GIR, L13710, BPM,    L18210, GIR, CH, L016
 US_CC      = [D02250, CV, GIR, L17710, BPM,                L18210, GIR, CH, L01610];
 US_SS      = [D02475, SD, GIR, L17935, BPM,                L18935, GIR, SF, L01335];
 US_SF_Scrn = [GIR, D21460, BPM,                            L17260, GIR, Scrn, L01675, SF, L01335];
-US_SE      = [D02250, CV, GIR, L16830, SEX, L00880,        L10000, L059628, BPM, L053572, GIR];
+US_SE      = [D02250, CV, GIR, L16830, SEX, L00880,        L159628, BPM, L053572, GIR];
 US_SI      = [D02250, CV, GIR, L17710, BPM,                L10960, SIN, L07250, GIR, CH, L01610];
 US_SF_GSL  = [GIR, D17960, GSL, L03500, BPM,               L18935, GIR, SF, L01335];
 DS         = [GIR, L21320,                                 D21460, GIR];
