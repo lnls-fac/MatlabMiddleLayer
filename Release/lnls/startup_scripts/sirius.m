@@ -10,6 +10,7 @@ function sirius(varargin)
 
 Disconnect = false;
 
+default_li_version = 'LI.V01.01';
 default_tb_version = 'TB.V02.02';
 default_bo_version = 'BO.V05.03';
 default_ts_version = 'TS.V03.04';
@@ -33,6 +34,8 @@ for i=length(varargin):-1:1
                 default_version = default_ts_version;
             elseif strfind(varargin{i}, 'SI')
                 default_version = default_si_version;
+            elseif strfind(varargin{i}, 'LI')
+                default_version = default_li_version;
             elseif strcmpi(varargin{i}, 'LABCA')
                 default_link = 'LABCA';
             elseif strcmpi(varargin{i}, 'CA_MATLAB')

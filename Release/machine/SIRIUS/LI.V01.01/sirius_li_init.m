@@ -12,7 +12,7 @@ setad([]);
 % Base on the location of this file
 [SIRIUS_ROOT, ~, ~] = fileparts(mfilename('fullpath'));
 
-AD.Directory.ExcDataDir  = '/home/fac_files/siriusdb/excitation_curves';
+AD.Directory.ExcDataDir  = '/home/fac_files/lnls-sirius/control-system-constants/magnet/excitation-data';
 
 %AD.Directory.ExcDataDir = [SIRIUS_ROOT, filesep, 'excitation_curves'];
 
@@ -26,7 +26,7 @@ AO.Spect.DeviceList  = getDeviceList(1,1);
 AO.Spect.ElementList = (1:size(AO.Spect.DeviceList,1))';
 AO.Spect.Status      = ones(size(AO.Spect.DeviceList,1),1);
 AO.Spect.Position    = [];
-AO.Spect.ExcitationCurves = sirius_getexcdata(repmat('lima-spect', size(AO.Spect.DeviceList,1), 1)); 
+AO.Spect.ExcitationCurves = sirius_getexcdata(repmat('li-spect', size(AO.Spect.DeviceList,1), 1)); 
 AO.Spect.Monitor.MemberOf = {};
 AO.Spect.Monitor.Mode = 'Simulator';
 AO.Spect.Monitor.DataType = 'Scalar';
@@ -55,7 +55,7 @@ AO.QF2.DeviceList  = getDeviceList(1,2);
 AO.QF2.ElementList = (1:size(AO.QF2.DeviceList,1))';
 AO.QF2.Status      = ones(size(AO.QF2.DeviceList,1),1);
 AO.QF2.Position    = [];
-AO.QF2.ExcitationCurves = sirius_getexcdata(repmat('lima-q', size(AO.QF2.DeviceList,1), 1));
+AO.QF2.ExcitationCurves = sirius_getexcdata(repmat('li-quadrupole-short', size(AO.QF2.DeviceList,1), 1));
 AO.QF2.Monitor.MemberOf = {};
 AO.QF2.Monitor.Mode = 'Simulator';
 AO.QF2.Monitor.DataType = 'Scalar';
@@ -84,7 +84,7 @@ AO.QD2.DeviceList  = getDeviceList(1,1);
 AO.QD2.ElementList = (1:size(AO.QD2.DeviceList,1))';
 AO.QD2.Status      = ones(size(AO.QD2.DeviceList,1),1);
 AO.QD2.Position    = [];
-AO.QD2.ExcitationCurves = sirius_getexcdata(repmat('lima-q', size(AO.QD2.DeviceList,1), 1));
+AO.QD2.ExcitationCurves = sirius_getexcdata(repmat('li-quadrupole-long', size(AO.QD2.DeviceList,1), 1));
 AO.QD2.Monitor.MemberOf = {};
 AO.QD2.Monitor.Mode = 'Simulator';
 AO.QD2.Monitor.DataType = 'Scalar';
@@ -113,7 +113,7 @@ AO.QF3.DeviceList  = getDeviceList(1,1);
 AO.QF3.ElementList = (1:size(AO.QF3.DeviceList,1))';
 AO.QF3.Status      = ones(size(AO.QF3.DeviceList,1),1);
 AO.QF3.Position    = [];
-AO.QF3.ExcitationCurves = sirius_getexcdata(repmat('lima-q', size(AO.QF3.DeviceList,1), 1));
+AO.QF3.ExcitationCurves = sirius_getexcdata(repmat('li-quadrupole-short', size(AO.QF3.DeviceList,1), 1));
 AO.QF3.Monitor.MemberOf = {};
 AO.QF3.Monitor.Mode = 'Simulator';
 AO.QF3.Monitor.DataType = 'Scalar';
@@ -142,7 +142,7 @@ AO.QD1.DeviceList  = getDeviceList(1,1);
 AO.QD1.ElementList = (1:size(AO.QD1.DeviceList,1))';
 AO.QD1.Status      = ones(size(AO.QD1.DeviceList,1),1);
 AO.QD1.Position    = [];
-AO.QD1.ExcitationCurves = sirius_getexcdata(repmat('lima-q', size(AO.QD1.DeviceList,1), 1));
+AO.QD1.ExcitationCurves = sirius_getexcdata(repmat('li-quadrupole-long', size(AO.QD1.DeviceList,1), 1));
 AO.QD1.Monitor.MemberOf = {};
 AO.QD1.Monitor.Mode = 'Simulator';
 AO.QD1.Monitor.DataType = 'Scalar';
@@ -171,7 +171,7 @@ AO.QF1.DeviceList  = getDeviceList(1,1);
 AO.QF1.ElementList = (1:size(AO.QF1.DeviceList,1))';
 AO.QF1.Status      = ones(size(AO.QF1.DeviceList,1),1);
 AO.QF1.Position    = [];
-AO.QF1.ExcitationCurves = sirius_getexcdata(repmat('lima-q', size(AO.QF1.DeviceList,1), 1));
+AO.QF1.ExcitationCurves = sirius_getexcdata(repmat('li-quadrupole-short', size(AO.QF1.DeviceList,1), 1));
 AO.QF1.Monitor.MemberOf = {};
 AO.QF1.Monitor.Mode = 'Simulator';
 AO.QF1.Monitor.DataType = 'Scalar';
@@ -199,6 +199,10 @@ AO.QF1.Setpoint.DeltaRespMat  = 0.5;
 % Corrector Magnets %
 %%%%%%%%%%%%%%%%%%%%%
 
+
+% XRR - 2018-08-22
+% corrector families should be separated into short and long ones !!!
+
 % CH
 AO.CH.FamilyName  = 'CH';
 AO.CH.MemberOf    = {'PlotFamily'; 'COR'; 'CH'; 'HCM'; 'Magnet'};
@@ -206,7 +210,7 @@ AO.CH.DeviceList  = getDeviceList(1,5);
 AO.CH.ElementList = (1:size(AO.CH.DeviceList,1))';
 AO.CH.Status      = ones(size(AO.CH.DeviceList,1),1);
 AO.CH.Position    = [];
-AO.CH.ExcitationCurves = sirius_getexcdata(repmat('lima-ch', size(AO.CH.DeviceList,1), 1));
+AO.CH.ExcitationCurves = sirius_getexcdata(repmat('li-corrector-ch-long', size(AO.CH.DeviceList,1), 1));
 AO.CH.Monitor.MemberOf = {'Horizontal'; 'COR'; 'CH'; 'HCM'; 'Magnet';};
 AO.CH.Monitor.ChannelNames = sirius_li_getname(AO.CH.FamilyName, 'Monitor', AO.CH.DeviceList);
 AO.CH.Monitor.HW2PhysicsFcn = @sirius_hw2ph;
@@ -236,7 +240,7 @@ AO.CV.DeviceList  = getDeviceList(1,6);
 AO.CV.ElementList = (1:size(AO.CV.DeviceList,1))';
 AO.CV.Status      = ones(size(AO.CV.DeviceList,1),1);
 AO.CV.Position    = [];
-AO.CV.ExcitationCurves = sirius_getexcdata(repmat('lima-cv', size(AO.CV.DeviceList,1), 1));
+AO.CV.ExcitationCurves = sirius_getexcdata(repmat('li-corrector-cv-long', size(AO.CV.DeviceList,1), 1));
 AO.CV.Monitor.MemberOf = {'Vertical'; 'COR'; 'CV'; 'VCM'; 'Magnet';};
 AO.CV.Monitor.ChannelNames = sirius_li_getname(AO.CV.FamilyName, 'Monitor', AO.CV.DeviceList);
 AO.CV.Monitor.HW2PhysicsFcn = @sirius_hw2ph;
@@ -263,7 +267,7 @@ AO.CV.Setpoint.DeltaRespMat = 0.0005;
 % BPMx
 AO.BPMx.FamilyName  = 'BPMx';
 AO.BPMx.MemberOf    = {'PlotFamily'; 'BPM'; 'BPMx'; 'Diagnostics'};
-AO.BPMx.DeviceList  = getDeviceList(1,5);
+AO.BPMx.DeviceList  = getDeviceList(1,3);
 AO.BPMx.ElementList = (1:size(AO.BPMx.DeviceList,1))';
 AO.BPMx.Status      = ones(size(AO.BPMx.DeviceList,1),1);
 AO.BPMx.Position    = [];
@@ -282,7 +286,7 @@ AO.BPMx.Monitor.PhysicsUnits = 'meter';
 % BPMy
 AO.BPMy.FamilyName  = 'BPMy';
 AO.BPMy.MemberOf    = {'PlotFamily'; 'BPM'; 'BPMy'; 'Diagnostics'};
-AO.BPMy.DeviceList  = getDeviceList(1,5);
+AO.BPMy.DeviceList  = getDeviceList(1,3);
 AO.BPMy.ElementList = (1:size(AO.BPMy.DeviceList,1))';
 AO.BPMy.Status      = ones(size(AO.BPMy.DeviceList,1),1);
 AO.BPMy.Position    = [];
