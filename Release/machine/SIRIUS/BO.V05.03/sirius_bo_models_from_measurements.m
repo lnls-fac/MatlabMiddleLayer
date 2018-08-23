@@ -39,7 +39,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.B.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'fmap-analysis-dipoles', 'sorting.txt'));
+sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models-dipoles', 'sorting.txt'));
 
 d2r = pi / 180.0;
 ang_nominal = 7.2;
@@ -49,7 +49,7 @@ model_sim = [ getcellstruct(the_ring, 'Length', idx(1,:)), getcellstruct(the_rin
     
 for i=1:length(sorting)
     % load instance of dipole model
-    maglabel = fullfile(tpath, 'fmap-analysis-dipoles', [sorting{i}, '-3gev']);
+    maglabel = fullfile(tpath, 'models-dipoles', [sorting{i}, '-3gev']);
     [harms, model] = sirius_bo_load_fmap_model(maglabel);
     if length(the_ring{idx(i, 1)}.PolynomB) ~= length(harms)
         error('Incompatible PolynomB and dipole model!')
