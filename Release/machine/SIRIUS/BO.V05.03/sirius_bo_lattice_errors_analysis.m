@@ -106,8 +106,10 @@ finalizations();
         config.fams.b.sigma_x      = 160 * um * 1;
         config.fams.b.sigma_y      = 160 * um * 1;
         config.fams.b.sigma_roll   = 0.800 * mrad * 1;
-        config.fams.b.sigma_e      = 0.15 * percent * 1;
-        config.fams.b.sigma_e_kdip = 2.4 * percent * 1;  % quadrupole errors due to pole variations
+%         config.fams.b.sigma_e      = 0.15 * percent * 1;
+        config.fams.b.sigma_e      = 0.05 * percent * 1; % based on estimated error of measured fmap analysis from measurement bench fluctuation - XRR - 2018-08-23
+%         config.fams.b.sigma_e_kdip = 2.4 * percent * 1;  % quadrupole errors due to pole variations
+        config.fams.b.sigma_e_kdip = 0.3 * percent * 1;  % based on measured fmap analysis - XRR - 2018-08-23 - see /home/fac_files/lnls-ima/bo-dipoles/model-09/analysis/hallprobe/production/magnet-dispersion.ipynb
 
         % sets number of segmentations for each family
         families = fieldnames(config.fams);
@@ -239,7 +241,11 @@ finalizations();
         multi.bends.main_multipole = 1;% positive for normal negative for skew
         multi.bends.r0 = 17.5e-3;
         multi.bends.order = [3, 4, 5, 6, 7]; % 1 for dipole
-        multi.bends.main_vals = [5.5, 4*ones(1,4)]*1e-4;
+        % based on measured fmap analysis - XRR - 2018-08-23 - see /home/fac_files/lnls-ima/bo-dipoles/model-09/analysis/hallprobe/production/magnet-dispersion.ipynb
+        % (dSL)r_0^2 / (DL) ~ 2.3e-3, dSL ~ 0.945 T/m, DL ~ 0.126 T.m
+%         multi.bends.main_vals = [5.5, 4*ones(1,4)]*1e-4;
+        multi.bends.main_vals = [23, 4*ones(1,4)]*1e-4; 
+        
         multi.bends.skew_vals = ones(1,5)*1e-4;
 
         % sets number of segmentations for each family
