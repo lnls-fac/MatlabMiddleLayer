@@ -57,15 +57,18 @@ L01335  = drift('l01335',  0.13350, 'DriftPass');
 L01360  = drift('l01360',  0.13600, 'DriftPass');
 L01610  = drift('l01610',  0.16100, 'DriftPass');
 L01675  = drift('l01675',  0.16750, 'DriftPass');
-L02500  = drift('l02500',  0.25000, 'DriftPass');
+L01886  = drift('l01886',  0.18860, 'DriftPass');
 L02725  = drift('l02725',  0.27250, 'DriftPass');
 L03500  = drift('l03500',  0.35000, 'DriftPass');
 L03860  = drift('l03860',  0.38600, 'DriftPass');
 L04500  = drift('l04500',  0.45000, 'DriftPass');
 L053572 = drift('l053572', 0.53572, 'DriftPass');
 L06200  = drift('l06200',  0.62000, 'DriftPass');
+L069811 = drift('l069811', 0.69811, 'DriftPass');
 L07250  = drift('l07250',  0.72500, 'DriftPass');
 L10960  = drift('l10960',  1.09600, 'DriftPass');
+L11574  = drift('l11574',  1.15740, 'DriftPass');
+L130389 = drift('l130389', 1.30389, 'DriftPass');
 L13460  = drift('l13460',  1.34600, 'DriftPass');
 L13710  = drift('l13710',  1.37100, 'DriftPass');
 L14460  = drift('l14460',  1.44600, 'DriftPass');
@@ -78,34 +81,33 @@ L17935  = drift('l17935',  1.79350, 'DriftPass');
 L17960  = drift('l17960',  1.79600, 'DriftPass');
 L18210  = drift('l18210',  1.82100, 'DriftPass');
 L18935  = drift('l18935',  1.89350, 'DriftPass');
-L18960  = drift('l18960',  1.89600, 'DriftPass');
+% L18960  = drift('l18960',  1.89600, 'DriftPass');
 L21320  = drift('l21320',  2.13200, 'DriftPass');
 
-
-
 % drifts affected by the dipole modelling:
-D02250 = drift('d02250',  0.2250-lenDif, 'DriftPass');
-D02475 = drift('d02475',  0.2475-lenDif, 'DriftPass');
-D02500 = drift('d02500',  0.2500-lenDif, 'DriftPass');
-D17960 = drift('d17960',  1.7960-lenDif, 'DriftPass');
-D21460 = drift('d21460',  2.1460-lenDif, 'DriftPass');
+D02250  = drift('d02250',  0.2250-lenDif, 'DriftPass');
+D02475  = drift('d02475',  0.2475-lenDif, 'DriftPass');
+D02500  = drift('d02500',  0.2500-lenDif, 'DriftPass');
+D17960  = drift('d17960',  1.7960-lenDif, 'DriftPass');
+D21460  = drift('d21460',  2.1460-lenDif, 'DriftPass');
+
 
 
 % --- markers ---
 
-STR  = marker('start',   'IdentityPass');   % start of the model
-FIM  = marker('end',     'IdentityPass');   % end of the model
-GIR  = marker('girder',  'IdentityPass');
+STR  = marker('start',    'IdentityPass'); % start of the model
+FIM  = marker('end',      'IdentityPass'); % end of the model
+GIR  = marker('girder',   'IdentityPass');
 
-SIN  = marker('InjSept',    'IdentityPass');   % end of BO injection septum at TB transport line
-SEX  = marker('EjeSeptF',   'IdentityPass');   % start of BO ejection thin septum at TS transport line
+SIN  = marker('InjSept',  'IdentityPass'); % end of BO injection septum at TB transport line
+SEX  = marker('EjeSeptF', 'IdentityPass'); % start of BO ejection thin septum at TS transport line
 
-DCCT = marker('DCCT',    'IdentityPass');
-BPM  = marker('BPM',     'IdentityPass');
-Scrn = marker('Scrn',    'IdentityPass');
-TunePkup= marker('TunePkup',   'IdentityPass');
-TuneShkr= marker('TuneShkr',   'IdentityPass');
-GSL  = marker('GSL',     'IdentityPass');
+DCCT = marker('DCCT',     'IdentityPass');
+BPM  = marker('BPM',      'IdentityPass');
+Scrn = marker('Scrn',     'IdentityPass');
+GSL  = marker('GSL',      'IdentityPass');
+TunePkup = marker('TunePkup',   'IdentityPass');
+TuneShkr = marker('TuneShkr',   'IdentityPass');
 
 
 % --- lattice elements ---
@@ -120,7 +122,6 @@ SD  = sirius_bo_sx_segmented_model(energy, 'SD', sext_pass_method, sd_strength *
 QD  = sirius_bo_qd_segmented_model(energy, 'QD', quad_pass_method, qd_strength * 0.100);
 QF  = sirius_bo_qf_segmented_model(energy, 'QF', quad_pass_method, qf_strength * 0.228);
 QS  = sirius_bo_qs_segmented_model(energy, 'QS', quad_pass_method, qs_strength * 0.100);
-%QS  = quadrupole('QS',  0.10, 0.0,  quad_pass_method);
 
 QF0 = [QF(1), FIM, STR, QF(2:end)]; % inserts markers inside QF model
 RFC = rfcavity('P5Cav', 0, rf_voltage, 0, harmonic_number, 'CavityPass'); % RF frequency will be set later.
@@ -141,10 +142,10 @@ DS_QD      = [GIR, L21320,                                 L17960, GIR, QD, D025
 DS_RF      = [GIR, L21320, RFC,                            D21460, GIR];
 DS_KE      = [GIR, L03860, KEX, L13460,                    L17960, GIR, QD, D02500];
 DS_CH      = [L01610, CH, GIR, L18210,                     D21460, GIR];
-DS_KI      = [GIR, L03860, KIN, L02500, Scrn, L10960,      L18960, Scrn, D02500, GIR];
-DS_QS_TuS  = [L01360, QS, GIR, L14460, TuneShkr, L04500,      L17960, GIR, QD, D02500];
+DS_KI      = [GIR, L03860, KIN, L01886, Scrn, L11574,      L130389, Scrn, L069811, GIR];
+DS_QS_TuS  = [L01360, QS, GIR, L14460, TuneShkr, L04500,   L17960, GIR, QD, D02500];
 DS_DCCT    = [GIR, L21320,  DCCT,                          D21460, GIR];
-DS_QD_TuP  = [GIR, L15120, TunePkup, L06200,                  L17960, GIR, QD, D02500];
+DS_QD_TuP  = [GIR, L15120, TunePkup, L06200,               L17960, GIR, QD, D02500];
 
 
 US_01 = US_SI;        DS_01 = DS_KI;        S01 = [US_01, QF0,DS_01, B];
