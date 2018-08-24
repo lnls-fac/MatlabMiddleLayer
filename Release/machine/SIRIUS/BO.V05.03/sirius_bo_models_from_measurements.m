@@ -77,7 +77,13 @@ idx = data.QF.ATIndex;
 sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
 
 fname = fullfile(tpath, 'models', 'quadrupoles-qf', 'README-110A.md');
-[mags, kls] = load_readme_file(fname, 'BQF-');
+[~, kls_3gev] = load_readme_file(fname, 'BQF-');
+
+fname = fullfile(tpath, 'models', 'quadrupoles-qf', 'README-4A.md');
+[mags, kls_150mev] = load_readme_file(fname, 'BQF-');
+
+e = the_ring{1}.Energy;
+kls = kls_150mev + (e - 150e6) * (kls_3gev - kls_150mev) / (3e9 - 150e6);
 
 kls_avg = mean(kls);
     
