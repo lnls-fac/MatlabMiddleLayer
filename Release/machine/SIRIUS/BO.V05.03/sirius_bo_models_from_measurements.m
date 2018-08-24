@@ -1,6 +1,7 @@
 function the_ring = sirius_bo_models_from_measurements(the_ring0)
 
 the_ring = models_from_measurements_dipoles(the_ring0);
+the_ring = models_from_measurements_quadrupoles_qf(the_ring);
 the_ring = correct_optics(the_ring);
 
 
@@ -39,7 +40,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.B.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models-dipoles', 'sorting.txt'));
+sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models', 'dipoles', 'sorting.txt'));
 
 d2r = pi / 180.0;
 ang_nominal = 7.2;
@@ -49,7 +50,7 @@ model_sim = [ getcellstruct(the_ring, 'Length', idx(1,:)), getcellstruct(the_rin
     
 for i=1:length(sorting)
     % load instance of dipole model
-    maglabel = fullfile(tpath, 'models-dipoles', [sorting{i}, '-3gev']);
+    maglabel = fullfile(tpath, 'models', 'dipoles', [sorting{i}, '-3gev']);
     [harms, model] = sirius_bo_load_fmap_model(maglabel);
     if length(the_ring{idx(i, 1)}.PolynomB) ~= length(harms)
         error('Incompatible PolynomB and dipole model!')
@@ -63,5 +64,49 @@ for i=1:length(sorting)
     for j=1:size(idx,2)
         the_ring{idx(i, j)}.PolynomB = model(j,3:end); % higher-order multipoles from instance dipole (quad, sext, ...)
         the_ring{idx(i, j)}.PolynomB(1) = dpolB(j); % dipolar errors applied to segments
+    end
+end
+
+function the_ring = models_from_measurements_quadrupoles_qf(the_ring0)
+the_ring = the_ring0;
+
+data = sirius_bo_family_data(the_ring);
+idx = data.QF.ATIndex;
+
+[tpath, ~, ~] = fileparts(mfilename('fullpath'));
+sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
+
+fname = fullfile(tpath, 'models', 'quadrupoles-qf', 'README-110A.md');
+[mags, kls] = load_readme_file(fname, 'BQF-');
+
+kls_avg = mean(kls);
+    
+for i=1:length(sorting)
+    for id=1:length(mags)
+        if strcmp(mags{id}, sorting{i})
+            break;
+        end
+    end
+    k_i = kls(id);
+    for j=1:size(idx,2)
+        k_old = the_ring{idx(i, j)}.PolynomB(2);    
+        k_new = k_old * (k_i / kls_avg);
+        the_ring{idx(i, j)}.PolynomB(2) = k_new;
+    end
+end
+
+function [mags, kls] = load_readme_file(filename, substr)
+
+fp = fopen(filename, 'rt');
+text = textscan(fp, '%s', 'Delimiter', '\n');
+text = text{1};
+mags = {};
+kls = [];
+for i=1:length(text)
+    line = text{i};
+    if ~isempty(strfind(line, substr))
+        words = strsplit(line);
+        mags{end+1} = words{1};
+        kls(end+1) = str2double(words{5});
     end
 end
