@@ -2,6 +2,7 @@ function the_ring = sirius_bo_models_from_measurements(the_ring0)
 
 the_ring = models_from_measurements_dipoles(the_ring0);
 the_ring = models_from_measurements_quadrupoles_qf(the_ring);
+the_ring = models_from_measurements_quadrupoles_qd(the_ring);
 the_ring = correct_optics(the_ring);
 
 
@@ -100,6 +101,36 @@ for i=1:length(sorting)
         the_ring{idx(i, j)}.PolynomB(2) = k_new;
     end
 end
+
+
+function the_ring = models_from_measurements_quadrupoles_qd(the_ring0)
+the_ring = the_ring0;
+
+data = sirius_bo_family_data(the_ring);
+idx = data.QD.ATIndex;
+
+[tpath, ~, ~] = fileparts(mfilename('fullpath'));
+sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qd', 'sorting.txt'));
+
+fname = fullfile(tpath, 'models', 'quadrupoles-qd', 'README-2A.md');
+[mags, kls] = load_readme_file(fname, 'BQD-');
+
+kls_avg = mean(kls);
+    
+for i=1:length(sorting)
+    for id=1:length(mags)
+        if strcmp(mags{id}, sorting{i})
+            break;
+        end
+    end
+    k_i = kls(id);
+    for j=1:size(idx,2)
+        k_old = the_ring{idx(i, j)}.PolynomB(2);    
+        k_new = k_old * (k_i / kls_avg);
+        the_ring{idx(i, j)}.PolynomB(2) = k_new;
+    end
+end
+
 
 function [mags, kls] = load_readme_file(filename, substr)
 

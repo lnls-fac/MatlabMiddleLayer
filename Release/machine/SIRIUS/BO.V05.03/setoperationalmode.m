@@ -2,8 +2,9 @@ function setoperationalmode(ModeNumber)
 %SETOPERATIONALMODE - Switches between the various operational modes
 %  setoperationalmode(ModeNumber)
 %
-%  ModeNumber = 1.  3 GeV {Default}
-%               2.  150 MeV
+%  ModeNumber = 1.  150 MeV {Default}
+%               2.  3.0 GeV
+%               
 %
 %
 % History
@@ -18,8 +19,8 @@ function setoperationalmode(ModeNumber)
 
 % MODES
 ModeCell = { ...
+    '150 MeV (default)'; ...
     '3.0 GeV'; ...
-    '150 MeV'; ...
 };
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,9 +35,9 @@ if nargin < 1
 end
 
 if ModeNumber == 1
-    set_operationalmode_High;
-elseif ModeNumber == 2
     set_operationalmode_Low;
+elseif ModeNumber == 2
+    set_operationalmode_High;
 else
      error('Operational mode unknown');
 end
