@@ -142,7 +142,7 @@ kls = [];
 for i=1:length(text)
     line = text{i};
     if ~isempty(strfind(line, substr))
-        words = strsplit(line);
+        words = strsplit(line, ' ');
         mags{end+1} = words{1};
         kls(end+1) = str2double(words{5});
     end
