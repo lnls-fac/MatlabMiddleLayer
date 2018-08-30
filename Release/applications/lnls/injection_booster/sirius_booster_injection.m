@@ -2,27 +2,34 @@ function r_final = sirius_booster_injection(ring, param, n_part)
 %
 % -->> ring: ring model
 % -->> param: struct with the following parameters:
-% - twiss functions in the point of injection: betax0, betay0, alphax0,
-% alphay0, etax0, etay0, etaxl0, etayl0
-% - kckr: angle of injection kicker
-% - offset_x and offset_xl are the nominal values to correct injection
-% - beam parameters: emitx, emity, energy spread and bunch length
-% - cutoff: value to cutoff of distributions to generate initial bunch
+%      - twiss functions in the point of injection: betax0, betay0, alphax0,
+%        alphay0, etax0, etay0, etaxl0, etayl0
+%      - kckr: angle of injection kicker
+%      - offset_x and offset_xl are the nominal values to correct injection
+%      - beam parameters: emitx, emity, energy spread and bunch length
+%      - cutoff: value to cutoff of distributions to generate initial bunch
+%      - sigma_bpm: precision of BPM measurements at 1nC single-pass (2mm)
+%      - sigma_scrn: precision of screen
 % -->> n_part: number of particles
 %
-% Obs.: once the function sirius_bo_lattice_errors_analysis() is updated,
+% NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
 % this function must be checked too.
+%
+% NEXT STEPS: ADD SCREEN MEASUREMENTS (IT KILLS THE BEAM), BPM MEASUREMENTS AND ERRORS
 
     % Setting the nominal kick of the injection kicker
-    sept = findcells(ring, 'FamName','InjSept');
-    ring = circshift(ring,[0,-(sept-1)]);
+    sept = findcells(ring, 'FamName', 'InjSept');
+    ring = circshift(ring, [0, - (sept - 1)]);
 
-    injkckr = findcells(ring, 'FamName','InjKckr');
+    injkckr = findcells(ring, 'FamName', 'InjKckr');
     ring = lnls_set_kickangle(ring, param.kckr, injkckr, 'x');
     % angle kicker = -19.34 mrad
 
-    % Error in the magnets
+    % Error in the magnets (allignment, rotation, excitation, multipoles,
+    % setting off rf cavity and radiation emission
     initializations();
+    ring = setcavity('off', ring);
+    ring = setradiation('off', ring);
     family_data = sirius_bo_family_data(ring);
     machine  = create_apply_errors(ring, family_data);
     machine  = create_apply_multipoles(machine, family_data);
@@ -51,40 +58,48 @@ function r_final = sirius_booster_injection(ring, param, n_part)
     %Tracking and convertion to 3D matrix
     r_final = linepass(machine, r_init, 1:length(machine));
     r_final = reshape(r_final, 6, n_part, length(machine));
-
+    
+    % [machine, r_scrn] = screen(machine, r_final, 1, param.sigma_scrn);   
+    
     VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:length(machine)))';
-    VChamb = VChamb([1,2],:);
+    VChamb = VChamb([1, 2], :);
     VChamb = reshape(VChamb, 2, [], length(machine));
 
-    %In the cas n_part = 1 there is a problem which is solved not transposing 
     r_final = r_final([1, 3], :, :);
- 
+   
     %For each element compares if x or y position ir greater than the vacuum
     %chamber limits
     ind = bsxfun(@gt, abs(r_final), VChamb);
 
-    either = ind(1,:,:) | ind(2,:,:);
-    ind(1,:,:) = either;
-    ind(2,:,:) = either;
-    
+    or = ind(1, :, :) | ind(2, :, :);
+    ind(1, :, :) = or;
+    ind(2, :, :) = or;
     ind_sum = cumsum(ind, 3);
-    ind_sum = ind_sum >= 1;
+    r_final(ind_sum >= 1) = NaN;
     
-    r_final(ind_sum) = NaN;
-  
+    [r_bpms, bpm] = bpms(machine, r_final, param.sigma_bpm);
+    
     % xx = squeeze(nanmean(r_final(1, :, :),2));
-    xx = squeeze(r_final(1, :, :));
-    %sxx = squeeze(nanstd(r_final(1, :, :), 0, 2));
+    % xx = squeeze(r_final(1, :, :));
+    % xx = squeeze(nanstd(r_final(1, :, :), 0, 2));
+
     %plot(s, (xx+sxx)', 'r --');
     %hold all
     %plot(s, (xx-sxx)', 'r --');
-    plot(s, (xx)', '.r');
+    x = squeeze(nanmean(r_final(1, :, bpm), 2));
+    x_bpm = r_bpms(1,:);
+    
+    figure;
+    plot(s(bpm), (x)', '.-b');
     hold all
+    plot(s(bpm), (x_bpm), '.-r');
     plot(s, VChamb(1,:),'k');
     plot(s, -VChamb(1,:),'k');
     
     % Prints the percentage of lost particles 
     % display((1-(length(r_final(1,:, end)) - sum(isnan(r_final(1,:, end))))/length(r_final(1,:, end)))*100);
+    n_perdida = sum(isnan(r_final(1,:, end)));
+    fprintf('%i particulas perdidas de %i (%g %%) \n', n_perdida, n_part, (n_perdida / n_part)*100);
 end
 %% Initializations
 function initializations()
@@ -206,7 +221,6 @@ function machine = create_apply_multipoles(machine, family_data)
         machine{i} = sirius_bo_multipole_systematic_errors(machine{i});
     end
     
-    % machine = machine{1,1};
     name = 'CONFIG';
     cutoff_errors = 2;
     multi_errors  = lnls_latt_err_generate_multipole_errors(name, machine{1,1}, multi, length(machine), cutoff_errors);
@@ -215,14 +229,62 @@ function machine = create_apply_multipoles(machine, family_data)
 end
 
 function [machine, s] = vchamber_injection(machine)
+    %Values of vacuum chamber radius in horizontal plane at the end of
+    %injection septum and the initial point of injection kicker
     xcv_sep = 41.86e-3;
     xcv_kckr = 30.14e-3;
     
     s = findspos(machine, 1:length(machine));
-
     injkckr = findcells(machine, 'FamName','InjKckr');
     xcv = (xcv_kckr - xcv_sep) / (s(injkckr) - s(1)) * s(1:injkckr)  + xcv_sep;
+    
+    % Vacuum chamber inside the inj. kicker set as the same as the its
+    % initial point
     xcv = [xcv, xcv(end)];
-
     machine = setcellstruct(machine, 'VChamber', 1:injkckr+1, xcv, 1, 1);
+end
+
+function [machine, r_scrn] = screen(machine, r, n_scrn, sigma_scrn)
+        if n_scrn > 3
+            error('Existem apenas 3 screens no booster!')
+        end
+        scrn = findcells(machine, 'FamName', 'Scrn');
+        scrn = scrn(n_scrn);
+        r_scrn = r([1,3], :, scrn);
+        sigma_scrn_x = lnls_generate_random_numbers(sigma_scrn, 1, 'norm');
+        sigma_scrn_y = lnls_generate_random_numbers(sigma_scrn, 1, 'norm'); 
+        sigma_scrn = [sigma_scrn_x; sigma_scrn_y];
+        r_scrn = nanmean(r_scrn, 2) + sigma_scrn;
+        machine = setcellstruct(machine, 'VChamber', scrn:length(machine), 0, 1, 1);
+        fprintf('Posicao x da Screen: %f mm\n', r_scrn(1)*1e3);
+        fprintf('Posicao y da Screen: %f mm\n', r_scrn(2)*1e3);
+end
+    
+function [r_bpms, bpm] = bpms(machine, r, sigma0)
+        bpm = findcells(machine, 'FamName', 'BPM');
+        r_bpms = r(:, :, bpm);
+        
+        N_t = size(r, 2);
+        N_loss = squeeze(sum(isnan(r(1,:, bpm))));
+        Rate = (N_t - N_loss) / N_t;
+        sigma = ( sigma0 ./ Rate )';
+        sigma_bpm_x = lnls_generate_random_numbers(1, length(sigma), 'norm') .* sigma;   
+        sigma_bpm_y = lnls_generate_random_numbers(1, length(sigma), 'norm') .* sigma;  
+        
+        errors_bpm = [sigma_bpm_x; sigma_bpm_y];
+        
+        r_bpms = squeeze(nanmean(r_bpms, 2)) + errors_bpm;
+        
+        VChamb = cell2mat(getcellstruct(machine, 'VChamber', bpm))';
+        VChamb = VChamb([1, 2], :);
+        
+        %For each element compares if x or y position ir greater than the vacuum
+        %chamber limits
+        ind_bpm = bsxfun(@gt, abs(r_bpms), VChamb);
+
+        or = ind_bpm(1, :) | ind_bpm(2, :);
+        ind_bpm(1, :) = or;
+        ind_bpm(2, :) = or;
+        ind_bpm = cumsum(ind_bpm, 2);
+        % r_bpms(ind_bpm >= 1) = NaN;
 end
