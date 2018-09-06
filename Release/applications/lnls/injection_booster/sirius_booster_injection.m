@@ -18,10 +18,7 @@ function r_final = sirius_booster_injection(machine, param, n_part)
     % Setting the nominal kick of the injection kicker
     sept = findcells(machine, 'FamName', 'InjSept');
     machine = circshift(machine, [0, - (sept - 1)]);
-
-    injkckr = findcells(machine, 'FamName', 'InjKckr');
-    machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
-    
+        
     offsets = [param.offset_x; param.offset_xl; 0; 0; 0; 0];
     offsets = repmat(offsets, 1, n_part);
        

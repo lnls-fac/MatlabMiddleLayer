@@ -1,5 +1,7 @@
 function [machine, param, s] = set_machine(bo_ring)
 
+    initializations();
+
     %=====================================================================
     %=====================================================================
 
@@ -18,12 +20,23 @@ function [machine, param, s] = set_machine(bo_ring)
     param.etaxl0 = bo_twiss.etaxl(1);
     param.etayl0 = bo_twiss.etayl(1);
 
-    % param.kckr = -18.90e-3;
-    param.kckr = -19.34e-3;
+    param.offset_x0 = -30e-3;
     param.offset_x = -30e-3;
+    param.offset_xl0 = 14.3e-3;
     param.offset_xl = 14.3e-3;
-    % param.offset_xl = 13.75e-3;
-
+    param.kckr0 = -19.34e-3;
+    param.kckr = -19.34e-3;
+    
+    p = 1;
+    x_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 3e-3;
+    param.offset_x_erro = param.offset_x0 + x_error;
+    
+    xl_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 12e-3;
+    param.offset_xl_erro = param.offset_xl0 + xl_error;
+    
+    kckr_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 2e-3;
+    param.kckr_erro = param.kckr0 + kckr_error;
+    
     param.emitx = 170e-9;
     param.emity = param.emitx;
     param.sigmae = 0.5e-2;
@@ -32,6 +45,8 @@ function [machine, param, s] = set_machine(bo_ring)
     param.cutoff = 3;
     param.sigma_bpm = 2e-3;
     param.sigma_scrn = 0.5e-3;
+    param.xl_error_pulse = 0.27e-3;
+    param.kckr_error_pulse = 0.074e-3;
     
     %=====================================================================
     %=====================================================================
@@ -42,7 +57,6 @@ function [machine, param, s] = set_machine(bo_ring)
     
     % Error in the magnets (allignment, rotation, excitation, multipoles,
     % setting off rf cavity and radiation emission
-    initializations();
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
     family_data = sirius_bo_family_data(machine);
@@ -65,6 +79,7 @@ function [machine, param, s] = set_machine(bo_ring)
         xcv = [xcv, xcv(end)];
         machine = setcellstruct(machine, 'VChamber', 1:injkckr+1, xcv, 1, 1);
     end
+end
 %% Initializations
 function initializations()
 
@@ -189,5 +204,4 @@ function machine = create_apply_multipoles(machine, family_data)
     multi_errors  = lnls_latt_err_generate_multipole_errors(name, machine{1,1}, multi, length(machine), cutoff_errors);
     machine = lnls_latt_err_apply_multipole_errors(name, machine, multi_errors, multi);
 
-end
 end
