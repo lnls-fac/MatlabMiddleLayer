@@ -66,6 +66,9 @@ end
 ring_model = A.ring_model;
 Accep = A.Accep;
 
+%Accep.pos = 5.5/4.5*Accep.pos;
+%Accep.neg = 5.5/4.5*Accep.neg;
+
 if ~isequal(ring,ring_model);
         warning('Input ring model differs from the ring model used to calculate acceptance');
         warning('It is recommended to calculate the acceptances to this input ring model with the function lnls_calc_touschek_accep');
@@ -111,7 +114,7 @@ W_q = lnls_lifetime_quantum(tau_am,K,EA_x,EA_y,E_n,E0,mcf,k,q,J_E);
 % Elastic Lifetime
 [~,W_e] = lnls_lifetime_elastic(Z,T,E0,theta_x,theta_y,s_B,P);
 lifetime.elastic   = (1/W_e) / 3600;
-    
+   
 % Inelastic Lifetime    
 [~,W_i] = lnls_lifetime_inelastic(Z,T,P,s_B,Accep);
 lifetime.inelastic = (1/W_i)/3600;
@@ -123,6 +126,6 @@ lifetime.touschek = (1/W_t) / 3600;
 
 % Total Lifetime
 W = W_q + W_e + W_i + W_t;
-lifetime.total = (1/W) / 3600;
+lifetime.total = (1/W) / 3600
 
 total = lifetime.total;
