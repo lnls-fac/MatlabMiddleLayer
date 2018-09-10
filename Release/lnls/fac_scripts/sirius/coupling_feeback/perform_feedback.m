@@ -4,7 +4,7 @@ function fb_data = perform_feedback(...
     fb_strens = zeros(length(rand_mach), length(indices.qs(:)));
     for i=1:length(rand_mach)
         fprintf('   . correcting machine %02i...\n', i);
-        goal_tilt = calc_coupling(rand_mach_goal{i});
+        goal_tilt = lnls_calc_coupling(rand_mach_goal{i});
         goal_tilt = goal_tilt.tilt;
         fb_strens(i,:) = correct_coupling_tilt(...
             rand_mach{i}, goal_tilt, response, indices, corr_params);
@@ -25,7 +25,7 @@ function qs_stren = correct_coupling_tilt(ring, goal_tilt, response, indices, pa
     idx = indices.b2(response.b2_selection);
     
     target = goal_tilt(idx)';
-    coup = calc_coupling(ring);
+    coup = lnls_calc_coupling(ring);
     actual = coup.tilt(idx)';
     residue = actual - target;
     res_ang = (180/pi)*std(residue);
@@ -38,7 +38,7 @@ function qs_stren = correct_coupling_tilt(ring, goal_tilt, response, indices, pa
         qs = repmat(qs, 1, size(indices.qs, 2));
         qs0 = getcellstruct(ring, 'PolynomA', indices.qs(:), 1, 2);
         ring = setcellstruct(ring, 'PolynomA', indices.qs(:), qs0 + qs(:), 1, 2);
-        coup = calc_coupling(ring);
+        coup = lnls_calc_coupling(ring);
         actual = coup.tilt(idx)';
         residue = actual - target;
         res_ang = (180/pi)*std(residue);

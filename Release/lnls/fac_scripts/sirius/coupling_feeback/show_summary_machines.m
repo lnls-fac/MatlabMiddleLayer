@@ -51,7 +51,7 @@ function coups = show_summary_machines(rand_mach, indices, plot_label)
     std_qs = zeros(1,length(rand_mach));
     for i=1:length(rand_mach)
         fprintf('%02d: ', i);
-        coup = calc_coupling(rand_mach{i});
+        coup = lnls_calc_coupling(rand_mach{i});
         plot(ax1, pos, (180/pi)*coup.tilt, 'Color', [1.0,0.6,0.6]);
         scatter(ax1, pos(bl_all), (180/pi)*coup.tilt(bl_all), 50, [1.0,0.4,0.4], 'filled');
         plot(ax2, pos, 1e6*coup.sigmas(2,:), 'Color', [0.6,0.6,1.0]);

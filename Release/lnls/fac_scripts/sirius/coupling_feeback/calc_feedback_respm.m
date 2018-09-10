@@ -28,9 +28,9 @@ function response = calc_feedback_respm(ring, indices, b2_selection)
         end
         qs0 = getcellstruct(ring, 'PolynomA', indices.qs(i,:), 1, 2);
         ring = setcellstruct(ring, 'PolynomA', indices.qs(i,:), qs0 + response.delta_qs/2, 1, 2);
-        coupling_p = calc_coupling(ring);
+        coupling_p = lnls_calc_coupling(ring);
         ring = setcellstruct(ring, 'PolynomA', indices.qs(i,:), qs0 - response.delta_qs/2, 1, 2);
-        coupling_n = calc_coupling(ring);
+        coupling_n = lnls_calc_coupling(ring);
         ring = setcellstruct(ring, 'PolynomA', indices.qs(i,:), qs0, 1, 2);
         tilt = coupling_p.tilt(b2_idx) - coupling_n.tilt(b2_idx);
         response.matrix(:,i) = tilt / response.delta_qs;
