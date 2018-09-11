@@ -13,12 +13,7 @@ function r_final = sirius_booster_injection(machine, param, n_part)
 % -->> n_part: number of particles
 %
 % NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
-% this function must be checked too.
-
-    % Setting the nominal kick of the injection kicker
-    sept = findcells(machine, 'FamName', 'InjSept');
-    machine = circshift(machine, [0, - (sept - 1)]);
-        
+% this function must be checked too.        
     offsets = [param.offset_x; param.offset_xl; 0; 0; 0; 0];
     offsets = repmat(offsets, 1, n_part);
        
@@ -32,4 +27,8 @@ function r_final = sirius_booster_injection(machine, param, n_part)
 
     r_final = linepass(machine, r_init, 1:length(machine));
     r_final = reshape(r_final, 6, n_part, length(machine));
+    
+    r_xy = compares_vchamb(machine, r_final([1,3], :, :), 1:length(machine));
+    
+    r_final([1,3], :, :) = r_xy;
 end
