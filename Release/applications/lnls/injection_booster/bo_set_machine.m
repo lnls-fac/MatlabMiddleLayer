@@ -10,56 +10,42 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     sept = findcells(bo_ring, 'FamName', 'InjSept');
     bo_ring = circshift(bo_ring, [0, - (sept - 1)]);
     bo_twiss = calctwiss(bo_ring);
-
-    param.betax0 = bo_twiss.betax(1);
+    
+    
+    %VARIAR COM PARAM DE TWISS
+    param.betax0 = bo_twiss.betax(1)*1.2;
     param.betay0 = bo_twiss.betay(1);
     param.alphax0 = bo_twiss.alphax(1);
     param.alphay0 = bo_twiss.alphay(1);
     param.etax0 = bo_twiss.etax(1);
     param.etay0 = bo_twiss.etay(1);
-    param.etaxl0 = bo_twiss.etaxl(1);
-    param.etayl0 = bo_twiss.etayl(1);
-
-    param.offset_x0 = -30e-3;
-    param.offset_x = -30e-3;
-    param.offset_xl0 = 14.3e-3;
-    param.offset_xl = 14.3e-3;
-    param.kckr0 = -19.34e-3;
-    param.kckr = -19.34e-3;
-    
-    p = 2;
-    x_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 3e-3;
-    param.offset_x_erro = param.offset_x0 + x_error;
-    
-    xl_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 2e-3;
-    param.offset_xl_erro = param.offset_xl0 + xl_error;
-    param.xl_error_pulse = 0.27e-3;
-    
-    kckr_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 2e-3;
-    param.kckr_erro = param.kckr0 + kckr_error;
-    param.kckr_error_pulse = 0.074e-3;
+    param.etaxl0 = bo_twiss.etaxl(1) + 0*0.2;
+    param.etayl0 = bo_twiss.etayl(1) + 0*0.2;
     
     param.emitx = 170e-9;
     param.emity = param.emitx;
     param.sigmae = 0.5e-2;
     param.sigmaz = 0.5e-3;
+    
+    dipole = findcells(bo_ring, 'FamName', 'B');
+    dipole = dipole(1);
+    scrn = findcells(bo_ring, 'FamName', 'Scrn');
+    scrn3 = scrn(3);
+    delta = 1e-5;
+    r_init_n = [0; 0; 0; 0; -delta; 0];
+    r_final_n = linepass(bo_ring, r_init_n, dipole:scrn3);
+    r_init_p = [0; 0; 0; 0; +delta; 0];
+    r_final_p = linepass(bo_ring, r_init_p, dipole:scrn3);
+    x_n = r_final_n(1, end);
+    x_p = r_final_p(1, end);
+    param.etax = (x_p - x_n) / 2 / delta;
 
-    param.cutoff = 3;
-    param.sigma_bpm = 2e-3;
-    param.sigma_scrn = 0.5e-3;
-    % res_scrn = param.sigma_scrn;
-    
-    % sigma_scrn_x1 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
-    % sigma_scrn_y1 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
-    % param.sigma_scrn1 = [sigma_scrn_x1; sigma_scrn_y1];
-    
-    % sigma_scrn_x2 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
-    % sigma_scrn_y2 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
-    % param.sigma_scrn2 = [sigma_scrn_x2; sigma_scrn_y2];
-    
-    % sigma_scrn_x3 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
-    % sigma_scrn_y3 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
-    % param.sigma_scrn3 = [sigma_scrn_x3; sigma_scrn_y3];
+    param.offset_x0 = -30e-3;
+    param.offset_xl0 = 14.3e-3;
+    param.offset_xl = 14.3e-3;
+    param.kckr0 = -19.34e-3;
+    param.delta_energy = 0;
+    param.delta_energy_ave = 0;
     
     %=====================================================================
     %=====================================================================
@@ -70,6 +56,7 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     
     % Error in the magnets (allignment, rotation, excitation, multipoles,
     % setting off rf cavity and radiation emission
+    
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
     family_data = sirius_bo_family_data(machine);
@@ -78,6 +65,7 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     machine = machine{1};
     
     function [machine, s] = vchamber_injection(machine)
+        
         %Values of vacuum chamber radius in horizontal plane at the end of
         %injection septum and the initial point of injection kicker
         xcv_sep = 41.86e-3;

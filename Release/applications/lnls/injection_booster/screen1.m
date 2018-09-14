@@ -1,8 +1,9 @@
-function [r_scrn1, param] = screen1(machine, param, n_part, n_pulse, scrn1)
-
+function [r_scrn1, param] = screen1(machine, param, n_part, n_pulse, scrn1, kckr)
+    xl_inicial = param.xl_sept_inicial;
     fprintf('=================================================\n');
     fprintf('SCREEN 1 ON \n')
     fprintf('=================================================\n');
+    machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);
     dxf_e = 1;
     dtheta0 = 0;
     res_scrn = param.sigma_scrn;
@@ -17,31 +18,29 @@ function [r_scrn1, param] = screen1(machine, param, n_part, n_pulse, scrn1)
 
     while dxf_e > res_scrn
         param.offset_xl_erro = param.offset_xl_erro + dtheta0;
-        error_inj_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param.xl_error_pulse;
-        param.offset_xl = param.offset_xl_erro + error_inj_pulse;
-        
-        % r_final = sirius_booster_injection(machine, param, n_part);
-        
-        % sigma_scrn = scrn_error_inten(r_final, n_part, scrn1, param.sigma_scrn);
-        [~, r_final_pulse1, sigma_scrn1] = bo_pulses(machine, param, n_part, n_pulse, 0, scrn1, 0);
-        r_scrn1 = r_final_pulse1(:, [1,3], :, scrn1);
-        r_scrn1 = squeeze(nanmean(r_scrn1, 3));
+        [~, r_final_pulse1, sigma_scrn1] = bo_pulses(machine1, param, n_part, n_pulse, 0, scrn1, kckr);
+        r_scrn1 = r_final_pulse1(:, :, scrn1);
         r_scrn1 = r_scrn1 + sigma_scrn1;
         r_scrn1 = squeeze(nanmean(r_scrn1, 1));
+        
+        r_scrn1 = compares_vchamb(machine1, r_scrn1, scrn1);
         
         if isnan(r_scrn1(1))
             error('PARTICLES ARE LOST BEFORE SCREEN 1');
         end
         
         dxf = r_scrn1(1) - x_kckr_scrn;
-        dtheta0 = scrn_septum_corresp(machine, dxf, scrn1);
+        dtheta0 = scrn_septum_corresp(machine1, dxf, scrn1);
         dxf_e = abs(dxf);
 
-        fprintf('Screen 1 - x position: %f mm SEM KICKER, error %f mm \n', r_scrn1(1)*1e3, dxf_e*1e3);
+        fprintf('Screen 1 - x position: %f mm KICKER ON, error %f mm \n', r_scrn1(1)*1e3, dxf_e*1e3);
         % fprintf('Posicao y da Screen: %f mm\n', r_scrn(2)*1e3); 
     end
     fprintf('=================================================\n');    
-    fprintf('SEPTUM ANGLE ADJUSTED TO %f mrad \n', param.offset_xl_erro*1e3);
+    erro = abs(xl_inicial - param.offset_xl_erro); 
+    fprintf('SEPTUM ANGLE ADJUSTED TO %f mrad, THE ERROR WAS %f mrad \n', param.offset_xl_erro*1e3, erro*1e3);
+    agr = (1-abs(erro - param.xl_error_sist)/param.xl_error_sist)*100;
+    fprintf('THE GENERATED ERROR WAS %f mrad, EFF %f %% \n', param.xl_error_sist*1e3, agr);
     fprintf('=================================================\n');
 end
 
