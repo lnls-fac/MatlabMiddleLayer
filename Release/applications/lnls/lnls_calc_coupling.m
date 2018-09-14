@@ -1,6 +1,7 @@
 function coupling = lnls_calc_coupling(ring, complete)
     [ring, ~, ~, ~, ~, idx_rad, ~] = setradiation('On', ring);
     ring = setcavity('On', ring);
+    
     if ~exist('complete', 'var')
         complete = false;
     end
