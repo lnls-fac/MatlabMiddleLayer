@@ -1,5 +1,5 @@
-function lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons, sym)
-% lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons)
+function lnls_draw_phase_space(the_ring, nturns, x_amps, y_amps, en_amps, resons, sym)
+% lnls_draw_phase_space(the_ring, nturns, x_amps, y_amps, en_amps,nturns, resons)
 %
 % Plota os espacos de fase horizontal e vertical e monta o diagrama de
 % tuneshifts com as amplitudes horizontal e vertical e com a energia:
@@ -18,6 +18,10 @@ function lnls_draw_phase_space(the_ring,x_amps,y_amps,en_amps,nturns, resons, sy
 % Por isso, o numero real de voltas usado sera tal que satisfaca a seguinte
 % formula nt = mod(2^nextpow2(nturns),6)==0
 
+if ~exist('x_amps', 'var'), x_amps = -linspace(12,1,30)*1e-3; end
+if ~exist('y_amps', 'var'), y_amps = linspace(0.2,3,30)*1e-3; end
+if ~exist('en_amps', 'var'), en_amps = linspace(-5,5,30)*1e-2; end
+if ~exist('resons', 'var'), resons = 1:4; end
 if ~exist('sym','var'), sym = 1; end
 
 % escolha do metodo para calculo das sintonias:
@@ -26,9 +30,10 @@ meth = 'naff';
 % ajuste do numero de voltas para que seja compativel com o naff
 nturns = nturns + 6 - mod(nturns,6);
 
-orb = findorbit6(the_ring);
-if any(isnan(orb))
-    orb = [findorbit4(the_ring,0);0;0];
+if strncmpi(getcavity(the_ring), 'On', 2)
+    orb = findorbit6(the_ring);
+else
+    orb = [findorbit4(the_ring, 0); 0; 0];
 end
 % calula os tunes do anel
 [~, tunes] = twissring(the_ring, 0, 1:length(the_ring)+1);
