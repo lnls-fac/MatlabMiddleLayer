@@ -1,4 +1,4 @@
-function [machine, param, s] = set_machine(bo_ring)
+function [machine, param, s] = bo_set_machine(bo_ring)
 
     initializations();
 
@@ -27,15 +27,17 @@ function [machine, param, s] = set_machine(bo_ring)
     param.kckr0 = -19.34e-3;
     param.kckr = -19.34e-3;
     
-    p = 1;
+    p = 2;
     x_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 3e-3;
     param.offset_x_erro = param.offset_x0 + x_error;
     
-    xl_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 12e-3;
+    xl_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 2e-3;
     param.offset_xl_erro = param.offset_xl0 + xl_error;
+    param.xl_error_pulse = 0.27e-3;
     
     kckr_error = lnls_generate_random_numbers(1, 1, 'norm') * p * 2e-3;
     param.kckr_erro = param.kckr0 + kckr_error;
+    param.kckr_error_pulse = 0.074e-3;
     
     param.emitx = 170e-9;
     param.emity = param.emitx;
@@ -45,8 +47,19 @@ function [machine, param, s] = set_machine(bo_ring)
     param.cutoff = 3;
     param.sigma_bpm = 2e-3;
     param.sigma_scrn = 0.5e-3;
-    param.xl_error_pulse = 0.27e-3;
-    param.kckr_error_pulse = 0.074e-3;
+    % res_scrn = param.sigma_scrn;
+    
+    % sigma_scrn_x1 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
+    % sigma_scrn_y1 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
+    % param.sigma_scrn1 = [sigma_scrn_x1; sigma_scrn_y1];
+    
+    % sigma_scrn_x2 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
+    % sigma_scrn_y2 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
+    % param.sigma_scrn2 = [sigma_scrn_x2; sigma_scrn_y2];
+    
+    % sigma_scrn_x3 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
+    % sigma_scrn_y3 = lnls_generate_random_numbers(1, 1, 'norm') * res_scrn;
+    % param.sigma_scrn3 = [sigma_scrn_x3; sigma_scrn_y3];
     
     %=====================================================================
     %=====================================================================
@@ -74,8 +87,7 @@ function [machine, param, s] = set_machine(bo_ring)
         injkckr = findcells(machine, 'FamName','InjKckr');
         xcv = (xcv_kckr - xcv_sep) / (s(injkckr) - s(1)) * s(1:injkckr)  + xcv_sep;
 
-        % Vacuum chamber inside the inj. kicker set as the same as the its
-        % initial point
+        % Vacuum chamber inside the inj. kicker set as the same as initial point
         xcv = [xcv, xcv(end)];
         machine = setcellstruct(machine, 'VChamber', 1:injkckr+1, xcv, 1, 1);
     end

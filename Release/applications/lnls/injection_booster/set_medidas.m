@@ -10,7 +10,7 @@ end
 
     function [machine, r_scrn] = screen(machine, r, n_scrn, sigma_scrn)
             if n_scrn > 3
-                error('Existem apenas 3 screens no booster!')
+                error('THERE IS ONLY 3 SCREEN IN THE BOOSTER')
             end
             scrn = findcells(machine, 'FamName', 'Scrn');
             scrn = scrn(n_scrn);
@@ -20,8 +20,8 @@ end
             sigma_scrn = [sigma_scrn_x; sigma_scrn_y];
             r_scrn = nanmean(r_scrn, 2) + sigma_scrn;
             machine = setcellstruct(machine, 'VChamber', scrn:length(machine), 0, 1, 1);
-            fprintf('Posicao x da Screen: %f mm\n', r_scrn(1)*1e3);
-            fprintf('Posicao y da Screen: %f mm\n', r_scrn(2)*1e3);
+            fprintf('Screen - x position: %f mm\n', r_scrn(1)*1e3);
+            fprintf('Screen - y position: %f mm\n', r_scrn(2)*1e3);
     end
  
     function [r_bpms, bpm] = bpms(machine, r, sigma0)
