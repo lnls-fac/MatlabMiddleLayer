@@ -1,4 +1,6 @@
-function [r_scrn1, param] = screen1_kckr(machine, param, n_part, n_pulse, scrn1)
+function [r_scrn1, param] = screen1_kckr(machine, param, n_part, n_pulse, scrn1, kckr)
+    machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);
+    kckr_inicial = param.kckr_inicial;
     fprintf('=================================================\n');
     fprintf('KICKER ON \n')
     fprintf('=================================================\n');
@@ -15,19 +17,11 @@ function [r_scrn1, param] = screen1_kckr(machine, param, n_part, n_pulse, scrn1)
         
     while abs(dx) > res_scrn
         param.kckr_erro = param.kckr_erro - dtheta_kckr;
-        error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param.kckr_error_pulse;
-        param.kckr = param.kckr_erro + error_kckr_pulse;
-        machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
-
-        error_inj_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param.xl_error_pulse;
-        param.offset_xl = param.offset_xl_erro + error_inj_pulse;
-
-        [~, r_final_pulse1, sigma_scrn2] = bo_pulses(machine, param, n_part, n_pulse, 0, scrn1, 1);
-
-        r_scrn1 = r_final_pulse1(:, [1,3], :, scrn1);
-        r_scrn1 = squeeze(nanmean(r_scrn1, 3));
+        [~, r_final_pulse1, sigma_scrn2] = bo_pulses(machine1, param, n_part, n_pulse, 0, scrn1, kckr);
+        r_scrn1 = r_final_pulse1(:, :, scrn1);
         r_scrn1 = r_scrn1 + sigma_scrn2;
         r_scrn1 = squeeze(nanmean(r_scrn1, 1));
+        r_scrn1 = compares_vchamb(machine1, r_scrn1, scrn1);
         
         if isnan(r_scrn1(1))
             error('PARTICLES ARE LOST BEFORE SCREEN 1');
@@ -40,6 +34,9 @@ function [r_scrn1, param] = screen1_kckr(machine, param, n_part, n_pulse, scrn1)
         fprintf('=================================================\n');
     end
     fprintf('=================================================\n');
-    fprintf('KICKER ANGLE ADJUSTED TO %f mrad \n', param.kckr_erro*1e3);
+    erro = abs(kckr_inicial - param.kckr_erro); 
+    fprintf('KICKER ANGLE ADJUSTED TO %f mrad, THE ERROR WAS %f mrad \n', param.kckr_erro*1e3, erro*1e3);
+    agr = (1-abs(erro - param.kckr_error_sist)/param.kckr_error_sist)*100;
+    fprintf('THE GENERATED ERROR WAS %f mrad, EFF %f %% \n', param.kckr_error_sist*1e3, agr);
     fprintf('=================================================\n');
 end
