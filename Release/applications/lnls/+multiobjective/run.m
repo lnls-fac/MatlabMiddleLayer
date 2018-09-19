@@ -13,6 +13,11 @@ function run(opt)
     Nobj = opt.Nobj;
     Strt = 2;
     
+    if ~isfield(opt, 'objective_max_values')
+        opt.objective_max_values = inf*ones(Nobj, 1);
+    end
+    obj_max = opt.objective_max_values;
+    
     if cont
         Gen = regexp(ls(fol, '-rt'), 'G[0-9]{3}', 'match');
         Gen = sort(Gen);
@@ -46,7 +51,7 @@ function run(opt)
         for i=1:size(Gn,2)
             resn(:,i) = opt.objective_fun(Gn(:,i), opt.objective_data);
         end
-        id_keep = multiobjective.save_best_and_kill_worst(resn, Ncut);
+        id_keep = multiobjective.save_best_and_kill_worst(resn, Ncut, obj_max);
         G = Gn(:,id_keep);
         res = resn(:,id_keep);
         save([fol,'G001.mat'], 'G', 'res');
@@ -67,7 +72,7 @@ function run(opt)
         for ii=sz+1:size(Gn,2)
             resn(:, ii) = opt.objective_fun(Gn(:, ii), opt.objective_data);
         end
-        id_keep = multiobjective.save_best_and_kill_worst(resn, Ncut);
+        id_keep = multiobjective.save_best_and_kill_worst(resn, Ncut, obj_max);
         G = Gn(:,id_keep);
         res = resn(:,id_keep);
         st = sprintf('G%03d', i);
