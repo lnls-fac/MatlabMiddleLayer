@@ -1,4 +1,4 @@
-function [param, machine] = bo_injection_adjustment(bo_ring, n_part, n_pulse, set_m, param)
+function [param, machine, r_scrn3] = bo_injection_adjustment(bo_ring, n_part, n_pulse, set_m, param_in)
 
     if(exist('set_m','var'))
         if(strcmp(set_m,'yes'))
@@ -12,93 +12,70 @@ function [param, machine] = bo_injection_adjustment(bo_ring, n_part, n_pulse, se
     
     if flag_machine
         [machine, param0, ~] = bo_set_machine(bo_ring);
-        param0_errors = add_errors(param0);
+        param0_errors = add_errors_machine(param0);
     else
         machine = bo_ring;
-        if(~exist('param', 'var'))
+        param0_errors = param_in;
+        if(~exist('param_in', 'var'))
             error('Struct with parameters missing');
         end
     end
     
     scrn = findcells(machine, 'FamName', 'Scrn');
-    lm = length(machine);
     
-    % PULSOS INICIAIS MOSTRAM QUE NÃO HÁ VOLTA COM CONFIG. INICIAIS
-    % KICKER ON    
-    fprintf('=================================================\n');
-    fprintf('INITIAL CONFIGURATION \n')
-    fprintf('=================================================\n');
-    kckr = 'on';
-    [eff0, ~] = bo_pulses(machine, param0_errors, n_part, n_pulse, 1, lm, kckr);
-    fprintf('=================================================\n');
-    fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff0)*100, std(eff0)*100);
-    fprintf('=================================================\n');
-    
-    % SCREEN 1 ON // KICKER OFF
-    kckr = 'off';
-    machine1 = setcellstruct(machine, 'VChamber', scrn(1)+1:lm, 0, 1, 1);      
-    
-    % WITH SCREEN 1 MEASUREMENTS, ADJUST THE SEPTUM FINAL ANGLE // KICKER OFF   
-    [~, param] = screen1(machine1, param0_errors, n_part, n_pulse, scrn(1), kckr);
+    % SCREEN 1 ON
+    kckr = 'off';   
+    [~, param] = screen1(machine, param0_errors, n_part, n_pulse, scrn(1), kckr);
     
     % KICKER ON -->> WITH SCREEN 1 MEAS., ADJUST THE KICKER
     kckr = 'on';
-    [~, param] = screen1_kckr(machine1, param, n_part, n_pulse, scrn(1), kckr);
-    [eff1, ~] = bo_pulses(machine, param, n_part, n_pulse, 1, lm, kckr);
-    fprintf('=================================================\n');
-    fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff1)*100, std(eff1)*100);
-    fprintf('=================================================\n');
+    [~, param] = screen1_kckr(machine, param, n_part, n_pulse, scrn(1), kckr);
        
     % SCREEN 2 ON TO ADJUST KICKER AGAIN // KICKER ON
-    machine2 = setcellstruct(machine, 'VChamber', scrn(2)+1:lm, 0, 1, 1);  
-    [~, param] = screen2(machine2, param, n_part, n_pulse, scrn(2), kckr);
-    [eff2, r_scrn2_in, sigma_scrn2_in] = bo_pulses(machine, param, n_part, n_pulse, 1, lm, kckr);
-    fprintf('=================================================\n');
-    fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff2)*100, std(eff2)*100);
-    fprintf('=================================================\n');
+    [r_scrn2, param] = screen2(machine, param, n_part, n_pulse, scrn(2), kckr);
     % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
-    [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, scrn(1), scrn(2), n_pulse, r_scrn2_in, sigma_scrn2_in, kckr);
-    % CHECK THE PULSES WITH THIS CONFIGURATION
+    [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
     
-    fprintf('ADJUST KICKER CENTER!!!! \n');
+    if abs(r_scrn2(1)) > param.sigma_scrn;    
+        fprintf('=================================================\n');
+        fprintf('READJUSTING THE BEAM TO REACH THE CENTER OF KICKER CENTER\n');
+        fprintf('=================================================\n');
+
+        param = center_kicker(machine, param, r_scrn2(1));
+        fprintf('=================================================\n');
+        fprintf('REPEAT THE PROCESS \n');
+        fprintf('=================================================\n');
+
+        % KICKER ON -->> WITH SCREEN 1 MEAS., ADJUST THE KICKER
+        kckr = 'on';
+        [~, param] = screen1_kckr(machine, param, n_part, n_pulse, scrn(1), kckr);
+        % [eff1, ~] = bo_pulses(machine, param, n_part, n_pulse, lm, kckr, 'plot');
+%         fprintf('=================================================\n');
+%         fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff1)*100, std(eff1)*100);
+%         fprintf('=================================================\n');
+
+        % SCREEN 2 ON TO ADJUST KICKER AGAIN // KICKER ON
+        [r_scrn2, param] = screen2(machine, param, n_part, n_pulse, scrn(2), kckr);
+        % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
+        [~, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
+    end
     
-    param = centro_kicker(machine, param, r_scrn2(1));
     
-     fprintf('CHECK AGAIN!!!! \n');
+     % CHECK THE PULSES WITH THIS CONFIGURATION    
+%     [eff2, ~] = bo_pulses(machine, param, n_part, n_pulse, lm, kckr, 'plot');
+%     fprintf('=================================================\n');
+%     fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff2)*100, std(eff2)*100);
+%     fprintf('=================================================\n');
     
-    % KICKER ON -->> WITH SCREEN 1 MEAS., ADJUST THE KICKER
-    kckr = 'on';
-    [~, param] = screen1_kckr(machine1, param, n_part, n_pulse, scrn(1), kckr);
-    [eff1, ~] = bo_pulses(machine, param, n_part, n_pulse, 1, lm, kckr);
-    fprintf('=================================================\n');
-    fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff1)*100, std(eff1)*100);
-    fprintf('=================================================\n');
-       
-    % SCREEN 2 ON TO ADJUST KICKER AGAIN // KICKER ON
-    machine2 = setcellstruct(machine, 'VChamber', scrn(2)+1:lm, 0, 1, 1);  
-    [~, param] = screen2(machine2, param, n_part, n_pulse, scrn(2), kckr);
-    [eff2, r_scrn2_in, sigma_scrn2_in] = bo_pulses(machine, param, n_part, n_pulse, 1, lm, kckr);
-    fprintf('=================================================\n');
-    fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff2)*100, std(eff2)*100);
-    fprintf('=================================================\n');
-    % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
-    [~, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, scrn(1), scrn(2), n_pulse, r_scrn2_in, sigma_scrn2_in, kckr);
-    % CHECK THE PULSES WITH THIS CONFIGURATION      
+      [param, r_scrn3] = screen3(machine, param, n_part, n_pulse, scrn(3), kckr);
+%     [eff3, ~] = bo_pulses(machine, param, n_part, n_pulse, lm, kckr, 'plot');
+%     fprintf('=================================================\n');
+%     fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff3)*100, std(eff3)*100);
+%     fprintf('=================================================\n');
     
-    [eff3, ~] = bo_pulses(machine, param, n_part, n_pulse, 1, lm, kckr);
-    fprintf('=================================================\n');
-    fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff3)*100, std(eff3)*100);
-    fprintf('=================================================\n');
-    
-    param = screen3(machine, param, n_part, n_pulse, scrn(3), kckr);
-    [eff4, ~] = bo_pulses(machine, param, n_part, 2*n_pulse, 1, lm, kckr);
-    fprintf('=================================================\n');
-    fprintf('AVERAGE EFFICIENCY %g %% +/- %g %% \n', mean(eff4)*100, std(eff4)*100);
-    fprintf('=================================================\n');
-    
-    fprintf('=================================================\n');
-    fprintf('IMPROVEMENT %g %% -> %g %% -> %g %% -> %g %% -> %g %% \n', mean(eff0)*100, mean(eff1)*100, mean(eff2)*100, mean(eff3)*100, mean(eff4)*100);
-    fprintf('=================================================\n');
+%     fprintf('=================================================\n');
+%     fprintf('IMPROVEMENT %g %% -> %g %% -> %g %% -> %g %% \n', mean(eff0)*100, mean(eff1)*100, mean(eff2)*100, mean(eff3)*100);
+%     fprintf('================================================= \n');
 end
     
  

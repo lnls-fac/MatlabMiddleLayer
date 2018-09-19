@@ -13,20 +13,21 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     
     
     %VARIAR COM PARAM DE TWISS
-    param.betax0 = bo_twiss.betax(1)*1.2;
+    param.betax0 = bo_twiss.betax(1);
     param.betay0 = bo_twiss.betay(1);
     param.alphax0 = bo_twiss.alphax(1);
     param.alphay0 = bo_twiss.alphay(1);
     param.etax0 = bo_twiss.etax(1);
     param.etay0 = bo_twiss.etay(1);
-    param.etaxl0 = bo_twiss.etaxl(1) + 0*0.2;
-    param.etayl0 = bo_twiss.etayl(1) + 0*0.2;
+    param.etaxl0 = bo_twiss.etaxl(1);
+    param.etayl0 = bo_twiss.etayl(1);
     
     param.emitx = 170e-9;
     param.emity = param.emitx;
     param.sigmae = 0.5e-2;
     param.sigmaz = 0.5e-3;
     
+    %Calculates the horizontal dispersion function at screen 3    
     dipole = findcells(bo_ring, 'FamName', 'B');
     dipole = dipole(1);
     scrn = findcells(bo_ring, 'FamName', 'Scrn');
@@ -38,14 +39,14 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     r_final_p = linepass(bo_ring, r_init_p, dipole:scrn3);
     x_n = r_final_n(1, end);
     x_p = r_final_p(1, end);
-    param.etax = (x_p - x_n) / 2 / delta;
+    param.etax_scrn3 = (x_p - x_n) / 2 / delta;
 
     param.offset_x0 = -30e-3;
     param.offset_xl0 = 14.3e-3;
-    param.offset_xl = 14.3e-3;
     param.kckr0 = -19.34e-3;
-    param.delta_energy = 0;
-    param.delta_energy_ave = 0;
+    param.delta0 = 0;
+    param.delta_ave = 0;
+    param.delta_energy_scrn3 = 0;
     
     %=====================================================================
     %=====================================================================
