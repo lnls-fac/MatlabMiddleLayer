@@ -14,6 +14,10 @@ function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, n_pu
         if isnan(r_scrn2(1))
            error('PARTICLES ARE LOST BEFORE SCREEN 2');
         end
+        
+        fprintf('=================================================\n');
+        fprintf('SCREEN 1 ON \n')
+        fprintf('=================================================\n');
 
         [eff1, r_scrn1] = bo_pulses(machine1, param, n_part, n_pulse, scrn1, kckr);
         
@@ -38,9 +42,9 @@ function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, n_pu
         
         % fprintf('error: %f mm, angle: %f mrad \n', abs(dx12)*1e3, abs(theta12)*1e3);
         param.kckr_sist = param.kckr_sist - theta12;
-        %fprintf('=================================================\n');
-        %fprintf('SCREEN 2 ON \n')
-        %fprintf('=================================================\n');
+        fprintf('=================================================\n');
+        fprintf('SCREEN 2 ON \n')
+        fprintf('=================================================\n');
         [eff2, r_scrn2] = bo_pulses(machine2, param, n_part, n_pulse, scrn2, kckr);
         
         if mean(eff2) < 0.75

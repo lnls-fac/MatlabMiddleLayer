@@ -8,6 +8,7 @@ n_times = 20;
 
 if n == 1;
     fprintf('LOW INTENSITY ON SCREEN 1 \n');
+    fprintf('=================================================\n');
     while eff < eff_lim
         dtheta0 = dtheta0 + param.offset_xl_sist * 0.1;
         param.offset_xl_sist = param.offset_xl_sist + dtheta0;
@@ -33,6 +34,7 @@ end
 
 if n == 2;
     fprintf('LOW INTENSITY ON SCREEN 2 \n');
+    fprintf('=================================================\n');
     while eff < eff_lim
         dtheta_kckr = dtheta_kckr + param.kckr_sist * 0.1;
         param.kckr_sist = param.kckr_sist - dtheta_kckr;
@@ -58,6 +60,7 @@ end
 
 if n == 3;
     fprintf('LOW INTENSITY ON SCREEN 3 \n');
+    fprintf('=================================================\n');
     while eff < eff_lim
         delta_energy = delta_energy + param.delta_sist * 0.1;
         param.delta_ave = param.delta_ave + delta_energy;

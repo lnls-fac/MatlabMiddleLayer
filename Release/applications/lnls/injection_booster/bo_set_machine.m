@@ -1,5 +1,5 @@
 function [machine, param, s] = bo_set_machine(bo_ring)
-
+    name = 'CONFIG'; name_saved_machines = name;
     initializations();
 
     %=====================================================================
@@ -63,7 +63,7 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     family_data = sirius_bo_family_data(machine);
     machine  = create_apply_errors(machine, family_data);
     machine  = create_apply_multipoles(machine, family_data);
-    machine = machine{1};
+    % machine = machine{1};
     
     function [machine, s] = vchamber_injection(machine)
         
@@ -80,7 +80,6 @@ function [machine, param, s] = bo_set_machine(bo_ring)
         xcv = [xcv, xcv(end)];
         machine = setcellstruct(machine, 'VChamber', 1:injkckr+1, xcv, 1, 1);
     end
-end
 %% Initializations
 function initializations()
 
@@ -136,11 +135,10 @@ function machine = create_apply_errors(the_ring, family_data)
     end
 
     % generates error vectors
-    nr_machines   = 1;
+    nr_machines   = 20;
     rndtype       = 'gaussian';
     cutoff_errors = 1;
     fprintf('-  generating errors ...\n');
-    name = 'CONFIG';
 
     errors        = lnls_latt_err_generate_errors(name, the_ring, config, nr_machines, cutoff_errors, rndtype);
 
@@ -200,9 +198,13 @@ function machine = create_apply_multipoles(machine, family_data)
         machine{i} = sirius_bo_multipole_systematic_errors(machine{i});
     end
     
-    name = 'CONFIG';
+    fname = which('sirius_bo_multipole_systematic_errors');
+    copyfile(fname, [name '_multipole_systematic_errors.m']);
+
     cutoff_errors = 2;
     multi_errors  = lnls_latt_err_generate_multipole_errors(name, machine{1,1}, multi, length(machine), cutoff_errors);
     machine = lnls_latt_err_apply_multipole_errors(name, machine, multi_errors, multi);
-
+    name_saved_machines = [name_saved_machines '_multi'];
+    save([name_saved_machines '.mat'], 'machine');
+end
 end
