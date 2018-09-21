@@ -1,19 +1,21 @@
 function ExcData = sirius_getexcdata(CommonNames)
 %SIRIUS_GETEXCDATA - Reads excitation curves for various magnets.
 %
-%2015-09-02
+% 2015-09-02
+% 2018-09-21: minor code cleanup - ximenes
 
 AD = getad;
 
 for i=1:length(CommonNames(:,1))  
     
     CName = lower(CommonNames(i,:));
-    file = fopen([AD.Directory.ExcDataDir, filesep, deblank(CName), '.txt']);
+    fname = [AD.Directory.ExcDataDir, filesep, deblank(CName), '.txt'];
+    fp = fopen(fname);
     j = 1;
     ExcData.skew{i} = false;
     try
-        while ~feof(file)
-            line = fgetl(file);
+        while ~feof(fp)
+            line = strip(fgetl(fp));
             if ~isempty(strfind(line, '#'))
                 if ~isempty(regexpi(line, 'main_harmonic', 'match'))
                    main_harmonic = regexpi(line, 'main_harmonic', 'split');
@@ -30,7 +32,7 @@ for i=1:length(CommonNames(:,1))
                 j = j+1;
             end
         end 
-        fclose(file);
+        fclose(fp);
 
         if size(data, 2) ~= (2*length(ExcData.harmonics{i})+1)
             error('Mismatch between number of columns and size of harmonics list in excitation curve');
