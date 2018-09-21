@@ -1,10 +1,24 @@
 function booster_turns(machine, param, n_part, n_turns)
 initializations()
 
-for j = 1:length(machine)
+if iscell(machine) && iscell(param)
+    machine_cell = machine;
+    param_cell = param;
+    lm = length(machine);
+else
+    lm = 1;
+end
+
+for j = 1:lm
     
-    machine = machine{j};
-    param = param{j};    
+    fprintf('=================================================\n');
+    fprintf('MACHINE NUMBER %i \n', j)
+    fprintf('=================================================\n');
+    
+    if iscell(machine) && iscell(param)
+        machine = machine_cell{j};
+        param = param_cell{j};
+    end
     
     lm = length(machine);
 
@@ -59,10 +73,10 @@ function [r_init, r_out, eff, r_bpm] = single_turn(machine, n_part, r_init, turn
     if flag_bpm
         bpm = findcells(machine, 'FamName', 'BPM');
         r_out_bpm = r_out_xy(:, :, bpm);
-        plot_booster_turn(machine, r_out_bpm, bpm, n_part, sigma_bpm0);
         sigma_bpm = bpm_error_inten(r_out_bpm, n_part, sigma_bpm0);
         r_diag_bpm = squeeze(nanmean(r_out_bpm, 2)) + sigma_bpm;
-        r_bpm = compares_vchamb(machine, r_diag_bpm, bpm, true);        
+        r_bpm = compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');  
+        plot_bpms(machine, r_bpm);
     end
 end
 
@@ -76,3 +90,20 @@ function initializations()
     RandStream.setGlobalStream(RandStream('mt19937ar','seed', seed));
 
 end
+
+function plot_bpms(machine, r_bpm)
+    VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:length(machine)))';
+    s_total = findspos(machine, 1:length(machine));
+    bpm = findcells(machine, 'FamName', 'BPM');
+    s = s_total(bpm);
+    x = r_bpm(1, :);
+    gcf();
+    ax = gca();
+    hold off;
+    plot(ax, s, x, '.-r', 'linewidth', 1);
+    hold all
+    plot(ax, s_total, VChamb(1,:),'k');
+    plot(ax, s_total, -VChamb(1,:),'k');
+    drawnow;
+end
+

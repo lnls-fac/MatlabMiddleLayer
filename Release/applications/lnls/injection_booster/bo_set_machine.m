@@ -1,4 +1,4 @@
-function [machine, param, s] = bo_set_machine(bo_ring)
+function [machine, param] = bo_set_machine(bo_ring)
     name = 'CONFIG'; name_saved_machines = name;
     initializations();
 
@@ -33,13 +33,25 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     scrn = findcells(bo_ring, 'FamName', 'Scrn');
     scrn3 = scrn(3);
     delta = 1e-5;
+    d = dipole:scrn3;
     r_init_n = [0; 0; 0; 0; -delta; 0];
-    r_final_n = linepass(bo_ring, r_init_n, dipole:scrn3);
+    r_final_n = linepass(bo_ring(d), r_init_n);
     r_init_p = [0; 0; 0; 0; +delta; 0];
-    r_final_p = linepass(bo_ring, r_init_p, dipole:scrn3);
-    x_n = r_final_n(1, end);
-    x_p = r_final_p(1, end);
+    r_final_p = linepass(bo_ring(d), r_init_p);
+    x_n = r_final_n(1);
+    x_p = r_final_p(1);
     param.etax_scrn3 = (x_p - x_n) / 2 / delta;
+    
+    %Calculates the horizontal dispersion function at BPMS    
+    bpms = findcells(bo_ring, 'FamName', 'BPM');
+    delta = 1e-5;
+    r_init_n = [0; 0; 0; 0; -delta; 0];
+    r_final_n = linepass(bo_ring, r_init_n, bpms);
+    r_init_p = [0; 0; 0; 0; +delta; 0];
+    r_final_p = linepass(bo_ring, r_init_p, bpms);
+    x_n = r_final_n(1, :);
+    x_p = r_final_p(1, :);
+    param.etax_bpms = (x_p - x_n) ./ 2 ./ delta;
 
     param.offset_x0 = -30e-3;
     param.offset_xl0 = 14.3e-3;
@@ -53,7 +65,7 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     
     % Setting the machine configurations
 
-    [machine, s] = vchamber_injection(bo_ring);
+    machine = vchamber_injection(bo_ring);
     
     % Error in the magnets (allignment, rotation, excitation, multipoles,
     % setting off rf cavity and radiation emission
@@ -65,7 +77,7 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     machine  = create_apply_multipoles(machine, family_data);
     % machine = machine{1};
     
-    function [machine, s] = vchamber_injection(machine)
+    function machine = vchamber_injection(machine)
         
         %Values of vacuum chamber radius in horizontal plane at the end of
         %injection septum and the initial point of injection kicker

@@ -64,7 +64,7 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
         
     
         if flag_plot && flag_diag
-            plot_booster_turn(machine, r_bpm, bpm, n_part, param.sigma_bpm);
+            % plot_booster_turn(machine, r_bpm, bpm, n_part, param.sigma_bpm);
         elseif flag_plot
             plot_booster_turn(machine, r_xy, 1:length(machine), n_part, param.sigma_bpm);
         end
@@ -85,16 +85,36 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
     
     r_point = r_pulse(:, :, point);
     r_point = r_point + sigma_scrn;
-    r_point = compares_vchamb(machine, r_point, point, true);
+    r_point = compares_vchamb(machine, r_point, point, 'screen');
     r_point = squeeze(nanmean(r_point, 1));
     r_end = squeeze(r_end(end, :, :));
     
     if flag_diag
         r_diag_bpm = r_diag_bpm + sigma_bpm;
-        r_bpm = compares_vchamb(machine, r_diag_bpm, bpm, true);
+        if n_pulse > 1
+            r_diag_bpm = squeeze(nanmean(r_diag_bpm, 1));
+        end
+        r_bpm = compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
         r_bpm = squeeze(nanmean(r_bpm, 1));
+        plot_bpms(machine, r_bpm);
     end
      fprintf('=================================================\n');
+end
+
+function plot_bpms(machine, r_bpm)
+    VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:length(machine)))';
+    s_total = findspos(machine, 1:length(machine));
+    bpm = findcells(machine, 'FamName', 'BPM');
+    s = s_total(bpm);
+    x = r_bpm(1, :);
+    gcf();
+    ax = gca();
+    hold off;
+    plot(ax, s, x, '.-r', 'linewidth', 1);
+    hold all
+    plot(ax, s_total, VChamb(1,:),'k');
+    plot(ax, s_total, -VChamb(1,:),'k');
+    drawnow;
 end
 
 

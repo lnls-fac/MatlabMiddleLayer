@@ -27,7 +27,7 @@ function [r_xy, r_end_ring, r_bpm] = sirius_booster_injection(machine, param, n_
     r_final = linepass(machine(1:point), r_init, 1:point);    
     r_final = reshape(r_final, 6, [], point);
 
-    r_xy = compares_vchamb(machine, r_final([1,3], :, :), 1:point, false);
+    r_xy = compares_vchamb(machine, r_final([1,3], :, :), 1:point);
     r_final([1,3], :, :) = r_xy;
     r_end_ring = squeeze(r_final(:, :, end));
     
