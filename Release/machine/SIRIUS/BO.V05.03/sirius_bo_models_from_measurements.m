@@ -3,35 +3,9 @@ function the_ring = sirius_bo_models_from_measurements(the_ring0)
 the_ring = models_from_measurements_dipoles(the_ring0);
 the_ring = models_from_measurements_quadrupoles_qf(the_ring);
 the_ring = models_from_measurements_quadrupoles_qd(the_ring);
+the_ring = models_from_measurements_correctors_ch(the_ring);
+the_ring = models_from_measurements_correctors_cv(the_ring);
 the_ring = correct_optics(the_ring);
-
-
-function the_ring = correct_optics(the_ring0)
-
-% see 'set_magnets_strength_booster.m' file with strength values.
-goal_tunes = [19.20433, 7.31417];
-goal_chrom = [0.5, 0.5];
-the_ring = the_ring0;
-idx_qf = findcells(the_ring, 'FamName', 'QF');
-idx_qd = findcells(the_ring, 'FamName', 'QD');
-idx_sf = findcells(the_ring, 'FamName', 'SF');
-idx_sd = findcells(the_ring, 'FamName', 'SD');
-the_ring = setcellstruct(the_ring, 'PolynomB', idx_qf, +1.65374903807441, 1, 2);
-the_ring = setcellstruct(the_ring, 'PolynomB', idx_qd, -0.10250366405148, 1, 2);
-the_ring = setcellstruct(the_ring, 'PolynomB', idx_sf, +11.25394814115368, 1, 3);
-the_ring = setcellstruct(the_ring, 'PolynomB', idx_sd, +11.09496614284700, 1, 3);
-ats = atsummary(the_ring);
-if any(abs(ats.tunes - goal_tunes) > 0.00001) || any(abs(ats.chromaticity - goal_chrom) > 0.01)
-    for i=1:8
-        the_ring = fitchrom2(the_ring, goal_chrom, 'SD', 'SF');
-        [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, {'QF','QD'}, 'svd', 'add', 10, 1e-9);
-    end
-    fprintf('   Tunes and Chromaticities corrected!\n');
-    fprintf('   qf_strength = %+.14f;\n', the_ring{idx_qf(1)}.PolynomB(2));
-    fprintf('   qd_strength = %+.14f;\n', the_ring{idx_qd(1)}.PolynomB(2));
-    fprintf('   sf_strength = %+.14f;\n', the_ring{idx_sf(1)}.PolynomB(3));
-    fprintf('   sd_strength = %+.14f;\n', the_ring{idx_sd(1)}.PolynomB(3));
-end
 
 
 function the_ring = models_from_measurements_dipoles(the_ring0)
@@ -51,7 +25,7 @@ model_sim = [ getcellstruct(the_ring, 'Length', idx(1,:)), getcellstruct(the_rin
     
 for i=1:length(sorting)
     % load instance of dipole model
-    maglabel = fullfile(tpath, 'models', 'dipoles', [sorting{i}, '-3gev']);
+    maglabel = fullfile(tpath, 'models', 'dipoles', [lower(sorting{i}), '-3gev']);
     [harms, model] = sirius_bo_load_fmap_model(maglabel);
     if length(the_ring{idx(i, 1)}.PolynomB) ~= length(harms)
         error('Incompatible PolynomB and dipole model!')
@@ -102,7 +76,6 @@ for i=1:length(sorting)
     end
 end
 
-
 function the_ring = models_from_measurements_quadrupoles_qd(the_ring0)
 the_ring = the_ring0;
 
@@ -131,6 +104,44 @@ for i=1:length(sorting)
     end
 end
 
+function the_ring = models_from_measurements_correctors_ch(the_ring0)
+
+the_ring = the_ring0;
+
+function the_ring = models_from_measurements_correctors_cv(the_ring0)
+
+% should use the same data as in correctors_ch but rotated 90 degrees.
+% C'_n = (-i)^(n+1) C_n
+% where C_n = (B_n + i A_n)
+
+the_ring = the_ring0;
+
+function the_ring = correct_optics(the_ring0)
+
+% see 'set_magnets_strength_booster.m' file with strength values.
+goal_tunes = [19.20433, 7.31417];
+goal_chrom = [0.5, 0.5];
+the_ring = the_ring0;
+idx_qf = findcells(the_ring, 'FamName', 'QF');
+idx_qd = findcells(the_ring, 'FamName', 'QD');
+idx_sf = findcells(the_ring, 'FamName', 'SF');
+idx_sd = findcells(the_ring, 'FamName', 'SD');
+the_ring = setcellstruct(the_ring, 'PolynomB', idx_qf, +1.65374903807441, 1, 2);
+the_ring = setcellstruct(the_ring, 'PolynomB', idx_qd, -0.10250366405148, 1, 2);
+the_ring = setcellstruct(the_ring, 'PolynomB', idx_sf, +11.25394814115368, 1, 3);
+the_ring = setcellstruct(the_ring, 'PolynomB', idx_sd, +11.09496614284700, 1, 3);
+ats = atsummary(the_ring);
+if any(abs(ats.tunes - goal_tunes) > 0.00001) || any(abs(ats.chromaticity - goal_chrom) > 0.01)
+    for i=1:8
+        the_ring = fitchrom2(the_ring, goal_chrom, 'SD', 'SF');
+        [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, {'QF','QD'}, 'svd', 'add', 10, 1e-9);
+    end
+    fprintf('   Tunes and Chromaticities corrected!\n');
+    fprintf('   qf_strength = %+.14f;\n', the_ring{idx_qf(1)}.PolynomB(2));
+    fprintf('   qd_strength = %+.14f;\n', the_ring{idx_qd(1)}.PolynomB(2));
+    fprintf('   sf_strength = %+.14f;\n', the_ring{idx_sf(1)}.PolynomB(3));
+    fprintf('   sd_strength = %+.14f;\n', the_ring{idx_sd(1)}.PolynomB(3));
+end
 
 function [mags, kls] = load_readme_file(filename, substr)
 
