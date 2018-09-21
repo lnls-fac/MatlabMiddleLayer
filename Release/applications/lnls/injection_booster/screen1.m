@@ -1,7 +1,7 @@
 function [r_scrn1, param] = screen1(machine, param, n_part, n_pulse, scrn1, kckr)
-    xl_inicial = param.xl_sept_inicial;
+    % xl_inicial = param.xl_sept_init;
     fprintf('=================================================\n');
-    fprintf('SCREEN 1 ON \n')
+    fprintf('SCREEN 1 ON - KICKER OFF \n')
     fprintf('=================================================\n');
     machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);
     dxf_e = 1;
@@ -17,13 +17,13 @@ function [r_scrn1, param] = screen1(machine, param, n_part, n_pulse, scrn1, kckr
     x_kckr_scrn = tan(-param.kckr0) * d_kckr_scrn;
 
     while dxf_e > res_scrn
-        param.offset_xl_erro = param.offset_xl_erro + dtheta0;
-        [~, r_final_pulse1, sigma_scrn1] = bo_pulses(machine1, param, n_part, n_pulse, 0, scrn1, kckr);
-        r_scrn1 = r_final_pulse1(:, :, scrn1);
-        r_scrn1 = r_scrn1 + sigma_scrn1;
-        r_scrn1 = squeeze(nanmean(r_scrn1, 1));
+        param.offset_xl_sist = param.offset_xl_sist + dtheta0;
+        [eff1, r_scrn1] = bo_pulses(machine1, param, n_part, n_pulse, scrn1, kckr);
         
-        r_scrn1 = compares_vchamb(machine1, r_scrn1, scrn1);
+        if mean(eff1) < 0.75
+            param = screen_low_intensity(machine1, param, n_part, n_pulse, scrn1, kckr, mean(eff1), 1, 0.75);
+            [~, r_scrn1] = bo_pulses(machine1, param, n_part, n_pulse, scrn1, kckr);
+        end
         
         if isnan(r_scrn1(1))
             error('PARTICLES ARE LOST BEFORE SCREEN 1');
@@ -32,16 +32,16 @@ function [r_scrn1, param] = screen1(machine, param, n_part, n_pulse, scrn1, kckr
         dxf = r_scrn1(1) - x_kckr_scrn;
         dtheta0 = scrn_septum_corresp(machine1, dxf, scrn1);
         dxf_e = abs(dxf);
-
-        fprintf('Screen 1 - x position: %f mm KICKER ON, error %f mm \n', r_scrn1(1)*1e3, dxf_e*1e3);
-        % fprintf('Posicao y da Screen: %f mm\n', r_scrn(2)*1e3); 
+        fprintf('(KICKER OFF) Screen 1 - x position: %f mm, error %f mm \n', r_scrn1(1)*1e3, dxf_e*1e3);
+        fprintf('=================================================\n');    
     end
-    fprintf('=================================================\n');    
-    erro = abs(xl_inicial - param.offset_xl_erro); 
-    fprintf('SEPTUM ANGLE ADJUSTED TO %f mrad, THE ERROR WAS %f mrad \n', param.offset_xl_erro*1e3, erro*1e3);
-    agr = (1-abs(erro - param.xl_error_sist)/param.xl_error_sist)*100;
-    fprintf('THE GENERATED ERROR WAS %f mrad, EFF %f %% \n', param.xl_error_sist*1e3, agr);
-    fprintf('=================================================\n');
+%     fprintf('(KICKER OFF) Screen 1 - x position: %f mm, error %f mm \n', r_scrn1(1)*1e3, dxf_e*1e3);
+%     fprintf('=================================================\n');    
+%     erro = abs(xl_inicial - param.offset_xl_sist); 
+%     fprintf('SEPTUM ANGLE ADJUSTED TO %f mrad, THE ERROR WAS %f mrad \n', param.offset_xl_sist*1e3, erro*1e3);
+%     agr = prox_percent(erro, param.xl_error_sist);
+%     fprintf('THE GENERATED ERROR WAS %f mrad, Conf. %f %% \n', param.xl_error_sist*1e3, agr);
+%     fprintf('=================================================\n');
 end
 
 function dtheta = scrn_septum_corresp(machine, dxf, scrn)

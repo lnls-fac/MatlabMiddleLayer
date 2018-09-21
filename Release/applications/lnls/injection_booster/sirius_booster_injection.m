@@ -1,4 +1,4 @@
-function r_xy = sirius_booster_injection(machine, param, n_part)
+function [r_xy, r_end_ring, r_bpm] = sirius_booster_injection(machine, param, n_part, point)
 %
 % -->> ring: ring model
 % -->> param: struct with the following parameters:
@@ -14,8 +14,7 @@ function r_xy = sirius_booster_injection(machine, param, n_part)
 %
 % NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
 % this function must be checked too.        
-    offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta_energy; 0];
-    offsets = repmat(offsets, 1, n_part);
+    offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta; 0];
        
     twi.betax = param.betax0; twi.alphax = param.alphax0;
     twi.betay = param.betay0; twi.alphay = param.alphay0;
@@ -23,13 +22,18 @@ function r_xy = sirius_booster_injection(machine, param, n_part)
     twi.etay = param.etay0;   twi.etayl = param.etayl0;
     
     r_init = lnls_generate_bunch(param.emitx, param.emity, param.sigmae, param.sigmaz, twi, n_part, param.cutoff);
-    r_init = r_init + offsets;
-    r_init(5, :) = (r_init(5, :) - param.delta_energy_ave) / (1 + param.delta_energy_ave);
+    r_init = bsxfun(@plus, r_init, offsets);
+    r_init(5, :) = (r_init(5, :) - param.delta_ave) / (1 + param.delta_ave);
+    r_final = linepass(machine(1:point), r_init, 1:point);    
+    r_final = reshape(r_final, 6, [], point);
+
+    r_xy = compares_vchamb(machine, r_final([1,3], :, :), 1:point);
+    r_final([1,3], :, :) = r_xy;
+    r_end_ring = squeeze(r_final(:, :, end));
     
-    r_final = linepass(machine, r_init, 1:length(machine));
-    r_final = reshape(r_final, 6, n_part, length(machine));
     
-    r_xy = compares_vchamb(machine, r_final([1,3], :, :), 1:length(machine));
-    
-    % r_final([1,3], :, :) = r_xy;
+    if point == length(machine);
+        bpm = findcells(machine, 'FamName', 'BPM');
+        r_bpm = r_xy(:, :, bpm);
+    end
 end

@@ -3,8 +3,7 @@ function res = treat_raw_results(opt, genstoload)
         error(['Folder ', opt.folder, 'do not exist in current directory']);
     end
     fol = [opt.folder,'/'];
-    
-   
+       
     res = struct();
     
     if ~exist('genstoload', 'var')
@@ -30,12 +29,15 @@ function res = treat_raw_results(opt, genstoload)
     % remove bad results
     Ncut = opt.Ncut;
     Gen = fieldnames(res);
+    if ~isfield(opt, 'objective_max_values')
+        opt.objective_max_values = inf*ones(size(res.(Gen{1}).res,1), 1);
+    end
     Gs = [];
     ress = [];
     lens = zeros(1, length(Gen));
     for i=1:length(Gen)
         G = res.(Gen{i});
-        id_keep = multiobjective.save_best_and_kill_worst(G.res, Ncut);
+        id_keep = multiobjective.save_best_and_kill_worst(G.res, Ncut, opt.objective_max_values);
         G.res = G.res(:,id_keep);
         G.G = G.G(:,id_keep);
         res.(Gen{i}) = G;

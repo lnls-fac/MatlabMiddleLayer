@@ -106,7 +106,6 @@ function make_plots_3d(re, resid_ref, legs)
         ylabel(ax, ylab, 'FontSize', 16);
     end
 
-
     ax = subplottight(2, 2, [3,4]);
     set(ax, 'Box', 'on', 'FontSize', 16, ...
             'XGrid', 'on', 'YGrid', 'on', 'NextPlot', 'add');

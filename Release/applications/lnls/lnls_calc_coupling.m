@@ -1,9 +1,15 @@
-function coupling = lnls_calc_coupling(ring, complete)
+function coupling = lnls_calc_coupling(ring, complete, calc_sigmas)
     [ring, ~, ~, ~, ~, idx_rad, ~] = setradiation('On', ring);
     ring = setcavity('On', ring);
     
     if ~exist('complete', 'var')
         complete = false;
+    end
+    if ~exist('calc_sigmas', 'var')
+        calc_sigmas = true;
+    end
+    if complete
+        calc_sigmas = true;
     end
     
     idx_rad = idx_rad';
@@ -70,16 +76,20 @@ function coupling = lnls_calc_coupling(ring, complete)
     ylylb = Rs(:,4,4) - nyl .* nyl .* sigd;
     yylb = Rs(:,3,4) - ny .* nyl .* sigd;
     emiy = sqrt(yyb .* ylylb - yylb .* yylb);
-    for i=1:length(Rs)
-        R = squeeze(Rs(i,:,:));
-        [U, DR] = eig(R([1 3], [1 3]));
-        tilt(i) = asin((U(2,1)-U(1,2))/2);
-        sigmas(1, i) = sqrt(DR(1,1));
-        sigmas(2, i) = sqrt(DR(2,2));
+    if calc_sigmas
+        for i=1:length(Rs)
+            R = squeeze(Rs(i,:,:));
+            [U, DR] = eig(R([1 3], [1 3]));
+            tilt(i) = asin((U(2,1)-U(1,2))/2);
+            sigmas(1, i) = sqrt(DR(1,1));
+            sigmas(2, i) = sqrt(DR(2,2));
 
-        [U, ~] = eig(R([2 4],[2 4]));
-        tiltl(i) = asin((U(2,1)-U(1,2))/2);
+            [U, ~] = eig(R([2 4],[2 4]));
+            tiltl(i) = asin((U(2,1)-U(1,2))/2);
+        end
     end
+    coupling.M66 = MRING;
+    coupling.MS = MS;
     coupling.sigmas = real(sigmas);
     coupling.tilt = tilt;
     coupling.tiltl = tiltl;

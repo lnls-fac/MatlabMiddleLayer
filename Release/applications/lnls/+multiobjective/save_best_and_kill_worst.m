@@ -1,13 +1,23 @@
-function varargout = save_best_and_kill_worst(res, Ncut)
+function varargout = save_best_and_kill_worst(res, Ncut, cube)
+    if ~exist('cube', 'var')
+        cube = inf*ones(size(res, 1), 1);
+    end
+
     n = size(res, 2);
-    ndom = zeros(n, 1);
-    for i=1:n
-        dres = res - res(:,i);
+    I = 1:n;
+    if ~all(isinf(cube))
+        I = I(all(res <= cube, 1));
+    end
+    ndom = n*ones(n, 1);
+    ndom(I) = 0;
+    for i=I
+        dres = res(:, I) - res(:, i);
         dominate = all(dres < 0);
         ndom(i) = sum(dominate);
 
         % Even tough the algorithm below only tests half the elements
-        % it is still much slower than the one above.
+        % it is still much slower than the one above due to MATLAB's
+        % vectorializations.
         % I'm still in the search for an algorithm faster than O(N^2)...
 %         ind = i+1:n;
 %         dres = res(:, ind) - res(:,i);

@@ -1,30 +1,45 @@
-function param = screen3(machine, param, n_part, n_pulse, scrn3, kckr)
+function [param, x_scrn3] = screen3(machine, param, n_part, n_pulse, scrn3, kckr)
+    
     fprintf('=================================================\n');
     fprintf('SCREEN 3 ON \n')
     fprintf('=================================================\n');
     machine3 = setcellstruct(machine, 'VChamber', scrn3+1:length(machine), 0, 1, 1);      
-   
-    xx_scrn3 = 1;
-    delta_energy = 0;
+        
+    % while abs(x_scrn3) > param.sigma_scrn;
+    [eff3, r_scrn3] = bo_pulses(machine3, param, n_part, n_pulse, scrn3, kckr); 
+    eff_lim = 0.75;
     
-    while abs(xx_scrn3) > param.sigma_scrn;
-        param.delta_energy_ave = delta_energy;
-        [~, r_final_pulse3, sigma_scrn3] = bo_pulses(machine3, param, n_part, 5*n_pulse, 0, scrn3, kckr);            
-        r_scrn3 = r_final_pulse3(:, :, scrn3);
-        r_scrn3 = r_scrn3 + sigma_scrn3;
-        r_scrn3 = squeeze(nanmean(r_scrn3, 1));
-        r_scrn3 = compares_vchamb(machine3, r_scrn3, scrn3);
-         if isnan(r_scrn3(1))
-            error('PARTICLES ARE LOST BEFORE SCREEN 3');
-        end
-        xx_scrn3 = r_scrn3(1);
-        delta_energy = xx_scrn3 / param.etax;
-        fprintf('Screen 3 - x position %f mm \n', xx_scrn3*1e3);
+    if mean(eff3) < eff_lim
+        param = screen_low_intensity(machine3, param, n_part, n_pulse, scrn3, kckr, mean(eff3), 3, eff_lim);
+        [~, r_scrn3] = bo_pulses(machine3, param, n_part, n_pulse, scrn3, kckr); 
     end
-    fprintf('=================================================\n');
-    fprintf('DELTA ENERGY ERROR WAS %f %%\n', param.delta_energy_ave*1e2);
-    agr = (1-abs(param.delta_energy_ave - param.energy_error_sist)/param.energy_error_sist)*100;
-    fprintf('THE GENERATED ERROR WAS %f %%, EFF %f %% \n', param.energy_error_sist*1e2, agr);
+
+    if isnan(r_scrn3(1))
+       error('PARTICLES ARE LOST BEFORE SCREEN 3');
+    end
+    
+    res_scrn = param.sigma_scrn;
+
+    x_scrn3 = r_scrn3(1);
+    
+    if abs(x_scrn3) < res_scrn
+        fprintf('Screen 3 - x position %f mm \n', x_scrn3*1e3);
+        fprintf('=================================================\n');    
+        fprintf('DELTA ENERGY ADJUSTED TO %f %% \n', param.delta_ave*1e2);
+        agr = prox_percent(param.delta_ave, param.delta_error_sist);
+        fprintf('THE GENERATED ERROR WAS %f %%, Conf. %f %% \n', param.delta_error_sist*1e2, agr);
+        fprintf('=================================================\n');
+        return
+    end
+    
+    param.delta_energy_scrn3 = x_scrn3 / param.etax_scrn3;
+    param.delta_ave = param.delta_ave * (1 + param.delta_energy_scrn3) + param.delta_energy_scrn3;
+    param.kckr_sist = param.kckr_sist / (1 + param.delta_ave);
+    fprintf('Screen 3 - x position %f mm \n', x_scrn3*1e3);
+    fprintf('=================================================\n');    
+    fprintf('DELTA ENERGY ADJUSTED TO %f %% \n', param.delta_ave*1e2);
+    agr = prox_percent(param.delta_ave, param.delta_error_sist);
+    fprintf('THE GENERATED ERROR WAS %f %%, Conf. %f %% \n', param.delta_error_sist*1e2, agr);
     fprintf('=================================================\n');
 end
 

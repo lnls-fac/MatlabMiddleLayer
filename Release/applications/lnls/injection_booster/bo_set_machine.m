@@ -1,5 +1,5 @@
-function [machine, param, s] = bo_set_machine(bo_ring)
-
+function [machine, param] = bo_set_machine(bo_ring)
+    name = 'CONFIG'; name_saved_machines = name;
     initializations();
 
     %=====================================================================
@@ -13,46 +13,59 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     
     
     %VARIAR COM PARAM DE TWISS
-    param.betax0 = bo_twiss.betax(1)*1.2;
+    param.betax0 = bo_twiss.betax(1);
     param.betay0 = bo_twiss.betay(1);
     param.alphax0 = bo_twiss.alphax(1);
     param.alphay0 = bo_twiss.alphay(1);
     param.etax0 = bo_twiss.etax(1);
     param.etay0 = bo_twiss.etay(1);
-    param.etaxl0 = bo_twiss.etaxl(1) + 0*0.2;
-    param.etayl0 = bo_twiss.etayl(1) + 0*0.2;
+    param.etaxl0 = bo_twiss.etaxl(1);
+    param.etayl0 = bo_twiss.etayl(1);
     
     param.emitx = 170e-9;
     param.emity = param.emitx;
     param.sigmae = 0.5e-2;
     param.sigmaz = 0.5e-3;
     
+    %Calculates the horizontal dispersion function at screen 3    
     dipole = findcells(bo_ring, 'FamName', 'B');
     dipole = dipole(1);
     scrn = findcells(bo_ring, 'FamName', 'Scrn');
     scrn3 = scrn(3);
     delta = 1e-5;
+    d = dipole:scrn3;
     r_init_n = [0; 0; 0; 0; -delta; 0];
-    r_final_n = linepass(bo_ring, r_init_n, dipole:scrn3);
+    r_final_n = linepass(bo_ring(d), r_init_n);
     r_init_p = [0; 0; 0; 0; +delta; 0];
-    r_final_p = linepass(bo_ring, r_init_p, dipole:scrn3);
-    x_n = r_final_n(1, end);
-    x_p = r_final_p(1, end);
-    param.etax = (x_p - x_n) / 2 / delta;
+    r_final_p = linepass(bo_ring(d), r_init_p);
+    x_n = r_final_n(1);
+    x_p = r_final_p(1);
+    param.etax_scrn3 = (x_p - x_n) / 2 / delta;
+    
+    %Calculates the horizontal dispersion function at BPMS    
+    bpms = findcells(bo_ring, 'FamName', 'BPM');
+    delta = 1e-5;
+    r_init_n = [0; 0; 0; 0; -delta; 0];
+    r_final_n = linepass(bo_ring, r_init_n, bpms);
+    r_init_p = [0; 0; 0; 0; +delta; 0];
+    r_final_p = linepass(bo_ring, r_init_p, bpms);
+    x_n = r_final_n(1, :);
+    x_p = r_final_p(1, :);
+    param.etax_bpms = (x_p - x_n) ./ 2 ./ delta;
 
     param.offset_x0 = -30e-3;
     param.offset_xl0 = 14.3e-3;
-    param.offset_xl = 14.3e-3;
     param.kckr0 = -19.34e-3;
-    param.delta_energy = 0;
-    param.delta_energy_ave = 0;
+    param.delta0 = 0;
+    param.delta_ave = 0;
+    param.delta_energy_scrn3 = 0;
     
     %=====================================================================
     %=====================================================================
     
     % Setting the machine configurations
 
-    [machine, s] = vchamber_injection(bo_ring);
+    machine = vchamber_injection(bo_ring);
     
     % Error in the magnets (allignment, rotation, excitation, multipoles,
     % setting off rf cavity and radiation emission
@@ -62,9 +75,9 @@ function [machine, param, s] = bo_set_machine(bo_ring)
     family_data = sirius_bo_family_data(machine);
     machine  = create_apply_errors(machine, family_data);
     machine  = create_apply_multipoles(machine, family_data);
-    machine = machine{1};
+    % machine = machine{1};
     
-    function [machine, s] = vchamber_injection(machine)
+    function machine = vchamber_injection(machine)
         
         %Values of vacuum chamber radius in horizontal plane at the end of
         %injection septum and the initial point of injection kicker
@@ -79,7 +92,6 @@ function [machine, param, s] = bo_set_machine(bo_ring)
         xcv = [xcv, xcv(end)];
         machine = setcellstruct(machine, 'VChamber', 1:injkckr+1, xcv, 1, 1);
     end
-end
 %% Initializations
 function initializations()
 
@@ -135,11 +147,10 @@ function machine = create_apply_errors(the_ring, family_data)
     end
 
     % generates error vectors
-    nr_machines   = 1;
+    nr_machines   = 20;
     rndtype       = 'gaussian';
     cutoff_errors = 1;
     fprintf('-  generating errors ...\n');
-    name = 'CONFIG';
 
     errors        = lnls_latt_err_generate_errors(name, the_ring, config, nr_machines, cutoff_errors, rndtype);
 
@@ -199,9 +210,13 @@ function machine = create_apply_multipoles(machine, family_data)
         machine{i} = sirius_bo_multipole_systematic_errors(machine{i});
     end
     
-    name = 'CONFIG';
+    fname = which('sirius_bo_multipole_systematic_errors');
+    copyfile(fname, [name '_multipole_systematic_errors.m']);
+
     cutoff_errors = 2;
     multi_errors  = lnls_latt_err_generate_multipole_errors(name, machine{1,1}, multi, length(machine), cutoff_errors);
     machine = lnls_latt_err_apply_multipole_errors(name, machine, multi_errors, multi);
-
+    name_saved_machines = [name_saved_machines '_multi'];
+    save([name_saved_machines '.mat'], 'machine');
+end
 end

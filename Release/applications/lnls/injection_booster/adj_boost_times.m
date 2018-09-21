@@ -1,8 +1,18 @@
-function adj_boost_times(bo_ring, n_part, n_pulse, n_times)
+function param = adj_boost_times(bo_ring, n_part, n_pulse, param0)
 
-[param, machine] = bo_injection_adjustment(bo_ring, n_part, n_pulse, 'yes');
+param0 = add_errors_injection(param0);
 
-for j = 1:n_times-1
-    [param, machine] = bo_injection_adjustment(machine, n_part, n_pulse, 'no', param);
+for j = 1:length(bo_ring)
+    tic;
+    fprintf('=================================================\n');
+    fprintf('MACHINE NUMBER %i \n', j)
+    fprintf('=================================================\n');
+    [param{j}, ~, x_scrn3] = bo_injection_adjustment(bo_ring{j}, n_part, n_pulse, 'no', param0);
+    res_scrn = param{j}.sigma_scrn;
+    while abs(x_scrn3) > res_scrn
+        fprintf('ADJUSTING ENERGY \n');
+        [param{j}, ~, x_scrn3] = bo_injection_adjustment(bo_ring{j}, n_part, n_pulse, 'no', param{j});
+    end
+    toc;
 end
-
+end
