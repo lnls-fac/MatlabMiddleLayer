@@ -15,7 +15,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.B.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models', 'dipoles', 'sorting.txt'));
+sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'dipoles', 'sorting.txt'));
 
 d2r = pi / 180.0;
 ang_nominal = 7.2;
@@ -49,7 +49,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.QF.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
+sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
 
 fname = fullfile(tpath, 'models', 'quadrupoles-qf', 'README-110A.md');
 [~, kls_3gev] = load_readme_file(fname, 'BQF-');
@@ -83,7 +83,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.QD.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_bo_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qd', 'sorting.txt'));
+sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qd', 'sorting.txt'));
 
 fname = fullfile(tpath, 'models', 'quadrupoles-qd', 'README-2A.md');
 [mags, kls] = load_readme_file(fname, 'BQD-');
