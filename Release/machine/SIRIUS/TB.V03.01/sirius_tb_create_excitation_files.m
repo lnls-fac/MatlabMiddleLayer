@@ -10,7 +10,7 @@ currs = {
 read_multipole_files(currs, 'CH', 'correctors', 'TBC-');
 currents = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'CH', 'correctors', 'sorting.txt', 6);
-save_excdata(sorting, 'bo-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+save_excdata(sorting, 'tb-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
 
 % CV
 currs = {
@@ -21,7 +21,7 @@ currs = {
 read_multipole_files(currs, 'CV', 'correctors', 'TBC-');
 currents = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'CV', 'correctors', 'sorting.txt', 6);
-save_excdata(sorting, 'bo-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std);
+save_excdata(sorting, 'tb-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std);
 
 
 
