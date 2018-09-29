@@ -27,6 +27,13 @@ function [machine, param] = bo_set_machine(bo_ring)
     param.sigmae = 0.5e-2;
     param.sigmaz = 0.5e-3;
     
+    param.offset_x0 = -30e-3;
+    param.offset_xl0 = 14.3e-3;
+    param.kckr0 = -19.34e-3;
+    param.delta0 = 0;
+    param.delta_ave = 0;
+    param.delta_energy_scrn3 = 0;
+    
     %Calculates the horizontal dispersion function at screen 3    
     dipole = findcells(bo_ring, 'FamName', 'B');
     dipole = dipole(1);
@@ -52,14 +59,6 @@ function [machine, param] = bo_set_machine(bo_ring)
     x_n = r_final_n(1, :);
     x_p = r_final_p(1, :);
     param.etax_bpms = (x_p - x_n) ./ 2 ./ delta;
-
-    param.offset_x0 = -30e-3;
-    param.offset_xl0 = 14.3e-3;
-    param.kckr0 = -19.34e-3;
-    param.delta0 = 0;
-    param.delta_ave = 0;
-    param.delta_energy_scrn3 = 0;
-    
     %=====================================================================
     %=====================================================================
     
@@ -75,7 +74,11 @@ function [machine, param] = bo_set_machine(bo_ring)
     family_data = sirius_bo_family_data(machine);
     machine  = create_apply_errors(machine, family_data);
     machine  = create_apply_multipoles(machine, family_data);
-    % machine = machine{1};
+    
+    % for k = 1:length(machine)
+    %    bpm = findcells(machine{k}, 'FamName', 'BPM');
+    %    param.orbit{k} = findorbit4(machine{k}, 0, bpm);
+    % end
     
     function machine = vchamber_injection(machine)
         
@@ -131,7 +134,7 @@ function machine = create_apply_errors(the_ring, family_data)
     config.fams.b.sigma_y      = 160 * um;
     config.fams.b.sigma_roll   = 0.800 * mrad;
 %         config.fams.b.sigma_e      = 0.15 * percent * 1;
-    config.fams.b.sigma_e      = 0.05 * percent; % based on estimated error of measured fmap analysis from measurement bench fluctuation - XRR - 2018-08-23
+    config.fams.b.sigma_e      = 0*0.05 * percent; % based on estimated error of measured fmap analysis from measurement bench fluctuation - XRR - 2018-08-23
 %         config.fams.b.sigma_e_kdip = 2.4 * percent * 1;  % quadrupole errors due to pole variations
     config.fams.b.sigma_e_kdip = 0.3 * percent;  % based on measured fmap analysis - XRR - 2018-08-23 - see /home/fac_files/lnls-ima/bo-dipoles/model-09/analysis/hallprobe/production/magnet-dispersion.ipynb
 

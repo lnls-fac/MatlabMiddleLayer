@@ -1,4 +1,4 @@
-function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_part, n_pulse, point, kckr, plt, diag)
+function [eff, r_point, r_end, machine, r_bpm, int_bpm] = bo_pulses(machine, param, n_part, n_pulse, point, kckr, plt, diag)
     injkckr = findcells(machine, 'FamName', 'InjKckr');
     eff = zeros(1, n_pulse);
     sigma_scrn = zeros(n_pulse, 2);
@@ -6,6 +6,7 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
     r_pulse = zeros(n_pulse, 2, point);
     r_diag_bpm = zeros(n_pulse, 2, 50);
     r_end = zeros(n_pulse, 6, n_part);
+    orbit = param.orbit;
     if(exist('kckr','var'))
         if(strcmp(kckr,'on'))
             flag_kckr = true;
@@ -16,9 +17,16 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
         error('Set if the kicker is turned on or off')
     end
     
+    flag_diag = false;
+    
     if(exist('plt','var'))
         if(strcmp(plt,'plot'))
             flag_plot = true;
+        elseif(strcmp(plt,'diag'))
+            flag_diag = true;
+            flag_plot = false;
+        else
+            error('Variable plot problem');
         end
     elseif(~exist('plt','var'))
             flag_plot = false;
@@ -28,7 +36,7 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
         if(strcmp(diag,'diag'))
             flag_diag = true;
         end
-    elseif(~exist('diag','var'))
+    elseif(~exist('diag','var')) && ~flag_diag
             flag_diag = false;
     end
     
@@ -52,7 +60,7 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
             [r_xy, r_end_part, r_bpm] = sirius_booster_injection(machine, param, n_part, point);
             r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
             bpm = findcells(machine, 'FamName', 'BPM');
-            sigma_bpm(j, :, :) = bpm_error_inten(r_bpm, n_part, param.sigma_bpm);
+            [sigma_bpm(j, :, :), int_bpm] = bpm_error_inten(r_bpm, n_part, param.sigma_bpm);
         else
             [r_xy, r_end_part] = sirius_booster_injection(machine, param, n_part, point);
         end    
@@ -63,10 +71,8 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
         sigma_scrn(j, :) = scrn_error_inten(r_xy, n_part, point, param.sigma_scrn);
         
     
-        if flag_plot && flag_diag
-            % plot_booster_turn(machine, r_bpm, bpm, n_part, param.sigma_bpm);
-        elseif flag_plot
-            plot_booster_turn(machine, r_xy, 1:length(machine), n_part, param.sigma_bpm);
+        if flag_plot
+            plot_booster_turn(machine, r_xy);
         end
         
         if ~mod(j, 10)
@@ -93,29 +99,88 @@ function [eff, r_point, r_end, machine, r_bpm] = bo_pulses(machine, param, n_par
         r_diag_bpm = r_diag_bpm + sigma_bpm;
         if n_pulse > 1
             r_diag_bpm = squeeze(nanmean(r_diag_bpm, 1));
+        else
+            r_diag_bpm = squeeze(r_diag_bpm);
         end
         r_bpm = compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
-        r_bpm = squeeze(nanmean(r_bpm, 1));
-        plot_bpms(machine, r_bpm);
+        plot_bpms(machine, orbit, r_bpm, int_bpm);
     end
      fprintf('=================================================\n');
 end
 
-function plot_bpms(machine, r_bpm)
+% function plot_bpms(machine, r_bpm, orbit, int_bpm)
+%     VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:length(machine)))';
+%     s_total = findspos(machine, 1:length(machine));
+%     bpm = findcells(machine, 'FamName', 'BPM');
+%     s = s_total(bpm);
+%     x = r_bpm(1, :);
+%     y = r_bpm(2, :);
+%     if ~isappdata(0, 'fig')
+%         fig = figure('OuterPosition', [100, 100, 800, 900]);
+%         ax1 = subplottight(3,1,1, 'vspace', 0.05);
+%         ax2 = subplottight(3,1,2, 'vspace', 0.05);
+%         ax3 = subplottight(3,1,3, 'vspace', 0.05);
+%         setappdata(0, 'fig', fig);
+%         setappdata(0, 'ax1', ax1);
+%         setappdata(0, 'ax2', ax2);
+%         setappdata(0, 'ax3', ax3);
+%     else
+%         fig = getappdata(0, 'fig');
+%         try
+%             get(fig, 'type');
+%         catch
+%             fig = figure('OuterPosition', [100, 100, 800, 900]);
+%             ax1 = subplottight(3,1,1, 'vspace', 0.05);
+%             ax2 = subplottight(3,1,2, 'vspace', 0.05);
+%             ax3 = subplottight(3,1,3, 'vspace', 0.05);
+%             setappdata(0, 'fig', fig);
+%             setappdata(0, 'ax1', ax1);
+%             setappdata(0, 'ax2', ax2);
+%             setappdata(0, 'ax3', ax3);
+%         end
+%         ax1 = getappdata(0, 'ax1');
+%         ax2 = getappdata(0, 'ax2');
+%         ax3 = getappdata(0, 'ax3');
+%     end
+%     hold(ax1, 'off');
+%     hold(ax2, 'off');
+%     hold(ax3, 'off');
+%     plot(ax1, s, x, '.-b', 'linewidth', 1);
+%     plot(ax2, s, y, '.-r', 'linewidth', 1);
+%     plot(ax3, s, int_bpm, '.-k', 'linewidth', 1);
+%     hold(ax1, 'on');
+%     hold(ax2, 'on');
+%     hold(ax3, 'on');
+%     plot(ax1, s, orbit(1, :), '.-k', 'linewidth', 2);
+%     plot(ax2, s, orbit(3, :), '--k', 'linewidth', 2);
+%     plot(ax1, s_total, VChamb(1,:),'k');
+%     plot(ax1, s_total, -VChamb(1,:),'k');
+%     plot(ax2, s_total, VChamb(2,:),'k');
+%     plot(ax2, s_total, -VChamb(2,:),'k');
+%     ylim(ax1, [-0.02, 0.02]);
+%     grid(ax1, 'on');
+%     grid(ax2, 'on');
+%     grid(ax3, 'on');
+%     drawnow;
+% end
+
+function plot_booster_turn(machine, r_final)
     VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:length(machine)))';
-    s_total = findspos(machine, 1:length(machine));
-    bpm = findcells(machine, 'FamName', 'BPM');
-    s = s_total(bpm);
-    x = r_bpm(1, :);
+    s = findspos(machine, 1:length(machine));
+    xx = squeeze(nanmean(r_final(1, :, :), 2));
+    sxx = squeeze(nanstd(r_final(1, :, :), 0, 2));
     gcf();
     ax = gca();
     hold off;
-    plot(ax, s, x, '.-r', 'linewidth', 1);
-    hold all
-    plot(ax, s_total, VChamb(1,:),'k');
-    plot(ax, s_total, -VChamb(1,:),'k');
-    drawnow;
+    plot(ax, s, (xx+3*sxx)', 'b --');
+    hold all;
+    plot(ax, s, (xx-3*sxx)', 'b --');
+    plot(ax, s, (xx)', '.-r', 'linewidth', 3);
+    plot(ax, s, VChamb(1,:),'k');
+    plot(ax, s, -VChamb(1,:),'k');
+    drawnow;        
 end
+
 
 
 
