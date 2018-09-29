@@ -1,60 +1,28 @@
-function sirius_bo_create_excitation_files
+function sirius_tb_create_excitation_files
 
-% SD
-currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A', '150A'};
-read_multipole_files(currs, 'SD', 'sextupoles', 'BS-');
-mpole_inv_polarity('SD');
-currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130, 150];
-[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'SD', 'sextupoles', 'sorting-sd.txt', 1);
-[currents, n_avg, s_avg, n_std, s_std] = mpoles_add_negative_currents(currents, n_avg, s_avg, n_std, s_std);
-save_excdata(sorting, 'bo-sextupole-sd-fam', currents, '2 normal', harmonics, n_avg, s_avg, n_std, s_std);
-
-% SF
-currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A', '150A'};
-read_multipole_files(currs, 'SF', 'sextupoles', 'BS-');
-currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130, 150];
-[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'SF', 'sextupoles', 'sorting-sf.txt', 1);
-save_excdata(sorting, 'bo-sextupole-sf-fam', currents, '2 normal', harmonics, n_avg, s_avg, n_std, s_std);
-
-
-% CV
-currs = {
-    'CH_01_-10A', 'CH_02_-9A', 'CH_03_-7A', 'CH_04_-5A', 'CH_05_-3A', ...
-    'CH_06_-1A',  'CH_07_+0A', 'CH_08_+1A', 'CH_09_+3A', 'CH_10_+5A', ...
-    'CH_11_+7A', 'CH_12_+9A', 'CH_13_+10A'
-};
-read_multipole_files(currs, 'CV', 'correctors', 'BC-');
-mpole_rot_z_p90('CV');
-currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
-[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'CV', 'correctors', 'sorting-cv.txt', 7);
-save_excdata(sorting, 'bo-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std);
 
 % CH
 currs = {
-    'CH_01_-10A', 'CH_02_-9A', 'CH_03_-7A', 'CH_04_-5A', 'CH_05_-3A', ...
-    'CH_06_-1A',  'CH_07_+0A', 'CH_08_+1A', 'CH_09_+3A', 'CH_10_+5A', ...
-    'CH_11_+7A', 'CH_12_+9A', 'CH_13_+10A'
+    'CH_01_-10A', 'CH_02_-8A', 'CH_03_-6A', 'CH_04_-4A', 'CH_05_-2A', ...
+    'CH_06_-0A', 'CH_07_+2A', 'CH_08_+4A', 'CH_09_+6A', 'CH_10_+8A', ...
+    'CH_11_+10A', ...
 };
-read_multipole_files(currs, 'CH', 'correctors', 'BC-');
-currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
-[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'CH', 'correctors', 'sorting-ch.txt', 7);
-save_excdata(sorting, 'bo-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+read_multipole_files(currs, 'CH', 'correctors', 'TBC-');
+currents = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
+[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'CH', 'correctors', 'sorting.txt', 6);
+save_excdata(sorting, 'tb-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
 
-% QD
-currs = {'2A', '4A', '6A', '8A', '10A', '20A', '32A'};
-read_multipole_files(currs, 'QD', 'quadrupoles-qd', 'BQD-');
-mpole_inv_polarity('QD');
-currents = [0, 2, 4, 6, 8, 10, 20, 32];
-[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'QD', 'quadrupoles-qd', 'sorting.txt', 1);
-[currents, n_avg, s_avg, n_std, s_std] = mpoles_add_negative_currents(currents, n_avg, s_avg, n_std, s_std);
-save_excdata(sorting, 'bo-quadrupole-qd-fam', currents, '1 normal', harmonics, n_avg, s_avg, n_std, s_std);
+% CV
+currs = {
+    'CV_01_-10A', 'CV_02_-8A', 'CV_03_-6A', 'CV_04_-4A', 'CV_05_-2A', ...
+    'CV_06_+0A', 'CV_07_+2A', 'CV_08_+4A', 'CV_09_+6A', 'CV_10_+8A', ...
+    'CV_11_+10A', ...
+};
+read_multipole_files(currs, 'CV', 'correctors', 'TBC-');
+currents = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
+[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'CV', 'correctors', 'sorting.txt', 6);
+save_excdata(sorting, 'tb-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std);
 
-% QF
-currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A'};
-read_multipole_files(currs, 'QF', 'quadrupoles-qf', 'BQF-');
-currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130];
-[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'QF', 'quadrupoles-qf', 'sorting.txt', 1);
-save_excdata(sorting, 'bo-quadrupole-qf-fam', currents, '1 normal', harmonics, n_avg, s_avg, n_std, s_std);
 
 
 function save_excdata(sorting, fname, currents, main_mpole, harmonics, n_avg, s_avg, n_std, s_std)
