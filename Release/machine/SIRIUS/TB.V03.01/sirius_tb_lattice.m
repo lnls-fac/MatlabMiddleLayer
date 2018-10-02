@@ -6,6 +6,17 @@ function [r, lattice_title, IniCond] = sirius_tb_lattice(varargin)
 % 2016-09-28 V01.02 - new version (Ximenes)
 % 2017-08-25 V02.01 - new dipole model 02 (Ximenes) - see 'VERSIONS.txt' in Release/machine/SIRIUS
 % 2018-10-02 V03.01 - Updated number and positions of corretors, screens, bpms and other diagnostics elements according to AutoCad drawing (Liu)
+%
+%
+% Beta plot:
+%
+% [ring, ~, tw0] = sirius_tb_lattice();
+% global THERING;
+% TD = twissline(ring,0,tw0,1:length(ring)+1);
+% BETA = cat(1,r.beta);
+% S = cat(1,r.SPos);
+% plot(S,BETA(:,1))
+% plot(S,BETA(:,2))
 
 %% global parameters
 %  =================
@@ -92,6 +103,7 @@ scrn     = marker('Scrn',  'IdentityPass');
 
 % --- beam current monitors ---
 ict      = marker('ICT',  'IdentityPass');
+fct      = marker('FCT',  'IdentityPass');
 
 % --- beam position monitors ---
 bpm      = marker('BPM', 'IdentityPass');
@@ -121,6 +133,7 @@ qd4   = quadrupole('QD4',   0.10, qd4_strength,  quad_pass_method);
 deg_2_rad = (pi/180);
 
 % -- spec --
+ang = 15.0;  % injection mode
 dip_nam =  'Spect';
 dip_len =  0.45003;
 dip_ang =  -ang * deg_2_rad;
@@ -175,7 +188,7 @@ s01_2  = [l100, l20, l9, lp4, ch, cv, l200, l100, l40, l4, lp2];
 s01_3  = [l200, l200, l200, l200, l200, l30, l2, slith, l100, l80, scrn, l100, l40, bpm, l200, l40, ch, cv, l200, l30, l4, lp3, slitv, l200, l100];
 s02_1  = [l200, l80, l4, ict, l200, l200, l200, l10, l6];
 s02_2  = [l200, l70];
-s02_3  = [l200, scrn, l100, l40, bpm, l100, L10, ch, cv, repmat(l200,1,27), l10, l4];
+s02_3  = [l200, scrn, l100, l40, bpm, l100, l10, ch, cv, repmat(l200,1,27), l10, l4];
 s02_4  = [l200, l70];
 s02_5  = [l200, scrn, l100, l40, bpm, l100, l9, lp5, ch, cv, l200, l200, l50, lp3];
 s03_1  = [repmat(l200,1,11), l80, l9, lp2];
