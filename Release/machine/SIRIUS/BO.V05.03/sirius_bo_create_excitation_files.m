@@ -221,7 +221,7 @@ text_avg = {
 };
 text_std = text_avg;
 fmt1 = '%+08.2f';
-fmt2 = '%+11.4e';
+fmt2 = '%+13.6e';
 for i=1:length(currents)
     text_avg{end+1} = [num2str(currents(i), fmt1), '  '];
     text_std{end+1} = [num2str(currents(i), fmt1), '  '];

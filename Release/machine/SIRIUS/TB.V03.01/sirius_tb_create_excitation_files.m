@@ -1,6 +1,19 @@
 function sirius_tb_create_excitation_files
 
 
+
+% B
+currs = {
+    '0025p362A', '0050p724A', '0076p086A', '0101p449A', '0126p811A', ...
+    '0152p173A', '0177p535A', '0202p898A', '0228p261A', '0240p941A', ...
+    '0253p622A', '0266p303A', '0278p984A', '0304p346A', '0329p709A'};
+serials = {'01', '02', '03'};
+read_multipoles_from_fmap_files(currs, 'B', 'TBD-', serials);
+currents = [0, 25, 51, 76, 101, 127, 152, 178, 203, 228, 241, 254, 266, 279, 304, 330];
+[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'B', 'dipoles', 'sorting.txt', 1);
+save_excdata(sorting, 'tb-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+
+
 % CH
 currs = {
     'CH_01_-10A', 'CH_02_-8A', 'CH_03_-6A', 'CH_04_-4A', 'CH_05_-2A', ...
@@ -152,6 +165,39 @@ for i=1:length(currs)
 end
 setappdata(0, 'rotcoil', rotcoil);
 
+function read_multipoles_from_fmap_files(currs, mag_field, mag_label, serials)
+
+[tpath, ~, ~] = fileparts(mfilename('fullpath'));
+rotcoil = getappdata(0, 'rotcoil');
+if isempty(rotcoil)
+    rotcoil = struct();
+end
+rotcoil.(mag_field).nmpoles = {};
+rotcoil.(mag_field).smpoles = {};
+rotcoil.(mag_field).currents = {};
+rotcoil.(mag_field).currents = {};
+for i=1:length(currs)
+    nmp = [];
+    smp = [];
+    rotcoil.(mag_field).mags = {};
+    currents = [];
+    for j=1:length(serials)
+        rotcoil.(mag_field).mags{end+1} = [mag_label, serials{j}];
+        fname = [lower(mag_label), serials{j}, '-', currs{i}];
+        magnet = fullfile(tpath, 'models', 'dipoles', fname);
+        [harms, ~, nmpole, smpole, params] = sirius_load_fmap_model(magnet);
+        nmp = [nmp; nmpole];
+        smp = [smp; smpole];
+        currents = [currents, params.current];
+    end
+    rotcoil.(mag_field).harms = harms;
+    rotcoil.(mag_field).currents{end+1} = currents;
+    rotcoil.(mag_field).nmpoles{end+1} = nmp;
+    rotcoil.(mag_field).smpoles{end+1} = smp;
+end
+setappdata(0, 'rotcoil', rotcoil);
+
+
 function [harms, mags, currents, nmpoles, smpoles] = load_multipoles_file(filename, substr)
 
 fp = fopen(filename, 'rt');
@@ -186,7 +232,7 @@ text_avg = {
 };
 text_std = text_avg;
 fmt1 = '%+08.2f';
-fmt2 = '%+11.4e';
+fmt2 = '%+13.6e';
 for i=1:length(currents)
     text_avg{end+1} = [num2str(currents(i), fmt1), '  '];
     text_std{end+1} = [num2str(currents(i), fmt1), '  '];

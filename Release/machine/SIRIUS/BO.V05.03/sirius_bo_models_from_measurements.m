@@ -26,7 +26,7 @@ model_sim = [ getcellstruct(the_ring, 'Length', idx(1,:)), getcellstruct(the_rin
 for i=1:length(sorting)
     % load instance of dipole model
     maglabel = fullfile(tpath, 'models', 'dipoles', [lower(sorting{i}), '-3gev']);
-    [harms, model] = sirius_load_fmap_model(maglabel);
+    [harms, model, ~, ~, ~] = sirius_load_fmap_model(maglabel);
     if length(the_ring{idx(i, 1)}.PolynomB) ~= length(harms)
         error('Incompatible PolynomB and dipole model!')
     end
