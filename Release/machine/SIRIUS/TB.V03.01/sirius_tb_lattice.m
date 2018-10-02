@@ -5,6 +5,7 @@ function [r, lattice_title, IniCond] = sirius_tb_lattice(varargin)
 % 2015-08-26 V01 - new version (Liu)
 % 2016-09-28 V01.02 - new version (Ximenes)
 % 2017-08-25 V02.01 - new dipole model 02 (Ximenes) - see 'VERSIONS.txt' in Release/machine/SIRIUS
+% 2018-10-02 V03.01 - Updated number and positions of corretors, screens, bpms and other diagnostics elements according to AutoCad drawing (Liu)
 
 %% global parameters
 %  =================
@@ -45,28 +46,38 @@ corr_length = 0.07;
 %% elements
 %  ========
 % --- drift spaces ---
+lp1 = drift('lp1', 0.0001,    'DriftPass');
+lp2 = drift('lp2', 0.0002,    'DriftPass');
+lp3 = drift('lp3', 0.0003,    'DriftPass');
+lp4 = drift('lp4', 0.0004,    'DriftPass');
+lp5 = drift('lp5', 0.0005,    'DriftPass');
+lp6 = drift('lp6', 0.0006,    'DriftPass');
+lp7 = drift('lp7', 0.0007,    'DriftPass');
+lp8 = drift('lp8', 0.0008,    'DriftPass');
+lp9 = drift('lp9', 0.0009,    'DriftPass');
+
+l1 = drift('l1', 0.001,   'DriftPass');
+l2 = drift('l2', 0.002,   'DriftPass');
+l3 = drift('l3', 0.003,   'DriftPass');
+l4 = drift('l4', 0.004,   'DriftPass');
+l5 = drift('l5', 0.005,   'DriftPass');
+l6 = drift('l6', 0.006,   'DriftPass');
+l7 = drift('l7', 0.007,   'DriftPass');
+l8 = drift('l8', 0.008,   'DriftPass');
+l9 = drift('l9', 0.009,   'DriftPass');
+
+l10 = drift('l10', 0.010,   'DriftPass');
+l20 = drift('l20', 0.020,   'DriftPass');
+l30 = drift('l30', 0.030,   'DriftPass');
+l40 = drift('l40', 0.040,   'DriftPass');
+l50 = drift('l50', 0.050,   'DriftPass');
+l60 = drift('l60', 0.060,   'DriftPass');
+l70 = drift('l70', 0.070,   'DriftPass');
+l80 = drift('l80', 0.080,   'DriftPass');
+l90 = drift('l90', 0.090,   'DriftPass');
+
 l100 = drift('l100', 0.100,    'DriftPass');
-l150 = drift('l150', 0.150,    'DriftPass');
 l200 = drift('l200', 0.200,    'DriftPass');
-l165 = drift('l165', 0.165000, 'DriftPass');
-l075 = drift('l075', 0.075429, 'DriftPass');
-l110 = drift('l110', 0.110429, 'DriftPass');
-l199 = drift('l199', 0.199629, 'DriftPass');
-l187 = drift('l187', 0.186929, 'DriftPass');
-
-lb1p     = drift('lb1p', 0.125,  'DriftPass');
-lb2p     = drift('lb2p', 0.275,  'DriftPass');
-lc2      = drift('lc2',  0.270,   'DriftPass');
-lc3p     = drift('lc3p', 0.2138, 'DriftPass');
-lc4      = drift('lc4',  0.270,   'DriftPass');
-ld2      = drift('ld2',  0.220,   'DriftPass');
-ld3p     = drift('ld3p', 0.180,   'DriftPass');
-le1p     = drift('le1p', 0.1856, 'DriftPass');
-le2      = drift('le2',  0.216,  'DriftPass');
-
-l100c  = drift('l100c', 0.1000 - corr_length/2, 'DriftPass');
-l150c  = drift('l150c', 0.1500 - corr_length/2, 'DriftPass');
-l100cc = drift('l100c', 0.1000 - corr_length, 'DriftPass');
 
 % --- markers ---
 inicio   = marker('start',  'IdentityPass');
@@ -89,6 +100,11 @@ bpm      = marker('BPM', 'IdentityPass');
 ch   = sextupole ('CH', corr_length, 0.0, sext_pass_method);
 cv   = sextupole ('CV', corr_length, 0.0, sext_pass_method);
 
+% --- quadrupoles ---
+qf2L  = quadrupole('QF2L',  0.05, qf2L_strength, quad_pass_method);   % LINAC TRIPLET
+qd2L  = quadrupole('QD2L',  0.10, qd2L_strength, quad_pass_method);   % LINAC TRIPLET
+qf3L  = quadrupole('QF3L',  0.05, qf3L_strength, quad_pass_method);   % LINAC QUADRUPOLE
+
 qd1   = quadrupole('QD1',   0.10, qd1_strength,  quad_pass_method);
 qf1   = quadrupole('QF1',   0.10, qf1_strength,  quad_pass_method);
 qd2a  = quadrupole('QD2A',  0.10, qd2a_strength, quad_pass_method);
@@ -103,6 +119,15 @@ qd4   = quadrupole('QD4',   0.10, qd4_strength,  quad_pass_method);
 
 % --- bending magnets ---
 deg_2_rad = (pi/180);
+
+% -- spec --
+dip_nam =  'Spect';
+dip_len =  0.45003;
+dip_ang =  -ang * deg_2_rad;
+dip_K   =  0.0;
+dip_S   =  0.00;
+spech      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0, 0, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
+spec   = [spech, spech];
 
 [bp, ~] = sirius_tb_b_segmented_model(energy, 'B', bend_pass_method, +1.0);
 [bn, ~] = sirius_tb_b_segmented_model(energy, 'B', bend_pass_method, -1.0);
@@ -143,23 +168,28 @@ septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consiste
 
 
 %% % --- lines ---
+s00_1  = [l100, l10, l5, qf2L, l100, qd2L, l100, qf2L, l100, qf3L];
+s00_2  = [l100, l10, l8, bpm, l200, l40, l6, ict, l200, l100, l90, l5];
+s01_1  = [l200, l200, l200, l80, l4, lp2, scrn, l100, l40, lp2, bpm, l100, l2, lp4];
+s01_2  = [l100, l20, l9, lp4, ch, cv, l200, l100, l40, l4, lp2];
+s01_3  = [l200, l200, l200, l200, l200, l30, l2, slith, l100, l80, scrn, l100, l40, bpm, l200, l40, ch, cv, l200, l30, l4, lp3, slitv, l200, l100];
+s02_1  = [l200, l80, l4, ict, l200, l200, l200, l10, l6];
+s02_2  = [l200, l70];
+s02_3  = [l200, scrn, l100, l40, bpm, l100, L10, ch, cv, repmat(l200,1,27), l10, l4];
+s02_4  = [l200, l70];
+s02_5  = [l200, scrn, l100, l40, bpm, l100, l9, lp5, ch, cv, l200, l200, l50, lp3];
+s03_1  = [repmat(l200,1,11), l80, l9, lp2];
+s03_2  = [l200, l20];
+s03_3  = [l80, l6, bpm, l100, l40, l4, scrn, l200, l100];
+s04_1  = [l200, l200, l3, ch, cv, l200, l200, l200, l20, l1, lp5, fct, l100, l40, ict, l200, l100, l5, lp7, bpm, l100, l10, l5, lp6];
+s04_2  = [l200, l10, l6];
+s04_3  = [l100, l70, scrn, l100, l2, lp2, cv, l100, l20, l7, lp6];
 
-ld1    = [l199, repmat(l200,1,10)];
-
-s01_1  = [lb1p, l200, l200, scrn, bpm, l150c, ch, l100cc, cv, l150c];
-s01_2  = [lb2p, l200];
-s01_3  = [l200, l200, l200, l200, l200, l200, slith, scrn, bpm, l150c, cv, l100cc, ch, l165, slitv, l200, l187];
-s02_1  = [l110, l200, ict, l200, l200, l100];
-s02_2  = [l200, scrn, bpm, l150c, ch, l100cc, cv, l165, repmat(l200,1,25), lc3p];
-s02_3  = [l150, l150, l150, scrn, bpm, l150c, ch, l100cc, cv, l075];
-s03_1  = [ld3p, scrn, bpm, l150c, ch, l075];
-s04_1  = [l075, cv, l165, l200, l200, l200, l200, l200, ict, le1p];
-s04_2  = [l150, scrn, bpm, l150c, cv, l100c];
-
-sector01 = [s01_1, qd1, s01_2, qf1, s01_3, bn];
-sector02 = [s02_1, qd2a, lc2, qf2a, s02_2, qf2b, lc4, qd2b, s02_3, bp];
-sector03 = [ld1, qf3, ld2, qd3, s03_1, bp];
-sector04 = [s04_1, qf4, le2, qd4, scrn, cv, s04_2, septin];
+sector00 = [s00_1, s00_2, spec];
+sector01 = [s01_1, qd1,  s01_2, qf1,  s01_3, bn];
+sector02 = [s02_1, qd2a, s02_2, qf2a, s02_3, qf2b, s02_4, qd2b, s02_5, bp];
+sector03 = [s03_1, qf3,  s03_2, qd3,  s03_3, bp];
+sector04 = [s04_1, qf4,  s04_2, qd4,  s04_3, septin];
 
 
 %% TB beamline 
