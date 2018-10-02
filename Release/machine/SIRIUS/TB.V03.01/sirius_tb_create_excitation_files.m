@@ -27,7 +27,6 @@ save_excdata(sorting, 'tb-correctors-cv', currents, '0 skew', harmonics, n_avg, 
 
 function save_excdata(sorting, fname, currents, main_mpole, harmonics, n_avg, s_avg, n_std, s_std)
 
-% currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A', '150A'}; 
 header = excdata_file_header(fname, harmonics, main_mpole);
 [data_avg, data_std] = excdata_table(currents, n_avg, s_avg, n_std, s_std);
 comments = excdata_file_comments(sorting);

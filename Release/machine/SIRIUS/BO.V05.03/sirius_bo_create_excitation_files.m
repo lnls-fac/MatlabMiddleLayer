@@ -178,7 +178,9 @@ rotcoil.(mag_field).currents = {};
 for i=1:length(currs)
     cname = ['MULTIPOLES-', currs{i}, '.txt'];
     fname = fullfile(tpath, 'models', mag_type, cname);
+%     fprintf('%s\n', fname);
     [rotcoil.(mag_field).harms, rotcoil.(mag_field).mags, curr, nmp, smp] = load_multipoles_file(fname, mag_label);
+%     fprintf('%i %i: %s\n', size(nmp), fname);
     rotcoil.(mag_field).currents{end+1} = curr;
     rotcoil.(mag_field).nmpoles{end+1} = nmp;
     rotcoil.(mag_field).smpoles{end+1} = smp;
