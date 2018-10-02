@@ -54,9 +54,6 @@ function [param, machine, r_scrn3] = bo_injection_adjustment(bo_ring, n_part, n_
     end
     
     [param, r_scrn3] = screen3(machine, param, n_part, n_pulse, scrn(3), kckr);
-    
-    bpm = findcells(machine, 'FamName', 'BPM');
-    param.orbit = findorbit4(ring, 0, bpm);
 end
     
  

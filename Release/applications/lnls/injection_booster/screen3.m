@@ -5,7 +5,6 @@ function [param, x_scrn3] = screen3(machine, param, n_part, n_pulse, scrn3, kckr
     fprintf('=================================================\n');
     machine3 = setcellstruct(machine, 'VChamber', scrn3+1:length(machine), 0, 1, 1);      
         
-    % while abs(x_scrn3) > param.sigma_scrn;
     [eff3, r_scrn3] = bo_pulses(machine3, param, n_part, n_pulse, scrn3, kckr); 
     eff_lim = 0.75;
     
