@@ -1,6 +1,15 @@
 function sirius_tb_create_excitation_files
 
 
+% QUAD
+currs = {
+    '-10A', '-9A', '-7A', '-5A', '-3A', '-1A', '-0A', '1A', '3A', '5A', '7A', '9A', '10A'
+};
+read_multipole_files(currs, 'QUAD', 'quadrupoles', 'TBQ-');
+currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
+[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'QUAD', 'quadrupoles', 'sorting.txt', 7);
+save_excdata(sorting, 'tb-quadrupole', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+
 
 % B
 currs = {
@@ -12,7 +21,6 @@ read_multipoles_from_fmap_files(currs, 'B', 'TBD-', serials);
 currents = [0, 25, 51, 76, 101, 127, 152, 178, 203, 228, 241, 254, 266, 279, 304, 330];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'B', 'dipoles', 'sorting.txt', 1);
 save_excdata(sorting, 'tb-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
-
 
 % CH
 currs = {
