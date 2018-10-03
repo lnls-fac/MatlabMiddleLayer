@@ -1,8 +1,8 @@
-function [harms, model, nmpole, smpole, params] = sirius_load_fmap_model(magnet)
+function [harms, model, nmpole, smpole, params] = load_fmap_model(magnet)
 
 
-[harmsP, modelP, nmpoleP, smpoleP, paramsP] = load_fmap_model([magnet, '-positive.txt']);
-[harmsN, modelN, nmpoleN, smpoleN, paramsN] = load_fmap_model([magnet, '-negative.txt']);
+[harmsP, modelP, nmpoleP, smpoleP, paramsP] = local_load_fmap_model([magnet, '-positive.txt']);
+[harmsN, modelN, nmpoleN, smpoleN, paramsN] = local_load_fmap_model([magnet, '-negative.txt']);
 
 check = all(harmsP == harmsN);
 if ~check
@@ -17,7 +17,7 @@ smpole = smpoleP + smpoleN;
 params.current = paramsP.current;
 
 
-function [harms, model, nmpole, smpole, params] = load_fmap_model(filename)
+function [harms, model, nmpole, smpole, params] = local_load_fmap_model(filename)
 
 fp = fopen(filename, 'rt');
 text = textscan(fp, '%s', 'Delimiter', '\n');
