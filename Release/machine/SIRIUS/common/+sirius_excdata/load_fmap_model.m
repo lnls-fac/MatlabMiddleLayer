@@ -29,7 +29,7 @@ params = struct();
 for i=1:length(text)
     line = text{i};
     if ~isempty(strfind(line, 'n=')) && ~isempty(strfind(line, ':'))
-        words = strsplit(line);
+        words = strsplit(line, ' ');
         harms(end+1) = str2double(words{1}(3:4));
         if strcmpi(words{3}, '---')
             nmpole = [nmpole, 0.0];
@@ -42,7 +42,7 @@ for i=1:length(text)
             smpole = [smpole, str2double(words{7})];
         end
     elseif ~isempty(strfind(line, 'main_coil_current:'))
-        words = strsplit(line);
+        words = strsplit(line, ' ');
         params.current = str2double(words{2});
     elseif ~isempty(strfind(line, '--- model polynom_b'))
         model = str2num(cell2mat(text(i+2:end)));
