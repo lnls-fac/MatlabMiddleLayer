@@ -1,6 +1,7 @@
 function the_ring = sirius_bo_models_from_measurements(the_ring0)
 
-the_ring = models_from_measurements_dipoles(the_ring0);
+the_ring = the_ring0;
+the_ring = models_from_measurements_dipoles(the_ring);
 the_ring = models_from_measurements_quadrupoles_qf(the_ring);
 the_ring = models_from_measurements_quadrupoles_qd(the_ring);
 the_ring = models_from_measurements_correctors_ch(the_ring);
@@ -15,7 +16,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.B.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'dipoles', 'sorting.txt'));
+sorting = sirius_excdata.importfile_sorting(fullfile(tpath, 'models', 'dipoles', 'sorting.txt'));
 
 d2r = pi / 180.0;
 ang_nominal = 7.2;
@@ -26,7 +27,7 @@ model_sim = [ getcellstruct(the_ring, 'Length', idx(1,:)), getcellstruct(the_rin
 for i=1:length(sorting)
     % load instance of dipole model
     maglabel = fullfile(tpath, 'models', 'dipoles', [lower(sorting{i}), '-3gev']);
-    [harms, model, ~, ~, ~] = sirius_load_fmap_model(maglabel);
+    [harms, model, ~, ~, ~] = sirius_excdata.load_fmap_model(maglabel);
     if length(the_ring{idx(i, 1)}.PolynomB) ~= length(harms)
         error('Incompatible PolynomB and dipole model!')
     end
@@ -49,7 +50,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.QF.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
+sorting = sirius_excdata.importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
 
 fname = fullfile(tpath, 'models', 'quadrupoles-qf', 'README-110A.md');
 [~, kls_3gev] = load_readme_file(fname, 'BQF-');
@@ -83,7 +84,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.QD.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qd', 'sorting.txt'));
+sorting = sirius_excdata.importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qd', 'sorting.txt'));
 
 fname = fullfile(tpath, 'models', 'quadrupoles-qd', 'README-2A.md');
 [mags, kls] = load_readme_file(fname, 'BQD-');

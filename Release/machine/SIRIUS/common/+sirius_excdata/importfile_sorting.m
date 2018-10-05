@@ -1,4 +1,4 @@
-function sorting = sirius_importfile_sorting(filename)
+function sorting = importfile_sorting(filename)
 %IMPORTFILE Import numeric data from a text file as column vectors.
 %   [VARNAME1,BD010] = IMPORTFILE(FILENAME) Reads data from text file
 %   FILENAME for the default selection.
