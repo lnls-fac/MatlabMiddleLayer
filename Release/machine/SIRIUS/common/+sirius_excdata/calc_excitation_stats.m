@@ -1,4 +1,8 @@
-function [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(tpath, currents, mag_field, mag_type, sorting_fname, index)
+function [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(tpath, currents, mag_field, mag_type, sorting_fname, index, check_not_in_sort)
+
+if ~exist('check_not_in_sort', 'var')
+    check_not_in_sort = false;
+end
 
 % load list of used magnets
 fname = fullfile(tpath, 'models', mag_type, sorting_fname);
@@ -19,7 +23,7 @@ for k=1:length(currents)
 end
 for i=1:length(mags)
     % continue, if mag not in sorting
-    if ~any(strcmp(rotcoil.(mag_field).mags{i}, sorting))
+    if ~check_not_in_sort && ~any(strcmp(rotcoil.(mag_field).mags{i}, sorting))
         continue;
     end
     % build c, n, s for interpolation
@@ -44,10 +48,10 @@ s_avg = zeros(length(currents), size(s_all{1}, 2));
 n_std = n_avg;
 s_std = s_avg;
 for k=1:length(currents)
-    n_avg(k,:) = mean(n_all{k});
-    s_avg(k,:) = mean(s_all{k});
-    n_std(k,:) = std(n_all{k});
-    s_std(k,:) = std(s_all{k});
+    n_avg(k,:) = mean(n_all{k}, 1);
+    s_avg(k,:) = mean(s_all{k}, 1);
+    n_std(k,:) = std(n_all{k}, 0, 1);
+    s_std(k,:) = std(s_all{k}, 0, 1);
 end
 
 % clear I=0

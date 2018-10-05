@@ -1,5 +1,8 @@
-function read_multipole_from_fmap_files(tpath, currs, mag_field, mag_label, serials)
+function read_multipole_from_fmap_files(tpath, currs, mag_field, mag_label, serials, loc_folder)
 
+if ~exist('loc_folder', 'var')
+    loc_folder = '';
+end
 rotcoil = getappdata(0, 'rotcoil');
 if isempty(rotcoil)
     rotcoil = struct();
@@ -16,7 +19,7 @@ for i=1:length(currs)
     for j=1:length(serials)
         rotcoil.(mag_field).mags{end+1} = [mag_label, serials{j}];
         fname = [lower(mag_label), serials{j}, '-', currs{i}];
-        magnet = fullfile(tpath, 'models', 'dipoles', fname);
+        magnet = fullfile(tpath, 'models', 'dipoles', loc_folder, fname);
         [harms, ~, nmpole, smpole, params] = sirius_excdata.load_fmap_model(magnet);
         nmp = [nmp; nmpole];
         smp = [smp; smpole];

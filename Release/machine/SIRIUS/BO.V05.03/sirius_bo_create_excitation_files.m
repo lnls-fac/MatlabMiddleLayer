@@ -2,16 +2,16 @@ function sirius_bo_create_excitation_files
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
 
-% % B
-% currs = {
-%     '0025p362A', '0050p724A', '0076p086A', '0101p449A', '0126p811A', ...
-%     '0152p173A', '0177p535A', '0202p898A', '0228p261A', '0240p941A', ...
-%     '0253p622A', '0266p303A', '0278p984A', '0304p346A', '0329p709A'};
-% serials = {'01', '02', '03'};
-% read_multipoles_from_fmap_files(currs, 'B', 'TBD-', serials);
-% currents = [0, 25, 51, 76, 101, 127, 152, 178, 203, 228, 241, 254, 266, 279, 304, 330];
-% [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = calc_excitation_stats(currents, 'B', 'dipoles', 'sorting.txt', 1);
-% save_excdata(sorting, 'tb-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+% B
+currs = {
+    '0040p31A', '0050p39A', '0060p46A', '0165p27A', '0330p54A', ...
+    '0500p00A', '0640p00A', '0680p00A', '0720p00A', '0800p00A', ...
+    '0942p05A', '0991p63A', '1041p21A'};
+serials = {'006'};
+sirius_excdata.read_multipole_from_fmap_files(tpath, currs, 'B', 'BD-', serials, 'excitation_curve');
+currents = [0, 40.31, 50.39, 60.46, 165.27, 330.54, 500, 640, 680, 720, 800, 942.05, 992.63, 1041.21];
+[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'B', 'dipoles', 'sorting.txt', 1, true);
+sirius_excdata.save_excdata({'BD-006'}, 'bo-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
 
 % SD
 currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A', '150A'};
