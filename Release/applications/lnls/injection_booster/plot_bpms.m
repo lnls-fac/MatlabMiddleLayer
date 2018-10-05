@@ -43,8 +43,8 @@ function plot_bpms(machine, orbit, r_bpm, int_bpm)
     hold(ax1, 'on');
     hold(ax2, 'on');
     hold(ax3, 'on');
-    plot(ax1, s, orbit(1, :) * mm, '--k', 'linewidth', 2);
-    plot(ax2, s, orbit(3, :) * mm, '--k', 'linewidth', 2);
+    plot(ax1, s_total, orbit(1, :) * mm, '--k', 'linewidth', 2);
+    plot(ax2, s_total, orbit(3, :) * mm, '--k', 'linewidth', 2);
     plot(ax1, s_total, VChamb(1,:) * mm,'k');
     plot(ax1, s_total, -VChamb(1,:) * mm,'k');
     plot(ax2, s_total, VChamb(2,:) * mm,'k');
