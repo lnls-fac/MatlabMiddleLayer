@@ -1,18 +1,31 @@
 function [machine, param] = bo_set_machine(bo_ring)
+% Setting of random machines and nominal injection parameters (without errors).
+% It includes random errors of excitation and alignment of magnets and also
+% adjustes the vacuum chamber at injection point (injection septum).
+%
+% INPUT: 
+% - bo_ring: nominal ring model
+%
+% OUTPUTS:
+% - machine: ring model with vacuum chamber adjusted and magnet errors
+% - param: nominal injection parameters struct
+%
+% NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
+% this function must be updated too in the parts of magnet errors. 
+%
+% See also: add_errors_injection, bo_injection_adjustment
+%
+% Version 1 - Murilo B. Alves - October 4th, 2018.
+
     name = 'CONFIG'; name_saved_machines = name;
     initializations();
 
-    %=====================================================================
-    %=====================================================================
-
     % Setting parameters of injection 
-
+    fam = sirius_bo_family_data(bo_ring);
     sept = findcells(bo_ring, 'FamName', 'InjSept');
     bo_ring = circshift(bo_ring, [0, - (sept - 1)]);
     bo_twiss = calctwiss(bo_ring);
     
-    
-    %VARIAR COM PARAM DE TWISS
     param.betax0 = bo_twiss.betax(1);
     param.betay0 = bo_twiss.betay(1);
     param.alphax0 = bo_twiss.alphax(1);
@@ -35,8 +48,8 @@ function [machine, param] = bo_set_machine(bo_ring)
     param.delta_energy_scrn3 = 0;
     
     %Calculates the horizontal dispersion function at screen 3    
-    dipole = findcells(bo_ring, 'FamName', 'B');
-    dipole = dipole(1);
+    % dipole = findcells(bo_ring, 'FamName', 'B');
+    dipole = fam.B.ATIndex(1);
     scrn = findcells(bo_ring, 'FamName', 'Scrn');
     scrn3 = scrn(3);
     delta = 1e-5;
@@ -49,8 +62,8 @@ function [machine, param] = bo_set_machine(bo_ring)
     x_p = r_final_p(1);
     param.etax_scrn3 = (x_p - x_n) / 2 / delta;
     
-    %Calculates the horizontal dispersion function at BPMS    
-    bpms = findcells(bo_ring, 'FamName', 'BPM');
+    %Calculates the horizontal dispersion function at BPMs    
+    bpms = fam.BPM.ATIndex;
     delta = 1e-5;
     r_init_n = [0; 0; 0; 0; -delta; 0];
     r_final_n = linepass(bo_ring, r_init_n, bpms);
@@ -59,29 +72,19 @@ function [machine, param] = bo_set_machine(bo_ring)
     x_n = r_final_n(1, :);
     x_p = r_final_p(1, :);
     param.etax_bpms = (x_p - x_n) ./ 2 ./ delta;
-    %=====================================================================
-    %=====================================================================
     
-    % Setting the machine configurations
-
+    % Setting the vacuum chamber at injection point
     machine = vchamber_injection(bo_ring);
     
     % Error in the magnets (allignment, rotation, excitation, multipoles,
     % setting off rf cavity and radiation emission
-    
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
     family_data = sirius_bo_family_data(machine);
     machine  = create_apply_errors(machine, family_data);
     machine  = create_apply_multipoles(machine, family_data);
-    
-    % for k = 1:length(machine)
-    %    bpm = findcells(machine{k}, 'FamName', 'BPM');
-    %    param.orbit{k} = findorbit4(machine{k}, 0, bpm);
-    % end
-    
+       
     function machine = vchamber_injection(machine)
-        
         %Values of vacuum chamber radius in horizontal plane at the end of
         %injection septum and the initial point of injection kicker
         xcv_sep = 41.86e-3;
@@ -134,7 +137,7 @@ function machine = create_apply_errors(the_ring, family_data)
     config.fams.b.sigma_y      = 160 * um;
     config.fams.b.sigma_roll   = 0.800 * mrad;
 %         config.fams.b.sigma_e      = 0.15 * percent * 1;
-    config.fams.b.sigma_e      = 0*0.05 * percent; % based on estimated error of measured fmap analysis from measurement bench fluctuation - XRR - 2018-08-23
+    config.fams.b.sigma_e      = 0.05 * percent; % based on estimated error of measured fmap analysis from measurement bench fluctuation - XRR - 2018-08-23
 %         config.fams.b.sigma_e_kdip = 2.4 * percent * 1;  % quadrupole errors due to pole variations
     config.fams.b.sigma_e_kdip = 0.3 * percent;  % based on measured fmap analysis - XRR - 2018-08-23 - see /home/fac_files/lnls-ima/bo-dipoles/model-09/analysis/hallprobe/production/magnet-dispersion.ipynb
 
