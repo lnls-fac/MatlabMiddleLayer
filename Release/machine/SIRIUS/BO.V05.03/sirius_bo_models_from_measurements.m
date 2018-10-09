@@ -132,7 +132,7 @@ the_ring = setcellstruct(the_ring, 'PolynomB', idx_qd, -0.10250366405148, 1, 2);
 the_ring = setcellstruct(the_ring, 'PolynomB', idx_sf, +11.25394814115368, 1, 3);
 the_ring = setcellstruct(the_ring, 'PolynomB', idx_sd, +11.09496614284700, 1, 3);
 ats = atsummary(the_ring);
-if any(abs(ats.tunes - goal_tunes) > 0.00001) || any(abs(ats.chromaticity - goal_chrom) > 0.01)
+if any(abs(ats.tunes - goal_tunes) > 0.00001) || any(abs(ats.chromaticity - goal_chrom) > 0.05)
     for i=1:8
         the_ring = fitchrom2(the_ring, goal_chrom, 'SD', 'SF');
         [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, {'QF','QD'}, 'svd', 'add', 10, 1e-9);
