@@ -1,5 +1,5 @@
-function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, n_pulse, kckr, scrn1, scrn2, r_scrn2)
-    res_scrn = param.sigma_scrn;
+function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, param_errors, n_part, n_pulse, kckr, scrn1, scrn2, r_scrn2)
+    res_scrn = param_errors.sigma_scrn;
     s = findspos(machine, 1:length(machine));
     dx12 = 1;
     machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);
@@ -18,11 +18,11 @@ function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, n_pu
         fprintf('SCREEN 1 ON \n')
         fprintf('=================================================\n');
 
-        [eff1, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, n_part, n_pulse, scrn1, kckr);
+        [eff1, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
         
         if mean(eff1) < 0.75
-            param = sirius_commis.injection.bo.screen_low_intensity(machine1, param, n_part, n_pulse, scrn1, kckr, mean(eff1), 1, 0.75);
-            [~, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, n_part, n_pulse, scrn1, kckr);
+            param = sirius_commis.injection.bo.screen_low_intensity(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr, mean(eff1), 1, 0.75);
+            [~, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
         end
 
         if isnan(r_scrn1(1))
@@ -43,11 +43,11 @@ function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, n_part, n_pu
         fprintf('=================================================\n');
         fprintf('SCREEN 2 ON \n')
         fprintf('=================================================\n');
-        [eff2, r_scrn2] = sirius_commis.injection.bo.multiple_pulse(machine2, param, n_part, n_pulse, scrn2, kckr);
+        [eff2, r_scrn2] = sirius_commis.injection.bo.multiple_pulse(machine2, param, param_errors, n_part, n_pulse, scrn2, kckr);
         
         if mean(eff2) < 0.75
-            param = sirius_commis.injection.bo.screen_low_intensity(machine2, param, n_part, n_pulse, scrn1, kckr, mean(eff2), 2, 0.75);
-            [~, r_scrn2] = sirius_commis.injection.bo.multiple_pulse(machine2, param, n_part, n_pulse, scrn2, kckr);
+            param = sirius_commis.injection.bo.screen_low_intensity(machine2, param, param_errors, n_part, n_pulse, scrn1, kckr, mean(eff2), 2, 0.75);
+            [~, r_scrn2] = sirius_commis.injection.bo.multiple_pulse(machine2, param, param_errors, n_part, n_pulse, scrn2, kckr);
         end
     end
 end

@@ -1,6 +1,6 @@
 function sigma_scrn = screen_error_inten(r_xy, n_part, scrn, sigma_scrn0)
-    Rate = calc_eff(n_part, r_xy(1, :, scrn));
-    if Rate == 0;
+    Rate = sirius_commis.common.calc_eff(n_part, r_xy(1, :, scrn));
+    if Rate == 0
         sigma_scrn = [NaN, NaN];
         return;
     end

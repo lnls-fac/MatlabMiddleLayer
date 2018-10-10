@@ -1,4 +1,4 @@
-function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_tl(machine, param, MS_acc, n_part, n_pulse)
+function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_tl(machine, param, param_errors, MS_acc, n_part, n_pulse)
 % Increases the intensity of BPMs and adjusts the orbit by changing the
 % correctors based on BPMs measurements with a transport line approach
 %
@@ -20,7 +20,7 @@ function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orb
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-% initializations()
+% sirius_commis.common.initializations()
 
 fam = sirius_bo_family_data(machine);
 ch = fam.CH.ATIndex;
@@ -33,11 +33,11 @@ theta_y = zeros(1, length(cv));
 corr_lim = 310e-6*10;
 chute = 10e-6;
 int_lim = 0.8;
-pos_lim = param.sigma_bpm / int_lim;
+pos_lim = param_errors.sigma_bpm / int_lim;
 
-eff1 = sirius_commis.first_turns.bo.single_pulse_turn(machine, 1, param, n_part);
+eff1 = sirius_commis.first_turns.bo.single_pulse_turn(machine, 1, param, param_errors, n_part);
 
-[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
 
 if eff1 > 0.95
     [rms_orbit_bpm, max_orbit_bpm] = calc_rms(r_bpm);

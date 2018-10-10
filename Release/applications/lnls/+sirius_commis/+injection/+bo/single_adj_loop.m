@@ -1,4 +1,4 @@
-function [param_out, machine, r_scrn3] = single_adj_loop(bo_ring, n_part, n_pulse, set_mach, param_in)
+function [param_out, machine, r_scrn3] = single_adj_loop(bo_ring, n_part, n_pulse, set_mach, param_in, param_errors_in)
 % Single loop of injection parameters adjustment. It uses measurements of
 % screen 1 to adjust the injection angle with injection kicker turned off, after that turns 
 % on the kicker and with screen 1 again adjustes the kicker angle for the first time.
@@ -44,10 +44,11 @@ function [param_out, machine, r_scrn3] = single_adj_loop(bo_ring, n_part, n_puls
     
     if flag_machine
         [machine, param0, ~] = set_machine(bo_ring);
-        param0_errors = add_errors(param0);
+        [param0_errors, param0] = add_errors(param0);
     else
         machine = bo_ring;
-        param0_errors = param_in;
+        param0 = param_in;
+        param0_errors = param_errors_in;
         if(~exist('param_in', 'var'))
             error('Struct with parameters missing');
         end
@@ -57,16 +58,16 @@ function [param_out, machine, r_scrn3] = single_adj_loop(bo_ring, n_part, n_puls
     
     % SCREEN 1 ON
     kckr = 'off';   
-    [~, param_out] = sirius_commis.injection.bo.screen1_sept(machine, param0_errors, n_part, n_pulse, scrn(1), kckr);
+    [~, param_out] = sirius_commis.injection.bo.screen1_sept(machine, param0, param0_errors, n_part, n_pulse, scrn(1), kckr);
     % KICKER ON -->> WITH SCREEN 1 MEASUREMENT, ADJUST THE KICKER
     kckr = 'on';
-    [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, n_part, n_pulse, scrn(1), kckr);
+    [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, param0_errors, n_part, n_pulse, scrn(1), kckr);
     % SCREEN 2 ON TO ADJUST KICKER AGAIN // KICKER ON
-    [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, n_part, n_pulse, scrn(2), kckr);
+    [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, param0_errors, n_part, n_pulse, scrn(2), kckr);
     % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
-    [r_scrn2, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
+    [r_scrn2, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param0_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
     
-    if abs(r_scrn2(1)) > param_out.sigma_scrn;    
+    if abs(r_scrn2(1)) > param0_errors.sigma_scrn
         fprintf('=================================================\n');
         fprintf('READJUSTING THE BEAM TO REACH THE KICKER CENTER\n');
         fprintf('=================================================\n');
@@ -78,14 +79,14 @@ function [param_out, machine, r_scrn3] = single_adj_loop(bo_ring, n_part, n_puls
 
         % KICKER ON -->> WITH SCREEN 1 MEAS., ADJUST THE KICKER
         kckr = 'on';
-        [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, n_part, n_pulse, scrn(1), kckr);
+        [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, param0_errors, n_part, n_pulse, scrn(1), kckr);
         % SCREEN 2 ON TO ADJUST KICKER AGAIN // KICKER ON
-        [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, n_part, n_pulse, scrn(2), kckr);
+        [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, param0_errors, n_part, n_pulse, scrn(2), kckr);
         % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
-        [~, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
+        [~, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param0_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
     end
     
-    [param_out, r_scrn3] = sirius_commis.injection.bo.screen3(machine, param_out, n_part, n_pulse, scrn(3), kckr);
+    [param_out, r_scrn3] = sirius_commis.injection.bo.screen3(machine, param_out, param0_errors, n_part, n_pulse, scrn(3), kckr);
 end
     
  

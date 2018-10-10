@@ -26,19 +26,19 @@ function [machine, param] = set_machine(bo_ring, n_mach)
     bo_ring = circshift(bo_ring, [0, - (sept - 1)]);
     bo_twiss = calctwiss(bo_ring);
     
-    param.betax0 = bo_twiss.betax(1);
-    param.betay0 = bo_twiss.betay(1);
-    param.alphax0 = bo_twiss.alphax(1);
-    param.alphay0 = bo_twiss.alphay(1);
-    param.etax0 = bo_twiss.etax(1);
-    param.etay0 = bo_twiss.etay(1);
-    param.etaxl0 = bo_twiss.etaxl(1);
-    param.etayl0 = bo_twiss.etayl(1);
+    param.twiss.betax0 = bo_twiss.betax(1);
+    param.twiss.betay0 = bo_twiss.betay(1);
+    param.twiss.alphax0 = bo_twiss.alphax(1);
+    param.twiss.alphay0 = bo_twiss.alphay(1);
+    param.twiss.etax0 = bo_twiss.etax(1);
+    param.twiss.etay0 = bo_twiss.etay(1);
+    param.twiss.etaxl0 = bo_twiss.etaxl(1);
+    param.twiss.etayl0 = bo_twiss.etayl(1);
     
-    param.emitx = 170e-9;
-    param.emity = param.emitx;
-    param.sigmae = 0.5e-2;
-    param.sigmaz = 0.5e-3;
+    param.beam.emitx = 170e-9;
+    param.beam.emity = param.beam.emitx;
+    param.beam.sigmae = 0.5e-2;
+    param.beam.sigmaz = 0.5e-3;
     
     param.offset_x0 = -30e-3;
     param.offset_xl0 = 14.3e-3;

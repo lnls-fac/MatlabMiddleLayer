@@ -1,4 +1,4 @@
-function [count_turns, r_bpm, int_bpm] = multiple_pulse_turn(machine, n_mach, param, n_part, n_pulse, n_turns)
+function [count_turns, r_bpm, int_bpm] = multiple_pulse_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns)
 % Simulation of booster injection and turns around the ring for multiple
 % injection pulses
 %
@@ -19,7 +19,7 @@ function [count_turns, r_bpm, int_bpm] = multiple_pulse_turn(machine, n_mach, pa
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-% initializations();
+% sirius_commis.common.initializations();
 
 if ~exist('n_turns','var')
     n_turns = 1e5;
@@ -37,7 +37,7 @@ for i = 1:n_pulse
     fprintf('======================= \n');
     fprintf('Pulse number %i \n', i);
     fprintf('======================= \n');
-    [~, count_turns(i, :), r_bpm_turns(i,:,:), int_bpm_turns(i,:,:)] = sirius_commis.first_turns.bo.single_pulse_turn(machine, n_mach, param, n_part, n_turns);
+    [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :)] = sirius_commis.first_turns.bo.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns);
 end
 
 r_bpm = squeeze(mean(r_bpm_turns, 1));

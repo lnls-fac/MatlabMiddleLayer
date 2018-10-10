@@ -1,4 +1,4 @@
-function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_matrix(machine, param, MS_acc, n_part, n_pulse)
+function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_matrix(machine, param, param_errors, MS_acc, n_part, n_pulse)
 % Increases the intensity of BPMs and adjusts the orbit by changing the
 % correctors based on BPMs measurements with a matrix approach
 %
@@ -20,7 +20,7 @@ function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orb
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-% initializations();
+% sirius_commis.common.initializations();
 
 fam = sirius_bo_family_data(machine);
 ch = fam.CH.ATIndex;
@@ -32,7 +32,7 @@ m_corr_y = zeros(length(bpm), length(cv));
 theta_x = zeros(length(ch), 1);
 theta_y = zeros(length(cv), 1);
 
-[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
 M_bpms_x = MS_acc(1:2, 1:2, bpm);
 M_bpms_y = MS_acc(3:4, 3:4, bpm);
 
@@ -69,8 +69,12 @@ for j = 1:length(ch)
 end
 
 eff_lim = 0.95;
-pos_lim = param.sigma_bpm / eff_lim;
-
+if n_pulse <= 10
+    pos_lim = param_errors.sigma_bpm / eff_lim;
+else
+    pos_lim = 1e-3;
+end
+n_corr = 1;
 while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim
     bpm_int_ok = bpm(int_bpm > 0.80);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
@@ -102,9 +106,13 @@ while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm >
     
     param.orbit = findorbit4(machine, 0, 1:length(machine));
 
-    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
     rms_orbit_x_bpm = nanstd(r_bpm(1,:));
     rms_orbit_y_bpm = nanstd(r_bpm(2,:));
+    n_corr = n_corr + 1;
+    if n_corr > 5
+        break
+    end
 end
 [rms_orbit_bpm, max_orbit_bpm] = calc_rms(r_bpm);
 end

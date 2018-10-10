@@ -1,4 +1,4 @@
-function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_respm(machine, param, respm, n_part, n_pulse)
+function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_respm(machine, param, param_errors, respm, n_part, n_pulse)
 % Increases the intensity of BPMs and adjusts the orbit by changing the
 % correctors based on BPMs measurements with the response matrix
 %
@@ -19,7 +19,7 @@ function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orb
 %
 % Version 1 - Murilo B. Alves - October 8th, 2018
 
-% initializations();
+% sirius_commis.common.initializations();
 
 fam = sirius_bo_family_data(machine);
 ch = fam.CH.ATIndex;
@@ -32,13 +32,13 @@ m_corr_y = respm.myy;
 theta_x = zeros(length(ch), 1);
 theta_y = zeros(length(cv), 1);
 
-[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
 
 rms_orbit_x_bpm = nanstd(r_bpm(1,:));
 rms_orbit_y_bpm = nanstd(r_bpm(2,:));
 
 eff_lim = 0.95;
-pos_lim = param.sigma_bpm / eff_lim;
+pos_lim = param_errors.sigma_bpm / eff_lim;
 
 
 for j = 1:length(ch)
@@ -46,7 +46,7 @@ for j = 1:length(ch)
     m_corr_y(bpm < cv(j), j) = 0;
 end
 
-while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim;
+while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim
     bpm_int_ok = bpm(int_bpm > 0.80);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
     
@@ -77,7 +77,7 @@ while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm >
     
     param.orbit = findorbit4(machine, 0, 1:length(machine));
     
-    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
     rms_orbit_x_bpm = nanstd(r_bpm(1,:));
     rms_orbit_y_bpm = nanstd(r_bpm(2,:));
 end

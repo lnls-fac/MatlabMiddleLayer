@@ -29,12 +29,13 @@ function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
 
     offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta; 0];
        
-    twi.betax = param.betax0; twi.alphax = param.alphax0;
-    twi.betay = param.betay0; twi.alphay = param.alphay0;
-    twi.etax = param.etax0;   twi.etaxl = param.etaxl0;
-    twi.etay = param.etay0;   twi.etayl = param.etayl0;
+    twi.betax = param.twiss.betax0; twi.alphax = param.twiss.alphax0;
+    twi.betay = param.twiss.betay0; twi.alphay = param.twiss.alphay0;
+    twi.etax = param.twiss.etax0;   twi.etaxl = param.twiss.etaxl0;
+    twi.etay = param.twiss.etay0;   twi.etayl = param.twiss.etayl0;
+    cutoff = 3;
     
-    r_init = lnls_generate_bunch(param.emitx, param.emity, param.sigmae, param.sigmaz, twi, n_part, param.cutoff);
+    r_init = lnls_generate_bunch(param.beam.emitx, param.beam.emity, param.beam.sigmae, param.beam.sigmaz, twi, n_part, cutoff);
     r_init = bsxfun(@plus, r_init, offsets);
     r_init(5, :) = (r_init(5, :) - param.delta_ave) / (1 + param.delta_ave);
     r_final = linepass(machine(1:point), r_init, 1:point);    

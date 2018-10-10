@@ -1,4 +1,4 @@
-function [eff, r_scrn, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine, param, n_part, n_pulse, point, kckr, plt, diag)
+function [eff, r_scrn, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
 % Simulation of injection pulses to the booster. The starting point is the
 % end of injection septum. 
 %
@@ -72,29 +72,29 @@ if(exist('diag','var'))
 elseif(~exist('diag','var')) && ~flag_diag
         flag_diag = false;
 end
-cutoff = 1;
+
 for j=1:n_pulse     
-    error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param.x_error_pulse;
+    error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
     param.offset_x = param.offset_x_sist + error_x_pulse;
 
-    error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', cutoff) * param.xl_error_pulse;
+    error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
     param.offset_xl = param.offset_xl_sist + error_xl_pulse;
     % Peak to Peak values from measurements - cutoff = 1;
 
     if flag_kckr
-        error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', cutoff) * param.kckr_error_pulse;
+        error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
         param.kckr = param.kckr_sist + error_kckr_pulse;
         machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
     end
 
-    error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', cutoff) * param.delta_error_pulse;
+    error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
     param.delta = param.delta_sist + error_delta_pulse;
 
     if flag_diag        
         [r_xy, r_end_part, r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
         r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
         bpm = findcells(machine, 'FamName', 'BPM');
-        [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param.sigma_bpm);
+        [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param_errors.sigma_bpm);
     else
         [r_xy, r_end_part] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
     end    
@@ -102,7 +102,7 @@ for j=1:n_pulse
     r_end(j, :, :) = r_end_part;
 
     eff(j) = sirius_commis.common.calc_eff(n_part, r_xy(:, :, point));      
-    sigma_scrn(j, :) = sirius_commis.injection.bo.screen_error_inten(r_xy, n_part, point, param.sigma_scrn);
+    sigma_scrn(j, :) = sirius_commis.injection.bo.screen_error_inten(r_xy, n_part, point, param_errors.sigma_scrn);
 
 
     if flag_plot

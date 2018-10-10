@@ -1,23 +1,23 @@
-function [param, x_scrn3] = screen3(machine, param, n_part, n_pulse, scrn3, kckr)
+function [param, x_scrn3] = screen3(machine, param, param_errors, n_part, n_pulse, scrn3, kckr)
     
     fprintf('=================================================\n');
     fprintf('SCREEN 3 ON \n')
     fprintf('=================================================\n');
     machine3 = setcellstruct(machine, 'VChamber', scrn3+1:length(machine), 0, 1, 1);      
         
-    [eff3, r_scrn3] = sirius_commis.injection.bo.multiple_pulse(machine3, param, n_part, n_pulse, scrn3, kckr); 
+    [eff3, r_scrn3] = sirius_commis.injection.bo.multiple_pulse(machine3, param, param_errors, n_part, n_pulse, scrn3, kckr); 
     eff_lim = 0.75;
     
     if mean(eff3) < eff_lim
-        param = sirius_commis.injection.bo.screen_low_intensity(machine3, param, n_part, n_pulse, scrn3, kckr, mean(eff3), 3, eff_lim);
-        [~, r_scrn3] = sirius_commis.injection.bo.multiple_pulse(machine3, param, n_part, n_pulse, scrn3, kckr); 
+        param = sirius_commis.injection.bo.screen_low_intensity(machine3, param, param_errors, n_part, n_pulse, scrn3, kckr, mean(eff3), 3, eff_lim);
+        [~, r_scrn3] = sirius_commis.injection.bo.multiple_pulse(machine3, param, param_errors, n_part, n_pulse, scrn3, kckr); 
     end
 
     if isnan(r_scrn3(1))
        error('PARTICLES ARE LOST BEFORE SCREEN 3');
     end
     
-    res_scrn = param.sigma_scrn;
+    res_scrn = param_errors.sigma_scrn;
 
     x_scrn3 = r_scrn3(1);
     
@@ -25,8 +25,8 @@ function [param, x_scrn3] = screen3(machine, param, n_part, n_pulse, scrn3, kckr
         fprintf('Screen 3 - x position %f mm \n', x_scrn3*1e3);
         fprintf('=================================================\n');    
         fprintf('DELTA ENERGY ADJUSTED TO %f %% \n', param.delta_ave*1e2);
-        agr = sirius_commis.common.prox_percent(param.delta_ave, param.delta_error_sist);
-        fprintf('THE GENERATED ERROR WAS %f %%, Conf. %f %% \n', param.delta_error_sist*1e2, agr);
+        agr = sirius_commis.common.prox_percent(param.delta_ave, param_errors.delta_error_sist);
+        fprintf('THE GENERATED ERROR WAS %f %%, Conf. %f %% \n', param_errors.delta_error_sist*1e2, agr);
         fprintf('=================================================\n');
         return
     end
@@ -37,8 +37,8 @@ function [param, x_scrn3] = screen3(machine, param, n_part, n_pulse, scrn3, kckr
     fprintf('Screen 3 - x position %f mm \n', x_scrn3*1e3);
     fprintf('=================================================\n');    
     fprintf('DELTA ENERGY ADJUSTED TO %f %% \n', param.delta_ave*1e2);
-    agr = sirius_commis.common.prox_percent(param.delta_ave, param.delta_error_sist);
-    fprintf('THE GENERATED ERROR WAS %f %%, Conf. %f %% \n', param.delta_error_sist*1e2, agr);
+    agr = sirius_commis.common.prox_percent(param.delta_ave, param_errors.delta_error_sist);
+    fprintf('THE GENERATED ERROR WAS %f %%, Conf. %f %% \n', param_errors.delta_error_sist*1e2, agr);
     fprintf('=================================================\n');
 end
 

@@ -13,7 +13,7 @@ function [sigma_bpm, int_bpm] = bpm_error_inten(r_xy, n_part, sigma_bpm0)
 %   (dimension is the same as r_xy)
 %   - int_bpm: corresponding intensity in each BPM (ratio of number of
 %   particles reaching BPM and total number of particles injected)
-    Rate = calc_eff(n_part, r_xy(1, :, :));
+    Rate = sirius_commis.common.calc_eff(n_part, r_xy(1, :, :));
     sigma = ( sigma_bpm0 ./ Rate )';
     sigma(isinf(sigma)) = NaN;
     sigma_bpm_x = lnls_generate_random_numbers(1, length(sigma), 'norm') .* sigma;   
