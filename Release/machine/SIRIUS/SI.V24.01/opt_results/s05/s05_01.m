@@ -1,0 +1,44 @@
+%% Version SI.V24.01-S05.01 
+%  ========================
+%  dipole BC Model-13
+
+% QUADRUPOLES
+% ===========
+QDA_strength  = -1.62140504231570;
+QFA_strength  = +3.57312866860243;
+QDB1_strength = -2.00609666472002;
+QDB2_strength = -3.41636329298560;
+QFB_strength  = +4.11468361390900;
+QDP1_strength = -2.00623004208620;
+QDP2_strength = -3.41638667777796;
+QFP_strength  = +4.11474509619435;
+
+Q1_strength   = +2.81580602167;
+Q2_strength   = +4.342314688125;
+Q3_strength   = +3.235627121213;
+Q4_strength   = +3.933913571031;
+
+% SEXTUPOLES
+% ==========
+SDA0_strength = -80.833699999999993;
+SDB0_strength = -64.942200000000000;
+SDP0_strength = -64.942200000000000;
+SFA0_strength = +52.569600000000001;
+SFB0_strength = +73.740099999999998;
+SFP0_strength = +73.740099999999998;
+
+SDA1_strength = -162.99770897901567;
+SDA2_strength = -88.86139948521226;
+SDA3_strength = -139.94649551136112;
+SFA1_strength = +191.83978904451774;
+SFA2_strength = +150.77750045568521;
+SDB1_strength = -141.66041724122798;
+SDB2_strength = -122.24362142235795;
+SDB3_strength = -173.82297579942781;
+SFB1_strength = +227.90339692122569;
+SFB2_strength = +197.83830402346805;
+SDP1_strength = -142.31715319924902;
+SDP2_strength = -122.28842606840020;
+SDP3_strength = -174.16371835610005;
+SFP1_strength = +229.26062594204964;
+SFP2_strength = +198.51173746324628;   
