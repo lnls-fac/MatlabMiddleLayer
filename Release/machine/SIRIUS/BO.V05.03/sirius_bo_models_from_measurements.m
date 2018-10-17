@@ -1,6 +1,7 @@
 function the_ring = sirius_bo_models_from_measurements(the_ring0)
 
-the_ring = models_from_measurements_dipoles(the_ring0);
+the_ring = the_ring0;
+the_ring = models_from_measurements_dipoles(the_ring);
 the_ring = models_from_measurements_quadrupoles_qf(the_ring);
 the_ring = models_from_measurements_quadrupoles_qd(the_ring);
 the_ring = models_from_measurements_correctors_ch(the_ring);
@@ -15,7 +16,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.B.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'dipoles', 'sorting.txt'));
+sorting = sirius_excdata.importfile_sorting(fullfile(tpath, 'models', 'dipoles', 'sorting.txt'));
 
 d2r = pi / 180.0;
 ang_nominal = 7.2;
@@ -26,7 +27,7 @@ model_sim = [ getcellstruct(the_ring, 'Length', idx(1,:)), getcellstruct(the_rin
 for i=1:length(sorting)
     % load instance of dipole model
     maglabel = fullfile(tpath, 'models', 'dipoles', [lower(sorting{i}), '-3gev']);
-    [harms, model, ~, ~, ~] = sirius_load_fmap_model(maglabel);
+    [harms, model, ~, ~, ~] = sirius_excdata.load_fmap_model(maglabel);
     if length(the_ring{idx(i, 1)}.PolynomB) ~= length(harms)
         error('Incompatible PolynomB and dipole model!')
     end
@@ -49,7 +50,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.QF.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
+sorting = sirius_excdata.importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qf', 'sorting.txt'));
 
 fname = fullfile(tpath, 'models', 'quadrupoles-qf', 'README-110A.md');
 [~, kls_3gev] = load_readme_file(fname, 'BQF-');
@@ -83,7 +84,7 @@ data = sirius_bo_family_data(the_ring);
 idx = data.QD.ATIndex;
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
-sorting = sirius_importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qd', 'sorting.txt'));
+sorting = sirius_excdata.importfile_sorting(fullfile(tpath, 'models', 'quadrupoles-qd', 'sorting.txt'));
 
 fname = fullfile(tpath, 'models', 'quadrupoles-qd', 'README-2A.md');
 [mags, kls] = load_readme_file(fname, 'BQD-');
@@ -131,7 +132,7 @@ the_ring = setcellstruct(the_ring, 'PolynomB', idx_qd, -0.10250366405148, 1, 2);
 the_ring = setcellstruct(the_ring, 'PolynomB', idx_sf, +11.25394814115368, 1, 3);
 the_ring = setcellstruct(the_ring, 'PolynomB', idx_sd, +11.09496614284700, 1, 3);
 ats = atsummary(the_ring);
-if any(abs(ats.tunes - goal_tunes) > 0.00001) || any(abs(ats.chromaticity - goal_chrom) > 0.01)
+if any(abs(ats.tunes - goal_tunes) > 0.00001) || any(abs(ats.chromaticity - goal_chrom) > 0.05)
     for i=1:8
         the_ring = fitchrom2(the_ring, goal_chrom, 'SD', 'SF');
         [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, {'QF','QD'}, 'svd', 'add', 10, 1e-9);

@@ -1,7 +1,7 @@
 function r = calctwiss(varargin)
 % r = calctwiss(varargin)
 %
-% calcula par?metros de twiss da rede.
+% calcula parametros de twiss da rede.
 % Inputs opcionais: 
 % 1) the_ring, 
 % 2) 'n+1' : calcula twiss no final do modelo tambem.

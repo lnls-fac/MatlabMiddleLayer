@@ -14,8 +14,7 @@ default_li_version = 'LI.V01.01';
 default_tb_version = 'TB.V03.01';
 default_bo_version = 'BO.V05.03';
 default_ts_version = 'TS.V03.04';
-% default_si_version = 'SI.V22.04';
-default_si_version = 'SI.V23.01';
+default_si_version = 'SI.V24.01';
 default_link       = 'NONE';
 
 default_version = default_si_version;

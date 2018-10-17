@@ -41,10 +41,15 @@ data.SFP2.nr_segs = 1;
 
 data.BPM.nr_segs  = 1;
 data.rBPM.nr_segs = 1;
-data.FC.nr_segs   = 1;
-data.FCQ.nr_segs  = 1;
-data.FCH.nr_segs  = 1;
-data.FCV.nr_segs  = 1;
+
+data.FC1.nr_segs   = 1; % fast correctors with skew quad poles (FCH+FCV and FCH+FCV+FQS)
+data.FC2.nr_segs   = 1; % fast correctors with normal quad poles (FCH+FCV)
+
+data.FC.nr_segs   = 1; % all fast correctors
+data.FCQ.nr_segs  = 1; % fast skew quad correctors
+data.FCH.nr_segs  = 1; % fast CH correctors
+data.FCV.nr_segs  = 1; % fast CV correctors
+
 data.QS.nr_segs   = 1; % All QS
 data.QSS.nr_segs  = 1; % QSs in sextupoles
 data.CH.nr_segs   = 1;
@@ -171,19 +176,33 @@ data.CVS.ATIndex = data.CVS.ATIndex';
 
 % FCH - fast horizontal correctors
 idx = [];
-idx = [idx; data.FC.ATIndex];
-idx = [idx; data.FCQ.ATIndex];
+idx = [idx; data.FC1.ATIndex];
+idx = [idx; data.FC2.ATIndex];
 idx = sort(idx);
 data.FCH.ATIndex = reshape(idx,data.FCH.nr_segs,[]);
 data.FCH.ATIndex = data.FCH.ATIndex';
+data.FCH.ATFamilies = {'FC1', 'FC2'};
 
 % FCV - fast vertical correctors
 idx = [];
-idx = [idx; data.FC.ATIndex];
-idx = [idx; data.FCQ.ATIndex];
+idx = [idx; data.FC1.ATIndex];
+idx = [idx; data.FC2.ATIndex];
 idx = sort(idx);
 data.FCV.ATIndex = reshape(idx,data.FCV.nr_segs,[]);
 data.FCV.ATIndex = data.FCV.ATIndex';
+data.FCV.ATFamilies = {'FC1', 'FC2'};
+
+% FCQ - fast skew correctors
+idx = [];
+idx = [idx; data.FC1.ATIndex(5:7:end)];
+idx = sort(idx);
+data.FCQ.ATIndex = reshape(idx,data.FCQ.nr_segs,[]);
+data.FCQ.ATIndex = data.FCQ.ATIndex';
+data.FCV.ATFamilies = 'FC1';
+
+% FC - fast correctors
+data.FC = data.FCH;
+
 
 % rBPM - BPMs for FOFB
 idx = [];
@@ -259,7 +278,8 @@ data.QSS.ATIndex = data.QSS.ATIndex';
 
 
 % QS - skew quad correctors (All)
-fcq_skew = data.FCQ.ATIndex(2:2:end); % remove from the odd Secs.
+% fcq_skew = data.FCQ.ATIndex(2:2:end); % remove from the odd Secs.
+fcq_skew = data.FCQ.ATIndex(:);
 idx = [data.QSS.ATIndex; fcq_skew];
 idx = sort(idx);
 data.QS.ATIndex = reshape(idx,data.QS.nr_segs,[]);
@@ -287,7 +307,8 @@ data.QN.ATIndex = data.QN.ATIndex';
 % sbs - sextupoles knobs for optics correction
 idx = [];
 idx = [idx; data.SDA0.ATIndex];
-idx = [idx; data.SDB0.ATIndex];
+idx = [idx; data.SDB0.ATIndex];git status
+
 idx = [idx; data.SDP0.ATIndex];
 idx = [idx; data.SDA1.ATIndex];
 idx = [idx; data.SDB1.ATIndex];
