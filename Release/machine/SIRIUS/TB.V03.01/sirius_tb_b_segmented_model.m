@@ -34,17 +34,15 @@ segmodel = [ ...
 
 ];
  
-
- 
 % converts deflection angle from degress to radians and sets correct positive or negative sign
 segmodel(:,3) = sign * segmodel(:,3) * (pi/180.0);
 
 % inverts odd-order polynomB, if sign=-1 (for the negative dipole)
-if sign ~= 1
-    for i=1:length(monomials)
-        segmodel(:,3+i) = segmodel(:,3+i) * sign ^ monomials(i);
-    end
-end
+% if sign ~= 1
+%     for i=1:length(monomials)
+%         segmodel(:,3+i) = segmodel(:,3+i) * sign ^ monomials(i);
+%     end
+% end
 
 % turns deflection angle error off (convenient for having a nominal model with zero 4d closed orbit)
 segmodel(:,4) = 0;

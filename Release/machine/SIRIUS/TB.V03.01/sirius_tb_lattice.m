@@ -113,9 +113,9 @@ ch   = sextupole ('CH', corr_length, 0.0, sext_pass_method);
 cv   = sextupole ('CV', corr_length, 0.0, sext_pass_method);
 
 % --- quadrupoles ---
-qf2L  = quadrupole('QF2L',  0.05, qf2L_strength, quad_pass_method);   % LINAC TRIPLET
-qd2L  = quadrupole('QD2L',  0.10, qd2L_strength, quad_pass_method);   % LINAC TRIPLET
-qf3L  = quadrupole('QF3L',  0.05, qf3L_strength, quad_pass_method);   % LINAC QUADRUPOLE
+qf2L  = quadrupole('QF2L',  0.112, qf2L_strength, quad_pass_method);   % LINAC TRIPLET
+qd2L  = quadrupole('QD2L',  0.162, qd2L_strength, quad_pass_method);   % LINAC TRIPLET
+qf3L  = quadrupole('QF3L',  0.112, qf3L_strength, quad_pass_method);   % LINAC QUADRUPOLE
 
 qd1   = quadrupole('QD1',   0.10, qd1_strength,  quad_pass_method);
 qf1   = quadrupole('QF1',   0.10, qf1_strength,  quad_pass_method);
@@ -144,7 +144,6 @@ spec   = [spech, spech];
 
 [bp, ~] = sirius_tb_b_segmented_model(energy, 'B', bend_pass_method, +1.0);
 [bn, ~] = sirius_tb_b_segmented_model(energy, 'B', bend_pass_method, -1.0);
-
 
 % % -- bn --
 % dip_nam =  'B';
@@ -181,20 +180,20 @@ septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consiste
 
 
 %% % --- lines ---
-s00_1  = [l100, l10, l5, qf2L, l100, qd2L, l100, qf2L, l100, qf3L];
-s00_2  = [l100, l10, l8, bpm, l200, l40, l6, ict, l200, l100, l90, l5];
+s00_1  = [l80, l4, qf2L, l30, l8, qd2L, l30, l8, qf2L, l30, l8, qf3L];
+s00_2  = [l80, l7, bpm, l200, l40, l6, ict, l200, l100, l90, l5];
 s01_1  = [l200, l200, l200, l80, l4, lp2, scrn, l100, l40, lp2, bpm, l100, l2, lp4];
-s01_2  = [l100, l20, l9, lp4, ch, cv, l200, l100, l40, l4, lp2];
-s01_3  = [l200, l200, l200, l200, l200, l30, l2, slith, l100, l80, scrn, l100, l40, bpm, l200, l40, ch, cv, l200, l30, l4, lp3, slitv, l200, l100];
-s02_1  = [l200, l80, l4, ict, l200, l200, l200, l10, l6];
+s01_2  = [l100, l20, l9, lp4, ch, cv, l200, l100, l30, l2, lp2];
+s01_3  = [l200, l200, l200, l200, l200, l40, l4, slith, l100, l80, scrn, l100, l40, bpm, l200, l40, ch, cv, l200, l30, l4, lp3, slitv, l200, l10, lp4];
+s02_1  = [l100, l90, l4, lp4, ict, l200, l200, l200, l10, l6];
 s02_2  = [l200, l70];
 s02_3  = [l200, scrn, l100, l40, bpm, l100, l10, ch, cv, repmat(l200,1,27), l10, l4];
 s02_4  = [l200, l70];
-s02_5  = [l200, scrn, l100, l40, bpm, l100, l9, lp5, ch, cv, l200, l200, l50, lp3];
-s03_1  = [repmat(l200,1,11), l80, l9, lp2];
-s03_2  = [l200, l20];
-s03_3  = [l80, l6, bpm, l100, l40, l4, scrn, l200, l100];
-s04_1  = [l200, l200, l3, ch, cv, l200, l200, l200, l20, l1, lp5, fct, l100, l40, ict, l200, l100, l5, lp7, bpm, l100, l10, l5, lp6];
+s02_5  = [l200, scrn, l100, l40, bpm, l100, l9, lp5, ch, cv, l200, l100, l60, lp7];
+s03_1  = [repmat(l200,1,10), l100, l90, l9, lp6];
+s03_2  = [l200, l6];
+s03_3  = [l100, bpm, l100, l40, l4, scrn, l200, l10, lp4];
+s04_1  = [l200, l100, l10, l3, lp4, ch, cv, l200, l200, l200, l20, l1, lp5, fct, l100, l40, ict, l200, l100, l5, lp7, bpm, l100, l10, l5, lp6];
 s04_2  = [l200, l10, l6];
 s04_3  = [l100, l70, scrn, l100, l2, lp2, cv, l100, l20, l7, lp6];
 
