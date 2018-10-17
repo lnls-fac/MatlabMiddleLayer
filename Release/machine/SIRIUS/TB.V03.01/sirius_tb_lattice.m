@@ -52,7 +52,7 @@ bend_pass_method = 'BndMPoleSymplectic4Pass';
 quad_pass_method = 'StrMPoleSymplectic4Pass';
 sext_pass_method = 'StrMPoleSymplectic4Pass';
 
-corr_length = 0.07;
+corr_length = 0.082;
 
 %% elements
 %  ========
@@ -109,8 +109,7 @@ fct      = marker('FCT',  'IdentityPass');
 bpm      = marker('BPM', 'IdentityPass');
 
 % --- correctors ---
-ch   = sextupole ('CH', corr_length, 0.0, sext_pass_method);
-cv   = sextupole ('CV', corr_length, 0.0, sext_pass_method);
+chv   = sextupole ('CHV', corr_length, 0.0, sext_pass_method);
 
 % --- quadrupoles ---
 qf2L  = quadrupole('QF2L',  0.112, qf2L_strength, quad_pass_method);   % LINAC TRIPLET
@@ -178,24 +177,23 @@ bseptin = marker('bInjS','IdentityPass');
 eseptin = marker('eInjS','IdentityPass');
 septin  = [bseptin, septine, septins,eseptin]; % excluded ch to make it consistent with other codes. the corrector can be implemented in the polynomB.
 
-
 %% % --- lines ---
 s00_1  = [l80, l4, qf2L, l30, l8, qd2L, l30, l8, qf2L, l30, l8, qf3L];
 s00_2  = [l80, l7, bpm, l200, l40, l6, ict, l200, l100, l90, l5];
 s01_1  = [l200, l200, l200, l80, l4, lp2, scrn, l100, l40, lp2, bpm, l100, l2, lp4];
-s01_2  = [l100, l20, l9, lp4, ch, cv, l200, l100, l30, l2, lp2];
-s01_3  = [l200, l200, l200, l200, l200, l40, l4, slith, l100, l80, scrn, l100, l40, bpm, l200, l40, ch, cv, l200, l30, l4, lp3, slitv, l200, l10, lp4];
+s01_2  = [l80, l8, lp4, chv, l200, l90, l1, lp2];
+s01_3  = [l200, l200, l200, l200, l200, l40, l4, slith, l100, l80, scrn, l100, l40, bpm, l100, l90, l9, chv, l100, l90, l3, lp3, slitv, l200, l10, lp4];
 s02_1  = [l100, l90, l4, lp4, ict, l200, l200, l200, l10, l6];
 s02_2  = [l200, l70];
-s02_3  = [l200, scrn, l100, l40, bpm, l100, l10, ch, cv, repmat(l200,1,27), l10, l4];
+s02_3  = [l200, scrn, l100, l40, bpm, l60, l9, chv, repmat(l200,1,26), l100, l70, l3];
 s02_4  = [l200, l70];
-s02_5  = [l200, scrn, l100, l40, bpm, l100, l9, lp5, ch, cv, l200, l100, l60, lp7];
+s02_5  = [l200, scrn, l100, l40, bpm, l60, l8, lp5, chv, l200, l100, l10, l9, lp7];
 s03_1  = [repmat(l200,1,10), l100, l90, l9, lp6];
 s03_2  = [l200, l6];
 s03_3  = [l100, bpm, l100, l40, l4, scrn, l200, l10, lp4];
-s04_1  = [l200, l100, l10, l3, lp4, ch, cv, l200, l200, l200, l20, l1, lp5, fct, l100, l40, ict, l200, l100, l5, lp7, bpm, l100, l10, l5, lp6];
+s04_1  = [l200, l70, l2, lp4, chv, l200, l200, l100, l80, lp5, fct, l100, l40, ict, l200, l100, l5, lp7, bpm, l100, l10, l5, lp6];
 s04_2  = [l200, l10, l6];
-s04_3  = [l100, l70, scrn, l100, l2, lp2, cv, l100, l20, l7, lp6];
+s04_3  = [l100, l70, scrn, l60, l1, lp2, chv, l80, l6, lp6];
 
 sector00 = [s00_1, s00_2, spec];
 sector01 = [s01_1, qd1,  s01_2, qf1,  s01_3, bn];
@@ -203,11 +201,9 @@ sector02 = [s02_1, qd2a, s02_2, qf2a, s02_3, qf2b, s02_4, qd2b, s02_5, bp];
 sector03 = [s03_1, qf3,  s03_2, qd3,  s03_3, bp];
 sector04 = [s04_1, qf4,  s04_2, qd4,  s04_3, septin];
 
-
 %% TB beamline 
-ltlb  = [inicio, sector01, sector02, sector03, sector04, fim];
+ltlb  = [inicio, sector00, sector01, sector02, sector03, sector04, fim];
 elist = ltlb;
-
 
 %% finalization
 the_line = buildlat(elist);
@@ -228,7 +224,6 @@ the_line = set_num_integ_steps(the_line);
 
 % Define Camara de Vacuo
 the_line = set_vacuum_chamber(the_line);
-
 
 % pre-carrega passmethods de forma a evitar problema com bibliotecas recem-compiladas
 % lnls_preload_passmethods;
