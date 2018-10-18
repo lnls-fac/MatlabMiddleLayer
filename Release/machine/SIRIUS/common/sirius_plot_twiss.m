@@ -98,7 +98,7 @@ if junto
     plot(twiss.pos(ini:fim),10*twiss.etax(ini:fim),'LineWidth',LnWd,'Color',DxCl);
 
     legend({'\beta_x','\beta_y', '\eta_x'},'Location','northwest','Box','off',...
-           'Color','none','XColor','w','YColor','w');
+           'Color','none');
     
     %Creat grid
     grid(ax1,'on');
