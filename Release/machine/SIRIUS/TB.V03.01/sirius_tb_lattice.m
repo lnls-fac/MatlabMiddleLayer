@@ -13,8 +13,8 @@ function [r, lattice_title, IniCond] = sirius_tb_lattice(varargin)
 % [ring, ~, tw0] = sirius_tb_lattice();
 % global THERING;
 % TD = twissline(ring,0,tw0,1:length(ring)+1);
-% BETA = cat(1,r.beta);
-% S = cat(1,r.SPos);
+% BETA = cat(1,TD.beta);
+% S = cat(1,TD.SPos);
 % plot(S,BETA(:,1))
 % plot(S,BETA(:,2))
 
@@ -145,27 +145,6 @@ spec   = [spech, spech];
 [bp, ~] = sirius_tb_b_segmented_model(energy, 'B', bend_pass_method, +1.0);
 [bn, ~] = sirius_tb_b_segmented_model(energy, 'B', bend_pass_method, -1.0);
 
-% % -- bn --
-% dip_nam =  'B';
-% dip_len =  0.300858;
-% dip_ang =  -15 * deg_2_rad;
-% dip_K   =  0.0;
-% dip_S   =  0.00;
-% bne     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-% bns     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-% bn      = [bne, bns];
-% 
-% % -- bp --
-% dip_nam =  'B';
-% dip_len =  0.300858;
-% dip_ang =  15 * deg_2_rad;
-% dip_K   =  0.0;
-% dip_S   =  0.00;
-% bpe     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-% bps     = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-% bp      = [bpe, bps];
-
-
 % -- bo injection septum --
 dip_nam =  'InjSept';
 dip_len =  0.50;
@@ -229,6 +208,8 @@ the_line = set_num_integ_steps(the_line);
 % Define Camara de Vacuo
 the_line = set_vacuum_chamber(the_line);
 
+% use models built from measurement data
+the_line = sirius_tb_models_from_measurements(the_line);
 
 % pre-carrega passmethods de forma a evitar problema com bibliotecas recem-compiladas
 % lnls_preload_passmethods;
