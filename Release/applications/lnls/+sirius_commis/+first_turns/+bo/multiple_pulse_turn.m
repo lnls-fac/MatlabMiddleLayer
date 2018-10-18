@@ -37,7 +37,11 @@ for i = 1:n_pulse
     fprintf('======================= \n');
     fprintf('Pulse number %i \n', i);
     fprintf('======================= \n');
-    [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :)] = sirius_commis.first_turns.bo.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns);
+    if i == 1
+        [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :)] = sirius_commis.first_turns.bo.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, n_turns);
+    else
+        [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :)] = sirius_commis.first_turns.bo.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, count_turns(i-1, :));
+    end
 end
 
 r_bpm = squeeze(mean(r_bpm_turns, 1));
