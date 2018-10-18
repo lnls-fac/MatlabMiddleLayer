@@ -26,10 +26,11 @@ function [param_errors, param] = add_errors(param)
     param_errors.delta_error_sist = 5e-2; 
     param.delta_sist = param.delta0 + param_errors.delta_error_sist;
     param_errors.delta_error_pulse = 3e-3;
-     
+    
     param_errors.sigma_bpm = 3e-3;
     param_errors.sigma_scrn = 0.5e-3;
     param_errors.cutoff = 1;
+    param_errors.phase_offset = 0;
     
     param.kckr_init = param.kckr_sist;
     param.xl_sept_init = param.offset_xl_sist;

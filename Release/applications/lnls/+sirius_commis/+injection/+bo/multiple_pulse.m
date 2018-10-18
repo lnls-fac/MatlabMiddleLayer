@@ -32,11 +32,13 @@ function [eff, r_scrn, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine,
 % Version 1 - Murilo B. Alves - October 4th, 2018.
 
 injkckr = findcells(machine, 'FamName', 'InjKckr');
+bpm = findcells(machine, 'FamName', 'BPM');
+l_bpm = length(bpm);
 eff = zeros(1, n_pulse);
 sigma_scrn = zeros(n_pulse, 2);
-sigma_bpm = zeros(n_pulse, 2, 50);
+sigma_bpm = zeros(n_pulse, 2, l_bpm);
 r_pulse = zeros(n_pulse, 2, point);
-r_diag_bpm = zeros(n_pulse, 2, 50);
+r_diag_bpm = zeros(n_pulse, 2, l_bpm);
 r_end = zeros(n_pulse, 6, n_part);
 if(exist('kckr','var'))
     if(strcmp(kckr,'on'))
@@ -89,11 +91,12 @@ for j=1:n_pulse
 
     error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
     param.delta = param.delta_sist + error_delta_pulse;
+    
+    param.phase = param_errors.phase_offset;
 
     if flag_diag        
         [r_xy, r_end_part, r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
         r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
-        bpm = findcells(machine, 'FamName', 'BPM');
         [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param_errors.sigma_bpm);
     else
         [r_xy, r_end_part] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
@@ -127,7 +130,7 @@ r_scrn = r_pulse(:, :, point);
 r_scrn = r_scrn + sigma_scrn;
 r_scrn = sirius_commis.common.compares_vchamb(machine, r_scrn, point, 'screen');
 r_scrn = squeeze(nanmean(r_scrn, 1));
-r_end = squeeze(r_end(end, :, :));
+r_end = squeeze(r_end);
 
 if flag_diag
     r_diag_bpm = r_diag_bpm + sigma_bpm;

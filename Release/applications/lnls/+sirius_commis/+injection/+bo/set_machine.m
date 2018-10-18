@@ -1,4 +1,4 @@
-function [machine, param] = set_machine(bo_ring, n_mach)
+function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
 % Setting of random machines and nominal injection parameters (without errors).
 % It includes random errors of excitation and alignment of magnets and also
 % adjustes the vacuum chamber at injection point (injection septum).
@@ -83,6 +83,8 @@ function [machine, param] = set_machine(bo_ring, n_mach)
     family_data = sirius_bo_family_data(machine);
     machine  = create_apply_errors(machine, family_data, n_mach);
     machine  = create_apply_multipoles(machine, family_data);
+    
+    [param_errors, param] = sirius_commis.injection.bo.add_errors(param);
        
     function machine = vchamber_injection(machine)
         %Values of vacuum chamber radius in horizontal plane at the end of

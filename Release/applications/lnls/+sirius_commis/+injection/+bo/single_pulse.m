@@ -27,7 +27,7 @@ function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-    offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta; 0];
+    offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta; param.phase];
        
     twi.betax = param.twiss.betax0; twi.alphax = param.twiss.alphax0;
     twi.betay = param.twiss.betay0; twi.alphay = param.twiss.alphay0;
@@ -35,19 +35,31 @@ function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
     twi.etay = param.twiss.etay0;   twi.etayl = param.twiss.etayl0;
     cutoff = 3;
     
-    r_init = lnls_generate_bunch(param.beam.emitx, param.beam.emity, param.beam.sigmae, param.beam.sigmaz, twi, n_part, cutoff);
-    r_init = bsxfun(@plus, r_init, offsets);
+    if n_part > 1
+        r_init = lnls_generate_bunch(param.beam.emitx, param.beam.emity, param.beam.sigmae, param.beam.sigmaz, twi, n_part, cutoff);
+        r_init = bsxfun(@plus, r_init, offsets);
+    elseif n_part
+        r_init = offsets;       
+    end
+    
     r_init(5, :) = (r_init(5, :) - param.delta_ave) / (1 + param.delta_ave);
-    r_final = linepass(machine(1:point), r_init, 1:point);    
+    r_final = linepass(machine(1:point), r_init, 1:point);
     r_final = reshape(r_final, 6, [], point);
-
     r_xy = sirius_commis.common.compares_vchamb(machine, r_final([1,3], :, :), 1:point);
     r_final([1,3], :, :) = r_xy;
     r_end_ring = squeeze(r_final(:, :, end));
     
     
+%         r_cent_init = squeeze(mean(r_init, 2));
+%         r_cent_final = linepass(machine(1:point), r_cent_init, 1:point);
+%         r_cent_final = reshape(r_cent_final, 6, [], point);
+%         r_xy = sirius_commis.common.compares_vchamb(machine, r_cent_final([1,3], :, :), 1:point);
+%         r_cent_final([1,3], :, :) = r_xy;
+%         r_cent_final = squeeze(r_cent_final(:, :, end));
+%         r_end_ring = r_cent_final;   
+    
     if point == length(machine)
         bpm = findcells(machine, 'FamName', 'BPM');
-        r_bpm = r_xy(:, :, bpm);
+        r_bpm = squeeze(r_xy(:, :, bpm));
     end
 end
