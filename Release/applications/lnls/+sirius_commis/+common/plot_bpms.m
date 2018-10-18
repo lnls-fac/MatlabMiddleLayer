@@ -53,5 +53,5 @@ function plot_bpms(machine, orbit, r_bpm, int_bpm)
     grid(ax1, 'on');
     grid(ax2, 'on');
     grid(ax3, 'on');
-    drawnow;
+    drawnow();
 end

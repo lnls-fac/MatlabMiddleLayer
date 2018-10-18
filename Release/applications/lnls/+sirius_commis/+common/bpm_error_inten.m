@@ -1,4 +1,4 @@
-function [sigma_bpm, int_bpm] = bpm_error_inten(r_xy, n_part, sigma_bpm0) 
+function [sigma_bpm, int_bpm] = bpm_error_inten(r_xy, n_part, sigma_bpm0)
 % Estimative of BPM errors by the intensity of beam (resolution is a linear
 % function of charge)
 %
@@ -16,8 +16,9 @@ function [sigma_bpm, int_bpm] = bpm_error_inten(r_xy, n_part, sigma_bpm0)
     Rate = sirius_commis.common.calc_eff(n_part, r_xy(1, :, :));
     sigma = ( sigma_bpm0 ./ Rate )';
     sigma(isinf(sigma)) = NaN;
-    sigma_bpm_x = lnls_generate_random_numbers(1, length(sigma), 'norm') .* sigma;   
-    sigma_bpm_y = lnls_generate_random_numbers(1, length(sigma), 'norm') .* sigma;
+    cutoff = 1;
+    sigma_bpm_x = lnls_generate_random_numbers(1, length(sigma), 'norm', cutoff) .* sigma;
+    sigma_bpm_y = lnls_generate_random_numbers(1, length(sigma), 'norm', cutoff) .* sigma;
     sigma_bpm = [sigma_bpm_x; sigma_bpm_y];
     int_bpm = Rate;
 end
