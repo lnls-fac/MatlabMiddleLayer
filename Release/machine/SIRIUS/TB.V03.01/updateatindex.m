@@ -150,7 +150,7 @@ end
 try
     % CH
     AO.CH.AT.ATType = 'HCM';
-    li = Indices.CH;
+    li = Indices.CHV(1:end-1);
     AO.CH.AT.ATIndex = buildatindex(AO.CH.FamilyName, li);
     AO.CH.Position = findspos(THERING, AO.CH.AT.ATIndex(:,1))';   
 catch
@@ -161,7 +161,7 @@ end
 try
     % CV
     AO.CV.AT.ATType = 'VCM';
-    li = Indices.CV;
+    li = Indices.CHV;
     AO.CV.AT.ATIndex = buildatindex(AO.CV.FamilyName, li);
     AO.CV.Position = findspos(THERING, AO.CV.AT.ATIndex(:,1))';   
 catch
