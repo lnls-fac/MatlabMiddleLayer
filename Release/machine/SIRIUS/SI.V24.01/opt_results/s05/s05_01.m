@@ -4,19 +4,33 @@
 
 % QUADRUPOLES
 % ===========
-QDA_strength  = -1.62140504231570;
-QFA_strength  = +3.57312866860243;
-QDB1_strength = -2.00609666472002;
-QDB2_strength = -3.41636329298560;
-QFB_strength  = +4.11468361390900;
-QDP1_strength = -2.00623004208620;
-QDP2_strength = -3.41638667777796;
-QFP_strength  = +4.11474509619435;
+QDA_strength  = -1.621574685852;
+QFA_strength  = +3.574634812728;
+QDB1_strength = -2.005392473335;
+QDB2_strength = -3.45470048266;
+QFB_strength  = +4.123901002989;
+QDP1_strength = -2.005392473335;
+QDP2_strength = -3.45470048266;
+QFP_strength  = +4.123901002989;
 
-Q1_strength   = +2.81580602167;
-Q2_strength   = +4.342314688125;
-Q3_strength   = +3.235627121213;
-Q4_strength   = +3.933913571031;
+Q1_strength   = +2.854911490368;
+Q2_strength   = +4.31450810756;
+Q3_strength   = +3.220001904023;
+Q4_strength   = +3.946533831532;
+
+% QDA_strength  = -1.62140504231570;
+% QFA_strength  = +3.57312866860243;
+% QDB1_strength = -2.00609666472002;
+% QDB2_strength = -3.41636329298560;
+% QFB_strength  = +4.11468361390900;
+% QDP1_strength = -2.00623004208620;
+% QDP2_strength = -3.41638667777796;
+% QFP_strength  = +4.11474509619435;
+
+% Q1_strength   = +2.81580602167;
+% Q2_strength   = +4.342314688125;
+% Q3_strength   = +3.235627121213;
+% Q4_strength   = +3.933913571031;
 
 % SEXTUPOLES
 % ==========
