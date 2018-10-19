@@ -307,8 +307,7 @@ data.QN.ATIndex = data.QN.ATIndex';
 % sbs - sextupoles knobs for optics correction
 idx = [];
 idx = [idx; data.SDA0.ATIndex];
-idx = [idx; data.SDB0.ATIndex];git status
-
+idx = [idx; data.SDB0.ATIndex];
 idx = [idx; data.SDP0.ATIndex];
 idx = [idx; data.SDA1.ATIndex];
 idx = [idx; data.SDB1.ATIndex];
