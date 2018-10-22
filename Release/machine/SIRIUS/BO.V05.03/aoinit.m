@@ -10,7 +10,7 @@ if exist(Directory, 'dir')
 end
     
 % set operational mode to low energy by default.
-OperationalMode = 2;
+OperationalMode = 1;
 
 sirius_bo_init;
 setoperationalmode(OperationalMode);
