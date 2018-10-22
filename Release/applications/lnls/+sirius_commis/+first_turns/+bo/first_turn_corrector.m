@@ -1,4 +1,4 @@
-function [machine_cell, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = first_turn_corrector(machine, n_mach, param, param_errors, M_acc, n_part, n_pulse, method)
+function [machine_cell, r_bpm_mach, gr_mach_x, gr_mach_y] = first_turn_corrector(machine, n_mach, param, param_errors, M_acc, n_part, n_pulse, r_bpm, int_bpm, method)
 
 % sirius_commis.common.initializations()
 
@@ -15,15 +15,27 @@ end
 if n_mach == 1
     machine_cell = {machine};
     param_cell = {param};
+    fam = sirius_bo_family_data(machine);
 elseif n_mach > 1
     machine_cell = machine;
     param_cell = param;
-end        
+    fam = sirius_bo_family_data(machine{1});
+end
 
-rms_orbit_bpm = zeros(n_mach, 2);
-max_orbit_bpm = zeros(n_mach, 2);
-theta_x = cell(n_mach, 1);
-theta_y = cell(n_mach, 1);
+bpm = fam.BPM.ATIndex;
+ch = fam.CH.ATIndex;
+cv = fam.CV.ATIndex;
+
+if ~exist('r_bpm', 'var') && ~exist('int_bpm', 'var')
+    no_bpm = true;
+else
+    no_bpm = false;
+end
+% rms_orbit_bpm = zeros(n_mach, 2);
+% max_orbit_bpm = zeros(n_mach, 2);
+r_bpm_mach = zeros(n_mach, 2, length(bpm));
+gr_mach_x = zeros(n_mach, length(ch));
+gr_mach_y = zeros(n_mach, length(cv));
 
 for j = 1:n_mach
     % fprintf('=================================================\n');
@@ -33,10 +45,13 @@ for j = 1:n_mach
     param = param_cell{j};
     
     if flag_tl
-        [machine_cell{j}, theta_x{j}, theta_y{j}, rms_orbit_bpm(j, :), max_orbit_bpm(j, :)] = sirius_commis.first_turns.bo.correct_orbit_bpm_tl(machine, param, param_errors, M_acc, n_part, n_pulse);
+        [machine_cell{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.bo.correct_orbit_bpm_tl(machine, param, param_errors, M_acc, n_part, n_pulse);
     else
-        [machine_cell{j}, theta_x{j}, theta_y{j}, rms_orbit_bpm(j, :), max_orbit_bpm(j, :)] = sirius_commis.first_turns.bo.correct_orbit_bpm_matrix(machine, param, param_errors, M_acc, n_part, n_pulse);
-        % [machine_cell{j}, theta_x{j}, theta_y{j}, rms_orbit_bpm(j, :), max_orbit_bpm(j, :)] = sirius_commis.first_turns.bo.correct_orbit_bpm_respm(machine, param, M_acc, n_part, n_pulse);
+        if no_bpm
+            [machine_cell{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.bo.correct_orbit_bpm_matrix(machine, param, param_errors, M_acc, n_part, n_pulse);
+        else
+            [machine_cell{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.bo.correct_orbit_bpm_matrix(machine, param, param_errors, M_acc, n_part, n_pulse, r_bpm, int_bpm);
+        end
     end
 end
 end

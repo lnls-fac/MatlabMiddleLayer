@@ -1,4 +1,4 @@
-function [r_xy, VChamb] = compares_vchamb(machine, r_xy, points, diag)
+function [r_xy, VChamb, ind_sum] = compares_vchamb(machine, r_xy, points, diag)
 % Compares the x and y position of particles with vacuum chamber in the
 % specified points. If the position is greater than the vacuum chamber, the
 % value of position is set as NaN (particles are considered lost if its
@@ -31,6 +31,7 @@ if ~exist('diag', 'var')
     ind(2, :, :) = or;
     ind_sum = cumsum(ind, 3);
     r_xy(ind_sum >= 1) = NaN;
+    ind_sum = repmat(ind_sum, 3, 1);
 elseif strcmp(diag, 'screen')
     ind = bsxfun(@gt, abs(r_xy), VChamb');
     if ~isempty(r_xy(ind))
