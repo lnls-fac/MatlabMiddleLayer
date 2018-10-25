@@ -133,8 +133,9 @@ the_ring = the_ring0;
 function the_ring = correct_optics(the_ring0)
 
 % goal tunes ans chroms as calculated with calctwiss, not atsummary!
-goal_tunes = [49.09624, 14.15188];
-goal_chrom = [2.58, 2.50];
+goal_tunes = [49.096188917357331,  14.151971558423915];
+goal_chrom = [2.549478494984214, 2.527086095938103];
+
 the_ring = the_ring0;
 
 fams_chrom = {'SDA1', 'SDA2', 'SDA3', 'SFA1', 'SFA2', ...
@@ -144,10 +145,10 @@ fams_tunes = {'QDA','QFA','QDB1','QDB2','QFB','QDP1','QDP2','QFP'};
 
 tw1 = calctwiss(the_ring);
 corrected = false;
-while any(abs([tw1.mux(end), tw1.muy(end)]/2/pi - goal_tunes) > 0.00001) || any(abs([tw1.chromx, tw1.chromy] - goal_chrom) > 0.04)
+while any(abs([tw1.mux(end), tw1.muy(end)]/2/pi - goal_tunes) > 0.0001) || any(abs([tw1.chromx, tw1.chromy] - goal_chrom) > 0.01)
     corrected = true;
     the_ring = lnls_correct_chrom(the_ring, goal_chrom, fams_chrom);
-    [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, fams_tunes, 'svd', 'add', 10, 1e-9);
+%     [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, fams_tunes, 'svd', 'add', 10, 1e-9);
     tw1 = calctwiss(the_ring);
 end
 
