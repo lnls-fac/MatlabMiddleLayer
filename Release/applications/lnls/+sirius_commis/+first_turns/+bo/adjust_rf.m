@@ -1,104 +1,209 @@
-function [r_6d_cent, r_bpm_turns] = adjust_rf(machine, param, param_errors, n_part, n_turns)
+function [ph_lag_new, f_new, df_erro, r6d] = adjust_rf(machine, param, param_errors, n_part, n_turns, n)
 
     sirius_commis.common.initializations();
 
     machine = setcavity('on', machine);
     machine = setradiation('on', machine);
-    eff_lim = 0.5;
-    n_iter = 5;
-    % alpha = 0.000721025937429492;
+    param.beam.sigmae = param.beam.sigmae/2;
+    param.beam.sigmaz = 3e-3;
+    param_errors.phase_sist = 23e-2;
+    param.phase_sist = param_errors.phase_sist;
+    lambda_rf = 0.6;
     
+    % figure;
     cavity_ind = findcells(machine, 'Frequency');
     cavity = machine{cavity_ind};
-    V0 = cavity.Voltage;    
-    machine{cavity_ind}.Voltage = V0; % 1e5;
-    
+    V0 = cavity.Voltage;
+    p_i = 3;
+    machine{cavity_ind}.Voltage = p_i * V0;
+
     f_rf0 = cavity.Frequency;
-    error = 5e-5; % THIS ERROR CORRESPONDS TO A BOOSTER LENGTH ERROR OF --mm
-    f_rf = f_rf0 * (1 + error);
+    error = 5e-6; % THIS ERROR CORRESPONDS TO A BOOSTER LENGTH ERROR OF 2.5mm
+    df_erro = error * f_rf0;
+    f_rf = f_rf0 + df_erro;
+    alpha = 7.21025937429492e-4;
+    de = - 1 / alpha * error;
     machine{cavity_ind}.Frequency = f_rf;
-    
-    injkckr = findcells(machine, 'FamName', 'InjKckr');
-    bpm = findcells(machine, 'FamName', 'BPM');
-    
-    r_init = zeros(n_iter, n_turns, 6, n_part);
-    RBPM = zeros(n_turns, 2, size(bpm, 2));
-    
-    error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
-    param.offset_x = param.offset_x_sist + error_x_pulse;
 
-    error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
-    param.offset_xl = param.offset_xl_sist + error_xl_pulse;
-    % Peak to Peak values from measurements - cutoff = 1;
+    ph_lag_old = 0;
+    ph_lag_new = 1;
 
-    error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
-    param.kckr = param.kckr_sist + error_kckr_pulse;
-    % machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
-    
-    error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
-    param.delta = param.delta_sist + error_delta_pulse;
-    
-    error_jitter = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * 3e-2;    
-    error_phase_sist = 0*5e-2; % param_errors.phase_offset;
-    
-    param.phase = error_phase_sist + 0 * error_jitter;
-    % count_turns = 1;
-    
-%     while count_turns < n_turns
-for j = 1:n_iter
-        machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - f_rf0 * 1e-5;
-%         z = 1e-2;
-%         phi = 360/0.6 * z;
-%         machine{cavity_ind}.PhaseLag = machine{cavity_ind}.PhaseLag + phi;
-
-        machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
-
-        [~, r_init(j, 1, :, :), r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, length(machine));
-
-        if n_part == 1
-            RBPM(1, :, :) = r_bpm;
-        else
-            RBPM(1, :, :) = squeeze(nanmean(r_bpm, 2));
-        end
-
-        machine = lnls_set_kickangle(machine, 0, injkckr, 'x');
-
-        [sigma_bpm, int_bpm] = sirius_commis.common.bpm_error_inten(RBPM(1, :, :), 1, param_errors.sigma_bpm);
-        r_bpm = squeeze(RBPM(1, :, :)) + sigma_bpm;
-        orbit0 = findorbit6(machine, 1:size(machine, 2));
-        % orbit0 = findorbit4(machine, 0, 1:size(machine, 2));
-        param.orbit = orbit0;
-        sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
-
-        count_turns = 1;
-        fprintf('Turn number 1 \n');
+    while ph_lag_new ~= ph_lag_old
         
-        for i = 1:n_turns-1
-            [r_init(j, i+1, :, :), eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init(j, i, :, :), i+1, 'bpm', param, param_errors);
-
-            if n_part
-                RBPM(i+1, :, :) = r_bpm;
-            else
-                RBPM(i+1, :, :) = squeeze(nanmean(r_bpm, 2));
-            end
-
-            if eff < eff_lim
-                r_bpm_turns = squeeze(nansum(RBPM, 1) / count_turns);figure; plot(r6d(:, 6), r6d(:, 5)); grid on;
-                sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm_turns, int_bpm);
-                break
-            end
-
-            count_turns = count_turns + 1;
+        if ph_lag_new == 1
+            fprintf('VARREDURA NA FASE DE RF \n');
+            [~, ~, ~, ~, ~, ph_max] = test(machine, param, param_errors, n_part, n_turns, n);
+            ph_lag_old = 2 * pi * ph_max / n;
+        else
+            ph_lag_old = ph_lag_new;
         end
+            
+        machine{cavity_ind}.Voltage = machine{cavity_ind}.Voltage / p_i;
+
+
+        fact_old = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
+
+        fact_new = fact_old;
+
+        n_change = 0;
+        freq_pass = 0.5e3;
+        p = 1;
+
+        while fact_new >= fact_old
+            fprintf('MUDANDO FREQUENCIA DE RF \n');
+
+            fact_old = fact_new;
+
+            machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency + (-1)^p * freq_pass;
+
+            fact_new = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
+            df_found = machine{cavity_ind}.Frequency - f_rf;
+            fprintf('DELTA DE FREQUÊNCIA: %f kHz \n', df_found * 1e-3);
+            
+            n_change = n_change + 1;
+
+            if fact_new < fact_old && n_change == 1
+                machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(freq_pass);
+                p = 0;
+                fact_new = fact_old;
+                n_change = 0;
+            end
+
+        end
+
+        machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(freq_pass);
+        
+        machine{cavity_ind}.Voltage = p_i * V0;
+        
+        fprintf('VARREDURA NA FASE DE RF \n');        
+        [~, r6d, ~, ~, ~, ph_max2] = test(machine, param, param_errors, n_part, n_turns, n);
+        
+        ph_lag_new = 2 * pi * ph_max2 / n ;
+    end
+    
+    machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(freq_pass);
+    f_new = machine{cavity_ind}.Frequency;
+    df_found = f_new - f_rf; % n_change * freq_pass;
+    
+    fprintf('df gerado %f kHz, df aplicado %f kHz, concordancia %f %% \n', df_erro*1e-3, df_found*1e-3, sirius_commis.common.prox_percent(df_erro, df_found));
+    dz_found = ph_lag_new * lambda_rf / 2 / pi;
+    fprintf('dz gerado %f cm, dz aplicado %f cm \n', param_errors.phase_sist*1e2, dz_found * 1e2); %sirius_commis.common.prox_percent(error_phase_sist, dz_found));
 end
-    r_bpm_turns = squeeze(sum(RBPM, 1) / count_turns);
-    r_6d_cent = squeeze(nanmean(r_init, 4));
-    r_6d_cent = r_6d_cent(:, 1:count_turns, :);
-    sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm_turns, int_bpm);
+
+function [fact, r_6d, r_init, r_bpm_turns, phase_max, ph_max] =  test(machine, param, param_errors, n_part, n_turns, n, ph_lag)
+
+        eff_lim = 0.25;
+        lambda_rf = 0.6;
+        
+        if ~exist('ph_lag', 'var')
+            ph_pass = 2 * pi / n;
+        else
+            ph_pass = ph_lag;
+        end
+
+        injkckr = findcells(machine, 'FamName', 'InjKckr');
+        bpm = findcells(machine, 'FamName', 'BPM');
+
+        r_init = zeros(n, n_turns, 6, n_part);
+        RBPM = zeros(n, n_turns, 2, size(bpm, 2));
+        INTBPM = zeros(n, n_turns, size(bpm, 2));
+        r_bpm_turns = zeros(n, 2, size(bpm, 2));
+        fact = zeros(1, n);
+        
+        for m = 1:n
+            
+            cavity_ind = findcells(machine, 'Frequency');
+            machine{cavity_ind}.PhaseLag = m * ph_pass;          
+            
+            error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
+            param.offset_x = param.offset_x_sist + error_x_pulse;
+
+            error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
+            param.offset_xl = param.offset_xl_sist + error_xl_pulse;
+        
+            % Peak to Peak values from measurements - cutoff = 1;
+        
+            error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
+            param.kckr = param.kckr_sist + error_kckr_pulse;
+
+            error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
+            param.delta = param.delta_sist + 0 * error_delta_pulse;
+
+            error_jitter = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * 3e-2;
+            param.phase = param.phase_sist + 0 * error_jitter;
+
+            machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
+
+            [~, r_init(m, 1, :, :), r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, length(machine));
+            eff = sirius_commis.common.calc_eff(n_part, squeeze(r_init(m, 1, :, :)));
+            fact(m) = fact(m) + 1 * eff;
+
+            machine = lnls_set_kickangle(machine, 0, injkckr, 'x');
+
+            [sigma_bpm, int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param_errors.sigma_bpm);
+        
+            if n_part == 1
+                r_bpm = r_bpm + sigma_bpm;
+            else
+                r_bpm = squeeze(nanmean(r_bpm, 2)) + sigma_bpm;
+            end
+
+            orbit0 = findorbit6(machine, 1:size(machine, 2));
+
+            RBPM(m, 1, :, :) = r_bpm;
+            INTBPM(m, 1, :) = int_bpm;
+
+            param.orbit = orbit0;
+            sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
+
+            count_turns = 1;
+            fprintf('Turn number 1 \n');
+
+            for i = 1:n_turns-1
+                [r_init(m, i+1, :, :), eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init(m, i, :, :), i+1, 'bpm', param, param_errors);
+
+                RBPM(m, i+1, :, :) = r_bpm;
+                INTBPM(m, i+1, :) = int_bpm;
+
+                if eff <= eff_lim
+                    r_bpm_turns(m, :, :) = squeeze(nansum(RBPM(m, :, :, :), 2) / count_turns);
+                    sirius_commis.common.plot_bpms(machine, param.orbit, squeeze(r_bpm_turns(m, :, :)), int_bpm);
+                    RBPM(m, :, :, :) = zeros(n_turns, 2, size(bpm, 2));
+                    break
+                end
+                count_turns = count_turns + 1;
+                fact(m) = fact(m) + count_turns * eff;
+            end
+
+            r_bpm_turns(m, :, :) = squeeze(nansum(RBPM(m, :, :, :), 2) / count_turns);
+            sirius_commis.common.plot_bpms(machine, param.orbit, squeeze(r_bpm_turns(m, :, :)), int_bpm);
+
+%             gcf();
+%             plot(squeeze(mean(INTBPM(m, :, :), 3)));
+            INTBPM(m, :, :) = zeros(n_turns, size(bpm, 2));            
+            % fprintf('PHASE: %f cm \n', lambda_rf * m / n * 1e2);
+        end
+        
+    [~, ph_max] = max(fact);
+    phase_max = lambda_rf * ph_max / n;
+    machine{cavity_ind}.PhaseLag = ph_max * ph_pass;
+    r_6d = squeeze(nanmean(r_init(ph_max, 1:count_turns, :, :), 4));
+    r_bpm_turns = squeeze(r_bpm_turns(ph_max, :, :));
+    % figure;
+    % plot(r_6d(:, 6), r_6d(:, 5)); 
 end
     
 function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, turn_n, bpm, param, param_errors)
     r_init = squeeze(r_init);
+    
+    cavity_ind = findcells(machine, 'Frequency');
+    cavity = machine{cavity_ind};    
+    h = cavity.HarmNumber;
+    L0 = findspos(machine,length(machine)+1); % design length [m]
+    C0 = 299792458; % speed of light [m/s]
+    T0 = L0/C0;
+    f_rf = cavity.Frequency;
+    
     if(exist('bpm','var'))
         if(strcmp(bpm,'bpm'))
             flag_bpm = true;
@@ -116,9 +221,9 @@ function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, tu
         r_out = reshape(r_out, 6, size(r_init, 2), size(machine, 2));
     else
         if turn_n == 2
-            r_out = linepass(machine, r_init', 1:size(machine, 2));
+            r_out = linepass(machine, r_init, 1:size(machine, 2));
         else
-            r_out = linepass(machine, r_init', 1:size(machine, 2), 'reuse');
+            r_out = linepass(machine, r_init, 1:size(machine, 2), 'reuse');
         end
         r_out = reshape(r_out, 6, [], size(machine, 2));
     end
@@ -126,8 +231,9 @@ function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, tu
     % r_out([1,3], :, :) = r_out_xy;
     r_out(ind_sum >= 1) = NaN;
     r_init = squeeze(r_out(:, :, end));
+    r_init(6, :) = r_init(6, :) - C0*(h/f_rf - T0);
     loss_ind = ~isnan(r_out(1, :, size(machine, 2)));
-    % r_init = r_init(:, loss_ind);
+   %  r_init = r_init(:, loss_ind, :);
     eff = sirius_commis.common.calc_eff(n_part, r_init);
     
     if n_part ~= 1
@@ -148,4 +254,16 @@ function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, tu
         r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
         sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
     end
+end
+
+function [df, de_f, delta_medio] = energy_bpm(machine, param, r_bpm_turns, f_rf0, df, j, alpha)
+    cavity_ind = findcells(machine, 'Frequency');
+    % sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm_turns, int_bpm);
+    x_bpm = squeeze(r_bpm_turns(1, :));
+    delta_bpm = x_bpm / mean(param.etax_bpms);
+    delta_medio = mean(delta_bpm);
+    ddf = sum(df(1:j-1));
+    df(j) = - alpha * delta_medio * (f_rf0 + ddf);
+    de_f = - 1/alpha * df(j)/machine{cavity_ind}.Frequency;
+    machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - abs(df(j));
 end
