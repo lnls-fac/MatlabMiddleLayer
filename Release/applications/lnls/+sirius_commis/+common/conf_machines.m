@@ -1,4 +1,4 @@
-function conf_machines(param)
+function conf_machines(param, param_errors)
 % Prints a table with comparison between values of systematic errors found
 % by the algorithm of injection adjustment with screens and the systematic
 % errors introduced in the random machines. It also calculates the rms of
@@ -20,6 +20,13 @@ erro_kckr = zero;
 diffx = zero;
 diffy = zero;
 
+gen_en = param_errors.delta_error_sist*100;
+gen_en = repmat(gen_en, 1, length(param));
+gen_xl = param_errors.xl_error_sist;
+gen_xl = repmat(gen_xl, 1, length(param));
+gen_kckr = param_errors.kckr_error_sist;
+gen_kckr = repmat(gen_kckr, 1, length(param));
+
 fprintf('============================================================ \n')
 fprintf('Energy \n')
 fprintf('============================================================ \n')
@@ -27,17 +34,18 @@ fprintf('Mach. n ||GEN. ERROR || SCRIPT FOUND ||  AGREEMENT \n')
 
 for j = 1:length(param)
     erro_en(j) = param{j}.delta_ave*100;
-    gen_en(j) = param{j}.delta_error_sist*100;
-    agree(j) = prox_percent(erro_en(j), gen_en(j));
+    agree(j) = sirius_commis.common.prox_percent(erro_en(j), gen_en(j));
     fprintf('-- %02d --|| %1.2f %% -- || -- %1.2f %% -- || -- %1.2f %% --\n', j, gen_en(j), erro_en(j), agree(j));
 end
 
-conc_en = prox_percent(erro_en, gen_en);
+conc_en = sirius_commis.common.prox_percent(erro_en, gen_en);
 conc_en_mean = mean(conc_en);
+conc_en_std = std(conc_en);
 [conc_en_max, i_max] = max(conc_en);
 [conc_en_min, i_min] = min(conc_en);
 fprintf('-------------------------------------------------------------\n')
 fprintf('Average || %1.2f %%||    -- -- %1.2f %% -- --   || -- %1.2f %% --\n', mean(gen_en), mean(erro_en), conc_en_mean);
+fprintf('RMS || %1.2f %%||    -- -- %1.2f %% -- --   || -- %1.2f %% --\n', std(gen_en), std(erro_en), conc_en_std);
 fprintf('Maximum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_max, conc_en_max);
 fprintf('Minimum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_min, conc_en_min);
 
@@ -49,11 +57,10 @@ fprintf('Mach. n ||  GEN. ERROR  ||   SCRIPT FOUND  ||  AGREEMENT \n')
 for j = 1:length(param)
     xl_inicial(j) = param{j}.xl_sept_init;
     erro_xl(j) = abs(xl_inicial(j) - param{j}.offset_xl_sist); 
-    gen_xl(j) = param{j}.xl_error_sist;
-    fprintf('-- %02d --|| %1.2f mrad -- || -- %1.2f mrad -- || -- %1.2f %% --\n', j, gen_xl(j)*1e3, erro_xl(j)*1e3, prox_percent(erro_xl(j), gen_xl(j)));
+    fprintf('-- %02d --|| %1.2f mrad -- || -- %1.2f mrad -- || -- %1.2f %% --\n', j, gen_xl(j)*1e3, erro_xl(j)*1e3, sirius_commis.common.prox_percent(erro_xl(j), gen_xl(j)));
 end
 
-conc_xl = prox_percent(erro_xl, gen_xl);
+conc_xl = sirius_commis.common.prox_percent(erro_xl, gen_xl);
 conc_xl_mean = mean(conc_xl);
 [conc_xl_max, i_max] = max(conc_xl);
 [conc_xl_min, i_min] = min(conc_xl);
@@ -70,11 +77,10 @@ fprintf('Mach. n ||  GEN. ERROR  ||  SCRIPT FOUND   ||  AGREEMENT \n')
 for j = 1:length(param)
     kckr_inicial(j) = param{j}.kckr_init;
     erro_kckr(j) = abs(kckr_inicial(j) - param{j}.kckr_sist); 
-    gen_kckr(j) = param{j}.kckr_error_sist;
-    fprintf('-- %02d --|| %1.2f mrad -- || -- %1.2f mrad -- || -- %1.2f %% --\n', j, gen_kckr(j)*1e3, erro_kckr(j)*1e3, prox_percent(erro_kckr(j), gen_kckr(j)));
+    fprintf('-- %02d --|| %1.2f mrad -- || -- %1.2f mrad -- || -- %1.2f %% --\n', j, gen_kckr(j)*1e3, erro_kckr(j)*1e3, sirius_commis.common.prox_percent(erro_kckr(j), gen_kckr(j)));
 end
 
-conc_kckr = prox_percent(erro_kckr, gen_kckr);
+conc_kckr = sirius_commis.common.prox_percent(erro_kckr, gen_kckr);
 [conc_kckr_max, i_max] = max(conc_kckr);
 [conc_kckr_min, i_min] = min(conc_kckr);
 conc_kckr_mean = mean(conc_kckr);

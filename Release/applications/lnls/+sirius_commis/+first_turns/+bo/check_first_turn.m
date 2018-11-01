@@ -16,6 +16,7 @@ first_turn_mach_refined = zeros(n_mach, 1);
 count_turns = ones(n_pulse, n_mach) * n_turns;
 gr_mach = cell(n_mach, 2);
 machine_correct = cell(n_mach, 1);
+param_errors.sigma_bpm = 2e-3;
 
 for j = 1:n_mach    
     fprintf('=================================================\n');

@@ -24,12 +24,16 @@ function [count_turns, r_bpm, int_bpm] = multiple_pulse_turn(machine, n_mach, pa
 if ~exist('n_turns','var')
     n_turns = 1e5;
 end
-count_turns = zeros(n_pulse, n_mach);
+
 if n_mach > 1
     bpm = findcells(machine{1}, 'FamName', 'BPM');
 else
     bpm = findcells(machine, 'FamName', 'BPM');
 end
+
+
+
+count_turns = zeros(n_pulse, n_mach);
 r_bpm_turns = zeros(n_pulse, 2, length(bpm));
 int_bpm_turns = zeros(n_pulse, length(bpm));
 
