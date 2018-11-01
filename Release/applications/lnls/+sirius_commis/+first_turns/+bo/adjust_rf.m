@@ -1,4 +1,4 @@
-function [freq, phase, fail] = adjust_rf(machine, n_mach, param, param_errors, n_part, n_turns, n)
+function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, param_errors, n_part, n_turns, n)
 
     sirius_commis.common.initializations();
     
@@ -48,7 +48,7 @@ function [freq, phase, fail] = adjust_rf(machine, n_mach, param, param_errors, n
         ph_lag_new = 1;
         f_pass = 2e3;
         step = 0.75;
-        tol_ph = 1e-2;
+        tol_ph = 1e-2 / 6;
         dif_ph = 1;
 
         while abs(dif_ph) > tol_ph
@@ -106,7 +106,14 @@ function [freq, phase, fail] = adjust_rf(machine, n_mach, param, param_errors, n
             end
             
             [~, ind_max_f] = max(fact_new);
+            
             f_max = f_new(ind_max_f);
+%             if fact_new(ind_max_f + 1) > fact_new(ind_max_f - 1)
+%                 f_max = (b * f_new(ind_max_f) + f_new(ind_max_f + 1)) / (b + 1) ;
+%             else
+%                 f_max = (b * f_new(ind_max_f) + f_new(ind_max_f - 1)) / (b + 1) ;
+%             end
+                
             machine{cavity_ind}.Frequency = f_max;
             f_new(1) = f_max;
             
@@ -127,11 +134,13 @@ function [freq, phase, fail] = adjust_rf(machine, n_mach, param, param_errors, n
 
         % machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(f_pass);
         f_final = machine{cavity_ind}.Frequency;
-        df_found = f_final - f_rf; % n_change * freq_pass;
+        df_found = abs(f_final - f_rf); % n_change * freq_pass;
         
         freq(j) = f_final;
+        freq0 = f_rf;
         phase(j) = ph_lag_new;
-
+        phase0 = param_errors.phase_sist;
+        
         fprintf('df gerado %f kHz, df aplicado %f kHz, concordancia %f %% \n', df_erro*1e-3, df_found*1e-3, sirius_commis.common.prox_percent(df_erro, df_found));
         dz_found = ph_lag_new * lambda_rf / 2 / pi;
         fprintf('dz gerado %f cm, dz aplicado %f cm, concordancia %f %% \n', param_errors.phase_sist*1e2, dz_found * 1e2, sirius_commis.common.prox_percent(param_errors.phase_sist, dz_found));
