@@ -1,93 +1,141 @@
-function [ph_lag_new, f_new, df_erro, r6d] = adjust_rf(machine, param, param_errors, n_part, n_turns, n)
+function [freq, phase, fail] = adjust_rf(machine, n_mach, param, param_errors, n_part, n_turns, n)
 
     sirius_commis.common.initializations();
-
-    machine = setcavity('on', machine);
-    machine = setradiation('on', machine);
-    param.beam.sigmae = param.beam.sigmae/2;
-    param.beam.sigmaz = 3e-3;
-    param_errors.phase_sist = 23e-2;
-    param.phase_sist = param_errors.phase_sist;
-    lambda_rf = 0.6;
     
-    % figure;
-    cavity_ind = findcells(machine, 'Frequency');
-    cavity = machine{cavity_ind};
-    V0 = cavity.Voltage;
-    p_i = 3;
-    machine{cavity_ind}.Voltage = p_i * V0;
-
-    f_rf0 = cavity.Frequency;
-    error = 5e-6; % THIS ERROR CORRESPONDS TO A BOOSTER LENGTH ERROR OF 2.5mm
-    df_erro = error * f_rf0;
-    f_rf = f_rf0 + df_erro;
-    alpha = 7.21025937429492e-4;
-    de = - 1 / alpha * error;
-    machine{cavity_ind}.Frequency = f_rf;
-
-    ph_lag_old = 0;
-    ph_lag_new = 1;
-
-    while ph_lag_new ~= ph_lag_old
-        
-        if ph_lag_new == 1
-            fprintf('VARREDURA NA FASE DE RF \n');
-            [~, ~, ~, ~, ~, ph_max] = test(machine, param, param_errors, n_part, n_turns, n);
-            ph_lag_old = 2 * pi * ph_max / n;
-        else
-            ph_lag_old = ph_lag_new;
-        end
-            
-        machine{cavity_ind}.Voltage = machine{cavity_ind}.Voltage / p_i;
-
-
-        fact_old = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
-
-        fact_new = fact_old;
-
-        n_change = 0;
-        freq_pass = 0.5e3;
-        p = 1;
-
-        while fact_new >= fact_old
-            fprintf('MUDANDO FREQUENCIA DE RF \n');
-
-            fact_old = fact_new;
-
-            machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency + (-1)^p * freq_pass;
-
-            fact_new = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
-            df_found = machine{cavity_ind}.Frequency - f_rf;
-            fprintf('DELTA DE FREQUÊNCIA: %f kHz \n', df_found * 1e-3);
-            
-            n_change = n_change + 1;
-
-            if fact_new < fact_old && n_change == 1
-                machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(freq_pass);
-                p = 0;
-                fact_new = fact_old;
-                n_change = 0;
-            end
-
-        end
-
-        machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(freq_pass);
-        
-        machine{cavity_ind}.Voltage = p_i * V0;
-        
-        fprintf('VARREDURA NA FASE DE RF \n');        
-        [~, r6d, ~, ~, ~, ph_max2] = test(machine, param, param_errors, n_part, n_turns, n);
-        
-        ph_lag_new = 2 * pi * ph_max2 / n ;
+    if n_mach == 1
+        machine_cell = {machine};
+        param_cell = {param};
+    elseif n_mach > 1
+        machine_cell = machine;
+        param_cell = param;
     end
     
-    machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(freq_pass);
-    f_new = machine{cavity_ind}.Frequency;
-    df_found = f_new - f_rf; % n_change * freq_pass;
+    freq = zeros(n_mach, 1);
+    phase = zeros(n_mach, 1);
+    fail = zeros(n_mach, 1);
     
-    fprintf('df gerado %f kHz, df aplicado %f kHz, concordancia %f %% \n', df_erro*1e-3, df_found*1e-3, sirius_commis.common.prox_percent(df_erro, df_found));
-    dz_found = ph_lag_new * lambda_rf / 2 / pi;
-    fprintf('dz gerado %f cm, dz aplicado %f cm \n', param_errors.phase_sist*1e2, dz_found * 1e2); %sirius_commis.common.prox_percent(error_phase_sist, dz_found));
+    for j = 1:n_mach
+        
+        fprintf('MACHINE NUMBER %i \n', j);
+        machine = machine_cell{j};
+        param = param_cell{j};
+
+        machine = setcavity('on', machine);
+        machine = setradiation('on', machine);
+        param.beam.sigmae = param.beam.sigmae/2;
+        param.beam.sigmaz = 3e-3;
+        param_errors.phase_sist = 23e-2;
+        param.phase_sist = param_errors.phase_sist;
+        lambda_rf = 0.6;
+
+        % figure;
+        cavity_ind = findcells(machine, 'Frequency');
+        cavity = machine{cavity_ind};
+        V0 = cavity.Voltage;
+        p_i = 3;
+        machine{cavity_ind}.Voltage = p_i * V0;
+
+        f_rf0 = cavity.Frequency;
+        error = 5e-6; % THIS ERROR CORRESPONDS TO A BOOSTER LENGTH ERROR OF 2.5mm
+        df_erro = error * f_rf0;
+        f_rf = f_rf0 + df_erro;
+        alpha = 7.21025937429492e-4;
+        de = - 1 / alpha * error;
+        machine{cavity_ind}.Frequency = f_rf;
+        f_new(1) = f_rf;
+
+        ph_lag_old = 0;
+        ph_lag_new = 1;
+        f_pass = 2e3;
+        step = 0.75;
+        tol_ph = 1e-2;
+        dif_ph = 1;
+
+        while abs(dif_ph) > tol_ph
+            fail(j) = 0;
+
+            if ph_lag_new == 1
+                fprintf('VARREDURA NA FASE DE RF \n');
+                [~, ~, ~, ~, ~, ph_max_old] = test(machine, param, param_errors, n_part, n_turns, n);
+                ph_lag_old = 2 * pi * ph_max_old / n;
+                fprintf('FASE DE RF ÓTIMA %f cm \n', lambda_rf * ph_max_old / n * 1e2);
+            else
+                ph_lag_old = ph_lag_new;
+                f_pass = f_pass * step ;
+            end
+
+            machine{cavity_ind}.Voltage = machine{cavity_ind}.Voltage / p_i;
+
+
+            fact_old = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
+            k = 1;
+            fact_new(k) = fact_old;
+
+            n_change = 0;
+            p = 1;
+            inv = 0;
+
+            while fact_new(k) >= fact_old
+                fprintf('MUDANDO FREQUENCIA DE RF \n');
+
+                fact_old = fact_new(k);
+
+                f_new(k+1) = f_new(k) + (-1)^p * f_pass;
+                machine{cavity_ind}.Frequency = f_new(k+1);
+
+                fact_new(k+1) = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
+                df_found = f_new(k+1) - f_rf;
+                fprintf('DELTA DE FREQUÊNCIA: %f kHz \n', df_found * 1e-3);
+
+                n_change = n_change + 1;
+
+                if fact_new(k+1) < fact_old && n_change == 1
+                    if inv == 1
+                        warning('Not able to find best frequency');
+                        fail(j) = 1;
+                        break                        
+                    end
+                    f_new(k+1) = f_new(k) - (-1)^p * abs(f_pass);
+                    machine{cavity_ind}.Frequency = f_new(k+1);
+                    p = 0;
+                    fact_new(k+1) = fact_old;
+                    n_change = 0;
+                    inv = 1;
+                end
+                k = k+1;
+            end
+            
+            [~, ind_max_f] = max(fact_new);
+            f_max = f_new(ind_max_f);
+            machine{cavity_ind}.Frequency = f_max;
+            f_new(1) = f_max;
+            
+
+            % machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(f_pass);
+
+            machine{cavity_ind}.Voltage = p_i * V0;
+
+            fprintf('VARREDURA NA FASE DE RF \n');
+            n = round(n / step);
+            [~, ~, ~, ~, ~, ph_max_new] = test(machine, param, param_errors, n_part, n_turns, n);
+            fprintf('FASE DE RF ÓTIMA %f cm \n', lambda_rf * ph_max_new / n * 1e2);
+
+            ph_lag_new = 2 * pi * ph_max_new / n ;
+
+            dif_ph = (ph_lag_new - ph_lag_old) * lambda_rf / 2 / pi;
+        end
+
+        % machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(f_pass);
+        f_final = machine{cavity_ind}.Frequency;
+        df_found = f_final - f_rf; % n_change * freq_pass;
+        
+        freq(j) = f_final;
+        phase(j) = ph_lag_new;
+
+        fprintf('df gerado %f kHz, df aplicado %f kHz, concordancia %f %% \n', df_erro*1e-3, df_found*1e-3, sirius_commis.common.prox_percent(df_erro, df_found));
+        dz_found = ph_lag_new * lambda_rf / 2 / pi;
+        fprintf('dz gerado %f cm, dz aplicado %f cm, concordancia %f %% \n', param_errors.phase_sist*1e2, dz_found * 1e2, sirius_commis.common.prox_percent(param_errors.phase_sist, dz_found));
+    end
 end
 
 function [fact, r_6d, r_init, r_bpm_turns, phase_max, ph_max] =  test(machine, param, param_errors, n_part, n_turns, n, ph_lag)
