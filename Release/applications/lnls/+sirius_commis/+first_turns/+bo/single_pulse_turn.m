@@ -1,4 +1,4 @@
-function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, c_prev)
+function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, c_prev)
 % Simulation of booster injection and turns around the ring for a single
 % pulse (for multiple pulses, see the function multiple_pulses_turns())
 %
@@ -41,13 +41,13 @@ for j = 1:n_mach
     % fprintf('=================================================\n');
     % fprintf('MACHINE NUMBER %i \n', j)
     % fprintf('=================================================\n');
-    
+
     param_cell{j}.orbit = findorbit4(machine_cell{j}, 0, 1:length(machine_cell{j}));
 
     machine = machine_cell{j};
     param = param_cell{j};
     lm = length(machine);
-    
+
 
     if ~exist('n_turns', 'var')
         n_turns = 1e5;
