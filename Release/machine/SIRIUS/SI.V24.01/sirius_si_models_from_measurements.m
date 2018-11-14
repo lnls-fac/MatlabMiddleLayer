@@ -148,7 +148,7 @@ corrected = false;
 while any(abs([tw1.mux(end), tw1.muy(end)]/2/pi - goal_tunes) > 0.0001) || any(abs([tw1.chromx, tw1.chromy] - goal_chrom) > 0.01)
     corrected = true;
     the_ring = lnls_correct_chrom(the_ring, goal_chrom, fams_chrom);
-%     [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, fams_tunes, 'svd', 'add', 10, 1e-9);
+    [the_ring, conv, t2, t1] = lnls_correct_tunes(the_ring, goal_tunes, fams_tunes, 'svd', 'add', 10, 1e-9);
     tw1 = calctwiss(the_ring);
 end
 
