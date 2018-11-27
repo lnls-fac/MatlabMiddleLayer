@@ -1,4 +1,4 @@
-function [machine, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_respm(machine, param, param_errors, respm, n_part, n_pulse)
+function [machine, r_bpm, theta_x, theta_y, rms_orbit_bpm, max_orbit_bpm] = correct_orbit_bpm_respm(machine, param, param_errors, respm, n_part, n_pulse)
 % Increases the intensity of BPMs and adjusts the orbit by changing the
 % correctors based on BPMs measurements with the response matrix
 %

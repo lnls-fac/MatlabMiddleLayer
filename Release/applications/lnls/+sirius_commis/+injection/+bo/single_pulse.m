@@ -27,8 +27,7 @@ function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-    offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta; param.phase];
-       
+    offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta; param.phase]; 
     twi.betax = param.twiss.betax0; twi.alphax = param.twiss.alphax0;
     twi.betay = param.twiss.betay0; twi.alphay = param.twiss.alphay0;
     twi.etax = param.twiss.etax0;   twi.etaxl = param.twiss.etaxl0;
@@ -48,7 +47,6 @@ function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
     r_xy = sirius_commis.common.compares_vchamb(machine, r_final([1,3], :, :), 1:point);
     r_final([1,3], :, :) = r_xy;
     r_end_ring = squeeze(r_final(:, :, end));
-    
     
 %         r_cent_init = squeeze(mean(r_init, 2));
 %         r_cent_final = linepass(machine(1:point), r_cent_init, 1:point);

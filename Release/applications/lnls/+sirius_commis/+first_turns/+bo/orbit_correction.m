@@ -1,4 +1,29 @@
 function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction(machine, n_mach, param, param_errors, respm, svd_min, n_part, n_pulse, several_turns)
+% Closed orbit correction algorithm
+%
+% INPUTS:
+%  - machine: booster ring model with errors
+%  - n_mach: number of random machines
+%  - param: cell of structs with adjusted injection parameters for each
+%  machine
+%  - param_errors: errors in the injection parameters
+%  - respm: response matrix from nominal model
+%  - svd_min: minimum number of singular values of response matrix to start the correction
+%  - n_part: number of particles
+%  - n_pulse: number of pulses injected
+%  - several_turns: number of turns to consider that the orbit correction
+%  already reached the several turns regime
+%
+% OUTPUTs: 
+%  - machine_cell: booster ring model with correctors adjusted to produce
+%  several turns 
+%  - hund_turns: if 1 indicates that the closed orbit was corrected,
+%  otherwise is 0
+%  - count_turns: is maximum number of turns reached in each injection
+%  pulse
+%  - num_svd: number of single values used to obtain the correction
+%
+%  Version 1 - October, 2018.
 
     sirius_commis.common.initializations();
 
@@ -9,6 +34,15 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction(mac
         machine_cell = machine;
         param_cell = param;
     end
+    
+%   cavity_ind = findcells(machine, 'Frequency');    
+%   f_rf0 = cavity.Frequency;
+%   error = 5e-6; % THIS ERROR CORRESPONDS TO A BOOSTER LENGTH ERROR OF 2.5mm
+%   df_erro = error * f_rf0;
+    
+%   machine{cavity_ind}.Frequency = 499653094.937151;
+%   machine{cavity_ind}.PhaseLag = 2.28479465715621;
+    
     hund_turns = zeros(n_mach, 1);
     count_turns = cell(n_mach, 1);
     num_svd = ones(n_mach, 1) * svd_min;

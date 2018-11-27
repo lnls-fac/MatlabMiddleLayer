@@ -3,7 +3,7 @@ function conf_machines(param, param_errors)
 % by the algorithm of injection adjustment with screens and the systematic
 % errors introduced in the random machines. It also calculates the rms of
 % horizontal and vertical closed orbits (if it exists) for each machine.
-% Finally it plots a figure with this data.
+% Finally it plots a figure with these data.
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 

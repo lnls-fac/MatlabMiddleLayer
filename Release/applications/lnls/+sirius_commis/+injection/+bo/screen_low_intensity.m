@@ -1,4 +1,9 @@
 function param = screen_low_intensity(machine, param, param_error, n_part, n_pulse, scrn, kckr, eff, n, eff_lim)
+% Applies changes in parameters as angle deflection of injection septum,
+% kicker and energy to obtain good intensity reaching the screen
+%
+% Version 1 - Murilo B. Alves - October, 2018.
+
 dtheta0 = 0;
 dtheta_kckr = 0;
 delta_energy = 0;

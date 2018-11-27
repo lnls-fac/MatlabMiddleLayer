@@ -37,8 +37,8 @@ function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
     
     param.beam.emitx = 170e-9;
     param.beam.emity = param.beam.emitx;
-    param.beam.sigmae = 0.5e-2;
-    param.beam.sigmaz = 0.5e-3;
+    param.beam.sigmae = 0.25e-2;
+    param.beam.sigmaz = 3e-3;
     
     param.offset_x0 = -30e-3;
     param.offset_xl0 = 14.3e-3;

@@ -1,18 +1,38 @@
 function [n_v, r] = phase_space_caract(machine, n_turns, n_points, mode)
+% Caracterization of longitudinal phase space introduzing a macroparticle
+% at different initial conditions of longitudinal phase and energy. It
+% simulates two cases: the first one with the RF frequency changing and in 
+% the second one the particle energy changes. The first one is more
+% appropriated to what happens in the real ring.
+%
+% The comparison to the vaccum chamber is done only at the end of one turn
+% due to the difference between synchrotron frequency which is much lesser
+% than betatron and revolution frequency.
+% 
+% Input: - machine: random machine 
+%        - n_turns: maximum number of turns to track
+%        - n_points: number of different initial longitudinal conditions
+%        - mode: 'frequency' which varies the RF frequency or 'energy'
+%        which varies the particle energy
+% 
+% Output: n_v: number of turns for each initial condition
+%         r: 6d vector with macroparticle coordinate for each turn
+%
+% Version 1 - Murilo B. Alves - November, 2018.
 
 machine = setcavity('on', machine);
 machine = setradiation('on', machine);
 
 energy_max = 2e-2;
 phase_max = 0.3;
-alpha = 7.21025937429492e-4;
+alpha = 7.21025937429492e-4; % Momentum compaction factor
 
 cavity_ind = findcells(machine, 'Frequency');
 cavity = machine{cavity_ind};
 f_rf0 = cavity.Frequency;
 
 V0 = cavity.Voltage;    
-machine{cavity_ind}.Voltage = V0 * 2;
+machine{cavity_ind}.Voltage = V0;
 
 L0 = findspos(machine, length(machine)+1); % design length [m]
 C0 = 299792458; % speed of light [m/s]
@@ -32,7 +52,7 @@ if strcmp(mode, 'frequency')
     % FREQUENCY (RF ENERGY, THEREFORE) IS DIFFERENT FROM RING ENERGY
 
     %CARE MUST BE TAKEN BECAUSE RING PASS WITH CAVITYPASS METHOD DOES NOT
-    %CONSIDER THE RIGHT FIXED POINT IN THE TRACKING WHEN THE RF FREQUENCY IS
+    %CONSIDER THE CORRECT FIXED POINT IN THE TRACKING WHEN THE RF FREQUENCY IS
     %NOT THE NOMINAL, AT EACH TURN A PHASE MUST BE ADDED TO COMPENSATE THE
     %DIFFERENCE BETWEEN THE FREQUENCIES.
     nn_v = zeros(n_points, n_points);
@@ -80,7 +100,7 @@ function [n_voltas, r_f] = comp(machine, E, Phi, n_turns, n_points, freq, ind, d
             r_i = squeeze(r_f(:, :, i));
         end
         r_f_xy = squeeze(r_f([1,3], :, :));
-        ind = isnan(r_f_xy) | abs(r_f_xy) > [18e-3; 18e-3]; % VChamb;
+        ind = isnan(r_f_xy) | abs(r_f_xy) > [18e-3; 18e-3]; % VChamber;
         or = ind(1, :, :) | ind(2, :, :);
         or6 = repmat(or, 6, 1);
         r_f(or6) = NaN;    

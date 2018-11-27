@@ -7,7 +7,7 @@ function [machine, r_bpm, gr_mach_x, gr_mach_y] = correct_orbit_bpm_matrix(machi
 %  - param: cell of structs with adjusted injection parameters for each
 % machine
 %  - MS_acc: transfer matrix from the origin (InjSept) to all the elements
-%  of machine ([~, MS] = find44())
+%  of machine ([~, MS] = findm44())
 %  - n_part: number of particles
 %  - n_pulse: number of pulses to average
 %

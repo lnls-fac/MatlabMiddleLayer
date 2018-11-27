@@ -1,4 +1,4 @@
-function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, c_prev)
+function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, c_prev)
 % Simulation of booster injection and turns around the ring for a single
 % pulse (for multiple pulses, see the function multiple_pulses_turns())
 %
@@ -35,12 +35,13 @@ INTBPM = zeros(n_turns, 1, length(bpm));
 
 eff_1turn = zeros(1, n_mach);
 count_turns = zeros(n_mach, 1);
+eff_turns = zeros(n_mach, n_turns);
 r_init = zeros(n_mach, n_turns, 6, n_part);
 eff_lim = 0.5;
 for j = 1:n_mach
-    % fprintf('=================================================\n');
-    % fprintf('MACHINE NUMBER %i \n', j)
-    % fprintf('=================================================\n');
+    fprintf('=================================================\n');
+    fprintf('MACHINE NUMBER %i \n', j)
+    fprintf('=================================================\n');
 
     param_cell{j}.orbit = findorbit4(machine_cell{j}, 0, 1:length(machine_cell{j}));
 
@@ -68,6 +69,7 @@ for j = 1:n_mach
     fprintf('=================================================\n');
 
     fprintf('Turn number 1 , Efficiency %f %% \n', eff_1turn(j)*100);
+    eff_turns(j, 1) = eff_1turn(j);
 
     if eff_1turn(j) < eff_lim
        r_bpm_turns = squeeze(RBPM(1, :, :));
@@ -76,8 +78,8 @@ for j = 1:n_mach
     end
     count_turns(j) = count_turns(j) + 1;
     for i = 1:n_turns-1
-        [r_init, ~, eff, RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
-        if eff < eff_lim
+        [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
+        if eff_turns(j, i) < eff_lim
             RBPM(i+1, :, :) = zeros(2, 50);
             INTBPM(i+1, :, :) = zeros(1, 50);
             break
@@ -101,14 +103,17 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
     elseif(~exist('bpm','var'))
             flag_bpm = false;
     end
-
+    
+    % +1 added because linepass does the tracking until the beginning of
+    % element and it is needed until the end to perform one turn
+    
     if turn_n ~= 2
-        r_out = linepass(machine, r_init, 1:length(machine), 'reuse');
+        r_out = linepass(machine, r_init, 1:length(machine)+1, 'reuse');
     else
-        r_out = linepass(machine, r_init, 1:length(machine));
+        r_out = linepass(machine, r_init, 1:length(machine)+1);
     end
 
-    r_out = reshape(r_out, 6, size(r_init, 2), size(machine, 2));
+    r_out = reshape(r_out, 6, size(r_init, 2), size(machine, 2)+1);
     r_out_xy = sirius_commis.common.compares_vchamb(machine, r_out([1,3], :, :), 1:size(machine));
     r_out([1,3], :, :) = r_out_xy;
     r_init = squeeze(r_out(:, :, end));

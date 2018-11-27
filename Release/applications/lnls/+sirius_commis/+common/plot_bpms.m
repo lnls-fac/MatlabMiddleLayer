@@ -5,7 +5,7 @@ function plot_bpms(machine, orbit, r_bpm, int_bpm)
     s = s_total(bpm);
     mm = 1e3;
     x = r_bpm(1, :)* mm;
-    y = r_bpm(2, :)* mm; 
+    y = r_bpm(2, :)* mm;
     if ~isappdata(0, 'fig')
         fig = figure('OuterPosition', [100, 100, 800, 900]);
         ax1 = subplottight(3,1,1, 'vspace', 0.05);

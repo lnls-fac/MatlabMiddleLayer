@@ -4,9 +4,9 @@ function [param_errors, param] = add_errors(param)
 % pulse dependent error for these quantities. The function includes the BPM
 % and Screens resolutions.
 %
-% See also: bo_injection_adjustment, adj_booster_times
+% See also: sirius_commis.injection.bo.single_adj_loop, sirius_commis.injection.bo.multiple_adj_loop
 %
-% Version 1 - Murilo B. Alves
+% Version 1 - Murilo B. Alves, 2018
 
     param_errors.x_error_sist = 3e-3;
     param.offset_x_sist = param.offset_x0 + param_errors.x_error_sist;

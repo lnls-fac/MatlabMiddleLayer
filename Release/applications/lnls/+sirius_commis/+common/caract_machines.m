@@ -1,4 +1,9 @@
-function caract_machines(machine0, machine_corr, n_mach, n_turns0, n_turns_corr, rms_orbit_bpm, max_orbit_bpm)
+function caract_machines(machine0, machine_corr, n_mach, n_turns0, n_turns_corr) %, rms_orbit_bpm, max_orbit_bpm)
+% Plots some graphics with some quantities for each random machine such as
+% number of turns, rms and max of horizontal and vertical orbit measured by the
+% BPMs and closed orbit, betatron tunes.
+%
+% Version 1 - Murilo B. Alves - October, 2018.
 
 bpm = findcells(machine0{1}, 'FamName', 'BPM');
 mu_x0 = zeros(n_mach, 1);
@@ -72,66 +77,68 @@ sigma_n_turns0 = squeeze(std(n_turns0, 1, 1));
 mean_n_turns_corr = squeeze(mean(n_turns_corr, 1));
 sigma_n_turns_corr = squeeze(std(n_turns_corr, 1, 1));
 
-figure('OuterPosition', [100, 100, 600, 600]);
+figure('OuterPosition', [0, 0, 1920, 1080]);
 errorbar(ind_mach, mean_n_turns0, sigma_n_turns0, 'ro',  'MarkerFaceColor', 'red')
 hold all
 errorbar(ind_mach, mean_n_turns_corr, sigma_n_turns_corr, 'bo',  'MarkerFaceColor', 'blue')
-title('Number of Turns - Matrix Method - 10 pulses');
+% title('Number of Turns - Matrix Method');
 xlabel('Machine')
 ylabel('Number of Turns')
 xlim([1, n_mach]);
 ylim([0, 25]);
 legend({'No correctors', 'Correction 1st Turn'})% ,'Correction 1st turn'},'Location','best')
-set(gca,'XTick',1:1:n_mach);
+% set(gca,'XTick',1:1:n_mach);
 grid on;
-fname = '/home/murilo/Documents/Injection_Booster/Correction_M/10_pulses_5xSV';
-saveas(gcf, fullfile(fname, 'turns_12corr.eps'), 'epsc');
+fname = '/home/murilo/Documents/Injection_Booster/Correction_M/Testes';
+% saveas(gcf, fullfile(fname, 'turns_100machines.png'));
+print(gcf, 'number_turns.png', '-dpng', '-r300');
 % 
-% figure('OuterPosition', [100, 100, 600, 600]);
+% figure('OuterPosition', [200, 200, 1200, 1200]);
 % hold off
-% plot(ind_mach, rms_orbit_bpm(:, 1)*mm, 'o',  'MarkerFaceColor', 'green')
+% % (ind_mach, rms_orbit_bpm(:, 1)*mm, 'o',  'MarkerFaceColor', 'green')
 % hold all
 % plot(ind_mach, sigma_x*mm, 'b--o',  'MarkerFaceColor', 'blue')
+% hold all
 % plot(ind_mach, sigma_x0*mm, 'r--o',  'MarkerFaceColor', 'red');
 % title('Standard Deviation Horizontal Orbit - Matrix Method - 100 pulses');
 % xlabel('Machine')
 % ylabel('RMS Horizontal [mm]')
 % xlim([1, n_mach]);
-% set(gca,'XTick',1:1:20);
-% legend({'1st turn BPM','Closed orbit with correction', 'Closed orbit no corrector'},'Location','best')
+% set(gca,'XTick',1:1:n_mach);
+% legend({'Closed orbit with correction', 'Closed orbit no corrector'},'Location','best')
 % grid on;
 % saveas(gcf, fullfile(fname, 'rms_orbit_x.eps'), 'epsc');
-% 
-% figure('OuterPosition', [100, 100, 600, 600]);
+% % 
+% figure('OuterPosition',  [200, 200, 1200, 1200]);
 % hold off
-% plot(ind_mach, max_orbit_bpm(:, 1)*mm, 'o',  'MarkerFaceColor', 'green')
-% hold all
+% % plot(ind_mach, max_orbit_bpm(:, 1)*mm, 'o',  'MarkerFaceColor', 'green')
 % plot(ind_mach, max_x*mm, 'o',  'MarkerFaceColor', 'blue')
+% hold all
 % plot(ind_mach, max_x0*mm, 'o',  'MarkerFaceColor', 'red');
 % title('Maximum Value Horizontal Orbit - Matrix Method - 100 pulses');
 % xlabel('Machine')
 % ylabel('Max Horizontal [mm]')
 % xlim([1, n_mach]);
 % set(gca,'XTick',1:1:20);
-% legend({'1st turn BPM','Closed orbit with correction', 'Closed orbit no corrector'},'Location','best')
+% legend({'Closed orbit with correction', 'Closed orbit no corrector'},'Location','best')
 % grid on;
 % saveas(gcf, fullfile(fname, 'max_orbit_x.eps'), 'epsc');
-% 
-% figure('OuterPosition', [100, 100, 600, 600]);
+% % 
+% figure('OuterPosition', [200, 200, 1200, 1200]);
 % hold off
-% plot(ind_mach, rms_orbit_bpm(:, 2)*mm, 'o',  'MarkerFaceColor', 'green');
-% hold all
+% % plot(ind_mach, rms_orbit_bpm(:, 2)*mm, 'o',  'MarkerFaceColor', 'green');
 % plot(ind_mach, sigma_y*mm, 'b--o',  'MarkerFaceColor', 'blue');
+% hold all
 % plot(ind_mach, sigma_y0*mm, 'r--o',  'MarkerFaceColor', 'red');
 % title('Standard Deviation Vertical Orbit - Matrix Method - 100 pulses');
 % xlabel('Machine')
 % ylabel('RMS Vertical [mm]')
 % xlim([1, n_mach]);
-% set(gca,'XTick',1:1:20);
-% legend({'1st turn BPM','Closed orbit with correction', 'Closed orbit no corrector'},'Location','best')
+% set(gca,'XTick',1:1:n_mach);
+% legend({'Closed orbit with correction', 'Closed orbit no corrector'},'Location','best')
 % grid on;
 % saveas(gcf, fullfile(fname, 'rms_orbit_y.eps'), 'epsc');
-% 
+% % 
 % figure('OuterPosition', [100, 100, 600, 600]);
 % hold off
 % plot(ind_mach, max_orbit_bpm(:, 2)*mm, 'o',  'MarkerFaceColor', 'green');
@@ -146,33 +153,39 @@ saveas(gcf, fullfile(fname, 'turns_12corr.eps'), 'epsc');
 % legend({'1st turn BPM','Closed orbit with correction', 'Closed orbit no corrector'},'Location','best')
 % grid on;
 % saveas(gcf, fullfile(fname, 'max_orbit_y.eps'), 'epsc');
-% 
-% figure('OuterPosition', [100, 100, 600, 600]);
+% % 
+% figure('OuterPosition', [200, 200, 1200, 1200]);
 % hold off
-% plot(ind_mach, mu_x0, 'o',  'MarkerFaceColor', 'red')
+% plot(ind_mach, mu_x0, 'o');%,  'MarkerFaceColor', 'red')
 % hold all
-% plot(ind_mach, mu_x_corr, 'o',  'MarkerFaceColor', 'blue')
+% plot(ind_mach, mu_x_corr, 'o');%,  'MarkerFaceColor', 'blue')
+% mu_x_nom = 19.204;
+% mu_x_nom = ones(n_mach, 1) .* mu_x_nom;
+% plot(ind_mach, mu_x_nom, 'r', 'linewidth', 3);
 % title('Horizontal Tune - Matrix Method - 100 pulses');
 % xlabel('Machine')
 % ylabel('Tune x')
 % xlim([1, n_mach]);
-% set(gca,'XTick',1:1:20);
-% legend({'No correctors','Correction 1st turn'},'Location','best')
+% set(gca,'XTick',1:1:n_mach);
+% legend({'No correctors', 'Correction 1st turn', 'Nominal Tune'},'Location','best')
 % grid on;
 % saveas(gcf, fullfile(fname, 'tune_x.eps'), 'epsc');
-% 
-% figure('OuterPosition', [100, 100, 600, 600]);
+% % 
+% figure('OuterPosition', [200, 200, 1200, 1200]);
 % hold off
-% plot(ind_mach, mu_y0, 'o',  'MarkerFaceColor', 'red');
+% plot(ind_mach, mu_y0, 'o');%,  'MarkerFaceColor', 'red');
 % hold all
-% plot(ind_mach, mu_y_corr, 'o',  'MarkerFaceColor', 'blue')
+% plot(ind_mach, mu_y_corr, 'o');%,  'MarkerFaceColor', 'blue')
+% mu_y_nom = 7.314;
+% mu_y_nom = ones(n_mach, 1) .* mu_y_nom;
+% plot(ind_mach, mu_y_nom, 'r', 'linewidth', 3);
 % title('Vertical Tune - Matrix Method - 100 pulses');
 % xlabel('Machine')
 % ylabel('Tune y')
 % xlim([1, n_mach]);
-% set(gca,'XTick',1:1:20);
-% legend({'No correctors','Correction 1st turn'},'Location','best')
+% set(gca,'XTick',1:1:n_mach);
+% legend({'No correctors','Correction 1st turn', 'Nominal Tune'},'Location','best')
 % grid on;
 % saveas(gcf, fullfile(fname,'tune_y.eps'), 'epsc');
-drawnow();
+% drawnow();
 end

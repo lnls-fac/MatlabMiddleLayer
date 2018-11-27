@@ -1,4 +1,11 @@
-function eff_twiss_plot(eff_twiss, n_mach, twiss, plane)
+function eff_twiss_plot(eff_twiss, twiss, plane)
+% Plots graphics using the output of
+% sirius_commis.injection.bo.twiss_inj_eff which is the input eff_twiss
+% - twiss: twiss function in eff_twiss, 'beta', 'alpha' or 'eta'
+% - plane: 'x' horizontal or 'y' vertical twiss function (Note: for dispersion
+% 'eta', the 'y' corresponds to the derivative of horizontal dispersion
+%
+% See also: sirius_commis.injection.bo.twiss_inj_eff
 
 figure; 
 
@@ -23,7 +30,7 @@ else
     error('Set the twiss function and the plane')
 end
     
-for k = 1:n_mach
+for k = 1:length(eff_twiss)
     gcf();
     
     if flag_x
@@ -39,9 +46,9 @@ xlabel(name);
 ylabel('Efficiency [%]'); 
 grid on; 
 
-eff_mach = zeros(n_mach, length(eff_twiss{1, 1}.tx)); 
+eff_mach = zeros(length(eff_twiss), length(eff_twiss{1, 1}.tx)); 
 
-for j = 1:n_mach
+for j = 1:length(eff_twiss)
     if flag_x
         eff_mach(j, :) = eff_twiss{j,1}.eff_x; 
     else

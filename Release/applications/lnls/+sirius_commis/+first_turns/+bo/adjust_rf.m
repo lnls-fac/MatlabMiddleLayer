@@ -1,4 +1,23 @@
-function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, param_errors, n_part, n_turns, n)
+function [freq, phase, fail] = adjust_rf(machine, n_mach, param, param_errors, n_part, n_turns, n_pass)
+% Scanning process to adjust the RF parameters: frequency and phase.
+%
+% INPUTS:
+%  - machine: booster ring model with errors
+%  - n_mach: number of machines
+%  - param: cell of structs with adjusted injection parameters for each
+% machine
+%  - param_errors: errors of injection parameters
+%  - n_part: number of particles
+%  - n_turns: number of turns 
+%  - n_pass: initial scanning pass
+%
+% OUTPUTS:
+%  - freq: RF frequency obtained in [Hz]
+%  - phase: RF phase obtained in [m]
+%  - fail: 1 indicates that it was not possible to determine a pair of
+%  frequency and phase to produce the n_turns around the booster
+%
+% Version 1 - Murilo B. Alves - November, 2018
 
     sirius_commis.common.initializations();
     
@@ -32,7 +51,7 @@ function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, 
         cavity_ind = findcells(machine, 'Frequency');
         cavity = machine{cavity_ind};
         V0 = cavity.Voltage;
-        p_i = 3;
+        p_i = 5;
         machine{cavity_ind}.Voltage = p_i * V0;
 
         f_rf0 = cavity.Frequency;
@@ -44,11 +63,12 @@ function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, 
         machine{cavity_ind}.Frequency = f_rf;
         f_new(1) = f_rf;
 
-        ph_lag_old = 0;
+        % ph_lag_old = 0;
         ph_lag_new = 1;
         f_pass = 2e3;
+        n = n_pass;
         step = 0.75;
-        tol_ph = 1e-2 / 6;
+        tol_ph = 1e-2 / 6 ;
         dif_ph = 1;
 
         while abs(dif_ph) > tol_ph
@@ -56,7 +76,7 @@ function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, 
 
             if ph_lag_new == 1
                 fprintf('VARREDURA NA FASE DE RF \n');
-                [~, ~, ~, ~, ~, ph_max_old] = test(machine, param, param_errors, n_part, n_turns, n);
+                [~, ~, ~, ~, ~, ph_max_old] = test(machine, j, param, param_errors, n_part, n_turns, n);
                 ph_lag_old = 2 * pi * ph_max_old / n;
                 fprintf('FASE DE RF ÓTIMA %f cm \n', lambda_rf * ph_max_old / n * 1e2);
             else
@@ -64,10 +84,10 @@ function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, 
                 f_pass = f_pass * step ;
             end
 
-            machine{cavity_ind}.Voltage = machine{cavity_ind}.Voltage / p_i;
+            % machine{cavity_ind}.Voltage = machine{cavity_ind}.Voltage / p_i;
 
 
-            fact_old = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
+            fact_old = test(machine, j, param, param_errors, n_part, n_turns, 1, ph_lag_old);
             k = 1;
             fact_new(k) = fact_old;
 
@@ -83,7 +103,7 @@ function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, 
                 f_new(k+1) = f_new(k) + (-1)^p * f_pass;
                 machine{cavity_ind}.Frequency = f_new(k+1);
 
-                fact_new(k+1) = test(machine, param, param_errors, n_part, n_turns, 1, ph_lag_old);
+                fact_new(k+1) = test(machine, j, param, param_errors, n_part, n_turns, 1, ph_lag_old);
                 df_found = f_new(k+1) - f_rf;
                 fprintf('DELTA DE FREQUÊNCIA: %f kHz \n', df_found * 1e-3);
 
@@ -120,17 +140,25 @@ function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, 
 
             % machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(f_pass);
 
-            machine{cavity_ind}.Voltage = p_i * V0;
+           %  machine{cavity_ind}.Voltage = p_i * V0;
 
             fprintf('VARREDURA NA FASE DE RF \n');
             n = round(n / step);
-            [~, ~, ~, ~, ~, ph_max_new] = test(machine, param, param_errors, n_part, n_turns, n);
+            
+            if lambda_rf / n < tol_ph
+                n = round(n * step);
+                break
+            end
+            
+            [~, ~, ~, ~, ~, ph_max_new] = test(machine, j, param, param_errors, n_part, n_turns, n);
             fprintf('FASE DE RF ÓTIMA %f cm \n', lambda_rf * ph_max_new / n * 1e2);
 
             ph_lag_new = 2 * pi * ph_max_new / n ;
 
             dif_ph = (ph_lag_new - ph_lag_old) * lambda_rf / 2 / pi;
         end
+        
+        fprintf('FASE DE RF ÓTIMA %f cm \n', lambda_rf * ph_max_new / n * 1e2);
 
         % machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - (-1)^p * abs(f_pass);
         f_final = machine{cavity_ind}.Frequency;
@@ -144,10 +172,12 @@ function [freq, phase, freq0, phase0, fail] = adjust_rf(machine, n_mach, param, 
         fprintf('df gerado %f kHz, df aplicado %f kHz, concordancia %f %% \n', df_erro*1e-3, df_found*1e-3, sirius_commis.common.prox_percent(df_erro, df_found));
         dz_found = ph_lag_new * lambda_rf / 2 / pi;
         fprintf('dz gerado %f cm, dz aplicado %f cm, concordancia %f %% \n', param_errors.phase_sist*1e2, dz_found * 1e2, sirius_commis.common.prox_percent(param_errors.phase_sist, dz_found));
+        
+        save machine_adj_rf_HIGHV0.mat freq phase fail
     end
 end
 
-function [fact, r_6d, r_init, r_bpm_turns, phase_max, ph_max] =  test(machine, param, param_errors, n_part, n_turns, n, ph_lag)
+function [fact, r_6d, r_init, r_bpm_turns, phase_max, ph_max] =  test(machine, mach_numb, param, param_errors, n_part, n_turns, n, ph_lag)
 
         eff_lim = 0.25;
         lambda_rf = 0.6;
@@ -217,7 +247,7 @@ function [fact, r_6d, r_init, r_bpm_turns, phase_max, ph_max] =  test(machine, p
             fprintf('Turn number 1 \n');
 
             for i = 1:n_turns-1
-                [r_init(m, i+1, :, :), eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init(m, i, :, :), i+1, 'bpm', param, param_errors);
+                [r_init(m, i+1, :, :), eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init(m, i, :, :), i+1, 'bpm', param, param_errors, mach_numb);
 
                 RBPM(m, i+1, :, :) = r_bpm;
                 INTBPM(m, i+1, :) = int_bpm;
@@ -250,7 +280,7 @@ function [fact, r_6d, r_init, r_bpm_turns, phase_max, ph_max] =  test(machine, p
     % plot(r_6d(:, 6), r_6d(:, 5)); 
 end
     
-function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, turn_n, bpm, param, param_errors)
+function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, turn_n, bpm, param, param_errors, mach_numb)
     r_init = squeeze(r_init);
     
     cavity_ind = findcells(machine, 'Frequency');
@@ -294,7 +324,7 @@ function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, tu
     eff = sirius_commis.common.calc_eff(n_part, r_init);
     
     if n_part ~= 1
-        fprintf('Turn number %i , Efficiency %f %% \n', turn_n, eff*100);
+        fprintf('Turn number %i , Efficiency %f %%, Machine %i \n', turn_n, eff*100, mach_numb);
     else
         fprintf('Turn number %i \n', turn_n);
         if ~loss_ind
@@ -311,16 +341,4 @@ function [r_init, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, tu
         r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
         sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
     end
-end
-
-function [df, de_f, delta_medio] = energy_bpm(machine, param, r_bpm_turns, f_rf0, df, j, alpha)
-    cavity_ind = findcells(machine, 'Frequency');
-    % sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm_turns, int_bpm);
-    x_bpm = squeeze(r_bpm_turns(1, :));
-    delta_bpm = x_bpm / mean(param.etax_bpms);
-    delta_medio = mean(delta_bpm);
-    ddf = sum(df(1:j-1));
-    df(j) = - alpha * delta_medio * (f_rf0 + ddf);
-    de_f = - 1/alpha * df(j)/machine{cavity_ind}.Frequency;
-    machine{cavity_ind}.Frequency = machine{cavity_ind}.Frequency - abs(df(j));
 end
