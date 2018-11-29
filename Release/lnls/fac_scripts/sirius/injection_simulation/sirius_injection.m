@@ -2,10 +2,10 @@ function sirius_injection()
 
 %% PARAMETERS
 
-p.bo_version      = 'BO.V03.02';
-p.ts_version      = 'TS.V02';
-p.si_version      = 'SI.V16.01';
-p.ts_mode         = 'M2';
+p.bo_version      = 'BO.V05.03';
+p.ts_version      = 'TS.V03.04';
+p.si_version      = 'SI.V24.01';
+p.ts_mode         = 'M1';
 p.nr_particles    = 1000;      % nr_particles in simulation
 p.bo_coupling     = 0.10;     % booster transverse coupling (<1.0)
 p.bo_kickex_kick  = 2.461e-3; % booster extraction kick [rad]
@@ -113,7 +113,7 @@ function p = create_lattice_models(p0)
 p = p0;
 
 lnls_setpath_mml_at;
-sirius_path = fullfile(lnls_get_root_folder(), 'code', 'MatlabMiddleLayer', 'Release', 'machine', 'SIRIUS');
+sirius_path = fullfile(lnls_get_root_folder(), 'MatlabMiddleLayer', 'Release', 'machine', 'SIRIUS');
 close all; drawnow;
 
 % loads BO model
@@ -134,16 +134,16 @@ p.si = sirius_si_lattice();
 [p.si, ~] = setcavity('on', p.si);
 [p.si,~,~,~,~,~,~] = setradiation('on', p.si);
 % adds defined acceptance as VChamber at entrance of nlk
-p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si_nlk_idx = findcells(p.si, 'FamName', 'InjNLKckr');
 p.si{p.si_nlk_idx}.VChamber(1) = p.si_nlk_physaccp(1);
 
 % shifts it so that it starts at begining of extraction kicker
-bo_kickex_idx = findcells(p.bo, 'FamName', 'kick_ex');
+bo_kickex_idx = findcells(p.bo, 'FamName', 'EjeKckr');
 p.bo = [p.bo(bo_kickex_idx(1):end) p.bo(1:bo_kickex_idx(1)-1)];
-p.bo_kickex_idx = findcells(p.bo, 'FamName', 'kick_ex');
+p.bo_kickex_idx = findcells(p.bo, 'FamName', 'EjeKckr');
 
 % shifts si so that it starts at injection point
-injection_point = findcells(p.si, 'FamName', 'eseptinj');
+injection_point = findcells(p.si, 'FamName', 'InjSeptF');
 p.si = [p.si(injection_point:end) p.si(1:injection_point-1)];
 
 fprintf('\n');
@@ -182,7 +182,7 @@ p = p0;
 p.bo = lnls_set_kickangle(p.bo, p.bo_kickex_kick, p.bo_kickex_idx, 'x');
 
 % transport bunch from entrance of extraction kicker to entrance of extraction thin septum
-p.bo_ejesepta_idx = findcells(p.bo, 'FamName', 'sept_ex');
+p.bo_ejesepta_idx = findcells(p.bo, 'FamName', 'EjeSeptF');
 trajectories = linepass(p.bo, p.bunch, 1:p.bo_ejesepta_idx(1));
 if p.print_flag, fprintf('- setting bo extraction kick to %+.3f mrad\n', p.bo_kickex_kick*1000); end
 bunch = trajectories(:,get_bunch(p.bo_kickex_idx(end)+1, p.nr_particles)); % bunch after kicker
@@ -237,7 +237,7 @@ if p.print_flag, fprintf('- beam centroid at si injpoint (rx,px)(ry,py): (%+.3f 
 if p.plot_flag, create_new_x_phase_space_plot(p.bunch,[], [], 'bunch at injection point of SI'); end
 
 % transports bunch from injection point to nlk
-p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si_nlk_idx = findcells(p.si, 'FamName', 'InjNLKckr');
 inj_2_nlk  = p.si(1:p.si_nlk_idx(1));
 trajectories = linepass(inj_2_nlk, p.bunch, 1:length(inj_2_nlk));
 [trajectories, p.loss_si_nlk] = calc_particle_loss(trajectories, inj_2_nlk, p.nr_particles, 'from SI injection point to entrance of nlk', p.plot_flag);
@@ -247,7 +247,7 @@ if p.print_flag, fprintf('- beam centroid at entrance of si nlk (rx,px): (%+.3f 
 
 % shifts si so that it starts at nlk
 p.si = [p.si(p.si_nlk_idx:end) p.si(1:p.si_nlk_idx-1)];
-p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si_nlk_idx = findcells(p.si, 'FamName', 'InjNLKckr');
 p.si{p.si_nlk_idx}.VChamber(1) = p.si_nlk_physaccp(1);
 
 function p = sets_nlk_and_kicks_beam(p0)
@@ -277,7 +277,7 @@ p.si_nlk_pulse = [p.si_nlk_pulse, zeros(1,p.nr_turns-length(p.si_nlk_pulse))];
 [x, integ_field, kickx, p.LPolyB] = sirius_si_nlk_kick(p.si_nlk_strength, [2,3,4,5,6,7,8,9,10], p.plot_flag);
 
 % sets nlk
-p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si_nlk_idx = findcells(p.si, 'FamName', 'InjNLKckr');
 p.si = sets_nlk(p.si, p.si_nlk_idx, p.si_nlk_pulse(1), p.LPolyB);
     
 % plots bunch at SI NLK entrance
@@ -295,7 +295,7 @@ p.bunch = linepass(p.si(p.si_nlk_idx(1):p.si_nlk_idx(end)), p.bunch);
 
 % shifts si lattice to the end of NLK
 p.si = [p.si(p.si_nlk_idx(end)+1:end) p.si(1:p.si_nlk_idx(end))];
-p.si_nlk_idx = findcells(p.si, 'FamName', 'nlk');
+p.si_nlk_idx = findcells(p.si, 'FamName', 'InjNLKckr');
 
 % plots bunch after nlk kick
 if p.plot_flag
