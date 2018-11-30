@@ -31,7 +31,7 @@ function [eff, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine, param, 
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018.
 
-sirius_commis.common.initializations();
+% sirius_commis.common.initializations();
 
 injkckr = findcells(machine, 'FamName', 'InjDpKckr');
 bpm = findcells(machine, 'FamName', 'BPM');

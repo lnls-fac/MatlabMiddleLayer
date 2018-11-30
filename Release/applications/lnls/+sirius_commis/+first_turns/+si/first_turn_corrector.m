@@ -54,16 +54,16 @@ gr_mach_x = zeros(n_mach, length(ch));
 gr_mach_y = zeros(n_mach, length(cv));
 
 for j = 1:n_mach
-    % fprintf('=================================================\n');
-    % fprintf('MACHINE NUMBER %i \n', j)
-    % fprintf('=================================================\n');
+    fprintf('=================================================\n');
+    fprintf('MACHINE NUMBER %i \n', j)
+    fprintf('=================================================\n');
     machine = machine_correct{j};
     param = param_cell{j};
     
     if flag_tl
         [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.si.correct_orbit_bpm_tl(machine, param, param_errors, M_acc, n_part, n_pulse);
     else
-        [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, M_acc, n_part, n_pulse, r_bpm, int_bpm);
+        [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, M_acc, n_part, n_pulse);
     end
 end
 end

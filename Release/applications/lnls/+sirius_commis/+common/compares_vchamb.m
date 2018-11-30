@@ -19,10 +19,14 @@ function [r_xy, VChamb, ind_sum] = compares_vchamb(machine, r_xy, points, diag)
 %   - VChamb: vacuum chamber at specified point
 %
 % Version 1 - Murilo B. Alves - October 5th, 2018
-
+    
 VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:length(machine)))';
 VChamb = VChamb([1, 2], points);
 VChamb = reshape(VChamb, 2, [], length(points));
+
+if size(r_xy, 3) > length(machine)
+    VChamb(:, :, length(points) + 1) = VChamb(:, :, length(points));
+end
 
 if ~exist('diag', 'var')
     ind = bsxfun(@gt, abs(r_xy), VChamb);

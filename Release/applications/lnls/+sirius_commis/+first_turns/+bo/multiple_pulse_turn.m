@@ -23,7 +23,7 @@ function [count_turns, r_bpm, int_bpm, eff_mean] = multiple_pulse_turn(machine, 
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-sirius_commis.common.initializations();
+% sirius_commis.common.initializations();
 
 if ~exist('n_turns','var')
     n_turns = 1e5;

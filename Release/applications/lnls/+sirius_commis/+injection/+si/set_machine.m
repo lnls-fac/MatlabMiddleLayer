@@ -43,12 +43,14 @@ function [machine, param, param_errors] = set_machine(si_ring, n_mach)
     param.beam.sigmae = 0.087e-2;
     param.beam.sigmaz = 11.25e-3;
     
-    param.offset_x0 = -17.35e-3;
+    param.offset_x0 = -17.92e-3;
     param.offset_xl0 = 5.608e-3;
     param.kckr0 = -5.608e-3;
     param.delta0 = 0;
     param.delta_ave = 0;
     param.phase = 0;
+    
+    param.orbit = NaN(4, length(si_ring));
     
     
     %Calculates the horizontal dispersion function at BPMs    

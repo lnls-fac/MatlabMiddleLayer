@@ -23,7 +23,7 @@ function [param_errors, param] = add_errors(param)
     param.delta_sist = param.delta0 + param_errors.delta_error_sist;
     param_errors.delta_error_pulse = 0*3e-3;
     
-    param_errors.sigma_bpm = 3e-3;
+    param_errors.sigma_bpm = 3e-3; % Turn-by-turn, Single pass = 2mm
     param_errors.cutoff = 1;
     param_errors.phase_offset = 0;
     

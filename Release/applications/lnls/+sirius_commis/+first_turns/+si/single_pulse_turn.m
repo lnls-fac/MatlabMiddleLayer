@@ -61,7 +61,7 @@ for j = 1:n_mach
     %   continue
     %end
 
-    injkckr = findcells(machine, 'FamName', 'InjKckr');
+    injkckr = findcells(machine, 'FamName', 'InjDpKckr');
     machine = lnls_set_kickangle(machine, 0, injkckr, 'x');
 
     fprintf('=================================================\n');
@@ -80,8 +80,8 @@ for j = 1:n_mach
     for i = 1:n_turns-1
         [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
         if eff_turns(j, i) < eff_lim
-            RBPM(i+1, :, :) = zeros(2, 50);
-            INTBPM(i+1, :, :) = zeros(1, 50);
+            RBPM(i+1, :, :) = zeros(2, length(bpm));
+            INTBPM(i+1, :, :) = zeros(1, length(bpm));
             break
         end
         count_turns(j) = count_turns(j) + 1;
@@ -114,11 +114,13 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
     end
 
     r_out = reshape(r_out, 6, size(r_init, 2), size(machine, 2)+1);
-    r_out_xy = sirius_commis.common.compares_vchamb(machine, r_out([1,3], :, :), 1:size(machine));
+    r_out_xy = sirius_commis.common.compares_vchamb(machine, r_out([1,3], :, :), 1:length(machine));
     r_out([1,3], :, :) = r_out_xy;
     r_init = squeeze(r_out(:, :, end));
     loss_ind = ~isnan(r_out(1, :, size(machine, 2)));
-    r_init = r_init(:, loss_ind);
+    if any(loss_ind)
+        r_init = r_init(:, loss_ind);
+    end
     eff = sirius_commis.common.calc_eff(n_part, r_init);
     fprintf('Turn number %i , Efficiency %f %% \n', turn_n, eff*100);
 

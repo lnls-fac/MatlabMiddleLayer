@@ -80,9 +80,8 @@ function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
     % setting off rf cavity and radiation emission
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
-    family_data = sirius_bo_family_data(machine);
-    machine  = create_apply_errors(machine, family_data, n_mach);
-    machine  = create_apply_multipoles(machine, family_data);
+    machine  = create_apply_errors(machine, fam, n_mach);
+    machine  = create_apply_multipoles(machine, fam);
     
     [param_errors, param] = sirius_commis.injection.bo.add_errors(param);
        

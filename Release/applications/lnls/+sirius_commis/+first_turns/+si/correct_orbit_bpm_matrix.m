@@ -44,7 +44,7 @@ M_bpms_y = MS_acc(3:4, 3:4, bpm);
 rms_orbit_x_bpm = nanstd(r_bpm(1,:));
 rms_orbit_y_bpm = nanstd(r_bpm(2,:));
 
-corr_lim = 310e-6*10;
+corr_lim = 310e-6;
 
 for j = 1:length(ch)
     ind_bpms_ch = bpm > ch(j);
@@ -82,7 +82,7 @@ else
     pos_lim = 1e-3;
 end
 n_corr = 1;
-while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim
+while int_bpm(end) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim 
     bpm_int_ok = bpm(int_bpm > 0.80);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
 

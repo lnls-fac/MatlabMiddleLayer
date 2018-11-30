@@ -39,9 +39,9 @@ eff_turns = zeros(n_mach, n_turns);
 r_init = zeros(n_mach, n_turns, 6, n_part);
 eff_lim = 0.5;
 for j = 1:n_mach
-    fprintf('=================================================\n');
-    fprintf('MACHINE NUMBER %i \n', j)
-    fprintf('=================================================\n');
+    %fprintf('=================================================\n');
+    %fprintf('MACHINE NUMBER %i \n', j)
+    %fprintf('=================================================\n');
 
     param_cell{j}.orbit = findorbit4(machine_cell{j}, 0, 1:length(machine_cell{j}));
 
@@ -103,7 +103,7 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
     elseif(~exist('bpm','var'))
             flag_bpm = false;
     end
-    
+    % !! IMPORTANT !!
     % +1 added because linepass does the tracking until the beginning of
     % element and it is needed until the end to perform one turn
     
@@ -114,7 +114,7 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
     end
 
     r_out = reshape(r_out, 6, size(r_init, 2), size(machine, 2)+1);
-    r_out_xy = sirius_commis.common.compares_vchamb(machine, r_out([1,3], :, :), 1:size(machine));
+    r_out_xy = sirius_commis.common.compares_vchamb(machine, r_out([1,3], :, :), 1:length(machine));
     r_out([1,3], :, :) = r_out_xy;
     r_init = squeeze(r_out(:, :, end));
     loss_ind = ~isnan(r_out(1, :, size(machine, 2)));
