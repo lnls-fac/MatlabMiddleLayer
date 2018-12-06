@@ -1,9 +1,9 @@
-function [eff, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
+function [eff, r_point, r_end, r_bpm, int_bpm] = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
 % Simulation of injection pulses to the booster. The starting point is the
 % end of injection septum. 
 %
 % INPUTS: 
-% - machine: cell with ring model which the first point is InjSept
+% - machine: cell with storage ring model which the first point is InjSeptF
 % - param: struct with injection parameters and systematic/pulsed errors
 % - n_part: number of particles
 % - n_pulse: number of injection pulses
@@ -18,8 +18,7 @@ function [eff, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine, param, 
 % - eff: efficiency of each injected pulse until the specified point (input
 % point) comparison between remaining particle reaching the point and
 % n_part
-% - r_scrn: returns the x and y position of specified point (used to determine
-% the position on a screen when point = Scrn) averaged over the pulses and
+% - r_point: returns the x and y position of specified point averaged over the pulses and
 % the particles
 % - r_end: a n_pulse x 6 x n_part vector at the end of ring which can be
 % used to perform turns around the ring of the injected pulses 
@@ -29,7 +28,7 @@ function [eff, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine, param, 
 % - int_bpm: intensity of particles reaching the each BPMs (efficiency in
 % the BPMs points), used to estimate the intensity dependent BPM error.
 %
-% Version 1 - Murilo B. Alves - October 4th, 2018.
+% Version 1 - Murilo B. Alves - December, 2018.
 
 % sirius_commis.common.initializations();
 
@@ -80,20 +79,20 @@ end
 
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
-    param.offset_x = param.offset_x_sist + 0*error_x_pulse;
+    param.offset_x = param.offset_x_sist + error_x_pulse;
 
     error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
-    param.offset_xl = param.offset_xl_sist + 0*error_xl_pulse;
+    param.offset_xl = param.offset_xl_sist + error_xl_pulse;
     % Peak to Peak values from measurements - cutoff = 1;
 
     if flag_kckr
         error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
-        param.kckr = param.kckr_sist + 0*error_kckr_pulse;
+        param.kckr = param.kckr_sist + error_kckr_pulse;
         machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
     end
 
     error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
-    param.delta = param.delta_sist + 0*error_delta_pulse;
+    param.delta = param.delta_sist + error_delta_pulse;
     
     param.phase = param_errors.phase_offset;
 
@@ -110,7 +109,7 @@ for j=1:n_pulse
     eff(j) = sirius_commis.common.calc_eff(n_part, r_xy(:, :, point));      
 
     if flag_plot
-        plot_si_turn(machine, param.orbit, r_xy);
+        plot_si_turn(machine, r_xy);
     end
 
     if ~mod(j, 10)
@@ -121,6 +120,12 @@ for j=1:n_pulse
 end
 
 fprintf('AVERAGE EFFICIENCY :  %g %% \n', mean(eff)*100);
+
+r_point = r_pulse(:, :, point);
+r_point = r_point + sigma_bpm(:, :, bpm == point);
+% The comparison with vacuum chamber in this case is screen-like.
+r_point = sirius_commis.common.compares_vchamb(machine, r_point, point, 'screen');
+r_point = squeeze(nanmean(r_point, 1));
 
 if flag_diag
     r_diag_bpm = r_diag_bpm + sigma_bpm;
@@ -135,9 +140,9 @@ end
  fprintf('=================================================\n');
 end
 
-function plot_si_turn(machine, orbit, r_final)
-    VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:length(machine)))';
-    s = findspos(machine, 1:length(machine));
+function plot_si_turn(machine, r_final)
+    VChamb = cell2mat(getcellstruct(machine, 'VChamber', 1:size(r_final, 3)))';
+    s = findspos(machine, 1:size(r_final, 3));
     xx = squeeze(nanmean(r_final(1, :, :), 2));
     sxx = squeeze(nanstd(r_final(1, :, :), 0, 2));
     gcf();
@@ -153,7 +158,7 @@ function plot_si_turn(machine, orbit, r_final)
     % plot(ax, s, orbit(1, :) * mm, '.-k', 'linewidth', 2);
     % plot(ax, s, orbit(3, :) * mm, '.-k', 'linewidth', 2);
     ylim(ax, [-15, 15]);
-    xlim(ax, [0, 520]);
+    xlim(ax, [0, s(end)]);
     drawnow;        
 end
 

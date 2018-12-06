@@ -14,7 +14,7 @@ function [r_scrn1, param] = screen1_kckr(machine, param, param_errors, n_part, n
     L_kckr = injkckr_struct.Length;
     d_kckr_scrn1 = s(scrn1) - s(injkckr) - L_kckr/2;
         
-    while abs(dx) > res_scrn
+    while abs(dx) > res_scrn / sqrt(n_pulse)
         param.kckr_sist = param.kckr_sist - dtheta_kckr;
         [eff1, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
         

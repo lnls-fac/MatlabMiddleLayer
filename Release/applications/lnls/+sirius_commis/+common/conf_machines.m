@@ -44,8 +44,8 @@ conc_en_std = std(conc_en);
 [conc_en_max, i_max] = max(conc_en);
 [conc_en_min, i_min] = min(conc_en);
 fprintf('-------------------------------------------------------------\n')
-fprintf('Average || %1.2f %%||    -- -- %1.2f %% -- --   || -- %1.2f %% --\n', mean(gen_en), mean(erro_en), conc_en_mean);
-fprintf('RMS || %1.2f %%||    -- -- %1.2f %% -- --   || -- %1.2f %% --\n', std(gen_en), std(erro_en), conc_en_std);
+fprintf('Average || %1.2f %% ||    -- -- %1.4f %% -- --      || -- %1.2f %% --\n', mean(gen_en), mean(erro_en), conc_en_mean);
+fprintf('RMS     || %1.2f %% ||    -- -- %1.4f %% -- --      || -- %1.2f %% --\n', std(gen_en), std(erro_en), conc_en_std);
 fprintf('Maximum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_max, conc_en_max);
 fprintf('Minimum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_min, conc_en_min);
 
@@ -62,10 +62,12 @@ end
 
 conc_xl = sirius_commis.common.prox_percent(erro_xl, gen_xl);
 conc_xl_mean = mean(conc_xl);
+conc_xl_std = std(conc_xl);
 [conc_xl_max, i_max] = max(conc_xl);
 [conc_xl_min, i_min] = min(conc_xl);
 fprintf('-------------------------------------------------------------\n')
-fprintf('Average || %1.2f mrad||    -- -- %1.2f mrad -- --   || -- %1.2f %% --\n', mean(gen_xl)*1e3, mean(erro_xl)*1e3, conc_xl_mean);
+fprintf('Average ||%1.2f mrad||    -- -- %1.4f mrad -- --    || -- %1.2f %% --\n', mean(gen_xl)*1e3, mean(erro_xl)*1e3, conc_xl_mean);
+fprintf('RMS     || %1.2fmrad||   -- -- %1.4fmrad-- --      || -- %1.2f %% --\n', std(gen_xl)*1e3, std(erro_xl)*1e3, conc_xl_std);
 fprintf('Maximum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_max, conc_xl_max);
 fprintf('Minimum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_min, conc_xl_min);
 
@@ -84,8 +86,10 @@ conc_kckr = sirius_commis.common.prox_percent(erro_kckr, gen_kckr);
 [conc_kckr_max, i_max] = max(conc_kckr);
 [conc_kckr_min, i_min] = min(conc_kckr);
 conc_kckr_mean = mean(conc_kckr);
+conc_kckr_std = std(conc_kckr);
 fprintf('-------------------------------------------------------------\n')
-fprintf('Average || %1.2f mrad||    -- -- %1.2f mrad -- --   || -- %1.2f %% --\n', mean(gen_kckr)*1e3, mean(erro_kckr)*1e3, conc_kckr_mean);
+fprintf('Average ||%1.2f mrad||    -- -- %1.4f mrad -- --    || -- %1.2f %% --\n', mean(gen_kckr)*1e3, mean(erro_kckr)*1e3, conc_kckr_mean);
+fprintf('RMS     || %1.2fmrad||    -- -- %1.4f mrad -- --    || -- %1.2f %% --\n', std(gen_kckr), std(erro_kckr)*1e3, conc_kckr_std);
 fprintf('Maximum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_max, conc_kckr_max);
 fprintf('Minimum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_min, conc_kckr_min);
 

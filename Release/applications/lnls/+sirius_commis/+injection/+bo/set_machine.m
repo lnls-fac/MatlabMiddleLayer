@@ -21,10 +21,10 @@ function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
     initializations();
 
     % Setting parameters of injection 
-    fam = sirius_bo_family_data(bo_ring);
     sept = findcells(bo_ring, 'FamName', 'InjSept');
     bo_ring = circshift(bo_ring, [0, - (sept - 1)]);
     bo_twiss = calctwiss(bo_ring);
+    fam = sirius_bo_family_data(bo_ring);
     
     param.twiss.betax0 = bo_twiss.betax(1);
     param.twiss.betay0 = bo_twiss.betay(1);
