@@ -1,4 +1,4 @@
-function [machine, r_bpm, gr_mach_x, gr_mach_y] = correct_orbit_bpm_matrix(machine, param, param_errors, MS_acc, n_part, n_pulse, r_bpm, int_bpm)
+function [machine, r_bpm, gr_mach_x, gr_mach_y] = correct_orbit_bpm_matrix(machine, param, param_errors, MS_acc, n_part, n_pulse, n_sv, r_bpm, int_bpm)
 % Increases the intensity of BPMs and adjusts the orbit by changing the
 % correctors based on BPMs measurements with a matrix approach
 %
@@ -41,10 +41,10 @@ end
 M_bpms_x = MS_acc(1:2, 1:2, bpm);
 M_bpms_y = MS_acc(3:4, 3:4, bpm);
 
-rms_orbit_x_bpm = nanstd(r_bpm(1,:));
-rms_orbit_y_bpm = nanstd(r_bpm(2,:));
+rms_orbit_x_bpm_old = nanstd(r_bpm(1,:));
+rms_orbit_y_bpm_old = nanstd(r_bpm(2,:));
 
-corr_lim = 310e-6;
+ corr_lim = 310e-6;
 
 for j = 1:length(ch)
     ind_bpms_ch = bpm > ch(j);
@@ -75,22 +75,31 @@ for j = 1:length(ch)
 
 end
 
-eff_lim = 0.95;
-if n_pulse <= 10
-    pos_lim = param_errors.sigma_bpm / eff_lim;
-else
-    pos_lim = 1e-3;
-end
-n_corr = 1;
-while int_bpm(end) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim 
+eff_lim = 1;
+% if n_pulse <= 10
+   % pos_lim = param_errors.sigma_bpm / eff_lim / sqrt(n_pulse);
+% else
+ %   pos_lim = 1e-3;
+%end
+n_cor = 1;
+
+rms_orbit_x_bpm_new = rms_orbit_x_bpm_old;
+rms_orbit_y_bpm_new = rms_orbit_y_bpm_old;
+inc_x = true; inc_y = true;
+stop_x = false; stop_y = false;
+
+while int_bpm(end) < eff_lim  ||  inc_x || inc_y
     bpm_int_ok = bpm(int_bpm > 0.80);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
+    
+    rms_orbit_x_bpm_old = rms_orbit_x_bpm_new;
+    rms_orbit_y_bpm_old = rms_orbit_y_bpm_new;
 
     m_corr_x_ok = m_corr_x(ind_ok_bpm, :);
     [Ux, Sx, Vx] = svd(m_corr_x_ok, 'econ');
     Sx_inv = 1 ./ diag(Sx);
     Sx_inv(isinf(Sx_inv)) = 0;
-    Sx_inv(6:end) = 0;
+    Sx_inv(n_sv+1:end) = 0;
     % Sx_inv(Sx_inv > 5 * Sx_inv(1)) = 0;
     Sx_inv = diag(Sx_inv);
     m_corr_inv_x = Vx * Sx_inv * Ux';    
@@ -109,7 +118,7 @@ while int_bpm(end) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > 
     [Uy, Sy, Vy] = svd(m_corr_y_ok, 'econ');
     Sy_inv = 1 ./ diag(Sy);
     Sy_inv(isinf(Sy_inv)) = 0;
-    Sy_inv(6:end) = 0;
+    Sy_inv(n_sv+1:end) = 0;
     % Sy_inv(Sy_inv > 5 * Sy_inv(1)) = 0;
     Sy_inv = diag(Sy_inv);
     m_corr_inv_y = Vy * Sy_inv * Uy';
@@ -124,21 +133,52 @@ while int_bpm(end) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > 
         theta_x(over_kick_y) =  sign(theta_x(over_kick_y)) * corr_lim;
     end
     
-    machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
-    machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
+    if inc_x 
+        machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
+    end
+    
+    if inc_y
+        machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
+    end
     
     param.orbit = findorbit4(machine, 0, 1:length(machine));
 
     [~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
-    rms_orbit_x_bpm = nanstd(r_bpm(1,:));
-    rms_orbit_y_bpm = nanstd(r_bpm(2,:));
-    n_corr = n_corr + 1;
-    if n_corr > 10
-        break
+    rms_orbit_x_bpm_new = nanstd(r_bpm(1,:));
+    rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
+    
+    if int_bpm(end) >= eff_lim
+        n_cor = 1;
+        if ~stop_x
+            inc_x = rms_orbit_x_bpm_new < rms_orbit_x_bpm_old;
+            if ~inc_x
+                theta_x = theta_x + m_corr_inv_x * x_bpm';
+                machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
+                stop_x = true;
+            end
+        end
+        if ~stop_y
+            inc_y = rms_orbit_y_bpm_new < rms_orbit_y_bpm_old;
+            if ~inc_y  
+                theta_y = theta_y + m_corr_inv_y * y_bpm';
+                machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
+                stop_y = true;
+            end
+        end
+    elseif int_bpm(end) < eff_lim && n_cor > 5
+       n_sv = n_sv - 5;
+       machine = lnls_set_kickangle(machine, zeros(length(ch), 1), ch, 'x');
+       machine = lnls_set_kickangle(machine, zeros(length(cv), 1), cv, 'y');
+       n_cor = 1;
+       warning('Number of Singular Values reduced')
+       if n_sv == 0
+           error('Problems in Singular Values')
+       end
     end
+    n_cor = n_cor + 1;
+end
 end
 % [rms_orbit_bpm, max_orbit_bpm] = calc_rms(r_bpm);
-end
 
 % function [rms_orbit_bpm, max_orbit_bpm] = calc_rms(r_bpm)
 %     rms_orbit_x_bpm = nanstd(r_bpm(1,:));

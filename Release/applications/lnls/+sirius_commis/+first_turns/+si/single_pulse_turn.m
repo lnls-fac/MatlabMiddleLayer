@@ -37,11 +37,11 @@ eff_1turn = zeros(1, n_mach);
 count_turns = zeros(n_mach, 1);
 eff_turns = zeros(n_mach, n_turns);
 r_init = zeros(n_mach, n_turns, 6, n_part);
-eff_lim = 0.5;
+eff_lim = 0.25;
 for j = 1:n_mach
-    fprintf('=================================================\n');
-    fprintf('MACHINE NUMBER %i \n', j)
-    fprintf('=================================================\n');
+    % fprintf('=================================================\n');
+    % fprintf('MACHINE NUMBER %i \n', j)
+    % fprintf('=================================================\n');
 
     param_cell{j}.orbit = findorbit4(machine_cell{j}, 0, 1:length(machine_cell{j}));
 
@@ -55,7 +55,7 @@ for j = 1:n_mach
     end
 
     kckr = 'on';
-    [eff_1turn(j), r_init, machine, RBPM(1, :, :), INTBPM(1, :, :)] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
+    [eff_1turn(j), ~,  r_init, RBPM(1, :, :), INTBPM(1, :, :)] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
 
     %if eff_1turn > 0.95
     %   continue
@@ -79,7 +79,7 @@ for j = 1:n_mach
     count_turns(j) = count_turns(j) + 1;
     for i = 1:n_turns-1
         [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
-        if eff_turns(j, i) < eff_lim
+        if eff_turns(j, i+1) < eff_lim
             RBPM(i+1, :, :) = zeros(2, length(bpm));
             INTBPM(i+1, :, :) = zeros(1, length(bpm));
             break
