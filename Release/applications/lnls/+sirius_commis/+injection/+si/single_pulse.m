@@ -27,7 +27,7 @@ function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
 %
 % Version 1 - Murilo B. Alves - December, 2018
 
-    offsets = [param.offset_x; param.offset_xl; 0; 0; param.delta; param.phase];
+    offsets = [param.offset_x; param.offset_xl; param.offset_y; param.offset_yl; param.delta; param.phase];
     twi.betax = param.twiss.betax0; twi.alphax = param.twiss.alphax0;
     twi.betay = param.twiss.betay0; twi.alphay = param.twiss.alphay0;
     twi.etax = param.twiss.etax0;   twi.etaxl = param.twiss.etaxl0;

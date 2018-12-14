@@ -84,6 +84,12 @@ for j=1:n_pulse
     error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
     param.offset_xl = param.offset_xl_sist + error_xl_pulse;
     % Peak to Peak values from measurements - cutoff = 1;
+    
+    error_y_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.y_error_pulse;
+    param.offset_y = param.offset_y_sist + error_y_pulse;
+
+    error_yl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.yl_error_pulse;
+    param.offset_yl = param.offset_yl_sist + error_yl_pulse;
 
     if flag_kckr
         error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
