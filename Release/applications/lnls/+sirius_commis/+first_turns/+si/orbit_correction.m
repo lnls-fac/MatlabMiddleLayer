@@ -46,7 +46,6 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
     hund_turns = zeros(n_mach, 1);
     count_turns = cell(n_mach, 1);
     % n_sv_f = ones(n_mach, 1) * n_sv;
-    corrected = true;
     param_errors.sigma_bpm = 3e-3;
 
     fam = sirius_si_family_data(machine_cell{1});
@@ -73,18 +72,12 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
         
         param.orbit = param_cell{j}.orbit;
 
-        [count_turns{j}, r_bpm, int_bpm] = sirius_commis.first_turns.si.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
-        
-        if min(int_bpm) == 0
-            corrected = false;
-            continue
-        end
+        [count_turns{j}, r_bpm] = sirius_commis.first_turns.si.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
 
         % n_correction = 1;
        
         x_bpm = squeeze(r_bpm(1, :)); y_bpm = squeeze(r_bpm(2, :));
         rms_x_bpm_old = std(x_bpm); rms_y_bpm_old = std(y_bpm);
-        rms_x_bpm_old = abs(rms_x_bpm_old); rms_y_bpm_old = abs(rms_y_bpm_old);
         rms_x_bpm_new = rms_x_bpm_old; rms_y_bpm_new = rms_y_bpm_old;
         % ratio_x = 0;
         % ratio_y = 0;
@@ -95,9 +88,9 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
         n_inc = 1;
         n_t = n_sv;
         stop_x = false; stop_y = false;
-        theta_x_i = lnls_get_kickangle(machine, ch, 'x')';
-        theta_y_i = lnls_get_kickangle(machine, cv, 'y')';
-        machine_n = machine;
+        plane = 'xy';
+        % theta_x_i = lnls_get_kickangle(machine, ch, 'x')';
+        % theta_y_i = lnls_get_kickangle(machine, cv, 'y')';
 
         while rms_x_bpm_new <= rms_x_bpm_old || rms_y_bpm_new <= rms_y_bpm_old
 %             sirius_commis.common.plot_bpms(machine, orbitf, r_bpm, int_bpm);
@@ -113,15 +106,13 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
 %             drawnow();
 
             % turn_inc = turn_inc + 1;
-            
             S_inv = 1 ./ diag(S);
             S_inv(isinf(S_inv)) = 0;
-            if n_t(j) > size(S,1)
-                S_inv(size(S,1):end) = 0;
+            
+            if n_t(j) <= size(S,1) - 2
+                S_inv(n_t(j)+1:end) = 0;
             elseif n_t(j) < 1
                 error('Problems in closed orbit correction \n')
-            else
-                S_inv(n_t(j)+1:end) = 0;
             end
             %end
 
@@ -129,17 +120,17 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
             M_resp_inv = V * S_inv * U';
 
             m_resp_inv_x = M_resp_inv(1:size(ch, 1), 1:size(bpm, 1));
-            m_resp_inv_y = M_resp_inv(size(ch)+1:end, size(bpm, 1)+1:end);
+            m_resp_inv_y = M_resp_inv(size(ch, 1)+1:end, size(bpm, 1)+1:end);
 
             % fm_old = fm_new;
             
             if rms_x_bpm_new <= rms_x_bpm_old && rms_y_bpm_new <= rms_y_bpm_old
                 plane = 'xy';
+                % stop_x = false; stop_y = false;
             elseif rms_x_bpm_new < rms_x_bpm_old && rms_y_bpm_new > rms_y_bpm_old && ~stop_x
                 plane = 'x';
-                stop_y = true;
-                machine_n = lnls_set_kickangle(machine_n, theta_y_i, cv, 'y');
-                rms_y_bpm_new = rms_y_bpm_old;
+                % stop_x = false; stop_y = true;
+                % rms_y_bpm_new = rms_y_bpm_old;
                 % if ratio_x > conv
                    %  break
                 % end
@@ -148,26 +139,32 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
                 %     break
                 % end
                 plane = 'y';
-                stop_x = true;
-                machine_n = lnls_set_kickangle(machine_n, theta_x_i, ch, 'x');
+                stop_x = true; stop_y = false;
                 rms_x_bpm_new = rms_x_bpm_old;
-            else
-                corrected = false;
             end
             
             rms_x_bpm_old = rms_x_bpm_new;
             rms_y_bpm_old = rms_y_bpm_new;
             
-            theta_x_i = lnls_get_kickangle(machine_n, ch, 'x')';
-            theta_y_i = lnls_get_kickangle(machine_n, cv, 'y')';
+            theta_x_i = lnls_get_kickangle(machine, ch, 'x')';
+            theta_y_i = lnls_get_kickangle(machine, cv, 'y')';
 
             % ind = num_sv(j);
             
-            orbit0 = findorbit4(machine_n, 0, 1:size(machine_n, 2));
+            orbit0 = findorbit4(machine, 0, 1:size(machine, 2));
 
-            [machine_n, param.orbit] = set_kicks(machine, r_bpm, m_resp_inv_x, m_resp_inv_y, ch, cv, theta_x_i, theta_y_i, plane);
+            [theta_x, theta_y] = calc_kicks(r_bpm, m_resp_inv_x, m_resp_inv_y, theta_x_i, theta_y_i, plane);
+            
+            if ~stop_x
+                machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
+            end
+            if ~stop_y
+                machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
+            end
+  
+            param.orbit = findorbit4(machine, 0, 1:size(machine, 2));
 
-            [count_turns{j}, r_bpm, int_bpm] = sirius_commis.first_turns.si.multiple_pulse_turn(machine_n, 1, param, param_errors, n_part, n_pulse, several_turns);
+            [count_turns{j}, r_bpm, int_bpm] = sirius_commis.first_turns.si.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
             
             x_bpm = squeeze(r_bpm(1, :));
             y_bpm = squeeze(r_bpm(2, :));
@@ -175,9 +172,6 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
             rms_x_bpm_new = std(x_bpm);
             rms_y_bpm_new = std(y_bpm);
             
-            rms_x_bpm_new = abs(rms_x_bpm_new); rms_y_bpm_new = abs(rms_y_bpm_new);
-            rms_x_bpm_old = abs(rms_x_bpm_old); rms_y_bpm_old = abs(rms_y_bpm_old);
-
             % if min_turns_0 < min_turns_f
             %    num_sv(j) = num_sv(j) - 5;
             %    turn_inc = turn_inc - 1;
@@ -216,6 +210,9 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
             % end
             
             if rms_x_bpm_new > rms_x_bpm_old && rms_y_bpm_new > rms_y_bpm_old
+                machine = lnls_set_kickangle(machine, theta_x_i, ch, 'x');
+                machine = lnls_set_kickangle(machine, theta_y_i, cv, 'y');
+                param.orbit = findorbit4(machine, 0, 1:size(machine, 2));
                 if n_inc == 0
                     break
                 else
@@ -227,28 +224,31 @@ function [machine_cell, hund_turns, count_turns] = orbit_correction(machine, n_m
                     stop_x = false; stop_y = false;
                     rms_x_bpm_new = rms_x_bpm_old;
                     rms_y_bpm_new = rms_y_bpm_old;
+                    plane = 'xy';
                     continue
                 end
-            elseif rms_x_bpm_new > rms_x_bpm_old && rms_y_bpm_new < rms_y_bpm_old
+            elseif rms_x_bpm_new > rms_x_bpm_old && rms_y_bpm_new < rms_y_bpm_old && ~stop_y
                 stop_x = true; stop_y = false;
+                machine = lnls_set_kickangle(machine, theta_x_i, ch, 'x');
+                plane = 'y';
                 % rms_x_bpm_new = rms_x_bpm_old;
-            elseif rms_x_bpm_new < rms_x_bpm_old && rms_y_bpm_new > rms_y_bpm_old
+            elseif rms_x_bpm_new < rms_x_bpm_old && rms_y_bpm_new > rms_y_bpm_old && ~stop_x
                 stop_x = false; stop_y = true;
+                machine = lnls_set_kickangle(machine, theta_y_i, cv, 'y');
+                plane = 'x';
                 % rms_y_bpm_new = rms_y_bpm_old;
+            else
+                plane = 'xy';
             end
-            machine = machine_n;
             n_inc = n_inc + 1;
-        end
-        
-        if corrected
-            machine_cell{j} = machine_n;
-            hund_turns(j) = 1;
-            param_cell{j}.orbit = param.orbit;
-        end
-    end 
+        end 
+        machine_cell{j} = machine;
+        hund_turns(j) = 1;
+        param_cell{j}.orbit = param.orbit;
+    end
 end
 
-function [machine, orbitf, theta_x, theta_y] = set_kicks(machine, r_bpm_turns, m_corr_inv_x, m_corr_inv_y, ch, cv, theta_x_in, theta_y_in, plane)
+function [theta_x, theta_y] = calc_kicks(r_bpm_turns, m_corr_inv_x, m_corr_inv_y, theta_x_in, theta_y_in, plane)
   fprintf('ORBIT CORRECTION \n');
   x_bpm = r_bpm_turns(1, :);
   y_bpm = r_bpm_turns(2, :);
@@ -262,7 +262,6 @@ function [machine, orbitf, theta_x, theta_y] = set_kicks(machine, r_bpm_turns, m
         warning('Horizontal corrector kick greater than maximum')
         theta_x(over_kick_x) =  sign(theta_x(over_kick_x)) * corr_lim;
     end        
-    machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
     fprintf('HORIZONTAL CORRECTION \n');
     theta_y = theta_y_in;
   elseif strcmp(plane, 'y')
@@ -272,26 +271,21 @@ function [machine, orbitf, theta_x, theta_y] = set_kicks(machine, r_bpm_turns, m
         warning('Vertical corrector kick greater than maximum')
         theta_y(over_kick_y) =  sign(theta_y(over_kick_y)) * corr_lim;
     end 
-    machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
     fprintf('VERTICAL CORRECTION \n');
     theta_x = theta_x_in;
   elseif strcmp(plane, 'xy')
-    theta_x = theta_x_in - m_corr_inv_x * x_bpm'/2;
+    theta_x = theta_x_in - m_corr_inv_x * x_bpm';
     over_kick_x = abs(theta_x) > corr_lim;
     if any(over_kick_x)
         warning('Horizontal corrector kick greater than maximum')
         theta_x(over_kick_x) =  sign(theta_x(over_kick_x)) * corr_lim;
     end        
-    machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
-    theta_y = theta_y_in - m_corr_inv_y * y_bpm'/2;
+    theta_y = theta_y_in - m_corr_inv_y * y_bpm';
     over_kick_y = abs(theta_y) > corr_lim;
     if any(over_kick_y)
         warning('Vertical corrector kick greater than maximum')
         theta_y(over_kick_y) =  sign(theta_y(over_kick_y)) * corr_lim;
     end 
-    machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
     fprintf('HORIZONTAL AND VERTICAL CORRECTION \n');
   end
-  param.orbit = findorbit4(machine, 0, 1:size(machine, 2));
-  orbitf = param.orbit;
 end
