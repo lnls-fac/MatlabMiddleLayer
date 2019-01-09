@@ -1,13 +1,14 @@
-function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, c_prev)
+function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns)
 % Simulation of booster injection and turns around the ring for a single
 % pulse (for multiple pulses, see the function multiple_pulses_turns())
 %
 % INPUTS:
-%  - machine: booster ring model with errors
+%  - machine: storage ring model with errors
 %  - n_mach: number of random machines
 %  - n_part: number of particles
 %  - param: cell of structs with adjusted injection parameters for each
 %  machine
+%  - param_errors: struct with injection and diagnostic resolution errors
 %  - n_turns [optional] : limited number of turns before reach the
 %  specified efficiency which considers the beam as lost. If n_turns is not
 %  specified, it is set as 10000;
@@ -16,8 +17,12 @@ function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, eff_
 %  - eff_1turn: efficiency of first turn
 %  - count_turns: number of turns that the beam is considered lost (maximum
 %  value is n_turns)
+%  - r_bpm_turns: BPM measurements averaged over turns
+%  - int_bpm_turns: turn-by-turn beam intensity reaching each BPM
+%  (it simulates the BPM sum signal)
+%  - RBPM: turn-by-turn BPM measurements
 %
-% Version 1 - Murilo B. Alves - October 4th, 2018
+% Version 1 - Murilo B. Alves - December, 2018
 
 % sirius_commis.common.initializations()
 if n_mach == 1
@@ -37,11 +42,11 @@ eff_1turn = zeros(1, n_mach);
 count_turns = zeros(n_mach, 1);
 eff_turns = zeros(n_mach, n_turns);
 r_init = zeros(n_mach, n_turns, 6, n_part);
-eff_lim = 0.5;
+eff_lim = 0.50;
 for j = 1:n_mach
-    fprintf('=================================================\n');
-    fprintf('MACHINE NUMBER %i \n', j)
-    fprintf('=================================================\n');
+    % fprintf('=================================================\n');
+    % fprintf('MACHINE NUMBER %i \n', j)
+    % fprintf('=================================================\n');
 
     param_cell{j}.orbit = findorbit4(machine_cell{j}, 0, 1:length(machine_cell{j}));
 
@@ -55,7 +60,7 @@ for j = 1:n_mach
     end
 
     kckr = 'on';
-    [eff_1turn(j), r_init, machine, RBPM(1, :, :), INTBPM(1, :, :)] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
+    [eff_1turn(j), ~,  r_init, RBPM(1, :, :), INTBPM(1, :, :)] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
 
     %if eff_1turn > 0.95
     %   continue
@@ -79,15 +84,12 @@ for j = 1:n_mach
     count_turns(j) = count_turns(j) + 1;
     for i = 1:n_turns-1
         [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
-        if eff_turns(j, i) < eff_lim
+        if eff_turns(j, i+1) < eff_lim
             RBPM(i+1, :, :) = zeros(2, length(bpm));
             INTBPM(i+1, :, :) = zeros(1, length(bpm));
             break
         end
         count_turns(j) = count_turns(j) + 1;
-        if count_turns(j) > c_prev
-            break
-        end
     end
     r_bpm_turns = squeeze(sum(RBPM, 1) / count_turns(j));
     int_bpm_turns = squeeze(sum(INTBPM, 1) / count_turns(j));

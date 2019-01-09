@@ -21,7 +21,7 @@ function [param, x_scrn3] = screen3(machine, param, param_errors, n_part, n_puls
 
     x_scrn3 = r_scrn3(1);
     
-    if abs(x_scrn3) < res_scrn
+    if abs(x_scrn3) < res_scrn / sqrt(n_pulse)
         fprintf('Screen 3 - x position %f mm \n', x_scrn3*1e3);
         fprintf('=================================================\n');    
         fprintf('DELTA ENERGY ADJUSTED TO %f %% \n', param.delta_ave*1e2);

@@ -55,34 +55,35 @@ for j = 1:length(ch)
         trecho = first:length(bpm);
         M_ch = MS_acc(1:2, 1:2, ch(j));
         for i=1:length(trecho)
-            M_x = M_bpms_x(:, :, trecho(i)) / M_ch; 
+            M_x = M_bpms_x(:, :, trecho(i)) / M_ch;
             m_corr_x(trecho(i), j) = squeeze(M_x(1, 2, :));
         end
     end
+end
 
-    ind_bpms_cv = bpm > cv(j);
+for jj = 1:length(cv)
+    ind_bpms_cv = bpm > cv(jj);
     first = find(ind_bpms_cv);
 
     if ~isempty(first)
         first = first(1);
         trecho = first:length(bpm);
-        M_cv = MS_acc(3:4, 3:4, cv(j));
-        for i=1:length(trecho)
-            M_y = M_bpms_y(:, :, trecho(i)) / M_cv; 
-            m_corr_y(trecho(i), j) = squeeze(M_y(1, 2, :));
+        M_cv = MS_acc(3:4, 3:4, cv(jj));
+        for ii=1:length(trecho)
+            M_y = M_bpms_y(:, :, trecho(ii)) / M_cv;
+            m_corr_y(trecho(ii), jj) = squeeze(M_y(1, 2, :));
         end
     end
-
 end
 
-eff_lim = 0.95;
+eff_lim = 1;
 if n_pulse <= 10
     pos_lim = param_errors.sigma_bpm / eff_lim;
 else
     pos_lim = 1e-3;
 end
 n_corr = 1;
-while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim
+while int_bpm(end) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm > pos_lim
     bpm_int_ok = bpm(int_bpm > 0.80);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
 
@@ -93,12 +94,12 @@ while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm >
     Sx_inv(6:end) = 0;
     % Sx_inv(Sx_inv > 5 * Sx_inv(1)) = 0;
     Sx_inv = diag(Sx_inv);
-    m_corr_inv_x = Vx * Sx_inv * Ux';    
+    m_corr_inv_x = Vx * Sx_inv * Ux';
 
     x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
     theta_x =  theta_x - m_corr_inv_x * x_bpm';
     over_kick_x = abs(theta_x) > corr_lim;
-    
+
     if any(over_kick_x)
         warning('Horizontal corrector kick greater than maximum')
         gr_mach_x(over_kick_x) = 1;
@@ -117,16 +118,16 @@ while mean(int_bpm) < eff_lim ||  rms_orbit_x_bpm > pos_lim || rms_orbit_y_bpm >
     y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
     theta_y = theta_y - m_corr_inv_y * y_bpm';
     over_kick_y = abs(theta_y) > corr_lim;
-    
+
     if any(over_kick_y)
         warning('Vertical corrector kick greater than maximum')
         gr_mach_y(over_kick_y) = 1;
         theta_x(over_kick_y) =  sign(theta_x(over_kick_y)) * corr_lim;
     end
-    
+
     machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
     machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
-    
+
     param.orbit = findorbit4(machine, 0, 1:length(machine));
 
     [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
@@ -150,5 +151,3 @@ end
 %     rms_orbit_bpm = [rms_orbit_x_bpm, rms_orbit_y_bpm];
 %     max_orbit_bpm = [max_orbit_x_bpm, max_orbit_y_bpm];
 % end
-
-

@@ -49,7 +49,10 @@ function plot_bpms(machine, orbit, r_bpm, int_bpm)
     plot(ax1, s_total, -VChamb(1,:) * mm,'k');
     plot(ax2, s_total, VChamb(2,:) * mm,'k');
     plot(ax2, s_total, -VChamb(2,:) * mm,'k');
-    ylim(ax1, [-20, 20]);
+    ylim(ax1, [-15, 15]);
+    xlim(ax1, [0, 520]);
+    xlim(ax2, [0, 520]);
+    xlim(ax3, [0, 520]);
     grid(ax1, 'on');
     grid(ax2, 'on');
     grid(ax3, 'on');

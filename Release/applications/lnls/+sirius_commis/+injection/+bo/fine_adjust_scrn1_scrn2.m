@@ -9,7 +9,7 @@ function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, param_errors
         error('It is necessary a screen 2 measurement as input');
     end
     
-    while abs(dx12) > res_scrn 
+    while abs(dx12) > res_scrn / sqrt(n_pulse)
         if isnan(r_scrn2(1))
            error('PARTICLES ARE LOST BEFORE SCREEN 2');
         end
@@ -33,7 +33,7 @@ function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, param_errors
         d12 = s(scrn2) - s(scrn1);
         theta12 = atan(dx12 / d12);
 
-        if abs(dx12) < res_scrn
+        if abs(dx12) < res_scrn / sqrt(n_pulse)
             param.kckr_sist = param.kckr_sist - theta12;
             fprintf('SCREEN 1 AND 2 DIFFERENCE: %f mm, ANGLE AFTER KICKER: %f mrad \n', abs(dx12)*1e3, abs(theta12)*1e3);
             break

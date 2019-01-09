@@ -1,9 +1,9 @@
-function [count_turns, r_bpm, int_bpm, eff_mean] = multiple_pulse_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns)
+function [count_turns, r_bpm, int_bpm, eff_mean, eff_tbt, fm] = multiple_pulse_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns)
 % Simulation of booster injection and turns around the ring for multiple
 % injection pulses
 %
 % INPUTS:
-%  - machine: booster ring model with errors
+%  - machine: storage ring model with errors
 %  - n_mach: number of random machines
 %  - param: cell of structs with adjusted injection parameters for each
 %  machine
@@ -21,9 +21,9 @@ function [count_turns, r_bpm, int_bpm, eff_mean] = multiple_pulse_turn(machine, 
 %  - int_bpm: average intensity of each BPM in turns
 %  - eff_mean: average effiency of turns for each injection pulse
 %
-% Version 1 - Murilo B. Alves - October 4th, 2018
+% Version 1 - Murilo B. Alves - December, 2018
 
-sirius_commis.common.initializations();
+% sirius_commis.common.initializations();
 
 if ~exist('n_turns','var')
     n_turns = 1e5;
@@ -45,11 +45,7 @@ for i = 1:n_pulse
     fprintf('======================= \n');
     fprintf('Pulse number %i \n', i);
     fprintf('======================= \n');
-    if i == 1
-        [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :), ~, ~, eff_turns(i, :, :)] = sirius_commis.first_turns.si.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, n_turns);
-    else
-        [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :), ~, ~, eff_turns(i, :, :)] = sirius_commis.first_turns.si.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, count_turns(i-1, :));
-    end
+    [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :), ~, ~, eff_turns(i, :, :)] = sirius_commis.first_turns.si.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns);
     a = sum(eff_turns, 3) ./ count_turns(i, :);
     eff_mean(i,:) = a(i);
     eff_mean = squeeze(eff_mean);
@@ -58,4 +54,8 @@ end
 r_bpm = squeeze(mean(r_bpm_turns, 1));
 int_bpm = squeeze(mean(int_bpm_turns, 1));
 eff_mean = squeeze(mean(eff_mean, 1));
+eff_tbt = squeeze(mean(eff_turns, 1));
+eff_tbt = eff_tbt(eff_tbt ~= 0);
+turn_n = linspace(1, size(eff_tbt, 1), size(eff_tbt, 1));
+fm = turn_n * eff_tbt;
 end

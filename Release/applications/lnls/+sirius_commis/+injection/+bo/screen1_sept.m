@@ -15,7 +15,7 @@ function [r_scrn1, param] = screen1_sept(machine, param, param_errors, n_part, n
     d_kckr_scrn = s(scrn1) - s(injkckr) - L_kckr/2; % Adjustment to particles reach x=0 at kicker center
     x_kckr_scrn = tan(-param.kckr0) * d_kckr_scrn;
 
-    while dxf_e > res_scrn
+    while dxf_e > res_scrn / sqrt(n_pulse)
         param.offset_xl_sist = param.offset_xl_sist + dtheta0;
         [eff1, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
 
