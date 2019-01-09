@@ -13,7 +13,7 @@ function config = simulated_annealing_run(opt, complete)
     
     st = sprintf(st_tmp,0);
     configs.(st).G = config;
-    configs.(st).res = vres';
+    configs.(st).res = vres(:);
     for i=1:opt.simulanneal_Niter
         config_t = opt.small_change(config, opt.objective_data);
         vres_t = opt.objective_fun(config_t, opt.objective_data);
@@ -24,7 +24,7 @@ function config = simulated_annealing_run(opt, complete)
             if complete
                 st = sprintf(st_tmp,i);
                 configs.(st).G = config;
-                configs.(st).res = vres_t';
+                configs.(st).res = vres_t(:);
             end
             fprintf('%03d : %7.4f\n', i, res);
         end
