@@ -1,13 +1,15 @@
-function new_ring = lnls_add_excitation_Kdip(errors, indices, old_ring)
+function ring = lnls_add_excitation_Kdip(errors, indices, ring)
 
-new_ring = old_ring;
+% if indices is an 2D-array, transform it into a cellarray of vectors;
+if isnumeric(indices)
+    indices = mat2cell(indices, ones(1, size(indices,1)));
+end
 
-
-for i=1:size(indices,1)
-    for j=1:size(indices,2)
-        idx = indices(i,j);
-        if isfield(new_ring{idx}, 'BendingAngle')
-            new_ring{idx}.PolynomB(2) = new_ring{idx}.PolynomB(2) * (1 + errors(i)); % nao funciona com 'BendLinearPass'
+for i=1:length(indices)
+    indcs = indices{i};
+    for idx=indcs
+        if isfield(ring{idx}, 'BendingAngle')
+            ring{idx}.PolynomB(2) = ring{idx}.PolynomB(2) * (1 + errors(i)); % nao funciona com 'BendLinearPass'
         else
             error('lnls_add_excitation_Kdip: not a dipole!');
         end

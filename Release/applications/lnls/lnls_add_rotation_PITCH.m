@@ -1,39 +1,39 @@
-function new_ring = lnls_add_rotation_PITCH(errors, indices, old_ring)
+function ring = lnls_add_rotation_PITCH(errors, indices, ring)
 
-new_ring = old_ring;
+% if indices is an 2D-array, transform it into a cellarray of vectors;
+if isnumeric(indices)
+    indices = mat2cell(indices, ones(1, size(indices,1)));
+end
 
-for i=1:size(indices,1)
+for i=1:length(indices)
+    indcs = indices{i};
     ang = -errors(i); %positive angle follows right hand convention 
-%     if size(indices,2) ~= 1
-%         disp('ok');
-%     end
-    len = sum(getcellstruct(new_ring, 'Length', indices(i,:)));
-    for j=1:size(indices,2)
-        idx = indices(i,j);
-        if (j == 1)
-            old_ang = new_ring{idx}.T1(4);
-            new_ring{idx}.T1 = new_ring{idx}.T1 + [0, 0, -(len/2)*ang, ang, 0, 0];
-        end
-        if (j == size(indices,2)) % the last term compensates the path length difference introduced by this artifice:
-            new_ring{idx}.T2 = new_ring{idx}.T2 + [0, 0, -(len/2)*ang, -ang, 0, -(len/2)*((ang+old_ang)^2-old_ang^2)];
-        end
-    end
+    len = sum(getcellstruct(ring, 'Length', indcs));
+    idx = indcs(1);
+    old_ang = ring{idx}.T1(4);
+    ring{idx}.T1 = ring{idx}.T1 + [0, 0, -(len/2)*ang, ang, 0, 0];
+    idx = indcs(end);
+    ring{idx}.T2 = ring{idx}.T2 + [0, 0, -(len/2)*ang, -ang, 0, -(len/2)*((ang+old_ang)^2-old_ang^2)];
 end
 
 
-% function new_ring = lnls_add_rotation_PITCH(errors, indices, old_ring)
+% function ring = lnls_add_rotation_PITCH(errors, indices, ring)
 % 
-% new_ring = old_ring;
+% % if indices is an 2D-array, transform it into a cellarray of vectors;
+% if isnumeric(indices)
+%     indices = mat2cell(indices, ones(1, size(indices,1)));
+% end
 % 
-% for i=1:size(indices,1)
-%     ang = -errors(i);
-%     for j=1:size(indices,2)
-%         idx = indices(i,j);
-%         len = new_ring{idx}.Length;
+% for i=1:length(indices)
+%     indcs = indices{i};
+%     ang = -errors(i); %positive angle follows right hand convention 
+%     for j=1:length(indcs)
+%         idx = indcs(j);
+%         len = ring{idx}.Length;
 %         new_error = [0 0 -(len/2)*ang ang 0 0];
-%         if (isfield(new_ring{idx},'T1') == 1); % checa se o campo T1 existe
-%             new_ring{idx}.T1 = new_ring{idx}.T1 + new_error;
-%             new_ring{idx}.T2 = new_ring{idx}.T2 - new_error;
+%         if (isfield(ring{idx},'T1') == 1); % checa se o campo T1 existe
+%             ring{idx}.T1 = ring{idx}.T1 + new_error;
+%             ring{idx}.T2 = ring{idx}.T2 - new_error;
 %         end
 %     end
 % end
