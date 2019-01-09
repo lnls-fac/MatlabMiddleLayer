@@ -1,8 +1,17 @@
-function sirius_nominal_dipole_trajectory
+function sirius_nominal_dipole_trajectory(dipole_famname)
 
 global THERING
 
-if ~isempty(getcellstruct(THERING, 'FamName', 'B'))
+if strcmpi(dipole_famname, 'B')
+    s_step = 0.1/1000;
+    s_max = 742.1/1000;
+    x0 = 9.1013/1000;
+    x_ref = 28.255/1000;
+%     p0 = [0;9.1013]/1000;
+    data = sirius_bo_family_data(THERING);
+    idx = data.B.ATIndex(1,:); % first dipole
+    idx = idx(length(idx)/2+1:end); % z>0 half dipole
+elseif strcmpi(dipole_famname, 'B1')
     s_step = 0.1/1000;
     s_max = 742.1/1000;
     x0 = 9.1013/1000;
