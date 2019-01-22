@@ -29,6 +29,7 @@ function sirius_cod_stat(N, arq_machines, scale)
     %    [FileName,PathName] = uigetfile('*.mat','Select the *.mat file with random machines', fullfile(PathName, '*.mat'));
     %    arq_machines = fullfile(PathName,FileName);
     %end
+    tic
     machine_corr = load(arq_machines);
     machine_corr = machine_corr.machine;
     
@@ -143,7 +144,7 @@ function sirius_cod_stat(N, arq_machines, scale)
     end
     fprintf('----------------------------------------------------\n');
     formatSpec='%4s|  %4.2f  | %4.2f \n';  
-    fprintf(formatSpec,'stat',mean(beatx),mean(beaty));
+    fprintf(formatSpec,'stat',nanmean(beatx),nanmean(beaty));
     fprintf('\n\n\n');
     
     % Calcula variacao de orbita total
@@ -171,12 +172,12 @@ function sirius_cod_stat(N, arq_machines, scale)
     end
     fprintf('----------------------------------------------------\n');
     formatSpec='%4s|   %4.2f     %4.2f   |  %4.2f     %4.2f\n';    
-    fprintf(formatSpec,'stat',mean(maxBCx),mean(stdBCx),mean(maxBCy),mean(stdBCy));
+    fprintf(formatSpec,'stat',nanmean(maxBCx),nanmean(stdBCx),nanmean(maxBCy),nanmean(stdBCy));
     fprintf('\n\n\n')
     
     formatSpec=' %4.2f     %4.2f   e  %4.2f     %4.2f\n'; 
     fprintf('Distorcao em relacao ao tamanho do feixe (X e Y):');
-    fprintf(formatSpec,mean(codx_sigmax),mean(codxp_sigmaxp),mean(cody_sigmay),mean(codyp_sigmayp));
+    fprintf(formatSpec,nanmean(codx_sigmax),nanmean(codxp_sigmaxp),nanmean(cody_sigmay),nanmean(codyp_sigmayp));
     fprintf('\n\n\n')
     
 
@@ -210,10 +211,10 @@ function sirius_cod_stat(N, arq_machines, scale)
         end
         fprintf('---------------------------------------------------------------------------\n');
         formatSpec='%4s|  %5.3f    %5.3f   %5.3f    %5.3f  |  %5.3f    %5.3f   %5.3f    %5.3f \n';  
-        fprintf(formatSpec,'stat',mean(maxBCx),mean(stdBCx),mean(maxBCxp),mean(stdBCxp),mean(maxBCy),mean(stdBCy),mean(maxBCyp),mean(stdBCyp));
+        fprintf(formatSpec,'stat',nanmean(maxBCx),nanmean(stdBCx),nanmean(maxBCxp),nanmean(stdBCxp),nanmean(maxBCy),nanmean(stdBCy),nanmean(maxBCyp),nanmean(stdBCyp));
         fprintf('\n\n\n')
     end
-    
+    toc
     % Faz o grafico das orbitas e rms de 1 setor
     ini=1;
     idx = findcells(thering0,'FamName','mib');
