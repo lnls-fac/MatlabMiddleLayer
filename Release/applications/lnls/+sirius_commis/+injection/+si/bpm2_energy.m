@@ -31,7 +31,7 @@ function [param, x_bpm2] = bpm2_energy(machine, param, param_errors, n_part, n_p
         return
     end
     percent = 1;
-    param.delta_energy_bpm2 = x_bpm2 / param.etax_bpms(2);
+    param.delta_energy_bpm2 = x_bpm2 / 0.077651808646934; % param.etax_bpms(2);
     param.delta_ave = percent * (param.delta_ave * (1 + param.delta_energy_bpm2) + param.delta_energy_bpm2);
     param.kckr_sist = param.kckr_sist / (1 + param.delta_ave);
     fprintf('BPM 2 - x position %f mm \n', x_bpm2*1e3);

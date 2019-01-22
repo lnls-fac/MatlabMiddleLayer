@@ -77,7 +77,9 @@ function [machine, param, param_errors] = set_machine(si_ring, n_mach)
     machine = setradiation('off', machine);
     machine  = create_apply_errors(machine, fam, n_mach);
     machine  = create_apply_multipoles(machine, fam);
+    machine = create_apply_bpm_errors(machine, fam);
 
+    
     [param_errors, param] = sirius_commis.injection.si.add_errors(param);
 
     function machine = vchamber_injection(machine)
@@ -196,6 +198,19 @@ function machine = create_apply_errors(the_ring, family_data, n_mach)
         fprintf('-  finding closed-orbit distortions with sextupoles off ...\n\n');
         machine = lnls_latt_err_apply_errors(name, the_ring, errors, fractional_delta);
 end
+%%
+function machine = create_apply_bpm_errors(machine, family_data)
+        % BPM  anc Corr errors are treated differently from magnet errors:
+        % constants
+        mm = 1e-3;
+        
+        control.bpm.idx = family_data.BPM.ATIndex;
+        control.bpm.sigma_offsetx   = 0.5 * mm * 1; % BBA precision
+        control.bpm.sigma_offsety   = 0.5 * mm * 1;
+        
+        cutoff_errors = 1;
+        machine = lnls_latt_err_generate_apply_bpmcorr_errors(name, machine, control, cutoff_errors);
+    end
 
 %% Multipoles insertion
 function machine = create_apply_multipoles(machine, family_data)

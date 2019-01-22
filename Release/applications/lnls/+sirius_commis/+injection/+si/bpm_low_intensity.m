@@ -64,7 +64,7 @@ if n == 2
 end
 
 if n == 3
-    fprintf('LOW INTENSITY ON BPM 3 \n');
+    fprintf('LOW INTENSITY ON BPM 2 \n');
     fprintf('=================================================\n');
     while eff < eff_lim
         delta_energy = delta_energy + param.delta_sist * 0.1;
@@ -82,7 +82,7 @@ if n == 3
             eff = mean(eff); 
             j = j + 1;
             if j > n_times
-                error('INCREASING INTENSITY PROBLEMS ON BPM 3!!!')
+                error('INCREASING INTENSITY PROBLEMS ON BPM 2!!!')
             end
             end
         end

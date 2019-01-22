@@ -1,4 +1,4 @@
-function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
+function [r_xy, r_end_ring, r_point, r_bpm] = single_pulse(machine, param, n_part, point)
 % Perfom the tracking of a number n_part of particles until the specified
 % point with given parameters of injection. Returns the position or the 6
 % component vector of particle at all points of ring, the end or at BPMs.
@@ -47,6 +47,7 @@ function [r_xy, r_end_ring, r_bpm] = single_pulse(machine, param, n_part, point)
     r_xy = sirius_commis.common.compares_vchamb(machine, r_final([1,3], :, :), 1:point);
     r_final([1,3], :, :) = r_xy;
     r_end_ring = squeeze(r_final(:, :, end));
+    r_point = squeeze(r_xy(:, :, point));
     
 %         r_cent_init = squeeze(mean(r_init, 2));
 %         r_cent_final = linepass(machine(1:point), r_cent_init, 1:point);

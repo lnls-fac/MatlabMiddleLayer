@@ -77,34 +77,37 @@ elseif(~exist('diag','var')) && ~flag_diag
         flag_diag = false;
 end
 
+p = 1;
+
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
-    param.offset_x = param.offset_x_sist + error_x_pulse;
+    param.offset_x = param.offset_x_sist + p * error_x_pulse;
 
     error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
-    param.offset_xl = param.offset_xl_sist + error_xl_pulse;
+    param.offset_xl = param.offset_xl_sist + p * error_xl_pulse;
     % Peak to Peak values from measurements - cutoff = 1;
 
     if flag_kckr
         error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
-        param.kckr = param.kckr_sist + error_kckr_pulse;
+        param.kckr = param.kckr_sist + p * error_kckr_pulse;
         machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
     end
 
     error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
-    param.delta = param.delta_sist + error_delta_pulse;
+    param.delta = param.delta_sist + p * error_delta_pulse;
     
     param.phase = param_errors.phase_offset;
 
     if flag_diag        
-        [r_xy, r_end_part, r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
+        [r_xy, r_end_part, r_point, r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
         r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
         [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param_errors.sigma_bpm);
     else
-        [r_xy, r_end_part] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
+        [r_xy, r_end_part, r_point] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
     end    
     r_pulse(j, :, :) =  nanmean(r_xy, 2);
     r_end(j, :, :) = r_end_part;
+    % r_part(j, :, :) = r_point;
 
     eff(j) = sirius_commis.common.calc_eff(n_part, r_xy(:, :, point));      
     sigma_scrn(j, :) = sirius_commis.injection.bo.screen_error_inten(r_xy, n_part, point, param_errors.sigma_scrn);
@@ -121,18 +124,21 @@ for j=1:n_pulse
     end
 end
 
+% r_mean_pulse = squeeze(nanmean(r_part, 1));
+
 if point ~= length(machine)
    fprintf('AVERAGE INTENSITY ON SCREEN :  %g %% \n', mean(eff)*100);
 else 
    % fprintf('AVERAGE EFFICIENCY :  %g %% \n', mean(eff)*100);
 end
 
-
 r_scrn = r_pulse(:, :, point);
 r_scrn = r_scrn + sigma_scrn;
 r_scrn = sirius_commis.common.compares_vchamb(machine, r_scrn, point, 'screen');
 r_scrn = squeeze(nanmean(r_scrn, 1));
 r_end = squeeze(r_end);
+
+% sirius_commis.scatplot(1e3 * r_mean_pulse(1, :), 1e3 * r_mean_pulse(2, :), 'circles', 1, 100, 5, 1, 4);
 
 if flag_diag
     r_diag_bpm = r_diag_bpm + sigma_bpm;

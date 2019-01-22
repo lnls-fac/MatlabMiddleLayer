@@ -17,7 +17,6 @@ function [r_bpm1, param] = bpm1_kckr(machine, param, param_errors, n_part, n_pul
 
         
     while abs(dx) > res_bpm/sqrt(n_pulse)
-        param.kckr_sist = param.kckr_sist - dtheta_kckr;
         [eff1, r_bpm1] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
         
         if mean(eff1) < 0.75
@@ -30,6 +29,7 @@ function [r_bpm1, param] = bpm1_kckr(machine, param, param_errors, n_part, n_pul
         end
 
         dtheta_kckr = r_bpm1(1) / d_kckr_bpm1;
+        param.kckr_sist = param.kckr_sist - dtheta_kckr;
         dx = r_bpm1(1);
         fprintf('(KICKER ON) BPM 1 position: %f mm \n', r_bpm1(1)*1e3);
         fprintf('=================================================\n');
