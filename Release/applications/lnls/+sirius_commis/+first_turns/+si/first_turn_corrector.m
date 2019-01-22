@@ -1,4 +1,4 @@
-function [machine_correct, cod, r_bpm_mach, gr_mach_x, gr_mach_y, n_t] = first_turn_corrector(machine, n_mach, param, param_errors, m_corr, n_part, n_pulse, n_sv, approach)
+function ft_data = first_turn_corrector(machine, n_mach, param, param_errors, m_corr, n_part, n_pulse, n_sv, approach)
 % Increases the intensity of BPMs and adjusts the first turn by changing the
 % correctors based on BPMs measurements using two approaches: 'tl' for
 % transport line and 'matrix' using matrix facilities of SOFB
@@ -54,7 +54,6 @@ cv = fam.CV.ATIndex;
 r_bpm_mach = zeros(n_mach, 2, length(bpm));
 gr_mach_x = zeros(n_mach, length(ch));
 gr_mach_y = zeros(n_mach, length(cv));
-n_t = zeros(n_mach, 1);
 cod = ones(n_mach, 1);
 
 for j = 1:n_mach
@@ -67,9 +66,9 @@ for j = 1:n_mach
     if flag_tl
         [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.si.correct_orbit_bpm_tl(machine, param, param_errors, m_corr, n_part, n_pulse);
     else
-        [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :), n_t(j)] = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv);
+        ft_data{j} = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv);
     end
-    orbita = findorbit4(machine_correct{j}, 0, 1:length(machine_correct{j}));
+    orbita = findorbit4(ft_data{j}.machine, 0, 1:length(ft_data{j}.machine));
     if any(isnan(orbita(1, :)))
         cod(j) = 0;
     end

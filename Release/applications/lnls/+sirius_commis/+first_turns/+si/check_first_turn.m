@@ -1,4 +1,4 @@
-function [machine_correct, first_turn_mach, first_turn_mach_refined, count_turns, gr_mach, n_t] = check_first_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns, n_pulse_turns, n0, n_sv, M_acc)
+function ft_data = check_first_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns, n_pulse_turns, n0, n_sv, M_acc)
 % Increases the intensity of BPMs and adjusts the first turn by changing the
 % correctors based on BPMs measurements
 %
@@ -37,8 +37,8 @@ elseif n_mach > 1
 end
 
 % machine_correct = cell(n_mach, 1);
-first_turn_mach = zeros(n_mach, 1);
-first_turn_mach_refined = zeros(n_mach, 1);
+ft_mach = zeros(n_mach, 1);
+ft_mach_refined = zeros(n_mach, 1);
 count_turns = zeros(n_pulse_turns, n_mach);
 gr_mach = cell(n_mach, 2);
 machine_correct = cell(n_mach, 1);
@@ -50,7 +50,7 @@ cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
 m_corr_x = zeros(length(bpm), length(ch));
 m_corr_y = zeros(length(bpm), length(cv));
-
+ft_data = cell(n_mach, 1);
 
 M_bpms_x = M_acc(1:2, 1:2, bpm);
 M_bpms_y = M_acc(3:4, 3:4, bpm);
@@ -87,7 +87,7 @@ end
 
 m0xy = zeros(size(bpm, 1), size(cv, 1));
 m0yx = zeros(size(bpm, 1), size(ch, 1));
-n_t = zeros(n_mach, 1);
+
 m_corr = [m_corr_x, m0xy; m0yx, m_corr_y];
 
 for j = 1:n_mach    
@@ -105,32 +105,49 @@ for j = 1:n_mach
     
     if n_min < n_turns
         % [machine_correct{j}, ~, gr_mach{j, 1}, gr_mach{j, 2}] = sirius_commis.first_turns.bo.first_turn_corrector(machine, 1, param, param_errors, M_acc, n_part, n_pulse);
-        [machine_correct{j}, ~, ~, ~, ~, n_t(j)] = sirius_commis.first_turns.si.first_turn_corrector(machine, 1, param, param_errors, m_corr, n_part, n_pulse, n_sv);
-        machine_correct1 = machine_correct{j}{1};
-        first_turn_mach(j) = 1;
+        ft_data1 = sirius_commis.first_turns.si.first_turn_corrector(machine, 1, param, param_errors, m_corr, n_part, n_pulse, n_sv);
+        ft_data1 = ft_data1{1, 1};
+        machine_correct1 = ft_data1.machine;
+        ft_mach(j) = 1;
         count_turns1 = sirius_commis.first_turns.si.multiple_pulse_turn(machine_correct1, 1, param, param_errors, n_part, n_pulse_turns, n_turns);
         
         if min(count_turns1) < n_turns
-            [machine_correct{j}, ~, ~, ~, ~, n_t(j)] = sirius_commis.first_turns.si.first_turn_corrector(machine_correct1, 1, param, param_errors, m_corr, n_part, 5*n_pulse, n_t(j));
+            ft_data2 = sirius_commis.first_turns.si.first_turn_corrector(machine_correct1, 1, param, param_errors, m_corr, n_part, 5*n_pulse, ft_data1.n_svd);
             % machine_correct{j} = sirius_commis.first_turns.si.first_turn_corrector(machine, 1, param, param_errors, M_acc, n_part, 10*n_pulse);
-            machine_correct2 = machine_correct{j}{1};
-            first_turn_mach_refined(j) = 1;
+            ft_data2 = ft_data2{1, 1};
+            machine_correct2 = ft_data2.machine;
+            ft_mach_refined(j) = 1;
             count_turns2 = sirius_commis.first_turns.si.multiple_pulse_turn(machine_correct2, 1, param, param_errors, n_part, n_pulse_turns, n_turns);
             if min(count_turns1) > min(count_turns2)
+                ft_data{j} = ft_data1;
                 machine_correct{j} = machine_correct1;
                 count_turns(:, j) = count_turns1;
             else
+                ft_data{j} = ft_data2;
                 machine_correct{j} = machine_correct2;
                 count_turns(:, j) = count_turns2;
             end
         else
+            ft_data{j} = ft_data1;
             machine_correct{j} = machine_correct1;
             count_turns(:, j) = count_turns1;
         end
     else
         machine_correct{j} = machine;        
     end
+   
+    ft_data{j}.ft_ok = ft_mach;
+    ft_data{j}.ft_ok_ref = ft_mach_refined;
+    ft_data{j}.n_turns = count_turns;
+    kickx_final = lnls_get_kickangle(ft_data{j}.machine, fam.CH.ATIndex, 'x'); 
+    kicky_final = lnls_get_kickangle(ft_data{j}.machine, fam.CV.ATIndex, 'y');
+    ft_data{j}.finalcod.kickx = kickx_final;
+    ft_data{j}.finalcod.kicky = kicky_final;
+    orbit_final = findorbit4(ft_data{j}.machine, 0, 1:length(ft_data{j}.machine));
+    ft_data{j}.finalcod.orbit = orbit_final;
+    rms_x = std(orbit_final(1, :));     rms_y = std(orbit_final(3, :));
+    ft_data{j}.finalcod.rms_x = rms_x;  ft_data{j}.finalcod.rms_y = rms_y;
     
-    save first_turns.mat machine_correct first_turn_mach first_turn_mach_refined count_turns gr_mach n_t
+    % save first_turns.mat ft_data
 end
 
