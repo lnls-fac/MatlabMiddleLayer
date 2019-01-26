@@ -40,50 +40,14 @@ end
 ft_mach = zeros(n_mach, 1);
 ft_mach_refined = zeros(n_mach, 1);
 count_turns = zeros(n_pulse_turns, n_mach);
-gr_mach = cell(n_mach, 2);
+% gr_mach = cell(n_mach, 2);
 machine_correct = cell(n_mach, 1);
 param_errors.sigma_bpm = 2e-3;
 
 fam = sirius_si_family_data(machine_cell{1});
-ch = fam.CH.ATIndex;
-cv = fam.CV.ATIndex;
-bpm = fam.BPM.ATIndex;
-m_corr_x = zeros(length(bpm), length(ch));
-m_corr_y = zeros(length(bpm), length(cv));
 ft_data = cell(n_mach, 1);
 
-M_bpms_x = M_acc(1:2, 1:2, bpm);
-M_bpms_y = M_acc(3:4, 3:4, bpm);
-
-for j = 1:length(ch)
-    ind_bpms_ch = bpm > ch(j);
-    first = find(ind_bpms_ch);
-
-    if ~isempty(first)
-        first = first(1);
-        trecho = first:length(bpm);
-        M_ch = M_acc(1:2, 1:2, ch(j));
-        for i=1:length(trecho)
-            M_x = M_bpms_x(:, :, trecho(i)) / M_ch; 
-            m_corr_x(trecho(i), j) = squeeze(M_x(1, 2, :));
-        end
-    end
-end
-
-for j = 1:length(cv)
-    ind_bpms_cv = bpm > cv(j);
-    first = find(ind_bpms_cv);
-
-    if ~isempty(first)
-        first = first(1);
-        trecho = first:length(bpm);
-        M_cv = M_acc(3:4, 3:4, cv(j));
-        for i=1:length(trecho)
-            M_y = M_bpms_y(:, :, trecho(i)) / M_cv; 
-            m_corr_y(trecho(i), j) = squeeze(M_y(1, 2, :));
-        end
-    end
-end
+[m_corr_x, m_corr_y] = sirius_commis.first_turns.si.check_first_turn(fam, M_acc);
 
 m0xy = zeros(size(bpm, 1), size(cv, 1));
 m0yx = zeros(size(bpm, 1), size(ch, 1));
