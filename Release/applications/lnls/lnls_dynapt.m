@@ -49,7 +49,7 @@ if ~isfield(r, 'nr_turns')
 end
 if ~isfield(r, 'points_angle')
     fprintf('lnls_dynapt: missing ''points_angle'' field! Using default value ...\n');
-    r.points_angle = repmat(linspace(0,pi,21), length(r.energy_deviation), 1);
+    r.points_angle = repmat(linspace(0+1e-6,pi-1e-6,21), length(r.energy_deviation), 1);
 end
 if ~isfield(r, 'points_radius')
     fprintf('lnls_dynapt: missing ''points_radius'' field! Using default value ...\n');
