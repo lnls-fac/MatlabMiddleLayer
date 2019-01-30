@@ -22,7 +22,7 @@ function [machine, r_bpm, gr_mach_x, gr_mach_y] = correct_orbit_bpm_tl(machine, 
 
 % sirius_commis.common.initializations()
 
-fam = sirius_bo_family_data(machine);
+fam = sirius_si_family_data(machine);
 ch = fam.CH.ATIndex;
 cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
@@ -37,9 +37,9 @@ chute = 10e-6;
 int_lim = 0.8;
 pos_lim = param_errors.sigma_bpm / int_lim;
 
-eff1 = sirius_commis.first_turns.bo.single_pulse_turn(machine, 1, param, param_errors, n_part);
+eff1 = sirius_commis.first_turns.si.single_pulse_turn(machine, 1, param, param_errors, n_part);
 
-[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+[~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
 
 if eff1 > 0.95
     % [rms_orbit_bpm, max_orbit_bpm] = calc_rms(r_bpm);
@@ -61,14 +61,14 @@ for i = 1:length(ch)
     while int_bpm_x < int_lim
         theta_x(i) = theta_x(i) + chute;
         machine = lnls_set_kickangle(machine, theta_x(i), ch_loop, 'x');
-        [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+        [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
         int_bpm_x = (int_bpm(bpm == bpm_x_ch(1)) + int_bpm(bpm == bpm_x_ch(2)))/2;
         if theta_x(i) > corr_lim - chute
             theta_x(i) = 0;
             while int_bpm_x < int_lim
                 theta_x(i) = theta_x(i) - chute;
                 machine = lnls_set_kickangle(machine, theta_x(i), ch_loop, 'x');
-                [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+                [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
                 int_bpm_x = (int_bpm(bpm == bpm_x_ch(1)) + int_bpm(bpm == bpm_x_ch(2)))/2;
                 if abs(theta_x(i)) > corr_lim + chute
                     error('Serious problem on x plane')
@@ -81,14 +81,14 @@ for i = 1:length(ch)
     while int_bpm_y < int_lim
         theta_y(i) = theta_y(i) + chute;
         machine = lnls_set_kickangle(machine, theta_y(i), cv_loop, 'y');
-        [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+        [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
         int_bpm_y = int_bpm(bpm == bpm_y);
         if theta_y(i) > corr_lim - chute
             theta_y(i) = 0;
             while int_bpm_y < int_lim
                 theta_y(i) = theta_y(i) + chute;
                 machine = lnls_set_kickangle(machine, theta_y(i), cv_loop, 'y');
-                [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+                [~, ~, ~, ~, ~, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
                 int_bpm_y = int_bpm(bpm == bpm_y);
                 if abs(theta_y(i)) > corr_lim + chute
                     error('Serious problem on y plane')
@@ -117,7 +117,7 @@ for i = 1:length(ch)
         end
         machine = lnls_set_kickangle(machine, theta_x(i), ch_loop, 'x');
         param.orbit = findorbit4(machine, 0, bpm);
-        [~, ~, ~, ~, r_bpm, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+        [~, ~, ~, ~, r_bpm, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
         fprintf('Horizontal corrector %i adjusted to %f urad \n', i, theta_x(i)*1e6);
         x_bpm = (r_bpm(1, bpm == bpm_x_ch(1)) + r_bpm(1, bpm == bpm_x_ch(2)))/2;
     end
@@ -132,7 +132,7 @@ for i = 1:length(ch)
         end
         machine = lnls_set_kickangle(machine, theta_y(i), cv_loop, 'y');
         param.orbit = findorbit4(machine, 0, bpm);
-        [~, ~, ~, ~, r_bpm, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
+        [~, ~, ~, ~, r_bpm, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, n_part, n_pulse, length(machine), 'on', 'diag');
         fprintf('Vertical corrector %i adjusted to %f urad \n', i, theta_y(i)*1e6);
         y_bpm = r_bpm(2, bpm == bpm_y);
     end

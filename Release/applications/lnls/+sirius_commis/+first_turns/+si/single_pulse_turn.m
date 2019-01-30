@@ -42,7 +42,7 @@ eff_1turn = zeros(1, n_mach);
 count_turns = zeros(n_mach, 1);
 eff_turns = zeros(n_mach, n_turns);
 r_init = zeros(n_mach, n_turns, 6, n_part);
-eff_lim = 0.50;
+eff_lim = 0.5;
 for j = 1:n_mach
     % fprintf('=================================================\n');
     % fprintf('MACHINE NUMBER %i \n', j)
@@ -76,7 +76,7 @@ for j = 1:n_mach
     fprintf('Turn number 1 , Efficiency %f %% \n', eff_1turn(j)*100);
     eff_turns(j, 1) = eff_1turn(j);
 
-    if eff_1turn(j) < eff_lim
+    if eff_1turn(j) <= eff_lim
        r_bpm_turns = squeeze(RBPM(1, :, :));
        int_bpm_turns = squeeze(INTBPM(1, :, :));
        continue
@@ -84,15 +84,17 @@ for j = 1:n_mach
     count_turns(j) = count_turns(j) + 1;
     for i = 1:n_turns-1
         [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
-        if eff_turns(j, i+1) < eff_lim
-            RBPM(i+1, :, :) = zeros(2, length(bpm));
-            INTBPM(i+1, :, :) = zeros(1, length(bpm));
+        if eff_turns(j, i+1) <= eff_lim
+            % RBPM(i+1, :, :) = zeros(2, length(bpm));
+            % INTBPM(i+1, :, :) = zeros(1, length(bpm));
             break
         end
         count_turns(j) = count_turns(j) + 1;
     end
-    r_bpm_turns = squeeze(sum(RBPM, 1) / count_turns(j));
-    int_bpm_turns = squeeze(sum(INTBPM, 1) / count_turns(j));
+    w = squeeze(INTBPM(1:count_turns(j), :, end));
+    r_bpm_turns = squeeze(mean(w .* RBPM(1:count_turns(j), :, :)));
+    % r_bpm_turns = squeeze(mean(RBPM(1:count_turns(j), :, :), 1));
+    int_bpm_turns = squeeze(mean(INTBPM(1:count_turns(j), 1)));
 end
 end
 

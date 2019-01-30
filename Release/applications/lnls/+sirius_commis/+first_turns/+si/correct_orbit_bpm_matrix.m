@@ -1,4 +1,4 @@
-function [machine, r_bpm, gr_mach_x, gr_mach_y, n_t] = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv, r_bpm, int_bpm)
+function ft_data = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv, r_bpm, int_bpm)
 % Increases the intensity of BPMs and adjusts the orbit by changing the
 % correctors based on BPMs measurements with a matrix approach
 %
@@ -33,17 +33,23 @@ theta_x = lnls_get_kickangle(machine, ch, 'x')';
 theta_y = lnls_get_kickangle(machine, cv, 'y')';
 gr_mach_x = zeros(length(ch), 1);
 gr_mach_y = zeros(length(cv), 1);
-param.orbit = findorbit4(machine, 0, 1:length(machine));
+first_cod = false;
+cod_data = [];
+
+[param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
+ft_data.firstcod = cod_data;
+
 if ~exist('r_bpm', 'var') && ~exist('int_bpm', 'var')
     [~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
 end
 
 rms_orbit_x_bpm_old = nanstd(r_bpm(1,:));
 rms_orbit_y_bpm_old = nanstd(r_bpm(2,:));
-corr_lim = 310e-6;
+corr_lim = 300e-6;
 
 eff_lim = 1;
 n_cor = 1;
+n_fcod = true;
 
 rms_orbit_x_bpm_new = rms_orbit_x_bpm_old;
 rms_orbit_y_bpm_new = rms_orbit_y_bpm_old;
@@ -99,14 +105,14 @@ while int_bpm(end) < eff_lim
         machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
     end
     
-    param.orbit = findorbit4(machine, 0, 1:length(machine));
+    [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
+    ft_data.firstcod = cod_data;
 
     [~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
-    rms_orbit_x_bpm_new = nanstd(r_bpm(1,:));
-    rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
+    rms_orbit_x_bpm_new = nanstd(r_bpm(1,:)); rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
     
-    if n_cor > 5
-       n_sv = n_sv - 5;
+    if n_cor > 10
+       n_sv = n_sv - 1;
        machine = lnls_set_kickangle(machine, zeros(length(ch), 1), ch, 'x');
        machine = lnls_set_kickangle(machine, zeros(length(cv), 1), cv, 'y');
        n_cor = 1;
@@ -117,6 +123,11 @@ while int_bpm(end) < eff_lim
     end
     n_cor = n_cor + 1;
 end
+
+kickx_ft = lnls_get_kickangle(machine, ch, 'x');
+kicky_ft = lnls_get_kickangle(machine, cv, 'y');
+orbit_ft = findorbit4(machine, 0, 1:length(machine));
+r_bpm_ft = r_bpm;
 
 [U, S, V] = svd(m_corr, 'econ');
 S_inv = 1 ./ diag(S);
@@ -133,6 +144,9 @@ theta_y_i = theta_y;
 while inc_x || inc_y
     S_inv_var = S_inv;
     
+    theta_x0 = lnls_get_kickangle(machine, ch, 'x')';
+    theta_y0 = lnls_get_kickangle(machine, cv, 'y')';
+
     if ~sv_change
         if ~stop_x
             rms_orbit_x_bpm_old = rms_orbit_x_bpm_new;
@@ -184,9 +198,36 @@ while inc_x || inc_y
         theta_y_i = theta_y_f;
     end
     
-    param.orbit = findorbit4(machine, 0, 1:length(machine));
+    [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
+    ft_data.firstcod = cod_data;
+    
+    % param.orbit = findorbit4(machine, 0, 1:length(machine));
+    ft_data.finalcod.bpm_pos = r_bpm;
 
-    [~, ~, ~, r_bpm, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+    [~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+    
+    if int_bpm(end) < eff_lim
+        machine = lnls_set_kickangle(machine, theta_x0, ch, 'x');
+        machine = lnls_set_kickangle(machine, theta_y0, cv, 'y');
+        [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
+        ft_data.firstcod = cod_data;
+        ft_data.machine = machine;
+        ft_data.max_kick = [gr_mach_x; gr_mach_y];
+        ft_data.n_svd = n_t;
+        ft_data.ftcod.kickx = kickx_ft;
+        ft_data.ftcod.kicky = kicky_ft;
+        ft_data.ftcod.orbit = orbit_ft;
+        rms_x = nanstd(orbit_ft(1, :));   rms_y = nanstd(orbit_ft(3, :));
+        ft_data.ftcod.rms_x = rms_x;      ft_data.ftcod.rms_y = rms_y; 
+        ft_data.ftcod.bpm_pos = r_bpm_ft;    
+        return    
+    end
+    
+    if first_cod && n_fcod
+        cod_data.bpm_pos = r_bpm;
+        ft_data.firstcod = cod_data;
+        n_fcod = false;
+    end
     
     rms_orbit_x_bpm_new = nanstd(r_bpm(1,:));
     rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
@@ -194,7 +235,7 @@ while inc_x || inc_y
     if ~stop_x
         inc_x = rms_orbit_x_bpm_new < rms_orbit_x_bpm_old;
         if ~inc_x
-            machine = lnls_set_kickangle(machine, theta_x_i, ch, 'x');
+            machine = lnls_set_kickangle(machine, theta_x0, ch, 'x');
             stop_x = true;
         end
     end
@@ -202,7 +243,7 @@ while inc_x || inc_y
     if ~stop_y
         inc_y = rms_orbit_y_bpm_new < rms_orbit_y_bpm_old;
         if ~inc_y
-            machine = lnls_set_kickangle(machine, theta_y_i, cv, 'y');
+            machine = lnls_set_kickangle(machine, theta_y0, cv, 'y');
             stop_y = true;
         end
     end
@@ -213,9 +254,20 @@ while inc_x || inc_y
             % theta_y = theta_y + m_corr_inv_y * y_bpm';
             % machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
             % machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
+            [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
+            ft_data.firstcod = cod_data;
+            ft_data.machine = machine;
+            ft_data.max_kick = [gr_mach_x; gr_mach_y];
+            ft_data.n_svd = n_t;
+            ft_data.ftcod.kickx = kickx_ft;
+            ft_data.ftcod.kicky = kicky_ft;
+            ft_data.ftcod.orbit = orbit_ft;
+            rms_x = nanstd(orbit_ft(1, :));   rms_y = nanstd(orbit_ft(3, :));
+            ft_data.ftcod.rms_x = rms_x;      ft_data.ftcod.rms_y = rms_y; 
+            ft_data.ftcod.bpm_pos = r_bpm_ft;
             return
         else
-            n_t = n_sv + k * 10;
+            n_t = n_sv + k * 5;
             inc_x = true; inc_y = true;
             stop_x = false; stop_y = false;
             k = k+1;
@@ -228,5 +280,25 @@ while inc_x || inc_y
     n_inc = n_inc + 1;
     sv_change = false;
 end
-param.orbit = findorbit4(machine, 0, 1:length(machine));
 end
+
+function [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data)
+        if first_cod
+            orbit = findorbit4(machine, 0, 1:length(machine));
+            param.orbit = orbit;
+            return
+        end
+        orbit = findorbit4(machine, 0, 1:length(machine));
+        param.orbit = orbit;
+        cod_nan = sum(isnan(orbit(:))) > 0;
+        if ~cod_nan
+            theta_x = lnls_get_kickangle(machine, fam.CH.ATIndex, 'x')';
+            theta_y = lnls_get_kickangle(machine, fam.CV.ATIndex, 'y')';
+            rms_x = nanstd(orbit(1, :));   rms_y = nanstd(orbit(3, :));
+            cod_data.kickx = theta_x;   cod_data.kicky = theta_y;
+            cod_data.rms_x = rms_x;     cod_data.rms_y = rms_y;
+            cod_data.orbit = orbit;
+            first_cod = true;
+        end
+end
+        

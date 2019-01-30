@@ -1,4 +1,4 @@
-function [param_adjusted, param0_error] = multiple_adj_loop(machine, n_mach, n_part, n_pulse, param0)
+function param_adjusted = multiple_adj_loop(machine, n_mach, n_part, n_pulse, param0, turn_off)
 % Algorithm of injection parameters adjustments using screens.
 %
 % INPUTS:
@@ -18,11 +18,14 @@ function [param_adjusted, param0_error] = multiple_adj_loop(machine, n_mach, n_p
 sirius_commis.common.initializations();
 [param0_error, param0] = sirius_commis.injection.si.add_errors(param0);
 param_adjusted = cell(n_mach, 1);
-
+param0_error.delta_error_sist = 0.5e-2;
+param0_error.sigma_bpm = 2e-3;
 res_bpm = param0_error.sigma_bpm;
 
 if n_mach == 1
-    machine = sirius_commis.injection.si.turn_off_magnets(machine);
+    if turn_off
+        [machine, ~] = sirius_commis.injection.si.turn_off_magnets(machine, param0);
+    end
     [param_adjusted, ~, x_bpm2] = sirius_commis.injection.si.single_adj_loop(machine, n_part, n_pulse, 'no', param0, param0_error);
     while abs(x_bpm2) > res_bpm / sqrt(n_pulse)
         fprintf('ADJUSTING ENERGY \n');
@@ -31,7 +34,9 @@ if n_mach == 1
     param_adjusted.orbit = findorbit4(machine, 0, 1:length(machine));
 else
     for j = 1:n_mach
-    %machine{j} = sirius_commis.injection.si.turn_off_magnets(machine{j});
+    if turn_off
+        [machine{j}, param0] = sirius_commis.injection.si.turn_off_magnets(machine{j}, param0);
+    end
     fprintf('=================================================\n');
     fprintf('MACHINE NUMBER %i \n', j)
     fprintf('=================================================\n');
