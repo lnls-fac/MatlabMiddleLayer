@@ -62,19 +62,20 @@
     
 % QUADRUPOLES
 % ===========
-Q1_strength   = +2.82467581344;
-Q2_strength   = +4.33553230561;
-Q3_strength   = +3.226244592296;
-Q4_strength   = +3.941477483915;
+Q1_strength   = +2.81838534979;
+Q2_strength   = +4.340291521605;
+Q3_strength   = +3.218059095552;
+Q4_strength   = +3.950643530397;
 
-QDA_strength  = -1.62552629954318;
-QFA_strength  = +3.57485875119348;
-QDB1_strength = -2.01484587379745;
-QDB2_strength = -3.40513381070117;
-QFB_strength  = +4.11322172158137;
-QDP1_strength = -2.01186124257248;
-QDP2_strength = -3.40445451002340;
-QFP_strength  = +4.11259048361335;   
+QDA_strength  = -1.620412680782;
+QFA_strength  = +3.573153825214;
+QDB1_strength = -2.00656541201;
+QDB2_strength = -3.421252073262;
+QFB_strength  = +4.115192695361;
+QDP1_strength = -2.00656541201;
+QDP2_strength = -3.421252073262;
+QFP_strength  = +4.115192695361;   
+
 
 % SEXTUPOLES
 % ==========
