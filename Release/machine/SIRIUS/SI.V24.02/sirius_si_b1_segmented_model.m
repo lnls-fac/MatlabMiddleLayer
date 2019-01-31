@@ -12,47 +12,12 @@ b1      = 1; types{end+1} = struct('fam_name', b_famname, 'passmethod', passmeth
 b1_edge = 2; types{end+1} = struct('fam_name', edge_famname, 'passmethod', 'IdentityPass');
 m_accep = 3; types{end+1} = struct('fam_name', m_accep_fam_name, 'passmethod', 'IdentityPass');
 
-% FIELDMAP
-% *** interpolation of fields is now cubic ***
-% *** more refined segmented model.
-% *** dipole angle is now in units of degrees
-%--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m],[T] for polynom_b ---
-
-% B1 model 09 (3 GeV)
-% ===================
-% filename: 2017-05-17_B1_Model09_Sim_X=-32_32mm_Z=-1000_1000mm_Imc=394.1A.txt
-% trajectory centered in good-field region.
-% init_rx is set to +8.285 mm at s=0
-
-% monomials = [0,1,2,3,4,5,6];
-% segmodel = [ ...
-% %type     len[m]    angle[deg]  PolyB(n=0)   PolyB(n=1)   PolyB(n=2)   PolyB(n=3)   PolyB(n=4)   PolyB(n=5)   PolyB(n=6) 
-% 
-% b1,       0.0020 ,  +0.00644 ,  +0.00e+00 ,  -7.53e-01 ,  -2.97e-01 ,  +7.76e-01 ,  -3.78e+01 ,  +7.77e+03 ,  -5.44e+04 ; 
-% b1,       0.0030 ,  +0.00966 ,  +0.00e+00 ,  -7.56e-01 ,  -2.45e-01 ,  +4.51e-01 ,  -3.89e+01 ,  +6.50e+03 ,  -1.57e+04 ; 
-% b1,       0.0050 ,  +0.01614 ,  +0.00e+00 ,  -7.62e-01 ,  -1.17e-01 ,  -2.34e-01 ,  -4.51e+01 ,  +5.95e+03 ,  +7.06e+04 ; 
-% b1,       0.0050 ,  +0.01620 ,  +0.00e+00 ,  -7.70e-01 ,  -1.50e-02 ,  +5.46e-02 ,  -3.70e+01 ,  +5.27e+03 ,  +7.14e+04 ; 
-% b1,       0.0050 ,  +0.01623 ,  +0.00e+00 ,  -7.74e-01 ,  +3.80e-03 ,  +7.50e-01 ,  -2.40e+01 ,  +4.25e+03 ,  +1.20e+05 ; 
-% b1,       0.0100 ,  +0.03250 ,  +0.00e+00 ,  -7.75e-01 ,  -3.12e-03 ,  +9.79e-01 ,  +2.39e+00 ,  +3.53e+03 ,  +1.25e+05 ; 
-% b1,       0.0400 ,  +0.12976 ,  +0.00e+00 ,  -7.74e-01 ,  +1.95e-02 ,  +1.11e+00 ,  +2.39e+01 ,  +3.18e+03 ,  +1.28e+05 ; 
-% b1,       0.1500 ,  +0.48326 ,  +0.00e+00 ,  -7.73e-01 ,  +5.49e-02 ,  +1.99e+00 ,  +4.10e+01 ,  +3.41e+03 ,  +1.45e+05 ; 
-% b1,       0.1000 ,  +0.32210 ,  +0.00e+00 ,  -7.73e-01 ,  +7.58e-02 ,  +2.68e+00 ,  +5.40e+01 ,  +3.46e+03 ,  +1.39e+05 ; 
-% b1,       0.0500 ,  +0.16186 ,  +0.00e+00 ,  -7.74e-01 ,  +7.84e-03 ,  +1.72e+00 ,  +4.94e+01 ,  +3.68e+03 ,  +1.38e+05 ; 
-% b1,       0.0340 ,  +0.10511 ,  +0.00e+00 ,  -7.77e-01 ,  -1.59e-01 ,  +5.66e+00 ,  +3.21e+01 ,  +7.92e+03 ,  -1.37e+04 ; 
-% b1_edge, 0,0,0,0,0,0,0,0,0;
-% b1,       0.0160 ,  +0.03328 ,  +0.00e+00 ,  -4.28e-01 ,  -2.23e+00 ,  +1.60e+01 ,  -1.87e+02 ,  +1.74e+04 ,  -3.29e+05 ; 
-% b1,       0.0400 ,  +0.03267 ,  +0.00e+00 ,  -8.48e-02 ,  -1.96e+00 ,  +7.58e+00 ,  -5.17e+01 ,  +5.46e+03 ,  +5.56e+03 ; 
-% b1,       0.0400 ,  +0.00789 ,  +0.00e+00 ,  -9.10e-03 ,  -4.28e-01 ,  +1.56e+00 ,  +2.04e+01 ,  +3.49e+01 ,  +1.22e+03 ; 
-% b1,       0.0500 ,  +0.00455 ,  -3.81e-06 ,  -9.98e-04 ,  -1.02e-01 ,  +2.07e-01 ,  +4.49e+00 ,  -1.54e+01 ,  -6.34e+02 ; 
-% m_accep, 0,0,0,0,0,0,0,0,0; 
-% ];
-
 
 % Average Dipole Model for B1 at current 403p6A
 % =============================================
 % date: 2019-01-30
 % Based on multipole expansion around average segmented model trajectory calculated
-% from fieldmap analysis of measured data
+% from fieldmap analysis of measurement data
 % init_rx =  8.527 mm
 % ref_rx  = 13.693 mm (average model trajectory)
 % goal_tunes = [49.096188917357331, 14.151971558423915];
@@ -81,9 +46,9 @@ m_accep, 0,0,0,0,0,0,0,0,0;
 ];
 
 
-
 % turns deflection angle error off (convenient for having a nominal model with zero 4d closed orbit)
 segmodel(:,4) = 0;
+
 
 % builds half of the magnet model
 d2r = pi/180.0;
