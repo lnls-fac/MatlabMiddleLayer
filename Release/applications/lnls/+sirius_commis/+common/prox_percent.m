@@ -1,10 +1,14 @@
 function p = prox_percent(a, b)
 p = zeros(length(a), 1);
+dif = length(a) - length(b);
 
-for j = 1:length(a)
-    p(j) = 1 - abs(a(j) - b(j)) / max(abs(a(j)),abs(b(j)));
+if dif ~= 0
+    error('Vectors must be the same size');
 end
-p = abs(p)*100;
+
+erro_percent = abs(a - b) ./ abs(b);
+
+p = abs(1 - erro_percent)*100;
 
 if isnan(p)
     p = 100;

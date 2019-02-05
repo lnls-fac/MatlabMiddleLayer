@@ -202,11 +202,11 @@ end
 function machine = create_apply_bpm_errors(machine, family_data)
         % BPM  anc Corr errors are treated differently from magnet errors:
         % constants
-        mm = 1e-3;
+        um = 1e-6;
         
         control.bpm.idx = family_data.BPM.ATIndex;
-        control.bpm.sigma_offsetx   = 0.5 * mm * 1; % BBA precision
-        control.bpm.sigma_offsety   = 0.5 * mm * 1;
+        control.bpm.sigma_offsetx   = 500 * um * 1; 
+        control.bpm.sigma_offsety   = 500 * um * 1;
         
         cutoff_errors = 1;
         machine = lnls_latt_err_generate_apply_bpmcorr_errors(name, machine, control, cutoff_errors);

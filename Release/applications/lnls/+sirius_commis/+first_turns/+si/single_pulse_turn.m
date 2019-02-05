@@ -1,4 +1,4 @@
-function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns)
+function [eff_1turn, count_turns, r_bpm_turns, r_init, RBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns)
 % Simulation of booster injection and turns around the ring for a single
 % pulse (for multiple pulses, see the function multiple_pulses_turns())
 %
@@ -85,16 +85,17 @@ for j = 1:n_mach
     for i = 1:n_turns-1
         [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
         if eff_turns(j, i+1) <= eff_lim
+            % r_bpm_turns = squeeze(mean(RBPM(1:count_turns(j), :, :), 1));
             % RBPM(i+1, :, :) = zeros(2, length(bpm));
             % INTBPM(i+1, :, :) = zeros(1, length(bpm));
             break
         end
         count_turns(j) = count_turns(j) + 1;
     end
-    w = squeeze(INTBPM(1:count_turns(j), :, end));
-    r_bpm_turns = squeeze(mean(w .* RBPM(1:count_turns(j), :, :)));
+    % w = squeeze(INTBPM(1:count_turns(j), :, end));
+    r_bpm_turns = squeeze(mean(RBPM(1:count_turns(j), :, :), 1));
     % r_bpm_turns = squeeze(mean(RBPM(1:count_turns(j), :, :), 1));
-    int_bpm_turns = squeeze(mean(INTBPM(1:count_turns(j), 1)));
+    % int_bpm_turns = squeeze(mean(INTBPM(1:count_turns(j), 1)));
 end
 end
 

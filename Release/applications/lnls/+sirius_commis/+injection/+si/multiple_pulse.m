@@ -38,9 +38,10 @@ l_bpm = length(bpm);
 eff = zeros(1, n_pulse);
 param_errors.sigma_bpm = 2e-3;
 sigma_bpm = zeros(n_pulse, 2, l_bpm);
-r_pulse = zeros(n_pulse, 2, point);
+r_pulse = zeros(n_pulse, 2, point(end));
 r_diag_bpm = zeros(n_pulse, 2, l_bpm);
 r_end = zeros(n_pulse, 6, n_part);
+r_point = zeros(2, n_part, length(point));
 if(exist('kckr','var'))
     if(strcmp(kckr,'on'))
         flag_kckr = true;
@@ -91,7 +92,7 @@ elseif(~exist('shape', 'var')) && ~flag_shape
     flag_shape = false;
 end
 
-p = 1/10;
+p = 0;
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
     param.offset_x = param.offset_x_sist + p * error_x_pulse;
@@ -113,23 +114,35 @@ for j=1:n_pulse
     end
 
     error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
-    param.delta = p * param.delta_sist + p * error_delta_pulse;
+    param.delta = param.delta_sist + 0 * error_delta_pulse;
     
     param.phase = param_errors.phase_offset;
 
     if flag_diag        
         [r_xy, r_end_part, r_point, r_bpm] = sirius_commis.injection.si.single_pulse(machine, param, n_part, point);
-        r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
+        if n_part == 1
+            r_diag_bpm(j, :, :) = r_bpm;
+        else
+            r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
+        end
         [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param_errors.sigma_bpm);
     else
         [r_xy, r_end_part, r_point] = sirius_commis.injection.si.single_pulse(machine, param, n_part, point);
-        [erro_bpm(:, j), int_bpm] = sirius_commis.common.bpm_error_inten(r_point, n_part, param_errors.sigma_bpm);
+        
+        if length(point) > 1 
+            for i = 1:length(point)
+                [erro_bpm(:, j, i), int_bpm(i)] = sirius_commis.common.bpm_error_inten(squeeze(r_point(:, :,i)), n_part, param_errors.sigma_bpm);
+            end
+        else
+            [erro_bpm(:, j), int_bpm] = sirius_commis.common.bpm_error_inten(r_point, n_part, param_errors.sigma_bpm);
+        end
+            
     end    
     r_pulse(j, :, :) =  nanmean(r_xy, 2);
-    r_part(j, :, :) = r_point;
-    r_end(j, :, :) = r_end_part;
+    r_part(j, :, :, :) = r_point;
+    r_end(j, :, :, :) = r_end_part;
     
-    eff(j) = sirius_commis.common.calc_eff(n_part, r_xy(:, :, point));      
+    eff(j) = sirius_commis.common.calc_eff(n_part, squeeze(r_xy(:, :, point(end))));      
 
     if flag_plot && ~flag_shape
         plot_si_turn(machine, r_xy);
@@ -173,14 +186,30 @@ end
 fprintf('AVERAGE EFFICIENCY :  %g %% \n', mean(eff)*100);
 
 if ~flag_diag
-r_point = r_pulse(:, :, point);
-offset = getcellstruct(machine,'Offsets', bpm);
-r_point = r_point + p * erro_bpm';
+    offset = getcellstruct(machine, 'Offsets', bpm);
+    if length(point) > 1
+        r_bpm_inj = zeros(n_pulse, 2, length(point));
+        for i = 1:length(point)
+            r_bpm_inj(:, :, i) = squeeze(r_pulse(:, :, point(i)));
+            r_bpm_inj(:, :, i) = r_bpm_inj(:, :, i) + p * erro_bpm(:, :, i)';
 
-% The comparison with vacuum chamber in this case is screen-like.
-r_point = squeeze(nanmean(r_point, 1));
-r_point = r_point + offset{bpm == point};
-r_point = sirius_commis.common.compares_vchamb(machine, r_point, point, 'screen');
+        % The comparison with vacuum chamber in this case is screen-like.
+            r_bpm_inj2(:, i) = squeeze(nanmean(r_bpm_inj(:, :, i), 1));
+            r_bpm_inj2(:, i) = r_bpm_inj2(:, i) + offset{bpm == point(i)}';
+            r_bpm_inj2(:, i) = sirius_commis.common.compares_vchamb(machine, r_bpm_inj2(:, i)', point(i), 'screen');
+        end
+        clear r_point
+        r_point = r_bpm_inj2;
+    else
+        r_point = squeeze(r_pulse(:, :, point));
+        r_point = r_point + p * erro_bpm';
+
+        % The comparison with vacuum chamber in this case is screen-like.
+        r_point = squeeze(nanmean(r_point, 1));
+        r_point = r_point + offset{bpm == point};
+        r_point = sirius_commis.common.compares_vchamb(machine, r_point, point, 'screen');
+    end
+        
 end
 
 if flag_diag
@@ -193,8 +222,9 @@ if flag_diag
     offset = getcellstruct(machine,'Offsets', bpm);
     offset = cell2mat(offset)';
     r_diag_bpm = r_diag_bpm + offset;
+    % orbit = findorbit4(machine, 0, 1:length(machine));
     r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
-    sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
+    % sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
 end
  fprintf('=================================================\n');
 end
@@ -217,7 +247,7 @@ function plot_si_turn(machine, r_final)
     grid on;
     % plot(ax, s, orbit(1, :) * mm, '.-k', 'linewidth', 2);
     % plot(ax, s, orbit(3, :) * mm, '.-k', 'linewidth', 2);
-    ylim(ax, [-15, 15]);
+    ylim(ax, [-mm*VChamb(1,1), mm*VChamb(1,1)]);
     xlim(ax, [0, s(end)]);
     drawnow;        
 end

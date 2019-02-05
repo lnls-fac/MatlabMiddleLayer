@@ -1,4 +1,4 @@
-function [param_out, machine, r_bpm2] = single_adj_loop(si_ring, n_part, n_pulse, set_mach, param_in, param_errors_in)
+function [param_out, machine, r_bpm] = single_adj_loop(si_ring, n_part, n_pulse, set_mach, param_in, param_errors_in, corr_energy)
 % Single loop of injection parameters adjustment. It uses measurements of
 % screen 1 to adjust the injection angle with injection kicker turned off, after that turns
 % on the kicker and with screen 1 again adjustes the kicker angle for the first time.
@@ -55,12 +55,19 @@ function [param_out, machine, r_bpm2] = single_adj_loop(si_ring, n_part, n_pulse
     end
 
     bpm = findcells(machine, 'FamName', 'BPM');
-    % SCREEN 1 ON
-    kckr = 'off';
-    [~, param_out] = sirius_commis.injection.si.bpm1_sept(machine, param0, param0_errors, n_part, n_pulse, bpm(1), kckr);
-    % KICKER ON -->> WITH BPM 1 MEASUREMENT, ADJUST THE KICKER
-    kckr = 'on';
-    [~, param_out] = sirius_commis.injection.si.bpm1_kckr(machine, param_out, param0_errors, n_part, n_pulse, bpm(1), kckr);
+    
+    % if ~corr_energy
+        % SCREEN 1 ON
+        kckr = 'off';
+        [~, param_out] = sirius_commis.injection.si.bpm1_sept(machine, param0, param0_errors, n_part, n_pulse, bpm(1), kckr);
+        % KICKER ON -->> WITH BPM 1 MEASUREMENT, ADJUST THE KICKER
+        kckr = 'on';
+        [~, param_out] = sirius_commis.injection.si.bpm1_kckr(machine, param_out, param0_errors, n_part, n_pulse, bpm(1), kckr);
+        r_bpm = [0, 0];
+    % else
+    %    param_out = param0;
+    %    kckr = 'on';
+    % end
 
-    [param_out, r_bpm2] = sirius_commis.injection.si.bpm2_energy(machine, param_out, param0_errors, n_part, n_pulse, bpm(2), kckr);
+    % [param_out, r_bpm] = sirius_commis.injection.si.bpm2_energy(machine, param_out, param0_errors, n_part, n_pulse, [bpm(1), bpm(2), bpm(3)], kckr);
 end

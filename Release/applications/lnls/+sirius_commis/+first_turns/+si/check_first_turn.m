@@ -45,9 +45,12 @@ machine_correct = cell(n_mach, 1);
 param_errors.sigma_bpm = 2e-3;
 
 fam = sirius_si_family_data(machine_cell{1});
+ch = fam.CH.ATIndex;
+cv = fam.CV.ATIndex;
+bpm = fam.BPM.ATIndex;
 ft_data = cell(n_mach, 1);
 
-[m_corr_x, m_corr_y] = sirius_commis.first_turns.si.check_first_turn(fam, M_acc);
+[m_corr_x, m_corr_y] = sirius_commis.first_turns.si.trajectory_matrix(fam, M_acc);
 
 m0xy = zeros(size(bpm, 1), size(cv, 1));
 m0yx = zeros(size(bpm, 1), size(ch, 1));
@@ -102,7 +105,7 @@ for j = 1:n_mach
    
     ft_data{j}.ft_ok = ft_mach;
     ft_data{j}.ft_ok_ref = ft_mach_refined;
-    ft_data{j}.n_turns = count_turns;
+    ft_data{j}.n_turns = count_turns(:, j);
     kickx_final = lnls_get_kickangle(ft_data{j}.machine, fam.CH.ATIndex, 'x'); 
     kicky_final = lnls_get_kickangle(ft_data{j}.machine, fam.CV.ATIndex, 'y');
     ft_data{j}.finalcod.kickx = kickx_final;

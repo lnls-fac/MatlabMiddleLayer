@@ -64,7 +64,7 @@ if n == 2
 end
 
 if n == 3
-    fprintf('LOW INTENSITY ON BPM 2 \n');
+    fprintf('LOW INTENSITY ON BPM 2 and 3 \n');
     fprintf('=================================================\n');
     while eff < eff_lim
         delta_energy = delta_energy + param.delta_sist * 0.1;

@@ -40,12 +40,13 @@ r_bpm_turns = zeros(n_pulse, 2, length(bpm));
 int_bpm_turns = zeros(n_pulse, length(bpm));
 eff_turns = zeros(n_pulse, n_mach, n_turns);
 eff_mean = zeros(n_pulse, n_mach);
+param_errors.sigma_bpm = 3e-3;
 
 for i = 1:n_pulse
     fprintf('======================= \n');
     fprintf('Pulse number %i \n', i);
     fprintf('======================= \n');
-    [~, count_turns(i, :), r_bpm_turns(i, :, :), int_bpm_turns(i, :, :), ~, ~, eff_turns(i, :, :)] = sirius_commis.first_turns.si.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns);
+    [~, count_turns(i, :), r_bpm_turns(i, :, :), ~, ~, eff_turns(i, :, :)] = sirius_commis.first_turns.si.single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns);
     a = sum(eff_turns, 3) ./ count_turns(i, :);
     eff_mean(i,:) = a(i);
     eff_mean = squeeze(eff_mean);

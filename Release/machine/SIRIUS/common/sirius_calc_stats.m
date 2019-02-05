@@ -222,13 +222,14 @@ function sirius_calc_stats(N, save_fig, arq_results, arq_machines, scale)
     set(CODfig, 'Position', [1 1 1000 350]);
     axes('FontSize',14);
     hold on;
+    %{
     for i=1:N
         plot(posz(ini:fim),abs(twiss(i).cox(ini:fim)*scale),'Color', [0.4 0.69 1]);
         plot(posz(ini:fim),-abs(twiss(i).coy(ini:fim)*scale),'Color', [1 0.6 0.6]);
     end
     plot(posz(ini:fim),abs(codx_std(ini:fim)),'LineWidth',3,'Color',[0 0 0.8]);
     plot(posz(ini:fim),-abs(cody_std(ini:fim)),'LineWidth',3,'Color',[1 0 0]);
-
+    %}
     offset=0;
     top=0;
     for i=1:N

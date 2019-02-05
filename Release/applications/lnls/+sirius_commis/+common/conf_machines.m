@@ -33,19 +33,19 @@ fprintf('============================================================ \n')
 fprintf('Mach. n ||GEN. ERROR || SCRIPT FOUND ||  AGREEMENT \n')
 
 for j = 1:length(param)
-    erro_en(j) = param{j}.delta_ave*100;
+    erro_en(j) = param{j}.delta_ave_f*100;
     agree(j) = sirius_commis.common.prox_percent(erro_en(j), gen_en(j));
     fprintf('-- %02d --|| %1.2f %% -- || -- %1.2f %% -- || -- %1.2f %% --\n', j, gen_en(j), erro_en(j), agree(j));
 end
 
-conc_en = sirius_commis.common.prox_percent(erro_en, gen_en);
+conc_en = sirius_commis.common.prox_percent(erro_en(erro_en ~= 0), gen_en);
 conc_en_mean = mean(conc_en);
 conc_en_std = std(conc_en);
 [conc_en_max, i_max] = max(conc_en);
 [conc_en_min, i_min] = min(conc_en);
 fprintf('-------------------------------------------------------------\n')
-fprintf('Average || %1.2f %% ||    -- -- %1.4f %% -- --      || -- %1.2f %% --\n', mean(gen_en), mean(erro_en), conc_en_mean);
-fprintf('RMS     || %1.2f %% ||    -- -- %1.4f %% -- --      || -- %1.2f %% --\n', std(gen_en), std(erro_en), conc_en_std);
+fprintf('Average || %1.2f %% ||    -- -- %1.4f %% -- --      || -- %1.2f %% --\n', mean(gen_en), mean(erro_en(erro_en ~= 0)), conc_en_mean);
+fprintf('RMS     || %1.2f %% ||    -- -- %1.4f %% -- --      || -- %1.2f %% --\n', std(gen_en), std(erro_en(erro_en ~= 0)), conc_en_std);
 fprintf('Maximum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_max, conc_en_max);
 fprintf('Minimum || -- -- -- ||  -- Machine Number %02d --   || -- %1.2f %% --\n', i_min, conc_en_min);
 
