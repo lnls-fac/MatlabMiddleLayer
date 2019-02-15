@@ -195,7 +195,7 @@ if ~flag_diag
 
         % The comparison with vacuum chamber in this case is screen-like.
             r_bpm_inj2(:, i) = squeeze(nanmean(r_bpm_inj(:, :, i), 1));
-            r_bpm_inj2(:, i) = r_bpm_inj2(:, i) + offset{bpm == point(i)}';
+            r_bpm_inj2(:, i) = r_bpm_inj2(:, i) - offset{bpm == point(i)}';
             r_bpm_inj2(:, i) = sirius_commis.common.compares_vchamb(machine, r_bpm_inj2(:, i)', point(i), 'screen');
         end
         clear r_point
@@ -219,12 +219,13 @@ if flag_diag
     else
         r_diag_bpm = squeeze(r_diag_bpm);
     end
-    offset = getcellstruct(machine,'Offsets', bpm);
+    offset = getcellstruct(machine, 'Offsets', bpm);
     offset = cell2mat(offset)';
-    r_diag_bpm = r_diag_bpm + offset;
-    % orbit = findorbit4(machine, 0, 1:length(machine));
+    r_diag_bpm = r_diag_bpm -  offset;
+    machine = lnls_set_kickangle(machine, 0, injkckr, 'x');
+    orbit = findorbit4(machine, 0, 1:length(machine));
     r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
-    % sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
+    sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
 end
  fprintf('=================================================\n');
 end
@@ -245,8 +246,8 @@ function plot_si_turn(machine, r_final)
     plot(ax, s, mm*VChamb(1,:),'k');
     plot(ax, s, -mm*VChamb(1,:),'k');
     grid on;
-    % plot(ax, s, orbit(1, :) * mm, '.-k', 'linewidth', 2);
-    % plot(ax, s, orbit(3, :) * mm, '.-k', 'linewidth', 2);
+    plot(ax, s, orbit(1, :) * mm, '.-k', 'linewidth', 2);
+    plot(ax, s, orbit(3, :) * mm, '.-k', 'linewidth', 2);
     ylim(ax, [-mm*VChamb(1,1), mm*VChamb(1,1)]);
     xlim(ax, [0, s(end)]);
     drawnow;        
