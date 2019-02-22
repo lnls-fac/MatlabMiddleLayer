@@ -1,7 +1,7 @@
-function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, twiss, n_points, plane, data_input)
+function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, plane, data_bpm, data_input)
 
     mili = 1e-3; micro = 1e-6;
-    bpm_stop = 15;
+    bpm_stop = 200;
     
     if n_mach == 1
         machine_cell = {machine};
@@ -16,6 +16,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
     off_bba = cell(n_mach, 1);
     off_theta = cell(n_mach, 1);
     m_resp = cell(n_mach, 1);
+    pos_bpm_i = cell(n_mach, 1); pos_bpm_f = cell(n_mach, 1);
     
     for j = 1:n_mach       
         fprintf('================================================\n');
@@ -66,27 +67,31 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         bpm_ok_x = ZERO_BPM; bpm_ok_y = ZERO_BPM;
         m_resp_x = ZERO_BPM; m_resp_y = ZERO_BPM;
         mx = ZERO_BPM; my = ZERO_BPM;
+        Ri_x = zeros(length(bpm), n_points_new, 2, length(bpm));
+        Rf_x = zeros(length(bpm), n_points_new, 2, length(bpm));
+        Ri_y = zeros(length(bpm), n_points_new, 2, length(bpm));
+        Rf_y= zeros(length(bpm), n_points_new, 2, length(bpm));
         
         bba_ind = get_bba_ind(machine, bpm, quads);
         
         % INITIAL TEST: SET QUADRUPOLE MISALIGNMENT TO ZERO
         
-        offset_quadx2 = getcellstruct(machine, 'T2', bba_ind, 1, 1);
-        offset_quady2 = getcellstruct(machine, 'T2', bba_ind, 1, 3);
-        offset_quadx1 = getcellstruct(machine, 'T1', bba_ind, 1, 1);
-        offset_quady1 = getcellstruct(machine, 'T1', bba_ind, 1, 3);
+        % offset_quadx2 = getcellstruct(machine, 'T2', bba_ind, 1, 1);
+        % offset_quady2 = getcellstruct(machine, 'T2', bba_ind, 1, 3);
+        % offset_quadx1 = getcellstruct(machine, 'T1', bba_ind, 1, 1);
+        % offset_quady1 = getcellstruct(machine, 'T1', bba_ind, 1, 3);
         
         % machine = setcellstruct(machine, 'T1', bba_ind, offset_quadx1.*0 , 1, 1);
         % machine = setcellstruct(machine, 'T1', bba_ind, offset_quady1.*0 , 1, 3);
         % machine = setcellstruct(machine, 'T2', bba_ind, offset_quadx2.*0 , 1, 1);
         % machine = setcellstruct(machine, 'T2', bba_ind, offset_quady2.*0 , 1, 3);
         
-        [m_corr_x, m_corr_y] = sirius_commis.first_turns.si.trajectory_matrix(fam, M_acc);
+        [m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
         [~ , ind_best_x] = max(abs(m_corr_x), [], 2);
         [~ , ind_best_y] = max(abs(m_corr_y), [], 2);
         
-        delta_x = 1.5 * mili / factor;
-        delta_y = 1.5 * mili / factor;
+        delta_x = 1.0 * mili / factor;
+        delta_y = 1.0 * mili / factor;
         corr_lim_max = 300 * micro;
         
         for k = 1:length(bpm)
@@ -121,6 +126,31 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                bpm_ok_y(k) = 0;
             end
         end
+        
+        bpms_x = find(bpm_ok_x);
+        bpms_y = find(bpm_ok_y);
+        
+        for kx = 1:length(bpms_x)
+           if ~ismember(bpms_x(kx), data_bpm.good_bpm_x)
+               bpm_ok_x(bpms_x(kx)) = 0;
+           end
+           % elseif ismember(bpms_x(kx), data_bpm.bad_bpm_x)
+           %     bpm_ok_x(bpms_x(kx)) = 0;
+           % else
+           %     continue
+           % end
+        end
+        
+        for ky = 1:length(bpms_y)
+           if ~ismember(bpms_y(ky), data_bpm.good_bpm_y)
+               bpm_ok_y(bpms_y(ky)) = 0;
+           % elseif ismember(bpms_y(ky), data_bpm.bad_bpm_y)
+           %     bpm_ok_y(bpms_y(ky)) = 0;
+           % else
+           %     continue
+           end
+        end
+        
         
         % clsf = ZERO_BPM; number_corr = ZERO_BPM;
         % pi_num = pi;
@@ -213,8 +243,8 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                     continue
                 end
 
-                [Ri_x, Rf_x] = bba_process(machine, param, param_errors, n_part, n_pulse, bba_ind, ind_best_x, dtheta_corr, i, n_points_new, fam, 'x');
-                [quadratic_x, linear_x, m_resp_x(i), mono] = sirius_commis.first_turns.si.bba_analysis(Ri_x, Rf_x, i, dtheta_corr, 'x', 'plot');
+                [ri_x, rf_x] = bba_process(machine, param, param_errors, n_part, n_pulse, bba_ind, ind_best_x, dtheta_corr, i, n_points_new, fam, 'x');
+                [quadratic_x, linear_x, m_resp_x(i), mono] = sirius_commis.common.bba_analysis(ri_x, rf_x, i, dtheta_corr, 'x', 'plot');
                 % off_bba_x(i) = quadratic_x.offset_bpm;
                 % off_bba_theta_x(i) = quadratic_x.offset_theta;
                 % if mono
@@ -226,6 +256,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                 % off_bba_theta_x(i) = linear_x.offset_theta;
                 off_bba_x(i) = quadratic_x.offset_bpm;
                 off_bba_theta_x(i) = quadratic_x.offset_theta;
+                Ri_x(i, :, :, :) = ri_x; Rf_x(i, :, :, :) = rf_x;
             end
         end
         if strcmp(plane, 'y') || strcmp(plane, 'xy')
@@ -281,12 +312,13 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                     continue
                 end
 
-                [Ri_y, Rf_y] = bba_process(machine, param, param_errors, n_part, n_pulse, bba_ind, ind_best_y, dtheta_corr, i, n_points_new, fam, 'y');
-                [quadratic_y, linear_y, m_resp_y(i)] = sirius_commis.first_turns.si.bba_analysis(Ri_y, Rf_y, i, dtheta_corr, 'y', 'plot');
+                [ri_y, rf_y] = bba_process(machine, param, param_errors, n_part, n_pulse, bba_ind, ind_best_y, dtheta_corr, i, n_points_new, fam, 'y');
+                [quadratic_y, linear_y, m_resp_y(i)] = sirius_commis.common.bba_analysis(ri_y, rf_y, i, dtheta_corr, 'y', 'plot');
                 % off_bba_y(i) = linear_y.offset_bpm;
                 % off_bba_theta_y(i) = linear_y.offset_theta;
                 off_bba_y(i) = quadratic_y.offset_bpm;
                 off_bba_theta_y(i) = quadratic_y.offset_theta;
+                Ri_y(i, :, :, :) = ri_y; Rf_y(i, :, :, :) = rf_y;
             end
         end
         offset_quadx = getcellstruct(machine, 'T2', bba_ind, 1, 1);
@@ -299,12 +331,18 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         off_bba{j} = [off_bba_x, off_bba_y];
         off_theta{j} = [off_bba_theta_x, off_bba_theta_y];
         m_resp{j} = [m_resp_x, m_resp_y];
+        pos_bpm_i{j} = [Ri_x, Ri_y];
+        pos_bpm_f{j} = [Rf_x, Rf_y];
     end
     bba_data.off_bba = off_bba;
     bba_data.off_theta = off_theta;
     bba_data.off_bpm = off_bpm;
     bba_data.off_quad = off_quad;
     bba_data.m_resp = m_resp;
+    bba_data.pos_bpm_i = pos_bpm_i;
+    bba_data.pos_bpm_f = pos_bpm_f;
+    bba_data.bpm_ok_x = bpm_ok_x;
+    bba_data.bpm_ok_y = bpm_ok_y;
 end
 
 function [Ri, Rf] = bba_process(machine_in, param, param_errors, n_part, n_pulse, bba_ind, ind_best, dtheta_corr, n_bpm, n_points, fam, plane)
@@ -370,7 +408,8 @@ end
 
 bpm_bba = bpm(bpm > bba_ind(n_bpm));
 [~, ind_bpm_bba] = intersect(bpm, bpm_bba);
-Ri = zeros(n_points, 2, length(ind_bpm_bba));
+% Ri = zeros(n_points, 2, length(ind_bpm_bba));
+Ri = zeros(n_points, 2, length(bpm));
 Rf = Ri;
 
 for ii = 1:n_points
@@ -417,9 +456,12 @@ for ii = 1:n_points
         %     n_corr = 0;
         % end
         int_min = 0.80;
+        dif = setdiff([1:1:160]', ind_bpm_bba);
         
-        Ri(ii, :, :) = r_bpm1(:, ind_bpm_bba);
-        Rf(ii, :, :) = r_bpm2(:, ind_bpm_bba);
+        % Ri(ii, :, :) = r_bpm1(:, ind_bpm_bba);
+        % Rf(ii, :, :) = r_bpm2(:, ind_bpm_bba);
+        Ri(ii, :, :) = r_bpm1; Ri(ii, :, dif) = NaN;
+        Rf(ii, :, :) = r_bpm2; Rf(ii, :, dif) = NaN;
         bpm_discard = int_bpm1(ind_bpm_bba) < int_min | int_bpm2(ind_bpm_bba) < int_min;
         first = ind_bpm_bba(bpm_discard);
         if ~isempty(first)
