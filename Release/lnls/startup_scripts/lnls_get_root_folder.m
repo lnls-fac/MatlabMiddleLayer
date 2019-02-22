@@ -7,8 +7,8 @@ if strcmpi(computer, 'PCWIN') || strcmpi(computer, 'PCWIN64')
         root_folder = ['D:' filesep 'Arq' filesep 'fac'];
     end
 else
-    if exist('/home/fac','dir')
-        root_folder = '/home/fac';
+    if exist('/home/facs/repos','dir')
+        root_folder = '/home/facs/repos';
     elseif exist('/home/fac_files/code','dir')
         root_folder = '/home/fac_files/code';
     else
