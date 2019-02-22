@@ -2,7 +2,10 @@ function [quadratic, linear, mresp, mono] = bba_analysis(Ri, Rf, n_bpm, dtheta, 
 
 f_merit_quad = squeeze(nansum((Ri - Rf).^2, 3)) / size(Ri, 3);
 f_merit_linear = Rf - Ri;
-r_bpm = squeeze(Ri(:, :, 1));
+r_bpm = squeeze(Ri(:, :, n_bpm));
+if any(isnan(r_bpm))
+    r_bpm = squeeze(Ri(:, :, n_bpm + 1));
+end
 
 if strcmp(plane, 'x')
     bpm_pos = squeeze(r_bpm(:, 1));
