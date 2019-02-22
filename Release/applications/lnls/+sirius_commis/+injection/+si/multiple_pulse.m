@@ -92,24 +92,24 @@ elseif(~exist('shape', 'var')) && ~flag_shape
     flag_shape = false;
 end
 
-p = 0;
+p = 1;
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
-    param.offset_x = param.offset_x_sist + p * error_x_pulse;
+    param.offset_x = param.offset_x_sist + p * error_x_pulse; %param.offset_x0;
 
     error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
-    param.offset_xl = param.offset_xl_sist + p * error_xl_pulse;
+    param.offset_xl = param.offset_xl_sist + p * error_xl_pulse; %param.offset_xl0;
     % Peak to Peak values from measurements - cutoff = 1;
     
     error_y_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.y_error_pulse;
-    param.offset_y = param.offset_y_sist + p * error_y_pulse;
+    param.offset_y = param.offset_y_sist + p * error_y_pulse; %param.offset_y0;
 
     error_yl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.yl_error_pulse;
-    param.offset_yl = param.offset_yl_sist + p * error_yl_pulse;
+    param.offset_yl = param.offset_yl_sist + p * error_yl_pulse; %param.offset_yl0;
 
     if flag_kckr
         error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
-        param.kckr = param.kckr_sist + p * error_kckr_pulse;
+        param.kckr = param.kckr_sist + p * error_kckr_pulse; %param.kckr0;
         machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
     end
 
@@ -206,7 +206,7 @@ if ~flag_diag
 
         % The comparison with vacuum chamber in this case is screen-like.
         r_point = squeeze(nanmean(r_point, 1));
-        r_point = r_point + offset{bpm == point};
+        r_point = r_point - offset{bpm == point};
         r_point = sirius_commis.common.compares_vchamb(machine, r_point, point, 'screen');
     end
         

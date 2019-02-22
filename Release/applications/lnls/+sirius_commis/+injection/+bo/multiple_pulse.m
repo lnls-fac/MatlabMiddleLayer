@@ -100,7 +100,11 @@ for j=1:n_pulse
 
     if flag_diag        
         [r_xy, r_end_part, r_point, r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
-        r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
+        if n_part == 1
+            r_diag_bpm(j, :, :) = r_bpm;
+        else
+            r_diag_bpm(j, :, :) =  nanmean(r_bpm, 2);
+        end
         [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param_errors.sigma_bpm);
     else
         [r_xy, r_end_part, r_point] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
@@ -147,6 +151,9 @@ if flag_diag
     else
         r_diag_bpm = squeeze(r_diag_bpm);
     end
+    offset = getcellstruct(machine, 'Offsets', bpm);
+    offset = cell2mat(offset)';
+    r_diag_bpm = r_diag_bpm -  offset;
     r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
     sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
 end

@@ -24,9 +24,9 @@ for j = 1:n_mach
     v_dcrs(offset_bbaj == 0) = NaN;
     % dcrs(isnan(dcrs)) = 0;
     % offset_bbaj(~dcrs) = NaN;
-    % initial_dif = abs(offset_quadj - (-offset_bpmj));
-    % new_offset = offset_bpmj - offset_bbaj;
-    % final_dif = abs(offset_quadj - (-new_offset));
+    % initial_dif = offset_quadj -offset_bpmj;
+    % new_offset = offset_bpmj + offset_bbaj;
+    % final_dif = offset_quadj - new_offset;
     
     final_bba(offset_bbaj == 0) = NaN;
     initial_bba(offset_bbaj == 0) = NaN;

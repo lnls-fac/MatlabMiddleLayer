@@ -38,7 +38,7 @@ function [r_xy, r_end_ring, r_point, r_bpm] = single_pulse(machine, param, n_par
     if n_part > 1
         r_init = lnls_generate_bunch(param.beam.emitx, param.beam.emity, param.beam.sigmae, param.beam.sigmaz, twi, n_part, cutoff);
         r_init = bsxfun(@plus, r_init, offsets);
-    elseif n_part
+    else
         r_init = offsets;
     end
     
