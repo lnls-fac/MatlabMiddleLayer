@@ -21,6 +21,7 @@ data.CH.nr_segs   = 1;
 data.CV.nr_segs   = 1;
 data.BPM.nr_segs  = 1;
 data.Scrn.nr_segs = 1;
+data.InjSept.nr_segs = 2;
 
 ind = atindex(the_ring);
 fams = fields(data);
