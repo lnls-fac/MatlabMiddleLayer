@@ -35,5 +35,7 @@ data.CH.ATIndex = data.CHV.ATIndex(1:end-1); % last CHV corrector does not have 
 data.CV.ATIndex = data.CHV.ATIndex;
 
 for i=1:length(fams)
-    data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
+    if isfield(ind, fams{i})
+        data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
+    end
 end
