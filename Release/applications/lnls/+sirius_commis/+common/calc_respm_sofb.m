@@ -50,14 +50,12 @@ if flag_cav
     ring_cavp = setcellstruct(ring_cav, 'Frequency', cav, fp);
     ring_cavm = setcellstruct(ring_cav, 'Frequency', cav, fm);
 
-    orbit0 = findorbit6(ring_cav, fam.BPM.ATIndex);
+    % orbit0 = findorbit6(ring_cav, fam.BPM.ATIndex);
     orbitp = findorbit6(ring_cavp, fam.BPM.ATIndex);
     orbitm = findorbit6(ring_cavm, fam.BPM.ATIndex);
 
-    dif_orbitp = 1e6 * (orbitp - orbit0) ./ df;
-    dif_orbitm = -1e6 * (orbitm - orbit0) ./ df;
-    dif_orbit = ( dif_orbitp + dif_orbitm ) ./ 2;
-
+    dif_orbit = 1e6 * (orbitp - orbitm) ./ (2 * df);
+    
     m_rf = [dif_orbit(1, :), dif_orbit(3, :)];
     respm_sofb6D = [respm_sofb6D, m_rf'];
     if flag_tb
