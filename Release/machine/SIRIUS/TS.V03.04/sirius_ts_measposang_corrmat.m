@@ -11,10 +11,10 @@ i_init = ch{1};
 i_end = length(thering);
 m_h = zeros(2,2);
 for i=1:length(ch)
-    the_ring = lnls_set_kickangle(thering, +kick/2, ch{i}, 'x');
-    p1 = linepass(the_ring(i_init:i_end), [0,0,0,0,0,0]');
-    the_ring = lnls_set_kickangle(thering, -kick/2, ch{i}, 'x');
-    p2 = linepass(the_ring(i_init:i_end), [0,0,0,0,0,0]');
+    r1 = lnls_set_kickangle(thering, +kick/2, ch{i}, 'x');
+    p1 = linepass(r1(i_init:i_end), [0,0,0,0,0,0]');
+    r2 = lnls_set_kickangle(thering, -kick/2, ch{i}, 'x');
+    p2 = linepass(r2(i_init:i_end), [0,0,0,0,0,0]');
     m_h(:,i) = -(p2([1,2]) - p1([1,2]))/kick;
 end
 
@@ -22,10 +22,10 @@ i_init = cv{1};
 i_end = length(thering);
 m_v = zeros(2,2);
 for i=1:length(cv)
-    the_ring = lnls_set_kickangle(thering, +kick/2, cv{i}, 'y');
-    p1 = linepass(the_ring(i_init:i_end), [0,0,0,0,0,0]');
-    the_ring = lnls_set_kickangle(thering, -kick/2, cv{i}, 'y');
-    p2 = linepass(the_ring(i_init:i_end), [0,0,0,0,0,0]');
+    r1 = lnls_set_kickangle(thering, +kick/2, cv{i}, 'y');
+    p1 = linepass(r1(i_init:i_end), [0,0,0,0,0,0]');
+    r2 = lnls_set_kickangle(thering, -kick/2, cv{i}, 'y');
+    p2 = linepass(r2(i_init:i_end), [0,0,0,0,0,0]');
     m_v(:,i) = -(p2([3,4]) - p1([3,4]))/kick;
 end
 
