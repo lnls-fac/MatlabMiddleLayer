@@ -7,8 +7,9 @@ function [bba_data1, bba_data2] = bba_loop(machine, n_mach, param, param_errors,
 
     bba_data1 = sirius_commis.first_turns.si.bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, plane, data_bpm);
     
-    data_input1.off = bba_data1.off_bba;
-    data_input1.off_theta = bba_data1.off_theta;
+    % data_input1.off = bba_data1.off_bba;
+    data_input1.off_theta1 = bba_data1.off_theta1;
+    data_input1.off_theta2 = bba_data1.off_theta2;
     data_input1.factor = 3;
     data_input1.m_resp = bba_data1.m_resp;
 

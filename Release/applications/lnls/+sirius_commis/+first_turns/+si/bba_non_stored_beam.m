@@ -2,6 +2,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
 
     mili = 1e-3; micro = 1e-6;
     bpm_stop = 200;
+    sirius_commis.common.initializations();
     
     if n_mach == 1
         machine_cell = {machine};
@@ -46,7 +47,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
             flag_data_input = false;
             n_points_new = n_points;
         else
-            theta_off = data_input.off_theta;
+            theta_off = data_input.off_theta2;
             theta_off = theta_off{j};
             thetax_off = theta_off(:, 1); thetay_off = theta_off(:, 2);
             factor = data_input.factor;
@@ -62,15 +63,19 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         
         theta_x0 = lnls_get_kickangle(machine, ch, 'x')';
         theta_y0 = lnls_get_kickangle(machine, cv, 'y')';
-        off_bba_x = ZERO_BPM; off_bba_y = ZERO_BPM;
-        off_bba_theta_x = ZERO_BPM; off_bba_theta_y = ZERO_BPM;
+        off_bba_x1 = ZERO_BPM; off_bba_y1 = ZERO_BPM;
+        off_bba_theta_x1 = ZERO_BPM; off_bba_theta_y1 = ZERO_BPM;
+        off_bba_x2 = ZERO_BPM; off_bba_y2 = ZERO_BPM;
+        off_bba_theta_x2 = ZERO_BPM; off_bba_theta_y2 = ZERO_BPM;
+        off_bba_x1f = ZERO_BPM; off_bba_y1f = ZERO_BPM;
+        off_bba_x2f = ZERO_BPM; off_bba_y2f = ZERO_BPM;
         bpm_ok_x = ZERO_BPM; bpm_ok_y = ZERO_BPM;
         m_resp_x = ZERO_BPM; m_resp_y = ZERO_BPM;
         mx = ZERO_BPM; my = ZERO_BPM;
         Ri_x = zeros(length(bpm), n_points_new, 2, length(bpm));
         Rf_x = zeros(length(bpm), n_points_new, 2, length(bpm));
         Ri_y = zeros(length(bpm), n_points_new, 2, length(bpm));
-        Rf_y= zeros(length(bpm), n_points_new, 2, length(bpm));
+        Rf_y = zeros(length(bpm), n_points_new, 2, length(bpm));
         
         bba_ind = get_bba_ind(machine, bpm, quads);
         
@@ -110,6 +115,8 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
             end
             
             mx(k) = m_corr_x(k, ind_best_x(k));
+            my(k) = m_corr_y(k, ind_best_y(k));
+            
             tx = theta_x0(ind_best_x(k));
             dtx = abs(abs(tx) - corr_lim_max);
             dx = mx(k) * dtx;
@@ -130,10 +137,20 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         bpms_x = find(bpm_ok_x);
         bpms_y = find(bpm_ok_y);
         
+        % for l = 1:20
+        %     v2(l) = 2 + (l-1) * 8;
+        %     v5(l) = 5 + (l-1) * 8;
+        % end
+        %{
         for kx = 1:length(bpms_x)
-           if ~ismember(bpms_x(kx), data_bpm.good_bpm_x)
+           % if ~ismember(bpms_x(kx), data_bpm.good_bpm_x)
+           %     bpm_ok_x(bpms_x(kx)) = 0;
+           % end
+           
+           if ~ismember(bpms_x(kx), v2) && ~ismember(bpms_x(kx), v5)
                bpm_ok_x(bpms_x(kx)) = 0;
            end
+           
            % elseif ismember(bpms_x(kx), data_bpm.bad_bpm_x)
            %     bpm_ok_x(bpms_x(kx)) = 0;
            % else
@@ -151,7 +168,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
            end
         end
         
-        
+        %}
         % clsf = ZERO_BPM; number_corr = ZERO_BPM;
         % pi_num = pi;
         %{
@@ -244,18 +261,14 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                 end
 
                 [ri_x, rf_x] = bba_process(machine, param, param_errors, n_part, n_pulse, bba_ind, ind_best_x, dtheta_corr, i, n_points_new, fam, 'x');
-                [quadratic_x, linear_x, m_resp_x(i), mono] = sirius_commis.common.bba_analysis(ri_x, rf_x, i, dtheta_corr, 'x', 'plot');
-                % off_bba_x(i) = quadratic_x.offset_bpm;
-                % off_bba_theta_x(i) = quadratic_x.offset_theta;
-                % if mono
-                %     off_bba_x(i) = 0;
-                %     off_bba_theta_x(i) = corr_lim_max;
-                % else
-                %     off_bba_x(i) = linear_x.offset_bpm;
-                % end
-                % off_bba_theta_x(i) = linear_x.offset_theta;
-                off_bba_x(i) = quadratic_x.offset_bpm;
-                off_bba_theta_x(i) = quadratic_x.offset_theta;
+                [quadratic_x, linear_x, m_resp_x(i)] = sirius_commis.common.bba_analysis(ri_x, rf_x, i, dtheta_corr, 'x', 'plot');
+                
+                off_bba_x1f(i) = linear_x.offset_bpm;
+                off_bba_theta_x1(i) = linear_x.offset_theta;
+                off_bba_x2f(i) = quadratic_x.offset_bpm;
+                off_bba_theta_x2(i) = quadratic_x.offset_theta;
+                off_bba_x1(i) = calc_offsets(machine, param, param_errors, n_part, n_pulse, off_bba_theta_x1(i), ind_best_x, 'x', i, fam);
+                off_bba_x2(i) = calc_offsets(machine, param, param_errors, n_part, n_pulse, off_bba_theta_x2(i), ind_best_x, 'x', i, fam);
                 Ri_x(i, :, :, :) = ri_x; Rf_x(i, :, :, :) = rf_x;
             end
         end
@@ -314,10 +327,12 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
 
                 [ri_y, rf_y] = bba_process(machine, param, param_errors, n_part, n_pulse, bba_ind, ind_best_y, dtheta_corr, i, n_points_new, fam, 'y');
                 [quadratic_y, linear_y, m_resp_y(i)] = sirius_commis.common.bba_analysis(ri_y, rf_y, i, dtheta_corr, 'y', 'plot');
-                % off_bba_y(i) = linear_y.offset_bpm;
-                % off_bba_theta_y(i) = linear_y.offset_theta;
-                off_bba_y(i) = quadratic_y.offset_bpm;
-                off_bba_theta_y(i) = quadratic_y.offset_theta;
+                off_bba_y1f(i) = linear_y.offset_bpm;
+                off_bba_theta_y1(i) = linear_y.offset_theta;
+                off_bba_y2f(i) = quadratic_y.offset_bpm;
+                off_bba_theta_y2(i) = quadratic_y.offset_theta;
+                off_bba_y1(i) = calc_offsets(machine, param, param_errors, n_part, n_pulse, off_bba_theta_y1(i), ind_best_y, 'y', i, fam);
+                off_bba_y2(i) = calc_offsets(machine, param, param_errors, n_part, n_pulse, off_bba_theta_y2(i), ind_best_y, 'y', i, fam);
                 Ri_y(i, :, :, :) = ri_y; Rf_y(i, :, :, :) = rf_y;
             end
         end
@@ -328,14 +343,22 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         offset_bpm = cell2mat(offset_bpm);
         off_bpm{j} = offset_bpm;
         off_quad{j} = offset_quad;
-        off_bba{j} = [off_bba_x, off_bba_y];
-        off_theta{j} = [off_bba_theta_x, off_bba_theta_y];
+        off_bba1{j} = [off_bba_x1, off_bba_y1];
+        off_bba2{j} = [off_bba_x2, off_bba_y2];
+        off_bba1f{j} = [off_bba_x1f, off_bba_y1f];
+        off_bba2f{j} = [off_bba_x2f, off_bba_y2f];
+        off_theta1{j} = [off_bba_theta_x1, off_bba_theta_y1];
+        off_theta2{j} = [off_bba_theta_x2, off_bba_theta_y2];
         m_resp{j} = [m_resp_x, m_resp_y];
         pos_bpm_i{j} = [Ri_x, Ri_y];
         pos_bpm_f{j} = [Rf_x, Rf_y];
     end
-    bba_data.off_bba = off_bba;
-    bba_data.off_theta = off_theta;
+    bba_data.off_bba1 = off_bba1;
+    bba_data.off_bba2 = off_bba2;
+    bba_data.off_bba1f = off_bba1f;
+    bba_data.off_bba2f = off_bba2f;
+    bba_data.off_theta1 = off_theta1;
+    bba_data.off_theta2 = off_theta2;
     bba_data.off_bpm = off_bpm;
     bba_data.off_quad = off_quad;
     bba_data.m_resp = m_resp;
@@ -436,8 +459,8 @@ for ii = 1:n_points
         [~, ~, ~, r_bpm2, int_bpm2] = sirius_commis.injection.si.multiple_pulse(machine2, param, param_errors, n_part, n_pulse, length(machine_in), 'on', 'diag');
         % orbit1 = findorbit4(machine1, 0, bpm);
         % orbit2 = findorbit4(machine2, 0, bpm);
-        % r_bpm1 = orbit1(1, :);
-        % r_bpm2 = orbit2(1, :);
+        % r_bpm1 = orbit1([1,3], :);
+        % r_bpm2 = orbit2([1,3], :);
         % int_bpm1 = ones(length(bpm), 1);
         % int_bpm2 = int_bpm1;
         
@@ -456,7 +479,7 @@ for ii = 1:n_points
         %     n_corr = 0;
         % end
         int_min = 0.80;
-        dif = setdiff([1:1:160]', ind_bpm_bba);
+        dif = setdiff([1:1:length(bpm)]', ind_bpm_bba);
         
         % Ri(ii, :, :) = r_bpm1(:, ind_bpm_bba);
         % Rf(ii, :, :) = r_bpm2(:, ind_bpm_bba);
@@ -493,4 +516,29 @@ for ii = 1:n_points
         %}
 end
 end
+
+function offset_bpm = calc_offsets(machine_in, param, param_errors, n_part, n_pulse, kicks, ind_best, plane, n_bpm, fam)
+
+if strcmp(plane, 'x')
+    corr = fam.CH.ATIndex;
+elseif strcmp(plane, 'y')
+    corr = fam.CV.ATIndex;
+end
+
+bpm = fam.BPM.ATIndex;
+% for k = 1:length(bpm)
+%     if ind_bpm_ok
+        machine_kick = lnls_set_kickangle(machine_in, kicks , corr(ind_best(n_bpm)), plane);
+        [~, ~, ~, r_bpm] = sirius_commis.injection.si.multiple_pulse(machine_kick, param, param_errors, n_part, n_pulse, length(machine_in), 'on', 'diag');
+        if strcmp(plane, 'x')
+            offset_bpm = r_bpm(1, n_bpm);
+        elseif strcmp(plane, 'y')
+            offset_bpm = r_bpm(2, n_bpm);
+        end
+%    else
+%        continue
+%    end
+end
+
+
 
