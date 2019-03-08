@@ -11,7 +11,7 @@ serials = {'006'};
 sirius_excdata.read_multipole_from_fmap_files(tpath, currs, 'B', 'BD-', serials, 'excitation_curve');
 currents = [0, 40.31, 50.39, 60.46, 165.27, 330.54, 500, 640, 680, 720, 800, 942.05, 992.63, 1041.21];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'B', 'dipoles', 'sorting.txt', 1, true);
-sirius_excdata.save_excdata({'BD-006'}, 'bo-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata({'BD-006'}, 'bo-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');
 
 % SD
 currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A', '150A'};
@@ -20,14 +20,14 @@ sirius_excdata.transf_inv_polarity('SD');
 currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130, 150];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'SD', 'sextupoles', 'sorting-sd.txt', 1);
 [currents, n_avg, s_avg, n_std, s_std] = sirius_excdata.transf_add_negative_currents(currents, n_avg, s_avg, n_std, s_std);
-sirius_excdata.save_excdata(sorting, 'bo-sextupole-sd-fam', currents, '2 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'bo-sextupole-sd-fam', currents, '2 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');
 
 % SF
 currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A', '150A'};
 sirius_excdata.read_multipole_files(tpath, currs, 'SF', 'sextupoles', 'BS-');
 currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130, 150];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'SF', 'sextupoles', 'sorting-sf.txt', 1);
-sirius_excdata.save_excdata(sorting, 'bo-sextupole-sf-fam', currents, '2 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'bo-sextupole-sf-fam', currents, '2 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');
 
 
 % CV
@@ -40,7 +40,7 @@ sirius_excdata.read_multipole_files(tpath, currs, 'CV', 'correctors', 'BC-');
 sirius_excdata.transf_rot_z_p90('CV');
 currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CV', 'correctors', 'sorting-cv.txt', 7);
-sirius_excdata.save_excdata(sorting, 'bo-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'bo-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');
 
 % CH
 currs = {
@@ -51,7 +51,7 @@ currs = {
 sirius_excdata.read_multipole_files(tpath, currs, 'CH', 'correctors', 'BC-');
 currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CH', 'correctors', 'sorting-ch.txt', 7);
-sirius_excdata.save_excdata(sorting, 'bo-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'bo-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');
 
 % QD
 currs = {'2A', '4A', '6A', '8A', '10A', '20A', '32A'};
@@ -60,11 +60,11 @@ sirius_excdata.transf_inv_polarity('QD');
 currents = [0, 2, 4, 6, 8, 10, 20, 32];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'QD', 'quadrupoles-qd', 'sorting.txt', 1);
 [currents, n_avg, s_avg, n_std, s_std] = sirius_excdata.transf_add_negative_currents(currents, n_avg, s_avg, n_std, s_std);
-sirius_excdata.save_excdata(sorting, 'bo-quadrupole-qd-fam', currents, '1 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'bo-quadrupole-qd-fam', currents, '1 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');
 
 % QF
 currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A'};
 sirius_excdata.read_multipole_files(tpath, currs, 'QF', 'quadrupoles-qf', 'BQF-');
 currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'QF', 'quadrupoles-qf', 'sorting.txt', 1);
-sirius_excdata.save_excdata(sorting, 'bo-quadrupole-qf-fam', currents, '1 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'bo-quadrupole-qf-fam', currents, '1 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');

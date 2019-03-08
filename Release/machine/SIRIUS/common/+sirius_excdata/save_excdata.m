@@ -1,8 +1,8 @@
-function save_excdata(sorting, fname, currents, main_mpole, harmonics, n_avg, s_avg, n_std, s_std)
+function save_excdata(sorting, fname, currents, main_mpole, harmonics, n_avg, s_avg, n_std, s_std, mfilename)
 
 header = excdata_file_header(fname, harmonics, main_mpole);
 [data_avg, data_std] = excdata_table(currents, n_avg, s_avg, n_std, s_std);
-comments = excdata_file_comments(sorting);
+comments = excdata_file_comments(sorting, mfilename);
 poltable = excdata_file_polarity_table;
 filefmt = excdata_fileformat;
 
@@ -47,13 +47,13 @@ end
 fclose(fp);
 
 
-function text = excdata_file_comments(mags)
+function text = excdata_file_comments(mags, mfilename)
 
 text = {
 ' ';
 '# COMMENTS';
 '# ========';
-'# 1. generated automatically with "sirius_bo_create_excitation_file.m"';
+['# 1. generated automatically with "', mfilename, '"'];
 '# 2. data taken from rotcoil measurements';
 '# 3. average excitation curves for magnets:';
 '#    ';

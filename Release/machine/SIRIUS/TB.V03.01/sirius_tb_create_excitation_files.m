@@ -9,7 +9,7 @@ currs = {
 sirius_excdata.read_multipole_files(tpath, currs, 'QUAD', 'quadrupoles', 'TBQ-');
 currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'QUAD', 'quadrupoles', 'sorting.txt', 7);
-sirius_excdata.save_excdata(sorting, 'tb-quadrupole', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'tb-quadrupole', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_tb_create_excitation_file.m');
 
 % B
 currs = {
@@ -20,7 +20,7 @@ serials = {'01', '02', '03'};
 sirius_excdata.read_multipole_from_fmap_files(tpath, currs, 'B', 'TBD-', serials);
 currents = [0, 25, 51, 76, 101, 127, 152, 178, 203, 228, 241, 254, 266, 279, 304, 330];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'B', 'dipoles', 'sorting.txt', 1);
-sirius_excdata.save_excdata(sorting, 'tb-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'tb-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_tb_create_excitation_file.m');
 
 % CH
 currs = {
@@ -31,7 +31,7 @@ currs = {
 sirius_excdata.read_multipole_files(tpath, currs, 'CH', 'correctors', 'TBC-');
 currents = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CH', 'correctors', 'sorting.txt', 6);
-sirius_excdata.save_excdata(sorting, 'tb-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'tb-correctors-ch', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_tb_create_excitation_file.m');
 
 % CV
 currs = {
@@ -42,5 +42,5 @@ currs = {
 sirius_excdata.read_multipole_files(tpath, currs, 'CV', 'correctors', 'TBC-');
 currents = [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CV', 'correctors', 'sorting.txt', 6);
-sirius_excdata.save_excdata(sorting, 'tb-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std);
+sirius_excdata.save_excdata(sorting, 'tb-correctors-cv', currents, '0 skew', harmonics, -n_avg, -s_avg, n_std, s_std, 'sirius_tb_create_excitation_file.m');
    
