@@ -1,4 +1,4 @@
-function [m_corr_x, m_corr_y] = trajectory_matrix(fam, M_acc)
+function [m_corr_x, m_corr_y, m_sofb] = trajectory_matrix(fam, M_acc)
 
 
 ch = fam.CH.ATIndex;
@@ -40,6 +40,10 @@ for j = 1:length(cv)
     end
 end
 
+mxy = zeros(length(bpm), length(cv));
+myx = zeros(length(bpm), length(ch));
+m_sofb = [m_corr_x, mxy; myx, m_corr_y];
+% m_sofb = [m_sofb, mrf];
 
 end
 

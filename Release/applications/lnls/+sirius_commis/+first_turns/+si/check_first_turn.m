@@ -50,7 +50,7 @@ cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
 ft_data = cell(n_mach, 1);
 
-[m_corr_x, m_corr_y] = sirius_commis.first_turns.si.trajectory_matrix(fam, M_acc);
+[m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
 
 m0xy = zeros(size(bpm, 1), size(cv, 1));
 m0yx = zeros(size(bpm, 1), size(ch, 1));

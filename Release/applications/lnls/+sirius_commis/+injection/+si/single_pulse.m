@@ -38,13 +38,13 @@ function [r_xy, r_end_ring, r_point, r_bpm] = single_pulse(machine, param, n_par
     if n_part > 1
         r_init = lnls_generate_bunch(param.beam.emitx, param.beam.emity, param.beam.sigmae, param.beam.sigmaz, twi, n_part, cutoff);
         r_init = bsxfun(@plus, r_init, offsets);
-    elseif n_part
+    else
         r_init = offsets;
     end
     
-    r_init(5, :) = r_init(5, :) - param.delta_ave_f; % (r_init(5, :) - param.delta_ave) / (1 + param.delta_ave);
+    r_init(5, :) = r_init(5, :) - param.delta_ave; % (r_init(5, :) - param.delta_ave) / (1 + param.delta_ave);
     
-    if param.delta_ave_f ~= 0
+    if param.delta_ave ~= 0
         bc = findcells(machine, 'FamName', 'BC');
         theta0 = getcellstruct(machine, 'BendingAngle', bc);
         len = getcellstruct(machine, 'Length', bc);
@@ -73,8 +73,25 @@ function [r_xy, r_end_ring, r_point, r_bpm] = single_pulse(machine, param, n_par
     r_xy = sirius_commis.common.compares_vchamb(machine_new, r_final([1,3], :, :), 1:point(end));
     r_final([1,3], :, :) = r_xy;
     r_end_ring = squeeze(r_final(:, :, end));
-    
-    
+    %{
+    fam_data = sirius_si_family_data(machine_new);
+    bba_ind = get_bba_ind(machine, fam_data.BPM.ATIndex, fam_data.QN.ATIndex);
+    bpm = fam_data.BPM.ATIndex;
+    s = findspos(machine, 1:length(machine));
+   
+    for i = 1:length(bpm)
+        ds(i) = s(bpm(i)) - s(bba_ind(i)+1);
+        if ds(i) > 0
+            dxl(i) = r_final(2, 1, bba_ind(i)+1) * 1e6;
+            dyl(i) = r_final(4, 1, bba_ind(i)+1) * 1e6;
+        else
+            dxl(i) = r_final(2, 1, bpm(i)) * 1e6;
+            dyl(i) = r_final(4, 1, bpm(i)) * 1e6;
+        end
+        dx(i) = dxl(i) * abs(ds(i));
+        dy(i) = dyl(i) * abs(ds(i));
+    end
+    %}
     for i = 1:length(point)
         r_point(:, :, i) = r_xy(:, :, point(i));
     end

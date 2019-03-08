@@ -1,25 +1,27 @@
 if strcmp(mode_version,'M1')
     
     %%% Initial Conditions from Linac measured parameters
+    %%% Linac second quadrupole triplet set to same values used during measurements
     IniCond.Dispersion = [0.0, 0.0, 0.0, 0.0]';
-    IniCond.beta =  [ 7.46, 16.86]';
-    IniCond.alpha = [ -0.50, 13.30]';
+    IniCond.beta =  [ 1.52012, 4.41004]';
+    IniCond.alpha = [ -1.16128, 1.09985]';
     
     %%% Quadrupoles
-    qf2L_strength     =  4.952541416674;
-    qd2L_strength     = -2.118904041299;
-    qf3L_strength     =  1.910188227337;
+    qf2L_strength     =  12.37;
+    qd2L_strength     = -14.85;
+    qf3L_strength     =  2.574953879766;
 
-    qd1_strength      = -8.822291640536;
-    qf1_strength      = 13.33606849342;
-    qd2a_strength     = -9.379077431495;
-    qf2a_strength     = 11.227046604434;
-    qf2b_strength     =  3.469836865301;
-    qd2b_strength     = -4.850764599732;
-    qf3_strength      =  9.27727582087;
-    qd3_strength      = -3.985859160514;
-    qf4_strength      = 11.479952189069;
-    qd4_strength      = -6.876402358085;
+    qd1_strength      = -8.822297193517;
+    qf1_strength      = 13.336070151902;
+    qd2a_strength     = -11.545107518252;
+    qf2a_strength     = 13.778320896856;
+    qf2b_strength     = 10.010343001131;
+    qd2b_strength     = -9.131081489222;
+    qf3_strength      = 9.853067340092;
+    qd3_strength      = -4.85435424189;
+    qf4_strength      = 11.764854917212;
+    qd4_strength      = -7.260998667337;
+
 
 elseif strcmp(mode_version,'M2')
     

@@ -92,24 +92,24 @@ elseif(~exist('shape', 'var')) && ~flag_shape
     flag_shape = false;
 end
 
-p = 0;
+p = 1;
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
-    param.offset_x = param.offset_x_sist + p * error_x_pulse;
+    param.offset_x = param.offset_x_sist + p * error_x_pulse; %param.offset_x0;
 
     error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
-    param.offset_xl = param.offset_xl_sist + p * error_xl_pulse;
+    param.offset_xl = param.offset_xl_sist + p * error_xl_pulse; %param.offset_xl0;
     % Peak to Peak values from measurements - cutoff = 1;
     
     error_y_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.y_error_pulse;
-    param.offset_y = param.offset_y_sist + p * error_y_pulse;
+    param.offset_y = param.offset_y_sist + p * error_y_pulse; %param.offset_y0;
 
     error_yl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.yl_error_pulse;
-    param.offset_yl = param.offset_yl_sist + p * error_yl_pulse;
+    param.offset_yl = param.offset_yl_sist + p * error_yl_pulse; %param.offset_yl0;
 
     if flag_kckr
         error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
-        param.kckr = param.kckr_sist + p * error_kckr_pulse;
+        param.kckr = param.kckr_sist + p * error_kckr_pulse; %param.kckr0;
         machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
     end
 
@@ -195,7 +195,7 @@ if ~flag_diag
 
         % The comparison with vacuum chamber in this case is screen-like.
             r_bpm_inj2(:, i) = squeeze(nanmean(r_bpm_inj(:, :, i), 1));
-            r_bpm_inj2(:, i) = r_bpm_inj2(:, i) + offset{bpm == point(i)}';
+            r_bpm_inj2(:, i) = r_bpm_inj2(:, i) - offset{bpm == point(i)}';
             r_bpm_inj2(:, i) = sirius_commis.common.compares_vchamb(machine, r_bpm_inj2(:, i)', point(i), 'screen');
         end
         clear r_point
@@ -206,7 +206,7 @@ if ~flag_diag
 
         % The comparison with vacuum chamber in this case is screen-like.
         r_point = squeeze(nanmean(r_point, 1));
-        r_point = r_point + offset{bpm == point};
+        r_point = r_point - offset{bpm == point};
         r_point = sirius_commis.common.compares_vchamb(machine, r_point, point, 'screen');
     end
         
@@ -219,12 +219,13 @@ if flag_diag
     else
         r_diag_bpm = squeeze(r_diag_bpm);
     end
-    offset = getcellstruct(machine,'Offsets', bpm);
+    offset = getcellstruct(machine, 'Offsets', bpm);
     offset = cell2mat(offset)';
-    r_diag_bpm = r_diag_bpm + offset;
-    % orbit = findorbit4(machine, 0, 1:length(machine));
+    r_diag_bpm = r_diag_bpm -  offset;
+    machine = lnls_set_kickangle(machine, 0, injkckr, 'x');
+    orbit = findorbit4(machine, 0, 1:length(machine));
     r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
-    % sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
+    sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
 end
  fprintf('=================================================\n');
 end
@@ -245,8 +246,8 @@ function plot_si_turn(machine, r_final)
     plot(ax, s, mm*VChamb(1,:),'k');
     plot(ax, s, -mm*VChamb(1,:),'k');
     grid on;
-    % plot(ax, s, orbit(1, :) * mm, '.-k', 'linewidth', 2);
-    % plot(ax, s, orbit(3, :) * mm, '.-k', 'linewidth', 2);
+    plot(ax, s, orbit(1, :) * mm, '.-k', 'linewidth', 2);
+    plot(ax, s, orbit(3, :) * mm, '.-k', 'linewidth', 2);
     ylim(ax, [-mm*VChamb(1,1), mm*VChamb(1,1)]);
     xlim(ax, [0, s(end)]);
     drawnow;        

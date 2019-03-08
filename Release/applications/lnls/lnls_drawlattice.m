@@ -29,7 +29,7 @@ end
 if exist('cms', 'var') && cms
     draw_cms(the_ring, nper, offset, scale, h);
 end
-if exist('bpms', 'var') && bpms
+if exist('bpms', 'var') & bpms
     draw_bpms(the_ring, nper, offset, scale, h);
 end
 

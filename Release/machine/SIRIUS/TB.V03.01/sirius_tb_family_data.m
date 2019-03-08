@@ -21,6 +21,7 @@ data.CH.nr_segs   = 1;
 data.CV.nr_segs   = 1;
 data.BPM.nr_segs  = 1;
 data.Scrn.nr_segs = 1;
+data.InjSept.nr_segs = 2;
 
 ind = atindex(the_ring);
 fams = fields(data);
@@ -35,5 +36,7 @@ data.CH.ATIndex = data.CHV.ATIndex(1:end-1); % last CHV corrector does not have 
 data.CV.ATIndex = data.CHV.ATIndex;
 
 for i=1:length(fams)
-    data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
+    if isfield(ind, fams{i})
+        data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
+    end
 end
