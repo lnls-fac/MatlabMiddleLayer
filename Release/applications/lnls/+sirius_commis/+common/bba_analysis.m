@@ -1,6 +1,9 @@
 function [quadratic, linear, mresp, mono] = bba_analysis(Ri, Rf, n_bpm, dtheta, plane, plot_graph)
 
-f_merit_quad = squeeze(nansum((Ri - Rf).^2, 3)) / size(Ri, 3);
+% f_merit_quad = squeeze(nansum((Ri - Rf).^2, 3)) / size(Ri, 3);
+sigma_res = 1e-6;
+sigma_offset = 500e-6;
+f_merit_quad = squeeze(nansum((Ri - Rf).^2, 3)) / (2 * sigma_res^2) + squeeze(nansum((Rf).^2, 3)) / (sigma_res^2 + sigma_offset^2);
 f_merit_linear = Rf - Ri;
 r_bpm = squeeze(Ri(:, :, n_bpm));
 if any(isnan(r_bpm))

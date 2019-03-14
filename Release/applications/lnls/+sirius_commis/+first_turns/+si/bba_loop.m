@@ -1,4 +1,4 @@
-function [bba_data1, bba_data2] = bba_loop(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, data_bpm, plane)
+function [bba_data1, bba_data2] = bba_loop(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, plane, data_bpm)
 
     if ~exist('data_bpm', 'var')
         data_bpm.good_bpm_x = [1:1:160]';

@@ -12,6 +12,11 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         param_cell = param;
     end
     
+    if ~exist('data_bpm', 'var')
+        data_bpm.good_bpm_x = [1:1:160]';
+        data_bpm.good_bpm_y = [1:1:160]';
+    end
+    
     off_bpm = cell(n_mach, 1);
     off_quad = cell(n_mach, 1);
     off_bba = cell(n_mach, 1);
@@ -422,7 +427,7 @@ if skew
     end
 else
     polyB = getcellstruct(machine_in, 'PolynomB', bba_ind(n_bpm), 1, 2);
-    polyB_bba = 1.01 * polyB;
+    polyB_bba = 1.05 * polyB;
     if abs(polyB_bba) > quad_lim
         polyB_bba = sign(polyB_bba) * quad_lim;
         warning('Quadrupole Strength greater than maximum');
