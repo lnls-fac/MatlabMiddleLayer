@@ -65,10 +65,22 @@ n_fcod = true;
 rms_orbit_x_bpm_new = rms_orbit_x_bpm_old;
 rms_orbit_y_bpm_new = rms_orbit_y_bpm_old;
 inc_x = true; inc_y = true;
+ft_data.error = false;
 
 while int_bpm(end) < eff_lim
     bpm_int_ok = bpm(int_bpm > 0.80);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
+    
+    bpm_select = zeros(length(bpm), 1);
+    bpm_select(ind_ok_bpm) = 1;
+    
+    if sum(bpm_select) == 1
+       warning('Only 1 BPM with good sum signal!')
+       ft_data.machine = machine;
+       ft_data.error = true;
+       ft_data.n_svd = n_sv;
+       return
+    end
     
     m_corr_ok = m_corr([ind_ok_bpm; length(bpm) + ind_ok_bpm], :);
     [U, S, V] = svd(m_corr_ok, 'econ');
@@ -148,9 +160,12 @@ while int_bpm(end) < eff_lim
        machine = lnls_set_kickangle(machine, zeros(length(cv), 1), cv, 'y');
        n_cor = 1;
        warning('Number of Singular Values reduced')
-       if n_sv < 1
+       if n_sv <= 1
            warning('Problems in Singular Values')
-           continue
+           ft_data.machine = machine;
+           ft_data.error = true;
+           ft_data.n_svd = n_sv;
+           return
        end
     end
     n_cor = n_cor + 1;
