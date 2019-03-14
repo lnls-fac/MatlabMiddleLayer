@@ -4,26 +4,32 @@ function ft_data = first_turn_corrector(machine, n_mach, param, param_errors, m_
 % transport line and 'matrix' using matrix facilities of SOFB
 %
 % INPUTS:
-%  - machine: storage ring model with errors
-%  - n_mach: number of machines
+%  - machine: booster ring model with errors
+%  - n_mach: number of machines to correct first turn
 %  - param: cell of structs with adjusted injection parameters for each
 % machine
-%  - param_errors: errors of injection parameters
-%  - m_corr: first turn trajectory corrector matrix calculate from transfer
-%  matrix as a response matrix
+%  - param_errors: struct with injection parameters errors and
+%  measurements errors
+%  - m_corr: first turn trajectory corrector matrix with 2 * #BPMs rows
+%  and #CH + #CV + 1 columns 
 %  - n_part: number of particles
 %  - n_pulse: number of pulses to average
-%  - n_sv: initial number of singular values
-%  - approach: 'tl' or 'matrix'
+%  - n_sv: number of singular values to use in correction
+%  - approach: strings 'tl' or 'matrix'
 %
 % OUTPUTS:
-%  - machine_correct: booster ring model with corrector setup adjusted for 1st turn
-%  - cod: 1 if code obtains closed orbit and 0 if does not
-%  - r_bpm_mach: BPM position for the first turn for each random machine
-%  - gr_mach_x and gr_mach_y: 1 indicates that the corresponding machine demanded a kick in
-%  correctors greater than the limit in horizontal and vertical plane
-%
+%  - ft_data: first turn data struct with the following properties:
+%  * first_cod: First COD solution obtained
+%  * final_cod: Last COD solution when algorithm has converged
+%  * machine: booster ring lattice with corrector kicks applied
+%  * max_kick: vector with 0 and 1 where 1 means that the kick
+%  reached the maximum value for the specific corrector
+%  * n_svd: number of singular values when the algorithm converge
+%  * ft_cod: data with kicks setting to obtain first COD solution, its
+%  values and statistics
+
 % Version 1 - Murilo B. Alves - October, 2018
+% Version 2 - Murilo B. Alves - March, 2019
 
 % sirius_commis.common.initializations()
 

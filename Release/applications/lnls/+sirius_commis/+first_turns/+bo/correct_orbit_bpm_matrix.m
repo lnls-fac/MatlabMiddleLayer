@@ -6,19 +6,30 @@ function ft_data = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr
 %  - machine: booster ring model with errors
 %  - param: cell of structs with adjusted injection parameters for each
 % machine
-%  - m_corr: first turn trajectory corrector matrix calculate from transfer
-%  matrix as a response matrix
+%  - param_errors: struct with injection parameters errors and
+%  measurements errors
+%  - m_corr: first turn trajectory corrector matrix with 2 * #BPMs rows
+%  and #CH + #CV + 1 columns
 %  - n_part: number of particles
 %  - n_pulse: number of pulses to average
+%  - n_sv: number of singular values to use in correction
+%  - r_bpm: BPM position measurements (2 x #BPMs) from previous first turn
+%  tracking
+%  - int_bpm: BPM sum signal (1 x #BPMs) from previous first turn tracking
 %
 % OUTPUTS:
-%  - machine: booster ring model with corrector setup adjusted for 1st turn
-%  - theta_x: horizontal correctors forces
-%  - theta_y: vertical correctors forces
-%  - rms_orbit_bpm: standard deviation x and y of 1 turn measured by BPMs
-%  - rms_orbit_bpm: maximum values x and y of 1 turn measured by BPMs
-%
-% Version 1 - Murilo B. Alves - October 4th, 2018
+%  - ft_data: first turn data struct with the following properties:
+%  * first_cod: First COD solution obtained
+%  * final_cod: Last COD solution when algorithm has converged
+%  * machine: booster ring lattice with corrector kicks applied
+%  * max_kick: vector with 0 and 1 where 1 means that the kick
+%  reached the maximum value for the specific corrector
+%  * n_svd: number of singular values when the algorithm converge
+%  * ft_cod: data with kicks setting to obtain first COD solution, its
+%  values and statistics
+
+% Version 1 - Murilo B. Alves - October, 2018
+% Version 2 - Murilo B. Alves - March, 2019
 
 % sirius_commis.common.initializations();
 
@@ -26,8 +37,8 @@ fam = sirius_bo_family_data(machine);
 ch = fam.CH.ATIndex;
 cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
-m_corr_x = m_corr(1:size(bpm, 1), 1:size(ch, 1));
-m_corr_y = m_corr(size(bpm, 1)+1:end, size(ch, 1)+1:end);
+% m_corr_x = m_corr(1:size(bpm, 1), 1:size(ch, 1));
+% m_corr_y = m_corr(size(bpm, 1)+1:end, size(ch, 1)+1:end);
 
 theta_x = lnls_get_kickangle(machine, ch, 'x')';
 theta_y = lnls_get_kickangle(machine, cv, 'y')';
@@ -58,7 +69,26 @@ inc_x = true; inc_y = true;
 while int_bpm(end) < eff_lim
     bpm_int_ok = bpm(int_bpm > 0.80);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
-   
+    
+    m_corr_ok = m_corr([ind_ok_bpm; length(bpm) + ind_ok_bpm], :);
+    [U, S, V] = svd(m_corr_ok, 'econ');
+    S_inv = 1 ./ diag(S);
+    S_inv(isinf(S_inv)) = 0;
+    S_inv(n_sv+1:end) = 0;
+    S_inv = diag(S_inv);
+    m_corr_inv = V * S_inv * U';
+    x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
+    y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
+    new_r_bpm = [x_bpm, y_bpm];
+    
+    kicks = [theta_x; theta_y; 0] - m_corr_inv * new_r_bpm';
+    theta_x = kicks(1:length(ch));
+    theta_y = kicks(length(ch)+1:end-1);
+    
+    % Particular method that works when there is no coupling, a more
+    % generic method of inversion is used in accordance with SOFB
+    
+    %{
     m_corr_x_ok = m_corr_x(ind_ok_bpm, :);
     [Ux, Sx, Vx] = svd(m_corr_x_ok, 'econ');
     Sx_inv = 1 ./ diag(Sx);
@@ -70,13 +100,6 @@ while int_bpm(end) < eff_lim
 
     x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
     theta_x =  theta_x - m_corr_inv_x * x_bpm';
-    over_kick_x = abs(theta_x) > corr_lim;
-    
-    if any(over_kick_x)
-        warning('Horizontal corrector kick greater than maximum')
-        gr_mach_x(over_kick_x) = 1;
-        theta_x(over_kick_x) =  sign(theta_x(over_kick_x)) * corr_lim;
-    end
 
     m_corr_y_ok = m_corr_y(ind_ok_bpm, :);
     [Uy, Sy, Vy] = svd(m_corr_y_ok, 'econ');
@@ -89,14 +112,22 @@ while int_bpm(end) < eff_lim
 
     y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
     theta_y = theta_y - m_corr_inv_y * y_bpm';
-    over_kick_y = abs(theta_y) > corr_lim;
+    %}
+        
+    over_kick_x = abs(theta_x) > corr_lim;
+    if any(over_kick_x)
+        warning('Horizontal corrector kick greater than maximum')
+        gr_mach_x(over_kick_x) = 1;
+        theta_x(over_kick_x) =  sign(theta_x(over_kick_x)) * corr_lim;
+    end
     
+    over_kick_y = abs(theta_y) > corr_lim;
     if any(over_kick_y)
         warning('Vertical corrector kick greater than maximum')
         gr_mach_y(over_kick_y) = 1;
         theta_x(over_kick_y) =  sign(theta_x(over_kick_y)) * corr_lim;
     end
-    
+      
     if inc_x 
         machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
     end
@@ -158,16 +189,17 @@ while inc_x || inc_y
     end
     
     S_inv_var(n_t + 1:end) = 0;
-    % Sx_inv(Sx_inv > 5 * Sx_inv(1)) = 0;
     S_inv_var = diag(S_inv_var);
     m_corr_inv = V * S_inv_var * U';
-    
-    m_corr_inv_x = m_corr_inv(1:size(ch, 1), 1:size(bpm, 1));
-    m_corr_inv_y = m_corr_inv(size(ch)+1:end, size(bpm, 1)+1:end);
+    x_bpm = squeeze(r_bpm(1, :));
+    y_bpm = squeeze(r_bpm(2, :));
+    new_r_bpm = [x_bpm, y_bpm];
+    kicks = [theta_x_i; theta_y_i; 0] - m_corr_inv * new_r_bpm';
     
     if inc_x 
-        x_bpm = squeeze(r_bpm(1, :));
-        theta_x_f =  theta_x_i - m_corr_inv_x * x_bpm';
+        % x_bpm = squeeze(r_bpm(1, :));
+        % theta_x_f =  theta_x_i - m_corr_inv_x * x_bpm';
+        theta_x_f = kicks(1:length(ch));
         over_kick_x = abs(theta_x_f) > corr_lim;
     
         if any(over_kick_x)
@@ -183,8 +215,9 @@ while inc_x || inc_y
     end
     
     if inc_y
-        y_bpm = squeeze(r_bpm(2, :));
-        theta_y_f = theta_y_i - m_corr_inv_y * y_bpm';
+        % y_bpm = squeeze(r_bpm(2, :));
+        % theta_y_f = theta_y_i - m_corr_inv_y * y_bpm';
+        theta_y_f = kicks(length(ch)+1:end-1);
         over_kick_y = abs(theta_y_f) > corr_lim;
     
         if any(over_kick_y)
@@ -202,10 +235,10 @@ while inc_x || inc_y
     [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
     ft_data.firstcod = cod_data;
     
-    % param.orbit = findorbit4(machine, 0, 1:length(machine));
+    param.orbit = findorbit4(machine, 0, 1:length(machine));
     ft_data.finalcod.bpm_pos = r_bpm;
 
-    [~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
     
     if int_bpm(end) < eff_lim
         machine = lnls_set_kickangle(machine, theta_x0, ch, 'x');
@@ -251,10 +284,6 @@ while inc_x || inc_y
     
     if ~inc_x && ~inc_y
         if n_inc == 0
-            % theta_x = theta_x + m_corr_inv_x * x_bpm';
-            % theta_y = theta_y + m_corr_inv_y * y_bpm';
-            % machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
-            % machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
             [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
             ft_data.firstcod = cod_data;
             ft_data.machine = machine;
