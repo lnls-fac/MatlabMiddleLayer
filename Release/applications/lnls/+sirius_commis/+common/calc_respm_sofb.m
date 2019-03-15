@@ -1,4 +1,4 @@
-function calc_respm_sofb(acc)
+function [respm_sofb4D_traj, respm_sofb4D, respm_sofb6D] = calc_respm_sofb(acc)
 
 flag_tb = false;
 flag_bo = false;
@@ -22,22 +22,24 @@ elseif strcmp(acc, 'BO')
     inj_sept = findcells(ring, 'FamName', 'InjSept');
     ring_new = circshift(ring, [0, -(inj_sept - 1)]);
     fam = sirius_bo_family_data(ring_new);
+    ring_new = setcavity('off', ring_new);
 elseif strcmp(acc, 'TS')
     flag_ts = true;
 elseif strcmp(acc, 'SI')
     flag_si = true;
     flag_cav = true;
-    sirius('BO')
+    sirius('SI')
     ring = sirius_si_lattice();
     inj_sept = findcells(ring, 'FamName', 'InjSeptF');
     ring_new = circshift(ring, [0, -(inj_sept - 1)]);
     fam = sirius_si_family_data(ring_new);
+    ring_new = setcavity('off', ring_new);
 else
     error('Set the accelerator name: TB, BO, TS or SI')
 end
 
 if flag_cav
-    ring_cav = setcavity('on', ring);
+    ring_cav = setcavity('on', ring_new);
     respm6D = calc_respm_cod(ring_cav, fam.BPM.ATIndex, fam.CH.ATIndex, fam.CV.ATIndex);
     respm6D = respm6D.respm;
     respm_sofb6D = [respm6D.mxx, respm6D.mxy; respm6D.myx, respm6D.myy];
@@ -69,17 +71,17 @@ if flag_cav
     end
 end
 
-[~, M4D] = findm44(ring, 0, 1:length(ring)+1);
-[~, ~, respm4D_traj] = sirius_commis.common.trajectory_matrix(fam, M4D);
+[~, M4D] = findm44(ring_new, 0, 1:length(ring_new)+1);
+[~, ~, respm_sofb4D_traj] = sirius_commis.common.trajectory_matrix(fam, M4D);
 
 if flag_bo || flag_si
-    respm4D = calc_respm_cod(ring, fam.BPM.ATIndex, fam.CH.ATIndex, fam.CV.ATIndex);
+    respm4D = calc_respm_cod(ring_new, fam.BPM.ATIndex, fam.CH.ATIndex, fam.CV.ATIndex);
     respm4D = respm4D.respm;
     respm_sofb4D = [respm4D.mxx, respm4D.mxy; respm4D.myx, respm4D.myy];
     respm_sofb4D = [respm_sofb4D, zeros(2*length(fam.BPM.ATIndex), 1)];
+else
+    respm_sofb4D_traj = respm_sofb4D_traj(:, 1:end-1);
 end
-
-respm_sofb4D_traj = respm4D_traj; % [respm4D_traj, zeros(2*length(fam.BPM.ATIndex), 1)];
 
 % dlmwrite('respm_sofb_bo4D.txt', respm_sofb4D, 'precision', 16);
 % dlmwrite('respm_sofb_bo4D_traj.txt', respm_sofb4D_traj, 'precision', 16);
