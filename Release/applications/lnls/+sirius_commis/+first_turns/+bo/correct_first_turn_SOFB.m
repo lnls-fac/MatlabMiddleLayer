@@ -1,4 +1,4 @@
-function correct_first_turn_SOFB(ring, n_sv, sum_min)
+function correct_first_turn_SOFB(bpm, n_sv, sum_min)
 
 % v_prefix = getenv('VACA_PREFIX');
 ioc_prefix = ['BO-Glob:AP-SOFB:'];
@@ -18,19 +18,20 @@ corr_fact_ch_pv = [ioc_prefix, 'CorrFactorCH-SP'];
 corr_fact_cv_pv = [ioc_prefix, 'CorrFactorCV-SP'];
 buffer_pulse_pv = [ioc_prefix, 'OrbitSmoothNPnts-SP'];
 
-inj_sept = findcells(ring, 'FamName', 'InjSept');
-ring = circshift(ring, [0, -(inj_sept -1)]);
-fam = sirius_bo_family_data(ring);
-bpm = fam.BPM.ATIndex;
+% inj_sept = findcells(ring, 'FamName', 'InjSept');
+% ring = circshift(ring, [0, -(inj_sept -1)]);
+% family = sirius_bo_family_data(ring);
+% bpm = fam.BPM.ATIndex;
 tw = 0.1;
 f_pulse = 1/2;
-tol = 0.8;
+tol1 = 0.8;
+tol2 = 0.95;
 n_corr = 1;
 n_corr_lim = 20;
 fact_corr_x = 0;
 fact_corr_y = 0;
-
 buffer = getpv(buffer_pulse_pv) * f_pulse + 1;
+
 if isnan(buffer)
     error('Problem getting Number of Orbits for Smoothing PV')
 end
@@ -47,7 +48,7 @@ if all(isnan(int_bpm))
    error('Problem getting SinglePass Sum PV')
 end
 
-ind_bad = find(int_bpm < sum_min);
+ind_bad = find(int_bpm < sum_min * tol2);
 
 if ~isempty(ind_bad)
     bpm_int_ok = bpm(1:ind_bad(1)-1);
@@ -61,7 +62,11 @@ bpm_select(ind_ok_bpm) = 1;
 int_bpm_ok = int_bpm(bpm_select);
 int_bpm_bad = int_bpm(~bpm_select);
 int_init_ok = nanmean(int_bpm_ok);
-int_final_ok = int_init_ok / tol;
+int_final_ok = int_init_ok / tol1;
+
+if sum(bpm_select) == 1
+   error('Only 1 BPM with good sum signal!')
+end
 
 if ~isempty(int_bpm_bad)
     int_init_bad = nanmean(int_bpm_bad);
@@ -69,10 +74,13 @@ else
     int_init_bad = 0;
 end
 
-int_final_bad = int_init_bad / tol;
+int_final_bad = int_init_bad / tol1;
+param_ok = true;
+param_bad = true;
 
-while int_final_ok >= int_init_ok / tol || int_final_bad <= int_init_bad / tol
+while param_ok || param_bad
     int_init_ok = int_final_ok;
+    int_init_bad = int_final_bad;
     
     setpv(bpmx_select_pv, double(bpm_select'));
     setpv(bpmy_select_pv, double(bpm_select'));
@@ -93,7 +101,7 @@ while int_final_ok >= int_init_ok / tol || int_final_bad <= int_init_bad / tol
         error('Problem getting SinglePass Sum PV')
     end
     
-    ind_bad = find(int_bpm < sum_min);
+    ind_bad = find(int_bpm < sum_min * tol2);
     
     if ~isempty(ind_bad)
         bpm_int_ok = bpm(1:ind_bad(1)-1);
@@ -107,7 +115,16 @@ while int_final_ok >= int_init_ok / tol || int_final_bad <= int_init_bad / tol
     int_bpm_ok = int_bpm(bpm_select);
     int_bpm_bad = int_bpm(~bpm_select);
     int_final_ok = nanmean(int_bpm_ok);
-    int_final_bad = nanmean(int_bpm_bad);
+    
+    param_ok = int_final_ok >= int_init_ok / tol1;
+    
+    if ~isempty(int_bpm_bad)
+        int_final_bad = nanmean(int_bpm_bad);
+        param_bad = int_final_bad >= int_init_bad / tol1;
+    else
+        int_final_bad = 0;
+        param_bad = false;
+    end
     
     if sum(bpm_select) == 1
        error('Only 1 BPM with good sum signal!')
@@ -117,11 +134,10 @@ while int_final_ok >= int_init_ok / tol || int_final_bad <= int_init_bad / tol
         cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, 'xy')
         n_sv = n_sv - 1;
         setpv(n_sv_pv, n_sv)
-        sleep(buffer)
         fprintf('=================================================\n');
         fprintf('COLLECTING PULSES\n');
         fprintf('=================================================\n');
-
+        sleep(buffer)
         int_bpm = getpv(sum_pv);
         % eff_lim = int_bpm(1);
         if all(isnan(int_bpm))
@@ -222,14 +238,14 @@ while inc_x || inc_y
     rms_orbit_x_bpm_new = nanstd(x_bpm);
     rms_orbit_y_bpm_new = nanstd(y_bpm);
     
-    if nanmean(int_bpm) < tol * eff_ft_init
+    if nanmean(int_bpm) < tol1 * eff_ft_init
         cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw)
         fprintf('IT IS NOT POSSIBLE TO REDUCE TRAJECTORY RMS WITHOUT LOSING FIRST TURN \n');
         return
     end
     
     if ~stop_x
-        inc_x = rms_orbit_x_bpm_new < rms_orbit_x_bpm_old;
+        inc_x = rms_orbit_x_bpm_new < rms_orbit_x_bpm_old / tol2;
         if ~inc_x
             cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, 'x')
             stop_x = true;
@@ -237,7 +253,7 @@ while inc_x || inc_y
     end
     
     if ~stop_y
-        inc_y = rms_orbit_y_bpm_new < rms_orbit_y_bpm_old;
+        inc_y = rms_orbit_y_bpm_new < rms_orbit_y_bpm_old / tol2;
         if ~inc_y
             cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, 'y')
             stop_y = true;
