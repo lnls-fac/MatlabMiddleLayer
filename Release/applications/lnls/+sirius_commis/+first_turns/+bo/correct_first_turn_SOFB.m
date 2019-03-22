@@ -24,12 +24,12 @@ buffer_pulse_pv = [ioc_prefix, 'OrbitSmoothNPnts-SP'];
 % bpm = fam.BPM.ATIndex;
 tw = 0.1;
 f_pulse = 1/2;
-tol1 = 0.8;
+tol1 = 0.5;
 tol2 = 0.95;
 n_corr = 1;
 n_corr_lim = 20;
-fact_corr_x = 0;
-fact_corr_y = 0;
+fact_corr_x = 100;
+fact_corr_y = 100;
 buffer = getpv(buffer_pulse_pv) * f_pulse + 1;
 
 if isnan(buffer)
@@ -77,8 +77,8 @@ end
 int_final_bad = int_init_bad / tol1;
 param_ok = true;
 param_bad = true;
-
-while param_ok || param_bad
+fake = true;
+while fake % (param_ok || param_bad) && int_bpm(end) < sum_min
     int_init_ok = int_final_ok;
     int_init_bad = int_final_bad;
     
@@ -116,11 +116,11 @@ while param_ok || param_bad
     int_bpm_bad = int_bpm(~bpm_select);
     int_final_ok = nanmean(int_bpm_ok);
     
-    param_ok = int_final_ok >= int_init_ok / tol1;
+    param_ok = int_final_ok >= int_init_ok * tol1;
     
     if ~isempty(int_bpm_bad)
         int_final_bad = nanmean(int_bpm_bad);
-        param_bad = int_final_bad >= int_init_bad / tol1;
+        param_bad = int_final_bad >= int_init_bad * tol1;
     else
         int_final_bad = 0;
         param_bad = false;
