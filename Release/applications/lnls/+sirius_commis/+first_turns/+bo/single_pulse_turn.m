@@ -79,9 +79,10 @@ for j = 1:n_mach
     count_turns(j) = count_turns(j) + 1;
     for i = 1:n_turns-1
         [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
-        if eff_turns(j, i) < eff_lim
+        if eff_turns(j, i+1) < eff_lim
             RBPM(i+1, :, :) = zeros(2, 50);
             INTBPM(i+1, :, :) = zeros(1, 50);
+            eff_turns(j, i+1) = 0;
             break
         end
         count_turns(j) = count_turns(j) + 1;

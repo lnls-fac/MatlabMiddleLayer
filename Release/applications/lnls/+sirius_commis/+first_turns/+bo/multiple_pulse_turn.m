@@ -1,4 +1,4 @@
-function [count_turns, r_bpm, int_bpm, eff_mean] = multiple_pulse_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns)
+function [count_turns, r_bpm, int_bpm, eff_mean, fm] = multiple_pulse_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns)
 % Simulation of booster injection and turns around the ring for multiple
 % injection pulses
 %
@@ -58,4 +58,8 @@ end
 r_bpm = squeeze(mean(r_bpm_turns, 1));
 int_bpm = squeeze(mean(int_bpm_turns, 1));
 eff_mean = squeeze(mean(eff_mean, 1));
+eff_tbt = squeeze(mean(eff_turns, 1));
+eff_tbt = eff_tbt(eff_tbt ~= 0);
+turn_n = linspace(1, size(eff_tbt, 1), size(eff_tbt, 1));
+fm = turn_n * eff_tbt;
 end
