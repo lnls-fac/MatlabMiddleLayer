@@ -1,6 +1,6 @@
 function check_emit_meas_tb(tb_lattice, mode, n_points)
 
-gamma = 293.5427; % @ 150MeV
+[~, gamma] = lnls_beta_gamma(0.150);
 
 % ANTES TRIPLETO
 % betax0 = 5.385; betay0 = 5.549;
@@ -12,6 +12,9 @@ gamma = 293.5427; % @ 150MeV
 betax0 = 3.00; betay0 = 3.50;
 alphax0 = 2.48; alphay0 = 1.58;
 mux0 = 0; muy0 = 0;
+emitx_n = 55 * 1e-6; emity_n = emitx_n;
+emitx = emitx_n / gamma; emity = emity_n / gamma;
+kmax = 15.9890;
 
 fam = sirius_tb_family_data(tb_lattice);
 tb_lattice = tb_lattice(fam.QF3L.ATIndex+1:end);
@@ -26,7 +29,7 @@ twiss_data_in.beta = [betax0, betay0];
 twiss_data_in.alpha = [alphax0, alphay0];
 twiss_data_in.mu = [mux0, muy0];
 
-QD_ind = fam.QD2A.ATIndex;
+QD_ind = fam.QF2A.ATIndex;
 Scrn1_ind = fam.Scrn.ATIndex(3);
 Scrn2_ind = fam.Scrn.ATIndex(4);
 init = QD_ind - 1;
@@ -34,14 +37,14 @@ final = Scrn2_ind + 1;
 % trecho_meas = tb_lattice(init:final);
 
 if strcmp(mode, 'pm')
-    grad = linspace(-15.9890, 15.9890, n_points);
+    grad = linspace(-kmax, kmax, n_points);
 elseif strcmp(mode, 'm')
-    grad = linspace(-15.9890, 0, n_points);
+    grad = linspace(-kmax, 0, n_points);
 elseif strcmp(mode, 'p')
-    grad = linspace(0, 15.9890, n_points);
+    grad = linspace(0, kmax, n_points);
 end
 
-tb_lattice = setcellstruct(tb_lattice, 'PolynomB', fam.QD2A.ATIndex, 0, 1, 2);
+% tb_lattice = setcellstruct(tb_lattice, 'PolynomB', fam.QD2A.ATIndex, 0, 1, 2);
 tb_lattice = setcellstruct(tb_lattice, 'PolynomB', fam.QF2A.ATIndex, 0, 1, 2);
 tb_lattice = setcellstruct(tb_lattice, 'PolynomB', fam.QD2B.ATIndex, 0, 1, 2);
 tb_lattice = setcellstruct(tb_lattice, 'PolynomB', fam.QF2B.ATIndex, 0, 1, 2);
@@ -52,10 +55,10 @@ for i = 1:n_points
     twiss_tb = twissline(tb_lattice_meas, 0, twiss_data_in, 1:length(tb_lattice));
     beta = cat(1, twiss_tb.beta);
     spos = cat(1, twiss_tb.SPos);
-    shape1x(i) = sqrt(55 * 1e-6 / gamma * beta(Scrn1_ind, 1)) * 1e3;
-    shape2x(i) = sqrt(55 * 1e-6 / gamma * beta(Scrn2_ind, 1)) * 1e3;
-    shape1y(i) = sqrt(55 * 1e-6 / gamma * beta(Scrn1_ind, 2)) * 1e3;
-    shape2y(i) = sqrt(55 * 1e-6 / gamma * beta(Scrn2_ind, 2)) * 1e3;
+    shape1x(i) = sqrt(emitx * beta(Scrn1_ind, 1)) * 1e3;
+    shape2x(i) = sqrt(emitx * beta(Scrn2_ind, 1)) * 1e3;
+    shape1y(i) = sqrt(emity * beta(Scrn1_ind, 2)) * 1e3;
+    shape2y(i) = sqrt(emity * beta(Scrn2_ind, 2)) * 1e3;
     % gcf();
     % plot(spos(init: final), beta(init:final, 1), 'blue');
     % hold all
