@@ -19,7 +19,7 @@ function respm_out = edit_meas_respm(ring, respm_in, no_coupling)
     end
     
     for j = 1:length(cv)
-        ind_bpms_cv = bpm < cv(i);
+        ind_bpms_cv = bpm < cv(j);
         first = find(ind_bpms_cv);
         if ~isempty(first)
             respm_out(1:first(end), j + n_ch) = 0;
