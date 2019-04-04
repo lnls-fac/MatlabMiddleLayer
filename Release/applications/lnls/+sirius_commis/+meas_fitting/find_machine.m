@@ -43,19 +43,19 @@ else
     respm_modelo = input_respm;
 end
 
-goal_respm = sirius_commis.common.edit_meas_respm(bo_ring, goal_respm, true);
+goal_respm = sirius_commis.meas_fitting.edit_meas_respm(bo_ring, goal_respm, true);
 
 flag_accept = false;
 
 if corr_gain
-    Rc_old = sirius_commis.common.calc_gains(goal_respm, respm_modelo, corr_gain, bpm_gain);
+    Rc_old = sirius_commis.meas_fitting.calc_gains(goal_respm, respm_modelo, corr_gain, bpm_gain);
 end
 
 if bpm_gain
-    [~, Rb_old] = sirius_commis.common.calc_gains(goal_respm, respm_modelo, corr_gain, bpm_gain);
+    [~, Rb_old] = sirius_commis.meas_fitting.calc_gains(goal_respm, respm_modelo, corr_gain, bpm_gain);
 end
 
-f_merit_old = sirius_commis.common.calc_merit(goal_respm, respm_modelo, 0, Rc_old, 0, Rb_old, 0);
+f_merit_old = sirius_commis.meas_fitting.calc_merit(goal_respm, respm_modelo, 0, Rc_old, 0, Rb_old, 0);
 
 count = 0;
 n_accept = 0;
@@ -104,14 +104,14 @@ while count < n_max
     respm_rand = sirius_commis.first_turns.bo.calc_respm_tracking(ring_rand, fam);
 
     if corr_gain
-        Rc_new = sirius_commis.common.calc_gains(goal_respm, respm_rand, corr_gain, bpm_gain);
+        Rc_new = sirius_commis.meas_fitting.calc_gains(goal_respm, respm_rand, corr_gain, bpm_gain);
     end
 
     if bpm_gain
-        [~, Rb_new] = sirius_commis.common.calc_gains(goal_respm, respm_rand, corr_gain, bpm_gain);
+        [~, Rb_new] = sirius_commis.meas_fitting.calc_gains(goal_respm, respm_rand, corr_gain, bpm_gain);
     end
 
-    [f_merit_new, corr_goal_respm, ratio_new] = sirius_commis.common.calc_merit(goal_respm, respm_rand, corr_gain, Rc_new, bpm_gain, Rb_new, 0);
+    [f_merit_new, corr_goal_respm, ratio_new] = sirius_commis.meas_fitting.calc_merit(goal_respm, respm_rand, corr_gain, Rc_new, bpm_gain, Rb_new, 0);
 
     count = count + 1;
     

@@ -85,6 +85,8 @@ function [R_c, R_b] = calc_gains(goal_respm, respm_modelo, corr_gain, bpm_gain)
                r(2) = 1;
             end
             R_b(:, :, i) = [r(1), r(3); -r(3), r(2)];
+            At_b = zeros(3, 3);
+            Bt_b = zeros(3, 1);
         end
     end
 end
