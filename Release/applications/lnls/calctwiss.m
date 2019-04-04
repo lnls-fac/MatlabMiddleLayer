@@ -7,7 +7,11 @@ function r = calctwiss(varargin)
 % 2) 'n+1' : calcula twiss no final do modelo tambem.
 % 3) dp : calcula os parâmetros de twiss para o dado desvio de energia
 % 4) elements : calcula os PT para os elementos especificados
+% 5) 'ddp', ddp : calcula twiss para um dado desvio de energia em torno de
+% dp. Para calculos de chromaticidade verificamos que uma ddp=1e-6 é mais 
+% adequado para modelos que consideram erros dipolares.
 %
+% 2019-04-02 modificado para utilizar ddp dos inputs no cálculo 
 % 2013-04-24 parametro 'n+1' adicional.
 % 2011-??-?? versao original.
 
@@ -18,16 +22,24 @@ np1_flag = false;
 elements = [];
 the_ring = THERING;
 dp = 0;
+ddp = 1e-8;
+ddp_flag = 0;
 for i=1:length(varargin)
     if iscell(varargin{i})
         the_ring = varargin{i};
     elseif ischar(varargin{i})
         if strcmpi(varargin{i}, 'N+1')
             np1_flag = true;
+        elseif strcmpi(varargin{i}, 'ddp')
+            ddp_flag = 1;
         end
     elseif isnumeric(varargin{i})
-        if length(varargin{i}) ==1
-            dp = varargin{i};
+        if length(varargin{i})==1
+            if ddp_flag==1
+                ddp = varargin{i};
+            else
+                dp = varargin{i};
+            end
         else
             elements = varargin{i};
         end
@@ -42,7 +54,7 @@ if isempty(elements)
     end
 end
 
-[TD, tune, chrom] = twissring(the_ring,dp,elements, 'chrom',1e-8);
+[TD, tune, chrom] = twissring(the_ring,dp,elements,'chrom',ddp);
 
 for i=1:length(TD)
     the_ring{i}.Twiss = TD(i);
