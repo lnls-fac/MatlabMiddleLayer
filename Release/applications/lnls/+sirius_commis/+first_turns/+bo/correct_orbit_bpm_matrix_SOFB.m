@@ -267,14 +267,14 @@ end
 function [delta_ch, delta_cv] = calc_kicks(r_bpm, n_sv, tw, bpm_select)
     v_prefix = getenv('VACA_PREFIX');
     ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
-    delta_kicks_ch_pv = [ioc_prefix, 'DeltaKicksCH-Mon'];
-    delta_kicks_cv_pv = [ioc_prefix, 'DeltaKicksCV-Mon'];
+    delta_kicks_ch_pv = [ioc_prefix, 'DeltaKickCH-Mon'];
+    delta_kicks_cv_pv = [ioc_prefix, 'DeltaKickCV-Mon'];
     bpmx_select_pv = [ioc_prefix, 'BPMXEnblList-SP'];
     bpmy_select_pv = [ioc_prefix, 'BPMYEnblList-SP'];
-    orbx_pv = [ioc_prefix, 'OrbitOfflineX-SP'];
-    orby_pv = [ioc_prefix, 'OrbitOfflineY-SP'];
-    n_sv_pv = [ioc_prefix, 'NumSingValues-SP'];
-    calc_kicks_pv = [ioc_prefix, 'CalcCorr-Cmd'];
+    orbx_pv = [ioc_prefix, 'OfflineOrbX-SP'];
+    orby_pv = [ioc_prefix, 'OfflineOrbY-SP'];
+    n_sv_pv = [ioc_prefix, 'NrSingValues-SP'];
+    calc_kicks_pv = [ioc_prefix, 'CalcDelta-Cmd'];
 
     if exist('bpm_select', 'var')
         setpv(bpmx_select_pv, bpm_select');

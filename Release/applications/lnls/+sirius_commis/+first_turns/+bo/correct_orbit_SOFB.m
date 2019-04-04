@@ -11,11 +11,11 @@ bpmy_select_pv = [ioc_prefix, 'BPMYEnblList-SP'];
 orbx_pv = [ioc_prefix, 'OrbitMultiTurnX-Mon'];
 orby_pv = [ioc_prefix, 'OrbitMultiTurnY-Mon'];
 sum_pv = [ioc_prefix, 'OrbitsMultiTurnSum-Mon'];
-n_sv_pv = [ioc_prefix, 'NumSingValues-SP'];
-calc_kicks_pv = [ioc_prefix, 'CalcCorr-Cmd'];
-apply_kicks_pv = [ioc_prefix, 'ApplyCorr-Cmd'];
-corr_fact_ch_pv = [ioc_prefix, 'CorrFactorCH-SP'];
-corr_fact_cv_pv = [ioc_prefix, 'CorrFactorCV-SP'];
+n_sv_pv = [ioc_prefix, 'NrSingValues-SP'];
+calc_kicks_pv = [ioc_prefix, 'CalcDelta-Cmd'];
+apply_kicks_pv = [ioc_prefix, 'ApplyDelta-Cmd'];
+corr_fact_ch_pv = [ioc_prefix, 'DeltaFactorCH-SP'];
+corr_fact_cv_pv = [ioc_prefix,  'DeltaFactorCV-SP'];
 buffer_pulse_pv = [ioc_prefix, 'OrbitSmoothNPnts-SP'];
 multi_turn_acq = [ioc_prefix, 'OrbitMultiTurnIdx-SP'];
 
@@ -93,7 +93,7 @@ while (inc_x || inc_y) || mean(eff_init) <= mean(eff_final) / tol1
     sleep(tw)
     setpv(calc_kicks_pv, 1);
     sleep(tw);
-    
+
     if inc_x && inc_y
         fprintf('HORIZONTAL AND VERTICAL CORRECTION \n');
         setpv(corr_fact_ch_pv, fact_corr_x);
@@ -128,7 +128,7 @@ while (inc_x || inc_y) || mean(eff_init) <= mean(eff_final) / tol1
         fprintf('=================================================\n');
         sleep(buffer);
     end
-    
+
     x_bpm = getpv(orbx_pv);
     y_bpm = getpv(orby_pv);
     int_turns = getpv(sum_pv);
@@ -137,7 +137,7 @@ while (inc_x || inc_y) || mean(eff_init) <= mean(eff_final) / tol1
     eff_final = mean(int_bpm_turns, 1);
     rms_orbit_x_bpm_new = nanstd(x_bpm);
     rms_orbit_y_bpm_new = nanstd(y_bpm);
-    
+
     if ~stop_x
         inc_x = rms_orbit_x_bpm_new < rms_orbit_x_bpm_old / tol2;
         if ~inc_x
@@ -145,7 +145,7 @@ while (inc_x || inc_y) || mean(eff_init) <= mean(eff_final) / tol1
             stop_x = true;
         end
     end
-    
+
     if ~stop_y
         inc_y = rms_orbit_y_bpm_new < rms_orbit_y_bpm_old / tol2;
         if ~inc_y
@@ -153,7 +153,7 @@ while (inc_x || inc_y) || mean(eff_init) <= mean(eff_final) / tol1
             stop_y = true;
         end
     end
-    
+
     if ~inc_x && ~inc_y
         if n_inc == 0
             fprintf('FIRST TURN CORRECTION IS DONE!\n');
@@ -176,18 +176,17 @@ end
 
 function cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, plane)
 
-if strcmp(plane, 'xy')    
+if strcmp(plane, 'xy')
     setpv(corr_fact_ch_pv, 0);
     setpv(corr_fact_cv_pv, 0);
     sleep(tw);
-elseif strcmp(plane, 'x')    
+elseif strcmp(plane, 'x')
     setpv(corr_fact_ch_pv, 0);
     sleep(tw);
-elseif strcmp(plane, 'y')    
+elseif strcmp(plane, 'y')
     setpv(corr_fact_cv_pv, 0);
     sleep(tw);
 end
 
 setpv(apply_kicks_pv, 1);
 end
-        
