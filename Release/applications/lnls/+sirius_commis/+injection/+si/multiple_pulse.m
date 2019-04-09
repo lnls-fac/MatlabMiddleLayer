@@ -92,29 +92,29 @@ elseif(~exist('shape', 'var')) && ~flag_shape
     flag_shape = false;
 end
 
-p = 1;
+p = 0;
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
-    param.offset_x = param.offset_x_sist + p * error_x_pulse; %param.offset_x0;
+    param.offset_x = param.offset_x0; % param.offset_x_sist + p * error_x_pulse; 
 
     error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
-    param.offset_xl = param.offset_xl_sist + p * error_xl_pulse; %param.offset_xl0;
+    param.offset_xl =  param.offset_xl0; % param.offset_xl_sist + p * error_xl_pulse
     % Peak to Peak values from measurements - cutoff = 1;
     
     error_y_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.y_error_pulse;
-    param.offset_y = param.offset_y_sist + p * error_y_pulse; %param.offset_y0;
+    param.offset_y = param.offset_y0; % param.offset_y_sist + p * error_y_pulse;
 
     error_yl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.yl_error_pulse;
-    param.offset_yl = param.offset_yl_sist + p * error_yl_pulse; %param.offset_yl0;
+    param.offset_yl = param.offset_yl0; % param.offset_yl_sist + p * error_yl_pulse;
 
     if flag_kckr
         error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
-        param.kckr = param.kckr_sist + p * error_kckr_pulse; %param.kckr0;
+        param.kckr = param.kckr0; % param.kckr_sist + p * error_kckr_pulse
         machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
     end
 
     error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
-    param.delta = param.delta_sist + 0 * error_delta_pulse;
+    param.delta = 0; % param.delta_sist + 0 * error_delta_pulse;
     
     param.phase = param_errors.phase_offset;
 

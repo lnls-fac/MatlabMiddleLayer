@@ -42,6 +42,8 @@ function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
     
     param.offset_x0 = -30e-3;
     param.offset_xl0 = 14.3e-3;
+    param.offset_y0 = 0;
+    param.offset_yl0 = 0;
     param.kckr0 = -19.34e-3;
     param.delta0 = 0;
     param.delta_ave = 0;

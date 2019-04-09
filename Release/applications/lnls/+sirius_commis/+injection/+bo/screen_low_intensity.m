@@ -30,7 +30,8 @@ if n == 1
             eff = mean(eff); 
             j = j + 1;
             if j > n_times
-                error('INCREASING INTENSITY PROBLEMS ON SCREEN 1!!!')
+                warning('INCREASING INTENSITY PROBLEMS ON SCREEN 1!!!')
+                return
             end
             end
         end
@@ -56,7 +57,8 @@ if n == 2
             eff = mean(eff); 
             j = j + 1;
             if j > n_times
-                error('INCREASING INTENSITY PROBLEMS ON SCREEN 2!!!')
+                warning('INCREASING INTENSITY PROBLEMS ON SCREEN 2!!!')
+                return
             end
             end
         end
@@ -82,7 +84,8 @@ if n == 3
             eff = mean(eff); 
             j = j + 1;
             if j > n_times
-                error('INCREASING INTENSITY PROBLEMS ON 3!!!')
+                warning('INCREASING INTENSITY PROBLEMS ON 3!!!')
+                return
             end
             end
         end

@@ -58,14 +58,14 @@ function [machine, param, param_errors] = set_machine(si_ring, n_mach)
 
     %Calculates the horizontal dispersion function at BPMs
     bpms = fam.BPM.ATIndex;
-    delta = 1e-5;
-    r_init_n = [0; 0; 0; 0; -delta; 0];
+    delta = 1e-8;
+    r_init_n = [0; 0; 0; 0; -delta / 2; 0];
     r_final_n = linepass(si_ring, r_init_n, bpms);
-    r_init_p = [0; 0; 0; 0; +delta; 0];
+    r_init_p = [0; 0; 0; 0; +delta / 2; 0];
     r_final_p = linepass(si_ring, r_init_p, bpms);
     x_n = r_final_n(1, :);
     x_p = r_final_p(1, :);
-    param.etax_bpms = (x_p - x_n) ./ 2 ./ delta;
+    param.etax_bpms = (x_p - x_n) ./ delta;
 
     % Setting the vacuum chamber at injection point
     % machine = vchamber_injection(si_ring);
@@ -75,8 +75,8 @@ function [machine, param, param_errors] = set_machine(si_ring, n_mach)
     % setting off rf cavity and radiation emission
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
-    machine  = create_apply_errors(machine, fam, n_mach);
-    machine  = create_apply_multipoles(machine, fam);
+    % machine  = create_apply_errors(machine, fam, n_mach);
+    % machine  = create_apply_multipoles(machine, fam);
     machine = create_apply_bpm_errors(machine, fam);
 
     

@@ -1,4 +1,4 @@
-function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, param_errors, n_part, n_pulse, kckr, scrn1, scrn2, r_scrn2)
+function [r_scrn2, param, thetax12] = fine_adjust_scrn1_scrn2(machine, param, param_errors, n_part, n_pulse, kckr, scrn1, scrn2, r_scrn2)
     res_scrn = param_errors.sigma_scrn;
     s = findspos(machine, 1:length(machine));
     dx12 = 1;
@@ -30,16 +30,20 @@ function [r_scrn2, param] = fine_adjust_scrn1_scrn2(machine, param, param_errors
         end
         
         dx12 = r_scrn2(1) - r_scrn1(1);
+        dy12 = r_scrn2(2) - r_scrn1(2);
         d12 = s(scrn2) - s(scrn1);
-        theta12 = atan(dx12 / d12);
+        thetax12 = atan(dx12 / d12);
+        thetay12 = atan(dy12 / d12);
 
-        if abs(dx12) < res_scrn / sqrt(n_pulse)
-            param.kckr_sist = param.kckr_sist - theta12;
-            fprintf('SCREEN 1 AND 2 DIFFERENCE: %f mm, ANGLE AFTER KICKER: %f mrad \n', abs(dx12)*1e3, abs(theta12)*1e3);
+        if abs(dx12) < res_scrn && abs(dy12) < res_scrn % / sqrt(n_pulse)
+            param.kckr_sist = param.kckr_sist - thetax12;
+            param.offset_yl_sist = param.offset_yl_sist - thetay12;
+            fprintf('SCREEN 1 AND 2 X DIFFERENCE: %f mm, ANGLE X AFTER KICKER: %f mrad \n', abs(dx12)*1e3, abs(thetax12)*1e3);
+            fprintf('SCREEN 1 AND 2 Y DIFFERENCE: %f mm, ANGLE Y AFTER KICKER: %f mrad \n', abs(dy12)*1e3, abs(thetay12)*1e3);
             break
         end
       
-        param.kckr_sist = param.kckr_sist - theta12;
+        param.kckr_sist = param.kckr_sist - thetax12;
         fprintf('=================================================\n');
         fprintf('SCREEN 2 ON \n')
         fprintf('=================================================\n');

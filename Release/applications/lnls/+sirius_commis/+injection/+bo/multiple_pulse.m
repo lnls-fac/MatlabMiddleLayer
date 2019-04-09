@@ -1,4 +1,4 @@
-function [eff, r_scrn, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
+function [eff, r_scrn, r_end, r_aft_kckr, r_bpm, int_bpm] = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
 % Simulation of injection pulses to the booster. The starting point is the
 % end of injection septum. 
 %
@@ -35,6 +35,12 @@ function [eff, r_scrn, r_end, machine, r_bpm, int_bpm] = multiple_pulse(machine,
 
 injkckr = findcells(machine, 'FamName', 'InjKckr');
 bpm = findcells(machine, 'FamName', 'BPM');
+scrn = findcells(machine, 'FamName', 'Scrn');
+if ismember(point, scrn)
+    off_scrn = param_errors.offset_scrn(:, point == scrn);
+else
+    off_scrn = 0;
+end
 l_bpm = length(bpm);
 eff = zeros(1, n_pulse);
 sigma_scrn = zeros(n_pulse, 2);
@@ -77,7 +83,7 @@ elseif(~exist('diag','var')) && ~flag_diag
         flag_diag = false;
 end
 
-p = 1;
+p = 0;
 
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
@@ -85,6 +91,12 @@ for j=1:n_pulse
 
     error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
     param.offset_xl = param.offset_xl_sist + p * error_xl_pulse;
+    
+    error_y_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.y_error_pulse;
+    param.offset_y = param.offset_y_sist + p * error_y_pulse;
+
+    error_yl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.yl_error_pulse;
+    param.offset_yl = param.offset_yl_sist + p * error_yl_pulse;
     % Peak to Peak values from measurements - cutoff = 1;
 
     if flag_kckr
@@ -99,7 +111,7 @@ for j=1:n_pulse
     param.phase = param_errors.phase_offset;
 
     if flag_diag        
-        [r_xy, r_end_part, r_point, r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
+        [r_xy, r_end_part, r_point, r_inj, r_bpm] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
         if n_part == 1
             r_diag_bpm(j, :, :) = r_bpm;
         else
@@ -107,14 +119,15 @@ for j=1:n_pulse
         end
         [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_bpm, n_part, param_errors.sigma_bpm);
     else
-        [r_xy, r_end_part, r_point] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
+        [r_xy, r_end_part, r_point, r_inj] = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
     end    
     r_pulse(j, :, :) =  nanmean(r_xy, 2);
+    r_inj_pulse(j, :) = nanmean(r_inj, 2);
     r_end(j, :, :) = r_end_part;
     % r_part(j, :, :) = r_point;
 
     eff(j) = sirius_commis.common.calc_eff(n_part, r_xy(:, :, point));      
-    sigma_scrn(j, :) = sirius_commis.injection.bo.screen_error_inten(r_xy, n_part, point, param_errors.sigma_scrn);
+    sigma_scrn(j, :) = sirius_commis.injection.bo.screen_error_inten(r_xy, n_part, point, param_errors.sigma_scrn_pulse);
 
 
     if flag_plot
@@ -122,30 +135,33 @@ for j=1:n_pulse
     end
 
     if ~mod(j, 10)
-    fprintf('. %i pulses \n', j);
+        fprintf('. %i pulses \n', j);
     else
-    fprintf('.');
+        fprintf('.');
     end
 end
+
+r_aft_kckr = squeeze(nanmean(r_inj_pulse, 1));
 
 % r_mean_pulse = squeeze(nanmean(r_part, 1));
 
 if point ~= length(machine)
-   fprintf('AVERAGE INTENSITY ON SCREEN :  %g %% \n', mean(eff)*100);
+    fprintf('AVERAGE INTENSITY ON SCREEN :  %g %% \n', mean(eff)*100);
 else 
    % fprintf('AVERAGE EFFICIENCY :  %g %% \n', mean(eff)*100);
 end
 
 r_scrn = r_pulse(:, :, point);
-r_scrn = r_scrn + sigma_scrn;
-r_scrn = sirius_commis.common.compares_vchamb(machine, r_scrn, point, 'screen');
+r_scrn = r_scrn + p * sigma_scrn;
 r_scrn = squeeze(nanmean(r_scrn, 1));
+r_scrn = r_scrn + 0*off_scrn';
+r_scrn = sirius_commis.common.compares_vchamb(machine, r_scrn, point, 'screen');
 r_end = squeeze(r_end);
 
 % sirius_commis.scatplot(1e3 * r_mean_pulse(1, :), 1e3 * r_mean_pulse(2, :), 'circles', 1, 100, 5, 1, 4);
 
 if flag_diag
-    r_diag_bpm = r_diag_bpm + sigma_bpm;
+    r_diag_bpm = r_diag_bpm + p * sigma_bpm;
     if n_pulse > 1
         r_diag_bpm = squeeze(nanmean(r_diag_bpm, 1));
     else
