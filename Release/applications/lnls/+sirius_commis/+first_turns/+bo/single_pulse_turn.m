@@ -1,4 +1,4 @@
-function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, c_prev)
+function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, INTBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns, c_prev)
 % Simulation of booster injection and turns around the ring for a single
 % pulse (for multiple pulses, see the function multiple_pulses_turns())
 %
@@ -37,7 +37,7 @@ eff_1turn = zeros(1, n_mach);
 count_turns = zeros(n_mach, 1);
 eff_turns = zeros(n_mach, n_turns);
 r_init = zeros(n_mach, n_turns, 6, n_part);
-eff_lim = 0.5;
+eff_lim = 0.01;
 for j = 1:n_mach
     %fprintf('=================================================\n');
     %fprintf('MACHINE NUMBER %i \n', j)
@@ -55,7 +55,7 @@ for j = 1:n_mach
     end
 
     kckr = 'on';
-    [eff_1turn(j), ~, r_init, machine, RBPM(1, :, :), INTBPM(1, :, :)] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
+    [eff_1turn(j), ~, r_init, ~, RBPM(1, :, :), INTBPM(1, :, :)] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
 
     %if eff_1turn > 0.95
     %   continue
@@ -80,9 +80,9 @@ for j = 1:n_mach
     for i = 1:n_turns-1
         [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
         if eff_turns(j, i+1) < eff_lim
-            RBPM(i+1, :, :) = zeros(2, 50);
-            INTBPM(i+1, :, :) = zeros(1, 50);
-            eff_turns(j, i+1) = 0;
+            % RBPM(i+1, :, :) = zeros(2, 50);
+            % INTBPM(i+1, :, :) = zeros(1, 50);
+            % eff_turns(j, i+1) = 0;
             break
         end
         count_turns(j) = count_turns(j) + 1;
@@ -104,6 +104,9 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
     elseif(~exist('bpm','var'))
             flag_bpm = false;
     end
+    
+    p = 0;
+    
     % !! IMPORTANT !!
     % +1 added because linepass does the tracking until the beginning of
     % element and it is needed until the end to perform one turn
@@ -128,7 +131,7 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
         bpm = findcells(machine, 'FamName', 'BPM');
         r_out_bpm = r_out_xy(:, :, bpm);
         [sigma_bpm, int_bpm] = sirius_commis.common.bpm_error_inten(r_out_bpm, n_part, sigma_bpm0);
-        r_diag_bpm = squeeze(nanmean(r_out_bpm, 2)) + sigma_bpm;
+        r_diag_bpm = squeeze(nanmean(r_out_bpm, 2)) + p * sigma_bpm;
         r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
         sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
     end
