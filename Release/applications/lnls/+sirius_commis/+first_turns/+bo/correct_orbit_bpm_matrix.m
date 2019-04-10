@@ -56,11 +56,12 @@ end
 
 rms_orbit_x_bpm_old = nanstd(r_bpm(1,:));
 rms_orbit_y_bpm_old = nanstd(r_bpm(2,:));
-corr_lim = 300e-6;
+corr_lim = 20 * 300e-6;
 
-eff_lim = 1;
+eff_lim = 0.5;
 n_cor = 1;
 n_fcod = true;
+tol = 0.90;
 
 rms_orbit_x_bpm_new = rms_orbit_x_bpm_old;
 rms_orbit_y_bpm_new = rms_orbit_y_bpm_old;
@@ -68,7 +69,7 @@ inc_x = true; inc_y = true;
 ft_data.error = false;
 
 while int_bpm(end) < eff_lim
-    bpm_int_ok = bpm(int_bpm > 0.80);
+    bpm_int_ok = bpm(int_bpm > 0.25);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
     
     bpm_select = zeros(length(bpm), 1);
@@ -92,8 +93,9 @@ while int_bpm(end) < eff_lim
     x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
     y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
     new_r_bpm = [x_bpm, y_bpm];
+    delta_kick = - m_corr_inv * new_r_bpm';
     
-    kicks = [theta_x; theta_y; 0] - m_corr_inv * new_r_bpm';
+    kicks = [theta_x; theta_y; 0] + delta_kick;
     theta_x = kicks(1:length(ch));
     theta_y = kicks(length(ch)+1:end-1);
     
@@ -154,22 +156,35 @@ while int_bpm(end) < eff_lim
     [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
     rms_orbit_x_bpm_new = nanstd(r_bpm(1,:)); rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
     
-    if n_cor > 10
-       n_sv = n_sv - 1;
+    if n_cor > 25
+       n_sv = n_sv - 10;
        machine = lnls_set_kickangle(machine, zeros(length(ch), 1), ch, 'x');
        machine = lnls_set_kickangle(machine, zeros(length(cv), 1), cv, 'y');
        n_cor = 1;
        warning('Number of Singular Values reduced')
-       if n_sv <= 1
-           warning('Problems in Singular Values')
-           ft_data.machine = machine;
-           ft_data.error = true;
-           ft_data.n_svd = n_sv;
-           return
-       end
+       ft_data.machine = machine;
+       ft_data.error = true;
+       ft_data.n_svd = n_sv;
+       ft_data.param = param;
+       return
+       % if n_sv <= 1
+           % warning('Problems in Singular Values')
+           % ft_data.machine = machine;
+           % ft_data.error = true;
+           % ft_data.n_svd = n_sv;
+           % ft_data.param = param;
+           % return
+       % end
     end
     n_cor = n_cor + 1;
+    n_sv = n_sv + 1;
 end
+
+x_mean = mean(r_bpm(1, :));
+% etax_mean = 0.1309;
+etax_mean_bpm = 0.2200;
+delta_mean = x_mean / etax_mean_bpm;
+param.delta_ave = param.delta_ave * (1 + delta_mean) + delta_mean;
 
 kickx_ft = lnls_get_kickangle(machine, ch, 'x');
 kicky_ft = lnls_get_kickangle(machine, cv, 'y');
@@ -225,8 +240,6 @@ while inc_x || inc_y
         
         machine = lnls_set_kickangle(machine, theta_x_f, ch, 'x');
         fprintf('HORIZONTAL CORRECTION \n');
-        
-        theta_x_i = theta_x_f;
     end
     
     if inc_y
@@ -243,8 +256,6 @@ while inc_x || inc_y
         
         machine = lnls_set_kickangle(machine, theta_y_f, cv, 'y');
         fprintf('VERTICAL CORRECTION \n');
-        
-        theta_y_i = theta_y_f;
     end
     
     [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
@@ -253,11 +264,12 @@ while inc_x || inc_y
     param.orbit = findorbit4(machine, 0, 1:length(machine));
     ft_data.finalcod.bpm_pos = r_bpm;
 
-    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+    [~, ~, ~, ~, r_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+    
     
     if int_bpm(end) < eff_lim
-        machine = lnls_set_kickangle(machine, theta_x0, ch, 'x');
-        machine = lnls_set_kickangle(machine, theta_y0, cv, 'y');
+        machine = lnls_set_kickangle(machine, kickx_ft, ch, 'x');
+        machine = lnls_set_kickangle(machine, kicky_ft, cv, 'y');
         [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
         ft_data.firstcod = cod_data;
         ft_data.machine = machine;
@@ -266,6 +278,7 @@ while inc_x || inc_y
         ft_data.ftcod.kickx = kickx_ft;
         ft_data.ftcod.kicky = kicky_ft;
         ft_data.ftcod.orbit = orbit_ft;
+        ft_data.param = param;
         rms_x = nanstd(orbit_ft(1, :));   rms_y = nanstd(orbit_ft(3, :));
         ft_data.ftcod.rms_x = rms_x;      ft_data.ftcod.rms_y = rms_y; 
         ft_data.ftcod.bpm_pos = r_bpm_ft;    
@@ -282,18 +295,26 @@ while inc_x || inc_y
     rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
     
     if ~stop_x
-        inc_x = rms_orbit_x_bpm_new < rms_orbit_x_bpm_old;
+        ratio_x = rms_orbit_x_bpm_new / rms_orbit_x_bpm_old;
+        inc_x = ratio_x < tol;
         if ~inc_x
-            machine = lnls_set_kickangle(machine, theta_x0, ch, 'x');
+            machine = lnls_set_kickangle(machine, theta_x_i, ch, 'x');
             stop_x = true;
-        end
+        else
+            theta_x_i = theta_x_f;
+            fprintf('X - OLD: %f -->> NEW: %f mm \n', rms_orbit_x_bpm_old*1e3, rms_orbit_x_bpm_new*1e3);
+        end 
     end
     
     if ~stop_y
-        inc_y = rms_orbit_y_bpm_new < rms_orbit_y_bpm_old;
+        ratio_y = rms_orbit_y_bpm_new / rms_orbit_y_bpm_old;
+        inc_y = ratio_y < tol;
         if ~inc_y
-            machine = lnls_set_kickangle(machine, theta_y0, cv, 'y');
+            machine = lnls_set_kickangle(machine, theta_y_i, cv, 'y');
             stop_y = true;
+        else
+            theta_y_i = theta_y_f;
+            fprintf('Y - OLD: %f -->> NEW: %f mm \n', rms_orbit_y_bpm_old*1e3, rms_orbit_y_bpm_new*1e3);
         end
     end
     
@@ -302,6 +323,7 @@ while inc_x || inc_y
             [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
             ft_data.firstcod = cod_data;
             ft_data.machine = machine;
+            ft_data.param = param;
             ft_data.max_kick = [gr_mach_x; gr_mach_y];
             ft_data.n_svd = n_t;
             ft_data.ftcod.kickx = kickx_ft;
@@ -312,7 +334,10 @@ while inc_x || inc_y
             ft_data.ftcod.bpm_pos = r_bpm_ft;
             return
         else
-            n_t = n_sv + k * 5;
+            n_t = n_sv + k * 10;
+            if n_t > 50
+                n_t = 50;
+            end
             inc_x = true; inc_y = true;
             stop_x = false; stop_y = false;
             k = k+1;
@@ -323,6 +348,20 @@ while inc_x || inc_y
         end
     end
     n_inc = n_inc + 1;
+    
+    if n_inc > 10
+        n_t = n_sv + k * 10;
+        if n_t > 50
+            n_t = 50;
+        end
+        inc_x = true; inc_y = true;
+        stop_x = false; stop_y = false;
+        k = k+1;
+        n_inc = 0;
+        sv_change = true;
+        fprintf('Number of Singular Values: %i \n', n_t);
+        continue
+    end
     sv_change = false;
 end
 end
