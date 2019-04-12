@@ -31,9 +31,11 @@ sirius_commis.common.initializations();
 if n_mach == 1
     machine_cell = {machine};
     param_cell = {param};
+    param_errors_cell = {param_errors};
 elseif n_mach > 1
     machine_cell = machine;
     param_cell = param;
+    param_errors_cell = param_errors;
 end
 
 % machine_correct = cell(n_mach, 1);
@@ -42,20 +44,21 @@ ft_mach_refined = zeros(n_mach, 1);
 count_turns = zeros(n_pulse_turns, n_mach);
 % gr_mach = cell(n_mach, 2);
 machine_correct = cell(n_mach, 1);
-param_errors.sigma_bpm = 2e-3;
+% param_errors.sigma_bpm = 2e-3;
 
 fam = sirius_bo_family_data(machine_cell{1});
 ft_data = cell(n_mach, 1);
 
 % [~, ~, m_corr] = sirius_commis.common.trajectory_matrix(fam, M_acc);
 
-for j = 1:n_mach    
+for j = 1:n_mach
     fprintf('=================================================\n');
     fprintf('MACHINE NUMBER %i \n', j)
     fprintf('=================================================\n');
     
     machine = machine_cell{j};
     param = param_cell{j};
+    param_errors = param_errors_cell{j};
     
     machine = setcavity('off', machine);
     machine = setradiation('on', machine);
@@ -71,12 +74,13 @@ for j = 1:n_mach
         count_turns1 = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_correct1, 1, param, param_errors, n_part, n_pulse_turns, n_turns);
         
         if min(count_turns1) < n_turns
-            ft_data2 = sirius_commis.first_turns.bo.first_turn_corrector_SOFB(machine_correct1, 1, param, param_errors, n_part, 3*n_pulse, ft_data1.n_svd);
+            % ft_data2 = sirius_commis.first_turns.bo.first_turn_corrector_SOFB(machine_correct1, 1, param, param_errors, n_part, 3*n_pulse, ft_data1.n_svd);
             % machine_correct{j} = sirius_commis.first_turns.si.first_turn_corrector(machine, 1, param, param_errors, M_acc, n_part, 10*n_pulse);
-            ft_data2 = ft_data2{1, 1};
+            ft_data2 = ft_data1;
             machine_correct2 = ft_data2.machine;
             ft_mach_refined(j) = 1;
-            count_turns2 = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_correct2, 1, param, param_errors, n_part, n_pulse_turns, n_turns);
+            % count_turns2 = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_correct2, 1, param, param_errors, n_part, n_pulse_turns, n_turns);
+            count_turns2 = count_turns1;
             if min(count_turns1) > min(count_turns2)
                 ft_data{j} = ft_data1;
                 machine_correct{j} = machine_correct1;

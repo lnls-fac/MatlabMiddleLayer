@@ -4,9 +4,11 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
     if n_mach == 1
         machine_cell = {machine};
         param_cell = {param};
+        param_err_cell = {param_errors};
     elseif n_mach > 1
         machine_cell = machine;
         param_cell = param;
+        param_err_cell = param_errors;
     end
     
 %   cavity_ind = findcells(machine, 'Frequency');    
@@ -21,7 +23,6 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
     count_turns = cell(n_mach, 1);
     num_svd = ones(n_mach, 1) * svd_min;
     corrected = true;
-    param_errors.sigma_bpm = 3e-3;
 
     fam = sirius_bo_family_data(machine_cell{1});
     ch = fam.CH.ATIndex;
@@ -38,6 +39,8 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
 
         machine = machine_cell{j};
         param = param_cell{j};
+        param_errors = param_err_cell{j};
+        % param_errors.sigma_bpm = 3e-3;
         
         machine = setcavity('off', machine);
         machine = setradiation('off', machine);
@@ -53,6 +56,17 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
         [count_turns{j}, r_bpm, int_bpm, ~, fm_i] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
         min_turns_0 = min(count_turns{j});
         
+        sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
+        %{
+        x_mean = mean(r_bpm(1, :));
+        % etax_mean = 0.1309;
+        % etax_mean_bpm = 0.2200;
+        delta_mean = x_mean / mean(param.etax_bpms);
+        param.delta_ave = param.delta_ave * (1 + delta_mean) + delta_mean;
+        
+        [count_turns{j}, r_bpm, int_bpm, ~, fm_i] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
+        min_turns_0 = min(count_turns{j});
+        %}
         sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
         
         if min(int_bpm) == 0
@@ -182,18 +196,20 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
     end
 end
 
-function [delta_ch, delta_cv] = calc_kicks(r_bpm, n_sv, tw, bpm_select)
-    % v_prefix = getenv('VACA_PREFIX');
-    % ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
-    ioc_prefix = ['BO-Glob:AP-SOFB:'];
-    delta_kicks_ch_pv = [ioc_prefix, 'DeltaKicksCH-Mon'];
-    delta_kicks_cv_pv = [ioc_prefix, 'DeltaKicksCV-Mon'];
+function [delta_ch, delta_cv] = calc_kicks(r_bpm, n_sv, tw, bpm_select)   
+    v_prefix = getenv('VACA_PREFIX');
+    ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
+    delta_kicks_ch_pv = [ioc_prefix, 'DeltaKickCH-Mon'];
+    delta_kicks_cv_pv = [ioc_prefix, 'DeltaKickCV-Mon'];
     bpmx_select_pv = [ioc_prefix, 'BPMXEnblList-SP'];
     bpmy_select_pv = [ioc_prefix, 'BPMYEnblList-SP'];
-    orbx_pv = [ioc_prefix, 'OrbitOfflineX-SP'];
-    orby_pv = [ioc_prefix, 'OrbitOfflineY-SP'];
-    n_sv_pv = [ioc_prefix, 'NumSingValues-SP'];
-    calc_kicks_pv = [ioc_prefix, 'CalcCorr-Cmd'];
+    orbx_pv = [ioc_prefix, 'OfflineOrbX-SP'];
+    orby_pv = [ioc_prefix, 'OfflineOrbY-SP'];
+    n_sv_pv = [ioc_prefix, 'NrSingValues-SP'];
+    calc_kicks_pv = [ioc_prefix, 'CalcDelta-Cmd'];
+    % ring_size_pv = [ioc_prefix, 'RingSize-SP'];
+    % reforbx_pv = [ioc_prefix, 'RefOrbX-SP'];
+    % reforby_pv = [ioc_prefix, 'RefOrbY-SP'];
 
     if exist('bpm_select', 'var')
         setpv(bpmx_select_pv, bpm_select');
