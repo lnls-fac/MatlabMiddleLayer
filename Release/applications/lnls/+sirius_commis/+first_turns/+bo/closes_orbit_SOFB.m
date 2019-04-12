@@ -6,6 +6,10 @@ fam = sirius_bo_family_data(machine);
 ch = fam.CH.ATIndex;
 cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
+
+machine = setcellstruct(machine, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
+machine = setcellstruct(machine, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
+
 theta_x0 = lnls_get_kickangle(machine, ch, 'x')';
 theta_y0 = lnls_get_kickangle(machine, cv, 'y')';
 theta_x = theta_x0;
@@ -229,9 +233,9 @@ function [delta_ch, delta_cv, ref_old] = calc_kicks(r_bpm, n_sv, tw, bpm_select,
     end
     %}
     
-    setpv(reforbx_pv, ref_old(1,:));
+    setpv(reforbx_pv, 0.*ref_old(1,:));
     sleep(tw);
-    setpv(reforby_pv, ref_old(2,:));
+    setpv(reforby_pv, 0.*ref_old(2,:));
     sleep(tw);
     
     

@@ -10,8 +10,8 @@ end
 
 % fam = sirius_bo_family_data(bo_ring);
 
-% bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
-% bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
+bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
+bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
 
 delta_kick_x = 300e-6;
 delta_kick_y = 150e-6;

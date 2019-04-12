@@ -37,6 +37,9 @@ fam = sirius_bo_family_data(machine);
 ch = fam.CH.ATIndex;
 cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
+
+machine = setcellstruct(machine, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
+machine = setcellstruct(machine, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
 % m_corr_x = m_corr(1:size(bpm, 1), 1:size(ch, 1));
 % m_corr_y = m_corr(size(bpm, 1)+1:end, size(ch, 1)+1:end);
 
@@ -182,8 +185,8 @@ end
 
 x_mean = mean(r_bpm(1, :));
 % etax_mean = 0.1309;
-etax_mean_bpm = 0.2200;
-delta_mean = x_mean / etax_mean_bpm;
+% etax_mean_bpm = 0.2200;
+delta_mean = x_mean / mean(param.etax_bpms);
 param.delta_ave = param.delta_ave * (1 + delta_mean) + delta_mean;
 
 kickx_ft = lnls_get_kickangle(machine, ch, 'x');
