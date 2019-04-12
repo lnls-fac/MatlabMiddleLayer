@@ -83,7 +83,7 @@ elseif(~exist('diag','var')) && ~flag_diag
         flag_diag = false;
 end
 
-p = 0;
+p = 1/10;
 
 for j=1:n_pulse     
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
@@ -154,7 +154,7 @@ end
 r_scrn = r_pulse(:, :, point);
 r_scrn = r_scrn + p * sigma_scrn;
 r_scrn = squeeze(nanmean(r_scrn, 1));
-r_scrn = r_scrn + 0*off_scrn';
+r_scrn = r_scrn + off_scrn';
 r_scrn = sirius_commis.common.compares_vchamb(machine, r_scrn, point, 'screen');
 r_end = squeeze(r_end);
 
@@ -169,7 +169,7 @@ if flag_diag
     end
     offset = getcellstruct(machine, 'Offsets', bpm);
     offset = cell2mat(offset)';
-    r_diag_bpm = r_diag_bpm -  offset;
+    r_diag_bpm = r_diag_bpm - offset;
     r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
     sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
 end

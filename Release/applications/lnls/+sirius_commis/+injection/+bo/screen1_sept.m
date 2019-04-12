@@ -4,7 +4,7 @@ function [r_scrn1, param] = screen1_sept(machine, param, param_errors, n_part, n
     fprintf('=================================================\n');
     machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);
     dxf_e = 1; dyf_e = 1;
-    dthetax = 0; dthetay = 0;
+    dthetax = 0; dthetay = 0; dyf = 0;
     eff_lim = 0.50;
     res_scrn = param_errors.sigma_scrn;
     s = findspos(machine, 1:length(machine));
@@ -18,7 +18,8 @@ function [r_scrn1, param] = screen1_sept(machine, param, param_errors, n_part, n
 
     while dxf_e > res_scrn || dyf_e > res_scrn% / sqrt(n_pulse)
         param.offset_xl_sist = param.offset_xl_sist + dthetax;
-        param.offset_yl_sist = param.offset_yl_sist - dthetay;
+        % param.offset_yl_sist = param.offset_yl_sist - dthetay;
+        param.offset_y_sist = param.offset_y_sist - dyf;
         [eff1, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
 
         if mean(eff1) < eff_lim

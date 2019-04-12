@@ -1,4 +1,4 @@
-function [param, x_scrn3] = screen3(machine, param, param_errors, n_part, n_pulse, scrn3, kckr)
+function [param, r_scrn3] = screen3(machine, param, param_errors, n_part, n_pulse, scrn3, kckr)
     
     fprintf('=================================================\n');
     fprintf('SCREEN 3 ON \n')
@@ -24,7 +24,7 @@ function [param, x_scrn3] = screen3(machine, param, param_errors, n_part, n_puls
     x_scrn3 = r_scrn3(1);
     y_scrn3 = r_scrn3(2);
     
-    if abs(x_scrn3) < res_scrn % / sqrt(n_pulse)
+    if abs(x_scrn3) < res_scrn && abs(y_scrn3) < res_scrn % / sqrt(n_pulse)
         fprintf('Screen 3 - x position %f mm \n', x_scrn3*1e3);
         fprintf('Screen 3 - y position %f mm \n', y_scrn3*1e3);
         fprintf('=================================================\n');    
@@ -41,7 +41,9 @@ function [param, x_scrn3] = screen3(machine, param, param_errors, n_part, n_puls
     dyf = r_scrn3(2);
     [~, dthetay] = sirius_commis.injection.bo.scrn_septum_corresp(machine3, 0, dyf, scrn3);
     param.offset_yl_sist = param.offset_yl_sist - dthetay;
+    % param.offset_y_sist = param.offset_y_sist - y_scrn3;
     fprintf('Screen 3 - x position %f mm \n', x_scrn3*1e3);
+    fprintf('Screen 3 - y position %f mm \n', y_scrn3*1e3);
     fprintf('=================================================\n');    
     fprintf('DELTA ENERGY ADJUSTED TO %f %% \n', param.delta_ave*1e2);
     agr = sirius_commis.common.prox_percent(param.delta_ave, param_errors.delta_error_sist);

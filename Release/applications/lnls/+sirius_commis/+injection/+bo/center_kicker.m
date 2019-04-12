@@ -1,4 +1,4 @@
-function param = center_kicker(machine, param, a)
+function param = center_kicker(machine, param, ax, ay)
 % Takes the value 'a' of screen 2 after kicker correction to adjust the
 % angle of injection to compensate the lack of adjustment of position at
 % injection point with screens
@@ -12,8 +12,9 @@ s = findspos(machine, 1:length(machine));
 
 d = s(injkckr) + L_kckr;
 
-dtheta = - a / d;
+dtheta = - ax / d;
 
 param.offset_xl_sist = param.offset_xl_sist + dtheta;
+param.offset_y_sist = param.offset_y_sist - ay;
 end
 

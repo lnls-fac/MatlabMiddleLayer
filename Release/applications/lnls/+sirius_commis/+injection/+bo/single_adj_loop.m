@@ -71,7 +71,7 @@ function [param_out, machine, r_scrn3, theta_aft_kckr] = single_adj_loop(bo_ring
         fprintf('READJUSTING THE BEAM TO REACH THE KICKER CENTER\n');
         fprintf('=================================================\n');
 
-        param_out = sirius_commis.injection.bo.center_kicker(machine, param_out, r_scrn2(1));
+        param_out = sirius_commis.injection.bo.center_kicker(machine, param_out, r_scrn2(1), r_scrn2(2));
         fprintf('=================================================\n');
         fprintf('REPEAT THE PROCESS \n');
         fprintf('=================================================\n');

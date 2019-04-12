@@ -3,7 +3,7 @@ function [r_scrn1, param] = screen1_kckr(machine, param, param_errors, n_part, n
     fprintf('SCREEN 1 ON - KICKER ON \n')
     fprintf('=================================================\n');
     machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);
-    dx = 10; dyf = 10;
+    dx = 10; dyf = 0;
     dtheta_kckr = 0;
     dthetay = 0;
     eff_lim = 0.5;
@@ -19,6 +19,7 @@ function [r_scrn1, param] = screen1_kckr(machine, param, param_errors, n_part, n
     while abs(dx) > res_scrn || abs(dyf) > res_scrn % / sqrt(n_pulse)
         param.kckr_sist = param.kckr_sist - dtheta_kckr;
         param.offset_yl_sist = param.offset_yl_sist - dthetay;
+        % param.offset_y_sist = param.offset_y_sist - dyf;
         
         [eff1, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
         dyf = r_scrn1(2);

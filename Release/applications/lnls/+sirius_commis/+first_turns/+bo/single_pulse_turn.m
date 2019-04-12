@@ -23,10 +23,12 @@ function [eff_1turn, count_turns, r_bpm_turns, int_bpm_turns, r_init, RBPM, INTB
 if n_mach == 1
     machine_cell = {machine};
     param_cell = {param};
+    param_err_cell = {param_errors};
     bpm = findcells(machine, 'FamName', 'BPM');
 elseif n_mach > 1
     machine_cell = machine;
     param_cell = param;
+    param_err_cell = param_errors;
     bpm = findcells(machine{1}, 'FamName', 'BPM');
 end
 
@@ -37,7 +39,7 @@ eff_1turn = zeros(1, n_mach);
 count_turns = zeros(n_mach, 1);
 eff_turns = zeros(n_mach, n_turns);
 r_init = zeros(n_mach, n_turns, 6, n_part);
-eff_lim = 0.01;
+eff_lim = 0.10;
 for j = 1:n_mach
     %fprintf('=================================================\n');
     %fprintf('MACHINE NUMBER %i \n', j)
@@ -47,6 +49,7 @@ for j = 1:n_mach
 
     machine = machine_cell{j};
     param = param_cell{j};
+    param_errors = param_err_cell{j};
     lm = length(machine);
 
 

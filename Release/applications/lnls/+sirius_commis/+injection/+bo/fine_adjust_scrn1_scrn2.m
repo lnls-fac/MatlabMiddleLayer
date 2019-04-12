@@ -9,7 +9,7 @@ function [r_scrn2, param, thetax12] = fine_adjust_scrn1_scrn2(machine, param, pa
         error('It is necessary a screen 2 measurement as input');
     end
     
-    while abs(dx12) > res_scrn / sqrt(n_pulse)
+    while abs(dx12) > res_scrn % / sqrt(n_pulse)
         if isnan(r_scrn2(1))
            error('PARTICLES ARE LOST BEFORE SCREEN 2');
         end

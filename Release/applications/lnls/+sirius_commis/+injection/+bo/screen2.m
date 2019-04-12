@@ -5,7 +5,7 @@ function [r_scrn2, param] = screen2(machine, param, param_errors, n_part, n_puls
     fprintf('SCREEN 2 ON \n')
     fprintf('=================================================\n');
       
-    dx12 = 10; dyf = 10;
+    dx12 = 10; dyf = 0;
     dtheta_kckr = 0;
     dthetay = 0;
     eff_lim = 0.5;
@@ -21,6 +21,7 @@ function [r_scrn2, param] = screen2(machine, param, param_errors, n_part, n_puls
     while abs(dx12) > res_scrn || abs(dyf) > res_scrn % / sqrt(n_pulse)
         param.kckr_sist = param.kckr_sist - dtheta_kckr;
         param.offset_yl_sist = param.offset_yl_sist - dthetay;
+        % param.offset_y_sist = param.offset_y_sist - dyf;
         [eff2, r_scrn2] = sirius_commis.injection.bo.multiple_pulse(machine2, param, param_errors, n_part, n_pulse, scrn2, kckr);
         
         dyf = r_scrn2(2);
