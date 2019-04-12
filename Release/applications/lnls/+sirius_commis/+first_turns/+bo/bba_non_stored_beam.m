@@ -1,4 +1,4 @@
-function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, twiss, n_points, plane, data_bpm, data_input)
+function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, m_corr, n_points, plane, data_bpm, data_input)
 
     mili = 1e-3; micro = 1e-6;
     bpm_stop = 200;
@@ -88,7 +88,9 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         % machine = setcellstruct(machine, 'T2', bba_ind, offset_quadx2.*0 , 1, 1);
         % machine = setcellstruct(machine, 'T2', bba_ind, offset_quady2.*0 , 1, 3);
         
-        [m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
+        % [m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
+        m_corr_x = m_corr(1:length(bpm), 1:length(ch));
+        m_corr_y = m_corr(length(bpm)+1: end, length(ch)+1:end);
         [~ , ind_best_x] = max(abs(m_corr_x), [], 2);
         [~ , ind_best_y] = max(abs(m_corr_y), [], 2);
         
