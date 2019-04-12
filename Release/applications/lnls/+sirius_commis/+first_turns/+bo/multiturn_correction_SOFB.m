@@ -1,8 +1,6 @@
-function periodic_condition_SOFB(n_bpm, n_sv, sum_lim, ring_size)
+function multiturn_correction_SOFB(n_bpm, n_sv, sum_lim, ring_size, closes_orbit)
 
-% sirius_commis.common.initializations();
-
-v_prefix = getenv('VACA_PREFIX');
+v_prefix = ''; % getenv('VACA_PREFIX');
 ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
 % kicks_ch_pv = [ioc_prefix, 'KicksCH-Mon'];
 % kicks_cv_pv = [ioc_prefix, 'KicksCV-Mon'];
@@ -20,9 +18,9 @@ corr_fact_ch_pv = [ioc_prefix, 'DeltaFactorCH-SP'];
 corr_fact_cv_pv = [ioc_prefix, 'DeltaFactorCV-SP'];
 buffer_pulse_pv = [ioc_prefix, 'SmoothNrPts-RB'];
 ring_size_pv = [ioc_prefix, 'RingSize-SP'];
-% reforbx_pv = [ioc_prefix, 'RefOrbX-SP'];
-% reforby_pv = [ioc_prefix, 'RefOrbY-SP'];
-    
+reforbx_pv = [ioc_prefix, 'RefOrbX-SP'];
+reforby_pv = [ioc_prefix, 'RefOrbY-SP'];
+
 tw = 0.1;
 f_pulse = 0.5;
 % tol1 = 0.5;
@@ -33,6 +31,10 @@ fact_corr_x = 100;
 fact_corr_y = 100;
 buffer = getpv(buffer_pulse_pv) * f_pulse + 1;
 
+if ~exist('closes_orbit', 'var')
+  closes_orbit = false;
+end
+
 setpv(ring_size_pv, ring_size);
 
 fprintf('=================================================\n');
@@ -42,7 +44,7 @@ sleep(buffer)
 
 int_bpm = getpv(sum_pv);
 
-[bpm_select, int_bpm_ok] = selection_bpm(int_bpm, sum_lim, 5 * n_bpm);  
+[bpm_select, int_bpm_ok] = selection_bpm(int_bpm, sum_lim, 5 * n_bpm);
 
 if sum(bpm_select) <= 1
      error('Only 1 BPM or none with good sum signal!')
@@ -52,32 +54,41 @@ n_bpm_select_old = sum(bpm_select);
 
 while int_bpm_ok(end) < sum_lim
     
+    x_bpm = getpv(orbx_pv);
+    y_bpm = getpv(orby_pv);
+
     setpv(bpmx_select_pv, double(bpm_select));
     setpv(bpmy_select_pv, double(bpm_select));
     sleep(tw);
-    
+
     setpv(n_sv_pv, n_sv);
+
+    if closes_orbit
+      setpv(reforbx_pv, x_bpm(1:n_bpm))
+      setpv(reforby_pv, y_bpm(1:n_bpm))
+    end
+
     setpv(calc_kicks_pv, 1);
     setpv(corr_fact_ch_pv, fact_corr_x);
     setpv(corr_fact_cv_pv, fact_corr_y);
     sleep(tw);
     setpv(apply_kicks_pv, 3);
-    
+
     fprintf('=================================================\n');
     fprintf('COLLECTING PULSES\n');
     fprintf('=================================================\n');
     sleep(buffer);
 
     int_bpm = getpv(sum_pv);
-    
+
     [bpm_select, int_bpm_ok] = selection_bpm(int_bpm, sum_lim, n_bpm * ring_size);
-    
+
     n_bpm_select_new = sum(bpm_select);
-    
+
     if n_bpm_select_new < n_bpm_select_old
         cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, 'xy')
     end
-    
+
     n_sv = n_sv + 5;
 end
 
@@ -113,4 +124,3 @@ end
 
 setpv(apply_kicks_pv, 1);
 end
-
