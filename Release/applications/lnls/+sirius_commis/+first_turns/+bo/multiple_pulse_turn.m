@@ -1,4 +1,4 @@
-function [count_turns, r_bpm, int_bpm, eff_mean, fm, r_bpm_turns, int_bpm_turns, RBPM, INTBPM] = multiple_pulse_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns)
+function [count_turns, r_bpm, int_bpm, eff_ft, fm, r_bpm_turns, int_bpm_turns, RBPM, INTBPM] = multiple_pulse_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns)
 % Simulation of booster injection and turns around the ring for multiple
 % injection pulses
 %
@@ -23,7 +23,7 @@ function [count_turns, r_bpm, int_bpm, eff_mean, fm, r_bpm_turns, int_bpm_turns,
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-% sirius_commis.common.initializations();
+sirius_commis.common.initializations();
 
 if ~exist('n_turns','var')
     n_turns = 1e5;
@@ -59,7 +59,12 @@ r_bpm = squeeze(mean(r_bpm_turns, 1));
 int_bpm = squeeze(mean(int_bpm_turns, 1));
 eff_mean = squeeze(mean(eff_mean, 1));
 eff_tbt = squeeze(mean(eff_turns, 1));
-eff_tbt = eff_tbt(eff_tbt ~= 0);
-turn_n = linspace(1, size(eff_tbt, 1), size(eff_tbt, 1));
-fm = turn_n * eff_tbt;
+if n_mach == 1
+    eff_ft = squeeze(eff_tbt(1, :));
+else
+    eff_ft = squeeze(eff_tbt(:, 1));
+end
+% eff_tbt = eff_tbt(eff_tbt ~= 0);
+turn_n = linspace(1, size(eff_tbt, 2), size(eff_tbt, 2));
+fm = turn_n * eff_tbt';
 end
