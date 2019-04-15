@@ -25,7 +25,7 @@ if n_mach == 1
     param0_error{j}.offset_scrn_mach{1} = scrn_error; % reshape(lnls_generate_random_numbers(1, 6, 'norm', 1) .* param0_error.sigma_scrn, 2, 3);
     param0_error{j}.offset_scrn = param0_error{j}.offset_scrn_mach{1};
     [param_adjusted, ~, r_scrn3] = sirius_commis.injection.bo.single_adj_loop(machine, n_part, n_pulse, 'no', param0, param0_error{j});
-    while abs(r_scrn3(1)) > res_scrn  || abs(r_scrn3(2)) > res_scrn
+    while abs(r_scrn3(1)) > res_scrn  || abs(r_scrn3(2)) > 2 * res_scrn
         fprintf('ADJUSTING ENERGY \n');
         [param_adjusted, ~, r_scrn3, theta_aft_kckr] = sirius_commis.injection.bo.single_adj_loop(machine, n_part, n_pulse, 'no', param_adjusted, param0_error{j});
     end
@@ -38,7 +38,7 @@ else
     param0_error{j}.offset_scrn_mach{j} = scrn_error; % reshape(lnls_generate_random_numbers(1, 6, 'norm', 1) .* param0_error.sigma_scrn, 2, 3);
     param0_error{j}.offset_scrn = param0_error{j}.offset_scrn_mach{j};
     [param_adjusted{j}, ~, r_scrn3, theta_aft_kckr(j)] = sirius_commis.injection.bo.single_adj_loop(machine{j}, n_part, n_pulse, 'no', param0, param0_error{j});
-    while abs(r_scrn3(1)) > res_scrn  || abs(r_scrn3(2)) > res_scrn % / sqrt(n_pulse)
+    while abs(r_scrn3(1)) > res_scrn  || abs(r_scrn3(2)) > 2 * res_scrn % / sqrt(n_pulse)
         fprintf('ADJUSTING ENERGY \n');
         [param_adjusted{j}, ~, r_scrn3] = sirius_commis.injection.bo.single_adj_loop(machine{j}, n_part, n_pulse, 'no', param_adjusted{j}, param0_error{j});
     end

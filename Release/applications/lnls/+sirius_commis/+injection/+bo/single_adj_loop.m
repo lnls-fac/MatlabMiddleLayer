@@ -66,12 +66,12 @@ function [param_out, machine, r_scrn3, theta_aft_kckr] = single_adj_loop(bo_ring
     % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
     [r_scrn2, param_out, theta_aft_kckr] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param0_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
 
-    if abs(r_scrn2(1)) > param0_errors.sigma_scrn || abs(r_scrn2(2)) > param0_errors.sigma_scrn % / sqrt(n_pulse)
+    if abs(r_scrn2(1)) > param0_errors.sigma_scrn || abs(r_scrn2(2)) >  2 * param0_errors.sigma_scrn % / sqrt(n_pulse)
         fprintf('=================================================\n');
         fprintf('READJUSTING THE BEAM TO REACH THE KICKER CENTER\n');
         fprintf('=================================================\n');
 
-        param_out = sirius_commis.injection.bo.center_kicker(machine, param_out, r_scrn2(1), r_scrn2(2));
+        param_out = sirius_commis.injection.bo.center_kicker(machine, param_out, r_scrn2(1), 0*r_scrn2(2));
         fprintf('=================================================\n');
         fprintf('REPEAT THE PROCESS \n');
         fprintf('=================================================\n');
