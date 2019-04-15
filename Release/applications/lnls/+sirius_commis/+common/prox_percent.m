@@ -6,9 +6,9 @@ if dif ~= 0
     error('Vectors must be the same size');
 end
 
-erro_percent = abs(a - b) ./ abs(b);
+erro_percent = (a - b) ./ max(abs(a), abs(b));
 
-p = abs(1 - erro_percent)*100;
+p = (1 - abs(erro_percent))*100;
 
 if isnan(p)
     p = 100;
