@@ -201,44 +201,44 @@ end
 function [delta_ch, delta_cv] = calc_kicks(r_bpm, n_sv, tw, bpm_select)   
     v_prefix = getenv('VACA_PREFIX');
     ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
-    delta_kicks_ch_pv = [ioc_prefix, 'DeltaKickCH-Mon'];
-    delta_kicks_cv_pv = [ioc_prefix, 'DeltaKickCV-Mon'];
-    bpmx_select_pv = [ioc_prefix, 'BPMXEnblList-SP'];
-    bpmy_select_pv = [ioc_prefix, 'BPMYEnblList-SP'];
-    orbx_pv = [ioc_prefix, 'OfflineOrbX-SP'];
-    orby_pv = [ioc_prefix, 'OfflineOrbY-SP'];
-    n_sv_pv = [ioc_prefix, 'NrSingValues-SP'];
-    calc_kicks_pv = [ioc_prefix, 'CalcDelta-Cmd'];
+    pv_name.delta_kicks_ch = [ioc_prefix, 'DeltaKickCH-Mon'];
+    pv_name.delta_kicks_cv = [ioc_prefix, 'DeltaKickCV-Mon'];
+    pv_name.bpmx_select = [ioc_prefix, 'BPMXEnblList-SP'];
+    pv_name.bpmy_select = [ioc_prefix, 'BPMYEnblList-SP'];
+    pv_name.orbx = [ioc_prefix, 'OfflineOrbX-SP'];
+    pv_name.orby = [ioc_prefix, 'OfflineOrbY-SP'];
+    pv_name.n_sv = [ioc_prefix, 'NrSingValues-SP'];
+    pv_name.calc_kicks = [ioc_prefix, 'CalcDelta-Cmd'];
     % ring_size_pv = [ioc_prefix, 'RingSize-SP'];
     % reforbx_pv = [ioc_prefix, 'RefOrbX-SP'];
     % reforby_pv = [ioc_prefix, 'RefOrbY-SP'];
 
     if exist('bpm_select', 'var')
-        setpv(bpmx_select_pv, bpm_select');
+        setpv(pv_name.bpmx_select, bpm_select');
         sleep(tw);
-        setpv(bpmy_select_pv, bpm_select');
+        setpv(pv_name.bpmy_select, bpm_select');
         sleep(tw);
     else
         bpm_select = ones(size(r_bpm, 2), 1);
-        setpv(bpmx_select_pv, bpm_select');
+        setpv(pv_name.bpmx_select, bpm_select');
         sleep(tw);
-        setpv(bpmy_select_pv, bpm_select');
+        setpv(pv_name.bpmy_select, bpm_select');
         sleep(tw);
     end
 
-    setpv(n_sv_pv, n_sv);
+    setpv(pv_name.n_sv, n_sv);
     sleep(tw);
     r_bpm(isnan(r_bpm)) = 0;
     x_bpm = r_bpm(1, :)' .* 1e6;
     y_bpm = r_bpm(2, :)' .* 1e6;
     
-    setpv(orbx_pv, x_bpm');
-    setpv(orby_pv, y_bpm');
+    setpv(pv_name.orbx, x_bpm');
+    setpv(pv_name.orby, y_bpm');
     
     sleep(tw);
-    setpv(calc_kicks_pv, 1);
+    setpv(pv_name.calc_kicks, 1);
     sleep(tw);
     
-    delta_ch = getpv(delta_kicks_ch_pv)' .* 1e-6;
-    delta_cv = getpv(delta_kicks_cv_pv)' .* 1e-6;
+    delta_ch = getpv(pv_name.delta_kicks_ch)' .* 1e-6;
+    delta_cv = getpv(pv_name.delta_kicks_cv)' .* 1e-6;
 end

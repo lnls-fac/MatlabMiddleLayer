@@ -26,7 +26,7 @@ n_bpm_turns = n_bpm * n_turns;
 corr_lim = 5*300e-6;
 tw = 0.1;
 
-eff_lim = 0.10;
+eff_lim = 0.50;
 
 n_cor = 1;
 % n_fcod = true;
@@ -85,6 +85,9 @@ while count_turns < n_turns %int_bpm(end) < eff_lim
     
     ref_old(1,:) = r_bpm_turn(1:50)'.*1e6;
     ref_old(2,:) = r_bpm_turn(251:300)'.*1e6;
+    
+    % r_bpm_turn(51:250) = r_bpm_turn(51:250).*0;
+    % r_bpm_turn(300:end) = r_bpm_turn(300:end).*0;
     
     if count_turns < 1
         [delta_ch, delta_cv] = calc_kicks(r_bpm_turn, n_sv, tw, bpm_ext, count_turns+1, 0.* ref_old_ft, n_cor);
@@ -192,29 +195,29 @@ end
 function [delta_ch, delta_cv, ref_old] = calc_kicks(r_bpm, n_sv, tw, bpm_select, n_turns, ref_old, n_iter)
     v_prefix = getenv('VACA_PREFIX');
     ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
-    delta_kicks_ch_pv = [ioc_prefix, 'DeltaKickCH-Mon'];
-    delta_kicks_cv_pv = [ioc_prefix, 'DeltaKickCV-Mon'];
-    bpmx_select_pv = [ioc_prefix, 'BPMXEnblList-SP'];
-    bpmy_select_pv = [ioc_prefix, 'BPMYEnblList-SP'];
-    orbx_pv = [ioc_prefix, 'OfflineOrbX-SP'];
-    orby_pv = [ioc_prefix, 'OfflineOrbY-SP'];
-    n_sv_pv = [ioc_prefix, 'NrSingValues-SP'];
-    calc_kicks_pv = [ioc_prefix, 'CalcDelta-Cmd'];
-    ring_size_pv = [ioc_prefix, 'RingSize-SP'];
-    reforbx_pv = [ioc_prefix, 'RefOrbX-SP'];
-    reforby_pv = [ioc_prefix, 'RefOrbY-SP'];
+    pv_name.delta_kicks_ch = [ioc_prefix, 'DeltaKickCH-Mon'];
+    pv_name.delta_kicks_cv = [ioc_prefix, 'DeltaKickCV-Mon'];
+    pv_name.bpmx_select = [ioc_prefix, 'BPMXEnblList-SP'];
+    pv_name.bpmy_select = [ioc_prefix, 'BPMYEnblList-SP'];
+    pv_name.orbx = [ioc_prefix, 'OfflineOrbX-SP'];
+    pv_name.orby = [ioc_prefix, 'OfflineOrbY-SP'];
+    pv_name.n_sv = [ioc_prefix, 'NrSingValues-SP'];
+    pv_name.calc_kicks = [ioc_prefix, 'CalcDelta-Cmd'];
+    pv_name.ring_size = [ioc_prefix, 'RingSize-SP'];
+    pv_name.reforbx = [ioc_prefix, 'RefOrbX-SP'];
+    pv_name.reforby = [ioc_prefix, 'RefOrbY-SP'];
     
-    setpv(ring_size_pv, n_turns);
+    setpv(pv_name.ring_size, n_turns);
     sleep(tw);
 
     if exist('bpm_select', 'var')
-        setpv(bpmx_select_pv, bpm_select);
+        setpv(pv_name.bpmx_select, bpm_select);
         sleep(tw);
-        setpv(bpmy_select_pv, bpm_select);
+        setpv(pv_name.bpmy_select, bpm_select);
         sleep(tw);
     end
 
-    setpv(n_sv_pv, n_sv);
+    setpv(pv_name.n_sv, n_sv);
     sleep(tw);
     r_bpm(isnan(r_bpm)) = 0;
     
@@ -233,9 +236,9 @@ function [delta_ch, delta_cv, ref_old] = calc_kicks(r_bpm, n_sv, tw, bpm_select,
     end
     %}
     
-    setpv(reforbx_pv, 0.*ref_old(1,:));
+    setpv(pv_name.reforbx, 0.*ref_old(1,:));
     sleep(tw);
-    setpv(reforby_pv, 0.*ref_old(2,:));
+    setpv(pv_name.reforby, 0.*ref_old(2,:));
     sleep(tw);
     
     
@@ -245,8 +248,8 @@ function [delta_ch, delta_cv, ref_old] = calc_kicks(r_bpm, n_sv, tw, bpm_select,
     x_bpm = prevent_nan(x_bpm);
     y_bpm = prevent_nan(y_bpm);
     
-    setpv(orbx_pv, x_bpm);
-    setpv(orby_pv, y_bpm); 
+    setpv(pv_name.orbx, x_bpm);
+    setpv(pv_name.orby, y_bpm); 
     
 %{
     if n_turns > 1
@@ -275,11 +278,11 @@ function [delta_ch, delta_cv, ref_old] = calc_kicks(r_bpm, n_sv, tw, bpm_select,
     end
 %}  
     sleep(tw);
-    setpv(calc_kicks_pv, 1);
+    setpv(pv_name.calc_kicks, 1);
     sleep(tw);
     
-    delta_ch = getpv(delta_kicks_ch_pv) .* 1e-6;
-    delta_cv = getpv(delta_kicks_cv_pv) .* 1e-6;
+    delta_ch = getpv(pv_name.delta_kicks_ch) .* 1e-6;
+    delta_cv = getpv(pv_name.delta_kicks_cv) .* 1e-6;
 end
 
 function [r_bpm_turn, bpm_ext, int_bpm] = reshape_ringsize(int_bpm, n_bpm_turns, r_bpm, eff_lim)
@@ -311,4 +314,3 @@ if sum(isnan(v_in)) > 0
     v_out(isnan(v_in)) = 0; 
 end
 end
-        

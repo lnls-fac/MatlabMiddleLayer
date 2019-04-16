@@ -6,17 +6,17 @@ ioc_prefix = ['BO-Glob:AP-SOFB:'];
 % kicks_cv_pv = [ioc_prefix, 'KicksCV-Mon'];
 % delta_kicks_ch_pv = [ioc_prefix, 'DeltaKicksCH-Mon'];
 % delta_kicks_cv_pv = [ioc_prefix, 'DeltaKicksCV-Mon'];
-bpmx_select_pv = [ioc_prefix, 'BPMXEnblList-SP'];
-bpmy_select_pv = [ioc_prefix, 'BPMYEnblList-SP'];
-orbx_pv = [ioc_prefix, 'SPassOrbX-Mon'];
-orby_pv = [ioc_prefix, 'SPassOrbY-Mon'];
-sum_pv = [ioc_prefix, 'SPassSum-Mon'];
-n_sv_pv = [ioc_prefix, 'NrSingValues-SP'];
-calc_kicks_pv = [ioc_prefix, 'CalcDelta-Cmd'];
-apply_kicks_pv = [ioc_prefix, 'ApplyDelta-Cmd'];
-corr_fact_ch_pv = [ioc_prefix, 'DeltaFactorCH-SP'];
-corr_fact_cv_pv = [ioc_prefix, 'DeltaFactorCV-SP'];
-buffer_pulse_pv = [ioc_prefix, 'SmoothNrPts-SP'];
+pv_name.bpmx_select = [ioc_prefix, 'BPMXEnblList-SP'];
+pv_name.bpmy_select = [ioc_prefix, 'BPMYEnblList-SP'];
+pv_name.orbx = [ioc_prefix, 'SPassOrbX-Mon'];
+pv_name.orby = [ioc_prefix, 'SPassOrbY-Mon'];
+pv_name.sum = [ioc_prefix, 'SPassSum-Mon'];
+pv_name.n_sv = [ioc_prefix, 'NrSingValues-SP'];
+pv_name.calc_kicks = [ioc_prefix, 'CalcDelta-Cmd'];
+pv_name.apply_kicks = [ioc_prefix, 'ApplyDelta-Cmd'];
+pv_name.corr_fact_ch = [ioc_prefix, 'DeltaFactorCH-SP'];
+pv_name.corr_fact_cv = [ioc_prefix, 'DeltaFactorCV-SP'];
+pv_name.buffer_pulse = [ioc_prefix, 'SmoothNrPts-SP'];
 
 % inj_sept = findcells(ring, 'FamName', 'InjSept');
 % ring = circshift(ring, [0, -(inj_sept -1)]);
@@ -30,20 +30,20 @@ n_corr = 1;
 n_corr_lim = 20;
 fact_corr_x = 100;
 fact_corr_y = 100;
-buffer = getpv(buffer_pulse_pv) * f_pulse + 1;
+buffer = getpv(pv_name.buffer_pulse) * f_pulse;
 
 if isnan(buffer)
     error('Problem getting Number of Orbits for Smoothing PV')
 end
 
-setpv(n_sv_pv, n_sv)
+setpv(pv_name.n_sv, n_sv)
 
 fprintf('=================================================\n');
 fprintf('COLLECTING PULSES\n');
 fprintf('=================================================\n');
 sleep(buffer);
 
-int_bpm = getpv(sum_pv);
+int_bpm = getpv(pv_name.sum);
 if all(isnan(int_bpm))
    error('Problem getting SinglePass Sum PV')
 end
@@ -78,25 +78,26 @@ int_final_bad = int_init_bad / tol1;
 param_ok = true;
 param_bad = true;
 fake = true;
+
 while fake % (param_ok || param_bad) && int_bpm(end) < sum_min
     int_init_ok = int_final_ok;
     int_init_bad = int_final_bad;
 
-    setpv(bpmx_select_pv, double(bpm_select'));
-    setpv(bpmy_select_pv, double(bpm_select'));
+    setpv(pv_name.bpmx_select, double(bpm_select'));
+    setpv(pv_name.bpmy_select, double(bpm_select'));
     sleep(tw);
 
-    setpv(calc_kicks_pv, 1);
-    setpv(corr_fact_ch_pv, fact_corr_x);
-    setpv(corr_fact_cv_pv, fact_corr_y);
+    setpv(pv_name.calc_kicks, 1);
+    setpv(pv_name.corr_fact_ch, fact_corr_x);
+    setpv(pv_name.corr_fact_cv, fact_corr_y);
     sleep(tw);
-    setpv(apply_kicks_pv, 3);
+    setpv(pv_name.apply_kicks, 3);
     fprintf('=================================================\n');
     fprintf('COLLECTING PULSES\n');
     fprintf('=================================================\n');
     sleep(buffer);
 
-    int_bpm = getpv(sum_pv);
+    int_bpm = getpv(pv_name.sum);
     if all(isnan(int_bpm))
         error('Problem getting SinglePass Sum PV')
     end
@@ -131,14 +132,14 @@ while fake % (param_ok || param_bad) && int_bpm(end) < sum_min
     end
 
     if n_corr > n_corr_lim
-        cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, 'xy')
+        cancel_kicks(pv_name.corr_fact_ch, pv_name.corr_fact_cv, pv_name.apply_kicks, tw, 'xy')
         n_sv = n_sv - 1;
-        setpv(n_sv_pv, n_sv)
+        setpv(pv_name.n_sv, n_sv)
         fprintf('=================================================\n');
         fprintf('COLLECTING PULSES\n');
         fprintf('=================================================\n');
         sleep(buffer)
-        int_bpm = getpv(sum_pv);
+        int_bpm = getpv(pv_name.sum);
         % eff_lim = int_bpm(1);
         if all(isnan(int_bpm))
             error('Problem getting SinglePass Sum PV')
@@ -156,12 +157,12 @@ fprintf('FIRST TURN!!! \n');
 fprintf('=================================================\n');
 
 bpm_select = ones(length(bpm), 1);
-setpv(bpmx_select_pv, bpm_select');
-setpv(bpmy_select_pv, bpm_select');
+setpv(pv_name.bpmx_select, bpm_select');
+setpv(pv_name.bpmy_select, bpm_select');
 sleep(tw);
 
-x_bpm = getpv(orbx_pv);
-y_bpm = getpv(orby_pv);
+x_bpm = getpv(pv_name.orbx);
+y_bpm = getpv(pv_name.orby);
 rms_orbit_x_bpm_old = nanstd(x_bpm);
 rms_orbit_y_bpm_old = nanstd(y_bpm);
 
@@ -192,29 +193,29 @@ while inc_x || inc_y
             rms_orbit_y_bpm_old = rms_orbit_y_bpm_new;
         end
     end
-    setpv(n_sv_pv, n_tsv)
+    setpv(pv_name.n_sv, n_tsv)
     sleep(tw)
-    setpv(calc_kicks_pv, 1);
+    setpv(pv_name.calc_kicks, 1);
     sleep(tw);
 
     if inc_x && inc_y
         fprintf('HORIZONTAL AND VERTICAL CORRECTION \n');
-        setpv(corr_fact_ch_pv, fact_corr_x);
+        setpv(pv_name.corr_fact_ch, fact_corr_x);
         sleep(tw);
-        setpv(corr_fact_cv_pv, fact_corr_y);
+        setpv(pv_name.corr_fact_cv, fact_corr_y);
         sleep(tw);
-        setpv(apply_kicks_pv, 3);
+        setpv(pv_name.apply_kicks, 3);
         fprintf('=================================================\n');
         fprintf('COLLECTING PULSES\n');
         fprintf('=================================================\n');
         sleep(buffer);
     elseif inc_x
         fprintf('HORIZONTAL CORRECTION \n');
-        setpv(corr_fact_ch_pv, fact_corr_x);
+        setpv(pv_name.corr_fact_ch, fact_corr_x);
         sleep(tw);
         % setpv(corr_fact_cv_pv, 0);
         % sleep(tw);
-        setpv(apply_kicks_pv, 0);
+        setpv(pv_name.apply_kicks, 0);
         fprintf('=================================================\n');
         fprintf('COLLECTING PULSES\n');
         fprintf('=================================================\n');
@@ -223,23 +224,23 @@ while inc_x || inc_y
         fprintf('VERTICAL CORRECTION \n');
         % setpv(corr_fact_ch_pv, 0);
         % sleep(tw);
-        setpv(corr_fact_cv_pv, fact_corr_y);
+        setpv(pv_name.corr_fact_cv, fact_corr_y);
         sleep(tw);
-        setpv(apply_kicks_pv, 1);
+        setpv(pv_name.apply_kicks, 1);
         fprintf('=================================================\n');
         fprintf('COLLECTING PULSES\n');
         fprintf('=================================================\n');
         sleep(buffer);
     end
 
-    x_bpm = getpv(orbx_pv);
-    y_bpm = getpv(orby_pv);
-    int_bpm = getpv(sum_pv);
+    x_bpm = getpv(pv_name.orbx);
+    y_bpm = getpv(pv_name.orby);
+    int_bpm = getpv(pv_name.sum);
     rms_orbit_x_bpm_new = nanstd(x_bpm);
     rms_orbit_y_bpm_new = nanstd(y_bpm);
 
     if nanmean(int_bpm) < tol1 * eff_ft_init
-        cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw)
+        cancel_kicks(pv_name.corr_fact_ch, pv_name.corr_fact_cv, pv_name.apply_kicks, tw)
         fprintf('IT IS NOT POSSIBLE TO REDUCE TRAJECTORY RMS WITHOUT LOSING FIRST TURN \n');
         return
     end
@@ -247,7 +248,7 @@ while inc_x || inc_y
     if ~stop_x
         inc_x = rms_orbit_x_bpm_new < rms_orbit_x_bpm_old / tol2;
         if ~inc_x
-            cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, 'x')
+            cancel_kicks(pv_name.corr_fact_ch, pv_name.corr_fact_cv, pv_name.apply_kicks, tw, 'x')
             stop_x = true;
         end
     end
@@ -255,7 +256,7 @@ while inc_x || inc_y
     if ~stop_y
         inc_y = rms_orbit_y_bpm_new < rms_orbit_y_bpm_old / tol2;
         if ~inc_y
-            cancel_kicks(corr_fact_ch_pv, corr_fact_cv_pv, apply_kicks_pv, tw, 'y')
+            cancel_kicks(pv_name.corr_fact_ch, pv_name.corr_fact_cv, pv_name.apply_kicks, tw, 'y')
             stop_y = true;
         end
     end
