@@ -182,7 +182,7 @@ while inc_x || inc_y
         end
     end
     
-    [delta_ch, delta_cv] = calc_kicks(r_bpm, n_sv, tw, bpm_select);
+    [delta_ch, delta_cv] = calc_kicks(r_bpm, n_t, tw, bpm_select);
     
     theta_x_f = theta_x_i + delta_ch';
     theta_y_f = theta_y_i + delta_cv';
@@ -309,6 +309,7 @@ while inc_x || inc_y
         end
     end
     n_inc = n_inc + 1;
+    n_t = n_t + 5;
     
     if n_inc > 10
         n_t = n_sv + k * 10;

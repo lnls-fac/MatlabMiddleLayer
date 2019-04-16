@@ -4,7 +4,8 @@ function param = screen_low_intensity(machine, param, param_error, n_part, n_pul
 %
 % Version 1 - Murilo B. Alves - October, 2018.
 
-dtheta0 = 0;
+dtheta0x = 0;
+dtheta0y = 0;
 dtheta_kckr = 0;
 delta_energy = 0;
 i = 0;
@@ -15,17 +16,21 @@ if n == 1
     fprintf('LOW INTENSITY ON SCREEN 1 \n');
     fprintf('=================================================\n');
     while eff < eff_lim
-        dtheta0 = dtheta0 + param.offset_xl_sist * 0.1;
-        param.offset_xl_sist = param.offset_xl_sist + dtheta0;
+        dtheta0x = dtheta0x + param.offset_xl_sist * 0.1;
+        % dtheta0y = dtheta0y + param.offset_yl_sist * 0.1;
+        param.offset_xl_sist = param.offset_xl_sist + dtheta0x;
+        % param.offset_yl_sist = param.offset_yl_sist + dtheta0y;
         [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
         eff = mean(eff); 
         i = i + 1;
         if i > n_times
-            dtheta0 = 0;
+            dtheta0x = 0;
             param.offset_xl_sist = param.xl_sept_init;
+            param.offset_yl_sist = param.yl_sept_init;
             while eff < eff_lim
-            dtheta0 = dtheta0 - param.offset_xl_sist * 0.1;
-            param.offset_xl_sist = param.offset_xl_sist + dtheta0;
+            dtheta0x = dtheta0x - param.offset_xl_sist * 0.1;
+            % dtheta0y = dtheta0y - param.offset_yl_sist * 0.1;
+            % param.offset_yl_sist = param.offset_yl_sist + dtheta0y;
             [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
             eff = mean(eff); 
             j = j + 1;

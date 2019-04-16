@@ -74,9 +74,9 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
             continue
         end
         
-        if count_turns{j} == several_turns
-            continue
-        end
+        % if count_turns{j} == several_turns
+        %     continue
+        % end
 
         n_correction = 1;
         orbitf = orbit0;
@@ -95,8 +95,9 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
         
         turn_inc = 1;
         fm_f = fm_i;
+        n = 1;
 
-        while true % fm_f >= fm_i % min_turns_f < turn_inc * several_turns || ratio_x < conv || ratio_y < conv
+        while count_turns{j} < 50 % fm_f >= fm_i % min_turns_f < turn_inc * several_turns || ratio_x < conv || ratio_y < conv
             turn_inc = turn_inc + 1;
             fm_i = fm_f;
             
@@ -121,7 +122,7 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
             rms_x_bpm_old = rms_x_bpm_new;
             rms_y_bpm_old = rms_y_bpm_new;
 
-            ind = num_svd(j) + 1;
+            ind = num_svd(j) + 5;
             
             [delta_ch, delta_cv] = calc_kicks(r_bpm, ind, tw);
             
@@ -130,7 +131,7 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
             theta_y = theta_y + delta_cv;
             machine_n = lnls_set_kickangle(machine_n, theta_y, cv, 'y');
             
-            [count_turns{j}, r_bpm, int_bpm, ~, fm_f] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_n, 1, param, param_errors, n_part, n_pulse, several_turns);
+            [count_turns{j}, r_bpm, int_bpm, ~, fm_f] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_n, 1, param, param_errors, n_part, n_pulse, n*several_turns);
             min_turns_0 = min(count_turns{j});
             x_bpm = squeeze(r_bpm(1, :));
             y_bpm = squeeze(r_bpm(2, :));
@@ -180,13 +181,14 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
             if ratio_x > conv || ratio_y > conv
                 machine_cell{j} = machine;
             end
+            
+            n = n+2;
         end
         
        
         if ind == 0
            num_svd(j) = 0; 
         end
-        
         
         if corrected
             machine_cell{j} = machine;

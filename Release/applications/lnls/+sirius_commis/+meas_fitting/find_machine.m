@@ -35,8 +35,6 @@ twiss = calctwiss(bo_ring);
 tunex = twiss.mux(end)/2/pi;
 tuney = twiss.muy(end)/2/pi;
 
-goal_respm_in = goal_respm;
-
 if isempty(input_respm)
     respm_modelo = sirius_commis.first_turns.bo.calc_respm_tracking(bo_ring, fam);
 else
@@ -61,7 +59,8 @@ count = 0;
 n_accept = 0;
 klqf_old = kl_qf;
 klqd_old = kl_qd;
-qf_max = 1.865 * L_qf;
+% Maximum K values from Wiki
+qf_max = 1.865 * L_qf; 
 qd_max = 0.525 * L_qd;
 warning on
 
@@ -90,12 +89,12 @@ while count < n_max
     
     if abs(klqf_new(1)) > qf_max
         klqf_new = sign(klqf_new) * qf_max;
-        warning('Maximum K in QF');
+        warning('Maximum K set in QF');
     end
     
     if abs(klqd_new(1)) > qd_max
         klqd_new = sign(klqd_new) * qd_max;
-        warning('Maximum K in QD');
+        warning('Maximum K set in QD');
     end    
     
     ring_rand = setcellstruct(ring_rand, 'PolynomB', idx_qf, klqf_new/L_qf, 1, 2);
