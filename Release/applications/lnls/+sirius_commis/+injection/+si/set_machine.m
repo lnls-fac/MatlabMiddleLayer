@@ -75,8 +75,8 @@ function [machine, param, param_errors] = set_machine(si_ring, n_mach)
     % setting off rf cavity and radiation emission
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
-    % machine  = create_apply_errors(machine, fam, n_mach);
-    % machine  = create_apply_multipoles(machine, fam);
+    machine  = create_apply_errors(machine, fam, n_mach);
+    machine  = create_apply_multipoles(machine, fam);
     machine = create_apply_bpm_errors(machine, fam);
 
     

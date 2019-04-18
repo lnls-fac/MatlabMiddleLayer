@@ -28,11 +28,13 @@ function [r_bpm1, param] = bpm1_kckr(machine, param, param_errors, n_part, n_pul
     end
     
     dx = r_bpm1(1);
+    dy = r_bpm1(2);
       
-    while abs(dx) > res 
+    while abs(dx) > res || abs(dy) > res 
         dtheta_kckr = dx / d_kckr_bpm1;
         fprintf('DELTA THETA KICKER %f urad \n', dtheta_kckr * 1e6)
         param.kckr_sist = param.kckr_sist - dtheta_kckr;
+        param.offset_y_sist= param.offset_y_sist - dy;
         
         [eff1, r_bpm1] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
     
@@ -42,8 +44,10 @@ function [r_bpm1, param] = bpm1_kckr(machine, param, param_errors, n_part, n_pul
         end
         
         dx = r_bpm1(1);
+        dy = r_bpm1(2);
         
-        fprintf('(KICKER ON) BPM 1 position: %f mm \n', dx*1e3);
+        fprintf('(KICKER ON) BPM 1 x position: %f mm \n', dx*1e3);
+        fprintf('(KICKER ON) BPM 1 y position: %f mm \n', dy*1e3);
         fprintf('=================================================\n');
         fprintf('KICKER ANGLE ADJUSTED TO %f mrad, GOAL %f mrad \n', param.kckr_sist*1e3, param.kckr0*1e3);
     	agr = sirius_commis.common.prox_percent(abs(kckr_init - param.kckr_sist), kckr_error);

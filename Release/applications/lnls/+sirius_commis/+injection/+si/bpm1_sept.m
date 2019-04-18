@@ -29,10 +29,12 @@ function [r_bpm1, param] = bpm1_sept(machine, param, param_errors, n_part, n_pul
     end
 
     dxf = r_bpm1(1) - x_kckr_scrn;
+    dyf = r_bpm1(2);
     
-    while abs(dxf) > res
+    while abs(dxf) > res || abs(dyf) > res
         dtheta0 = - dxf / s(bpm1);
         param.offset_xl_sist = param.offset_xl_sist + dtheta0;
+        param.offset_y_sist = param.offset_y_sist - dyf;
         
         [eff1, r_bpm1] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
 
@@ -42,12 +44,14 @@ function [r_bpm1, param] = bpm1_sept(machine, param, param_errors, n_part, n_pul
         end
         
         dxf = r_bpm1(1) - x_kckr_scrn;
+        dyf = r_bpm1(2);
 
         if isnan(r_bpm1(1))
             error('PARTICLES ARE LOST BEFORE BPM 1');
         end
    
         fprintf('(KICKER OFF) BPM 1 - x position: %f mm, error %f mm \n', r_bpm1(1)*1e3, dxf*1e3);
+        fprintf('(KICKER OFF) BPM 1 - y position: %f mm, error %f mm \n', r_bpm1(2)*1e3, dyf*1e3);
         fprintf('=================================================\n');         
         fprintf('SEPTUM ANGLE ADJUSTED TO %f mrad, GOAL %f mrad \n', param.offset_xl_sist*1e3, param.offset_xl0*1e3);
     	agr = sirius_commis.common.prox_percent(abs(xl_init - param.offset_xl_sist), xl_error);

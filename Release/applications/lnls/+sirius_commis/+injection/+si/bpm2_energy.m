@@ -34,6 +34,8 @@ function [param, x_bpm, delta_bpm] = bpm2_energy(machine, param, param_errors, n
 
     x_bpm2 = r_bpms(1, 2) - r_bpms(1, 1);
     x_bpm3 = r_bpms(1, 3) - r_bpms(1, 1);
+    y_bpm1 = r_bpms(2, 1); y_bpm2 = r_bpms(2, 2); y_bpm3 = r_bpms(2, 3);
+    dy12 = y_bpm2 - y_bpm1; dy23 = y_bpm3 - y_bpm2;
     x_bpm = [x_bpm2, x_bpm3];
     difs = abs(abs(x_bpm3) - abs(x_bpm2));
     
