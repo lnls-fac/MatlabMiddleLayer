@@ -1,4 +1,4 @@
-function ft_data = check_first_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns, n_pulse_turns, n0, n_sv, M_acc)
+function ft_data = check_first_turn(machine, n_mach, param, param_errors, n_part, n_pulse, n_turns, n_pulse_turns, n0, n_sv, m_corr, cod_bba)
 % Increases the intensity of BPMs and adjusts the first turn by changing the
 % correctors based on BPMs measurements
 %
@@ -36,6 +36,10 @@ elseif n_mach > 1
     param_cell = param;
 end
 
+if ~exist('cod_bba', 'var')
+    cod_bba = zeros(2*n_bpm, 1);
+end
+
 % machine_correct = cell(n_mach, 1);
 ft_mach = zeros(n_mach, 1);
 ft_mach_refined = zeros(n_mach, 1);
@@ -50,12 +54,12 @@ cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
 ft_data = cell(n_mach, 1);
 
-[m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
+% [m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
 
-m0xy = zeros(size(bpm, 1), size(cv, 1));
-m0yx = zeros(size(bpm, 1), size(ch, 1));
+% m0xy = zeros(size(bpm, 1), size(cv, 1));
+% m0yx = zeros(size(bpm, 1), size(ch, 1));
 
-m_corr = [m_corr_x, m0xy; m0yx, m_corr_y];
+% m_corr = [m_corr_x, m0xy; m0yx, m_corr_y];
 
 for j = 1:n_mach    
     fprintf('=================================================\n');
@@ -72,16 +76,17 @@ for j = 1:n_mach
     
     if n_min < n_turns
         % [machine_correct{j}, ~, gr_mach{j, 1}, gr_mach{j, 2}] = sirius_commis.first_turns.bo.first_turn_corrector(machine, 1, param, param_errors, M_acc, n_part, n_pulse);
-        ft_data1 = sirius_commis.first_turns.si.first_turn_corrector(machine, 1, param, param_errors, m_corr, n_part, n_pulse, n_sv);
+        ft_data1 = sirius_commis.first_turns.si.first_turn_corrector(machine, 1, param, param_errors, m_corr, n_part, n_pulse, n_sv, cod_bba);
         ft_data1 = ft_data1{1, 1};
         machine_correct1 = ft_data1.machine;
         ft_mach(j) = 1;
         count_turns1 = sirius_commis.first_turns.si.multiple_pulse_turn(machine_correct1, 1, param, param_errors, n_part, n_pulse_turns, n_turns);
         
         if min(count_turns1) < n_turns
-            ft_data2 = sirius_commis.first_turns.si.first_turn_corrector(machine_correct1, 1, param, param_errors, m_corr, n_part, 5*n_pulse, ft_data1.n_svd);
+            % ft_data2 = sirius_commis.first_turns.si.first_turn_corrector(machine_correct1, 1, param, param_errors, m_corr, n_part, 5*n_pulse, ft_data1.n_svd);
             % machine_correct{j} = sirius_commis.first_turns.si.first_turn_corrector(machine, 1, param, param_errors, M_acc, n_part, 10*n_pulse);
-            ft_data2 = ft_data2{1, 1};
+            % ft_data2 = ft_data2{1, 1};
+            ft_data2 = ft_data1;
             machine_correct2 = ft_data2.machine;
             ft_mach_refined(j) = 1;
             count_turns2 = sirius_commis.first_turns.si.multiple_pulse_turn(machine_correct2, 1, param, param_errors, n_part, n_pulse_turns, n_turns);
