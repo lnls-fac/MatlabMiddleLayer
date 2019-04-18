@@ -1,8 +1,8 @@
-function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, plane, data_bpm, data_input)
+function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, m_corr, n_points, plane, data_bpm, data_input)
 
     mili = 1e-3; micro = 1e-6;
     bpm_stop = 200;
-    sirius_commis.common.initializations();
+    % sirius_commis.common.initializations();
     
     if n_mach == 1
         machine_cell = {machine};
@@ -96,7 +96,9 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
         % machine = setcellstruct(machine, 'T2', bba_ind, offset_quadx2.*0 , 1, 1);
         % machine = setcellstruct(machine, 'T2', bba_ind, offset_quady2.*0 , 1, 3);
         
-        [m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
+        % [m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
+        m_corr_x = m_corr(1:length(bpm), 1:length(ch));
+        m_corr_y = m_corr(length(bpm)+1: end, length(ch)+1:end-1);
         [~ , ind_best_x] = max(abs(m_corr_x), [], 2);
         [~ , ind_best_y] = max(abs(m_corr_y), [], 2);
         
@@ -139,8 +141,8 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
             end
         end
         
-        bpms_x = find(bpm_ok_x);
-        bpms_y = find(bpm_ok_y);
+        %bpms_x = find(bpm_ok_x);
+        %bpms_y = find(bpm_ok_y);
         
         % for l = 1:20
         %     v2(l) = 2 + (l-1) * 8;
@@ -207,7 +209,8 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
 
          
         % delta_x = max(dx_phase) / factor;
-        % score = [clsf, number_corr]; 
+        % score = [clsf, number_corr];
+        
         if strcmp(plane, 'x') || strcmp(plane, 'xy')
             fprintf('================================================\n');
             fprintf('HORIZONTAL BBA \n');
@@ -306,7 +309,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                     if abs(theta_min) > corr_lim_max
                         % theta_min = sign(theta_min) * corr_lim_max;
                         warning('on')
-                        warning('CALCULATED CORRECTOR KICK GREATER THAN MAX, 300 um APPLIED')
+                        warning('CALCULATED CORRECTOR KICK GREATER THAN MAX, 300 um APPLIED') 
                         bpm_ok_y(i) = 0;
                         off_bba_y(i) = 0;
                         off_bba_theta_y(i) = corr_lim_max;
@@ -331,7 +334,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                 end
 
                 [ri_y, rf_y] = bba_process(machine, param, param_errors, n_part, n_pulse, bba_ind, ind_best_y, dtheta_corr, i, n_points_new, fam, 'y');
-                [quadratic_y, linear_y, m_resp_y(i)] = sirius_commis.common.bba_analysis(ri_y, rf_y, i, dtheta_corr, 'y', 'plot');
+                [quadratic_y, linear_y, m_resp_y(i)] = sirius_commis.common.bba_analysis(ri_y, rf_y, i, dtheta_corr, 'y');
                 off_bba_y1f(i) = linear_y.offset_bpm;
                 off_bba_theta_y1(i) = linear_y.offset_theta;
                 off_bba_y2f(i) = quadratic_y.offset_bpm;
@@ -427,7 +430,7 @@ if skew
     end
 else
     polyB = getcellstruct(machine_in, 'PolynomB', bba_ind(n_bpm), 1, 2);
-    polyB_bba = 1.05 * polyB;
+    polyB_bba = 1.10 * polyB;
     if abs(polyB_bba) > quad_lim
         polyB_bba = sign(polyB_bba) * quad_lim;
         warning('Quadrupole Strength greater than maximum');
@@ -483,20 +486,20 @@ for ii = 1:n_points
             
         %     n_corr = 0;
         % end
-        int_min = 0.80;
-        dif = setdiff([1:1:length(bpm)]', ind_bpm_bba);
+        % int_min = 0.80;
+        % dif = setdiff([1:1:length(bpm)]', ind_bpm_bba);
         
         % Ri(ii, :, :) = r_bpm1(:, ind_bpm_bba);
         % Rf(ii, :, :) = r_bpm2(:, ind_bpm_bba);
-        Ri(ii, :, :) = r_bpm1; Ri(ii, :, dif) = NaN;
-        Rf(ii, :, :) = r_bpm2; Rf(ii, :, dif) = NaN;
-        bpm_discard = int_bpm1(ind_bpm_bba) < int_min | int_bpm2(ind_bpm_bba) < int_min;
-        first = ind_bpm_bba(bpm_discard);
-        if ~isempty(first)
-            first = first(1);
-            Ri(ii, :, first:end)= NaN;
-            Rf(ii, :, first:end) = NaN;
-        end
+        Ri(ii, :, :) = r_bpm1; % Ri(ii, :, dif) = NaN;
+        Rf(ii, :, :) = r_bpm2; % Rf(ii, :, dif) = NaN;
+        % bpm_discard = int_bpm1(ind_bpm_bba) < int_min | int_bpm2(ind_bpm_bba) < int_min;
+        % first = ind_bpm_bba(bpm_discard);
+        % if ~isempty(first)
+        %     first = first(1);
+        %     Ri(ii, :, first:end)= NaN;
+        %     Rf(ii, :, first:end) = NaN;
+        % end
         
         % bpm_bba = bpm(int_bpm1 > int_min & int_bpm2 > int_min & bpm > bba_ind(n_bpm));
         % [~, ind_bpm_bba] = intersect(bpm, bpm_bba);
@@ -530,15 +533,15 @@ elseif strcmp(plane, 'y')
     corr = fam.CV.ATIndex;
 end
 
-bpm = fam.BPM.ATIndex;
+% bpm = fam.BPM.ATIndex;
 % for k = 1:length(bpm)
 %     if ind_bpm_ok
         machine_kick = lnls_set_kickangle(machine_in, kicks , corr(ind_best(n_bpm)), plane);
-        [~, ~, ~, r_bpm] = sirius_commis.injection.si.multiple_pulse(machine_kick, param, param_errors, n_part, n_pulse, length(machine_in), 'on', 'diag');
+        [~, ~, ~, r_bpm_kick] = sirius_commis.injection.si.multiple_pulse(machine_kick, param, param_errors, n_part, n_pulse, length(machine_in), 'on', 'diag');
         if strcmp(plane, 'x')
-            offset_bpm = r_bpm(1, n_bpm);
+            offset_bpm = r_bpm_kick(1, n_bpm);
         elseif strcmp(plane, 'y')
-            offset_bpm = r_bpm(2, n_bpm);
+            offset_bpm = r_bpm_kick(2, n_bpm);
         end
 %    else
 %        continue

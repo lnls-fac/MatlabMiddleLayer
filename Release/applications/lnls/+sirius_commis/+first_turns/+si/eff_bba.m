@@ -5,13 +5,16 @@ data_bpm = cell(n_mach, 1);
 um = 1e6;
 
 for j = 1:n_mach
+    if j == 4
+        continue
+    end
     
     offset_bbaj = offset_bba{j} * um;
     % derro(offset_bbaj == 0 ) = 0;
     % offset_bbaj = offset_bbaj + derro;
     offset_quadj = offset_quad{j} * um;
     offset_bpmj = offset_bpm{j} * um;
-    dcrs = zeros(length(offset_bpmj(:, 1)), length(offset_bpmj(1, :)));
+    dcrs = false(length(offset_bpmj(:, 1)), length(offset_bpmj(1, :)));
     
     %{
     bpms_indx = find(offset_bbaj(:, 1) ~= 0);
@@ -31,22 +34,30 @@ for j = 1:n_mach
     
     % bpms_indx = find(offset_bbaj(:, 1) ~= 0);
     % bpms_indy = find(offset_bbaj(:, 2) ~= 0);
+    
+    k = 1;
+    offset_bbaj(offset_bbaj == 0) = NaN;
+    std_bba = nanstd(offset_bbaj(:, 1));
+    mean_bba = nanmean(offset_bbaj(:, 1));
+    lower = mean_bba - k * std_bba;
+    upper = mean_bba + k * std_bba;
+    select = offset_bbaj < lower | offset_bbaj > upper;
+    offset_bbaj(select) = NaN;
 
-    offset_quadj(offset_bbaj == 0) = NaN;
-    % rms = nanstd(offset_bbaj);
-    % offset_bbaj(abs(offset_bbaj) > rms(1)) = 0;
-    % offset_bbaj(abs(offset_bbaj) < rms(1)) = 0;
-    initial_bba = offset_quadj - offset_bpmj;
+    offset_quadj(isnan(offset_bbaj)) = NaN;
+    offset_bpmj(isnan(offset_bbaj)) = NaN;
+    initial_bba = abs(offset_quadj) - abs(offset_bpmj);
     new_offset = offset_bpmj + offset_bbaj;
-    final_bba = offset_quadj - new_offset;
-    dcrs(abs(final_bba) <= abs(initial_bba)) = 1;
+    final_bba = abs(offset_quadj) - abs(new_offset);
+    dcrs(abs(final_bba) <= abs(initial_bba)) = true;
+    
     data_bpm{j}.good_bpm_x = find(dcrs(:, 1));
     data_bpm{j}.good_bpm_y = find(dcrs(:, 2));
-    dcrs(offset_bbaj == 0) = NaN;
-    data_bpm{j}.fail_x = find(dcrs(:, 1) == 0 & offset_bbaj(:, 1) ~= 0);
-    data_bpm{j}.fail_y = find(dcrs(:, 2) == 0 & offset_bbaj(:, 2) ~= 0);
+    dcrs(isnan(offset_bbaj)) = false;
+    data_bpm{j}.fail_x = find(dcrs(:, 1) == 0 & ~isnan(offset_bbaj(:, 1)));
+    data_bpm{j}.fail_y = find(dcrs(:, 2) == 0 & ~isnan(offset_bbaj(:, 2)));
     v_dcrs = abs(final_bba) - abs(initial_bba);
-    v_dcrs(offset_bbaj == 0) = NaN;
+    v_dcrs(isnan(offset_bbaj)) = NaN;
     erro_percent = abs((new_offset - offset_quadj) ./ offset_quadj) * 100;
    
     % dcrs(isnan(dcrs)) = 0;
@@ -67,13 +78,20 @@ for j = 1:n_mach
     stat_bba{j}.bba_ok = dcrs;
     stat_bba{j}.decrease_value = v_dcrs;
     stat_bba{j}.erro_percent = erro_percent;
+    offset_bbaj(isnan(offset_bbaj)) = 0;
+    stat_bba{j}.offset_bba = offset_bbaj ./ um;
 end
 
 for k = 1:size(offset_bbaj, 1)
     for j = 1:n_mach
+        if j == 4
+            continue
+        end
         bba_mach_init(j, :) = stat_bba{j}.initial_dif(k, :);
         bba_mach_final(j, :) = stat_bba{j}.final_dif(k, :);
     end
+    bba_mach_init(bba_mach_init == 0) = NaN;
+    bba_mach_final(bba_mach_final == 0) = NaN;
     init_dif_mach(k, :) = nanstd(bba_mach_init, 1);
     final_dif_mach(k, :) = nanstd(bba_mach_final, 1);
 end
@@ -81,8 +99,11 @@ end
 mach_bba.init_dif_mach = init_dif_mach;
 mach_bba.final_dif_mach = final_dif_mach;
 % decrease = init_dif_mach < final_dif_mach;
-mach_bba.init_dif_rms = nanmean(init_dif_mach, 1);
-mach_bba.final_dif_rms = nanmean(final_dif_mach, 1);
+mach_bba.init_dif_rms_mean = nanmean(init_dif_mach, 1);
+mach_bba.final_dif_rms_mean = nanmean(final_dif_mach, 1);
+mach_bba.init_dif_rms_rms = nanstd(init_dif_mach, 1);
+mach_bba.final_dif_rms_rms = nanstd(final_dif_mach, 1);
+
 
     % goal_bba = offset_quad - offset_bpm;
     % goal_bba(offset_bba == 0) = NaN;

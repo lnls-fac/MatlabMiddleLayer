@@ -1,11 +1,11 @@
-function [bba_data1, bba_data2] = bba_loop(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, plane, data_bpm)
-
+function [bba_data1, bba_data2] = bba_loop(machine, n_mach, param, param_errors, n_part, n_pulse, m_corr, n_points, plane, data_bpm)
+sirius_commis.common.initializations();
     if ~exist('data_bpm', 'var')
         data_bpm.good_bpm_x = [1:1:160]';
         data_bpm.good_bpm_y = [1:1:160]';
     end
 
-    bba_data1 = sirius_commis.first_turns.si.bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, plane, data_bpm);
+    bba_data1 = sirius_commis.first_turns.si.bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, m_corr, n_points, plane, data_bpm);
     
     % data_input1.off = bba_data1.off_bba;
     data_input1.off_theta1 = bba_data1.off_theta1;
@@ -13,7 +13,7 @@ function [bba_data1, bba_data2] = bba_loop(machine, n_mach, param, param_errors,
     data_input1.factor = 3;
     data_input1.m_resp = bba_data1.m_resp;
 
-    bba_data2 = sirius_commis.first_turns.si.bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, M_acc, n_points, plane, data_bpm, data_input1);
+    bba_data2 = sirius_commis.first_turns.si.bba_non_stored_beam(machine, n_mach, param, param_errors, n_part, n_pulse, m_corr, n_points, plane, data_bpm, data_input1);
     
     % data_input2.off = bba_data2.off_bba;
     % data_input2.off_theta = bba_data2.off_theta;

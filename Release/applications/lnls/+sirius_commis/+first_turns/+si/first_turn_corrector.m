@@ -1,4 +1,4 @@
-function ft_data = first_turn_corrector(machine, n_mach, param, param_errors, m_corr, n_part, n_pulse, n_sv, approach)
+function ft_data = first_turn_corrector(machine, n_mach, param, param_errors, m_corr, n_part, n_pulse, n_sv, cod_bba)
 % Increases the intensity of BPMs and adjusts the first turn by changing the
 % correctors based on BPMs measurements using two approaches: 'tl' for
 % transport line and 'matrix' using matrix facilities of SOFB
@@ -26,7 +26,7 @@ function ft_data = first_turn_corrector(machine, n_mach, param, param_errors, m_
 % Version 1 - Murilo B. Alves - October, 2018
 
 % sirius_commis.common.initializations()
-
+%{
 if(exist('method','var'))
     if(strcmp(approach,'tl'))
         flag_tl = true;
@@ -36,7 +36,7 @@ if(exist('method','var'))
 else
     flag_tl = false;
 end
-
+%}
 if n_mach == 1
     machine_correct = {machine};
     param_cell = {param};
@@ -51,6 +51,10 @@ bpm = fam.BPM.ATIndex;
 ch = fam.CH.ATIndex;
 cv = fam.CV.ATIndex;
 
+if ~exist('cod_bba', 'var')
+    cod_bba = zeros(2*length(bpm), 1);
+end
+
 r_bpm_mach = zeros(n_mach, 2, length(bpm));
 gr_mach_x = zeros(n_mach, length(ch));
 gr_mach_y = zeros(n_mach, length(cv));
@@ -63,11 +67,11 @@ for j = 1:n_mach
     machine = machine_correct{j};
     param = param_cell{j};
     
-    if flag_tl
-        [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.si.correct_orbit_bpm_tl(machine, param, param_errors, m_corr, n_part, n_pulse);
-    else
-        ft_data{j} = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv);
-    end
+    % if flag_tl
+    %     [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.si.correct_orbit_bpm_tl(machine, param, param_errors, m_corr, n_part, n_pulse);
+    % else
+        ft_data{j} = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv, cod_bba);
+    % end
     orbita = findorbit4(ft_data{j}.machine, 0, 1:length(ft_data{j}.machine));
     if any(isnan(orbita(1, :)))
         cod(j) = 0;
