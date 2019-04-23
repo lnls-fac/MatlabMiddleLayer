@@ -46,7 +46,7 @@ for j = 1:n_mach
     %fprintf('=================================================\n');
 
     param_cell{j}.orbit = findorbit4(machine_cell{j}, 0, 1:length(machine_cell{j}));
-
+    
     machine = machine_cell{j};
     param = param_cell{j};
     param_errors = param_err_cell{j};

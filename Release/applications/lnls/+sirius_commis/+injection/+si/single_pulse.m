@@ -26,7 +26,7 @@ function [r_xy, r_end_ring, r_point, r_bpm] = single_pulse(machine, param, n_par
 % average over particles and result in BPM measurement simulation)
 %
 % Version 1 - Murilo B. Alves - December, 2018
-      
+    
     offsets = [param.offset_x; param.offset_xl; param.offset_y; param.offset_yl; param.delta; param.phase];
     twi.betax = param.twiss.betax0; twi.alphax = param.twiss.alphax0;
     twi.betay = param.twiss.betay0; twi.alphay = param.twiss.alphay0;

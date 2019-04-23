@@ -36,10 +36,6 @@ elseif n_mach > 1
     param_cell = param;
 end
 
-if ~exist('cod_bba', 'var')
-    cod_bba = zeros(2*n_bpm, 1);
-end
-
 % machine_correct = cell(n_mach, 1);
 ft_mach = zeros(n_mach, 1);
 ft_mach_refined = zeros(n_mach, 1);
@@ -53,6 +49,10 @@ ch = fam.CH.ATIndex;
 cv = fam.CV.ATIndex;
 bpm = fam.BPM.ATIndex;
 ft_data = cell(n_mach, 1);
+
+if ~exist('cod_bba', 'var')
+    cod_bba = zeros(2*length(bpm), 1);
+end
 
 % [m_corr_x, m_corr_y] = sirius_commis.common.trajectory_matrix(fam, M_acc);
 
@@ -71,6 +71,7 @@ for j = 1:n_mach
     
     machine = setcavity('off', machine);
     machine = setradiation('on', machine);
+    machine = setcellstruct(machine, 'PolynomB', fam.SN.ATIndex, 0, 1, 3);
     
     n_min = min(n0(:, j));
     

@@ -112,10 +112,13 @@ erro_fit_linear = nansum(dot(abs(angle_coef), error_fit_linear_bpm)) / nansum(ab
     hold off;
     gcf();
     for i = n_bpm + 1:size(fm_linear, 2)
-        plot(bpm_pos * 1e6, fm_linear(:, i), '-', 'MarkerSize', 6 ,'MarkerEdgeColor','red','MarkerFaceColor',[1 0 0]); hold all;
+        plot(bpm_pos * 1e6, fm_linear(:, i) * 1e6, '-', 'MarkerSize', 6 ,'MarkerEdgeColor','red','MarkerFaceColor',[1 0 0]); hold all;
         y = get(gca, 'ylim');
         plot([offset_linear*1e6 offset_linear*1e6], y, 'black', 'LineWidth', 2);
     end
+    title(['BPM #' , num2str(n_bpm)]);
+    xlabel('BPMs positions [um]');
+    ylabel('Fig. of merit [um]');
     grid on;
 %}
 

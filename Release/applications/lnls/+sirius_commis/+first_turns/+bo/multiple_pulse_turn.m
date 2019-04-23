@@ -23,7 +23,7 @@ function [count_turns, r_bpm, int_bpm, eff_ft, fm, r_bpm_turns, int_bpm_turns, R
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
-sirius_commis.common.initializations();
+% sirius_commis.common.initializations();
 
 if ~exist('n_turns','var')
     n_turns = 1e5;

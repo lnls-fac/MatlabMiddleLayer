@@ -111,7 +111,7 @@ if flag_tb
         hdf5write('respm_sofb_TB4D_traj.h5', '/Points', respm_sofb4D_traj);
     elseif flag_bo
         hdf5write('respm_sofb_BO4D_traj.h5', '/Points', respm_sofb4D_traj);
-%         hdf5write('respm_sofb_BO4D.h5', '/Points', respm_sofb4D);
+        hdf5write('respm_sofb_BO4D.h5', '/Points', respm_sofb4D);
     elseif flag_ts
         hdf5write('respm_sofb_TS4D_traj.h5', '/Points', respm_sofb4D_traj);
     elseif flag_si

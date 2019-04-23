@@ -4,11 +4,7 @@ stat_bba = cell(n_mach, 1);
 data_bpm = cell(n_mach, 1);
 um = 1e6;
 
-for j = 1:n_mach
-    if j == 4
-        continue
-    end
-    
+for j = 1:n_mach    
     offset_bbaj = offset_bba{j} * um;
     % derro(offset_bbaj == 0 ) = 0;
     % offset_bbaj = offset_bbaj + derro;
@@ -84,9 +80,6 @@ end
 
 for k = 1:size(offset_bbaj, 1)
     for j = 1:n_mach
-        if j == 4
-            continue
-        end
         bba_mach_init(j, :) = stat_bba{j}.initial_dif(k, :);
         bba_mach_final(j, :) = stat_bba{j}.final_dif(k, :);
     end
