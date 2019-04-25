@@ -1,4 +1,4 @@
-function multiturn_correction_SOFB(n_bpm, n_sv, sum_lim, ring_size, closes_orbit)
+function multiturn_correction_SOFB(n_sv, sum_lim, ring_size, closes_orbit)
     v_prefix = getenv('VACA_PREFIX');
     ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
     % kicks_ch_pv = [ioc_prefix, 'KicksCH-Mon'];
@@ -20,10 +20,12 @@ function multiturn_correction_SOFB(n_bpm, n_sv, sum_lim, ring_size, closes_orbit
     pv_name.reforbx = [ioc_prefix, 'RefOrbX-SP'];
     pv_name.reforby = [ioc_prefix, 'RefOrbY-SP'];
 
+    n_bpm = 50;
+
     if ~exist('closes_orbit', 'var')
       closes_orbit = false;
     end
-    
+
     if ~exist('ring_size', 'var')
       ring_size = 1;
     end
@@ -41,12 +43,12 @@ function n_sv = corr_loop(sum_lim, n_sv, n_bpm, pv_name, closes_orbit, ring_size
     fcorr_x = 100;
     fcorr_y = 100;
     t_wait = 0.1;
-    
+
     fprintf('=================================================\n');
     fprintf('COLLECTING PULSES\n');
     fprintf('=================================================\n');
     sleep(buffer)
-
+    
     int_bpm = getpv(pv_name.sum);
 
     bpm_select = selection_bpm(int_bpm, sum_lim, 5 * n_bpm);

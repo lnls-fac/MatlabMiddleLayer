@@ -1,4 +1,4 @@
-function [quadratic, linear, mresp, mono] = bba_analysis(Ri, Rf, n_bpm, dtheta, plane, plot_graph)
+function [quadratic, linear, mresp, mono] = bba_analysis(Ri, Rf, n_bpm, dtheta, plane, plot_graph, flag_first)
 
 f_merit_quad = squeeze(nansum((Ri(:, :, n_bpm+1:end) - Rf(:, :, n_bpm+1:end)).^2, 3)) / size(Ri, 3);
 % sigma_res = 1e-6;
@@ -14,18 +14,22 @@ if strcmp(plane, 'x')
     bpm_pos = squeeze(r_bpm(:, 1));
     fm_quad = squeeze(f_merit_quad(:, 1));
     fm_linear = squeeze(f_merit_linear(:, 1, :));
+    
     for k = 1:length(dtheta)-1
         mresp(k) = (r_bpm(k+1, 1) - r_bpm(k, 1)) / (dtheta(k+1) - dtheta(k));
     end
     mresp = mean(mresp);
+    
 elseif strcmp(plane, 'y')
     bpm_pos = squeeze(r_bpm(:, 2));
     fm_quad = squeeze(f_merit_quad(:, 2));
     fm_linear = squeeze(f_merit_linear(:, 2, :));
+    
     for k = 1:length(dtheta)-1
         mresp(k) = (r_bpm(k+1, 2) - r_bpm(k, 2)) / (dtheta(k+1) - dtheta(k));
     end
     mresp = mean(mresp);
+    
 end
 
 if ~exist('plot_graph', 'var')
@@ -56,6 +60,8 @@ if flag_plot
     grid on;
 end
 %}
+
+
 [prbla_theta, S_theta_quad, mu_theta_quad] = polyfit(dtheta', fm_quad, 2);
 theta_fit = [min(dtheta):1e-8:max(dtheta)];
 [px, ~] = polyval(prbla_theta, theta_fit, S_theta_quad, mu_theta_quad);    
@@ -64,6 +70,8 @@ theta_fit = [min(dtheta):1e-8:max(dtheta)];
 offset_theta_quad = theta_fit(i_min);
 % offset_theta_quad = - prbla_theta(2) / 2 / prbla_theta(1) * mu_theta_quad(2) + mu_theta_quad(1);
 erro_fit_theta_quad = mean(erro_fit_theta_quad);
+
+
 
 % fit_bpm = polyfit(dtheta', bpm_pos, 1);
 % offset_quad = fit_bpm(1) * offset_theta_quad + fit_bpm(2);
@@ -98,16 +106,19 @@ end
 
 off_std = std(offset_linear_bpm);
 off_mean = mean(offset_linear_bpm);
-lower = off_mean - off_std;
-upper = off_mean + off_std;
+lower = off_mean - 3 * off_std;
+upper = off_mean + 3 * off_std;
 sel = offset_linear_bpm >= lower & offset_linear_bpm <= upper;
 outliers = offset_linear_bpm(offset_linear_bpm < lower | offset_linear_bpm > upper);
 off_sel = offset_linear_bpm(sel);
 angle_sel = angle_coef(sel);
 
 offset_linear = nansum(dot(abs(angle_sel), off_sel)) / nansum(abs(angle_sel));
+if (offset_linear < min(bpm_pos) || offset_linear > max(bpm_pos)) && flag_first
+   offset_linear =  0;
+end
 erro_fit_linear = nansum(dot(abs(angle_coef), error_fit_linear_bpm)) / nansum(abs(angle_coef));
-%{
+
     close(gcf());
     hold off;
     gcf();
@@ -120,7 +131,8 @@ erro_fit_linear = nansum(dot(abs(angle_coef), error_fit_linear_bpm)) / nansum(ab
     xlabel('BPMs positions [um]');
     ylabel('Fig. of merit [um]');
     grid on;
-%}
+
+
 
 for i = n_bpm + 1:size(fm_linear, 2)
     [straight_theta, S_theta_linear, mu_theta_linear] = polyfit(dtheta', fm_linear(:, i), 1);
@@ -132,15 +144,20 @@ end
 
 off_std = std(offset_theta_linear_bpm);
 off_mean = mean(offset_theta_linear_bpm);
-lower = off_mean - off_std;
-upper = off_mean + off_std;
+lower = off_mean - 3 * off_std;
+upper = off_mean + 3 * off_std;
 sel = offset_theta_linear_bpm >= lower & offset_theta_linear_bpm <= upper;
 outliers = offset_theta_linear_bpm(offset_theta_linear_bpm < lower | offset_theta_linear_bpm > upper);
 off_sel = offset_theta_linear_bpm(sel);
 angle_sel = angle_coef_theta(sel);
 
 offset_theta_linear = nansum(dot(abs(angle_sel), off_sel)) / nansum(abs(angle_sel));
+if (offset_theta_linear < min(dtheta) || offset_linear > max(dtheta)) && flag_first
+   offset_theta_linear =  0;
+end
 erro_theta_linear = nansum(dot(abs(angle_coef), error_fit_linear_bpm)) / nansum(abs(angle_coef));
+%}
+
 %{
     close(gcf());
     hold off;
