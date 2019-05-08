@@ -83,9 +83,20 @@ elseif(~exist('diag','var')) && ~flag_diag
         flag_diag = false;
 end
 
-p = 1/10;
+p = 0; % 1/100;
+inj_top = 1;
 
-for j=1:n_pulse     
+for j=1:n_pulse
+    if inj_top
+        param.offset_x = param.offset_x0; 
+        param.offset_xl =  param.offset_xl0;
+        param.offset_y = param.offset_y0;
+        param.offset_yl = param.offset_yl0;
+        if flag_kckr
+            machine = lnls_set_kickangle(machine, param.kckr0, injkckr, 'x');
+        end
+        param.delta = 0;
+    else
     error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
     param.offset_x = param.offset_x_sist + p * error_x_pulse;
 
@@ -107,6 +118,7 @@ for j=1:n_pulse
 
     error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
     param.delta = param.delta_sist + p * error_delta_pulse;
+    end
     
     param.phase = param_errors.phase_offset;
 
