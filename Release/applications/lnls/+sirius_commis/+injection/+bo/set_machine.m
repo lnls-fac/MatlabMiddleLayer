@@ -1,9 +1,9 @@
-function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
+function machine_data = set_machine(bo_ring, n_mach)
 % Setting of random machines and nominal injection parameters (without errors).
 % It includes random errors of excitation and alignment of magnets and also
 % adjustes the vacuum chamber at injection point (injection septum).
 %
-% INPUT: 
+% INPUT:
 % - bo_ring: nominal ring model
 %
 % OUTPUTS:
@@ -11,45 +11,52 @@ function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
 % - param: nominal injection parameters struct
 %
 % NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
-% this function must be updated too in the parts of magnet errors. 
+% this function must be updated too in the parts of magnet errors.
 %
 % See also: add_errors_injection, bo_injection_adjustment
 %
 % Version 1 - Murilo B. Alves - October 4th, 2018.
 
-    name = 'CONFIG'; name_saved_machines = name;
-    initializations();
+    sirius_commis.common.initializations();
 
-    % Setting parameters of injection 
-    sept = findcells(bo_ring, 'FamName', 'InjSept');
-    bo_ring = circshift(bo_ring, [0, - (sept - 1)]);
+    % Setting parameters of injection
+    bo_ring = shift_ring(bo_ring, 'InjSept');
     bo_twiss = calctwiss(bo_ring);
     fam = sirius_bo_family_data(bo_ring);
-    
-    param.twiss.betax0 = bo_twiss.betax(1);
-    param.twiss.betay0 = bo_twiss.betay(1);
-    param.twiss.alphax0 = bo_twiss.alphax(1);
-    param.twiss.alphay0 = bo_twiss.alphay(1);
-    param.twiss.etax0 = bo_twiss.etax(1);
-    param.twiss.etay0 = bo_twiss.etay(1);
-    param.twiss.etaxl0 = bo_twiss.etaxl(1);
-    param.twiss.etayl0 = bo_twiss.etayl(1);
-    
-    param.beam.emitx = 170e-9;
-    param.beam.emity = param.beam.emitx;
-    param.beam.sigmae = 0.5e-2;
-    param.beam.sigmaz = 3e-3;
-    
-    param.offset_x0 = -30e-3;
-    param.offset_xl0 = 14.3e-3;
-    param.offset_y0 = 0;
-    param.offset_yl0 = 0;
-    param.kckr0 = -19.34e-3;
-    param.delta0 = 0;
-    param.delta_ave = 0;
-    param.delta_energy_scrn3 = 0;
-    
-    %Calculates the horizontal dispersion function at screen 3    
+
+    param_init.twiss.betax0 = bo_twiss.betax(1);
+    param_init.twiss.betay0 = bo_twiss.betay(1);
+    param_init.twiss.alphax0 = bo_twiss.alphax(1);
+    param_init.twiss.alphay0 = bo_twiss.alphay(1);
+    param_init.twiss.etax0 = bo_twiss.etax(1);
+    param_init.twiss.etay0 = bo_twiss.etay(1);
+    param_init.twiss.etaxl0 = bo_twiss.etaxl(1);
+    param_init.twiss.etayl0 = bo_twiss.etayl(1);
+
+    param_init.beam.emitx = 170e-9;
+    param_init.beam.emity = param_init.beam.emitx;
+    param_init.beam.sigmae = 0.5e-2;
+    param_init.beam.sigmaz = 3e-3;
+
+    param_init.offset_x0 = -30e-3;
+    param_init.offset_xl0 = 14.3e-3;
+    param_init.offset_y0 = 0;
+    param_init.offset_yl0 = 0;
+    param_init.kckr0 = -19.34e-3;
+    param_init.delta0 = 0;
+    param_init.delta_ave = 0;
+    param_init.delta_energy_scrn3 = 0;
+
+    param_sigma.x_syst = 2e-3; param_sigma.x_jit = 500e-6;
+    param_sigma.xl_syst = 3e-3; param_sigma.xl_jit = 30e-6;
+    param_sigma.y_syst = 2e-3; param_sigma.y_jit = 500e-6;
+    param_sigma.yl_syst = 2e-3; param_sigma.yl_jit = 30e-6;
+    param_sigma.kckr_syst = 1e-3; param_sigma.kckr_jit = 30e-6;
+    param_sigma.energy_syst = 1e-2; param_sigma.energy_jit = 0.3e-2;
+    param_sigma.bpm_offset = 500e-6; param_sigma.bpm_jit = 2e-3;
+    param_sigma.scrn_offset = 1e-3; param_sigma.scrn_jit = 500e-6;
+
+    %Calculates the horizontal dispersion function at screen 3
     % dipole = findcells(bo_ring, 'FamName', 'B');
     dipole = fam.B.ATIndex(1);
     scrn = findcells(bo_ring, 'FamName', 'Scrn');
@@ -62,9 +69,9 @@ function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
     r_final_p = linepass(bo_ring(d), r_init_p);
     x_n = r_final_n(1);
     x_p = r_final_p(1);
-    param.etax_scrn3 = (x_p - x_n) / 2 / delta;
-    
-    %Calculates the horizontal dispersion function at BPMs    
+    param_init.etax_scrn3 = (x_p - x_n) / 2 / delta;
+
+    %Calculates the horizontal dispersion function at BPMs
     bpms = fam.BPM.ATIndex;
     delta = 1e-5;
     r_init_n = [0; 0; 0; 0; -delta; 0];
@@ -73,77 +80,62 @@ function [machine, param, param_errors] = set_machine(bo_ring, n_mach)
     r_final_p = linepass(bo_ring, r_init_p, bpms);
     x_n = r_final_n(1, :);
     x_p = r_final_p(1, :);
-    param.etax_bpms = (x_p - x_n) ./ 2 ./ delta;
-    
+    param_init.etax_bpms = (x_p - x_n) ./ 2 ./ delta;
+
     % Setting the vacuum chamber at injection point
-    machine = vchamber_injection(bo_ring);
-    
+    machine = sirius_commis.injection.bo.vchamber_injection(bo_ring);
+
     % Error in the magnets (allignment, rotation, excitation, multipoles,
     % setting off rf cavity and radiation emission
+
+    factor = 1;
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
-    machine  = create_apply_errors(machine, fam, n_mach);
+    machine  = create_apply_errors(machine, fam, n_mach, factor);
     machine  = create_apply_multipoles(machine, fam);
-    machine = create_apply_bpm_errors(machine, fam);
-    
-    [param_errors, param] = sirius_commis.injection.bo.add_errors(param);
-       
-    function machine = vchamber_injection(machine)
-        %Values of vacuum chamber radius in horizontal plane at the end of
-        %injection septum and the initial point of injection kicker
-        xcv_sep = 41.86e-3;
-        xcv_kckr = 30.14e-3;
+    machine = create_apply_bpm_errors(machine, fam, factor, param_sigma.bpm_offset);
 
-        s = findspos(machine, 1:length(machine));
-        injkckr = findcells(machine, 'FamName','InjKckr');
-        xcv = (xcv_kckr - xcv_sep) / (s(injkckr) - s(1)) * s(1:injkckr)  + xcv_sep;
-
-        % Vacuum chamber inside the inj. kicker set as the same as initial point
-        xcv = [xcv, xcv(end)];
-        machine = setcellstruct(machine, 'VChamber', 1:injkckr+1, xcv, 1, 1);
+    for i = 1:n_mach
+        [param_errors{i}, param{i}] = sirius_commis.injection.bo.add_errors(param_init, param_sigma);
     end
-%% Initializations
-function initializations()
 
-    fprintf('\n<initializations> [%s]\n\n', datestr(now));
-
-    % seed for random number generator
-    seed = 131071;
-    fprintf('-  initializing random number generator with seed = %i ...\n', seed);
-    RandStream.setGlobalStream(RandStream('mt19937ar','seed', seed));
-
+    machine_data.machine = machine;
+    machine_data.parameters = param;
+    machine_data.errors = param_errors;
+    machine_data.sigma_errors = param_sigma;
 end
 %% Magnet Errors:
-function machine = create_apply_errors(the_ring, family_data, n_mach)
+function machine = create_apply_errors(the_ring, family_data, n_mach, factor)
 
     fprintf('\n<error generation and random machines creation> [%s]\n\n', datestr(now));
 
     % constants
     um = 1e-6; mrad = 0.001; percent = 0.01;
+    name = 'CONFIG';
 
     % <quadrupoles> alignment, rotation and excitation errors
     config.fams.quads.labels     = {'QF','QD','QS'};
-    config.fams.quads.sigma_x    = 160 * um;
-    config.fams.quads.sigma_y    = 160 * um;
-    config.fams.quads.sigma_roll = 0.800 * mrad;
-    config.fams.quads.sigma_e    = 0.3 * percent;
+    config.fams.quads.sigma_x    = factor * 160 * um;
+    config.fams.quads.sigma_y    = factor * 160 * um;
+    config.fams.quads.sigma_roll = factor * 0.800 * mrad;
+    config.fams.quads.sigma_e    = factor * 0.3 * percent;
 
     % <sextupoles> alignment, rotation and excitation errors
     config.fams.sexts.labels     = {'SD','SF'};
-    config.fams.sexts.sigma_x    = 160 * um;
-    config.fams.sexts.sigma_y    = 160 * um;
-    config.fams.sexts.sigma_roll = 0.800 * mrad;
-    config.fams.sexts.sigma_e    = 0.3 * percent;
+    config.fams.sexts.sigma_x    = factor * 160 * um;
+    config.fams.sexts.sigma_y    = factor * 160 * um;
+    config.fams.sexts.sigma_roll = factor * 0.800 * mrad;
+    config.fams.sexts.sigma_e    = factor * 0.3 * percent;
 
     % <dipoles with more than one piece> alignment, rotation and excitation errors
     config.fams.b.labels       = {'B'};
-    config.fams.b.sigma_x      = 160 * um;
-    config.fams.b.sigma_y      = 160 * um;
-    config.fams.b.sigma_roll   = 0.800 * mrad;
+    config.fams.b.sigma_x      = factor * 160 * um;
+    config.fams.b.sigma_y      = factor * 160 * um;
+    config.fams.b.sigma_roll   = factor * 0.800 * mrad;
 %         config.fams.b.sigma_e      = 0.15 * percent * 1;
-    config.fams.b.sigma_e      = 0.05 * percent; % based on estimated error of measured fmap analysis from measurement bench fluctuation - XRR - 2018-08-23
+    config.fams.b.sigma_e      = factor * 0.05 * percent; % based on estimated error of measured fmap analysis from measurement bench fluctuation - XRR - 2018-08-23
 %         config.fams.b.sigma_e_kdip = 2.4 * percent * 1;  % quadrupole errors due to pole variations
-    config.fams.b.sigma_e_kdip = 0.3 * percent;  % based on measured fmap analysis - XRR - 2018-08-23 - see /home/fac_files/lnls-ima/bo-dipoles/model-09/analysis/hallprobe/production/magnet-dispersion.ipynb
+    config.fams.b.sigma_e_kdip = factor * 0.3 * percent;  % based on measured fmap analysis - XRR - 2018-08-23 - see /home/fac_files/lnls-ima/bo-dipoles/model-09/analysis/hallprobe/production/magnet-dispersion.ipynb
 
     % sets number of segmentations for each family
     families = fieldnames(config.fams);
@@ -171,23 +163,22 @@ function machine = create_apply_errors(the_ring, family_data, n_mach)
     machine = lnls_latt_err_apply_errors(name, the_ring, errors, fractional_delta);
 end
 
-function machine = create_apply_bpm_errors(machine, family_data)
+function machine = create_apply_bpm_errors(machine, family_data, factor, offset)
         % BPM  anc Corr errors are treated differently from magnet errors:
         % constants
-        um = 1e-6;
-        
+        name = 'CONFIG';
         control.bpm.idx = family_data.BPM.ATIndex;
-        control.bpm.sigma_offsetx   = 500 * um * 1; 
-        control.bpm.sigma_offsety   = 500 * um * 1;
-        
+        control.bpm.sigma_offsetx   = factor * offset * 1;
+        control.bpm.sigma_offsety   = factor * offset * 1;
+
         cutoff_errors = 1;
         machine = lnls_latt_err_generate_apply_bpmcorr_errors(name, machine, control, cutoff_errors);
 end
-
 %% Multipoles insertion
 function machine = create_apply_multipoles(machine, family_data)
 
     fprintf('\n<application of multipole errors> [%s]\n\n', datestr(now));
+    name = 'CONFIG';
 
     % QUADRUPOLES
     multi.quads.labels = {'QD','QF','QS'};
@@ -213,7 +204,7 @@ function machine = create_apply_multipoles(machine, family_data)
     % based on measured fmap analysis - XRR - 2018-08-23 - see /home/fac_files/lnls-ima/bo-dipoles/model-09/analysis/hallprobe/production/magnet-dispersion.ipynb
     % (dSL)r_0^2 / (DL) ~ 2.3e-3, dSL ~ 0.945 T/m, DL ~ 0.126 T.m
 %         multi.bends.main_vals = [5.5, 4*ones(1,4)]*1e-4;
-    multi.bends.main_vals = [23, 4*ones(1,4)]*1e-4; 
+    multi.bends.main_vals = [23, 4*ones(1,4)]*1e-4;
 
     multi.bends.skew_vals = ones(1,5)*1e-4;
 
@@ -232,14 +223,8 @@ function machine = create_apply_multipoles(machine, family_data)
     for i=1:length(machine)
         machine{i} = sirius_bo_multipole_systematic_errors(machine{i});
     end
-    
-    fname = which('sirius_bo_multipole_systematic_errors');
-    copyfile(fname, [name '_multipole_systematic_errors.m']);
 
     cutoff_errors = 2;
     multi_errors  = lnls_latt_err_generate_multipole_errors(name, machine{1,1}, multi, length(machine), cutoff_errors);
     machine = lnls_latt_err_apply_multipole_errors(name, machine, multi_errors, multi);
-    name_saved_machines = [name_saved_machines '_multi'];
-    save([name_saved_machines '.mat'], 'machine');
-end
 end

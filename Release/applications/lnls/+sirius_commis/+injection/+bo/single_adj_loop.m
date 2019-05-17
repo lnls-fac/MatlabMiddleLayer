@@ -1,4 +1,4 @@
-function [param_out, machine, r_scrn3, theta_aft_kckr] = single_adj_loop(bo_ring, n_part, n_pulse, set_mach, param_in, param_errors_in)
+function [param_out, r_scrn3] = single_adj_loop(bo_ring, n_part, n_pulse, set_mach, param_in, param_errors_in)
 % Single loop of injection parameters adjustment. It uses measurements of
 % screen 1 to adjust the injection angle with injection kicker turned off, after that turns
 % on the kicker and with screen 1 again adjustes the kicker angle for the first time.
@@ -55,6 +55,7 @@ function [param_out, machine, r_scrn3, theta_aft_kckr] = single_adj_loop(bo_ring
     end
 
     scrn = findcells(machine, 'FamName', 'Scrn');
+    res_scrn = param0_errors.sigma_scrn;
     % SCREEN 1 ON
     kckr = 'off';
     [~, param_out] = sirius_commis.injection.bo.screen1_sept(machine, param0, param0_errors, n_part, n_pulse, scrn(1), kckr);
@@ -66,12 +67,14 @@ function [param_out, machine, r_scrn3, theta_aft_kckr] = single_adj_loop(bo_ring
     % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
     [r_scrn2, param_out, theta_aft_kckr] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param0_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
 
-    if abs(r_scrn2(1)) > param0_errors.sigma_scrn || abs(r_scrn2(2)) >  2 * param0_errors.sigma_scrn % / sqrt(n_pulse)
+    if abs(r_scrn2(1)) > res_scrn || abs(r_scrn2(2)) > res_scrn
+
         fprintf('=================================================\n');
         fprintf('READJUSTING THE BEAM TO REACH THE KICKER CENTER\n');
         fprintf('=================================================\n');
 
         param_out = sirius_commis.injection.bo.center_kicker(machine, param_out, r_scrn2(1), 0*r_scrn2(2));
+
         fprintf('=================================================\n');
         fprintf('REPEAT THE PROCESS \n');
         fprintf('=================================================\n');
@@ -86,7 +89,7 @@ function [param_out, machine, r_scrn3, theta_aft_kckr] = single_adj_loop(bo_ring
     end
 
     [param_out, r_scrn3] = sirius_commis.injection.bo.screen3(machine, param_out, param0_errors, n_part, n_pulse, scrn(3), kckr);
-    
+
     if isnan(r_scrn3)
         return
     end

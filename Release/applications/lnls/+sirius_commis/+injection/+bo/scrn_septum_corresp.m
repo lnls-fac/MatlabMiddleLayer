@@ -4,7 +4,7 @@ function [dthetax, dthetay] = scrn_septum_corresp(machine, dxf, dyf, scrn)
     qf = findcells(machine, 'FamName', 'QF');
     qf_struct = machine(qf(1));
     qf_struct = qf_struct{1};
-    
+
     K_QF = qf_struct.PolynomB;
     K_QF = K_QF(2);
     L_QF = qf_struct.Length; % It corresponds to half quadrupole length
@@ -25,5 +25,4 @@ function [dthetax, dthetay] = scrn_septum_corresp(machine, dxf, dyf, scrn)
 
     dthetax = dxf / factor_x;
     dthetay = dyf / factor_y;
-    
 end

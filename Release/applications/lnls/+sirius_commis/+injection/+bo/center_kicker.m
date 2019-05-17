@@ -3,18 +3,17 @@ function param = center_kicker(machine, param, ax, ay)
 % angle of injection to compensate the lack of adjustment of position at
 % injection point with screens
 
-injkckr = findcells(machine, 'FamName', 'InjKckr');
-injkckr_struct = machine(injkckr(1));
-injkckr_struct = injkckr_struct{1};
-L_kckr = injkckr_struct.Length;
+    injkckr = findcells(machine, 'FamName', 'InjKckr');
+    injkckr_struct = machine(injkckr(1));
+    injkckr_struct = injkckr_struct{1};
+    L_kckr = injkckr_struct.Length;
 
-s = findspos(machine, 1:length(machine));
+    s = findspos(machine, 1:length(machine));
 
-d = s(injkckr) + L_kckr;
+    d = s(injkckr) + L_kckr;
 
-dtheta = - ax / d;
+    dtheta = - ax / d;
 
-param.offset_xl_sist = param.offset_xl_sist + dtheta;
-param.offset_y_sist = param.offset_y_sist - ay;
+    param.offset_xl_syst = param.offset_xl_syst + dtheta;
+    param.offset_y_syst = param.offset_y_syst - ay;
 end
-

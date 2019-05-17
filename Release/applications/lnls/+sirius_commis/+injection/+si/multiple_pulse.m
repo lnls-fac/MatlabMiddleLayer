@@ -92,7 +92,7 @@ elseif(~exist('shape', 'var')) && ~flag_shape
     flag_shape = false;
 end
 
-p = 0;
+p = 0; %1/100;
 inj_top = 0;
 
 for j=1:n_pulse     
@@ -240,7 +240,7 @@ if flag_diag
     r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
     sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
 end
- fprintf('=================================================\n');
+    fprintf('=================================================\n');
 end
 
 function plot_si_turn(machine, r_final)

@@ -1,7 +1,9 @@
 function [r_scrn1, param] = screen1_sept(machine, param, param_errors, n_part, n_pulse, scrn1, kckr)
+
     fprintf('=================================================\n');
     fprintf('SCREEN 1 ON - KICKER OFF \n')
     fprintf('=================================================\n');
+
     machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);
     dxf_e = 1; dyf_e = 1;
     dthetax = 0; dthetay = 0; dyf = 0;
@@ -9,18 +11,18 @@ function [r_scrn1, param] = screen1_sept(machine, param, param_errors, n_part, n
     res_scrn = param_errors.sigma_scrn;
     s = findspos(machine, 1:length(machine));
 
-    injkckr = findcells(machine, 'FamName', 'InjKckr');
-    injkckr_struct = machine(injkckr(1));
-    injkckr_struct = injkckr_struct{1};
-    L_kckr = injkckr_struct.Length;
-    d_kckr_scrn = s(scrn1) - s(injkckr) - L_kckr/2; % Adjustment to particles reach x=0 at kicker center
+    kckr_ind = findcells(machine, 'FamName', 'InjKckr');
+    L_kckr = machine{kckr_ind}.Length;
+    d_kckr_scrn = s(scrn1) - s(kckr_ind) - L_kckr/2; % Adjustment to particles reach x=0 at kicker center
     x_kckr_scrn = tan(-param.kckr0) * d_kckr_scrn;
 
-    while dxf_e > res_scrn || dyf_e > res_scrn% / sqrt(n_pulse)
-        param.offset_xl_sist = param.offset_xl_sist + dthetax;
-        % param.offset_yl_sist = param.offset_yl_sist - dthetay;
-        param.offset_y_sist = param.offset_y_sist - dyf;
-        [eff1, r_scrn1] = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
+    while dxf_e > res_scrn || dyf_e > res_scrn
+        param.offset_xl_syst = param.offset_xl_syst + dthetax;
+        % param.offset_yl_syst = param.offset_yl_syst - dthetay;
+        param.offset_y_syst = param.offset_y_syst - dyf;
+        r_particles = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
+        eff1 = r_particles.efficiency;
+        r_scrn1 = r_particles.r_screen;
 
         if mean(eff1) < eff_lim
             param = sirius_commis.injection.bo.screen_low_intensity(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr, mean(eff1), 1, 0.75);
