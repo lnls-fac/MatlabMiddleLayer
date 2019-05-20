@@ -21,12 +21,12 @@ function [r_scrn1, param] = screen1_kckr(machine, param, param_errors, n_part, n
     while abs(dx) > res_scrn || abs(dyf) > res_scrn % / sqrt(n_pulse)
         param.kckr_syst = param.kckr_syst - dtheta_kckr;
         param.offset_yl_syst = param.offset_yl_syst - dthetay;
-        param.offset_y_syst = param.offset_y_syst - dyf;
+        % param.offset_y_syst = param.offset_y_syst - dyf;
 
         r_particles = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
         eff1 = r_particles.efficiency;
         r_scrn1 = r_particles.r_screen;
-       
+
         dyf = r_scrn1(2);
         [~, dthetay] = sirius_commis.injection.bo.scrn_septum_corresp(machine1, 0, dyf, scrn1);
 

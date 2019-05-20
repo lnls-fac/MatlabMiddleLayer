@@ -18,8 +18,8 @@ function [r_scrn1, param] = screen1_sept(machine, param, param_errors, n_part, n
 
     while dxf_e > res_scrn || dyf_e > res_scrn
         param.offset_xl_syst = param.offset_xl_syst + dthetax;
-        % param.offset_yl_syst = param.offset_yl_syst - dthetay;
-        param.offset_y_syst = param.offset_y_syst - dyf;
+        param.offset_yl_syst = param.offset_yl_syst - dthetay;
+        % param.offset_y_syst = param.offset_y_syst - dyf;
         r_particles = sirius_commis.injection.bo.multiple_pulse(machine1, param, param_errors, n_part, n_pulse, scrn1, kckr);
         eff1 = r_particles.efficiency;
         r_scrn1 = r_particles.r_screen;

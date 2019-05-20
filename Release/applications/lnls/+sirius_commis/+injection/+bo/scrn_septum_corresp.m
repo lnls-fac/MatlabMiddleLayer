@@ -18,7 +18,7 @@ function [dthetax, dthetay] = scrn_septum_corresp(machine, dxf, dyf, scrn)
 
     % Drift from the end inj sept to the center of QF, then apply QF, and one
     % more drift from the center of QF to the first screen (relation
-    % between x_scrn and x'_septum
+    % between x_scrn and x'_septum and y_scrn and y'_septum also).
 
     factor_x = d1 + d2 - d1 * d2 / KL_QF;
     factor_y = d1 + d2 + d1 * d2 / KL_QF;

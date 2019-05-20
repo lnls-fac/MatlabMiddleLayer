@@ -5,17 +5,19 @@ function machine_data = set_machine(bo_ring, n_mach)
 %
 % INPUT:
 % - bo_ring: nominal ring model
+% - n_mach: number of machines that will be generated
 %
 % OUTPUTS:
-% - machine: ring model with vacuum chamber adjusted and magnet errors
-% - param: nominal injection parameters struct
+% - machine_data: struct with the following fields
+%         - machine: cell with n_mach elements which are random machines models
+%         - parameters: injection parameters with errors added for each machine
+%         - errors: injection errors introduced in the nominal parameters
+%         - sigma_errors: standard deviation to generate random errors
 %
 % NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
 % this function must be updated too in the parts of magnet errors.
 %
-% See also: add_errors_injection, bo_injection_adjustment
-%
-% Version 1 - Murilo B. Alves - October 4th, 2018.
+% See also: add_errors
 
     sirius_commis.common.initializations();
 
@@ -63,13 +65,13 @@ function machine_data = set_machine(bo_ring, n_mach)
     scrn3 = scrn(3);
     delta = 1e-5;
     d = dipole:scrn3;
-    r_init_n = [0; 0; 0; 0; -delta; 0];
+    r_init_n = [0; 0; 0; 0; -delta/2; 0];
     r_final_n = linepass(bo_ring(d), r_init_n);
-    r_init_p = [0; 0; 0; 0; +delta; 0];
+    r_init_p = [0; 0; 0; 0; +delta/2; 0];
     r_final_p = linepass(bo_ring(d), r_init_p);
     x_n = r_final_n(1);
     x_p = r_final_p(1);
-    param_init.etax_scrn3 = (x_p - x_n) / 2 / delta;
+    param_init.etax_scrn3 = (x_p - x_n) / delta;
 
     %Calculates the horizontal dispersion function at BPMs
     bpms = fam.BPM.ATIndex;
@@ -104,6 +106,7 @@ function machine_data = set_machine(bo_ring, n_mach)
     machine_data.errors = param_errors;
     machine_data.sigma_errors = param_sigma;
 end
+
 %% Magnet Errors:
 function machine = create_apply_errors(the_ring, family_data, n_mach, factor)
 

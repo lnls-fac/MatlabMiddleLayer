@@ -16,21 +16,21 @@ if n == 1
     fprintf('LOW INTENSITY ON SCREEN 1 \n');
     fprintf('=================================================\n');
     while eff < eff_lim
-        dtheta0x = dtheta0x + param.offset_xl_sist * 0.1;
-        % dtheta0y = dtheta0y + param.offset_yl_sist * 0.1;
-        param.offset_xl_sist = param.offset_xl_sist + dtheta0x;
-        % param.offset_yl_sist = param.offset_yl_sist + dtheta0y;
+        dtheta0x = dtheta0x + param.offset_xl_syst * 0.1;
+        % dtheta0y = dtheta0y + param.offset_yl_syst * 0.1;
+        param.offset_xl_syst = param.offset_xl_syst + dtheta0x;
+        % param.offset_yl_syst = param.offset_yl_syst + dtheta0y;
         [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
         eff = mean(eff); 
         i = i + 1;
         if i > n_times
             dtheta0x = 0;
-            param.offset_xl_sist = param.xl_sept_init;
-            param.offset_yl_sist = param.yl_sept_init;
+            param.offset_xl_syst = param.xl_sept_init;
+            param.offset_yl_syst = param.yl_sept_init;
             while eff < eff_lim
-            dtheta0x = dtheta0x - param.offset_xl_sist * 0.1;
-            % dtheta0y = dtheta0y - param.offset_yl_sist * 0.1;
-            % param.offset_yl_sist = param.offset_yl_sist + dtheta0y;
+            dtheta0x = dtheta0x - param.offset_xl_syst * 0.1;
+            % dtheta0y = dtheta0y - param.offset_yl_syst * 0.1;
+            % param.offset_yl_syst = param.offset_yl_syst + dtheta0y;
             [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
             eff = mean(eff); 
             j = j + 1;
@@ -47,17 +47,17 @@ if n == 2
     fprintf('LOW INTENSITY ON SCREEN 2 \n');
     fprintf('=================================================\n');
     while eff < eff_lim
-        dtheta_kckr = dtheta_kckr + param.kckr_sist * 0.1;
-        param.kckr_sist = param.kckr_sist - dtheta_kckr;
+        dtheta_kckr = dtheta_kckr + param.kckr_syst * 0.1;
+        param.kckr_syst = param.kckr_syst - dtheta_kckr;
         [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
         eff = mean(eff); 
         i = i + 1;
         if i > n_times
             dtheta_kckr = 0;
-            param.kckr_sist = param.kckr_init;
+            param.kckr_syst = param.kckr_init;
             while eff < eff_lim
-            dtheta_kckr = dtheta_kckr - param.kckr_sist * 0.1;
-            param.kckr_sist = param.kckr_sist - dtheta_kckr;
+            dtheta_kckr = dtheta_kckr - param.kckr_syst * 0.1;
+            param.kckr_syst = param.kckr_syst - dtheta_kckr;
             [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
             eff = mean(eff); 
             j = j + 1;
@@ -74,7 +74,7 @@ if n == 3
     fprintf('LOW INTENSITY ON SCREEN 3 \n');
     fprintf('=================================================\n');
     while eff < eff_lim
-        delta_energy = delta_energy + param.delta_sist * 0.1;
+        delta_energy = delta_energy + param.delta_syst * 0.1;
         param.delta_ave = param.delta_ave + delta_energy;
         [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
         eff = mean(eff); 
@@ -83,7 +83,7 @@ if n == 3
             delta_energy = 0;
             param.delta_ave = 0;
             while eff < eff_lim
-            delta_energy = delta_energy - param.delta_sist * 0.1;
+            delta_energy = delta_energy - param.delta_syst * 0.1;
             param.delta_ave = param.delta_ave + delta_energy;
             [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
             eff = mean(eff); 

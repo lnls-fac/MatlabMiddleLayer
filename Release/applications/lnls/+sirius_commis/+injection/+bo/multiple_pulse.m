@@ -79,7 +79,7 @@ function r_particles = multiple_pulse(machine, param, param_errors, n_part, n_pu
             flag_diag = false;
     end
 
-    p = 0;
+    p = 1;
     inj_top = 0;
 
     for j=1:n_pulse
