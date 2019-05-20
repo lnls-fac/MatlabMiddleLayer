@@ -1,4 +1,4 @@
-function [param_out, machine, r_bpm] = single_adj_loop(si_ring, n_part, n_pulse, set_mach, param_in, param_errors_in, corr_energy)
+function [param_out, machine, r_bpm] = single_adj_loop(si_ring, n_part, n_pulse, param_in, param_errors_in)
 % Single loop of injection parameters adjustment. It uses measurements of
 % screen 1 to adjust the injection angle with injection kicker turned off, after that turns
 % on the kicker and with screen 1 again adjustes the kicker angle for the first time.
@@ -31,29 +31,9 @@ function [param_out, machine, r_bpm] = single_adj_loop(si_ring, n_part, n_pulse,
 % properly corrected
 %
 % Version 1 - Murilo B. Alves - December, 2018
-
-    if(exist('set_mach','var'))
-        if(strcmp(set_mach,'yes'))
-            flag_machine = true;
-        elseif(strcmp(set_mach,'no'))
-            flag_machine = false;
-        end
-    else
-        error('Set machine: yes or no')
-    end
-
-    if flag_machine
-        [machine, param0, ~] = sirius_commis.injection.si.set_machine(si_ring);
-        [param0_errors, param0] = sirius_commis.injection.si.add_errors(param0);
-    else
-        machine = si_ring;
-        param0 = param_in;
-        param0_errors = param_errors_in;
-        if(~exist('param_in', 'var'))
-            error('Struct with parameters missing');
-        end
-    end
-
+    machine = si_ring;
+    param0 = param_in;
+    param0_errors = param_errors_in;
     bpm = findcells(machine, 'FamName', 'BPM');
     
     % if ~corr_energy
@@ -63,11 +43,11 @@ function [param_out, machine, r_bpm] = single_adj_loop(si_ring, n_part, n_pulse,
         % KICKER ON -->> WITH BPM 1 MEASUREMENT, ADJUST THE KICKER
         kckr = 'on';
         [~, param_out] = sirius_commis.injection.si.bpm1_kckr(machine, param_out, param0_errors, n_part, n_pulse, bpm(1), kckr);
-        r_bpm = [0, 0];
     % else
     %    param_out = param0;
     %    kckr = 'on';
     % end
 
     % [param_out, r_bpm] = sirius_commis.injection.si.bpm2_energy(machine, param_out, param0_errors, n_part, n_pulse, [bpm(1), bpm(2), bpm(3)], kckr);
+    r_bpm = [0, 0];
 end

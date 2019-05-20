@@ -15,19 +15,19 @@ if n == 1
     fprintf('LOW INTENSITY ON BPM 1 (KICKER OFF) \n');
     fprintf('=================================================\n');
     while eff < eff_lim
-        dtheta0 = dtheta0 - param.offset_xl_sist * 0.1;
-        param.offset_xl_sist = param.offset_xl_sist + dtheta0;
-        [eff, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
-        eff = mean(eff); 
+        dtheta0 = dtheta0 - param.offset_xl_syst * 0.1;
+        param.offset_xl_syst = param.offset_xl_syst + dtheta0;
+        r = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
+        eff = mean(r.efficiency);
         i = i + 1;
         if i > n_times
             dtheta0 = 0;
-            param.offset_xl_sist = param.xl_sept_init;
+            param.offset_xl_syst = param.xl_sept_init;
             while eff < eff_lim
-            dtheta0 = dtheta0 + param.offset_xl_sist * 0.1;
-            param.offset_xl_sist = param.offset_xl_sist + dtheta0;
-            [eff, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
-            eff = mean(eff); 
+            dtheta0 = dtheta0 + param.offset_xl_syst * 0.1;
+            param.offset_xl_syst = param.offset_xl_syst + dtheta0;
+            r = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
+            eff = mean(r.efficiency);
             j = j + 1;
             if j > n_times
                 error('INCREASING INTENSITY PROBLEMS ON SCREEN 1!!!')
@@ -41,19 +41,19 @@ if n == 2
     fprintf('LOW INTENSITY ON BPM 1 (KICKER ON) \n');
     fprintf('=================================================\n');
     while eff < eff_lim
-        dtheta_kckr = dtheta_kckr + param.kckr_sist * 0.1;
-        param.kckr_sist = param.kckr_sist - dtheta_kckr;
-        [eff, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
-        eff = mean(eff); 
+        dtheta_kckr = dtheta_kckr + param.kckr_syst * 0.1;
+        param.kckr_syst = param.kckr_syst - dtheta_kckr;
+        r = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
+        eff = mean(r.efficiency);
         i = i + 1;
         if i > n_times
             dtheta_kckr = 0;
-            param.kckr_sist = param.kckr_init;
+            param.kckr_syst = param.kckr_init;
             while eff < eff_lim
-            dtheta_kckr = dtheta_kckr - param.kckr_sist * 0.1;
-            param.kckr_sist = param.kckr_sist - dtheta_kckr;
-            [eff, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
-            eff = mean(eff); 
+            dtheta_kckr = dtheta_kckr - param.kckr_syst * 0.1;
+            param.kckr_syst = param.kckr_syst - dtheta_kckr;
+            r = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
+            eff = mean(r.efficiency);
             j = j + 1;
             if j > n_times
                 error('INCREASING INTENSITY PROBLEMS ON BPM 1!!!')
@@ -67,19 +67,19 @@ if n == 3
     fprintf('LOW INTENSITY ON BPM 2 and 3 \n');
     fprintf('=================================================\n');
     while eff < eff_lim
-        delta_energy = delta_energy + param.delta_sist * 0.1;
+        delta_energy = delta_energy + param.delta_syst * 0.1;
         param.delta_ave = param.delta_ave + delta_energy;
-        [eff, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
-        eff = mean(eff); 
+        r = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
+        eff = mean(r.efficiency);
         i = i + 1;
         if i > n_times
             delta_energy = 0;
             param.delta_ave = 0;
             while eff < eff_lim
-            delta_energy = delta_energy - param.delta_sist * 0.1;
+            delta_energy = delta_energy - param.delta_syst * 0.1;
             param.delta_ave = param.delta_ave + delta_energy;
-            [eff, ~] = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
-            eff = mean(eff); 
+            r = sirius_commis.injection.si.multiple_pulse(machine, param, param_error, n_part, n_pulse, bpm, kckr);
+            eff = mean(r.efficiency);
             j = j + 1;
             if j > n_times
                 error('INCREASING INTENSITY PROBLEMS ON BPM 2!!!')
@@ -89,4 +89,3 @@ if n == 3
     end
 end
 end
-
