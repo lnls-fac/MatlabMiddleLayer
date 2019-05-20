@@ -20,8 +20,8 @@ if n == 1
         % dtheta0y = dtheta0y + param.offset_yl_syst * 0.1;
         param.offset_xl_syst = param.offset_xl_syst + dtheta0x;
         % param.offset_yl_syst = param.offset_yl_syst + dtheta0y;
-        [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
-        eff = mean(eff); 
+        r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
+        eff = mean(r.efficiency); 
         i = i + 1;
         if i > n_times
             dtheta0x = 0;
@@ -31,8 +31,8 @@ if n == 1
             dtheta0x = dtheta0x - param.offset_xl_syst * 0.1;
             % dtheta0y = dtheta0y - param.offset_yl_syst * 0.1;
             % param.offset_yl_syst = param.offset_yl_syst + dtheta0y;
-            [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
-            eff = mean(eff); 
+            r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
+            eff = mean(r.efficiency); 
             j = j + 1;
             if j > n_times
                 warning('INCREASING INTENSITY PROBLEMS ON SCREEN 1!!!')
@@ -49,8 +49,8 @@ if n == 2
     while eff < eff_lim
         dtheta_kckr = dtheta_kckr + param.kckr_syst * 0.1;
         param.kckr_syst = param.kckr_syst - dtheta_kckr;
-        [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
-        eff = mean(eff); 
+        r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
+        eff = mean(r.efficiency); 
         i = i + 1;
         if i > n_times
             dtheta_kckr = 0;
@@ -58,8 +58,8 @@ if n == 2
             while eff < eff_lim
             dtheta_kckr = dtheta_kckr - param.kckr_syst * 0.1;
             param.kckr_syst = param.kckr_syst - dtheta_kckr;
-            [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
-            eff = mean(eff); 
+            r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
+            eff = mean(r.efficiency); 
             j = j + 1;
             if j > n_times
                 warning('INCREASING INTENSITY PROBLEMS ON SCREEN 2!!!')
@@ -76,8 +76,8 @@ if n == 3
     while eff < eff_lim
         delta_energy = delta_energy + param.delta_syst * 0.1;
         param.delta_ave = param.delta_ave + delta_energy;
-        [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
-        eff = mean(eff); 
+        r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
+        eff = mean(r.efficiency); 
         i = i + 1;
         if i > n_times
             delta_energy = 0;
@@ -85,8 +85,8 @@ if n == 3
             while eff < eff_lim
             delta_energy = delta_energy - param.delta_syst * 0.1;
             param.delta_ave = param.delta_ave + delta_energy;
-            [eff, ~] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
-            eff = mean(eff); 
+            r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_error, n_part, n_pulse, scrn, kckr);
+            eff = mean(r.efficiency); 
             j = j + 1;
             if j > n_times
                 warning('INCREASING INTENSITY PROBLEMS ON 3!!!')

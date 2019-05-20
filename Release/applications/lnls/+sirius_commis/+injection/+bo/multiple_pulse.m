@@ -1,4 +1,4 @@
-function r_particles = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
+function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
 % Simulation of injection pulses to the booster. The starting point is the
 % end of injection septum.
 %
@@ -83,7 +83,6 @@ function r_particles = multiple_pulse(machine, param, param_errors, n_part, n_pu
     inj_top = 0;
 
     for j=1:n_pulse
-
         if inj_top
             param.offset_x = param.offset_x0;
             param.offset_xl =  param.offset_xl0;
@@ -133,7 +132,7 @@ function r_particles = multiple_pulse(machine, param, param_errors, n_part, n_pu
         else
             r_particles = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
         end
-        
+
         r_xy = squeeze(r_particles.r_track([1,3], :, :));
         r_track_pulse(j, :, :) =  squeeze(nanmean(r_xy, 2));
         r_end(j, :, :) = r_particles.r_track(:, :, end);
@@ -179,13 +178,13 @@ function r_particles = multiple_pulse(machine, param, param_errors, n_part, n_pu
         r_bpm_mean = r_bpm_mean - offset;
         r_bpm = sirius_commis.common.compares_vchamb(machine, r_bpm_mean, bpm, 'bpm');
         sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
-        r_particles.r_bpm = r_bpm;
-        r_particles.sum_bpm = int_bpm;
+        r_particles_out.r_bpm = r_bpm;
+        r_particles_out.sum_bpm = int_bpm;
     end
 
-    r_particles.r_end = r_end;
-    r_particles.r_screen = r_scrn;
-    r_particles.efficiency = eff;
+    r_particles_out.r_end = r_end;
+    r_particles_out.r_screen = r_scrn;
+    r_particles_out.efficiency = eff;
 end
 
 function plot_booster_turn(machine, r_final)
