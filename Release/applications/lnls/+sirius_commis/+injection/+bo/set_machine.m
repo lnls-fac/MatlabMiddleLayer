@@ -98,7 +98,7 @@ function machine_data = set_machine(bo_ring, n_mach)
     machine = create_apply_bpm_errors(machine, fam, factor, param_sigma.bpm_offset);
 
     for i = 1:n_mach
-        [param_errors{i}, param{i}] = sirius_commis.injection.bo.add_errors(param_init, param_sigma);
+        [param_errors{i}, param{i}] = sirius_commis.common.add_errors(param_init, param_sigma);
     end
 
     machine_data.machine = machine;
