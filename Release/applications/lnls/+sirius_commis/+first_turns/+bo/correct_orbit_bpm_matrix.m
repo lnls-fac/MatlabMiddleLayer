@@ -33,310 +33,270 @@ function ft_data = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr
 
 % sirius_commis.common.initializations();
 
-fam = sirius_bo_family_data(machine);
-ch = fam.CH.ATIndex;
-cv = fam.CV.ATIndex;
-bpm = fam.BPM.ATIndex;
+    fam = sirius_bo_family_data(machine);
+    ch = fam.CH.ATIndex;
+    cv = fam.CV.ATIndex;
+    bpm = fam.BPM.ATIndex;
 
-machine = setcellstruct(machine, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
-machine = setcellstruct(machine, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
-% m_corr_x = m_corr(1:size(bpm, 1), 1:size(ch, 1));
-% m_corr_y = m_corr(size(bpm, 1)+1:end, size(ch, 1)+1:end);
+    machine = setcellstruct(machine, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
+    machine = setcellstruct(machine, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
 
-theta_x = lnls_get_kickangle(machine, ch, 'x')';
-theta_y = lnls_get_kickangle(machine, cv, 'y')';
-gr_mach_x = zeros(length(ch), 1);
-gr_mach_y = zeros(length(cv), 1);
-first_cod = false;
-cod_data = [];
+    theta_x = lnls_get_kickangle(machine, ch, 'x')';
+    theta_y = lnls_get_kickangle(machine, cv, 'y')';
 
-[param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
-ft_data.firstcod = cod_data;
-
-if ~exist('r_bpm', 'var') && ~exist('int_bpm', 'var')
-    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
-end
-
-rms_orbit_x_bpm_old = nanstd(r_bpm(1,:));
-rms_orbit_y_bpm_old = nanstd(r_bpm(2,:));
-corr_lim = 20 * 300e-6;
-
-eff_lim = 0.5;
-n_cor = 1;
-n_fcod = true;
-tol = 0.90;
-
-rms_orbit_x_bpm_new = rms_orbit_x_bpm_old;
-rms_orbit_y_bpm_new = rms_orbit_y_bpm_old;
-inc_x = true; inc_y = true;
-ft_data.error = false;
-
-while int_bpm(end) < eff_lim
-    bpm_int_ok = bpm(int_bpm > 0.25);
-    [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
-    
-    bpm_select = zeros(length(bpm), 1);
-    bpm_select(ind_ok_bpm) = 1;
-    
-    if sum(bpm_select) == 1
-       warning('Only 1 BPM with good sum signal!')
-       ft_data.machine = machine;
-       ft_data.error = true;
-       ft_data.n_svd = n_sv;
-       return
+    if ~exist('r_bpm', 'var') && ~exist('int_bpm', 'var')
+        r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+        r_bpm = r.r_bpm;
+        int_bpm = r.sum_bpm;
     end
-    
-    m_corr_ok = m_corr([ind_ok_bpm; length(bpm) + ind_ok_bpm], :);
-    [U, S, V] = svd(m_corr_ok, 'econ');
-    S_inv = 1 ./ diag(S);
-    S_inv(isinf(S_inv)) = 0;
-    S_inv(n_sv+1:end) = 0;
-    S_inv = diag(S_inv);
-    m_corr_inv = V * S_inv * U';
-    x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
-    y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
-    new_r_bpm = [x_bpm, y_bpm];
-    delta_kick = - m_corr_inv * new_r_bpm';
-    
-    kicks = [theta_x; theta_y; 0] + delta_kick;
-    theta_x = kicks(1:length(ch));
-    theta_y = kicks(length(ch)+1:end-1);
-    
-    % Particular method that works when there is no coupling, a more
-    % generic method of inversion is used in accordance with SOFB
-    
-    %{
-    m_corr_x_ok = m_corr_x(ind_ok_bpm, :);
-    [Ux, Sx, Vx] = svd(m_corr_x_ok, 'econ');
-    Sx_inv = 1 ./ diag(Sx);
-    Sx_inv(isinf(Sx_inv)) = 0;
-    Sx_inv(n_sv+1:end) = 0;
-    % Sx_inv(Sx_inv > 5 * Sx_inv(1)) = 0;
-    Sx_inv = diag(Sx_inv);
-    m_corr_inv_x = Vx * Sx_inv * Ux';    
 
-    x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
-    theta_x =  theta_x - m_corr_inv_x * x_bpm';
+    rms_orbit_x_bpm_old = nanstd(r_bpm(1,:));
+    rms_orbit_y_bpm_old = nanstd(r_bpm(2,:));
+    corr_lim = 20 * 300e-6;
 
-    m_corr_y_ok = m_corr_y(ind_ok_bpm, :);
-    [Uy, Sy, Vy] = svd(m_corr_y_ok, 'econ');
-    Sy_inv = 1 ./ diag(Sy);
-    Sy_inv(isinf(Sy_inv)) = 0;
-    Sy_inv(n_sv+1:end) = 0;
-    % Sy_inv(Sy_inv > 5 * Sy_inv(1)) = 0;
-    Sy_inv = diag(Sy_inv);
-    m_corr_inv_y = Vy * Sy_inv * Uy';
+    eff_lim = 0.5;
+    n_cor = 1;
+    tol = 0.90;
 
-    y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
-    theta_y = theta_y - m_corr_inv_y * y_bpm';
-    %}
-        
-    over_kick_x = abs(theta_x) > corr_lim;
-    if any(over_kick_x)
-        warning('Horizontal corrector kick greater than maximum')
-        gr_mach_x(over_kick_x) = 1;
-        theta_x(over_kick_x) =  sign(theta_x(over_kick_x)) * corr_lim;
-    end
-    
-    over_kick_y = abs(theta_y) > corr_lim;
-    if any(over_kick_y)
-        warning('Vertical corrector kick greater than maximum')
-        gr_mach_y(over_kick_y) = 1;
-        theta_x(over_kick_y) =  sign(theta_x(over_kick_y)) * corr_lim;
-    end
-      
-    if inc_x 
-        machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
-    end
-    
-    if inc_y
-        machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
-    end
-    
-    [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
-    ft_data.firstcod = cod_data;
+    rms_orbit_x_bpm_new = rms_orbit_x_bpm_old;
+    rms_orbit_y_bpm_new = rms_orbit_y_bpm_old;
+    inc_x = true; inc_y = true;
+    ft_data.error = false;
 
-    [~, ~, ~, ~, r_bpm, int_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
-    rms_orbit_x_bpm_new = nanstd(r_bpm(1,:)); rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
-    
-    if n_cor > 25
-       n_sv = n_sv - 10;
-       machine = lnls_set_kickangle(machine, zeros(length(ch), 1), ch, 'x');
-       machine = lnls_set_kickangle(machine, zeros(length(cv), 1), cv, 'y');
-       n_cor = 1;
-       warning('Number of Singular Values reduced')
-       ft_data.machine = machine;
-       ft_data.error = true;
-       ft_data.n_svd = n_sv;
-       ft_data.param = param;
-       return
-       % if n_sv <= 1
-           % warning('Problems in Singular Values')
-           % ft_data.machine = machine;
-           % ft_data.error = true;
-           % ft_data.n_svd = n_sv;
-           % ft_data.param = param;
-           % return
-       % end
-    end
-    n_cor = n_cor + 1;
-    n_sv = n_sv + 1;
-end
+    while int_bpm(end) < eff_lim
+        bpm_int_ok = bpm(int_bpm > 0.25);
+        [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
 
-x_mean = mean(r_bpm(1, :));
-% etax_mean = 0.1309;
-% etax_mean_bpm = 0.2200;
-delta_mean = x_mean / mean(param.etax_bpms);
-param.delta_ave = param.delta_ave * (1 + delta_mean) + delta_mean;
+        bpm_select = zeros(length(bpm), 1);
+        bpm_select(ind_ok_bpm) = 1;
 
-kickx_ft = lnls_get_kickangle(machine, ch, 'x');
-kicky_ft = lnls_get_kickangle(machine, cv, 'y');
-orbit_ft = findorbit4(machine, 0, 1:length(machine));
-r_bpm_ft = r_bpm;
-
-[U, S, V] = svd(m_corr, 'econ');
-S_inv = 1 ./ diag(S);
-S_inv(isinf(S_inv)) = 0;
-n_t = n_sv;
-k = 1;
-n_inc = 0;
-stop_x = false; stop_y = false;
-sv_change = false;
-
-theta_x_i = theta_x;
-theta_y_i = theta_y;
-
-while inc_x || inc_y
-    S_inv_var = S_inv;
-    
-    theta_x0 = lnls_get_kickangle(machine, ch, 'x')';
-    theta_y0 = lnls_get_kickangle(machine, cv, 'y')';
-
-    if ~sv_change
-        if ~stop_x
-            rms_orbit_x_bpm_old = rms_orbit_x_bpm_new;
+        if sum(bpm_select) == 1
+        warning('Only 1 BPM with good sum signal!')
+        ft_data.machine = machine;
+        ft_data.error = true;
+        ft_data.n_svd = n_sv;
+        return
         end
-        if ~stop_y
-            rms_orbit_y_bpm_old = rms_orbit_y_bpm_new;
-        end
-    end
-    
-    S_inv_var(n_t + 1:end) = 0;
-    S_inv_var = diag(S_inv_var);
-    m_corr_inv = V * S_inv_var * U';
-    x_bpm = squeeze(r_bpm(1, :));
-    y_bpm = squeeze(r_bpm(2, :));
-    new_r_bpm = [x_bpm, y_bpm];
-    kicks = [theta_x_i; theta_y_i; 0] - m_corr_inv * new_r_bpm';
-    
-    if inc_x 
-        % x_bpm = squeeze(r_bpm(1, :));
-        % theta_x_f =  theta_x_i - m_corr_inv_x * x_bpm';
-        theta_x_f = kicks(1:length(ch));
-        over_kick_x = abs(theta_x_f) > corr_lim;
-    
+
+        m_corr_ok = m_corr([ind_ok_bpm; length(bpm) + ind_ok_bpm], :);
+        [U, S, V] = svd(m_corr_ok, 'econ');
+        S_inv = 1 ./ diag(S);
+        S_inv(isinf(S_inv)) = 0;
+        S_inv(n_sv+1:end) = 0;
+        S_inv = diag(S_inv);
+        m_corr_inv = V * S_inv * U';
+        x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
+        y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
+        new_r_bpm = [x_bpm, y_bpm];
+        delta_kick = - m_corr_inv * new_r_bpm';
+        theta_x = theta_x + delta_kick(1:length(ch));
+        theta_y = theta_y + delta_kick(length(ch)+1:end-1);
+
+        % Particular method that works when there is no coupling, a more
+        % generic method of inversion is used in accordance with SOFB
+
+        %{
+        m_corr_x_ok = m_corr_x(ind_ok_bpm, :);
+        [Ux, Sx, Vx] = svd(m_corr_x_ok, 'econ');
+        Sx_inv = 1 ./ diag(Sx);
+        Sx_inv(isinf(Sx_inv)) = 0;
+        Sx_inv(n_sv+1:end) = 0;
+        % Sx_inv(Sx_inv > 5 * Sx_inv(1)) = 0;
+        Sx_inv = diag(Sx_inv);
+        m_corr_inv_x = Vx * Sx_inv * Ux';
+
+        x_bpm = squeeze(r_bpm(1, ind_ok_bpm));
+        theta_x =  theta_x - m_corr_inv_x * x_bpm';
+
+        m_corr_y_ok = m_corr_y(ind_ok_bpm, :);
+        [Uy, Sy, Vy] = svd(m_corr_y_ok, 'econ');
+        Sy_inv = 1 ./ diag(Sy);
+        Sy_inv(isinf(Sy_inv)) = 0;
+        Sy_inv(n_sv+1:end) = 0;
+        % Sy_inv(Sy_inv > 5 * Sy_inv(1)) = 0;
+        Sy_inv = diag(Sy_inv);
+        m_corr_inv_y = Vy * Sy_inv * Uy';
+
+        y_bpm = squeeze(r_bpm(2, ind_ok_bpm));
+        theta_y = theta_y - m_corr_inv_y * y_bpm';
+        %}
+
+        over_kick_x = abs(theta_x) > corr_lim;
         if any(over_kick_x)
             warning('Horizontal corrector kick greater than maximum')
             gr_mach_x(over_kick_x) = 1;
-            theta_x_f(over_kick_x) =  sign(theta_x_f(over_kick_x)) * corr_lim;
+            theta_x(over_kick_x) =  sign(theta_x(over_kick_x)) * corr_lim;
         end
-        
-        machine = lnls_set_kickangle(machine, theta_x_f, ch, 'x');
-        fprintf('HORIZONTAL CORRECTION \n');
-    end
-    
-    if inc_y
-        % y_bpm = squeeze(r_bpm(2, :));
-        % theta_y_f = theta_y_i - m_corr_inv_y * y_bpm';
-        theta_y_f = kicks(length(ch)+1:end-1);
-        over_kick_y = abs(theta_y_f) > corr_lim;
-    
+
+        over_kick_y = abs(theta_y) > corr_lim;
         if any(over_kick_y)
             warning('Vertical corrector kick greater than maximum')
             gr_mach_y(over_kick_y) = 1;
-            theta_y_f(over_kick_y) =  sign(theta_y_f(over_kick_y)) * corr_lim;
+            theta_y(over_kick_y) =  sign(theta_y(over_kick_y)) * corr_lim;
+        end
+
+        machine = lnls_set_kickangle(machine, theta_x, ch, 'x');
+        machine = lnls_set_kickangle(machine, theta_y, cv, 'y');
+
+        r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+        r_bpm = r.r_bpm;
+        int_bpm = r.sum_bpm;
+        rms_orbit_x_bpm_new = nanstd(r_bpm(1,:)); rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
+
+        n_cor = n_cor + 1;
+        n_sv = n_sv + 1;
+    end
+
+    x_mean = mean(r_bpm(1, :));
+    delta_mean = x_mean / mean(param.etax_bpms);
+    param.delta_ave = param.delta_ave * (1 + delta_mean) + delta_mean;
+
+    kickx_ft = lnls_get_kickangle(machine, ch, 'x');
+    kicky_ft = lnls_get_kickangle(machine, cv, 'y');
+    orbit_ft = findorbit4(machine, 0, 1:length(machine));
+    r_bpm_ft = r_bpm;
+
+    [U, S, V] = svd(m_corr, 'econ');
+    S_inv = 1 ./ diag(S);
+    S_inv(isinf(S_inv)) = 0;
+    n_t = n_sv;
+    k = 1;
+    n_inc = 0;
+    stop_x = false; stop_y = false;
+    sv_change = false;
+
+    theta_x_i = kickx_ft;
+    theta_y_i = kicky_ft;
+
+    while inc_x || inc_y
+        S_inv_var = S_inv;
+
+        if ~sv_change
+            if ~stop_x
+                rms_orbit_x_bpm_old = rms_orbit_x_bpm_new;
+            end
+            if ~stop_y
+                rms_orbit_y_bpm_old = rms_orbit_y_bpm_new;
+            end
+        end
+
+        S_inv_var(n_t + 1:end) = 0;
+        S_inv_var = diag(S_inv_var);
+        m_corr_inv = V * S_inv_var * U';
+        x_bpm = squeeze(r_bpm(1, :));
+        y_bpm = squeeze(r_bpm(2, :));
+        new_r_bpm = [x_bpm, y_bpm];
+        delta_kick = - m_corr_inv * new_r_bpm';
+        theta_x_f = theta_x_i + delta_kick(1:length(ch));
+        theta_y_f = theta_y_i + delta_kick(length(ch)+1:end-1);
+
+        if inc_x
+            over_kick_x = abs(theta_x_f) > corr_lim;
+
+            if any(over_kick_x)
+                warning('Horizontal corrector kick greater than maximum')
+                gr_mach_x(over_kick_x) = 1;
+                theta_x_f(over_kick_x) =  sign(theta_x_f(over_kick_x)) * corr_lim;
+            end
+
+            machine = lnls_set_kickangle(machine, theta_x_f, ch, 'x');
+            fprintf('HORIZONTAL CORRECTION \n');
+        end
+
+        if inc_y
+            over_kick_y = abs(theta_y_f) > corr_lim;
+
+            if any(over_kick_y)
+                warning('Vertical corrector kick greater than maximum')
+                gr_mach_y(over_kick_y) = 1;
+                theta_y_f(over_kick_y) =  sign(theta_y_f(over_kick_y)) * corr_lim;
+            end
+
+            machine = lnls_set_kickangle(machine, theta_y_f, cv, 'y');
+            fprintf('VERTICAL CORRECTION \n');
         end
         
-        machine = lnls_set_kickangle(machine, theta_y_f, cv, 'y');
-        fprintf('VERTICAL CORRECTION \n');
-    end
-    
-    [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data);
-    ft_data.firstcod = cod_data;
-    
-    param.orbit = findorbit4(machine, 0, 1:length(machine));
-    ft_data.finalcod.bpm_pos = r_bpm;
+        param.orbit = findorbit4(machine, 0, 1:length(machine));
+        ft_data.finalcod.bpm_pos = r_bpm;
 
-    [~, ~, ~, ~, r_bpm] = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
-    
-    
-    if int_bpm(end) < eff_lim
-        machine = lnls_set_kickangle(machine, kickx_ft, ch, 'x');
-        machine = lnls_set_kickangle(machine, kicky_ft, cv, 'y');
-        [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
-        ft_data.firstcod = cod_data;
-        ft_data.machine = machine;
-        ft_data.max_kick = [gr_mach_x; gr_mach_y];
-        ft_data.n_svd = n_t;
-        ft_data.ftcod.kickx = kickx_ft;
-        ft_data.ftcod.kicky = kicky_ft;
-        ft_data.ftcod.orbit = orbit_ft;
-        ft_data.param = param;
-        rms_x = nanstd(orbit_ft(1, :));   rms_y = nanstd(orbit_ft(3, :));
-        ft_data.ftcod.rms_x = rms_x;      ft_data.ftcod.rms_y = rms_y; 
-        ft_data.ftcod.bpm_pos = r_bpm_ft;    
-        return    
-    end
-    
-    if first_cod && n_fcod
-        cod_data.bpm_pos = r_bpm;
-        ft_data.firstcod = cod_data;
-        n_fcod = false;
-    end
-    
-    rms_orbit_x_bpm_new = nanstd(r_bpm(1,:));
-    rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
-    
-    if ~stop_x
-        ratio_x = rms_orbit_x_bpm_new / rms_orbit_x_bpm_old;
-        inc_x = ratio_x < tol;
-        if ~inc_x
-            machine = lnls_set_kickangle(machine, theta_x_i, ch, 'x');
-            stop_x = true;
-        else
-            theta_x_i = theta_x_f;
-            fprintf('X - OLD: %f -->> NEW: %f mm \n', rms_orbit_x_bpm_old*1e3, rms_orbit_x_bpm_new*1e3);
-        end 
-    end
-    
-    if ~stop_y
-        ratio_y = rms_orbit_y_bpm_new / rms_orbit_y_bpm_old;
-        inc_y = ratio_y < tol;
-        if ~inc_y
-            machine = lnls_set_kickangle(machine, theta_y_i, cv, 'y');
-            stop_y = true;
-        else
-            theta_y_i = theta_y_f;
-            fprintf('Y - OLD: %f -->> NEW: %f mm \n', rms_orbit_y_bpm_old*1e3, rms_orbit_y_bpm_new*1e3);
-        end
-    end
-    
-    if ~inc_x && ~inc_y
-        if n_inc == 0
+        r = sirius_commis.injection.bo.multiple_pulse(machine, param, param_errors, n_part, n_pulse, length(machine), 'on', 'diag');
+        r_bpm = r.r_bpm;
+        int_bpm = r.sum_bpm;
+
+        if int_bpm(end) < eff_lim
+            machine = lnls_set_kickangle(machine, kickx_ft, ch, 'x');
+            machine = lnls_set_kickangle(machine, kicky_ft, cv, 'y');
             [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
             ft_data.firstcod = cod_data;
             ft_data.machine = machine;
-            ft_data.param = param;
             ft_data.max_kick = [gr_mach_x; gr_mach_y];
             ft_data.n_svd = n_t;
             ft_data.ftcod.kickx = kickx_ft;
             ft_data.ftcod.kicky = kicky_ft;
             ft_data.ftcod.orbit = orbit_ft;
+            ft_data.param = param;
             rms_x = nanstd(orbit_ft(1, :));   rms_y = nanstd(orbit_ft(3, :));
-            ft_data.ftcod.rms_x = rms_x;      ft_data.ftcod.rms_y = rms_y; 
+            ft_data.ftcod.rms_x = rms_x;      ft_data.ftcod.rms_y = rms_y;
             ft_data.ftcod.bpm_pos = r_bpm_ft;
             return
-        else
+        end
+
+        rms_orbit_x_bpm_new = nanstd(r_bpm(1,:));
+        rms_orbit_y_bpm_new = nanstd(r_bpm(2,:));
+
+        if ~stop_x
+            ratio_x = rms_orbit_x_bpm_new / rms_orbit_x_bpm_old;
+            inc_x = ratio_x < tol;
+            if ~inc_x
+                machine = lnls_set_kickangle(machine, theta_x_i, ch, 'x');
+                stop_x = true;
+            else
+                theta_x_i = theta_x_f;
+                fprintf('X - OLD: %f -->> NEW: %f mm \n', rms_orbit_x_bpm_old*1e3, rms_orbit_x_bpm_new*1e3);
+            end
+        end
+
+        if ~stop_y
+            ratio_y = rms_orbit_y_bpm_new / rms_orbit_y_bpm_old;
+            inc_y = ratio_y < tol;
+            if ~inc_y
+                machine = lnls_set_kickangle(machine, theta_y_i, cv, 'y');
+                stop_y = true;
+            else
+                theta_y_i = theta_y_f;
+                fprintf('Y - OLD: %f -->> NEW: %f mm \n', rms_orbit_y_bpm_old*1e3, rms_orbit_y_bpm_new*1e3);
+            end
+        end
+
+        if ~inc_x && ~inc_y
+            if n_inc == 0
+                ft_data.machine = machine;
+                ft_data.param = param;
+                ft_data.n_svd = n_t;
+                ft_data.ftcod.kickx = kickx_ft;
+                ft_data.ftcod.kicky = kicky_ft;
+                ft_data.ftcod.orbit = orbit_ft;
+                rms_x = nanstd(orbit_ft(1, :));   rms_y = nanstd(orbit_ft(3, :));
+                ft_data.ftcod.rms_x = rms_x;      ft_data.ftcod.rms_y = rms_y;
+                ft_data.ftcod.bpm_pos = r_bpm_ft;
+                return
+            else
+                n_t = n_sv + k * 10;
+                if n_t > 50
+                    n_t = 50;
+                end
+                inc_x = true; inc_y = true;
+                stop_x = false; stop_y = false;
+                k = k+1;
+                n_inc = 0;
+                sv_change = true;
+                fprintf('Number of Singular Values: %i \n', n_t);
+                continue
+            end
+        end
+        n_inc = n_inc + 1;
+
+        if n_inc > 10
             n_t = n_sv + k * 10;
             if n_t > 50
                 n_t = 50;
@@ -349,24 +309,8 @@ while inc_x || inc_y
             fprintf('Number of Singular Values: %i \n', n_t);
             continue
         end
+        sv_change = false;
     end
-    n_inc = n_inc + 1;
-    
-    if n_inc > 10
-        n_t = n_sv + k * 10;
-        if n_t > 50
-            n_t = 50;
-        end
-        inc_x = true; inc_y = true;
-        stop_x = false; stop_y = false;
-        k = k+1;
-        n_inc = 0;
-        sv_change = true;
-        fprintf('Number of Singular Values: %i \n', n_t);
-        continue
-    end
-    sv_change = false;
-end
 end
 
 function [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod, cod_data)
@@ -388,4 +332,3 @@ function [param, cod_data, first_cod] = checknan(machine, param, fam, first_cod,
             first_cod = true;
         end
 end
-        
