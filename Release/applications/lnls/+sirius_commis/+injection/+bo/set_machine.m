@@ -1,5 +1,5 @@
 function machine_data = set_machine(bo_ring, n_mach)
-% Setting of random machines and nominal injection parameters (without errors).
+% Setting of random machines, nominal injection parameters (without errors), parameters with errors and the standard deviation to generate errors.
 % It includes random errors of excitation and alignment of magnets and also
 % adjustes the vacuum chamber at injection point (injection septum).
 %
@@ -13,19 +13,26 @@ function machine_data = set_machine(bo_ring, n_mach)
 %         - parameters: injection parameters with errors added for each machine
 %         - errors: injection errors introduced in the nominal parameters
 %         - sigma_errors: standard deviation to generate random errors
+%         - nominal_parameters: nominal injection parameters
 %
 % NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
 % this function must be updated too in the parts of magnet errors.
 %
 % See also: add_errors
 
+    % Seeds initialization for the sake of reprodubility
     sirius_commis.common.initializations();
 
-    % Setting parameters of injection
+    % Initializing variables
+    param_errors = cells(n_mach, 1);
+    param = cells(n_mach, 1);
+
+    % Shifting the ring to begin in the injection septum
     bo_ring = shift_ring(bo_ring, 'InjSept');
-    bo_twiss = calctwiss(bo_ring);
     fam = sirius_bo_family_data(bo_ring);
 
+    %Twiss function at injection point
+    bo_twiss = calctwiss(bo_ring);
     param_init.twiss.betax0 = bo_twiss.betax(1);
     param_init.twiss.betay0 = bo_twiss.betay(1);
     param_init.twiss.alphax0 = bo_twiss.alphax(1);
@@ -35,11 +42,13 @@ function machine_data = set_machine(bo_ring, n_mach)
     param_init.twiss.etaxl0 = bo_twiss.etaxl(1);
     param_init.twiss.etayl0 = bo_twiss.etayl(1);
 
+    %Beam parameters from Linac-LTB
     param_init.beam.emitx = 170e-9;
     param_init.beam.emity = param_init.beam.emitx;
     param_init.beam.sigmae = 0.5e-2;
     param_init.beam.sigmaz = 3e-3;
 
+    %Nominal settings for injection
     param_init.offset_x0 = -30e-3;
     param_init.offset_xl0 = 14.3e-3;
     param_init.offset_y0 = 0;
@@ -49,6 +58,7 @@ function machine_data = set_machine(bo_ring, n_mach)
     param_init.delta_ave = 0;
     param_init.delta_energy_scrn3 = 0;
 
+    %One sigma to generate systematic and jitter errors in injection parameters and also in the diagnostics
     param_sigma.x_syst = 2e-3; param_sigma.x_jit = 500e-6;
     param_sigma.xl_syst = 3e-3; param_sigma.xl_jit = 30e-6;
     param_sigma.y_syst = 2e-3; param_sigma.y_jit = 500e-6;
@@ -59,7 +69,6 @@ function machine_data = set_machine(bo_ring, n_mach)
     param_sigma.scrn_offset = 1e-3; param_sigma.scrn_jit = 500e-6;
 
     %Calculates the horizontal dispersion function at screen 3
-    % dipole = findcells(bo_ring, 'FamName', 'B');
     dipole = fam.B.ATIndex(1);
     scrn = findcells(bo_ring, 'FamName', 'Scrn');
     scrn3 = scrn(3);
@@ -90,13 +99,22 @@ function machine_data = set_machine(bo_ring, n_mach)
     % Error in the magnets (allignment, rotation, excitation, multipoles,
     % setting off rf cavity and radiation emission
 
-    factor = 1;
+    factor = 1; %Can be used to control the error tolerances
+
+    %Turning off the cavity and radiation effects
     machine = setcavity('off', machine);
     machine = setradiation('off', machine);
+
+    %Alignments, rolls and excitation errors
     machine  = create_apply_errors(machine, fam, n_mach, factor);
+
+    %Higher-order multipoles errors
     machine  = create_apply_multipoles(machine, fam);
+
+    %Including offsets in the BPMs measurements
     machine = create_apply_bpm_errors(machine, fam, factor, param_sigma.bpm_offset);
 
+    %For each random machine, based on the sigma errors given by param_sigma, generate random injection parameters errors
     for i = 1:n_mach
         [param_errors{i}, param{i}] = sirius_commis.common.add_errors(param_init, param_sigma);
     end
@@ -105,6 +123,7 @@ function machine_data = set_machine(bo_ring, n_mach)
     machine_data.parameters = param;
     machine_data.errors = param_errors;
     machine_data.sigma_errors = param_sigma;
+    machine_data.nominal_parameters = param_init;
 end
 
 %% Magnet Errors:
