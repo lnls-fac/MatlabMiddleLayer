@@ -8,7 +8,7 @@ function [r_scrn1, param] = screen1_sept(machine, param, param_errors, n_part, n
     dxf_e = 1; dyf_e = 1;
     dthetax = 0; dthetay = 0; dyf = 0;
     eff_lim = 0.50;
-    res_scrn = param_errors.sigma_scrn;
+    res_scrn = param_errors.sigma_scrn / sqrt(n_pulse);
     s = findspos(machine, 1:length(machine));
 
     kckr_ind = findcells(machine, 'FamName', 'InjKckr');

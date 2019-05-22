@@ -30,25 +30,25 @@ function [param_out, r_scrn3] = single_adj_loop(bo_ring, n_part, n_pulse, param_
 % Version 1 - Murilo B. Alves - October 4th, 2018
 
     machine = bo_ring;
-    param0 = param_in;
-    param0_errors = param_errors_in;
+    param = param_in;
+    param_errors = param_errors_in;
 
     scrn = findcells(machine, 'FamName', 'Scrn');
-    res_scrn = param0_errors.sigma_scrn;
+    res_scrn = param_errors.sigma_scrn;
 
     % SCREEN 1 ON
     kckr = 'off';
-    [~, param_out] = sirius_commis.injection.bo.screen1_sept(machine, param0, param0_errors, n_part, n_pulse, scrn(1), kckr);
+    [~, param_out] = sirius_commis.injection.bo.screen1_sept(machine, param, param_errors, n_part, n_pulse, scrn(1), kckr);
 
     % KICKER ON -->> WITH SCREEN 1 MEASUREMENT, ADJUST THE KICKER
     kckr = 'on';
-    [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, param0_errors, n_part, n_pulse, scrn(1), kckr);
+    [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, param_errors, n_part, n_pulse, scrn(1), kckr);
 
     % SCREEN 2 ON TO ADJUST KICKER AGAIN // KICKER ON
-    [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, param0_errors, n_part, n_pulse, scrn(2), kckr);
+    [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, param_errors, n_part, n_pulse, scrn(2), kckr);
 
     % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
-    [r_scrn2, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param0_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
+    [r_scrn2, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
 
     if abs(r_scrn2(1)) > res_scrn || abs(r_scrn2(2)) > res_scrn
 
@@ -64,16 +64,16 @@ function [param_out, r_scrn3] = single_adj_loop(bo_ring, n_part, n_pulse, param_
 
         % KICKER ON -->> WITH SCREEN 1 MEAS., ADJUST THE KICKER
         kckr = 'on';
-        [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, param0_errors, n_part, n_pulse, scrn(1), kckr);
+        [~, param_out] = sirius_commis.injection.bo.screen1_kckr(machine, param_out, param_errors, n_part, n_pulse, scrn(1), kckr);
 
         % SCREEN 2 ON TO ADJUST KICKER AGAIN // KICKER ON
-        [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, param0_errors, n_part, n_pulse, scrn(2), kckr);
+        [r_scrn2, param_out] = sirius_commis.injection.bo.screen2(machine, param_out, param_errors, n_part, n_pulse, scrn(2), kckr);
 
         % FINE ADJUSTMENT OF ANGLE IN SCREEN 1
-        [~, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param0_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
+        [~, param_out] = sirius_commis.injection.bo.fine_adjust_scrn1_scrn2(machine, param_out, param_errors, n_part, n_pulse, kckr, scrn(1), scrn(2), r_scrn2);
     end
 
-    [param_out, r_scrn3] = sirius_commis.injection.bo.screen3(machine, param_out, param0_errors, n_part, n_pulse, scrn(3), kckr);
+    [param_out, r_scrn3] = sirius_commis.injection.bo.screen3(machine, param_out, param_errors, n_part, n_pulse, scrn(3), kckr);
 
     if isnan(r_scrn3)
         return

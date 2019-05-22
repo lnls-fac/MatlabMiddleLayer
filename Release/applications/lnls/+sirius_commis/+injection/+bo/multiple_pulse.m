@@ -26,16 +26,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
 
 % sirius_commis.common.initializations();
 
-    injkckr = findcells(machine, 'FamName', 'InjKckr');
-    bpm = findcells(machine, 'FamName', 'BPM');
-    scrn = findcells(machine, 'FamName', 'Scrn');
-
-    if ismember(point, scrn)
-        off_scrn = param_errors.offset_scrn(:, point == scrn);
-    else
-        off_scrn = 0;
-    end
-
+    % Initializing variables
     l_bpm = length(bpm);
     eff = zeros(1, n_pulse);
     sigma_scrn = zeros(n_pulse, 2);
@@ -44,6 +35,18 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
     r_track_pulse = zeros(n_pulse, 2, point);
     r_end = zeros(n_pulse, 6, n_part);
 
+    injkckr = findcells(machine, 'FamName', 'InjKckr');
+    bpm = findcells(machine, 'FamName', 'BPM');
+    scrn = findcells(machine, 'FamName', 'Scrn');
+
+    % If the required point is one of the screens, it takes the correspondent offset value
+    if ismember(point, scrn)
+        off_scrn = param_errors.offset_scrn(:, point == scrn);
+    else
+        off_scrn = 0;
+    end
+
+    % The tracking can be done either with the kicker turned on or off
     if(exist('kckr','var'))
         if(strcmp(kckr,'on'))
             flag_kckr = true;
@@ -79,66 +82,72 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
             flag_diag = false;
     end
 
-    p = 1;
-    inj_top = 0;
+    pbp = 1; % Pulse by Pulse variation
+    inj_nom = false; % Injection with nominal parameters (no errors)
 
     for j=1:n_pulse
-        if inj_top
+        if inj_nom
+            % Setting nominal values for injection parameters
             param.offset_x = param.offset_x0;
             param.offset_xl =  param.offset_xl0;
             param.offset_y = param.offset_y0;
             param.offset_yl = param.offset_yl0;
 
             if flag_kckr
+                % Setting the kicker on
                 machine = lnls_set_kickangle(machine, param.kckr0, injkckr, 'x');
             end
 
+            % No energy errors
             param.delta = 0;
             param.delta_ave = 0;
         else
+            % Setting injection parameters systematic errors and with pulse by pulse variations
             error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
-            param.offset_x = param.offset_x_syst + p * error_x_pulse;
+            param.offset_x = param.offset_x_syst + pbp * error_x_pulse;
 
             error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
-            param.offset_xl = param.offset_xl_syst + p * error_xl_pulse;
+            param.offset_xl = param.offset_xl_syst + pbp * error_xl_pulse;
 
             error_y_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.y_error_pulse;
-            param.offset_y = param.offset_y_syst + p * error_y_pulse;
+            param.offset_y = param.offset_y_syst + pbp * error_y_pulse;
 
             error_yl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.yl_error_pulse;
-            param.offset_yl = param.offset_yl_syst + p * error_yl_pulse;
-            % Peak to Peak values from measurements - cutoff = 1;
+            param.offset_yl = param.offset_yl_syst + pbp * error_yl_pulse;
 
             if flag_kckr
                 error_kckr_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.kckr_error_pulse;
-                param.kckr = param.kckr_syst + p * error_kckr_pulse;
+                param.kckr = param.kckr_syst + pbp * error_kckr_pulse;
                 machine = lnls_set_kickangle(machine, param.kckr, injkckr, 'x');
             end
 
             error_delta_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.delta_error_pulse;
-            param.delta = param.delta_syst + p * error_delta_pulse;
+            param.delta = param.delta_syst + pbp * error_delta_pulse;
         end
 
         param.phase = param_errors.phase_offset;
 
+
+        r_particles = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
+
         if flag_diag
-            r_particles = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
+            % Simulation of BPM measurements for each pulse
             if n_part == 1
                 r_bpm_pulse(j, :, :) = r_particles.r_bpm;
             else
+                % Averaging over particles to obtain centroid position
                 r_bpm_pulse(j, :, :) =  nanmean(r_particles.r_bpm, 2);
             end
+
+            %Calculates the intensity dependent error in the BPM measurement
             [sigma_bpm(j, :, :), int_bpm] = sirius_commis.common.bpm_error_inten(r_particles.r_bpm, n_part, param_errors.sigma_bpm);
-        else
-            r_particles = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
         end
 
-        r_xy = squeeze(r_particles.r_track([1,3], :, :));
-        r_track_pulse(j, :, :) =  squeeze(nanmean(r_xy, 2));
-        r_end(j, :, :) = r_particles.r_track(:, :, end);
+        r_xy = squeeze(r_particles.r_track([1,3], :, :)); %(x,y) position only
+        r_track_pulse(j, :, :) =  squeeze(nanmean(r_xy, 2)); %(x, y) position for the centroid and for each pulse
+        r_end(j, :, :) = r_particles.r_track(:, :, end); % 6D position at the last element (used to simulate multiple turns)
 
-        eff(j) = sirius_commis.common.calc_eff(n_part, squeeze(r_xy(:, :, point(end))));
-        sigma_scrn(j, :) = sirius_commis.injection.bo.screen_error_inten(r_xy, n_part, point, param_errors.sigma_scrn_pulse);
+        eff(j) = sirius_commis.common.calc_eff(n_part, squeeze(r_xy(:, :, point(end)))); %efficiency of particles reaching the required point
 
         if flag_plot
             plot_booster_turn(machine, r_xy);
@@ -149,42 +158,47 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         else
             fprintf('.');
         end
+
+        if ~flag_diag
+            sigma_scrn(j, :) = sirius_commis.injection.bo.screen_error_inten(r_xy, n_part, point, param_errors.sigma_scrn_pulse); %Calculates the intensity dependent error in the Screen measurement
+        end
     end
 
     if point ~= length(machine)
         fprintf('AVERAGE INTENSITY ON SCREEN :  %g %% \n', mean(eff) * 100);
     end
 
-    r_scrn = r_track_pulse(:, :, point);
-    r_scrn = r_scrn + p * sigma_scrn;
-    r_scrn = squeeze(nanmean(r_scrn, 1));
-    r_scrn = r_scrn + off_scrn';
-    r_scrn = sirius_commis.common.compares_vchamb(machine, r_scrn, point, 'screen');
-    r_end = squeeze(r_end);
+    if ~flag_diag
+        r_scrn = r_track_pulse(:, :, point);
+        r_scrn = r_scrn + pbp * sigma_scrn; % Jitter Errors
+        r_scrn = squeeze(nanmean(r_scrn, 1)); % Average over pulses
+        r_scrn = r_scrn - off_scrn'; % Offset error
+        r_scrn = sirius_commis.common.compares_vchamb(machine, r_scrn, point, 'screen'); % Vacuum chamber comparison
+        r_particles_out.r_screen = r_scrn;
+    end
+
+    r_particles_out.r_end = squeeze(r_end);
+    r_particles_out.efficiency = eff;
 
     % sirius_commis.scatplot(1e3 * r_mean_pulse(1, :), 1e3 * r_mean_pulse(2, :), 'circles', 1, 100, 5, 1, 4);
 
     if flag_diag
-        r_bpm_pulse = r_bpm_pulse + p * sigma_bpm;
+        r_bpm_pulse = r_bpm_pulse + pbp * sigma_bpm; % Jitter Errors
 
         if n_pulse > 1
-            r_bpm_mean = squeeze(nanmean(r_bpm_pulse, 1));
+            r_bpm_mean = squeeze(nanmean(r_bpm_pulse, 1)); % Average over pulses
         else
             r_bpm_mean = squeeze(r_bpm_pulse);
         end
 
         offset = getcellstruct(machine, 'Offsets', bpm);
         offset = cell2mat(offset)';
-        r_bpm_mean = r_bpm_mean - offset;
-        r_bpm = sirius_commis.common.compares_vchamb(machine, r_bpm_mean, bpm, 'bpm');
+        r_bpm_mean = r_bpm_mean - offset; % Offset error
+        r_bpm = sirius_commis.common.compares_vchamb(machine, r_bpm_mean, bpm, 'bpm'); % Vacuum chamber compariso
         sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
         r_particles_out.r_bpm = r_bpm;
         r_particles_out.sum_bpm = int_bpm;
     end
-
-    r_particles_out.r_end = r_end;
-    r_particles_out.r_screen = r_scrn;
-    r_particles_out.efficiency = eff;
 end
 
 function plot_booster_turn(machine, r_final)
