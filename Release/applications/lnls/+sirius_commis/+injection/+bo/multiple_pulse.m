@@ -1,5 +1,5 @@
 function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, n_pulse, point, kckr, plt, diag)
-% Simulation of injection pulses to the booster. The starting point is the
+% Simulation of injection pulses in the booster. The starting point is the
 % end of injection septum.
 %
 % INPUTS:
@@ -126,7 +126,6 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         end
 
         param.phase = param_errors.phase_offset;
-
 
         r_particles = sirius_commis.injection.bo.single_pulse(machine, param, n_part, point);
 

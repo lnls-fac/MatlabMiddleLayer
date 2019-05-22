@@ -18,33 +18,36 @@ function r_particles = single_pulse(machine, param, n_part, point)
 % - point: specific position to stop the tracking
 %
 % OUTPUTS:
-% - r_xy: position x and y for all the particles at all the points of
-% ring model
-% - r_end_ring: 6 row vector for all the particles at the end of ring model
-% (used to perform turns)
-% - r_bpm: position x and y for all the particles at BPM points (used to
-% average over particles and result in BPM measurement simulation)
-%
-% Version 1 - Murilo B. Alves - December, 2018
+% - r_particles: structure with the fields
+%       - r_track: 6D coordinates for all the particles at all the points of
+%       ring model
+%       - r_bpm: position x and y for all the particles at BPM points (used to
+%       average over particles and result in BPM measurement simulation)
+%       - r_point: 6D coordinates for all the particles at the input point
 
+    %   Initial offsets at injection point - nominal + syst. errors + jitter errors
     offsets = [param.offset_x; param.offset_xl; param.offset_y; param.offset_yl; param.delta; param.phase];
+
+    % Twiss function at injection point
     twi.betax = param.twiss.betax0; twi.alphax = param.twiss.alphax0;
     twi.betay = param.twiss.betay0; twi.alphay = param.twiss.alphay0;
     twi.etax = param.twiss.etax0;   twi.etaxl = param.twiss.etaxl0;
     twi.etay = param.twiss.etay0;   twi.etayl = param.twiss.etayl0;
-    cutoff = 3;
 
-
+    % Generate particles
     if n_part > 1
+        cutoff = 3;
         r_init = lnls_generate_bunch(param.beam.emitx, param.beam.emity, param.beam.sigmae, param.beam.sigmaz, twi, n_part, cutoff);
         r_init = bsxfun(@plus, r_init, offsets);
     else
         r_init = offsets;
     end
 
+    % The beam energy is changed to simulate the dipoles adjusts
     r_init(5, :) = (r_init(5, :) - param.delta_ave) / (1 + param.delta_ave);
 
     if param.delta_ave ~= 0
+        % To simulate dipoles adjusts changing the beam energy one has to consider that the BC energy is always fixed
         bc = findcells(machine, 'FamName', 'BC');
         theta0 = getcellstruct(machine, 'BendingAngle', bc);
         len = getcellstruct(machine, 'Length', bc);
@@ -68,36 +71,20 @@ function r_particles = single_pulse(machine, param, n_part, point)
         machine_new = machine;
     end
 
-    r_final = linepass(machine_new(1:point(end)), r_init, 1:point(end));
-    r_final = reshape(r_final, 6, [], point(end));
-    r_xy = sirius_commis.common.compares_vchamb(machine_new, r_final([1,3], :, :), 1:point(end));
+    % Perform the tracking until the required point at the ring
+    r_final = linepass(machine(1:point), r_init, 1:point);
+    r_final = reshape(r_final, 6, [], point);
+
+    % Comparison with Vacuum Chamber at every point, lost particles are set as NaN
+    r_xy = sirius_commis.common.compares_vchamb(machine, r_final([1,3], :, :), 1:point);
     r_final([1,3], :, :) = r_xy;
-    r_end_ring = squeeze(r_final(:, :, end));
 
-    %{
-    fam_data = sirius_si_family_data(machine_new);
-    bba_ind = get_bba_ind(machine, fam_data.BPM.ATIndex, fam_data.QN.ATIndex);
-    bpm = fam_data.BPM.ATIndex;
-    s = findspos(machine, 1:length(machine));
-
-    for i = 1:length(bpm)
-        ds(i) = s(bpm(i)) - s(bba_ind(i)+1);
-        if ds(i) > 0
-            dxl(i) = r_final(2, 1, bba_ind(i)+1) * 1e6;
-            dyl(i) = r_final(4, 1, bba_ind(i)+1) * 1e6;
-        else
-            dxl(i) = r_final(2, 1, bpm(i)) * 1e6;
-            dyl(i) = r_final(4, 1, bpm(i)) * 1e6;
-        end
-        dx(i) = dxl(i) * abs(ds(i));
-        dy(i) = dyl(i) * abs(ds(i));
-    end
-    %}
-
+    % Beam coordinates x and y at the required point
     for i = 1:length(point)
-        r_point(:, :, i) = r_xy(:, :, point(i));
+        r_point(:, :, i) = squeeze(r_xy(:, :, point(i)));
     end
 
+    % If the tracking was performed in all the ring, it also returns the x, y position of all tracked particles at BPMs
     if point(end) == length(machine_new)
         bpm = findcells(machine_new, 'FamName', 'BPM');
         r_bpm = squeeze(r_xy(:, :, bpm));

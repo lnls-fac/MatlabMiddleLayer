@@ -18,7 +18,7 @@ function machine_data = set_machine(bo_ring, n_mach)
 % NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
 % this function must be updated too in the parts of magnet errors.
 %
-% See also: add_errors
+% See also: sirius_commis.common.add_errors
 
     % Seeds initialization for the sake of reprodubility
     sirius_commis.common.initializations();
@@ -72,11 +72,11 @@ function machine_data = set_machine(bo_ring, n_mach)
     dipole = fam.B.ATIndex(1);
     scrn = findcells(bo_ring, 'FamName', 'Scrn');
     scrn3 = scrn(3);
-    delta = 1e-5;
+    delta = 1e-8;
     d = dipole:scrn3;
-    r_init_n = [0; 0; 0; 0; -delta/2; 0];
+    r_init_n = [0; 0; 0; 0; - delta/2; 0];
     r_final_n = linepass(bo_ring(d), r_init_n);
-    r_init_p = [0; 0; 0; 0; +delta/2; 0];
+    r_init_p = [0; 0; 0; 0; + delta/2; 0];
     r_final_p = linepass(bo_ring(d), r_init_p);
     x_n = r_final_n(1);
     x_p = r_final_p(1);
@@ -84,10 +84,10 @@ function machine_data = set_machine(bo_ring, n_mach)
 
     %Calculates the horizontal dispersion function at BPMs
     bpms = fam.BPM.ATIndex;
-    delta = 1e-5;
-    r_init_n = [0; 0; 0; 0; -delta; 0];
+    delta = 1e-8;
+    r_init_n = [0; 0; 0; 0; - delta; 0];
     r_final_n = linepass(bo_ring, r_init_n, bpms);
-    r_init_p = [0; 0; 0; 0; +delta; 0];
+    r_init_p = [0; 0; 0; 0; + delta; 0];
     r_final_p = linepass(bo_ring, r_init_p, bpms);
     x_n = r_final_n(1, :);
     x_p = r_final_p(1, :);
@@ -95,9 +95,6 @@ function machine_data = set_machine(bo_ring, n_mach)
 
     % Setting the vacuum chamber at injection point
     machine = sirius_commis.injection.bo.vchamber_injection(bo_ring);
-
-    % Error in the magnets (allignment, rotation, excitation, multipoles,
-    % setting off rf cavity and radiation emission
 
     factor = 1; %Can be used to control the error tolerances
 
@@ -190,8 +187,8 @@ function machine = create_apply_bpm_errors(machine, family_data, factor, offset)
         % constants
         name = 'CONFIG';
         control.bpm.idx = family_data.BPM.ATIndex;
-        control.bpm.sigma_offsetx   = factor * offset * 1;
-        control.bpm.sigma_offsety   = factor * offset * 1;
+        control.bpm.sigma_offsetx   = factor * offset;
+        control.bpm.sigma_offsety   = factor * offset;
 
         cutoff_errors = 1;
         machine = lnls_latt_err_generate_apply_bpmcorr_errors(name, machine, control, cutoff_errors);
