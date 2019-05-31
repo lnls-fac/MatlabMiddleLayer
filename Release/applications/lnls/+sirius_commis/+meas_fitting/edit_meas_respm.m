@@ -1,4 +1,4 @@
-function respm_out = edit_meas_respm(no_noise, no_coupling, no_rf)
+function respm_out = edit_meas_respm(no_noise, no_coupling, no_rf, change_bpm, n1, n2)
 
     sirius('BO') % optional
     switch2online
@@ -20,7 +20,7 @@ function respm_out = edit_meas_respm(no_noise, no_coupling, no_rf)
     % respm_in = readtable(file_txt);
     % respm_in = table2array(respm_in);
 
-    v_prefix = ''; %getenv('VACA_PREFIX');
+    v_prefix = getenv('VACA_PREFIX');
     ioc_prefix = [v_prefix, 'BO-Glob:AP-SOFB:'];
     respm_pv = [ioc_prefix, 'RespMat-RB'];
     ring_size_pv =[ioc_prefix, 'RingSize-RB'];
@@ -59,6 +59,25 @@ function respm_out = edit_meas_respm(no_noise, no_coupling, no_rf)
     if no_coupling
         respm_out(1:(ring_size*length(bpm)), n_ch+1:end-1) = 0; % EFFECT OF CVs IN X
         respm_out((ring_size*length(bpm)+1):end, 1:n_ch) = 0; % EFFECT OF CHs IN Y
+    end
+    
+    if change_bpm
+        new_respm = respm_out;
+        new_respm([n1 n2], :) = new_respm([n2 n1], :);
+        ind1 = n1 + size(new_respm, 1)/2;
+        ind2 = n2 + size(new_respm, 1)/2;
+        new_respm([ind1 ind2], :) = new_respm([ind2 ind1], :);
+        if ring_size > 1
+            for j = 1:ring_size
+                ind1x = n1 + j * length(bpm);
+                ind2x = n2 + j * length(bpm);
+                new_respm([ind1x  ind2x], :) = new_respm([ind2x ind1x], :);
+                ind1y = ind1x + size(new_respm, 1)/2;
+                ind2y = ind2x + size(new_espm, 1)/2;
+                new_respm([ind1y ind2y], :) = new_respm([ind2y ind1y], :);
+            end
+        end
+        respm_out = new_respm;
     end
 
     hdf5write('respm_edit.h5', '/Points', respm_out);
