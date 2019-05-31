@@ -52,27 +52,17 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
 
         theta_x = lnls_get_kickangle(machine, ch, 'x')';
         theta_y = lnls_get_kickangle(machine, cv, 'y')';
+        r_bpm = [orbit0(1, bpm); orbit0(3, bpm)];
 
-        [count_turns{j}, r_bpm, int_bpm, ~, fm_i] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
-        min_turns_0 = min(count_turns{j});
+        % [count_turns{j}, r_bpm, int_bpm, ~, fm_i] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
+        % min_turns_0 = min(count_turns{j});
         
-        sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
-        %{
-        x_mean = mean(r_bpm(1, :));
-        % etax_mean = 0.1309;
-        % etax_mean_bpm = 0.2200;
-        delta_mean = x_mean / mean(param.etax_bpms);
-        param.delta_ave = param.delta_ave * (1 + delta_mean) + delta_mean;
-        
-        [count_turns{j}, r_bpm, int_bpm, ~, fm_i] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine, 1, param, param_errors, n_part, n_pulse, several_turns);
-        min_turns_0 = min(count_turns{j});
-        %}
-        sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
-        
-        if min(int_bpm) == 0
-            corrected = false;
-            continue
-        end
+        % sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
+                
+        % if min(int_bpm) == 0
+        %    corrected = false;
+        %    continue
+        %end
         
         % if count_turns{j} == several_turns
         %     continue
@@ -81,7 +71,7 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
         n_correction = 1;
         orbitf = orbit0;
 
-        min_turns_f = min_turns_0;
+        % min_turns_f = min_turns_0;
         ind = 0;
         x_bpm = squeeze(r_bpm(1, :));
         y_bpm = squeeze(r_bpm(2, :));
@@ -94,12 +84,13 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
         conv = 95;
         
         turn_inc = 1;
-        fm_f = fm_i;
+        % fm_f = fm_i;
         n = 1;
 
-        while count_turns{j} < 50 % fm_f >= fm_i % min_turns_f < turn_inc * several_turns || ratio_x < conv || ratio_y < conv
+        while true % fm_f >= fm_i % min_turns_f < turn_inc * several_turns || ratio_x < conv || ratio_y < conv
             turn_inc = turn_inc + 1;
-            fm_i = fm_f;
+            % fm_i = fm_f;
+            ind = num_svd(j);
             
             if rms_x_bpm_new <= rms_x_bpm_old && rms_y_bpm_new <= rms_y_bpm_old
                 plane = 'xy';
@@ -121,8 +112,6 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
             
             rms_x_bpm_old = rms_x_bpm_new;
             rms_y_bpm_old = rms_y_bpm_new;
-
-            ind = num_svd(j) + 5;
             
             [delta_ch, delta_cv] = calc_kicks(r_bpm, ind, tw);
             
@@ -131,7 +120,10 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
             theta_y = theta_y + delta_cv;
             machine_n = lnls_set_kickangle(machine_n, theta_y, cv, 'y');
             
-            [count_turns{j}, r_bpm, int_bpm, ~, fm_f] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_n, 1, param, param_errors, n_part, n_pulse, n*several_turns);
+            % [count_turns{j}, r_bpm, int_bpm, ~, fm_f] = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_n, 1, param, param_errors, n_part, n_pulse, n*several_turns);
+            orbitf = findorbit4(machine_n, 0, 1:size(machine, 2));
+            r_bpm = [orbitf(1, bpm); orbitf(3, bpm)];
+            
             min_turns_0 = min(count_turns{j});
             x_bpm = squeeze(r_bpm(1, :));
             y_bpm = squeeze(r_bpm(2, :));
@@ -140,28 +132,28 @@ function [machine_cell, hund_turns, count_turns, num_svd] = orbit_correction_SOF
             %    break
             end
             
-            calc_kicks(r_bpm, ind, tw);
+            % calc_kicks(r_bpm, ind, tw);
             
             rms_x_bpm_new = std(x_bpm);
             rms_y_bpm_new = std(y_bpm);
 
-            if min_turns_0 < min_turns_f
-                num_svd(j) = num_svd(j) - 1;
-                turn_inc = turn_inc - 1;
-                if num_svd(j) < 0
-                    num_svd(j) = 0;
-                end
-            else
-                num_svd(j) = num_svd(j) + 2;
+            %if min_turns_0 < min_turns_f
+            %    num_svd(j) = num_svd(j) - 1;
+            %    turn_inc = turn_inc - 1;
+            %    if num_svd(j) < 0
+            %        num_svd(j) = 0;
+            %    end
+            %else
+                % num_svd(j) = num_svd(j) + 2;
                 machine = machine_n;
-            end
+            %end
 
             % if min(int_bpm) == 0
             %     corrected = false;
             %     break
             % end
-            orbitf = findorbit4(machine, 0, 1:size(machine, 2));
-            sirius_commis.common.plot_bpms(machine, orbitf, r_bpm, int_bpm);
+           
+            % sirius_commis.common.plot_bpms(machine, orbitf, r_bpm, int_bpm);
             n_correction = n_correction + 1;
             
             if n_correction > 20
