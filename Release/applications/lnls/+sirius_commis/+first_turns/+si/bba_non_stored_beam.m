@@ -141,7 +141,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
             dx = mx(k) * dtx;
     
             if abs(dx) < delta_x * factor 
-               bpm_ok_x(k) = 0;
+               bpm_ok_x(k) = 1; %SHOULD BE ZERO
             else
                bpm_ok_x(k) = 1;
             end
@@ -152,7 +152,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
             dy = my(k) * dty;
             
             if abs(dy) < delta_y * factor
-               bpm_ok_y(k) = 0;
+               bpm_ok_y(k) = 1; %SHOULD BE ZERO
             else
                bpm_ok_y(k) = 1;
             end
@@ -233,7 +233,8 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
             fprintf('HORIZONTAL BBA \n');
             fprintf('================================================\n');
             for i = 1:length(bpm)-1
-                if sum(bpm_ok_x(1:i)) > bpm_stop
+                % if sum(bpm_ok_x(1:i)) > bpm_stop
+                if i >  bpm_stop
                    break
                 end
                 if bpm_ok_x(i)
@@ -246,7 +247,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                         if abs(thetax_off(i)) >= corr_lim_max
                             bpm_ok_x(i) = 0;
                             off_bba_x(i) = 0;
-                            continue
+                        %     continue
                         end
                         theta1 = thetax_off(i) - delta_x / mmx_nominal;
                         theta2 = thetax_off(i) + delta_x / mmx_nominal;
@@ -266,14 +267,14 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                         bpm_ok_x(i) = 0;
                         off_bba_x(i) = 0;
                         off_bba_theta_x(i) = corr_lim_max;
-                        continue
+                        % continue
                     end
                     if abs(theta_max) > corr_lim_max
                         warning('CALCULATED CORRECTOR KICK GREATER THAN MAX, 300 um APPLIED')
                         bpm_ok_x(i) = 0;
                         off_bba_x(i) = 0;
                         off_bba_theta_x(i) = corr_lim_max;
-                        continue
+                        % continue
                     end
 
                     dtheta_corr = linspace(theta_min, theta_max, n_points_new);  
@@ -290,7 +291,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                     bpm_ok_x(i) = 0;
                     continue
                 end
-                [quadratic_x, linear_x, m_resp_x(i)] = sirius_commis.common.bba_analysis(ri_x, rf_x, i, dtheta_corr, 'x', 'plot');
+                [quadratic_x, linear_x, m_resp_x(i)] = sirius_commis.common.bba_analysis(ri_x, rf_x, i, dtheta_corr, 'x', 'plot', flag_data_input);
                 
                 off_bba_x1f(i) = linear_x.offset_bpm;
                 off_bba_theta_x1(i) = linear_x.offset_theta;
@@ -307,7 +308,8 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
             fprintf('================================================\n');
 
             for i = 1:length(bpm)-1
-                if sum(bpm_ok_y(1:i)) > bpm_stop
+                % if sum(bpm_ok_y(1:i)) > bpm_stop
+                if i >  bpm_stop
                     break
                 end
                 if bpm_ok_y(i)
@@ -334,7 +336,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                         bpm_ok_y(i) = 0;
                         off_bba_y(i) = 0;
                         off_bba_theta_y(i) = corr_lim_max;
-                        continue
+                    %     continue
                     end
                     if abs(theta_max) > corr_lim_max
                         % theta_max = sign(theta_max) * corr_lim_max;
@@ -342,7 +344,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                         bpm_ok_y(i) = 0;
                         off_bba_y(i) = 0;
                         off_bba_theta_y(i) = corr_lim_max;
-                        continue
+                    %     continue
                     end
 
                     dtheta_corr = linspace(theta_min, theta_max, n_points_new);
@@ -359,7 +361,7 @@ function bba_data = bba_non_stored_beam(machine, n_mach, param, param_errors, n_
                     bpm_ok_y(i) = 0;
                     continue
                 end
-                [quadratic_y, linear_y, m_resp_y(i)] = sirius_commis.common.bba_analysis(ri_y, rf_y, i, dtheta_corr, 'y');
+                [quadratic_y, linear_y, m_resp_y(i)] = sirius_commis.common.bba_analysis(ri_y, rf_y, i, dtheta_corr, 'y', 'plot', flag_data_input);
                 off_bba_y1f(i) = linear_y.offset_bpm;
                 off_bba_theta_y1(i) = linear_y.offset_theta;
                 off_bba_y2f(i) = quadratic_y.offset_bpm;
