@@ -53,6 +53,7 @@ function r_particles = single_pulse(machine, param, n_part, point)
     % Comparison with Vacuum Chamber at every point, lost particles are set as NaN
     r_xy = sirius_commis.common.compares_vchamb(machine, r_final([1,3], :, :), 1:point);
     r_final([1,3], :, :) = r_xy;
+    % sirius_commis.scatplot(1e3 * squeeze(r_xy(1, :, point)), 1e3 * squeeze(r_xy(2, :, point)), 'circles', 50e-2, 2e3, 5, 1, 4);
 
     % Beam coordinates x and y at the required point
     r_point = squeeze(r_xy(:, :, point));

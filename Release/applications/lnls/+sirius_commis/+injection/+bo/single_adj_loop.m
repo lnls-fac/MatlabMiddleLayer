@@ -34,7 +34,7 @@ function [param_out, r_scrn3] = single_adj_loop(bo_ring, n_part, n_pulse, param_
     param_errors = param_errors_in;
 
     scrn = findcells(machine, 'FamName', 'Scrn');
-    res_scrn = param_errors.sigma_scrn;
+    res_scrn = param_errors.sigma_scrn_pulse;
 
     % SCREEN 1 ON
     kckr = 'off';

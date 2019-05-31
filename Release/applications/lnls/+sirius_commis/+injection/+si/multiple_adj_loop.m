@@ -1,4 +1,4 @@
-function param_adjusted = multiple_adj_loop(machine, n_mach, n_part, n_pulse, param0, param0_error, turn_off)
+function [param_adjusted, machine] = multiple_adj_loop(machine, n_mach, n_part, n_pulse, param0, param0_error, turn_off, matrix_inj)
 % Algorithm of injection parameters adjustments using screens.
 %
 % INPUTS:
@@ -31,7 +31,7 @@ if n_mach == 1
     if turn_off
         machine = sirius_commis.injection.si.turn_off_magnets(machine);
     end
-    param_adjusted = sirius_commis.injection.si.single_adj_loop(machine, n_part, n_pulse, param0, param0_error);
+    [param_adjusted, machine] = sirius_commis.injection.si.single_adj_loop(machine, n_part, n_pulse, param0, param0_error, matrix_inj);
     param_adjusted.orbit = findorbit4(machine, 0, 1:length(machine));
 else
     for j = 1:n_mach
@@ -41,7 +41,7 @@ else
         fprintf('=================================================\n');
         fprintf('MACHINE NUMBER %i \n', j)
         fprintf('=================================================\n');
-        param_adjusted{j} = sirius_commis.injection.si.single_adj_loop(machine{j}, n_part, n_pulse, param0{j}, param0_error{j});
+        [param_adjusted{j}, machine{j}] = sirius_commis.injection.si.single_adj_loop(machine{j}, n_part, n_pulse, param0{j}, param0_error{j}, matrix_inj);
         param_adjusted{j}.orbit = findorbit4(machine{j}, 0, 1:length(machine{j}));
         
         save param_adjusted.mat param_adjusted

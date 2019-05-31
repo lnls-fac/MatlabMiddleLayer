@@ -1,70 +1,44 @@
-function [eff_1turn, count_turns, r_bpm_turns, r_init, RBPM, eff_turns] = single_pulse_turn(machine, n_mach, param, param_errors, n_part, n_turns)
-% Simulation of booster injection and turns around the ring for a single
+function r_out = single_pulse_turn(machine, param, param_errors, n_part, n_turns, c_prev)
+% Simulation of storage ring injection and turns around the ring for a single
 % pulse (for multiple pulses, see the function multiple_pulses_turns())
 %
 % INPUTS:
-%  - machine: storage ring model with errors
+%  - machine: storage ring ring model with errors
 %  - n_mach: number of random machines
 %  - n_part: number of particles
 %  - param: cell of structs with adjusted injection parameters for each
 %  machine
-%  - param_errors: struct with injection and diagnostic resolution errors
-%  - n_turns [optional] : limited number of turns before reach the
-%  specified efficiency which considers the beam as lost. If n_turns is not
-%  specified, it is set as 10000;
+%  - n_turns: limited number of turns before reach the
+%  specified efficiency which considers the beam as lost
 %
-% OUTPUTS:
-%  - eff_1turn: efficiency of first turn
-%  - count_turns: number of turns that the beam is considered lost (maximum
-%  value is n_turns)
-%  - r_bpm_turns: BPM measurements averaged over turns
-%  - int_bpm_turns: turn-by-turn beam intensity reaching each BPM
-%  (it simulates the BPM sum signal)
-%  - RBPM: turn-by-turn BPM measurements
-%
-% Version 1 - Murilo B. Alves - December, 2018
+% OUTPUTS: r_out - struct with the fields:
+%               - eff_1st_turn: first turn efficiency
+%               - num_of_turns: number of turns
+%               - r_bpm_mean: mean BPM meas. in turns
+%               - sum_bpm_mean: mean BPM sum in turns
+%               - r_bpm_tbt: turn-by-turn BPM position.
+%               - sum_bpm_tbt: turn-by-turn BPM sum.
+%               - eff_turns: efficiency for each turn
 
 % sirius_commis.common.initializations()
-if n_mach == 1
-    machine_cell = {machine};
-    param_cell = {param};
+
     bpm = findcells(machine, 'FamName', 'BPM');
-elseif n_mach > 1
-    machine_cell = machine;
-    param_cell = param;
-    bpm = findcells(machine{1}, 'FamName', 'BPM');
-end
+    r_bpm_tbt = zeros(n_turns, 2, length(bpm));
+    sum_bpm_tbt = zeros(n_turns, 1, length(bpm));
 
-RBPM = zeros(n_turns, 2, length(bpm));
-INTBPM = zeros(n_turns, 1, length(bpm));
-
-eff_1turn = zeros(1, n_mach);
-count_turns = zeros(n_mach, 1);
-eff_turns = zeros(n_mach, n_turns);
-r_init = zeros(n_mach, n_turns, 6, n_part);
-eff_lim = 0.5;
-for j = 1:n_mach
-    % fprintf('=================================================\n');
-    % fprintf('MACHINE NUMBER %i \n', j)
-    % fprintf('=================================================\n');
-
-    param_cell{j}.orbit = findorbit4(machine_cell{j}, 0, 1:length(machine_cell{j}));
-
-    machine = machine_cell{j};
-    param = param_cell{j};
+    eff_turns = zeros(n_turns, 1);
+    eff_lim = 0.50;
     lm = length(machine);
-
-
-    if ~exist('n_turns', 'var')
-        n_turns = 1e5;
-    end
+    param.orbit = findorbit4(machine, 0, 1:lm);
+    count_turns = 0;
 
     kckr = 'on';
-    [eff_1turn(j), ~,  r_init, RBPM(1, :, :), INTBPM(1, :, :)] = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
+    r =  sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, 1, lm, kckr, 'diag');
 
-    %if eff_1turn > 0.95
-    %   continue
-    %end
+    eff_1turn = r.efficiency;
+    r_init = r.r_end;
+    r_bpm_tbt(1, :, :) = r.r_bpm;
+    sum_bpm_tbt(1, :, :) = r.sum_bpm;
 
     injkckr = findcells(machine, 'FamName', 'InjDpKckr');
     machine = lnls_set_kickangle(machine, 0, injkckr, 'x');
@@ -73,33 +47,55 @@ for j = 1:n_mach
     fprintf('TURNS \n');
     fprintf('=================================================\n');
 
-    fprintf('Turn number 1 , Efficiency %f %% \n', eff_1turn(j)*100);
-    eff_turns(j, 1) = eff_1turn(j);
+    fprintf('Turn number 1 , Efficiency %f %% \n', eff_1turn*100);
+    eff_turns(1) = eff_1turn;
 
-    if eff_1turn(j) <= eff_lim
-       r_bpm_turns = squeeze(RBPM(1, :, :));
-       int_bpm_turns = squeeze(INTBPM(1, :, :));
-       continue
+    if eff_1turn < eff_lim
+        r_bpm_turns = squeeze(r_bpm_tbt(1, :, :));
+        int_bpm_turns = squeeze(sum_bpm_tbt(1, :, :));
+        r_out.num_of_turns = count_turns;
+        r_out.r_bpm_mean = r_bpm_turns;
+        r_out.sum_bpm_mean = int_bpm_turns;
+        r_out.eff_turns = eff_turns;
+        r_out.r_bpm_tbt = r_bpm_tbt;
+        r_out.sum_bpm_tbt = sum_bpm_tbt;
+        return
     end
-    count_turns(j) = count_turns(j) + 1;
+
+    count_turns = count_turns + 1;
+
     for i = 1:n_turns-1
-        [r_init, ~, eff_turns(j, i+1), RBPM(i+1, :, :), INTBPM(i+1, :, :)] = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
-        if eff_turns(j, i+1) <= eff_lim
-            % r_bpm_turns = squeeze(mean(RBPM(1:count_turns(j), :, :), 1));
-            % RBPM(i+1, :, :) = zeros(2, length(bpm));
-            % INTBPM(i+1, :, :) = zeros(1, length(bpm));
+        r = single_turn(machine, n_part, r_init, i+1, 'bpm', param, param_errors);
+
+        eff_turns(i+1) = r.efficiency;
+        r_init = r.r_end;
+        r_bpm_tbt(i+1, :, :) = r.r_bpm;
+        sum_bpm_tbt(i+1, :, :) = r.sum_bpm;
+
+        if eff_turns(i+1) < eff_lim
             break
         end
-        count_turns(j) = count_turns(j) + 1;
+
+        count_turns = count_turns + 1;
+
+        if count_turns > c_prev
+            break
+        end
     end
-    % w = squeeze(INTBPM(1:count_turns(j), :, end));
-    r_bpm_turns = squeeze(mean(RBPM(1:count_turns(j), :, :), 1));
-    % r_bpm_turns = squeeze(mean(RBPM(1:count_turns(j), :, :), 1));
-    % int_bpm_turns = squeeze(mean(INTBPM(1:count_turns(j), 1)));
-end
+
+    r_bpm_turns = squeeze(sum(r_bpm_tbt, 1) / count_turns);
+    int_bpm_turns = squeeze(sum(sum_bpm_tbt, 1) / count_turns);
+
+    r_out.eff_1st_turn = eff_1turn;
+    r_out.num_of_turns = count_turns;
+    r_out.r_bpm_mean = r_bpm_turns;
+    r_out.sum_bpm_mean = int_bpm_turns;
+    r_out.r_bpm_tbt = r_bpm_tbt;
+    r_out.sum_bpm_tbt = sum_bpm_tbt;
+    r_out.eff_turns = eff_turns;
 end
 
-function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_init, turn_n, bpm, param, param_errors)
+function r = single_turn(machine, n_part, r_init, turn_n, bpm, param, param_errors)
     r_init = squeeze(r_init);
     if(exist('bpm','var'))
         if(strcmp(bpm,'bpm'))
@@ -108,10 +104,13 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
     elseif(~exist('bpm','var'))
             flag_bpm = false;
     end
-    
+
+    p = 0;
+
+    % !! IMPORTANT !!
     % +1 added because linepass does the tracking until the beginning of
     % element and it is needed until the end to perform one turn
-    
+
     if turn_n ~= 2
         r_out = linepass(machine, r_init, 1:length(machine)+1, 'reuse');
     else
@@ -123,9 +122,7 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
     r_out([1,3], :, :) = r_out_xy;
     r_init = squeeze(r_out(:, :, end));
     loss_ind = ~isnan(r_out(1, :, size(machine, 2)));
-    if any(loss_ind)
-        r_init = r_init(:, loss_ind);
-    end
+    r_init = r_init(:, loss_ind);
     eff = sirius_commis.common.calc_eff(n_part, r_init);
     fprintf('Turn number %i , Efficiency %f %% \n', turn_n, eff*100);
 
@@ -134,8 +131,14 @@ function [r_init, r_out, eff, r_bpm, int_bpm] = single_turn(machine, n_part, r_i
         bpm = findcells(machine, 'FamName', 'BPM');
         r_out_bpm = r_out_xy(:, :, bpm);
         [sigma_bpm, int_bpm] = sirius_commis.common.bpm_error_inten(r_out_bpm, n_part, sigma_bpm0);
-        r_diag_bpm = squeeze(nanmean(r_out_bpm, 2)) + sigma_bpm;
+        r_diag_bpm = squeeze(nanmean(r_out_bpm, 2)) + p * sigma_bpm;
         r_bpm = sirius_commis.common.compares_vchamb(machine, r_diag_bpm, bpm, 'bpm');
         sirius_commis.common.plot_bpms(machine, param.orbit, r_bpm, int_bpm);
     end
+
+    r.r_end = r_init;
+    r.r_track = r_out;
+    r.efficiency = eff;
+    r.r_bpm = r_bpm;
+    r.sum_bpm = int_bpm;
 end

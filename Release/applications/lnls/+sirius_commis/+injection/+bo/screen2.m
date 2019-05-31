@@ -5,12 +5,12 @@ function [r_scrn2, param] = screen2(machine, param, param_errors, n_part, n_puls
     fprintf('SCREEN 2 ON \n')
     fprintf('=================================================\n');
 
-    dx12 = 10; dyf_new = 0;
     dtheta_kckr = 0;
     dthetay = 0;
     p = 1;
     eff_lim = 0.5;
-    res_scrn = param_errors.sigma_scrn / sqrt(n_pulse);
+    res_scrn = param_errors.sigma_scrn_pulse;
+    dx12 = 10*res_scrn; dyf_new = 10*res_scrn;
     s = findspos(machine, 1:length(machine));
 
     injkckr = findcells(machine, 'FamName', 'InjKckr');
@@ -23,7 +23,6 @@ function [r_scrn2, param] = screen2(machine, param, param_errors, n_part, n_puls
     while abs(dx12) > res_scrn || abs(dyf_new) > res_scrn
         param.kckr_syst = param.kckr_syst - dtheta_kckr;
         param.offset_yl_syst = param.offset_yl_syst - dthetay;
-        % param.offset_y_syst = param.offset_y_syst - p * dyf_new;
         r_particles = sirius_commis.injection.bo.multiple_pulse(machine2, param, param_errors, n_part, n_pulse, scrn2, kckr);
 
         eff2 = r_particles.efficiency;
@@ -31,12 +30,7 @@ function [r_scrn2, param] = screen2(machine, param, param_errors, n_part, n_puls
 
         dyf_new = r_scrn2(2);
         [~, dthetay] = sirius_commis.injection.bo.scrn_septum_corresp(machine2, 0, dyf_new, scrn2);
-
-        if abs(dyf_new) > abs(dyf_old)
-           p = 0;
-           param.offset_y_syst = param.offset_y_syst + dyf_old;
-        end
-
+        
         if mean(eff2) < eff_lim
             param = sirius_commis.injection.bo.screen_low_intensity(machine2, param, param_errors, n_part, n_pulse, scrn2, kckr, mean(eff2), 2, 0.75);
             r_particles = sirius_commis.injection.bo.multiple_pulse(machine2, param, param_errors, n_part, n_pulse, scrn2, kckr);

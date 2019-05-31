@@ -70,14 +70,14 @@ rms_orbit_y_bpm_new = rms_orbit_y_bpm_old;
 inc_x = true; inc_y = true;
 ft_data.error = false;
 
-bpm_int_ok = bpm(int_bpm > 0.25);
+bpm_int_ok = bpm(int_bpm > eff_lim);
 [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
 
 bpm_select = zeros(length(bpm), 1);
 bpm_select(ind_ok_bpm) = 1;
 
 while int_bpm(end) < eff_lim
-    bpm_int_ok = bpm(int_bpm > 0.25);
+    bpm_int_ok = bpm(int_bpm > eff_lim);
     [~, ind_ok_bpm] = intersect(bpm, bpm_int_ok);
     
     bpm_select = zeros(length(bpm), 1);

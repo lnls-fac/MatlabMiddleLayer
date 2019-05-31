@@ -136,8 +136,10 @@ switch po
         hs = gsp(xi,yi,zi,ms);
         set(ax,'color', map(1,:));
         out.hs = hs;
-        % ylim([-1, 1]);
-        % xlim([-3, 3]);
+        ylim([-1, 1]);
+        xlim([-1, 1]);
+        xlabel('X position [mm]');
+        ylabel('Y position [mm]');
         colorbar
         drawnow();
         grid on
@@ -181,7 +183,7 @@ n = [];
 ms = 5;
 x = randn(1000,1);
 y = randn(1000,1);
-out = scatplot(x,y,method,radius,N,n,po,ms)
+out = scatplot(x,y,method,radius,N,n,po,ms);
 return
 %~~~~~~~~~~ Data Density ~~~~~~~~~~~~~~
 function dd = datadensity(x,y,method,r)

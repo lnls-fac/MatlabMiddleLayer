@@ -27,6 +27,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
 % sirius_commis.common.initializations();
 
     % Initializing variables
+    bpm = findcells(machine, 'FamName', 'BPM');
     l_bpm = length(bpm);
     eff = zeros(1, n_pulse);
     sigma_scrn = zeros(n_pulse, 2);
@@ -36,7 +37,6 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
     r_end = zeros(n_pulse, 6, n_part);
 
     injkckr = findcells(machine, 'FamName', 'InjKckr');
-    bpm = findcells(machine, 'FamName', 'BPM');
     scrn = findcells(machine, 'FamName', 'Scrn');
 
     % If the required point is one of the screens, it takes the correspondent offset value
@@ -82,7 +82,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
             flag_diag = false;
     end
 
-    pbp = 1; % Pulse by Pulse variation
+    pbp = 1/10; % Pulse by Pulse variation
     inj_nom = false; % Injection with nominal parameters (no errors)
 
     for j=1:n_pulse

@@ -2,16 +2,15 @@ function M = calc_respm_tracking_nturns(bo_ring, fam, n_turns)
 
 if ~exist('bo_ring', 'var')
     bo_ring = sirius_bo_lattice();
-    inj_sept = findcells(bo_ring, 'FamName', 'InjSept');
-    bo_ring = circshift(bo_ring, [0, -(inj_sept - 1)]);
+    bo_ring = shift_ring(bo_ring, 'InjSept');
 end
 
 % inj_kckr = findcells(bo_ring, 'FamName', 'InjKckr');
 
 % fam = sirius_bo_family_data(bo_ring);
 
-bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
-bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
+% bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SD.ATIndex, 0, 1, 3);
+% bo_ring = setcellstruct(bo_ring, 'PolynomB', fam.SF.ATIndex, 0, 1, 3);
 
 delta_kick_x = 300e-6;
 delta_kick_y = 150e-6;

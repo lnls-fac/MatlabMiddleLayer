@@ -24,8 +24,8 @@ function machine_data = set_machine(si_ring, n_mach)
     sirius_commis.common.initializations();
 
     % Initializing variables
-    param_errors = cells(n_mach, 1);
-    param = cells(n_mach, 1);
+    param_errors = cell(n_mach, 1);
+    param = cell(n_mach, 1);
 
     % Shifting the ring to begin in the injection septum
     si_ring = shift_ring(si_ring, 'InjSeptF');
@@ -64,7 +64,7 @@ function machine_data = set_machine(si_ring, n_mach)
     param_sigma.x_syst = 2e-3; param_sigma.x_jit = 500e-6;
     param_sigma.xl_syst = 3e-3; param_sigma.xl_jit = 30e-6;
     param_sigma.y_syst = 2e-3; param_sigma.y_jit = 500e-6;
-    param_sigma.yl_syst = 2e-3; param_sigma.yl_jit = 30e-6;
+    param_sigma.yl_syst = 3e-3; param_sigma.yl_jit = 30e-6;
     param_sigma.kckr_syst = 1e-3; param_sigma.kckr_jit = 30e-6;
     param_sigma.energy_syst = 1e-2; param_sigma.energy_jit = 0.3e-2;
     param_sigma.bpm_offset = 500e-6; param_sigma.bpm_jit = 2e-3;
@@ -99,14 +99,16 @@ function machine_data = set_machine(si_ring, n_mach)
 
     %For each random machine, based on the sigma errors given by param_sigma, generate random injection parameters errors
     for i = 1:n_mach
-        [param_errors{i}, param{i}] = sirius_commis.common.add_errors(param_init, param_sigma);
+        [param_errors{i}, param{i}] = sirius_commis.common.add_errors(param_init, param_sigma, 1);
     end
+    
+    [~, param_nom] = sirius_commis.common.add_errors(param_init, param_sigma, 0);
 
     machine_data.machine = machine;
     machine_data.parameters = param;
     machine_data.errors = param_errors;
     machine_data.sigma_errors = param_sigma;
-    machine_data.nominal_parameters = param_init;
+    machine_data.nominal_parameters = param_nom;
 end
 
 %% Magnet Errors:

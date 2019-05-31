@@ -1,6 +1,6 @@
 function [r_scrn2, param, thetax12] = fine_adjust_scrn1_scrn2(machine, param, param_errors, n_part, n_pulse, kckr, scrn1, scrn2, r_scrn2)
 
-    res_scrn = param_errors.sigma_scrn / sqrt(n_pulse);
+    res_scrn = param_errors.sigma_scrn_pulse;
     s = findspos(machine, 1:length(machine));
     dx12 = 1; dy12 = 1;
     machine1 = setcellstruct(machine, 'VChamber', scrn1+1:length(machine), 0, 1, 1);

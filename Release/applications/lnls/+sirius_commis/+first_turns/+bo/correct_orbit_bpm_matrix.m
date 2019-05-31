@@ -54,7 +54,7 @@ function ft_data = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr
     rms_orbit_y_bpm_old = nanstd(r_bpm(2,:));
     corr_lim = 20 * 300e-6;
 
-    eff_lim = 0.5;
+    eff_lim = 0.9;
     n_cor = 1;
     tol = 0.90;
 
@@ -71,10 +71,10 @@ function ft_data = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr
         bpm_select(ind_ok_bpm) = 1;
 
         if sum(bpm_select) == 1
-        warning('Only 1 BPM with good sum signal!')
-        ft_data.machine = machine;
-        ft_data.error = true;
-        ft_data.n_svd = n_sv;
+            warning('Only 1 BPM with good sum signal!')
+            ft_data.machine = machine;
+            ft_data.error = true;
+            ft_data.n_svd = n_sv;
         return
         end
 
@@ -215,7 +215,7 @@ function ft_data = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr
             machine = lnls_set_kickangle(machine, theta_y_f, cv, 'y');
             fprintf('VERTICAL CORRECTION \n');
         end
-        
+
         param.orbit = findorbit4(machine, 0, 1:length(machine));
         ft_data.finalcod.bpm_pos = r_bpm;
 
@@ -226,10 +226,7 @@ function ft_data = correct_orbit_bpm_matrix(machine, param, param_errors, m_corr
         if int_bpm(end) < eff_lim
             machine = lnls_set_kickangle(machine, kickx_ft, ch, 'x');
             machine = lnls_set_kickangle(machine, kicky_ft, cv, 'y');
-            [~, cod_data, ~] = checknan(machine, param, fam, first_cod, cod_data);
-            ft_data.firstcod = cod_data;
             ft_data.machine = machine;
-            ft_data.max_kick = [gr_mach_x; gr_mach_y];
             ft_data.n_svd = n_t;
             ft_data.ftcod.kickx = kickx_ft;
             ft_data.ftcod.kicky = kicky_ft;

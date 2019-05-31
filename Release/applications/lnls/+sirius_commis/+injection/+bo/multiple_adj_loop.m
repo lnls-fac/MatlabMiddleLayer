@@ -35,8 +35,8 @@ param_adjusted = cell(n_mach, 1);
             fprintf('MACHINE NUMBER %i \n', j)
             fprintf('=================================================\n');
 
-            res_scrn = param_error{j}.sigma_scrn_pulse / sqrt(n_pulse);
-            res_x = sqrt(res_scrn^2 + (param.etax_scrn3 * param_error.delta_error_pulse)^2) / sqrt(n_pulse);
+            res_scrn = param_error{j}.sigma_scrn_pulse;
+            res_x = sqrt(res_scrn^2 + (param{j}.etax_scrn3 * param_error{j}.delta_error_pulse)^2);
             param_error{j}.offset_scrn_mach{j} = reshape(lnls_generate_random_numbers(1, 6, 'norm', 1) .* 1e-3, 2, 3);
             param_error{j}.offset_scrn = param_error{j}.offset_scrn_mach{j};
             [param_adjusted{j}, r_scrn3] = sirius_commis.injection.bo.single_adj_loop(machine{j}, n_part, n_pulse, param{j}, param_error{j});

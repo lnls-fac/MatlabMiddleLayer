@@ -56,12 +56,12 @@ function r_particles = single_pulse(machine, param, n_part, point)
         dtheta = zeros(length(polyB_new), 1);
 
         for j = 1:length(polyB_orig)
-            polyB_new{j} = polyB_orig{j} / (1 + param.delta_ave_f) ;
+            polyB_new{j} = polyB_orig{j} / (1 + param.delta_ave) ;
         end
 
         for j = 1:length(polyB_new)
             pb = polyB_new{j};
-            dtheta(j) = theta0(j) ./ len(j) * (- param.delta_ave_f) / (1 + param.delta_ave_f);
+            dtheta(j) = theta0(j) ./ len(j) * (- param.delta_ave) / (1 + param.delta_ave);
             pb(1,1) = pb(1,1) - dtheta(j);
             polyB_new{j} = pb;
         end
@@ -72,12 +72,13 @@ function r_particles = single_pulse(machine, param, n_part, point)
     end
 
     % Perform the tracking until the required point at the ring
-    r_final = linepass(machine(1:point), r_init, 1:point);
-    r_final = reshape(r_final, 6, [], point);
+    r_final = linepass(machine(1:point(end)), r_init, 1:point(end));
+    r_final = reshape(r_final, 6, [], point(end));
 
     % Comparison with Vacuum Chamber at every point, lost particles are set as NaN
-    r_xy = sirius_commis.common.compares_vchamb(machine, r_final([1,3], :, :), 1:point);
+    r_xy = sirius_commis.common.compares_vchamb(machine, r_final([1,3], :, :), 1:point(end));
     r_final([1,3], :, :) = r_xy;
+    % sirius_commis.scatplot(1e3 * squeeze(r_xy(1, :, point)), 1e3 * squeeze(r_xy(2, :, point)), 'circles', 2e-2, 2e3, 5, 1, 4);
 
     % Beam coordinates x and y at the required point
     for i = 1:length(point)

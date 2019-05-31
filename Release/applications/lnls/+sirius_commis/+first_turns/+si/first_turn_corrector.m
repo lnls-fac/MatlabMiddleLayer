@@ -70,7 +70,7 @@ for j = 1:n_mach
     % if flag_tl
     %     [machine_correct{j}, r_bpm_mach(j, :, :), gr_mach_x(j, :), gr_mach_y(j, :)] = sirius_commis.first_turns.si.correct_orbit_bpm_tl(machine, param, param_errors, m_corr, n_part, n_pulse);
     % else
-        ft_data{j} = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv, cod_bba);
+        ft_data{j} = sirius_commis.first_turns.si.correct_orbit_bpm_matrix(machine, param, param_errors, m_corr, n_part, n_pulse, n_sv);
     % end
     orbita = findorbit4(ft_data{j}.machine, 0, 1:length(ft_data{j}.machine));
     if any(isnan(orbita(1, :)))

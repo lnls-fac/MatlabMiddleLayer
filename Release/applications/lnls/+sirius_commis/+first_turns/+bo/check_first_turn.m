@@ -68,7 +68,7 @@ for j = 1:n_mach
         r = sirius_commis.first_turns.bo.multiple_pulse_turn(machine_correct, 1, ft_data{j}.param, param_errors, n_part, n_pulse_turns, n_turns);
     end
 
-    ft_data{j}.n_turns = r.num_of_turns;
+    ft_data{j}.n_turns = r{1}.num_of_turns;
     kickx_final = lnls_get_kickangle(machine_correct, fam.CH.ATIndex, 'x');
     kicky_final = lnls_get_kickangle(machine_correct, fam.CV.ATIndex, 'y');
     ft_data{j}.kickx = kickx_final;

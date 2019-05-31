@@ -1,4 +1,4 @@
-function [respm_sofb4D_traj, respm_sofb4D, respm_sofb6D] = calc_respm_sofb(acc, ring, dim)
+function [respm_sofb4D_traj, respm_sofb4D, respm_sofb6D] = calc_respm_sofb(acc, dim, ring)
 
 flag_tb = false;
 flag_bo = false;
@@ -35,8 +35,7 @@ elseif strcmp(acc, 'BO')
     if flag_ring
         sirius('BO')
         ring = sirius_bo_lattice();
-        inj_sept = findcells(ring, 'FamName', 'InjSept');
-        ring_new = circshift(ring, [0, -(inj_sept - 1)]);
+        ring_new = shift_ring(ring, 'InjSept');
     end
     fam = sirius_bo_family_data(ring_new);
     ring_new = setcavity('off', ring_new);
@@ -48,8 +47,7 @@ elseif strcmp(acc, 'SI')
     if flag_ring
         sirius('SI')
         ring = sirius_si_lattice();
-        inj_sept = findcells(ring, 'FamName', 'InjSeptF');
-        ring_new = circshift(ring, [0, -(inj_sept - 1)]);
+        ring = shift_ring(ring, 'InjSeptF');
     end
     fam = sirius_si_family_data(ring_new);
     ring_new = setcavity('off', ring_new);

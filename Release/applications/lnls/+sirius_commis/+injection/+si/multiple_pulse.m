@@ -27,16 +27,19 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
 % sirius_commis.common.initializations();
 
     % Initializing variables
+    bpm = findcells(machine, 'FamName', 'BPM');
     l_bpm = length(bpm);
     eff = zeros(1, n_pulse);
     sigma_bpm = zeros(n_pulse, 2, l_bpm);
-    r_pulse = zeros(n_pulse, 2, point(end));
-    r_diag_bpm = zeros(n_pulse, 2, l_bpm);
     r_end = zeros(n_pulse, 6, n_part);
-    r_point = zeros(2, n_part, length(point));
+    r_point = zeros(2, n_part, point(end));
+    r_bpm_pulse = zeros(n_pulse, 2, l_bpm);
+    r_track_pulse = zeros(n_pulse, 2, point(end));
+    r_bpm_inj2 = zeros(2, length(point));
+    erro_bpm = zeros(2, n_pulse, length(point));
+    orbit = param.orbit;
 
     injkckr = findcells(machine, 'FamName', 'InjDpKckr');
-    bpm = findcells(machine, 'FamName', 'BPM');
 
     % The tracking can be done either with the kicker turned on or off
     if(exist('kckr','var'))
@@ -58,7 +61,6 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         elseif(strcmp(plt,'diag'))
             flag_diag = true;
             flag_plot = false;
-            orbit = param.orbit;
         else
             error('Variable plot problem');
         end
@@ -89,8 +91,8 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         flag_shape = false;
     end
 
-    pbp = 1; % Pulse by Pulse variation
-    inj_nom = 0; % Injection with nominal parameters (no errors)
+    pbp = 0; % Pulse by Pulse variation
+    inj_nom = false; % Injection with nominal parameters (no errors)
 
     for j=1:n_pulse
         if inj_nom
@@ -110,7 +112,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
             param.delta_ave = 0;
         else
             % Setting injection parameters systematic errors and with pulse by pulse variations
-            error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm') * param_errors.x_error_pulse;
+            error_x_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.x_error_pulse;
             param.offset_x = param.offset_x_syst + pbp * error_x_pulse;
 
             error_xl_pulse = lnls_generate_random_numbers(1, 1, 'norm', param_errors.cutoff) * param_errors.xl_error_pulse;
@@ -158,11 +160,17 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         end
 
         r_xy = squeeze(r_particles.r_track([1,3], :, :)); %(x,y) position only
+        
+        if n_part == 1
+            r_xy = reshape(r_xy, 2, 1, point(end));
+        end
+        
         r_track_pulse(j, :, :) =  squeeze(nanmean(r_xy, 2));  %(x, y) position for the centroid and for each pulse
-        r_part(j, :, :, :) = r_particles.r_point;
+        eff(j) = sirius_commis.common.calc_eff(n_part, squeeze(r_xy(:, :, point(end)))); %efficiency of particles reaching the required point
+       
         r_end(j, :, :, :) = r_particles.r_track(:, :, end); % 6D position at the last element (used to simulate multiple turns)
 
-        eff(j) = sirius_commis.common.calc_eff(n_part, squeeze(r_xy(:, :, point(end)))); %efficiency of particles reaching the required point
+        
 
         if flag_plot && ~flag_shape
             plot_si_turn(machine, r_xy);
@@ -173,10 +181,12 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         else
             fprintf('.');
         end
+        
+        if flag_shape
+             sirius_commis.scatplot(1e3 * squeeze(r_track_pulse(j, 1, :)), 1e3 * squeeze(r_track_pulse(j, 2, :)), 'circles', 2e-2, 1e3, 5, 1, 4);
+        end
     end
-
-        r_mean_pulse = squeeze(nanmean(r_part, 1));
-
+    
         %gcf();
         % figure;
         % hold off;
@@ -189,10 +199,6 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         % xlim([-5, 5]);
         %drawnow();
 
-        if flag_shape
-            sirius_commis.scatplot(1e3 * r_mean_pulse(1, :), 1e3 * r_mean_pulse(2, :), 'circles', 2e-2, 1e3, 5, 1, 4);
-        end
-
         %function circle(x,y,r)
             %x and y are the coordinates of the center of the circle
             %r is the radius of the circle
@@ -204,7 +210,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         %    plot(x+xp,y+yp, 'r');
         %end
 
-    fprintf('AVERAGE EFFICIENCY :  %g %% \n', mean(eff)*100);
+    % fprintf('AVERAGE EFFICIENCY :  %g %% \n', mean(eff)*100);
 
     if ~flag_diag
         offset = getcellstruct(machine, 'Offsets', bpm);
@@ -212,7 +218,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
             r_bpm_inj = zeros(n_pulse, 2, length(point));
             for i = 1:length(point)
                 r_bpm_inj(:, :, i) = squeeze(r_track_pulse(:, :, point(i)));
-                r_bpm_inj(:, :, i) = r_bpm_inj(:, :, i) + pbp * erro_bpm(:, :, i)';
+                r_bpm_inj(:, :, i) = r_bpm_inj(:, :, i) + pbp * squeeze(erro_bpm(:, :, i))';
 
             % The comparison with vacuum chamber in this case is screen-like.
                 r_bpm_inj2(:, i) = squeeze(nanmean(r_bpm_inj(:, :, i), 1));
@@ -223,7 +229,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
             r_point = r_bpm_inj2;
         else
             r_point = squeeze(r_track_pulse(:, :, point));
-            r_point = r_point + pbp * erro_bpm';
+            r_point = r_point + pbp * squeeze(erro_bpm)';
 
             % The comparison with vacuum chamber in this case is screen-like.
             r_point = squeeze(nanmean(r_point, 1));
@@ -244,7 +250,7 @@ function r_particles_out = multiple_pulse(machine, param, param_errors, n_part, 
         offset = cell2mat(offset)';
         r_bpm_mean = r_bpm_mean -  offset;
         machine = lnls_set_kickangle(machine, 0, injkckr, 'x');
-        orbit = findorbit4(machine, 0, 1:length(machine));
+        % orbit = zeros(6, length(machine));
         r_bpm = sirius_commis.common.compares_vchamb(machine, r_bpm_mean, bpm, 'bpm');
         sirius_commis.common.plot_bpms(machine, orbit, r_bpm, int_bpm);
         r_particles_out.r_bpm = r_bpm;
@@ -261,20 +267,33 @@ function plot_si_turn(machine, r_final)
     s = findspos(machine, 1:size(r_final, 3));
     xx = squeeze(nanmean(r_final(1, :, :), 2));
     sxx = squeeze(nanstd(r_final(1, :, :), 0, 2));
+    yy = squeeze(nanmean(r_final(2, :, :), 2));
+    syy = squeeze(nanstd(r_final(2, :, :), 0, 2));
     gcf();
-    ax = gca();
+    ax1a = subplottight(2,1,1, 'vspace', 0.05);
+    ax2a = subplottight(2,1,2, 'vspace', 0.05);
     mm = 1e3;
-    hold off;
-    plot(ax, s, mm*(xx+3*sxx)', 'b --');
-    hold all;
-    plot(ax, s, mm*(xx-3*sxx)', 'b --');
-    plot(ax, s, mm*(xx)', '.-r', 'linewidth', 3);
-    plot(ax, s, mm*VChamb(1,:),'k');
-    plot(ax, s, -mm*VChamb(1,:),'k');
-    grid on;
+    hold(ax1a, 'off');
+    plot(ax1a, s, mm*(xx+3*sxx)', 'b --');
+    hold(ax1a, 'on');
+    plot(ax1a, s, mm*(xx-3*sxx)', 'b --');
+    plot(ax1a, s, mm*(xx)', '.-r', 'linewidth', 3);
+    plot(ax1a, s, mm*VChamb(1,:),'k');
+    plot(ax1a, s, -mm*VChamb(1,:),'k');
+    grid(ax1a, 'on');
+    ylim(ax1a, [-mm*VChamb(1,1), mm*VChamb(1,1)]);
+    xlim(ax1a, [0, s(end)]);
+    hold(ax2a, 'off');
+    plot(ax2a, s, mm*(yy+3*syy)', 'r --');
+    hold(ax2a, 'on');
+    plot(ax2a, s, mm*(yy-3*syy)', 'r --');
+    plot(ax2a, s, mm*(yy)', '.-b', 'linewidth', 3);
+    plot(ax2a, s, mm*VChamb(2,:),'k');
+    plot(ax2a, s, -mm*VChamb(2,:),'k');
+    grid(ax2a, 'on');
 %     plot(ax, s, orbit(1, :) * mm, '.-k', 'linewidth', 2);
 %     plot(ax, s, orbit(3, :) * mm, '.-k', 'linewidth', 2);
-    ylim(ax, [-mm*VChamb(1,1), mm*VChamb(1,1)]);
-    xlim(ax, [0, s(end)]);
+    ylim(ax2a, [-mm*VChamb(2,1), mm*VChamb(2,1)]);
+    xlim(ax2a, [0, s(end)]);
     drawnow;
 end

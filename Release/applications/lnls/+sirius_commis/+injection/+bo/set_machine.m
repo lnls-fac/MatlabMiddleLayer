@@ -24,8 +24,8 @@ function machine_data = set_machine(bo_ring, n_mach)
     sirius_commis.common.initializations();
 
     % Initializing variables
-    param_errors = cells(n_mach, 1);
-    param = cells(n_mach, 1);
+    param_errors = cell(n_mach, 1);
+    param = cell(n_mach, 1);
 
     % Shifting the ring to begin in the injection septum
     bo_ring = shift_ring(bo_ring, 'InjSept');
