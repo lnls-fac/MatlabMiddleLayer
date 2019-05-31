@@ -4,6 +4,7 @@ function [r_bpm1, param] = bpm1_kckr(machine, param, param_errors, n_part, n_pul
     fprintf('=================================================\n');
     dx = 1;
     dtheta_kckr = 0;
+    eff_lim = 0.5;
     res_bpm = param_errors.sigma_bpm;
     s = findspos(machine, 1:length(machine));
     kckr_init = param.kckr_init;
@@ -18,11 +19,10 @@ function [r_bpm1, param] = bpm1_kckr(machine, param, param_errors, n_part, n_pul
     eff1 = r_particles.efficiency;
     r_bpm1 = r_particles.r_point;
 
-    if mean(eff1) < 0.75
-        param = sirius_commis.si.bpm_low_intensity(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, mean(eff1), 2, 0.75);
+    if mean(eff1) < eff_lim
+        param = sirius_commis.injection.si.bpm_low_intensity(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, mean(eff1), 2, 0.75);
         r_particles = sirius_commis.injection.si.multiple_pulse(machine,  param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
         r_bpm1 = r_particles.r_point;
-
     end
 
     if isnan(r_bpm1(1))
@@ -33,10 +33,12 @@ function [r_bpm1, param] = bpm1_kckr(machine, param, param_errors, n_part, n_pul
     dy = r_bpm1(2);
 
     while abs(dx) > res || abs(dy) > res
-        dtheta_kckr = dx / d_kckr_bpm1;
+        dtheta_kckr = - dx / d_kckr_bpm1;
+        dthetay = - dy / s(bpm1);
         fprintf('DELTA THETA KICKER %f urad \n', dtheta_kckr * 1e6)
-        param.kckr_syst = param.kckr_syst - dtheta_kckr;
-        param.offset_y_syst= param.offset_y_syst - dy;
+        param.kckr_syst = param.kckr_syst + dtheta_kckr;
+        param.offset_yl_syst = param.offset_yl_syst + dthetay;
+        % param.offset_y_syst= param.offset_y_syst - dy;
 
         r_particles = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
         eff1 = r_particles.efficiency;

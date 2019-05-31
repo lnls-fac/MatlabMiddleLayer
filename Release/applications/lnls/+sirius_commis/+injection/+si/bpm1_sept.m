@@ -19,8 +19,9 @@ function [r_bpm1, param] = bpm1_sept(machine, param, param_errors, n_part, n_pul
     r_particles = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
     eff1 = r_particles.efficiency;
     r_bpm1 = r_particles.r_point;
+    eff_lim = 0.5;
 
-    if mean(eff1) < 0.10
+    if mean(eff1) < eff_lim
        param = sirius_commis.injection.si.bpm_low_intensity(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, mean(eff1), 1, 0.75);
        r_particles = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
        r_bpm1 = r_particles.r_point;
@@ -34,15 +35,17 @@ function [r_bpm1, param] = bpm1_sept(machine, param, param_errors, n_part, n_pul
     dyf = r_bpm1(2);
 
     while abs(dxf) > res_bpm || abs(dyf) > res_bpm
-        dtheta0 = - dxf / s(bpm1);
-        param.offset_xl_syst = param.offset_xl_syst + dtheta0;
-        param.offset_y_syst = param.offset_y_syst - dyf;
+        dtheta0x = - dxf / s(bpm1);
+        dtheta0y = - dyf / s(bpm1);
+        param.offset_xl_syst = param.offset_xl_syst + dtheta0x;
+        param.offset_yl_syst = param.offset_yl_syst + dtheta0y;
+        % param.offset_y_syst = param.offset_y_syst - dyf;
 
         r_particles = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
         eff1 = r_particles.efficiency;
         r_bpm1 = r_particles.r_point;
 
-        if mean(eff1) < 0.10
+        if mean(eff1) < eff_lim
             param = sirius_commis.injection.si.bpm_low_intensity(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, mean(eff1), 1, 0.75);
             r_particles = sirius_commis.injection.si.multiple_pulse(machine, param, param_errors, n_part, n_pulse, bpm1, kckr, 'plot');
             r_bpm1 = r_particles.r_point;
