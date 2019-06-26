@@ -104,26 +104,25 @@
 
 
 % ============================================================
-% SI.V24.02 strengths
+% SI.V24.03 strengths
 % Based of average B1, B2 and BC measurement-calibrated models
 % ============================================================
-
     
 % QUADRUPOLES
 % ===========
-Q1_strength   = +2.818385349790;
-Q2_strength   = +4.340291521605;
-Q3_strength   = +3.218059095552;
-Q4_strength   = +3.950643530397;
+Q1_strength   = +2.818380593329;
+Q2_strength   = +4.340321500742;
+Q3_strength   = +3.218428850149;
+Q4_strength   = +3.950687390088;
 
-QDA_strength  = -1.62022368129277;
-QFA_strength  = +3.57321987512408;
-QDB1_strength = -2.00618916521549;
-QDB2_strength = -3.42112212774383;
-QFB_strength  = +4.11533715037234;
-QDP1_strength = -2.00637697125776;
-QDP2_strength = -3.42118699917273;
-QFP_strength  = +4.11526512937034;
+QDA_strength  = -1.619440054711;
+QFA_strength  = +3.573222860605;
+QDB1_strength = -2.006560368475;
+QDB2_strength = -3.421399129616;
+QFB_strength  = +4.115233308875;
+QDP1_strength = -2.006560368475;
+QDP2_strength = -3.421399129616;
+QFP_strength  = +4.115233308875;
 
 % SEXTUPOLES
 % ==========
