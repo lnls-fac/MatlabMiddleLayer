@@ -16,8 +16,8 @@ m_accep = 3; types{end+1} = struct('fam_name', m_accep_fam_name, 'passmethod', '
 % folder = si-dipoles-bc/model-13/analysis/hallprobe/production/x0-0p079mm-reftraj
 % init_rx =  79 um
 % ref_rx  = 7.7030 mm (average model trajectory)
-% goal_tunes = [49.096201069422555, 14.151922051552047];
-% goal_chrom = [2.549657551753626, 2.526562781213215];
+% goal_tunes = [49.096188917357331, 14.151971558423915];
+% goal_chrom = [2.549478494984214, 2.527086095938103];
 
 monomials = [0,1,2,3,4,5,6,7,8,10];
 segmodel = [ ...
