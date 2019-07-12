@@ -217,14 +217,14 @@ TunePkup = marker('TunePkup', 'IdentityPass'); % Tune Pickup
 
 
 %% transport lines
-M1A      = [GIR,L134,GIR,QDA,L150,SDA0,L074,FC1,L082,QFA,L150,SFA0,L135,BPM,GIR];                 % high beta xxM1 girder (with fasc corrector)
-M1B      = [GIR,L134,GIR,QDB1,L150,SDB0,L240,QFB,L150,SFB0,L049,FC1,L052,QDB2,L140,BPM,GIR];      % low beta xxM1 girder
-M1P      = [GIR,L134,GIR,QDP1,L150,SDP0,L240,QFP,L150,SFP0,L049,FC1,L052,QDP2,L140,BPM,GIR];      % low beta xxM1 girder
+M1A      = [L134,QDA,L150,SDA0,GIR,L074,GIR,FC1,L082,QFA,L150,SFA0,L135,BPM,GIR];                 % high beta xxM1 girder (with fasc corrector)
+M1B      = [L134,QDB1,L150,SDB0,GIR,L240,GIR,QFB,L150,SFB0,L049,FC1,L052,QDB2,L140,BPM,GIR];      % low beta xxM1 girder
+M1P      = [L134,QDP1,L150,SDP0,GIR,L240,GIR,QFP,L150,SFP0,L049,FC1,L052,QDP2,L140,BPM,GIR];      % low beta xxM1 girder
 M2A      = fliplr(M1A);                                                                          % high beta xxM2 girder (with fast correctors)
 M2B      = fliplr(M1B);                                                                          % low beta xxM2 girder
 M2P      = fliplr(M1P);                                                                          
 
-M1B_BbBPkup = [GIR,L134,GIR,QDB1,L150,SDB0,L120,BbBPkup,L120,QFB,L150,SFB0,L049,FC1,L052,QDB2,L140,BPM,GIR];
+M1B_BbBPkup = [L134,QDB1,L150,SDB0,GIR,L120,BbBPkup,L120,GIR,QFB,L150,SFB0,L049,FC1,L052,QDB2,L140,BPM,GIR];
 
 IDA        = [L500,LIA,L500,MIDA,L500,L500,MIA,L500,L500,MIDA,L500,LIA,L500];                              % high beta ID straight section
 IDA_INJ    = [L500,TuneShkrH,LIA,L419,InjSeptF,L081,L500,L500,END,START,MIA,...
