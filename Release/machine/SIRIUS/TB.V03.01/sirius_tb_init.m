@@ -487,7 +487,7 @@ AO.QD4.Setpoint.DeltaRespMat  = 0.5;
 % CH
 AO.CH.FamilyName  = 'CH';
 AO.CH.MemberOf    = {'PlotFamily'; 'COR'; 'CH'; 'HCM'; 'Magnet'};
-AO.CH.DeviceList  = getDeviceList(1,6);
+AO.CH.DeviceList  = getDeviceList(1,5);
 AO.CH.ElementList = (1:size(AO.CH.DeviceList,1))';
 AO.CH.Status      = ones(size(AO.CH.DeviceList,1),1);
 AO.CH.Position    = [];
