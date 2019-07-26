@@ -11,7 +11,8 @@ setad([]);
 
 % Base on the location of this file
 [SIRIUS_ROOT, ~, ~] = fileparts(mfilename('fullpath'));
-AD.Directory.ExcDataDir  = '/home/fac_files/lnls-sirius/control-system-constants/magnet/excitation-data';
+% AD.Directory.ExcDataDir  = '/home/fac_files/lnls-sirius/control-system-constants/magnet/excitation-data';
+AD.Directory.ExcDataDir  = '/home/sirius/repos/control-system-constants/magnet/excitation-data';
 AD.Directory.LatticesDef = [SIRIUS_ROOT, filesep, 'lattices_def'];
 setad(AD);
 
