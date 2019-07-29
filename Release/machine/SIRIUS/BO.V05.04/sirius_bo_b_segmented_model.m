@@ -14,7 +14,7 @@ b_pb   = 3; types{end+1} = struct('fam_name', 'physB', 'passmethod', 'IdentityPa
 %--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m],[T] for polynom_b ---
 monomials = [0,1,2,3,4,5,6];
 
-% Average Dipole Model for BD
+% Average Dipole Model for BD at 3GeV (991.63A)
 % =============================================
 % date: 2019-07-26
 % Based on multipole expansion around reference trajectory from fieldmap analysis of measurement data
@@ -41,7 +41,33 @@ b,      0.05000, 0.01039, +3.2630e-04, +8.5522e-03, -5.0122e-01, -6.4221e-01, -4
 b_pb,   0,0,0,0,0,0,0,0,0
 ];
 
-% % Average Dipole Model for BD
+% % Dipole Model for BD-006 at 149.3018 MeV (60.46A)
+% % =============================================
+% % date: 2019-07-29
+% % Based on multipole expansion around reference trajectory from fieldmap analysis of measurement data
+% % folder = bo-dipoles/model-09/analysis/hallprobe/excitation_curve/x-ref-28p255mm-reftraj/bd-006/0060p46A
+% % ref_rx  = 28.255 mm (used in the alignment)
+% % init_rx = 9.1563 mm (average, different for each dipole to match ref_rx)
+% % goal_tunes = [19.20433, 7.31417];
+% % goal_chrom = [0.5, 0.5];
+
+segmodel_150MeV = [ ...
+b,      0.19600, 1.16095, -2.9521e-05, -2.2953e-01, -1.9835e+00, -3.1164e+00, -5.5670e+02, -1.7476e+04, -5.0956e+05;
+b,      0.19200, 1.14607, +4.6028e-05, -2.1389e-01, -1.9732e+00, +1.0720e+00, -3.3952e+02, -2.9134e+04, +1.6710e+06; 
+b,      0.18200, 1.09390, +4.6495e-04, -1.8724e-01, -1.9278e+00, -3.4280e-01, -2.5900e+02, -3.8416e+03, +4.5036e+05; 
+b,      0.01000, 0.04988, +1.3811e-03, -2.5658e-01, -1.8540e+00, +1.4360e+01, +1.5288e+03, -8.5204e+03, -8.8288e+06; 
+b,      0.01000, 0.03607, +1.0497e-03, -1.7873e-01, -1.3828e+00, +1.7956e+01, +1.1377e+03, +2.1959e+04, -9.8321e+06; 
+b_edge, 0,0,0,0,0,0,0,0,0
+b,      0.01300, 0.03238, +3.7135e-04, -6.0692e-02, -1.9748e+00, +1.9712e+01, +4.7660e+02, +2.6825e+04, -6.4633e+06; 
+b,      0.01700, 0.02914, +3.8800e-05, +1.0925e-03, -2.4287e+00, +9.8002e+00, +1.9017e+02, +2.7471e+04, -2.9952e+06; 
+b,      0.02000, 0.02274, -1.4480e-04, +2.2144e-02, -2.2824e+00, -3.1138e-01, +7.3542e+02, +2.3161e+04, -3.8130e+06; 
+b,      0.03000, 0.01848, -2.0692e-04, +2.0159e-02, -1.4701e+00, -6.1800e+00, -1.6290e+01, +3.2373e+04, +2.7180e+05; 
+b,      0.05000, 0.01039, -8.3314e-04, +6.7566e-03, -4.7985e-01, +1.4036e+00, -2.2084e+02, -8.8720e+03, +1.0762e+06; 
+b_pb,   0,0,0,0,0,0,0,0,0
+];
+
+
+% % Average Dipole Model for BD at 3GeV (991.63A)
 % % =============================================
 % % date: 2019-07-26
 % % Based on multipole expansion around Runge-Kutta trajectory from fieldmap analysis of measurement data
@@ -68,33 +94,34 @@ b_pb,   0,0,0,0,0,0,0,0,0
 % b_pb,   0,0,0,0,0,0,0,0,0
 % ];
 
-% dipole model 2018-08-16 (150MeV)
-% ================================
-% dipole model09
-% filename: 2016-12-05_BD_Model09_Sim_X=-80_35mm_Z=-1000_1000mm_I=48.92A.txt
-% analysis with x0(@z=0)=9.1013mm so that x_ref = 28.255 mm, the same value
-% used in alignning the magnets.
-segmodel_150MeV = [ ...
- %--- model polynom_b (rz > 0). units: [m] for length, [rad] for angle and [m^(n-1)] for polynom_b ---
- %type   len[m]   angle[deg]  PolyB(n=0)   PolyB(n=1)   PolyB(n=2)   PolyB(n=3)   PolyB(n=4)   PolyB(n=5)   PolyB(n=6)
- b,      0.1960 ,  +1.15695 ,  +0.00e+00 ,  -2.27e-01 ,  -1.98e+00 ,  -6.46e+00 ,  -3.18e+02 ,  -2.07e+04 ,  -7.38e+05 ;
- b,      0.1920 ,  +1.14266 ,  +0.00e+00 ,  -2.12e-01 ,  -1.93e+00 ,  -3.58e+00 ,  -1.25e+02 ,  -7.24e+03 ,  -4.62e+05 ;
- b,      0.1820 ,  +1.09643 ,  +0.00e+00 ,  -1.86e-01 ,  -1.90e+00 ,  +1.97e-01 ,  -1.76e+02 ,  +3.42e+03 ,  -1.05e+05 ;
- b,      0.0100 ,  +0.05151 ,  +0.00e+00 ,  -2.61e-01 ,  -1.71e+00 ,  +1.15e+01 ,  -6.72e+02 ,  +2.00e+04 ,  +3.34e+05 ;
- b,      0.0100 ,  +0.03716 ,  +0.00e+00 ,  -1.84e-01 ,  -1.12e+00 ,  +2.05e+01 ,  -9.15e+02 ,  +1.94e+04 ,  -3.13e+05 ;
- b_edge, 0,0,0,0,0,0,0,0,0
- b,      0.0130 ,  +0.03296 ,  +0.00e+00 ,  -6.81e-02 ,  -1.64e+00 ,  +2.68e+01 ,  -9.37e+02 ,  +1.14e+04 ,  -2.40e+05 ;
- b,      0.0170 ,  +0.02916 ,  +0.00e+00 ,  -1.26e-02 ,  -1.91e+00 ,  +2.13e+01 ,  -5.64e+02 ,  +1.60e+03 ,  +1.02e+04 ;
- b,      0.0200 ,  +0.02235 ,  +0.00e+00 ,  +4.51e-03 ,  -1.59e+00 ,  +1.07e+01 ,  -1.95e+02 ,  -1.19e+03 ,  +3.80e+04 ;
- b,      0.0300 ,  +0.01836 ,  +0.00e+00 ,  +4.57e-03 ,  -9.29e-01 ,  +3.96e+00 ,  -4.34e+01 ,  -5.33e+02 ,  +1.08e+04 ;
- b,      0.0500 ,  +0.01246 ,  -1.17e-04 ,  +2.34e-03 ,  -3.61e-01 ,  +8.08e-01 ,  -3.79e-01 ,  -1.15e+02 ,  +1.97e+03 ;
- b_pb,   0,0,0,0,0,0,0,0,0
-];
-
+% % Dipole Model for BD-006 at 149.3018 MeV (60.46A)
+% % =============================================
+% % date: 2019-07-29
+% % Based on multipole expansion around Runge-Kutta trajectory from fieldmap analysis of measurement data
+% % folder = bo-dipoles/model-09/analysis/hallprobe/excitation_curve/x0-9p1013mm/bd-006/0060p46A
+% % ref_rx  = 28.255 mm (used in the alignment)
+% % init_rx = 9.1013 mm (value used in bd-004 to match required ref_rx)
+% % goal_tunes = [19.20433, 7.31417];
+% % goal_chrom = [0.5, 0.5];
+% 
+% segmodel_150MeV = [ ...
+% b,      0.19600, 1.16080, +0.0000e+00, -2.2900e-01, -1.9850e+00, -2.8750e+00, -5.8000e+02, -1.8380e+04, -3.5200e+05; 
+% b,      0.19200, 1.14674, +0.0000e+00, -2.1350e-01, -1.9700e+00, +1.0605e+00, -3.2650e+02, -2.9050e+04, +1.6300e+06; 
+% b,      0.18200, 1.09889, +0.0000e+00, -1.8700e-01, -1.9300e+00, -2.9000e-01, -2.5000e+02, -4.0300e+03, +4.0800e+05; 
+% b,      0.01000, 0.05067, +0.0000e+00, -2.5650e-01, -1.8550e+00, +1.4100e+01, +1.5670e+03, -5.8450e+03, -9.0400e+06; 
+% b,      0.01000, 0.03667, +0.0000e+00, -1.7900e-01, -1.3850e+00, +1.7800e+01, +1.1415e+03, +2.4300e+04, -9.9150e+06;
+% b_edge, 0,0,0,0,0,0,0,0,0
+% b,      0.01300, 0.03265, +0.0000e+00, -6.0650e-02, -1.9750e+00, +1.9650e+01, +4.5650e+02, +2.8550e+04, -6.3900e+06; 
+% b,      0.01700, 0.02917, +0.0000e+00, +1.2650e-03, -2.4250e+00, +9.7850e+00, +1.6800e+02, +2.8300e+04, -2.9090e+06; 
+% b,      0.02000, 0.02257, +0.0000e+00, +2.2350e-02, -2.2800e+00, -3.3350e-01, +6.9800e+02, +2.3400e+04, -3.6350e+06; 
+% b,      0.03000, 0.01811, +0.0000e+00, +2.0300e-02, -1.4700e+00, -6.1750e+00, -6.5000e+01, +3.2300e+04, +5.0000e+05; 
+% b,      0.05000, 0.00375, -4.5000e-05, +6.6600e-03, -4.9550e-01, +1.7900e+00, -1.6400e+02, -1.5005e+04, +9.4750e+05;
+% b_pb,   0,0,0,0,0,0,0,0,0
+% ];
 
 % interpolates multipoles linearly in energy
 segmodel = segmodel_3GeV;
-segmodel(:,4:end) = segmodel_150MeV(:,4:end) + (energy - 150e6)/(3e9-150e6) * (segmodel_3GeV(:,4:end) - segmodel_150MeV(:,4:end));
+segmodel(:,4:end) = segmodel_150MeV(:,4:end) + (energy - 149.3018e6)/(3e9-149.3018e6) * (segmodel_3GeV(:,4:end) - segmodel_150MeV(:,4:end));
 
 % converts deflection angle from degress to radians
 segmodel(:,3) = segmodel(:,3) * (pi/180.0);
