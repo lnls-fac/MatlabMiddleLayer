@@ -1,8 +1,18 @@
-function [m_h, m_v, ch, cv] = sirius_tb_measposang_corrmat(thering)
+function [m_h, m_v, ch, cv] = sirius_tb_measposang_corrmat(thering, flag_corr)
 
 data = sirius_tb_family_data(thering);
 chv = data.CHV.ATIndex;
-ch = {chv(end-1), data.InjSept.ATIndex};
+
+% It is possible to use the last CH or the Injection Septum to calculate 
+% the PosAng correction matrix.
+if strcmp(flag_corr, 'CH-CH')
+    ch = {chv(end-1), chv(end)};
+elseif strcmp(flag_corr, 'CH-Sept')
+    ch = {chv(end-1), data.InjSept.ATIndex};
+else
+    error('Set flag_corr CH-CH or CH-Sept')
+end
+
 cv = {chv(end-1), chv(end)};
 
 kick = 1e-5;

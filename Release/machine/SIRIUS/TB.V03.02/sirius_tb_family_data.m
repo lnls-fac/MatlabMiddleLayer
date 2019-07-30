@@ -32,7 +32,7 @@ for i=1:length(fams)
 end
 
 % correctors
-data.CH.ATIndex = data.CHV.ATIndex(1:end-1); % last CHV corrector does not have CH power supply.
+data.CH.ATIndex = data.CHV.ATIndex;
 data.CV.ATIndex = data.CHV.ATIndex;
 
 for i=1:length(fams)
