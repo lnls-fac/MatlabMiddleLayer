@@ -12,7 +12,7 @@ Disconnect = false;
 
 default_li_version = 'LI.V01.01';
 default_tb_version = 'TB.V03.01';
-default_bo_version = 'BO.V05.03';
+default_bo_version = 'BO.V05.04';
 default_ts_version = 'TS.V03.04';
 default_si_version = 'SI.V24.04';
 default_link       = 'LABCA';
