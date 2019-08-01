@@ -23,7 +23,7 @@ function [r, lattice_title, IniCond] = sirius_tb_lattice(varargin)
 
 % --- system parameters ---
 energy = 0.15e9;
-lattice_version = 'TB.V03.01';
+lattice_version = 'TB.V03.02';
 mode = 'M';
 version = '1';
 mode_version = [mode version];
