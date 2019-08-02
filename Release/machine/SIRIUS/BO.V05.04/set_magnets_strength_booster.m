@@ -179,25 +179,44 @@
 % idx = findcells(THERING, 'FamName', 'SF'); disp(THERING{idx(1)}.PolynomB(3));
 % idx = findcells(THERING, 'FamName', 'SD'); disp(THERING{idx(1)}.PolynomB(3));
 
-% NOTE: if magnet models based on measurements are used, these strength
-% values will be different. see 'sirius_bo_models_from_measurements.m'
+% % NOTE: if magnet models based on measurements are used, these strength
+% % values will be different. see 'sirius_bo_models_from_measurements.m'
+% 
+% qf_strength_3gev = 1.653948476924229;
+% qd_strength_3gev = 0.004348693222430; % this is correct! the sign has changed!
+% qs_strength_3gev = 0.0;
+% sf_strength_3gev = 11.331409123896279;
+% sd_strength_3gev = 6.254896348595790;
+% 
+% qf_strength_150mev = 1.653944034925625;
+% qd_strength_150mev = 0.011836698177126; % this is correct! the sign has changed!
+% qs_strength_150mev = 0.0;
+% sf_strength_150mev = 11.332065904774284;
+% sd_strength_150mev = 4.973798424490276;
+% 
+% qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
+% qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
+% qs_strength = qs_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qs_strength_3gev - qs_strength_150mev);
+% sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
+% sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
 
-qf_strength_3gev = 1.653948476924229;
-qd_strength_3gev = 0.004348693222430; % this is correct! the sign has changed!
+% 2019-08-01 Murilo
+
+qf_strength_3gev = 1.65458216649285;
+qd_strength_3gev = -0.11276026973021;
 qs_strength_3gev = 0.0;
-sf_strength_3gev = 11.331409123896279;
-sd_strength_3gev = 6.254896348595790;
+sf_strength_3gev = +11.30745884748409;
+sd_strength_3gev = +10.52221952522381;
 
-qf_strength_150mev = 1.653944034925625;
-qd_strength_150mev = 0.011836698177126; % this is correct! the sign has changed!
+qf_strength_150mev = 1.65380213538720;
+qd_strength_150mev = -0.00097311784326;
 qs_strength_150mev = 0.0;
-sf_strength_150mev = 11.332065904774284;
-sd_strength_150mev = 4.973798424490276;
+sf_strength_150mev = 11.32009586848142;
+sd_strength_150mev = 10.37672159358045;
 
 qf_strength = qf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qf_strength_3gev - qf_strength_150mev);
 qd_strength = qd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qd_strength_3gev - qd_strength_150mev);
 qs_strength = qs_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (qs_strength_3gev - qs_strength_150mev);
 sf_strength = sf_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sf_strength_3gev - sf_strength_150mev);
 sd_strength = sd_strength_150mev + ((energy-150e6)/(3e9-150e6)) * (sd_strength_3gev - sd_strength_150mev);
-
 
