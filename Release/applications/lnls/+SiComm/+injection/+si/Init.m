@@ -1,15 +1,15 @@
-function machine_data = set_machine(si_ring, n_mach)
+function MD = Init(THERING)
 % Setting of random machines, nominal injection parameters (without errors), parameters with errors and the standard deviation to generate errors.
 % It includes random errors of excitation and alignment of magnets and also
 % adjustes the vacuum chamber at injection point (injection septum).
 %
 % INPUT:
-% - si_ring: nominal ring model
-% - n_mach: number of machines that will be generated
+% - THERING: nominal ring model
+% - NMACH: number of machines that will be generated
 %
 % OUTPUTS:
-% - machine_data: struct with the following fields
-%         - machine: cell with n_mach elements which are random machines models
+% - MD (machine_data): struct with the following fields
+%         - machine: cell with NMACH elements which are random machines models
 %         - parameters: injection parameters with errors added for each machine
 %         - errors: injection errors introduced in the nominal parameters
 %         - sigma_errors: standard deviation to generate random errors
@@ -18,101 +18,97 @@ function machine_data = set_machine(si_ring, n_mach)
 % NOTE: once the function sirius_bo_lattice_errors_analysis() is updated,
 % this function must be updated too in the parts of magnet errors.
 %
-% See also: sirius_commis.common.add_errors
+% See also: SiComm.common.add_errors
 
     % Seeds initialization for the sake of reprodubility
-    sirius_commis.common.initializations();
-
-    % Initializing variables
-    param_errors = cell(n_mach, 1);
-    param = cell(n_mach, 1);
+    % SiComm.common.initializations();
 
     % Shifting the ring to begin in the injection septum
-    si_ring = shift_ring(si_ring, 'InjSeptF');
-    fam = sirius_si_family_data(si_ring);
+    THERING = shift_ring(THERING, 'InjSeptF');
+    fam = sirius_si_family_data(THERING);
 
     %Twiss function at injection point
-    si_twiss = calctwiss(si_ring);
-    param_init.twiss.betax0 = si_twiss.betax(1);
-    param_init.twiss.betay0 = si_twiss.betay(1);
-    param_init.twiss.alphax0 = si_twiss.alphax(1);
-    param_init.twiss.alphay0 = si_twiss.alphay(1);
-    param_init.twiss.etax0 = si_twiss.etax(1);
-    param_init.twiss.etay0 = si_twiss.etay(1);
-    param_init.twiss.etaxl0 = si_twiss.etaxl(1);
-    param_init.twiss.etayl0 = si_twiss.etayl(1);
+    si_twiss = calctwiss(THERING);
+    MD.Inj.Twiss.betax0 = si_twiss.betax(1);
+    MD.Inj.Twiss.betay0 = si_twiss.betay(1);
+    MD.Inj.Twiss.alphax0 = si_twiss.alphax(1);
+    MD.Inj.Twiss.alphay0 = si_twiss.alphay(1);
+    MD.Inj.Twiss.etax0 = si_twiss.etax(1);
+    MD.Inj.Twiss.etay0 = si_twiss.etay(1);
+    MD.Inj.Twiss.etaxl0 = si_twiss.etaxl(1);
+    MD.Inj.Twiss.etayl0 = si_twiss.etayl(1);
 
     %Beam parameters from Booster
-    param_init.beam.emitn = 3.47e-9; k = 3e-2;
-    param_init.beam.coupling = k;
-    param_init.beam.emitx =  param_init.beam.emitn / (1+k);
-    param_init.beam.emity = param_init.beam.emitx * k;
-    param_init.beam.sigmae = 9e-4;
-    param_init.beam.sigmaz = 3e-3;
+    MD.Beam.emitn = 3.47e-9; k = 3e-2;
+    MD.Beam.coupling = k;
+    MD.Beam.emitx =  MD.Beam.emitn / (1+k);
+    MD.Beam.emity = MD.Beam.emitx * k;
+    MD.Beam.sigmae = 9e-4;
+    MD.Beam.sigmaz = 3e-3;
+    MD.Beam.Cutoff = 3;
+    MD.Beam.NPart = 100;
+    MD.Beam.Lost = 0.10;
 
     %Nominal settings for injection
-    param_init.offset_x0 = -17.92e-3;
-    param_init.offset_xl0 = 5.608e-3;
-    param_init.offset_y0 = 0;
-    param_init.offset_yl0 = 0;
-    param_init.kckr0 = -5.608e-3;
-    param_init.delta0 = 0;
-    param_init.delta_ave = 0;
-    param_init.phase = 0;
+    MD.Inj.R0.offset_x0 = -17.92e-3;
+    MD.Inj.R0.offset_xl0 = 5.608e-3;
+    MD.Inj.R0.offset_y0 = 0;
+    MD.Inj.R0.offset_yl0 = 0;
+    MD.Inj.R0.kckr0 = -5.608e-3;
+    MD.Inj.R0.delta0 = 0;
+    MD.Inj.R0.delta_ave = 0;
+    MD.Inj.R0.phase = 0;
+    MD.Inj.NPulses = 1;
+    MD.Inj.NTurns = 1;
 
     %One sigma to generate systematic and jitter errors in injection parameters and also in the diagnostics
-    param_sigma.x_syst = 2e-3; param_sigma.x_jit = 500e-6;
-    param_sigma.xl_syst = 3e-3; param_sigma.xl_jit = 30e-6;
-    param_sigma.y_syst = 2e-3; param_sigma.y_jit = 500e-6;
-    param_sigma.yl_syst = 3e-3; param_sigma.yl_jit = 30e-6;
-    param_sigma.kckr_syst = 1e-3; param_sigma.kckr_jit = 30e-6;
-    param_sigma.energy_syst = 1e-2; param_sigma.energy_jit = 0.3e-2;
-    param_sigma.bpm_offset = 500e-6; param_sigma.bpm_jit = 2e-3;
-    param_sigma.scrn_offset = 1e-3; param_sigma.scrn_jit = 500e-6;
+    MD.Err.Sigma.x_syst = 2e-3; MD.Err.Sigma.x_jit = 500e-6;
+    MD.Err.Sigma.xl_syst = 3e-3; MD.Err.Sigma.xl_jit = 30e-6;
+    MD.Err.Sigma.y_syst = 2e-3; MD.Err.Sigma.y_jit = 500e-6;
+    MD.Err.Sigma.yl_syst = 3e-3; MD.Err.Sigma.yl_jit = 30e-6;
+    MD.Err.Sigma.kckr_syst = 1e-3; MD.Err.Sigma.kckr_jit = 30e-6;
+    MD.Err.Sigma.energy_syst = 1e-2; MD.Err.Sigma.energy_jit = 0.3e-2;
+    MD.Err.Sigma.bpm_offset = 500e-6; MD.Err.Sigma.bpm_jit = 2e-3;
+    MD.Err.Sigma.scrn_offset = 1e-3; MD.Err.Sigma.scrn_jit = 500e-6;
 
     %Calculates the horizontal dispersion function at BPMs
     bpms = fam.BPM.ATIndex;
     delta = 1e-8;
     r_init_n = [0; 0; 0; 0; - delta / 2; 0];
-    r_final_n = linepass(si_ring, r_init_n, bpms);
+    r_final_n = linepass(THERING, r_init_n, bpms);
     r_init_p = [0; 0; 0; 0; + delta / 2; 0];
-    r_final_p = linepass(si_ring, r_init_p, bpms);
+    r_final_p = linepass(THERING, r_init_p, bpms);
     x_n = r_final_n(1, :);
     x_p = r_final_p(1, :);
-    param_init.etax_bpms = (x_p - x_n) ./ delta;
+    MD.Inj.Twiss.DispersionBPMs = (x_p - x_n) ./ delta;
 
-    machine = si_ring;
-    factor = 1; %Can be used to control the error tolerances
+    MD.Ring = THERING;
+    MD.Err.Sigma.Cutoff = 1;
 
     %Turning off the cavity and radiation effects
-    machine = setcavity('off', machine);
-    machine = setradiation('off', machine);
+    MD.Ring = setcavity('off', MD.Ring);
+    MD.Ring = setradiation('off', MD.Ring);
+
+    factor = 1;
 
     %Alignments, rolls and excitation errors
-    machine  = create_apply_errors(machine, fam, n_mach, factor);
+    MD.Ring  = create_apply_errors(MD.Ring, fam, 1, factor);
 
     %Higher-order multipoles errors
-    machine  = create_apply_multipoles(machine, fam);
+    MD.Ring  = create_apply_multipoles(MD.Ring, fam);
 
     %Including offsets in the BPMs measurements
-    machine = create_apply_bpm_errors(machine, fam, factor, param_sigma.bpm_offset);
+    MD.Ring = create_apply_bpm_errors(MD.Ring, fam, factor, MD.Err.Sigma.bpm_offset);
+    MD.Ring = MD.Ring{1};
 
-    %For each random machine, based on the sigma errors given by param_sigma, generate random injection parameters errors
-    for i = 1:n_mach
-        [param_errors{i}, param{i}] = sirius_commis.common.add_errors(param_init, param_sigma, 1);
-    end
+    MD = SiComm.common.add_errors(MD);
     
-    [~, param_nom] = sirius_commis.common.add_errors(param_init, param_sigma, 0);
-
-    machine_data.machine = machine;
-    machine_data.parameters = param;
-    machine_data.errors = param_errors;
-    machine_data.sigma_errors = param_sigma;
-    machine_data.nominal_parameters = param_nom;
+    MD.COD4D = findorbit4(MD.Ring, 0, 1:length(MD.Ring));
+    MD.COD6D = findorbit6(MD.Ring, 1:length(MD.Ring));
 end
 
 %% Magnet Errors:
-function machine = create_apply_errors(the_ring, family_data, n_mach, factor)
+function machine = create_apply_errors(the_ring, family_data, NMACH, factor)
 
           fprintf('\n<error generation and random machines creation> [%s]\n\n', datestr(now));
         name = 'CONFIG';
@@ -190,7 +186,7 @@ function machine = create_apply_errors(the_ring, family_data, n_mach, factor)
 
 
         % generates error vectors
-        nr_machines   = n_mach;
+        nr_machines   = NMACH;
         rndtype       = 'gaussian';
         cutoff_errors = 1;
         fprintf('-  generating errors ...\n');

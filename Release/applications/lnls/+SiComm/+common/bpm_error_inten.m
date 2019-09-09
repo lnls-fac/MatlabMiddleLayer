@@ -14,10 +14,10 @@ function [sigma_bpm, int_bpm] = bpm_error_inten(r_xy, n_part, sigma_bpm0)
 %   - int_bpm: corresponding intensity in each BPM (ratio of number of
 %   particles reaching BPM and total number of particles injected)
 
-    if n_part == 1
-        r_xy = reshape(r_xy, 2, [], size(r_xy, 2));
-    end
-    Rate = sirius_commis.common.calc_eff(n_part, r_xy(1, :, :));
+    % if n_part == 1
+    %    r_xy = reshape(r_xy, 2, [], size(r_xy, 2));
+    % end
+    Rate = SiComm.common.calc_eff(n_part, r_xy(1, :, :));
     sigma = ( sigma_bpm0 ./ Rate )';
     sigma(isinf(sigma)) = NaN;
     cutoff = 1;
