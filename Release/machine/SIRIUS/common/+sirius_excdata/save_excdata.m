@@ -167,8 +167,8 @@ text_avg = {
 '# ===============';
 };
 text_std = text_avg;
-fmt1 = '%+08.2f';
-fmt2 = '%+13.6e';
+fmt1 = '%+08.4f';
+fmt2 = '%+13.4e';
 if mirror
     for i=length(currents):-1:2
         text_avg{end+1} = [num2str(-currents(i), fmt1), '  '];

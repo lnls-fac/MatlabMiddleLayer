@@ -20,6 +20,11 @@ for i=1:length(currs)
         rotcoil.(mag_field).mags{end+1} = [mag_label, serials{j}];
         fname = [lower(mag_label), serials{j}, '-', currs{i}];
         magnet = fullfile(tpath, 'models', 'dipoles', loc_folder, fname);
+        if strcmpi(mag_label, 'b1-')
+            magnet = fullfile(tpath, 'models', 'dipoles-b1', loc_folder, fname);
+        elseif strcmpi(mag_label, 'b2-')
+            magnet = fullfile(tpath, 'models', 'dipoles-b2', loc_folder, fname);
+        end
         [harms, ~, nmpole, smpole, params] = sirius_excdata.load_fmap_model(magnet);
         nmp = [nmp; nmpole];
         smp = [smp; smpole];
