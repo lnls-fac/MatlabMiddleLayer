@@ -36,18 +36,23 @@ set_parameters_ts;
 
 bend_pass_method = 'BndMPoleSymplectic4Pass';
 quad_pass_method = 'StrMPoleSymplectic4Pass';
+sext_pass_method = 'StrMPoleSymplectic4Pass';
 
 
 %% elements
 %  ========
 % --- drift spaces ---
 ldif     = 0.1442; 
+lcv      = 0.150;
 l015     = drift('l015',  0.15, 'DriftPass');
 l020     = drift('l020',  0.20, 'DriftPass');
+l0125    = drift('l0125', 0.20-lcv/2, 'DriftPass');
 l025     = drift('l025',  0.25, 'DriftPass');
+l0175    = drift('l0175', 0.25-lcv/2, 'DriftPass');
 l060     = drift('l060',  0.60, 'DriftPass');
+l0525    = drift('l0525', 0.60-lcv/2, 'DriftPass');
 l080     = drift('l080',  0.80, 'DriftPass');
-l090     = drift('l090',  0.90, 'DriftPass');
+l0825    = drift('l0825', 0.90-lcv/2, 'DriftPass');
 l160     = drift('l160',  1.60, 'DriftPass');
 l280     = drift('l280',  2.80, 'DriftPass');
 l400     = drift('l400',  4.00, 'DriftPass');
@@ -59,15 +64,15 @@ lb3p     = drift('lb3p', 0.30049, 'DriftPass');
 lb4p     = drift('lb4p', 0.19897-ldif, 'DriftPass');
 lc1p     = drift('lc1p', 0.18704-ldif, 'DriftPass');
 lc2p     = drift('lc2p', 0.07304, 'DriftPass');
-lc3p     = drift('lc3p', 0.19934, 'DriftPass');
-lc4p     = drift('lc4p', 0.72666-ldif, 'DriftPass');
+lc3p     = drift('lc3p', 0.19934-lcv/2, 'DriftPass');
+lc4p     = drift('lc4p', 0.72666-ldif-lcv/2, 'DriftPass');
 ld1p     = drift('ld1p', 0.25700-ldif, 'DriftPass');
 ld2p     = drift('ld2p', 0.05389, 'DriftPass');
-ld3p     = drift('ld3p', 0.154, 'DriftPass');
+ld3p     = drift('ld3p', 0.154-lcv/2, 'DriftPass');
 ld4p     = drift('ld4p', 0.192, 'DriftPass');
 ld5p     = drift('ld5p', 0.456, 'DriftPass');
-ld6p     = drift('ld6p', 0.258, 'DriftPass');
-ld7p     = drift('ld7p', 0.175, 'DriftPass');
+ld6p     = drift('ld6p', 0.258-lcv/2, 'DriftPass');
+ld7p     = drift('ld7p', 0.175-lcv/2, 'DriftPass');
 
 % --- markers ---
 start    = marker('start',  'IdentityPass');
@@ -84,54 +89,23 @@ fct    = marker('FCT', 'IdentityPass');
 bpm    = marker('BPM', 'IdentityPass');
 
 % --- correctors ---
-ch     = corrector('CH',  0, [0 0], 'CorrectorPass');
-cv     = corrector('CV',  0, [0 0], 'CorrectorPass');
+% CHs are inside quadrupoles
+cv = sextupole('CV', lcv, 0.0, sext_pass_method); % same model as BO correctors
 
 % --- quadrupoles ---
-  
-qf1a    = quadrupole('QF1A', 0.14, qf1ah_strength, quad_pass_method); % qf
-qf1b    = quadrupole('QF1B', 0.14, qf1bh_strength, quad_pass_method); % qf
-qd2     = quadrupole('QD2',  0.14, qd2h_strength,  quad_pass_method); % qd
-qf2     = quadrupole('QF2',  0.20, qf2h_strength,  quad_pass_method); % qf
-qf3     = quadrupole('QF3',  0.20, qf3h_strength,  quad_pass_method); % qf
-qd4a    = quadrupole('QD4A', 0.14, qd4ah_strength, quad_pass_method); % qd
-qf4     = quadrupole('QF4',  0.20, qf4h_strength,  quad_pass_method); % qf
-qd4b    = quadrupole('QD4B', 0.14, qd4bh_strength, quad_pass_method); % qd
 
-% [qf1a, ~] = sirius_si_q20_segmented_model('QF1A', qf1ah_strength,  quad_pass_method);
-% [qf1b, ~] = sirius_si_q30_segmented_model('QF1B', qf1bh_strength,  quad_pass_method);
+[qf1a, ~] = sirius_ts_q14_segmented_model('QF1A', qf1ah_strength,  quad_pass_method);
+[qf1b, ~] = sirius_ts_q14_segmented_model('QF1B', qf1bh_strength,  quad_pass_method);
+[qd2, ~]  = sirius_ts_q14_segmented_model('QD2', qd2h_strength,  quad_pass_method);
+[qf2, ~]  = sirius_ts_q20_segmented_model('QF2', qf2h_strength,  quad_pass_method);
+[qf3, ~]  = sirius_ts_q20_segmented_model('QF3', qf3h_strength,  quad_pass_method);
+[qd4a, ~] = sirius_ts_q14_segmented_model('QD4A', qd4ah_strength,  quad_pass_method);
+[qf4, ~]  = sirius_ts_q20_segmented_model('QF4', qf4h_strength,  quad_pass_method);
+[qd4b, ~] = sirius_ts_q14_segmented_model('QD4B', qd4bh_strength,  quad_pass_method);
 
 % --- bending magnets --- 
 
-      
-% -- bend --
-%dip_nam =  'B';
-%dip_len =  1.151658;
-%dip_ang =  5.333333 * deg_2_rad;
-%dip_K   =  -0.1526;
-%dip_S   =  0.00;
-%h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang/2,...
-%           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);        
-%h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2,...
-%           0, 0, 0, [0 0 0], [0 dip_K dip_S], bend_pass_method);
-%bend      = [h1 mbend h2];      
-
-% f = 5.011542/5.333333;
-% h1  = rbend_sirius('B', 0.196, d2r * 0.8597 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.163 -1.443 0] * f, bend_pass_method);
-% h2  = rbend_sirius('B', 0.192, d2r * 0.8467 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.154 -1.418 0] * f, bend_pass_method);
-% h3  = rbend_sirius('B', 0.182, d2r * 0.8099 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.14 -1.403 0] * f, bend_pass_method);
-% h4  = rbend_sirius('B', 0.010, d2r * 0.0379 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.175 -1.245 0] * f, bend_pass_method);
-% h5  = rbend_sirius('B', 0.010, d2r * 0.0274 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.115 -0.902 0] * f, bend_pass_method);
-% h6  = rbend_sirius('B', 0.013, d2r * 0.0244 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.042 -1.194 0] * f, bend_pass_method);
-% h7  = rbend_sirius('B', 0.017, d2r * 0.0216 * f, 0, 0, 0, 0, 0, [0 0 0], [0 -0.008 -1.408 0] * f, bend_pass_method);
-% h8  = rbend_sirius('B', 0.020, d2r * 0.0166 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.004 -1.276 0] * f, bend_pass_method);
-% h9  = rbend_sirius('B', 0.030, d2r * 0.0136 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0.006 -0.858 0] * f, bend_pass_method);
-% h10 = rbend_sirius('B', 0.05,  d2r * 0.0089 * f, 0, 0, 0, 0, 0, [0 0 0], [0 0 -0.05 0] * f, bend_pass_method);
-% mbend = marker('mB',  'IdentityPass');
-% bend = [h10 h9 h8 h7 h6 h5 h4 h3 h2 h1 mbend h1 h2 h3 h4 h5 h6 h7 h8 h9 h10];
-
 [bend, ~] = sirius_ts_b_segmented_model(energy, 'B', bend_pass_method);
-
 
 % -- pulsed magnets --
 
@@ -191,16 +165,14 @@ einjsf = marker('eInjSeptF', 'IdentityPass'); % marker at the end of thin septum
 injsf = [binjsf, h1, minjsf, h2, einjsf];
 
 % --- lines ---
-sec01 = [ejesf,l025,ejesg,l060,cv,l090,qf1a,la2p,ict,l280,scrn,bpm,...
-         l020,l020,ch,qf1b,l020,cv,l020,la3p,bend];
-sec02 = [l080,lb1p,qd2,lb2p,scrn,bpm,lb3p,ch,qf2,l020,cv,l025,l015,lb4p,bend];
-sec03 = [lc1p,l400,scrn,bpm,l020,lc2p,ch,qf3,lc3p,cv,lc4p,bend];
-sec04 = [ld1p,l060,qd4a,ld2p,l160,bpm,scrn,l020,ld3p,cv,l020,ch,qf4,ld4p,fct, ...
+sec01 = [ejesf,l025,ejesg,l0525,cv,l0825,qf1a,la2p,ict,l280,scrn,bpm,...
+         l020,l020,qf1b,l0125,cv,l0125,la3p,bend];
+sec02 = [l080,lb1p,qd2,lb2p,scrn,bpm,lb3p,qf2,l0125,cv,l0175,l015,lb4p,bend];
+sec03 = [lc1p,l400,scrn,bpm,l020,lc2p,qf3,lc3p,cv,lc4p,bend];
+sec04 = [ld1p,l060,qd4a,ld2p,l160,bpm,scrn,l020,ld3p,cv,l0125,qf4,ld4p,fct, ...
          ld4p,ict,ld4p,qd4b,ld5p,bpm,scrn,ld6p,cv,ld7p,injsg,l025,injsg,l025,injsf,scrn];   
      
 ltba  = [start,sec01,sec02,sec03,sec04,fim];
-
-
 %% finalization 
 
 elist = ltba;
@@ -278,10 +250,16 @@ function the_ring = set_num_integ_steps(the_ring0)
 
 the_ring = the_ring0;
 
+% bends = findcells(the_ring, 'BendingAngle');
+% quads = setdiff(findcells(the_ring, 'K'), bends);
+% sexts = setdiff(findcells(the_ring, 'PolynomB'), [bends quads]);
+% kicks = findcells(the_ring, 'XGrid');
+
+mags = findcells(the_ring, 'PolynomB');
+cv = findcells(the_ring, 'FamName', 'CV');
 bends = findcells(the_ring, 'BendingAngle');
-quads = setdiff(findcells(the_ring, 'K'), bends);
-sexts = setdiff(findcells(the_ring, 'PolynomB'), [bends quads]);
-kicks = findcells(the_ring, 'XGrid');
+quads = setdiff(mags, bends);
+quads = setdiff(quads, cv);
 
 dl = 0.035;
 
@@ -290,5 +268,5 @@ bends_nis = ceil(bends_len / dl);
 bends_nis = max([bends_nis'; 10 * ones(size(bends_nis'))]);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', bends, bends_nis);
 the_ring = setcellstruct(the_ring, 'NumIntSteps', quads, 10);
-the_ring = setcellstruct(the_ring, 'NumIntSteps', sexts, 5);
-the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);
+% the_ring = setcellstruct(the_ring, 'NumIntSteps', sexts, 5);
+% the_ring = setcellstruct(the_ring, 'NumIntSteps', kicks, 1);

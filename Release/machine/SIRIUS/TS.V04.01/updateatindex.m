@@ -18,6 +18,7 @@ Indices = atindex(THERING);
 
 AO = getao;
 
+family_data = sirius_ts_family_data(THERING);
 
 try
     % BEND
@@ -157,38 +158,50 @@ catch
     warning('BPMy family not found in the model.');
 end
 
+% try
+%     % CH
+%     AO.CH.AT.ATType = 'HCM';
+%     li = [];
+%     if isfield(Indices, 'CH'), li = [li Indices.CH]; end;
+%     if isfield(Indices, 'EjeSeptF'), li = [li Indices.EjeSeptF]; end;
+%     if isfield(Indices, 'InjSeptG'), li = [li Indices.InjSeptG]; end;
+%     AO.CH.AT.ATIndex = buildatindex(AO.CH.FamilyName, sort(li));
+%     AO.CH.Position = findspos(THERING, AO.CH.AT.ATIndex(:,1))';   
+% catch
+%     warning('CH family not found in the model.');
+% end
+% 
+% 
+% try
+%     % CV
+%     AO.CV.AT.ATType = 'VCM';
+%     li = [];
+%     if isfield(Indices, 'CV'), li = [li Indices.CV]; end;
+%     AO.CV.AT.ATIndex = buildatindex(AO.CV.FamilyName, sort(li));
+%     AO.CV.Position = findspos(THERING, AO.CV.AT.ATIndex(:,1))';   
+% catch
+%     warning('CV family not found in the model.');
+% end
+
 try
     % CH
     AO.CH.AT.ATType = 'HCM';
-    li = [];
-    if isfield(Indices, 'CH'), li = [li Indices.CH]; end;
-    if isfield(Indices, 'EjeSeptF'), li = [li Indices.EjeSeptF]; end;
-    if isfield(Indices, 'InjSeptG'), li = [li Indices.InjSeptG]; end;
-    AO.CH.AT.ATIndex = buildatindex(AO.CH.FamilyName, sort(li));
-    AO.CH.Position = findspos(THERING, AO.CH.AT.ATIndex(:,1))';   
+    AO.CH.AT.ATIndex = family_data.CH.ATIndex;
+    AO.CH.Position   = findspos(THERING, AO.CH.AT.ATIndex(:,1))';   
 catch
     warning('CH family not found in the model.');
 end
 
-
 try
     % CV
     AO.CV.AT.ATType = 'VCM';
-    li = [];
-    if isfield(Indices, 'CV'), li = [li Indices.CV]; end;
-    AO.CV.AT.ATIndex = buildatindex(AO.CV.FamilyName, sort(li));
-    AO.CV.Position = findspos(THERING, AO.CV.AT.ATIndex(:,1))';   
+    AO.CV.AT.ATIndex = family_data.CV.ATIndex;
+    AO.CV.Position   = findspos(THERING, AO.CV.AT.ATIndex(:,1))';   
 catch
     warning('CV family not found in the model.');
 end
 
-
-
-
-
 setao(AO);
-
-
 
 % Set TwissData at the start of the storage ring
 % try

@@ -20,6 +20,8 @@ data.EjeSeptG.nr_segs = 2;
 data.InjSeptF.nr_segs = 2;
 data.EjeSeptF.nr_segs = 2;
 
+data.QN.nr_segs   = 1;
+
 ind = atindex(the_ring);
 fams = fields(data);
 for i=1:length(fams)
@@ -33,3 +35,28 @@ for i=1:length(fams)
         data.(fams{i}).ATIndex = reshape(data.(fams{i}).ATIndex,data.(fams{i}).nr_segs,[])';
     end
 end
+
+% chs - slow horizontal correctors
+idx = [];
+idx = [idx; data.QF1B.ATIndex];
+idx = [idx; data.QF2.ATIndex];
+idx = [idx; data.QF3.ATIndex];
+idx = [idx; data.QF4.ATIndex];
+idx = sort(idx);
+data.CH.ATIndex = reshape(idx,data.CH.nr_segs,[]);
+data.CH.ATIndex = data.CH.ATIndex';
+
+% kbs - quadrupoles knobs for optics correction
+idx = [];
+idx = [idx; data.QF1A.ATIndex];
+idx = [idx; data.QF1B.ATIndex];
+idx = [idx; data.QD2.ATIndex];
+idx = [idx; data.QF2.ATIndex];
+idx = [idx; data.QF3.ATIndex];
+idx = [idx; data.QD4A.ATIndex];
+idx = [idx; data.QF4.ATIndex];
+idx = [idx; data.QD4B.ATIndex];
+idx = sort(idx);
+data.QN.ATIndex = reshape(idx,data.QN.nr_segs,[]);
+data.QN.ATIndex = data.QN.ATIndex';
+
