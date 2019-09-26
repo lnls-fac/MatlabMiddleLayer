@@ -55,23 +55,23 @@ l080     = drift('l080',  0.80, 'DriftPass');
 l0825    = drift('l0825', 0.90-lcv/2, 'DriftPass');
 l160     = drift('l160',  1.60, 'DriftPass');
 l280     = drift('l280',  2.80, 'DriftPass');
-l400     = drift('l400',  4.00, 'DriftPass');
+% l400     = drift('l400',  4.00, 'DriftPass');
 la2p     = drift('la2p', 0.08323, 'DriftPass');
 la3p     = drift('la3p', 0.232-ldif, 'DriftPass');
 lb1p     = drift('lb1p', 0.220-ldif, 'DriftPass');
 lb2p     = drift('lb2p', 0.83251, 'DriftPass');
 lb3p     = drift('lb3p', 0.30049, 'DriftPass');
 lb4p     = drift('lb4p', 0.19897-ldif, 'DriftPass');
-lc1p     = drift('lc1p', 0.18704-ldif, 'DriftPass');
+lc1p     = drift('lc1p', 1.314-ldif, 'DriftPass');
 lc2p     = drift('lc2p', 0.07304, 'DriftPass');
 lc3p     = drift('lc3p', 0.19934-lcv/2, 'DriftPass');
 lc4p     = drift('lc4p', 0.72666-ldif-lcv/2, 'DriftPass');
-ld1p     = drift('ld1p', 0.25700-ldif, 'DriftPass');
-ld2p     = drift('ld2p', 0.05389, 'DriftPass');
-ld3p     = drift('ld3p', 0.154-lcv/2, 'DriftPass');
+ld1p     = drift('ld1p', 0.25700 + ldif -ldif, 'DriftPass'); % drift length in the drawing is specified different
+ld2p     = drift('ld2p', 0.05428, 'DriftPass');
+ld3p     = drift('ld3p', 0.35361-lcv/2, 'DriftPass');
 ld4p     = drift('ld4p', 0.192, 'DriftPass');
-ld5p     = drift('ld5p', 0.456, 'DriftPass');
-ld6p     = drift('ld6p', 0.258-lcv/2, 'DriftPass');
+ld5p     = drift('ld5p', 0.45593, 'DriftPass');
+ld6p     = drift('ld6p', 0.48307-lcv/2, 'DriftPass');
 ld7p     = drift('ld7p', 0.175-lcv/2, 'DriftPass');
 
 % --- markers ---
@@ -168,9 +168,9 @@ injsf = [binjsf, h1, minjsf, h2, einjsf];
 sec01 = [ejesf,l025,ejesg,l0525,cv,l0825,qf1a,la2p,ict,l280,scrn,bpm,...
          l020,l020,qf1b,l0125,cv,l0125,la3p,bend];
 sec02 = [l080,lb1p,qd2,lb2p,scrn,bpm,lb3p,qf2,l0125,cv,l0175,l015,lb4p,bend];
-sec03 = [lc1p,l400,scrn,bpm,l020,lc2p,qf3,lc3p,cv,lc4p,bend];
-sec04 = [ld1p,l060,qd4a,ld2p,l160,bpm,scrn,l020,ld3p,cv,l0125,qf4,ld4p,fct, ...
-         ld4p,ict,ld4p,qd4b,ld5p,bpm,scrn,ld6p,cv,ld7p,injsg,l025,injsg,l025,injsf,scrn];   
+sec03 = [lc1p,l280,scrn,bpm,l020,lc2p,qf3,lc3p,cv,lc4p,bend];
+sec04 = [ld1p,l060,qd4a,ld2p,l160,bpm,scrn,ld3p,cv,l0125,qf4,ld4p,fct, ...
+         ld4p,ict,ld4p,qd4b,ld5p,bpm,scrn,ld6p,cv,ld7p,injsg,l025,injsg,l025,injsf,scrn];
      
 ltba  = [start,sec01,sec02,sec03,sec04,fim];
 %% finalization 
