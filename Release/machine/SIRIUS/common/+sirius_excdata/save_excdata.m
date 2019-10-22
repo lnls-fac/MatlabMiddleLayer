@@ -1,7 +1,10 @@
-function save_excdata(sorting, fname, currents, main_mpole, harmonics, n_avg, s_avg, n_std, s_std, mfilename)
+function save_excdata(sorting, fname, currents, main_mpole, harmonics, n_avg, s_avg, n_std, s_std, mfilename, mirror)
 
+if ~exist('mirror', 'var')
+    mirror = 0;
+end
 header = excdata_file_header(fname, harmonics, main_mpole);
-[data_avg, data_std] = excdata_table(currents, n_avg, s_avg, n_std, s_std);
+[data_avg, data_std] = excdata_table(currents, n_avg, s_avg, n_std, s_std, mirror);
 comments = excdata_file_comments(sorting, mfilename);
 poltable = excdata_file_polarity_table;
 filefmt = excdata_fileformat;
@@ -83,7 +86,7 @@ text = {
 '# corrector-vertical      | VKick > 0      | BXL  < 0    | -1.0        | I > 0';
 '# quadrupole (focusing)   | KL    > 0      | D1NL < 0    | -1.0        | I > 0';
 '# quadrupole (defocusing) | KL    < 0      | D1NL > 0    | -1.0        | I > 0';
-'# quadrupole (skew)       | KL    > 0      | D1SL > 0    | +1.0        | I > 0';
+'# quadrupole (skew)       | KL    < 0      | D1SL > 0    | -1.0        | I > 0';
 '# sextupole  (focusing)   | SL    > 0      | D2NL < 0    | -1.0        | I > 0';
 '# sextupole  (defocusing) | SL    < 0      | D2NL > 0    | -1.0        | I > 0';
 '# ';
@@ -99,6 +102,7 @@ text = {
 '# HKick := ConvSign * BYL / abs(Brho)';
 '# VKick := ConvSign * BXL / abs(Brho)';
 '# KL    := ConvSign * D1NL / abs(Brho)';
+'# KL    := ConvSign * D1SL / abs(Brho)';
 '# SL    := ConvSign * D2NL / abs(Brho)';
 '# ';
 '# Obs:';
@@ -142,7 +146,7 @@ text = {
 function text = excdata_fileformat
 
 text = {
-' '; 
+' ';
 '# STATIC DATA FILE FORMAT';
 '# =======================';
 '# ';
@@ -156,7 +160,7 @@ text = {
 '#    b) otherwise the line is ignored as a comment line.';
 };
 
-function [text_avg, text_std] = excdata_table(currents, n_avg, s_avg, n_std, s_std)
+function [text_avg, text_std] = excdata_table(currents, n_avg, s_avg, n_std, s_std, mirror)
 
 text_avg = {
 '';
@@ -166,6 +170,17 @@ text_avg = {
 text_std = text_avg;
 fmt1 = '%+08.2f';
 fmt2 = '%+13.6e';
+if mirror
+    for i=length(currents):-1:2
+        text_avg{end+1} = [num2str(-currents(i), fmt1), '  '];
+        text_std{end+1} = [num2str(-currents(i), fmt1), '  '];
+        for j=1:size(n_avg, 2)
+            text_avg{end} = [text_avg{end}, num2str(-n_avg(i,j), fmt2), ' ', num2str(-s_avg(i,j), fmt2), '  '];
+            text_std{end} = [text_std{end}, num2str(n_std(i,j), fmt2), ' ', num2str(s_std(i,j), fmt2), '  '];
+        end
+end
+
+end
 for i=1:length(currents)
     text_avg{end+1} = [num2str(currents(i), fmt1), '  '];
     text_std{end+1} = [num2str(currents(i), fmt1), '  '];

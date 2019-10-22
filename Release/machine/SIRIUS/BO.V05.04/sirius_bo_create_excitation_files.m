@@ -9,9 +9,9 @@ currs = {
     '0942p05A', '0991p63A', '1041p21A'};
 serials = {'006'};
 sirius_excdata.read_multipole_from_fmap_files(tpath, currs, 'B', 'BD-', serials, 'excitation_curve');
-currents = [0, 40.31, 50.39, 60.46, 165.27, 330.54, 500, 640, 680, 720, 800, 942.05, 992.63, 1041.21];
+currents = [0, 40.31, 50.39, 60.46, 165.27, 330.54, 500, 640, 680, 720, 800, 942.05, 991.63, 1041.21];
 [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'B', 'dipoles', 'sorting.txt', 1, true);
-sirius_excdata.save_excdata({'BD-006'}, 'bo-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m');
+sirius_excdata.save_excdata({'BD-006'}, 'bo-dipole-b-fam', currents, '0 normal', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_bo_create_excitation_files.m', 1);
 
 % SD
 currs = {'2A', '4A', '6A', '8A', '10A', '30A', '50A', '70A', '90A', '110A', '130A', '150A'};
