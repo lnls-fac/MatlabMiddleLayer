@@ -86,7 +86,7 @@ text = {
 '# corrector-vertical      | VKick > 0      | BXL  < 0    | -1.0        | I > 0';
 '# quadrupole (focusing)   | KL    > 0      | D1NL < 0    | -1.0        | I > 0';
 '# quadrupole (defocusing) | KL    < 0      | D1NL > 0    | -1.0        | I > 0';
-'# quadrupole (skew)       | KL    > 0      | D1SL > 0    | +1.0        | I > 0';
+'# quadrupole (skew)       | KL    < 0      | D1SL > 0    | -1.0        | I > 0';
 '# sextupole  (focusing)   | SL    > 0      | D2NL < 0    | -1.0        | I > 0';
 '# sextupole  (defocusing) | SL    < 0      | D2NL > 0    | -1.0        | I > 0';
 '# ';
@@ -102,6 +102,7 @@ text = {
 '# HKick := ConvSign * BYL / abs(Brho)';
 '# VKick := ConvSign * BXL / abs(Brho)';
 '# KL    := ConvSign * D1NL / abs(Brho)';
+'# KL    := ConvSign * D1SL / abs(Brho)';
 '# SL    := ConvSign * D2NL / abs(Brho)';
 '# ';
 '# Obs:';
@@ -145,7 +146,7 @@ text = {
 function text = excdata_fileformat
 
 text = {
-' '; 
+' ';
 '# STATIC DATA FILE FORMAT';
 '# =======================';
 '# ';
