@@ -1,40 +1,44 @@
 % carrega forcas dos imas de acordo com modo de operacao
 %%% Initial Conditions
+IniCond.Dispersion = [0.231; 0.069; 0; 0];
+IniCond.beta = [9.321, 12.881];
+IniCond.alpha= [-2.647, 2.000];
 
 if strcmpi(mode_version,'M1')
-        
-    %%% Initial Conditions
-    IniCond.Dispersion = [0.231; 0.069; 0; 0];
-    IniCond.beta = [9.321, 12.881];
-    IniCond.alpha= [-2.647, 2.000];
+    %%% Quadrupoles
+    %%% Alphas and Dispersion Matches, Betax Max = 40m
+    qf1ah_strength = 1.247810891477;
+    qf1bh_strength = 2.269454982012;
+    qd2h_strength  = -3.095390628668;
+    qf2h_strength  = 2.478673710387;
+    qf3h_strength  = 2.48378256297;
+    qd4ah_strength = -2.570893964278;
+    qf4h_strength  = 3.549734282477;
+    qd4bh_strength = -2.209083568757;
+    
+elseif strcmp(mode_version,'M2')   
+    %%% Mismatched NLK    
+    %%% Quadrupoles
+    qf1ah_strength = 1.563599428323;
+    qf1bh_strength = 2.303150061796;
+    qd2h_strength  = -2.95822108328;
+    qf2h_strength  = 2.815338463764;
+    qf3h_strength  = 2.433331684549;
+    qd4ah_strength = -2.295731518617;
+    qf4h_strength  = 3.413868033048;
+    qd4bh_strength = -2.230138095518;
 
-    %%% Quadrupoles
-    qf1ah_strength = 1.70521151606;
-    qf1bh_strength = 1.734817173998;
-    qd2h_strength  = -2.8243902951;
-    qf2h_strength  = 2.76086143922;
-    qf3h_strength  = 2.632182549934;
-    qd4ah_strength = -3.048732667316;
-    qf4h_strength  = 3.613066375692;
-    qd4bh_strength = -1.46213606815;
-    
-elseif strcmp(mode_version,'M2')
-    
-    %%% Initial Conditions
-    IniCond.Dispersion = [0.231; 0.069; 0; 0];
-    IniCond.beta = [9.321, 12.881];
-    IniCond.alpha= [-2.647, 2.000];
-    
-    %%% Quadrupoles
-    qf1ah_strength = 1.670801801437;
-    qf1bh_strength = 2.098494339697;
-    qd2h_strength  = -2.906779151209;
-    qf2h_strength  = 2.807031512313;
-    qf3h_strength  = 2.533815202102;
-    qd4ah_strength = -2.962460334623;
-    qf4h_strength  = 3.537403658428;
-    qd4bh_strength = -1.421177262593;
-    
+elseif strcmp(mode_version,'M3')   
+    %%% Matched optics, betax_max=100m
+    qf1ah_strength = 0.801090058058;
+    qf1bh_strength = 2.83641570018;
+    qd2h_strength  = -3.025223032377;
+    qf2h_strength  = 1.753256050021;
+    qf3h_strength  = 2.353655122791;
+    qd4ah_strength = -2.670345064247;
+    qf4h_strength  = 3.530990934212;
+    qd4bh_strength = -2.073377200462;
+      
 else
     error('caso nao implementado');
 end
