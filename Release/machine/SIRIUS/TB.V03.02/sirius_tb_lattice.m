@@ -120,7 +120,6 @@ qd3   = quadrupole('QD3',   0.100, qd3_strength,  quad_pass_method);
 qf4   = quadrupole('QF4',   0.100, qf4_strength,  quad_pass_method);
 qd4   = quadrupole('QD4',   0.100, qd4_strength,  quad_pass_method);
 
-
 % --- bending magnets ---
 deg_2_rad = (pi/180);
 

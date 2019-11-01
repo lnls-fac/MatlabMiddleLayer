@@ -55,7 +55,6 @@ l080     = drift('l080',  0.80, 'DriftPass');
 l0825    = drift('l0825', 0.90-lcv/2, 'DriftPass');
 l160     = drift('l160',  1.60, 'DriftPass');
 l280     = drift('l280',  2.80, 'DriftPass');
-% l400     = drift('l400',  4.00, 'DriftPass');
 la2p     = drift('la2p', 0.08323, 'DriftPass');
 la3p     = drift('la3p', 0.232-ldif, 'DriftPass');
 lb1p     = drift('lb1p', 0.220-ldif, 'DriftPass');
