@@ -5,7 +5,7 @@ if ~exist('mirror', 'var')
 end
 header = excdata_file_header(fname, harmonics, main_mpole);
 [data_avg, data_std] = excdata_table(currents, n_avg, s_avg, n_std, s_std, mirror);
-comments = excdata_file_comments(sorting, mfilename);
+comments = excdata_file_comments(sorting, fname, mfilename);
 poltable = excdata_file_polarity_table;
 filefmt = excdata_fileformat;
 
@@ -50,24 +50,45 @@ end
 fclose(fp);
 
 
-function text = excdata_file_comments(mags, mfilename)
+function text = excdata_file_comments(mags, fname, mfilename)
 
-text = {
-' ';
-'# COMMENTS';
-'# ========';
-['# 1. generated automatically with "', mfilename, '"'];
-'# 2. data taken from rotcoil measurements';
-'# 3. average excitation curves for magnets:';
-'#    ';
-};
+if strcmp(fname, 'si-dipole-b1b2-fam')
+    text = {
+    ' ';
+    '# COMMENTS';
+    '# ========';
+    ['# 1. generated automatically with "', mfilename, '"'];
+    '# 2. the excitation data above is the sum of combined B1 and B2 dipoles.';
+    '# 3. see files ''si-dipole-b1-fam.txt'' and ''si-dipole-b2-fam.txt'' for original data';
+    };
+else
+    text = {
+    ' ';
+    '# COMMENTS';
+    '# ========';
+    ['# 1. generated automatically with "', mfilename, '"'];
+    '# 2. data taken from rotcoil measurements';
+    '# 3. average excitation curves for magnets:';
+    };
+end
 
-for i=1:length(mags)
-    text{end} = [text{end}, mags{i}, ' '];
-    if rem(i, 10) == 0
-        text{end+1} = '#    ';
+if strcmp(fname, 'si-dipole-b2-fam')
+    text{end+1} = '# 4. fields corresponding to current 403.6A are interpolated';
+end
+
+text{end+1} = '# ';
+
+if strcmp(fname, 'si-dipole-b1b2-fam')
+    return
+else
+    for i=1:length(mags)
+        text{end} = [text{end}, mags{i}, ' '];
+        if rem(i, 10) == 0
+            text{end+1} = '#    ';
+        end
     end
 end
+
 if ~strcmpi(text{end}, '#    ')
     text{end+1} = '#    ';
 end
@@ -168,8 +189,8 @@ text_avg = {
 '# ===============';
 };
 text_std = text_avg;
-fmt1 = '%+08.2f';
-fmt2 = '%+13.6e';
+fmt1 = '%+08.4f';
+fmt2 = '%+13.4e';
 if mirror
     for i=length(currents):-1:2
         text_avg{end+1} = [num2str(-currents(i), fmt1), '  '];
