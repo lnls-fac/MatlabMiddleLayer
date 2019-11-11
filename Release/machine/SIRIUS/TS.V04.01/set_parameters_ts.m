@@ -15,9 +15,28 @@ if strcmpi(mode_version,'M1')
     qd4ah_strength = -2.570893964278;
     qf4h_strength  = 3.549734282477;
     qd4bh_strength = -2.209083568757;
-    
-elseif strcmp(mode_version,'M2')   
-    %%% Mismatched NLK    
+
+    ejeseptg_kxl_strength = 0;
+    ejeseptg_kyl_strength = 0;
+    ejeseptg_ksxl_strength = 0;
+    ejeseptg_ksyl_strength = 0;
+
+    ejeseptf_kxl_strength = 0;
+    ejeseptf_kyl_strength = 0;
+    ejeseptf_ksxl_strength = 0;
+    ejeseptf_ksyl_strength = 0;
+
+    injseptg_kxl_strength = 0;
+    injseptg_kyl_strength = 0;
+    injseptg_ksxl_strength = 0;
+    injseptg_ksyl_strength = 0;
+
+    injseptf_kxl_strength = 0;
+    injseptf_kyl_strength = 0;
+    injseptf_ksxl_strength = 0;
+    injseptf_ksyl_strength = 0;
+elseif strcmp(mode_version,'M2')
+    %%% Mismatched NLK
     %%% Quadrupoles
     qf1ah_strength = 1.563599428323;
     qf1bh_strength = 2.303150061796;
@@ -28,7 +47,26 @@ elseif strcmp(mode_version,'M2')
     qf4h_strength  = 3.413868033048;
     qd4bh_strength = -2.230138095518;
 
-elseif strcmp(mode_version,'M3')   
+    ejeseptg_kxl_strength = 0;
+    ejeseptg_kyl_strength = 0;
+    ejeseptg_ksxl_strength = 0;
+    ejeseptg_ksyl_strength = 0;
+
+    ejeseptf_kxl_strength = 0;
+    ejeseptf_kyl_strength = 0;
+    ejeseptf_ksxl_strength = 0;
+    ejeseptf_ksyl_strength = 0;
+
+    injseptg_kxl_strength = 0;
+    injseptg_kyl_strength = 0;
+    injseptg_ksxl_strength = 0;
+    injseptg_ksyl_strength = 0;
+
+    injseptf_kxl_strength = 0;
+    injseptf_kyl_strength = 0;
+    injseptf_ksxl_strength = 0;
+    injseptf_ksyl_strength = 0;
+elseif strcmp(mode_version,'M3')
     %%% Matched optics, betax_max=100m
     qf1ah_strength = 0.801090058058;
     qf1bh_strength = 2.83641570018;
@@ -38,7 +76,26 @@ elseif strcmp(mode_version,'M3')
     qd4ah_strength = -2.670345064247;
     qf4h_strength  = 3.530990934212;
     qd4bh_strength = -2.073377200462;
-      
+
+    ejeseptg_kxl_strength = 0;
+    ejeseptg_kyl_strength = 0;
+    ejeseptg_ksxl_strength = 0;
+    ejeseptg_ksyl_strength = 0;
+
+    ejeseptf_kxl_strength = 0;
+    ejeseptf_kyl_strength = 0;
+    ejeseptf_ksxl_strength = 0;
+    ejeseptf_ksyl_strength = 0;
+
+    injseptg_kxl_strength = 0;
+    injseptg_kyl_strength = 0;
+    injseptg_ksxl_strength = 0;
+    injseptg_ksyl_strength = 0;
+
+    injseptf_kxl_strength = 0;
+    injseptf_kyl_strength = 0;
+    injseptf_ksxl_strength = 0;
+    injseptf_ksyl_strength = 0;
 else
     error('caso nao implementado');
 end
