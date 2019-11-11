@@ -2,7 +2,7 @@ function [r, lattice_title, IniCond] = sirius_ts_lattice(varargin)
 % 2013-11-26 created Ximenes (from V100)
 % 2016-09-28 V01.02 - new version (Ximenes) - see 'VERSIONS.txt' in Release/machine/SIRIUS
 
-%% global parameters 
+%% global parameters
 %  =================
 
 d2r = pi/180;
@@ -42,7 +42,7 @@ sext_pass_method = 'StrMPoleSymplectic4Pass';
 %% elements
 %  ========
 % --- drift spaces ---
-ldif     = 0.1442; 
+ldif     = 0.1442;
 lcv      = 0.150;
 l015     = drift('l015',  0.15, 'DriftPass');
 l020     = drift('l020',  0.20, 'DriftPass');
@@ -102,7 +102,7 @@ cv = sextupole('CV', lcv, 0.0, sext_pass_method); % same model as BO correctors
 [qf4, ~]  = sirius_ts_q20_segmented_model('QF4', qf4h_strength,  quad_pass_method);
 [qd4b, ~] = sirius_ts_q14_segmented_model('QD4B', qd4bh_strength,  quad_pass_method);
 
-% --- bending magnets --- 
+% --- bending magnets ---
 
 [bend, ~] = sirius_ts_b_segmented_model(energy, 'B', bend_pass_method);
 
@@ -112,56 +112,32 @@ cv = sextupole('CV', lcv, 0.0, sext_pass_method); % same model as BO correctors
 % dynamics
 
 % -- bo thin ejection septum --
-dip_nam =  'EjeSeptF';
-dip_len =  0.5773;
-dip_ang =  -3.6 * d2r;
-dip_K   =  0.0;
-dip_S   =  0.00;
-h1      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang,   0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
-h2      = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang/2, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-bejesf = marker('bEjeSeptF', 'IdentityPass'); % marker at the beginning of thin septum
-mejesf = marker('mEjeSeptF', 'IdentityPass'); % marker at the center of thin septum
-eejesf = marker('eEjeSeptF', 'IdentityPass'); % marker at the end of thin septum
-ejesf = [bejesf, h1, mejesf, h2, eejesf];
+ejeseptf_strength.kxl = ejeseptf_kxl_strength;
+ejeseptf_strength.kyl = ejeseptf_kyl_strength;
+ejeseptf_strength.ksxl = ejeseptf_ksxl_strength;
+ejeseptf_strength.ksyl = ejeseptf_ksyl_strength;
+ejesf = sirius_ts_septa_segmented_model('EjeSeptF', 0.5773, -3.6, ejeseptf_strength, 6);
 
 % -- bo thick ejection septum --
-dip_nam  =  'EjeSeptG';
-dip_len  =  0.5773;
-dip_ang  =  -3.6 * d2r;
-dip_K    =  0.0;
-dip_S    =  0.00;
-h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
-h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-bejesg = marker('bEjeSeptG', 'IdentityPass'); % marker at the beginning of thick septum
-mejesg = marker('mEjeSeptG', 'IdentityPass'); % marker at the center of thick septum
-eejesg = marker('eEjeSeptG', 'IdentityPass'); % marker at the end of thick septum
-ejesg = [bejesg, h1, mejesg, h2, eejesg];
+ejeseptg_strength.kxl = ejeseptg_kxl_strength;
+ejeseptg_strength.kyl = ejeseptg_kyl_strength;
+ejeseptg_strength.ksxl = ejeseptg_ksxl_strength;
+ejeseptg_strength.ksyl = ejeseptg_ksyl_strength;
+ejesg = sirius_ts_septa_segmented_model('EjeSeptG', 0.5773, -3.6, ejeseptg_strength, 6);
 
 % -- si thick injection septum (2 of these are used) --
-dip_nam  =  'InjSeptG';
-dip_len  =  0.5773;
-dip_ang  =  +3.6 * d2r;
-dip_K    =  0.0;
-dip_S    =  0.00;
-h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
-h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-binjsg = marker('bInjSeptG', 'IdentityPass'); % marker at the beginning of thick septum
-minjsg = marker('mInjSeptG', 'IdentityPass'); % marker at the center of thick septum
-einjsg = marker('eInjSeptG', 'IdentityPass'); % marker at the end of thick septum
-injsg = [binjsg, h1, minjsg, h2, einjsg];
+injseptg_strength.kxl = injseptg_kxl_strength;
+injseptg_strength.kyl = injseptg_kyl_strength;
+injseptg_strength.ksxl = injseptg_ksxl_strength;
+injseptg_strength.ksyl = injseptg_ksyl_strength;
+injsg = sirius_ts_septa_segmented_model('InjSeptG', 0.5773, +3.6, injseptg_strength, 6);
 
 % -- si thin injection septum --
-dip_nam  =  'InjSeptF';
-dip_len  =  0.5773;
-dip_ang  =  +3.118 * d2r;
-dip_K    =  0.0;
-dip_S    =  0.00;
-h1       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 1*dip_ang/2, 0*dip_ang, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);        
-h2       = rbend_sirius(dip_nam, dip_len/2, dip_ang/2, 0*dip_ang, 1*dip_ang/2, 0,0,0, [0,0,0], [0,dip_K,dip_S], bend_pass_method);
-binjsf = marker('bInjSeptF', 'IdentityPass'); % marker at the beginning of thin septum
-minjsf = marker('mInjSeptF', 'IdentityPass'); % marker at the center of thin septum
-einjsf = marker('eInjSeptF', 'IdentityPass'); % marker at the end of thin septum
-injsf = [binjsf, h1, minjsf, h2, einjsf];
+injseptf_strength.kxl = injseptf_kxl_strength;
+injseptf_strength.kyl = injseptf_kyl_strength;
+injseptf_strength.ksxl = injseptf_ksxl_strength;
+injseptf_strength.ksyl = injseptf_ksyl_strength;
+injsf = sirius_ts_septa_segmented_model('InjSeptF', 0.5773, +3.118, injseptf_strength, 6);
 
 % --- lines ---
 sec01 = [ejesf,l025,ejesg,l0525,cv,l0825,qf1a,la2p,ict,l280,scrn,bpm,...
@@ -170,9 +146,9 @@ sec02 = [l080,lb1p,qd2,lb2p,scrn,bpm,lb3p,qf2,l0125,cv,l0175,l015,lb4p,bend];
 sec03 = [lc1p,l280,scrn,bpm,l020,lc2p,qf3,lc3p,cv,lc4p,bend];
 sec04 = [ld1p,l060,qd4a,ld2p,l160,bpm,scrn,ld3p,cv,l0125,qf4,ld4p,fct, ...
          ld4p,ict,ld4p,qd4b,ld5p,bpm,scrn,ld6p,cv,ld7p,injsg,l025,injsg,l025,injsf,scrn];
-     
+
 ltba  = [start,sec01,sec02,sec03,sec04,fim];
-%% finalization 
+%% finalization
 
 elist = ltba;
 the_line = buildlat(elist);
@@ -200,7 +176,6 @@ the_line = set_num_integ_steps(the_line);
 
 % Define Camara de Vacuo
 the_line = set_vacuum_chamber(the_line);
-
 
 % pre-carrega passmethods de forma a evitar problema com bibliotecas recem-compiladas
 % lnls_preload_passmethods;
