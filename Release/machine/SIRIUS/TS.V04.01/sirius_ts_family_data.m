@@ -15,10 +15,10 @@ data.BPM.nr_segs  = 1;
 data.Scrn.nr_segs = 1;
 data.ICT.nr_segs = 1;
 data.FCT.nr_segs = 1;
-data.EjeSeptF.nr_segs = 2;
-data.EjeSeptG.nr_segs = 2;
-data.InjSeptF.nr_segs = 2;
-data.EjeSeptF.nr_segs = 2;
+data.EjeSeptF.nr_segs = 6;
+data.EjeSeptG.nr_segs = 6;
+data.InjSeptF.nr_segs = 6;
+data.EjeSeptF.nr_segs = 6;
 
 data.QN.nr_segs   = 1;
 
