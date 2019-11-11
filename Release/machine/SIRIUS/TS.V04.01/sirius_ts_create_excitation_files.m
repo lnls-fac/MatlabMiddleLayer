@@ -2,6 +2,30 @@ function sirius_ts_create_excitation_files
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
 
+% CV
+currs = {
+    'CV_01_-10A', 'CV_02_-9A', 'CV_03_-7A', 'CV_04_-5A', 'CV_05_-3A', ...
+    'CV_06_-1A',  'CV_07_+0A', 'CV_08_+1A', 'CV_09_+3A', 'CV_10_+5A', ...
+    'CV_11_+7A', 'CV_12_+9A', 'CV_13_+10A'
+};
+sirius_excdata.read_multipole_files(tpath, currs, 'CV', 'correctors', 'BC-');
+sirius_excdata.transf_rot_z_p90('CV');
+currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
+[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CV_', 'correctors', 'sorting-cv-strong.txt', 7);
+sirius_excdata.save_excdata(sorting, 'ts-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_ts_create_excitation_files.m');
+
+% CV_STRONG
+currs = {
+    'CV_01_-10A', 'CV_02_-9A', 'CV_03_-7A', 'CV_04_-5A', 'CV_05_-3A', ...
+    'CV_06_-1A',  'CV_07_+0A', 'CV_08_+1A', 'CV_09_+3A', 'CV_10_+5A', ...
+    'CV_11_+7A', 'CV_12_+9A', 'CV_13_+10A'
+};
+sirius_excdata.read_multipole_files(tpath, currs, 'CV_STRONG', 'correctors', 'BC-');
+sirius_excdata.transf_rot_z_p90('CV');
+currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
+[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CV_STRONG', 'correctors', 'sorting-cv-strong.txt', 7);
+sirius_excdata.save_excdata(sorting, 'ts-correctors-cv-strong', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_ts_create_excitation_files.m');
+
 % B
 currs = {
     '0040p31A', '0050p39A', '0060p46A', '0165p27A', '0330p54A', ...
