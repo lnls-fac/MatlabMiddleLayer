@@ -137,7 +137,7 @@ injseptf_strength.kxl = injseptf_kxl_strength;
 injseptf_strength.kyl = injseptf_kyl_strength;
 injseptf_strength.ksxl = injseptf_ksxl_strength;
 injseptf_strength.ksyl = injseptf_ksyl_strength;
-injsf = sirius_ts_septa_segmented_model('InjSeptF', 0.5773, +3.118, injseptf_strength, 6);
+injsf = sirius_ts_septa_segmented_model('InjSeptF', 0.5, +3.118, injseptf_strength, 6);
 
 % --- lines ---
 sec01 = [ejesf,l025,ejesg,l0525,cv,l0825,qf1a,la2p,ict,l280,scrn,bpm,...
