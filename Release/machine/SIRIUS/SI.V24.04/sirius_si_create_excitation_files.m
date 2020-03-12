@@ -77,8 +77,8 @@ sirius_excdata.read_multipole_files(tpath, currs, 'Q20trim', 'quadrupoles-q20', 
 % sirius_excdata.transf_inv_polarity('QD');
 rotcoil = getappdata(0, 'rotcoil');
 currents(1) = 0;
-for k = 1:length(rotcoil.Q20.currents)
-    currents(k+1) = mean(rotcoil.Q20.currents{k});
+for k = 1:length(rotcoil.Q20trim.currents)
+    currents(k+1) = mean(rotcoil.Q20trim.currents{k});
 end
 % currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130, 157];
 % currents = [0.0003, 1.9951, 3.9977, 5.9968, 7.9956, 9.9958, 29.9956, 49.9945, 69.9942, 89.9973, 109.9969, 129.9966, 147.9959];
@@ -99,8 +99,8 @@ sirius_excdata.read_multipole_files(tpath, currs, 'Q30trim', 'quadrupoles-q30', 
 % sirius_excdata.transf_inv_polarity('QD');
 rotcoil = getappdata(0, 'rotcoil');
 currents(1) = 0;
-for k = 1:length(rotcoil.Q30.currents)
-    currents(k+1) = mean(rotcoil.Q30.currents{k});
+for k = 1:length(rotcoil.Q30trim.currents)
+    currents(k+1) = mean(rotcoil.Q30trim.currents{k});
 end
 % currents = [0, 2, 4, 6, 8, 10, 30, 50, 70, 90, 110, 130, 155];
 % currents = [0.0003, 1.9951, 3.9977, 5.9968, 7.9956, 9.9958, 29.9956, 49.9945, 69.9942, 89.9973, 109.9969, 129.9966, 147.9959];
