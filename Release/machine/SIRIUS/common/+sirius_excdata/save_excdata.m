@@ -61,6 +61,30 @@ if strcmp(fname, 'si-dipole-b1b2-fam')
     '# 2. the excitation data above is the sum of combined B1 and B2 dipoles.';
     '# 3. see files ''si-dipole-b1-fam.txt'' and ''si-dipole-b2-fam.txt'' for original data';
     };
+elseif strcmp(fname, 'si-quadrupole-q14-trim')
+    text = {
+    ' ';
+    '# COMMENTS';
+    '# ========';
+    ['# 1. generated automatically with "', mfilename, '"'];
+    '# 2. data taken from rotcoil measurements for main coil, limited to +/-10A, mirrored in negative currents, dropped dipolar term';
+    '# 3. data multiplied by ncoils_trims/ncoils_main = 28/20 ';
+    '# 4. individual (I_trim)  -> (KL_quad): KL_quad = KL_fam + KL_trim(I_trim)';
+    '#    individual (KL_quad) -> (I_trim) : I_trim = KL_trim^(-1)(KL_quad - KL_fam)';
+    '# 5. average excitation curves for magnets:';
+    };
+elseif strcmp(fname, 'si-quadrupole-q20-trim') || strcmp(fname, 'si-quadrupole-q30-trim')
+    text = {
+    ' ';
+    '# COMMENTS';
+    '# ========';
+    ['# 1. generated automatically with "', mfilename, '"'];
+    '# 2. data taken from rotcoil measurements for main coil, limited to +/-10A, mirrored in negative currents, dropped dipolar term';
+    '# 3. data multiplied by ncoils_trims/ncoils_main = 18/23.25 ';
+    '# 4. individual (I_trim)  -> (KL_quad): KL_quad = KL_fam + KL_trim(I_trim)';
+    '#    individual (KL_quad) -> (I_trim) : I_trim = KL_trim^(-1)(KL_quad - KL_fam)';
+    '# 5. average excitation curves for magnets:';
+    };
 else
     text = {
     ' ';
