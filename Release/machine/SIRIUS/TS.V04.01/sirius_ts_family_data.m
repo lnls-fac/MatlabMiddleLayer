@@ -18,7 +18,7 @@ data.FCT.nr_segs = 1;
 data.EjeSeptF.nr_segs = 6;
 data.EjeSeptG.nr_segs = 6;
 data.InjSeptF.nr_segs = 6;
-data.EjeSeptF.nr_segs = 6;
+data.InjSeptG.nr_segs = 6;
 
 data.QN.nr_segs   = 1;
 
