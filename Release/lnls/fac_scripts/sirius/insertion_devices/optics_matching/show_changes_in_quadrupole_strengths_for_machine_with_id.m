@@ -2,7 +2,7 @@ function show_changes_in_quadrupole_strengths_for_machine_with_id(the_ring1,the_
 
 if ~exist('the_ring1','var'), load('the_ring0.mat'); the_ring1 = the_ring; end
 if ~exist('the_ring2','var'), load('the_ring_withids.mat'); the_ring2 = the_ring; end
-if ~exist('knobs','var'), knobs = {'qda','qfa','qdb1','qdb2','qfb'};end
+if ~exist('knobs','var'), knobs = {'QFA','QDA','QFB','QDB1','QDB2', 'QFP', 'QDP1', 'QDP2'}; end
 
 idx1 = findcells(the_ring1,'FamName','mc'); idx1 = idx1(end);
 the_ring1 = circshift(the_ring1',[0,-idx1]);
@@ -50,9 +50,9 @@ fprintf('Max q14 quadrupole Strength: %6.2f\n',maxK14);
 fprintf('Max q20 quadrupole Strength: %6.2f\n',maxK20);
 fprintf('Max q30 quadrupole Strength: %6.2f\n',maxK30);
 
-get_max_deltas_from_quadrupole_model('q14', the_ring1, the_ring2, maxK14)
-get_max_deltas_from_quadrupole_model('q20', the_ring1, the_ring2, maxK20)
-get_max_deltas_from_quadrupole_model('q30', the_ring1, the_ring2, maxK30)
+get_max_deltas_from_quadrupole_model('Q14', the_ring1, the_ring2, maxK14)
+get_max_deltas_from_quadrupole_model('Q20', the_ring1, the_ring2, maxK20)
+get_max_deltas_from_quadrupole_model('Q30', the_ring1, the_ring2, maxK30)
 
 function get_max_deltas_from_quadrupole_model(quad_model, the_ring1, the_ring2, maxK)
 
