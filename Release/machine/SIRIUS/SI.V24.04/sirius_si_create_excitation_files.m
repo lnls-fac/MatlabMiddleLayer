@@ -2,33 +2,35 @@ function sirius_si_create_excitation_files
 
 [tpath, ~, ~] = fileparts(mfilename('fullpath'));
 
-% Individual CV (same as BO-correctors)
-currs = {
-    'CV_01_-10A', 'CV_02_-9A', 'CV_03_-7A', 'CV_04_-5A', 'CV_05_-3A', ...
-    'CV_06_-1A',  'CV_07_-0A', 'CV_08_+1A', 'CV_09_+3A', 'CV_10_+5A', ...
-    'CV_11_+7A', 'CV_12_+9A', 'CV_13_+10A'
-};
-sirius_excdata.read_multipole_files(tpath, currs, 'CV', 'correctors', 'BC-');
-sirius_excdata.transf_rot_z_p90('CV');
-currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
-[sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CV', 'correctors', 'sorting-cv.txt', 7);
-sirius_excdata.save_excdata(sorting, 'si-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_si_create_excitation_files.m');
+% % Individual CV (same as BO-correctors)
+% currs = {
+%     'CV_01_-10A', 'CV_02_-9A', 'CV_03_-7A', 'CV_04_-5A', 'CV_05_-3A', ...
+%     'CV_06_-1A',  'CV_07_-0A', 'CV_08_+1A', 'CV_09_+3A', 'CV_10_+5A', ...
+%     'CV_11_+7A', 'CV_12_+9A', 'CV_13_+10A'
+% };
+% sirius_excdata.read_multipole_files(tpath, currs, 'CV', 'correctors', 'BC-');
+% sirius_excdata.transf_rot_z_p90('CV');
+% currents = [-10, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 10];
+% [sorting, currents, harmonics, n_avg, s_avg, n_std, s_std] = sirius_excdata.calc_excitation_stats(tpath, currents, 'CV', 'correctors', 'sorting-cv.txt', 7);
+% sirius_excdata.save_excdata(sorting, 'si-correctors-cv', currents, '0 skew', harmonics, n_avg, s_avg, n_std, s_std, 'sirius_si_create_excitation_files.m');
 
 % B1-B2
-currents = [0, 381.7, 401.8, 403.6, 421.9];
+currents = [0, 381.7, 394.0, 401.8, 403.6];
 
 currs1 = {
     '381p7A', '401p8A', '403p6A', '421p9A'
     };
-serials = {
-    '002', '003', '004', '005', '006', '009', '010', '011', '012', '013', '014', ...
-    '014', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', ...
-    '025', '026', '027', '028', '029', '030', '031', '032', '033', '034', '035', ...
-    '036', '037', '038', '039', '040', '041', '042', '043', '046'
-    };
+% serials = {
+%     '002', '003', '004', '005', '006', '009', '010', '011', '012', '013', '014', ...
+%     '014', '015', '016', '017', '018', '019', '020', '021', '022', '023', '024', ...
+%     '025', '026', '027', '028', '029', '030', '031', '032', '033', '034', '035', ...
+%     '036', '037', '038', '039', '040', '041', '042', '043', '046'
+%     };
+% currs1 = {'381p7A', '394p0A', '401p8A', '403p6A'};
+serials = {'022'};
 sirius_excdata.read_multipole_from_fmap_files(tpath, currs1, 'B', 'B1-', serials, 'excitation_curve');
 [sorting1, currents, harmonics1, n_avg1, s_avg1, n_std1, s_std1] = sirius_excdata.calc_excitation_stats(tpath, currents, 'B', 'dipoles-b1', 'sorting.txt', 1, true);
-sirius_excdata.save_excdata(sorting1, 'si-dipole-b1-fam', currents, '0 normal', harmonics1, n_avg1, s_avg1, n_std1, s_std1, 'sirius_si_create_excitation_files.m');
+sirius_excdata.save_excdata(sorting1, 'si-dipole-b1-022-old', currents, '0 normal', harmonics1, n_avg1, s_avg1, n_std1, s_std1, 'sirius_si_create_excitation_files.m');
 
 currs2 = {
     '381p7A', '401p8A', '421p9A'
