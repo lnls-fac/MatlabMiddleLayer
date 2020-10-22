@@ -615,6 +615,52 @@ def excdata_QDB2():
     plt.show()
 
 
+def excdata_QDP1():
+
+    fam = 'QDP1'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = q14_fnames
+    label = 'si-quadrupole-q14-qdp1-fam'
+    main_harmonic = '1 normal'
+
+    harmonics, excdata = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+
+    excdata = np.array(excdata)
+
+    currents = excdata[:, 0]
+    idx = harmonics.index(1)
+    plt.plot(currents, excdata[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('GL [T]')
+    plt.grid()
+    plt.title('QDP1 Family Excitation Curve')
+    plt.show()
+
+
+def excdata_QDP2():
+
+    fam = 'QDP2'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = q14_fnames
+    label = 'si-quadrupole-q14-qdp2-fam'
+    main_harmonic = '1 normal'
+
+    harmonics, excdata = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+
+    excdata = np.array(excdata)
+
+    currents = excdata[:, 0]
+    idx = harmonics.index(1)
+    plt.plot(currents, excdata[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('GL [T]')
+    plt.grid()
+    plt.title('QDP2 Family Excitation Curve')
+    plt.show()
+
+
 def excdata_QFA():
 
     fam = 'QFA'
@@ -780,6 +826,8 @@ def excdata_QFP():
 # excdata_QDA()
 # excdata_QDB1()
 # excdata_QDB2()
+# excdata_QDP1()
+# excdata_QDP2()
 
 # Q20 quadrupoles
 # excdata_QFA()
