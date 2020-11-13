@@ -21,7 +21,7 @@ function [r, lattice_title] = sirius_si_lattice(varargin)
 % 2015-11-03: agora modelo do BC ?? segmentado
 % 2017-02-08: updated dipole B1 and B2 versions, updated FamNames, updated sys multi of fast correctors (xrr)
 % 2018-10-16: new BC model-13
-% 2-18-12-13: updated girder definitions and updated model with B2 measured integrated quads
+% 2018-12-13: updated girder definitions and updated model with B2 measured integrated quads
 
 global THERING;
 

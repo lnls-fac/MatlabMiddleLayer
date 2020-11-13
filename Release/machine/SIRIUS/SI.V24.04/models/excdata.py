@@ -762,8 +762,23 @@ def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=F
     excdata_std.insert(0, [0,] + list(b))
     excdata_std = np.array(excdata_avg)
 
-    if extrapolation_current:
-        pass
+    if extrapolation_current is not None:
+        currents = excdata_avg[:, 0]
+        datum_avg = np.zeros(excdata_avg.shape[1])
+        datum_avg[0] = extrapolation_current
+        datum_std = np.zeros(excdata_std.shape[1])
+        datum_std[0] = extrapolation_current
+        for i in range(1, excdata_avg.shape[1]):
+            mpoles_data = excdata_avg[:, i]
+            poly = np.polyfit(currents[-3:], mpoles_data[-3:], 2)
+            mpoles_fit = np.polyval(poly, extrapolation_current)
+            datum_avg[i] = mpoles_fit
+            mpoles_data = excdata_std[:, i]
+            poly = np.polyfit(currents[-3:], mpoles_data[-3:], 2)
+            mpoles_fit = np.polyval(poly, extrapolation_current)
+            datum_std[i] = mpoles_fit
+        excdata_avg = np.vstack((excdata_avg, datum_avg))
+        excdata_std = np.vstack((excdata_std, datum_std))
 
     print('# HEADER')
     print('# ======')
@@ -811,7 +826,8 @@ def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=F
             print('\n#    ', end='')
         print('{} '.format(magnets_fam[i]), end='')
     print()
-
+    if extrapolation_current is not None:
+        print('# 5. last data point was extrapolated from a quadratic fitting using last 3 points.')
     print()
     print('# POLARITY TABLE')
     print('# ==============')
@@ -1037,7 +1053,8 @@ def excdata_QDA():
     label = 'si-quadrupole-q14-qda-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1060,7 +1077,8 @@ def excdata_QDB1():
     label = 'si-quadrupole-q14-qdb1-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1083,7 +1101,8 @@ def excdata_QDB2():
     label = 'si-quadrupole-q14-qdb2-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1106,7 +1125,8 @@ def excdata_QDP1():
     label = 'si-quadrupole-q14-qdp1-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1129,7 +1149,8 @@ def excdata_QDP2():
     label = 'si-quadrupole-q14-qdp2-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1152,7 +1173,8 @@ def excdata_QFA():
     label = 'si-quadrupole-q20-qfa-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1175,7 +1197,8 @@ def excdata_Q1():
     label = 'si-quadrupole-q20-q1-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1198,7 +1221,8 @@ def excdata_Q2():
     label = 'si-quadrupole-q20-q2-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1221,7 +1245,8 @@ def excdata_Q3():
     label = 'si-quadrupole-q20-q3-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1244,7 +1269,8 @@ def excdata_Q4():
     label = 'si-quadrupole-q20-q4-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1267,7 +1293,8 @@ def excdata_QFB():
     label = 'si-quadrupole-q30-qfb-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1290,7 +1317,8 @@ def excdata_QFP():
     label = 'si-quadrupole-q30-qfp-fam'
     main_harmonic = '1 normal'
 
-    harmonics, excdata_avg, excdata_std = excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
+    harmonics, excdata_avg, excdata_std = \
+    excdata_print(fam, fnames, exclude_harms, label, main_harmonic)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1314,7 +1342,7 @@ def excdata_SFA0():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1338,7 +1366,7 @@ def excdata_SFA1():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1362,7 +1390,7 @@ def excdata_SFA2():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1386,7 +1414,7 @@ def excdata_SFB0():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1410,7 +1438,7 @@ def excdata_SFB1():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1434,7 +1462,7 @@ def excdata_SFB2():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1458,7 +1486,7 @@ def excdata_SFP0():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1482,7 +1510,7 @@ def excdata_SFP1():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1506,7 +1534,7 @@ def excdata_SFP2():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180)
 
     excdata_avg = np.array(excdata_avg)
 
