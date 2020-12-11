@@ -1,6 +1,7 @@
-function the_ring = ids_insert_set(the_ring_old, ids, strength)
+function the_ring = ids_insert_set(the_ring_old, ids, strength, length_scale)
 
 if ~exist('strength','var'), strength = 1; end
+if ~exist('length_scale','var'), length_scale = 1; end
 
 % Start at the last mc marker to preserve sections numbers
 idx = findcells(the_ring_old, 'FamName', 'mc');  idx = idx(end)-1;
@@ -25,7 +26,7 @@ for i=1:length(ids)
         
     % insert ID kicktable
     center = elements(findcells(the_ring(elements),'FamName',ids{i}.straight_label));
-    the_ring = lnls_insert_kicktable(the_ring, center, ids{i}, strength);
+    the_ring = lnls_insert_kicktable(the_ring, center, ids{i}, strength, length_scale);
 end
 
 % Shift the ring back to its original starting point
