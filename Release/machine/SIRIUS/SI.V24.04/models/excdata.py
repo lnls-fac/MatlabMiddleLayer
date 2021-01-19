@@ -725,10 +725,12 @@ def multipole_get_avg(fname, magnets_fam, exclude_harms):
     return current, harmonics, nmpoles_avg, smpoles_avg, nmpoles_std, smpoles_std
 
 
-def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=False, extrapolation_current=None):
+def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=False, extrapolation_current=None, rescaling=0.2908):
 
     fams = get_sorting(sextupoles)
     magnets_fam = fams[fam]
+
+    rescaling = 1 + rescaling/100
 
     # get data from file and build
     excdata_avg = list()
@@ -789,7 +791,7 @@ def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=F
             print('{} '.format(h), end='')
     print()
     print('# main_harmonic     {}'.format(main_harmonic))
-    print('# rescaling factor  1.002908')
+    print('# rescaling factor  {:.6f}'.format(rescaling))
     print('# units             Ampere  ', end='')
     for h in harmonics:
         if h not in exclude_harms:
@@ -1548,6 +1550,306 @@ def excdata_SFP2():
     plt.show()
 
 
+def excdata_SDA0():
+
+    fam = 'SDA0'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sda0-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180, rescaling=0.413)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDA1():
+
+    fam = 'SDA1'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sda1-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.343)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDA2():
+
+    fam = 'SDA2'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sda2-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.404)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDA3():
+
+    fam = 'SDA3'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sda3-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.365)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDB0():
+
+    fam = 'SDB0'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdb0-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.435)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDB1():
+
+    fam = 'SDB1'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdb1-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.365)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDB2():
+
+    fam = 'SDB2'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdb2-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.376)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDB3():
+
+    fam = 'SDB3'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdb3-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.333)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDP0():
+
+    fam = 'SDP0'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdp0-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.435)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDP1():
+
+    fam = 'SDP1'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdp1-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.363)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDP2():
+
+    fam = 'SDP2'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdp2-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.376)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+def excdata_SDP3():
+
+    fam = 'SDP3'
+    # exclude_harms = [0, ]
+    exclude_harms = [ ]
+    fnames = s15_fnames
+    label = 'si-sextupole-s15-sdp3-fam'
+    main_harmonic = '2 normal'
+
+    harmonics, excdata_avg, excdata_std = \
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
+                      extrapolation_current=180, rescaling=0.333)
+
+    excdata_avg = np.array(excdata_avg)
+
+    currents = excdata_avg[:, 0]
+    idx = harmonics.index(2)
+    plt.plot(currents, excdata_avg[:, 1 + 2*idx], 'o--')
+    plt.xlabel('Current [A]')
+    plt.ylabel('SL [T/m]')
+    plt.grid()
+    plt.title(fam + ' Family Excitation Curve')
+    plt.show()
+
+
+
 # Q14 quadrupoles
 # excdata_QDA()
 # excdata_QDB1()
@@ -1576,8 +1878,20 @@ def excdata_SFP2():
 
 # excdata_SFP0()
 # excdata_SFP1()
-excdata_SFP2()
+# excdata_SFP2()
 
+# excdata_SDA0()
+# excdata_SDA1()
+# excdata_SDA2()
+# excdata_SDA3()
+# excdata_SDB0()
+# excdata_SDB1()
+# excdata_SDB2()
+# excdata_SDB3()
+# excdata_SDP0()
+# excdata_SDP1()
+# excdata_SDP2()
+excdata_SDP3()
 
 # excdata_plot_family('QDA')
 # excdata_plot_family('QDB1')
