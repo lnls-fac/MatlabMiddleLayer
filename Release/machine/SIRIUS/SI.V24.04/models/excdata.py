@@ -700,17 +700,19 @@ def multipole_read_file(fname):
     return magnets, currents, harmonics, multipoles_normal, multipoles_skew
 
 
-def multipole_get_avg(fname, magnets_fam, exclude_harms):
+def multipole_get_avg(fname, magnets_fam, exclude_harms, invert_polarity=False):
     magnets, currents, harmonics, multipoles_normal, multipoles_skew = multipole_read_file(fname)
     indices = [magnets.index(mag) for mag in magnets_fam]
     selection = \
         list(set(np.arange(len(harmonics))) - set([harmonics.index(h) for h in exclude_harms]))
     # print(selection)
 
+    factor = -1.0 if invert_polarity else 1.0
+
     nmpoles = multipoles_normal[:, selection]
     smpoles = multipoles_skew[:, selection]
-    nmpoles = nmpoles[indices, :]
-    smpoles = smpoles[indices, :]
+    nmpoles = factor * nmpoles[indices, :]
+    smpoles = factor * smpoles[indices, :]
     currents = currents[indices]
     for i in range(len(currents)):
         nmpoles[i, :] *= currents[i]
@@ -725,7 +727,7 @@ def multipole_get_avg(fname, magnets_fam, exclude_harms):
     return current, harmonics, nmpoles_avg, smpoles_avg, nmpoles_std, smpoles_std
 
 
-def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=False, extrapolation_current=None, rescaling=0.2908):
+def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=False, extrapolation_current=None, rescaling=0.2908, invert_polarity=False):
 
     fams = get_sorting(sextupoles)
     magnets_fam = fams[fam]
@@ -737,7 +739,7 @@ def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=F
     excdata_std = list()
     for fname in fnames:
         current, harmonics, nmpoles_avg, smpoles_avg, nmpoles_std, smpoles_std = \
-            multipole_get_avg(fname, magnets_fam, exclude_harms)
+            multipole_get_avg(fname, magnets_fam, exclude_harms, invert_polarity)
         datum = np.array([0.0, ] * (1 + len(nmpoles_avg) + len(smpoles_avg)))
         datum[0] = current
         datum[1::2] = nmpoles_avg
@@ -791,7 +793,7 @@ def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=F
             print('{} '.format(h), end='')
     print()
     print('# main_harmonic     {}'.format(main_harmonic))
-    print('# rescaling factor  {:.6f}'.format(rescaling))
+    print('# rescaling_factor  {:.6f}'.format(rescaling))
     print('# units             Ampere  ', end='')
     for h in harmonics:
         if h not in exclude_harms:
@@ -830,6 +832,32 @@ def excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=F
     print()
     if extrapolation_current is not None:
         print('# 5. last data point was extrapolated from a quadratic fitting using last 3 points.')
+    if sextupoles:
+        print('# 6. rescaling factor based on new measurements compared to previous ones')
+        print('#    === S15 ===')
+        print('#    Family          Current[A] GL2020[T/m] GL2019[T/m] Diff[%]')
+        print('#    SI-Fam:PS-SFA0   034.98     -79.16832   -78.79904  +0.469')
+        print('#    SI-Fam:PS-SFB0   049.05    -111.06953  -110.60355  +0.421')
+        print('#    SI-Fam:PS-SFP0   049.05    -111.06953  -110.60355  +0.421')
+        print('#    SI-Fam:PS-SFA2   100.28    -226.93267  -226.12582  +0.357')
+        print('#    SI-Fam:PS-SFA1   128.48    -288.11642  -287.21829  +0.313')
+        print('#    SI-Fam:PS-SFB2   132.81    -297.45731  -296.61973  +0.282')
+        print('#    SI-Fam:PS-SFP2   133.33    -298.58556  -297.76223  +0.277')
+        print('#    SI-Fam:PS-SFB1   155.22    -344.48435  -351.10163  -1.885')
+        print('#    SI-Fam:PS-SFP1   156.53    -346.61199  -354.72640  -2.288')
+        print('#    SI-Fam:PS-SDB0   043.18     +97.72405   +97.30107  +0.435')
+        print('#    SI-Fam:PS-SDP0   043.18     +97.72405   +97.30107  +0.435')
+        print('#    SI-Fam:PS-SDA0   053.72    +121.71106  +121.21016  +0.413')
+        print('#    SI-Fam:PS-SDA2   059.29    +134.38117  +133.83979  +0.404')
+        print('#    SI-Fam:PS-SDB2   081.57    +184.93776  +184.24588  +0.376')
+        print('#    SI-Fam:PS-SDP2   081.55    +184.89068  +184.19894  +0.376')
+        print('#    SI-Fam:PS-SDA3   093.40    +211.57649  +210.80689  +0.365')
+        print('#    SI-Fam:PS-SDB1   094.58    +214.22775  +213.45115  +0.364')
+        print('#    SI-Fam:PS-SDP1   095.00    +215.17967  +214.40061  +0.363')
+        print('#    SI-Fam:PS-SDA1   109.04    +246.21948  +245.37664  +0.343')
+        print('#    SI-Fam:PS-SDB3   116.56    +262.52284  +261.65091  +0.333')
+        print('#    SI-Fam:PS-SDP3   116.79    +263.03286  +262.15994  +0.333')
+
     print()
     print('# POLARITY TABLE')
     print('# ==============')
@@ -1560,7 +1588,8 @@ def excdata_SDA0():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True, extrapolation_current=180, rescaling=0.413)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic,
+            sextupoles=True, extrapolation_current=180, rescaling=0.413, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1584,8 +1613,8 @@ def excdata_SDA1():
     main_harmonic = '2 normal'
 
     harmonics, excdata_avg, excdata_std = \
-        excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.343)
+        excdata_print(fam, fnames, exclude_harms, label, main_harmonic,
+            sextupoles=True, extrapolation_current=180, rescaling=0.343, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1610,7 +1639,7 @@ def excdata_SDA2():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.404)
+                      extrapolation_current=180, rescaling=0.404, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1635,7 +1664,7 @@ def excdata_SDA3():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.365)
+                      extrapolation_current=180, rescaling=0.365, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1660,7 +1689,7 @@ def excdata_SDB0():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.435)
+                      extrapolation_current=180, rescaling=0.435, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1685,7 +1714,7 @@ def excdata_SDB1():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.365)
+                      extrapolation_current=180, rescaling=0.365, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1710,7 +1739,7 @@ def excdata_SDB2():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.376)
+                      extrapolation_current=180, rescaling=0.376, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1735,7 +1764,7 @@ def excdata_SDB3():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.333)
+                      extrapolation_current=180, rescaling=0.333, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1760,7 +1789,7 @@ def excdata_SDP0():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.435)
+                      extrapolation_current=180, rescaling=0.435, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1785,7 +1814,7 @@ def excdata_SDP1():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.363)
+                      extrapolation_current=180, rescaling=0.363, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1810,7 +1839,7 @@ def excdata_SDP2():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.376)
+                      extrapolation_current=180, rescaling=0.376, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
@@ -1835,7 +1864,7 @@ def excdata_SDP3():
 
     harmonics, excdata_avg, excdata_std = \
         excdata_print(fam, fnames, exclude_harms, label, main_harmonic, sextupoles=True,
-                      extrapolation_current=180, rescaling=0.333)
+                      extrapolation_current=180, rescaling=0.333, invert_polarity=True)
 
     excdata_avg = np.array(excdata_avg)
 
