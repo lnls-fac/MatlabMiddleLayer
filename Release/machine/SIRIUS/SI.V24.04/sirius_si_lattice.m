@@ -82,6 +82,9 @@ LPMD  = drift('lpmd', 0.4929, 'DriftPass');
 LIA   = drift('lia',  1.5179, 'DriftPass');
 LIB   = drift('lib',  1.0879, 'DriftPass');
 LIP   = drift('lip',  1.0879, 'DriftPass');
+LID1  = drift('lid1', 1.83425, 'DriftPass');
+LID2  = drift('lid2', 0.29965, 'DriftPass');
+LID3  = drift('lid3', 1.86790, 'DriftPass');
 
 L011  = drift('l011', 0.011, 'DriftPass');
 L049  = drift('l049', 0.049, 'DriftPass');
@@ -185,6 +188,10 @@ FC2 = sextupole('FC2', 0.082, 0.0, sext_pass_method); % 10 magnets: normal quad 
 RFC = rfcavity('SRFCav', 0, 3.0e6, 500e6, harmonic_number, 'CavityPass');
 HCav = marker('H3Cav', 'IdentityPass');
 
+% -- insertion devices --
+APU22H = drift('APU22', 1.300/2);
+APU58H = drift('APU58', 1.300/2);
+
 % -- lattice markers --
 START  = marker('start',    'IdentityPass'); % start of the model
 END    = marker('end',      'IdentityPass'); % end of the model
@@ -270,18 +277,25 @@ C4P_TuneShkrV = [GIR,L216,GIR,SDP2,L170,Q2,L230,SFP1,L125,BPM,L135,Q1,L170,SDP1,
 
 %% GIRDERS
 
+% insertion devices
+
+IDA_APU22 = [L500, LID3, L500, MIDA, APU22H, MIA, APU22H, MIDA, L500, LID3, L500];  % high beta ID straight section
+IDP_APU22 = [L500, LIP, L500, L350, MIDP, APU22H, MIP, APU22H, MIDP, L350, L500, LIP, L500];  % low beta ID straight section
+IDB_APU22 = [L500, LIB, L500, L350, MIDB, APU22H, MIB, APU22H, MIDB, L350, L500, LIB, L500];  % low beta ID straight section
+IDP_APU58 = [L500, LIP, L500, L350, MIDP, APU58H, MIP, APU58H, MIDP, L350, L500, LIP, L500];  % low beta ID straight section
+
 % straight sections
 SS_S01 = IDA_INJ;
 SS_S02 = IDB02;
 SS_S03 = IDP_CAV;
 SS_S04 = IDB;
 SS_S05 = IDA_ScrapH;
-SS_S06 = IDB;
-SS_S07 = IDP;
-SS_S08 = IDB;
-SS_S09 = IDA;
+SS_S06 = IDB_APU22;
+SS_S07 = IDP_APU22;
+SS_S08 = IDB_APU22;
+SS_S09 = IDA_APU22;
 SS_S10 = IDB;
-SS_S11 = IDP;
+SS_S11 = IDP_APU58;
 SS_S12 = IDB;
 SS_S13 = IDA_BbBKckrH;
 SS_S14 = IDB;
