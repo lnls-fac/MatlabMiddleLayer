@@ -152,9 +152,9 @@ for i=1:nr_machines
     end
      
     [x_max_all,x_rms_all] = get_max_rms(codx,1e6);
-    [x_max_bpm,x_rms_bpm] = get_max_rms(codx(orbit.bpm_idx),1e6);
+    [x_max_bpm,x_rms_bpm] = get_max_rms(codx(orbit.bpm_idx)-gcodx,1e6);
     [y_max_all,y_rms_all] = get_max_rms(cody,1e6);
-    [y_max_bpm,y_rms_bpm] = get_max_rms(cody(orbit.bpm_idx),1e6);
+    [y_max_bpm,y_rms_bpm] = get_max_rms(cody(orbit.bpm_idx)-gcody,1e6);
     [kickx_max,kickx_rms] = get_max_rms(hkck,1e6);
     [kicky_max,kicky_rms] = get_max_rms(vkck,1e6);
     fprintf('%03i| %5.1f   %5.1f | %5.1f   %5.1f | %5.1f   %5.1f | %5.1f   %5.1f |  %3.0f     %3.0f  |  %3.0f     %3.0f  | ', i, ...
