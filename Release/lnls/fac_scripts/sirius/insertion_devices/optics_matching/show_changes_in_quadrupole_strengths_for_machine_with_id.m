@@ -19,8 +19,9 @@ for i=1:20
     idx = findcells(the_line2,'XGrid');
     if ~isempty(idx), id_name = ['<',the_line2{idx(1)}.FamName, '>'];
     else              id_name = 'No ID'; end
-    if mod(i,2), fprintf('[ %02d-MIA ] --> %s\n', i, id_name);
-    else         fprintf('[ %02d-MIB ] --> %s\n', i, id_name); end
+    if mod(i,4) == 1, fprintf('[ %02d-MIA ] --> %s\n', i, id_name);
+    elseif mod(i,4) == 3, fprintf('[ %02d-MIP ] --> %s\n', i, id_name);
+    else fprintf('[ %02d-MIB ] --> %s\n', i, id_name); end
     
     idx1 = findcells(the_line1, 'PolynomB');
     idx2 = findcells(the_line2, 'PolynomB');

@@ -33,9 +33,12 @@ save('the_ring0.mat', 'the_ring0');
 
 
 %% Inserts IDs of Phase1
+% strength = 2.8/3.6;
+% length_scale = 2.8/3.6;
 strength = 1;
-ring_nosym = ids_insert_set(the_ring0, ids_phase2, strength);
-save('the_ring_nosym_shift0.mat', 'ring_nosym');
+length_scale = 1;
+ring_nosym = ids_insert_set(the_ring0, ids_phase2, strength, length_scale);
+save('the_ring_nosym_apu_commissioning.mat', 'ring_nosym');
 
 
 
@@ -53,7 +56,7 @@ else
 end
 
 ring_sym = ids_symmetrize(ring_nosym, symm);
-save('the_ring_sym_shift0.mat', 'ring_sym');
+save('the_ring_sym_apu_commissioning.mat', 'ring_sym');
 
 
 
@@ -71,7 +74,7 @@ ring_symtune = lnls_correct_chrom(ring_symtune, [2.5,2.5]);
 
 
 %% saves lattice model with ids
-save('the_ring_withids_shift0.mat', 'ring_symtune');
+save('the_ring_withids_apu_commissioning.mat', 'ring_symtune');
 disp('Symmetrized ring saved in file: the_ring_withids.mat')
 end
 
