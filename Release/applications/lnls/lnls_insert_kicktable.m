@@ -24,9 +24,9 @@ if ~exist('length_scale','var'), length_scale = 1; end
 id_length = id_length * length_scale;
 
 % calculates indices of elements in the location of insertion
-idx_dws = idx_pos+1; 
-while any(strcmpi(the_ring0{idx_dws}.PassMethod, 'DriftPass')), 
-    idx_dws = idx_dws + 1; 
+idx_dws = idx_pos+1;
+while any(strcmpi(the_ring0{idx_dws}.PassMethod, 'DriftPass'))
+    idx_dws = idx_dws + 1;
 end
 idx_dws = idx_dws - 1;
 
@@ -62,11 +62,3 @@ half_id{1}.Energy = the_ring0{idx_pos}.Energy;
 
 % finally builds lattice with id
 the_ring = [the_ring0(1:(idx_ups-1)) ups_drift half_id the_ring0{idx_pos} half_id dws_drift the_ring0((idx_dws+1):end)];
-
-
-
-
-
-
-
-

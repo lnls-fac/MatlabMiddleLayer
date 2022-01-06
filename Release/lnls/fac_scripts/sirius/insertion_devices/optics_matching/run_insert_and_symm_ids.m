@@ -1,4 +1,4 @@
-function run_insert_and_symm_ids(ids_phase2)
+function run_insert_and_symm_ids(ids)
 
 % Loads Phase1 ID definitions
 ids_names = {};
@@ -10,9 +10,9 @@ ids_names{end+1} = 'caterete';  % SS-10 PHASE1
 ids_names{end+1} = 'ipe_hp';    % SS-11 PHASE1
 ids_names{end+1} = 'sabia_hp';  % SS-12 PHASE1
 ids_names{end+1} = 'manaca';    % SS-14 PHASE1
-ids_names{end+1} = 'caterete2'; % SS-02 
+ids_names{end+1} = 'caterete2'; % SS-02
 ids_names{end+1} = 'ema2';      % SS-04        (with 3rd H cavity?)
-ids_names{end+1} = 'inga2';     % SS-05          
+ids_names{end+1} = 'inga2';     % SS-05
 ids_names{end+1} = 'ipe3_hp';   % SS-07
 ids_names{end+1} = 'sabia3_hp'; % SS-13
 ids_names{end+1} = 'ipe4_hp';   % SS-15
@@ -21,7 +21,7 @@ ids_names{end+1} = 'ipe2_hp';   % SS-17
 ids_names{end+1} = 'sabia2_hp'; % SS-18
 ids_names{end+1} = 'sabia4_hp'; % SS-19
 ids_names{end+1} = 'manaca2';   % SS-20
-             
+
 % ids_phase2 = ids_select_80mm(ids_names);
 
 
@@ -49,10 +49,10 @@ symm.tol         = 1e-6;
 symm.look_tune   = false;
 symm.the_ring0   = the_ring0;
 
-if isempty(ids_phase2)
+if isempty(ids)
     symm.id_sections = [];
 else
-    symm.id_sections = getcellstruct(ids_phase2,'straight_number',1:length(ids_phase2));
+    symm.id_sections = getcellstruct(ids,'straight_number',1:length(ids));
 end
 
 ring_sym = ids_symmetrize(ring_nosym, symm);
@@ -77,4 +77,3 @@ ring_symtune = lnls_correct_chrom(ring_symtune, [2.5,2.5]);
 save('the_ring_withids_apu_commissioning.mat', 'ring_symtune');
 disp('Symmetrized ring saved in file: the_ring_withids.mat')
 end
-

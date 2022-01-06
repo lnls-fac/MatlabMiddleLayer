@@ -24,7 +24,7 @@ for i =1:length(id_names)
                 ids{i}.label = 'carnauba_shift_11mm';
             end
             ids{i}.nr_segs = 40;
-            ids{i}.straight_label  = 'mib'; 
+            ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 6;
         case 'caterete'
             if shift(i) == 0
@@ -44,7 +44,7 @@ for i =1:length(id_names)
                 ids{i}.label = 'caterete_shift_11mm';
             end
             ids{i}.nr_segs = 40;
-            ids{i}.straight_label  = 'mip'; 
+            ids{i}.straight_label  = 'mip';
             ids{i}.straight_number = 7;
         case 'ema'
             if shift(i) == 0
@@ -64,7 +64,7 @@ for i =1:length(id_names)
                 ids{i}.label = 'ema_shift_11mm';
             end
             ids{i}.nr_segs = 40;
-            ids{i}.straight_label  = 'mib'; 
+            ids{i}.straight_label  = 'mib';
             ids{i}.straight_number = 8;
         case 'manaca'
             if shift(i) == 0
@@ -84,7 +84,7 @@ for i =1:length(id_names)
                 ids{i}.label = 'manaca_shift_11mm';
             end
             ids{i}.nr_segs = 40;
-            ids{i}.straight_label  = 'mia'; 
+            ids{i}.straight_label  = 'mia';
             ids{i}.straight_number = 9;
         case 'ipe'
             if shift(i) == 0
@@ -104,7 +104,7 @@ for i =1:length(id_names)
                 ids{i}.label = 'ipe_shift_29mm';
             end
             ids{i}.nr_segs = 40;
-            ids{i}.straight_label  = 'mip'; 
-            ids{i}.straight_number = 11;         
+            ids{i}.straight_label  = 'mip';
+            ids{i}.straight_number = 11;
     end
 end
