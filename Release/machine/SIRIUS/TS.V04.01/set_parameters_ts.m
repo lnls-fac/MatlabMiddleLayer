@@ -1,40 +1,39 @@
 % carrega forcas dos imas de acordo com modo de operacao
 %%% Initial Conditions
+IniCond.Dispersion = [0.21135; 0.06939; 0; 0];
+IniCond.beta = [7.906, 11.841];
+IniCond.alpha= [-2.4231, 1.8796];
 
 if strcmpi(mode_version,'M1')
-        
-    %%% Initial Conditions
-    IniCond.Dispersion = [0.231; 0.069; 0; 0];
-    IniCond.beta = [9.321, 12.881];
-    IniCond.alpha= [-2.647, 2.000];
+    % Unmatched optics at dipolar kicker (betax_max = 40m)
+    qf1ah_strength = 1.814573972458;
+    qf1bh_strength = 2.097583535652;
+    qd2h_strength  = -2.872960628905;
+    qf2h_strength  = 2.804180421441;
+    qf3h_strength  = 2.55050231931;
+    qd4ah_strength = -2.358451356072;
+    qf4h_strength  = 3.388995991451;
+    qd4bh_strength = -2.209843757138;
 
-    %%% Quadrupoles
-    qf1ah_strength = 1.70521151606;
-    qf1bh_strength = 1.734817173998;
-    qd2h_strength  = -2.8243902951;
-    qf2h_strength  = 2.76086143922;
-    qf3h_strength  = 2.632182549934;
-    qd4ah_strength = -3.048732667316;
-    qf4h_strength  = 3.613066375692;
-    qd4bh_strength = -1.46213606815;
-    
-elseif strcmp(mode_version,'M2')
-    
-    %%% Initial Conditions
-    IniCond.Dispersion = [0.231; 0.069; 0; 0];
-    IniCond.beta = [9.321, 12.881];
-    IniCond.alpha= [-2.647, 2.000];
-    
-    %%% Quadrupoles
-    qf1ah_strength = 1.670801801437;
-    qf1bh_strength = 2.098494339697;
-    qd2h_strength  = -2.906779151209;
-    qf2h_strength  = 2.807031512313;
-    qf3h_strength  = 2.533815202102;
-    qd4ah_strength = -2.962460334623;
-    qf4h_strength  = 3.537403658428;
-    qd4bh_strength = -1.421177262593;
-    
+    ejeseptg_kxl_strength = 0;
+    ejeseptg_kyl_strength = 0;
+    ejeseptg_ksxl_strength = 0;
+    ejeseptg_ksyl_strength = 0;
+
+    ejeseptf_kxl_strength = 0;
+    ejeseptf_kyl_strength = 0;
+    ejeseptf_ksxl_strength = 0;
+    ejeseptf_ksyl_strength = 0;
+
+    injseptg_kxl_strength = 0;
+    injseptg_kyl_strength = 0;
+    injseptg_ksxl_strength = 0;
+    injseptg_ksyl_strength = 0;
+
+    injseptf_kxl_strength = 0;
+    injseptf_kyl_strength = 0;
+    injseptf_ksxl_strength = 0;
+    injseptf_ksyl_strength = 0;
 else
     error('caso nao implementado');
 end
