@@ -15,7 +15,7 @@ sum.circumference = findspos(the_ring, length(the_ring)+1);
 sum.revTime = sum.circumference / const.c;
 sum.revFreq = const.c / sum.circumference;
 sum.gamma = sum.e0 / (const.E0/1000);
-sum.beta = sqrt(1 - 1/sum.gamma);
+sum.beta = sqrt(1 - 1/sum.gamma^2);
 
 [TD, sum.tunes, ~] = twissring(the_ring, 0, 1:length(the_ring)+1,'chrom',1e-8);
 
@@ -71,4 +71,3 @@ sum.radiationDamping(2) = 1/(2113.1*sum.e0.^3*sum.integrals(2)*sum.damping(2)/ci
 sum.radiationDamping(3) = 1/(2113.1*sum.e0.^3*sum.integrals(2)*sum.damping(3)/circ);
 
 a = sum.naturalEmittance;
-

@@ -2,7 +2,7 @@ function change_the_ring(r)
 
 global THERING;
 
-% implementa mudanças
+% implementa mudanï¿½as
 change_drift_lengths(r.parms.drift_length.scale_range, r.parms.drift_length.scale_offset, r);
 change_quad_strengths(r.parms.quad_strength.scale_range, r.parms.quad_strength.offset_range, r);
 change_quad_lengths(r.parms.quad_length.scale_range, r.parms.quad_length.offset_range, r);
@@ -10,7 +10,7 @@ change_quad_lengths(r.parms.quad_length.scale_range, r.parms.quad_length.offset_
 %change_bend_lengths(r.parms.bend_length.scale_range, r.parms.bend_length.offset_range, r);
 %change_bend_Ks(r.parms.bend_k.scale_range, r.parms.bend_k.offset_range, r)
 
-% reajusta perímetro do anel se necessário
+% reajusta perï¿½metro do anel se necessï¿½rio
 perimeter = findspos(THERING, length(THERING)+1);
 lengths_orig = getcellstruct(THERING, 'Length',1:length(THERING));
 if (perimeter < r.constraints.perimeter.min)
@@ -21,11 +21,11 @@ end
 perimeter = findspos(THERING, length(THERING)+1);
 
 
-% ajusta freq cav RF para novo perímetro do anel
+% ajusta freq cav RF para novo perï¿½metro do anel
 const = lnls_constants;
 e0 = getenergy('Model');
 gamma = e0 / (const.E0/1000);
-beta = sqrt(1 - 1/gamma);
+beta = sqrt(1 - 1/gamma/gamma);
 revFreq = const.c*beta / perimeter;
 rf_idx = getfamilydata('RF','AT','ATIndex');
 HarmNumber = THERING{rf_idx(1)}.HarmNumber;
@@ -54,4 +54,3 @@ for i=1:5
     if (best < 0.01), break; end;
 end
 THERING = best_THERING;
-

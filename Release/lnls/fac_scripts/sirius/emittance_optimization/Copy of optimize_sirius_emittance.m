@@ -28,7 +28,7 @@ opt.max_bendg    = 10.0;
 opt.max_quadg    = 45.0;
 opt.coupling     = 0.1 / 100;
 
-opt = initialization(opt); 
+opt = initialization(opt);
 opt = identity_elements(opt);
 opt = calc_optics(opt);
 opt = close_ring(opt);
@@ -63,8 +63,8 @@ for i=1:length(uid)
     opt.identical_elements{i} = find(sel);
 end
 
-   
-    
+
+
  function r = calc_identity(the_ring)
 
 r = 1:length(the_ring);
@@ -91,7 +91,7 @@ if isfield(e1, 'PolynomB')
     if isfield(e2, 'PolynomB')
         if any(e1.PolynomB ~= e2.PolynomB), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -99,7 +99,7 @@ if isfield(e1, 'PolynomA')
     if isfield(e2, 'PolynomA')
         if any(e1.PolynomA ~= e2.PolynomA), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -107,7 +107,7 @@ if isfield(e1, 'MaxOrder')
     if isfield(e2, 'MaxOrder')
         if any(e1.MaxOrder ~= e2.MaxOrder), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -115,7 +115,7 @@ if isfield(e1, 'NumIntSteps')
     if isfield(e2, 'NumIntSteps')
         if any(e1.NumIntSteps ~= e2.NumIntSteps), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -123,7 +123,7 @@ if isfield(e1, 'R1')
     if isfield(e2, 'R1')
         if any(e1.R1 ~= e2.R1), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -131,7 +131,7 @@ if isfield(e1, 'R2')
     if isfield(e2, 'R2')
         if any(e1.R2 ~= e2.R2), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -140,7 +140,7 @@ if isfield(e1, 'T1')
     if isfield(e2, 'T1')
         if any(e1.T1 ~= e2.T1), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -148,7 +148,7 @@ if isfield(e1, 'T2')
     if isfield(e2, 'T2')
         if any(e1.T2 ~= e2.T2), return; end;
     else
-       return; 
+       return;
     end
 end
 
@@ -202,8 +202,8 @@ if isfield(e1, 'YGrid')
 end
 
 
-r = true;   
-    
+r = true;
+
 function opt = simplify_lattice(opt0)
 
 opt = opt0;
@@ -217,7 +217,7 @@ i = 1; while (i <= length(opt.the_ring))
     i = j + 1;
 end
 opt.the_ring = the_ring;
-    
+
 function opt = vary_parameter(opt0)
 
 opt  = opt0;
@@ -226,9 +226,9 @@ p_fld = opt.stepsize_fld;
 p_grd = opt.stepsize_grd;
 
 while true
-    
+
     the_ring = opt.the_ring;
-    
+
     while true
         type = randi(3,1,1);
         switch type
@@ -271,8 +271,8 @@ while true
                 end
         end
     end
-    
-    % propaga mudanças para elementos idênticos
+
+    % propaga mudanï¿½as para elementos idï¿½nticos
     if isfield(opt, 'identical_elements')
         for i=1:length(opt.identical_elements)
             elems = opt.identical_elements{i};
@@ -284,7 +284,7 @@ while true
             end
         end
     end
-    
+
     opt = close_ring(opt);
     opt = calc_optics(opt);
     if isfield(opt.optics, 'betax') && (opt.naturalEmittance >= 0) && all(opt.radiationDamping >= 0)
@@ -293,7 +293,7 @@ while true
     else
         opt.the_ring = the_ring;
     end
-    
+
 end
 
 function opt = calc_chi2(opt0)
@@ -444,7 +444,7 @@ r.circumference = opt.nr_cells * findspos(the_ring, length(the_ring)+1);
 r.revTime = r.circumference / const.c;
 r.revFreq = const.c / r.circumference;
 r.gamma = opt.gamma;
-r.beta = sqrt(1 - 1/r.gamma);
+r.beta = sqrt(1 - 1/r.gamma^2);
 [TD, r.tunes, r.chromaticity] = twissring(the_ring, 0, 1:length(the_ring)+1, 'chrom', 1e-8);
 r.twiss.beta        = cat(1,TD.beta);
 r.twiss.mu          = cat(1,TD.mu);

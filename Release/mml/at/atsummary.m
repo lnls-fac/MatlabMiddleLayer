@@ -23,7 +23,7 @@ r.circumference = findspos(THERING, length(THERING)+1);
 r.revTime = r.circumference / 2.99792458e8;
 r.revFreq = 2.99792458e8 / r.circumference;
 r.gamma = r.e0 / 0.51099906e-3;
-r.beta = sqrt(1 - 1/r.gamma);
+r.beta = sqrt(1 - 1/r.gamma^2);
 [TD, r.tunes, r.chromaticity] = twissring(THERING, 0, 1:length(THERING)+1, 'chrom', 1e-8);
 r.compactionFactor = mcf(THERING);
 
@@ -85,7 +85,7 @@ if ~isempty(cavind)
     %freq = THERING{cavind}.Frequency; % Original X.R.R. 2011-04-26
     %v_cav = THERING{cavind}.Voltage;  % Original X.R.R. 2011-04-26
     freq  = mean(getcellstruct(THERING, 'Frequency', cavind));
-    v_cav = sum(getcellstruct(THERING, 'Voltage', cavind)); 
+    v_cav = sum(getcellstruct(THERING, 'Voltage', cavind));
 else
     % Default
     freq = 352.202e6;

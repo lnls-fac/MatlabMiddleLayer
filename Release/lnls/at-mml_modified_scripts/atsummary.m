@@ -42,7 +42,7 @@ r.circumference = findspos(the_ring, length(the_ring)+1);
 r.revTime = r.circumference / const.c;
 r.revFreq = const.c / r.circumference;
 r.gamma = r.e0 / (const.E0/1000);
-r.beta = sqrt(1 - 1/r.gamma);
+r.beta = sqrt(1 - 1/r.gamma^2);
 [TD, r.tunes, r.chromaticity] = twissring(the_ring, 0, 1:length(the_ring)+1, 'chrom', 1e-8);
 r.twiss.beta        = cat(1,TD.beta);
 r.twiss.mu          = cat(1,TD.mu);
@@ -93,7 +93,7 @@ for i = 1:length(the_ring)
         r.integrals(6) = r.integrals(6) + the_ring{i}.PolynomB(2)^2*dispersion^2*the_ring{i}.Length;
     end
     if isfield(the_ring{i}, 'Period')
-        
+
     end
 end
 
@@ -121,7 +121,7 @@ if ~isempty(cavind)
     %freq = the_ring{cavind}.Frequency; % Original X.R.R. 2011-04-26
     %v_cav = the_ring{cavind}.Voltage;  % Original X.R.R. 2011-04-26
     freq  = mean(getcellstruct(the_ring, 'Frequency', cavind));
-    v_cav = sum(getcellstruct(the_ring, 'Voltage', cavind)); 
+    v_cav = sum(getcellstruct(the_ring, 'Voltage', cavind));
 else
     % Default
     v_cav = 2.5e6;
@@ -143,7 +143,7 @@ r.the_ring = the_ring;
 
 % Lifetime and pressure - Afonso 2012-07-02 - Ximenes 2015-06-13
 try
-    AD = getad; 
+    AD = getad;
     if ~isempty(AD)
         pressure_file = fullfile(getmmlroot,'machine',AD.Machine,AD.SubMachine,AD.OpsData.PrsProfFile);
         if(exist(pressure_file,'file'))
